@@ -64,6 +64,13 @@
 
 #define NODE_VERSION "v" NODE_VERSION_STRING
 
+#define D_MAJOR_VERSION 1
+#define D_MINOR_VERSION 0
+#define D_PATCH_VERSION 0
+#define D_VERSION_STRING  NODE_STRINGIFY(D_MAJOR_VERSION) "." \
+                            NODE_STRINGIFY(D_MINOR_VERSION) "." \
+                            NODE_STRINGIFY(D_PATCH_VERSION)
+#define D_VERSION "v" D_VERSION_STRING
 
 #define NODE_VERSION_AT_LEAST(major, minor, patch) \
   (( (major) < NODE_MAJOR_VERSION) \

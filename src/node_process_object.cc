@@ -91,6 +91,10 @@ MaybeLocal<Object> CreateProcessObject(Environment* env) {
   Local<Object> versions = Object::New(env->isolate());
   READONLY_PROPERTY(process, "versions", versions);
 
+  READONLY_PROPERTY(versions,
+	  "d",
+	  OneByteString(env->isolate(), D_VERSION + 1));
+
 #define V(key)                                                                 \
   if (!per_process::metadata.versions.key.empty()) {                           \
     READONLY_STRING_PROPERTY(                                                  \
