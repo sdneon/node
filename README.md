@@ -9,6 +9,101 @@
   </a>
 </p>
 
+# About this mod
+This is a *fun* mod of Node.JS that initially embedded a modified version of dcodeIO’s defunct  [pre-processor.js](https://github.com/dcodeIO/Preprocessor.js/), to allow use of simple C++ like preprocessor directives in CJS modules. Subsequently, it also embedded [CoffeeScript](https://coffeescript.org/) and [TypeScript](https://www.typescriptlang.org/).
+
+Thanks to the inspiration from dcodeIO et al =D
+
+# Current build(s)
+Node.JS+ 14.16.0 / 15.16.0 builds embed CS & TS from Mar 2021.
+* Thus, TS is probably ~v2.3.
+
+## Usage
+The mod thus allows Node.JS+ to run .ds, .cs and .ts scripts directly for D Script, CoffeeScript and TypeScript directly. D being just a simple moniker for preprocessor sprinkled scripts.
+
+### Main Directives
+* Preprocessor directives are only available for D at the moment, but not for CS & TS.
+* `#ds`: D scripts can be identified by file extension of .ds, or CJS files with initial 3 characters of `#ds`.
+  *  `#ds colors`: declares a D script file and imports [colors](https://github.com/marak/colors.js/) with basic color mapping:
+  ```
+  require('colors').setTheme({
+      silly: 'rainbow',
+      input: 'grey',
+      verbose: 'cyan',
+      prompt: 'grey',
+      info: 'green',
+      data: 'grey',
+      help: 'cyan',
+      warn: 'yellow',
+      debug: 'blue',
+      error: 'red'
+  });
+  ```
+* `#cs`, `#ts`, `#end`: CS & TS code fragments/blocks can be embedded in D using `#cs` & `#ts` respectively, and terminated by `#end`.
+  ```
+  #ds colors This is a D example 
+  #cs
+  # this is a sample CoffeeScript code block in D
+  square = (x) -> x * x
+  #end
+  console.log('2 squared='.bold.info, square(2));
+  ```
+* `#define`: declares preprocessor variables for use with `#ifdef`s et al.
+  * Does not support elaborate C++ like marco function definitions.
+  * Can declare variables via `DS_DEFINES` environment variable.
+    * Windows OS example: set DS_DEFINES=VERBOSE=false;DETAILS=true
+* `#ifdef`, `#ifndef`, `#if`, `#elif`, `#else`, `#endif`: conditional code blocks
+* `#put`: [pre-processor.js](https://github.com/dcodeIO/Preprocessor.js/)' version of inline expressions.
+* `#include`, `#include_once`: inline one or more files, using simple path or [glob](https://github.com/isaacs/node-glob/) pattern.
+  * Root path defaults to '.' but can be specified via 'DS_ROOT' environment variable.
+
+### Other wacky experimental Directives
+* `#import`: asychonously import a ESM module.
+  * Example 1: 
+  ```
+  #import exported_name '<ESM module path>'
+  <callback content>
+  #end
+  ```
+  expands to:
+  ```
+  (async () => {
+      const exported_name = await import('<ESM module path>');
+      <callback content>
+  })();
+  ```
+  * Example 2:
+  ```
+  #import {exported_names} '<ESM module path>'
+  <callback content>
+  #end
+  ```
+  expands to:
+  ```
+  (async () => {
+      const {exported_names} = await import('<ESM module path>');
+      <callback content>
+  })();
+  ```
+* `#inflate`: inline base64 encoded and zipped code block.
+* others in the form `#name` where *name* is not a reserved directive keyword:  exapnds to `module.exports.name`.
+
+### Exports
+The transpilers are made available in `global.transpiler`. I.e. the transpiler functions are: `transpiler.dscript.transpile`, `transpiler.coffeescript.compile`, and `transpiler.typescript.transpile`.
+Example:
+```
+const coffeeCode = '...'; //<- your code goes here
+const outputCode = global.transpiler.coffeescript.compile(
+    coffeeCode,
+    { bare: true }); //<- this option is to exclude function wrapper
+```
+Example:
+```
+const typescriptCode = '...'; //<- your code goes here
+const outputCode = global.transpiler.typescript.transpile(typescriptCode);
+```
+
+# Original README
 Node.js is an open-source, cross-platform, JavaScript runtime environment. It
 executes JavaScript code outside of a browser. For more information on using
 Node.js, see the [Node.js Website][].
