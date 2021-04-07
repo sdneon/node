@@ -15,8 +15,9 @@ This is a *fun* mod of Node.JS that initially embedded a modified version of dco
 Thanks to the inspiration from dcodeIO et al =D
 
 # Current build(s)
-Node.JS+ 14.16.0 / 15.16.0 builds embed CS & TS from Mar 2021.
-* Thus, TS is probably ~v2.3.
+Node.JS+ 14.16.0 / 15.16.0 builds embed CS & TS from Mar 2021. Thus:
+* CS is probably ~v2.5.1.
+* TS is probably ~v4.2.3.
 
 ## Usage
 The mod thus allows Node.JS+ to run .ds, .cs and .ts scripts directly for D Script, CoffeeScript and TypeScript directly. D being just a simple moniker for preprocessor sprinkled scripts.
