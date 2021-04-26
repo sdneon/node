@@ -9,6 +9,140 @@
   </a>
 </p>
 
+# About this mod
+This is a *fun* mod of Node.JS that initially embedded a modified version of dcodeIO’s defunct  [pre-processor.js](https://github.com/dcodeIO/Preprocessor.js/), to allow use of simple C++ like preprocessor directives in CJS modules. Subsequently, it also embedded [CoffeeScript](https://coffeescript.org/) and [TypeScript](https://www.typescriptlang.org/).
+
+Thanks to the inspiration from dcodeIO et al =D
+
+# Current build(s)
+Node.JS+ 14.16.0 / 15.16.0 builds embed CS & TS from Mar 2021. Thus:
+* CS is probably ~v2.5.1.
+* TS is probably ~v4.2.3.
+
+## How to Build
+Maintaining modded source code branches for 14.x and 15.x build based on Node.JS releases is troublesome, so going ahead, will leave the 3 modified files in 2 existing branches listed in #2 below.
+
+To build your copy:
+1. Download original Node.JS source archive like node-15.14.0.tar.gz.
+2. Merge/Replace with appropriate main *mod* file: `lib/internal/modules/cjs/loader.js`
+  a. E.g.: [15.13.0+](https://github.com/sdneon/node/tree/15.13.0+) branch's [loader.js](https://github.com/sdneon/node/blob/15.13.0%2B/lib/internal/modules/cjs/loader.js)
+  b. E.g.: [v14.16.0+](https://github.com/sdneon/node/tree/v14.16.0+) branch's [loader.js](https://github.com/sdneon/node/blob/v14.16.0+/lib/internal/modules/cjs/loader.js)
+  c. Probably will zip and release a copy of loader.js along with its Windows OS binary (.exe) if there are changes, for new 15.x releases.
+  d. Master branch will have an *untested* copy of loader.js as well.
+3. Replace optional versioning in 2 files: `src/node_process_object.cc` and `src/node_version.h`.
+4. For Windows OS, build node.sln as usual.
+
+### How to Update CS, TS & Glob
+CS, TS & glob modules are "packed" and embedded in `loader.js` so as to avoid the trouble of adding tons of files to the Node.JS repo.
+
+The workflow in short is as follows:
+1.  [Whenever update available and desired] Install new copies of those modules and dependencies.
+   a. Tidy up some files in these modules to make packing run smoothly.
+   b. E.g.: Comment out *transpile* function coffeescript/lib/coffeescript/index.js, as we only want to use/retain CS' *compile* function. If not, *transpile* needs @babel/core.
+   c. E.g.: Comment out top level 'return's like in graceful-fs.js as some tool hates it.
+2.  [Do once] Install tools: [browserify](https://github.com/browserify/browserify), [uglifyify](https://github.com/hughsk/uglifyify) and [terser](https://github.com/terser/terser). Along with babel and supports-colors.
+3.  [Do once] Prepare pack scripts for browserify to identify what to pack.
+   a. E.g. packTS.js:
+    ````
+    require('typescript')
+    ````
+4.  Pack using browserify.
+   a. E.g. command for TS:
+    ````
+    browserify packTS.js --node -g uglifyify -o typescript.packed.min.js
+    ````
+5. Tidy up, add wrappers and embed into `loader.js`.
+   a. E.g. Within TS packed codes, need to replace `__dirname` in instances of `join(__dirname, ` with `'.'`, since `__dirname` is not available in loader.js or rather the packed environment.
+   a. E.g. Within TS packed codes, need to add guard by changing `={args: process.argv.slice(2),` to `={args:process.argv?process.argv.slice(2):[],`, since `process.argv` is not available when the packed TS is 'loaded' within loader.js.
+
+Potential Problem: 2 huge repos of CS & TS and 1 smaller repo of glob are embedded - these may occasionally break when Node.JS startup JS codes are refactored => occasional tidy up (like those exampels listed above) is needed. Otherwise, Node.JS may fail to start.
+
+## Usage
+The mod thus allows Node.JS+ to run .ds, .cs and .ts scripts directly for D Script, CoffeeScript and TypeScript directly. D being just a simple moniker for preprocessor sprinkled scripts.
+
+### Main Directives
+* Preprocessor directives are only available for D at the moment, but not for CS & TS.
+* `#ds`: D scripts can be identified by file extension of .ds, or CJS files with initial 3 characters of `#ds`.
+  *  `#ds colors`: declares a D script file and imports [colors](https://github.com/marak/colors.js/) with basic color mapping:
+  ```
+  require('colors').setTheme({
+      silly: 'rainbow',
+      input: 'grey',
+      verbose: 'cyan',
+      prompt: 'grey',
+      info: 'green',
+      data: 'grey',
+      help: 'cyan',
+      warn: 'yellow',
+      debug: 'blue',
+      error: 'red'
+  });
+  ```
+* `#cs`, `#ts`, `#end`: CS & TS code fragments/blocks can be embedded in D using `#cs` & `#ts` respectively, and terminated by `#end`.
+  ```
+  #ds colors This is a D example 
+  #cs
+  # this is a sample CoffeeScript code block in D
+  square = (x) -> x * x
+  #end
+  console.log('2 squared='.bold.info, square(2));
+  ```
+* `#define`: declares preprocessor variables for use with `#ifdef`s et al.
+  * Does not support elaborate C++ like marco function definitions.
+  * Can declare variables via `DS_DEFINES` environment variable.
+    * Windows OS example: set DS_DEFINES=VERBOSE=false;DETAILS=true
+* `#ifdef`, `#ifndef`, `#if`, `#elif`, `#else`, `#endif`: conditional code blocks
+* `#put`: [pre-processor.js](https://github.com/dcodeIO/Preprocessor.js/)' version of inline expressions.
+* `#include`, `#include_once`: inline one or more files, using simple path or [glob](https://github.com/isaacs/node-glob/) pattern.
+  * Root path defaults to '.' but can be specified via 'DS_ROOT' environment variable.
+
+### Other wacky experimental Directives
+* `#import`: asychonously import a ESM module.
+  * Example 1: 
+  ```
+  #import exported_name '<ESM module path>'
+  <callback content>
+  #end
+  ```
+  expands to:
+  ```
+  (async () => {
+      const exported_name = await import('<ESM module path>');
+      <callback content>
+  })();
+  ```
+  * Example 2:
+  ```
+  #import {exported_names} '<ESM module path>'
+  <callback content>
+  #end
+  ```
+  expands to:
+  ```
+  (async () => {
+      const {exported_names} = await import('<ESM module path>');
+      <callback content>
+  })();
+  ```
+* `#inflate`: inline base64 encoded and zipped code block.
+* others in the form `#name` where *name* is not a reserved directive keyword:  exapnds to `module.exports.name`.
+
+### Exports
+The transpilers are made available in `global.transpiler`. I.e. the transpiler functions are: `transpiler.dscript.transpile`, `transpiler.coffeescript.compile`, and `transpiler.typescript.transpile`.
+Example:
+```
+const coffeeCode = '...'; //<- your code goes here
+const outputCode = global.transpiler.coffeescript.compile(
+    coffeeCode,
+    { bare: true }); //<- this option is to exclude function wrapper
+```
+Example:
+```
+const typescriptCode = '...'; //<- your code goes here
+const outputCode = global.transpiler.typescript.transpile(typescriptCode);
+```
+
+# Original README
 Node.js is an open-source, cross-platform, JavaScript runtime environment. It
 executes JavaScript code outside of a browser. For more information on using
 Node.js, see the [Node.js Website][].
