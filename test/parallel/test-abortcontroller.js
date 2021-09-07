@@ -2,6 +2,7 @@
 'use strict';
 
 const common = require('../common');
+const { inspect } = require('util');
 
 const { ok, strictEqual, throws } = require('assert');
 
@@ -55,10 +56,9 @@ const { ok, strictEqual, throws } = require('assert');
 {
   // Tests that AbortSignal is impossible to construct manually
   const ac = new AbortController();
-  throws(
-    () => new ac.signal.constructor(),
-    /^TypeError: Illegal constructor$/
-  );
+  throws(() => new ac.signal.constructor(), {
+    code: 'ERR_ILLEGAL_CONSTRUCTOR',
+  });
 }
 {
   // Symbol.toStringTag
@@ -131,4 +131,12 @@ const { ok, strictEqual, throws } = require('assert');
       { code: 'ERR_INVALID_THIS', name: 'TypeError' }
     );
   }
+}
+
+{
+  const ac = new AbortController();
+  strictEqual(inspect(ac, { depth: 1 }),
+              'AbortController { signal: [AbortSignal] }');
+  strictEqual(inspect(ac, { depth: null }),
+              'AbortController { signal: AbortSignal { aborted: false } }');
 }

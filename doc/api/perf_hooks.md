@@ -119,7 +119,7 @@ are not guaranteed to reflect any correct state of the event loop.
 <!-- YAML
 added: v8.5.0
 changes:
-  - version: REPLACEME
+  - version: v16.0.0
     pr-url: https://github.com/nodejs/node/pull/37136
     description: Updated to conform to the User Timing Level 3 specification.
 -->
@@ -140,7 +140,7 @@ to mark specific significant moments in the Performance Timeline.
 <!-- YAML
 added: v8.5.0
 changes:
-  - version: REPLACEME
+  - version: v16.0.0
     pr-url: https://github.com/nodejs/node/pull/37136
     description: Updated to conform to the User Timing Level 3 specification.
   - version:
@@ -214,10 +214,10 @@ which the current `node` process began, measured in Unix time.
 <!-- YAML
 added: v8.5.0
 changes:
-  - version: REPLACEME
+  - version: v16.0.0
     pr-url: https://github.com/nodejs/node/pull/37475
     description: Added the histogram option.
-  - version: REPLACEME
+  - version: v16.0.0
     pr-url: https://github.com/nodejs/node/pull/37136
     description: Re-implemented to use pure-JavaScript and the ability
                  to time async functions.
@@ -261,6 +261,14 @@ If the wrapped function returns a promise, a finally handler will be attached
 to the promise and the duration will be reported once the finally handler is
 invoked.
 
+### `performance.toJSON()`
+<!-- YAML
+added: v16.1.0
+-->
+
+An object which is JSON representation of the `performance` object. It
+is similar to [`window.performance.toJSON`][] in browsers.
+
 ## Class: `PerformanceEntry`
 <!-- YAML
 added: v8.5.0
@@ -268,7 +276,7 @@ added: v8.5.0
 
 ### `performanceEntry.details`
 <!-- YAML
-added: REPLACEME
+added: v16.0.0
 -->
 
 * {any}
@@ -308,7 +316,7 @@ added:
  - v13.9.0
  - v12.17.0
 changes:
-  - version: REPLACEME
+  - version: v16.0.0
     pr-url: https://github.com/nodejs/node/pull/37136
     description: Runtime deprecated. Now moved to the detail property
                  when entryType is 'gc'.
@@ -343,7 +351,7 @@ The name of the performance entry.
 <!-- YAML
 added: v8.5.0
 changes:
-  - version: REPLACEME
+  - version: v16.0.0
     pr-url: https://github.com/nodejs/node/pull/37136
     description: Runtime deprecated. Now moved to the detail property
                  when entryType is 'gc'.
@@ -577,7 +585,11 @@ Disconnects the `PerformanceObserver` instance from all notifications.
 <!-- YAML
 added: v8.5.0
 changes:
-  - version: REPLACEME
+  - version: v16.7.0
+    pr-url: https://github.com/nodejs/node/pull/39297
+    description: Updated to conform to Performance Timeline Level 2. The
+                 buffered option has been added back.
+  - version: v16.0.0
     pr-url: https://github.com/nodejs/node/pull/37136
     description: Updated to conform to User Timing Level 3. The
                  buffered option has been removed.
@@ -589,6 +601,10 @@ changes:
   * `entryTypes` {string[]} An array of strings identifying the types of
     {PerformanceEntry} instances the observer is interested in. If not
     provided an error will be thrown.
+  * `buffered` {boolean} If true, the observer callback is called with a
+    list global `PerformanceEntry` buffered entries. If false, only
+    `PerformanceEntry`s created after the time point are sent to the
+    observer callback. **Default:** `false`.
 
 Subscribes the {PerformanceObserver} instance to notifications of new
 {PerformanceEntry} instances identified either by `options.entryTypes`
@@ -1025,4 +1041,5 @@ require('some-module');
 [`child_process.spawnSync()`]: child_process.md#child_process_child_process_spawnsync_command_args_options
 [`process.hrtime()`]: process.md#process_process_hrtime_time
 [`timeOrigin`]: https://w3c.github.io/hr-time/#dom-performance-timeorigin
+[`window.performance.toJSON`]: https://developer.mozilla.org/en-US/docs/Web/API/Performance/toJSON
 [`window.performance`]: https://developer.mozilla.org/en-US/docs/Web/API/Window/performance

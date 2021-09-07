@@ -5,6 +5,7 @@ if (!common.hasCrypto)
   common.skip('missing crypto');
 
 const assert = require('assert');
+const { types: { isKeyObject } } = require('util');
 const {
   createCipheriv,
   createDecipheriv,
@@ -20,7 +21,8 @@ const {
   privateDecrypt,
   privateEncrypt,
   getCurves,
-  generateKeyPairSync
+  generateKeyPairSync,
+  webcrypto,
 } = require('crypto');
 
 const fixtures = require('../common/fixtures');
@@ -63,6 +65,16 @@ const privateDsa = fixtures.readKey('dsa_private_encrypted_1025.pem',
     message:
       'The "handle" argument must be of type object. Received type ' +
       "string ('')"
+  });
+}
+
+{
+  assert.throws(() => KeyObject.from('invalid_key'), {
+    name: 'TypeError',
+    code: 'ERR_INVALID_ARG_TYPE',
+    message:
+      'The "key" argument must be an instance of CryptoKey. Received type ' +
+      "string ('invalid_key')"
   });
 }
 
@@ -293,7 +305,7 @@ const privateDsa = fixtures.readKey('dsa_private_encrypted_1025.pem',
   assert.throws(() => {
     createPrivateKey({ key: '' });
   }, common.hasOpenSSL3 ? {
-    message: 'Failed to read private key',
+    message: 'error:1E08010C:DECODER routines::unsupported',
   } : {
     message: 'error:0909006C:PEM routines:get_name:no start line',
     code: 'ERR_OSSL_PEM_NO_START_LINE',
@@ -318,7 +330,10 @@ const privateDsa = fixtures.readKey('dsa_private_encrypted_1025.pem',
       type: 'pkcs1'
     });
     createPrivateKey({ key, format: 'der', type: 'pkcs1' });
-  }, {
+  }, common.hasOpenSSL3 ? {
+    message: /error:1E08010C:DECODER routines::unsupported/,
+    library: 'DECODER routines'
+  } : {
     message: /asn1 encoding/,
     library: 'asn1 encoding routines'
   });
@@ -504,7 +519,7 @@ const privateDsa = fixtures.readKey('dsa_private_encrypted_1025.pem',
   // Reading an encrypted key without a passphrase should fail.
   assert.throws(() => createPrivateKey(privateDsa), common.hasOpenSSL3 ? {
     name: 'Error',
-    message: 'Failed to read private key',
+    message: 'error:1E08010C:DECODER routines::unsupported',
   } : {
     name: 'TypeError',
     code: 'ERR_MISSING_PASSPHRASE',
@@ -530,7 +545,7 @@ const privateDsa = fixtures.readKey('dsa_private_encrypted_1025.pem',
     passphrase: Buffer.alloc(1024, 'a')
   }), {
     message: common.hasOpenSSL3 ?
-      'Failed to read private key' :
+      'error:1E08010C:DECODER routines::unsupported' :
       /bad decrypt/
   });
 
@@ -756,4 +771,25 @@ const privateDsa = fixtures.readKey('dsa_private_encrypted_1025.pem',
       code: 'ERR_CRYPTO_JWK_UNSUPPORTED_CURVE',
       message: `Unsupported JWK EC curve: ${namedCurve}.`
     });
+}
+
+{
+  const buffer = Buffer.from('Hello World');
+  const keyObject = createSecretKey(buffer);
+  const keyPair = generateKeyPairSync('ec', { namedCurve: 'P-256' });
+  assert(isKeyObject(keyPair.publicKey));
+  assert(isKeyObject(keyPair.privateKey));
+  assert(isKeyObject(keyObject));
+
+  assert(!isKeyObject(buffer));
+
+  webcrypto.subtle.importKey(
+    'node.keyObject',
+    keyPair.publicKey,
+    { name: 'ECDH', namedCurve: 'P-256' },
+    false,
+    [],
+  ).then((cryptoKey) => {
+    assert(!isKeyObject(cryptoKey));
+  });
 }

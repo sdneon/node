@@ -1,7 +1,6 @@
-const { test } = require('tap')
+const t = require('tap')
 const pack = require('libnpmpack')
 const ssri = require('ssri')
-const requireInject = require('require-inject')
 
 const { logTar, getContents } = require('../../../lib/utils/tar.js')
 
@@ -18,7 +17,7 @@ const printLogs = (tarball, unicode) => {
   return logs.join('\n')
 }
 
-test('should log tarball contents', async (t) => {
+t.test('should log tarball contents', async (t) => {
   const testDir = t.testdir({
     'package.json': JSON.stringify({
       name: 'my-cool-pkg',
@@ -27,6 +26,9 @@ test('should log tarball contents', async (t) => {
         'bundle-dep',
       ],
     }, null, 2),
+    cat: 'meow',
+    chai: 'blub',
+    dog: 'woof',
     node_modules: {
       'bundle-dep': 'toto',
     },
@@ -42,8 +44,8 @@ test('should log tarball contents', async (t) => {
   t.matchSnapshot(printLogs(tarballContents, false))
 })
 
-test('should log tarball contents with unicode', async (t) => {
-  const { logTar } = requireInject('../../../lib/utils/tar.js', {
+t.test('should log tarball contents with unicode', async (t) => {
+  const { logTar } = t.mock('../../../lib/utils/tar.js', {
     npmlog: {
       notice: (str) => {
         t.ok(true, 'defaults to npmlog')
@@ -55,13 +57,15 @@ test('should log tarball contents with unicode', async (t) => {
   logTar({
     files: [],
     bundled: [],
+    size: 0,
+    unpackedSize: 0,
     integrity: '',
   }, { unicode: true })
   t.end()
 })
 
-test('should default to npmlog', async (t) => {
-  const { logTar } = requireInject('../../../lib/utils/tar.js', {
+t.test('should default to npmlog', async (t) => {
+  const { logTar } = t.mock('../../../lib/utils/tar.js', {
     npmlog: {
       notice: (str) => {
         t.ok(true, 'defaults to npmlog')
@@ -73,12 +77,14 @@ test('should default to npmlog', async (t) => {
   logTar({
     files: [],
     bundled: [],
+    size: 0,
+    unpackedSize: 0,
     integrity: '',
   })
   t.end()
 })
 
-test('should getContents of a tarball', async (t) => {
+t.test('should getContents of a tarball', async (t) => {
   const testDir = t.testdir({
     'package.json': JSON.stringify({
       name: 'my-cool-pkg',

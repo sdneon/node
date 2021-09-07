@@ -4,7 +4,7 @@
 #include "node_internals.h"
 #include "node_metadata.h"
 #include "node_options-inl.h"
-#include "node_process.h"
+#include "node_process-inl.h"
 #include "node_revert.h"
 #include "util-inl.h"
 
@@ -99,10 +99,6 @@ MaybeLocal<Object> CreateProcessObject(Environment* env) {
   // process.versions
   Local<Object> versions = Object::New(env->isolate());
   READONLY_PROPERTY(process, "versions", versions);
-
-  READONLY_PROPERTY(versions,
-	  "d",
-	  OneByteString(env->isolate(), D_VERSION + 1));
 
 #define V(key)                                                                 \
   if (!per_process::metadata.versions.key.empty()) {                           \

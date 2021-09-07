@@ -1664,6 +1664,35 @@ int uv_os_unsetenv(const char* name) {
 
 
 int uv_os_gethostname(char* buffer, size_t* size) {
+#if WINVER >= 0x0603 //Windows 8.1
+  WCHAR buf[UV_MAXHOSTNAMESIZE];
+  size_t len;
+  char* utf8_str;
+  int convert_result;
+
+  if (buffer == NULL || size == NULL || *size == 0)
+    return UV_EINVAL;
+
+  uv__once_init(); /* Initialize winsock */
+
+  if (GetHostNameW(buf, UV_MAXHOSTNAMESIZE) != 0)
+    return uv_translate_sys_error(WSAGetLastError());
+
+  convert_result = uv__convert_utf16_to_utf8(buf, -1, &utf8_str);
+
+  if (convert_result != 0)
+    return convert_result;
+
+  len = strlen(utf8_str);
+  if (len >= *size) {
+    *size = len + 1;
+    uv__free(utf8_str);
+    return UV_ENOBUFS;
+  }
+
+  memcpy(buffer, utf8_str, len + 1);
+  uv__free(utf8_str);
+#else //WINVER < 0x0603
   char buf[UV_MAXHOSTNAMESIZE];
   size_t len;
 
@@ -1684,6 +1713,7 @@ int uv_os_gethostname(char* buffer, size_t* size) {
   }
 
   memcpy(buffer, buf, len + 1);
+#endif //WINVER
   *size = len;
   return 0;
 }

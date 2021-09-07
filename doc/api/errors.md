@@ -714,6 +714,22 @@ Used when a child process is being forked without specifying an IPC channel.
 Used when the main process is trying to read data from the child process's
 STDERR/STDOUT, and the data's length is longer than the `maxBuffer` option.
 
+<a id="ERR_CLOSED_MESSAGE_PORT"></a>
+### `ERR_CLOSED_MESSAGE_PORT`
+<!--
+added: v16.2.0
+changes:
+  - version: 11.12.0
+    pr-url: https://github.com/nodejs/node/pull/26487
+    description: The error message was removed.
+  - version: v16.2.0
+    pr-url: https://github.com/nodejs/node/pull/38510
+    description: The error message was reintroduced.
+-->
+
+There was an attempt to use a `MessagePort` instance in a closed
+state, usually after `.close()` has been called.
+
 <a id="ERR_CONSOLE_WRITABLE_STREAM"></a>
 ### `ERR_CONSOLE_WRITABLE_STREAM`
 
@@ -987,6 +1003,22 @@ added: v15.0.0
 
 An attempt to invoke an unsupported crypto operation was made.
 
+<a id="ERR_DEBUGGER_ERROR"></a>
+### `ERR_DEBUGGER_ERROR`
+<!-- YAML
+added: v16.4.0
+-->
+
+An error occurred with the [debugger][].
+
+<a id="ERR_DEBUGGER_STARTUP_ERROR"></a>
+### `ERR_DEBUGGER_STARTUP_ERROR`
+<!-- YAML
+added: v16.4.0
+-->
+
+The [debugger][] timed out waiting for the required host/port to be free.
+
 <a id="ERR_DLOPEN_FAILED"></a>
 ### `ERR_DLOPEN_FAILED`
 <!-- YAML
@@ -1074,6 +1106,74 @@ added: v14.0.0
 
 Used when a feature that is not available
 to the current platform which is running Node.js is used.
+
+<a id="ERR_FS_CP_DIR_TO_NON_DIR"></a>
+### `ERR_FS_CP_DIR_TO_NON_DIR`
+<!--
+added: v16.7.0
+-->
+
+An attempt was made to copy a directory to a non-directory (file, symlink,
+etc.) using [`fs.cp()`][].
+
+<a id="ERR_FS_CP_EEXIST"></a>
+### `ERR_FS_CP_EEXIST`
+<!--
+added: v16.7.0
+-->
+
+An attempt was made to copy over a file that already existed with
+[`fs.cp()`][], with the `force` and `errorOnExist` set to `true`.
+
+<a id="ERR_FS_CP_EINVAL"></a>
+### `ERR_FS_CP_EINVAL`
+<!--
+added: v16.7.0
+-->
+
+When using [`fs.cp()`][], `src` or `dest` pointed to an invalid path.
+
+<a id="ERR_FS_CP_FIFO_PIPE"></a>
+### `ERR_FS_CP_FIFO_PIPE`
+<!--
+added: v16.7.0
+-->
+
+An attempt was made to copy a named pipe with [`fs.cp()`][].
+
+<a id="ERR_FS_CP_NON_DIR_TO_DIR"></a>
+### `ERR_FS_CP_NON_DIR_TO_DIR`
+<!--
+added: v16.7.0
+-->
+
+An attempt was made to copy a non-directory (file, symlink, etc.) to a directory
+using [`fs.cp()`][].
+
+<a id="ERR_FS_CP_SOCKET"></a>
+### `ERR_FS_CP_SOCKET`
+<!--
+added: v16.7.0
+-->
+
+An attempt was made to copy to a socket with [`fs.cp()`][].
+
+<a id="ERR_FS_CP_SYMLINK_TO_SUBDIRECTORY"></a>
+### `ERR_FS_CP_SYMLINK_TO_SUBDIRECTORY`
+<!--
+added: v16.7.0
+-->
+
+When using [`fs.cp()`][], a symlink in `dest` pointed to a subdirectory
+of `src`.
+
+<a id="ERR_FS_CP_UNKNOWN"></a>
+### `ERR_FS_CP_UNKNOWN`
+<!--
+added: v16.7.0
+-->
+
+An attempt was made to copy to an unknown file type with [`fs.cp()`][].
 
 <a id="ERR_FS_EISDIR"></a>
 ### `ERR_FS_EISDIR`
@@ -1367,7 +1467,7 @@ made to mark a stream and dependent of itself.
 <a id="ERR_HTTP2_TOO_MANY_INVALID_FRAMES"></a>
 ### `ERR_HTTP2_TOO_MANY_INVALID_FRAMES`
 <!--
-added: REPLACEME
+added: v15.14.0
 -->
 
 The limit of acceptable invalid HTTP/2 protocol frames sent by the peer,
@@ -1391,6 +1491,11 @@ is set for the `Http2Stream`.
 
 `http2.connect()` was passed a URL that uses any protocol other than `http:` or
 `https:`.
+
+<a id="ERR_ILLEGAL_CONSTRUCTOR"></a>
+### `ERR_ILLEGAL_CONSTRUCTOR`
+
+An attempt was made to construct an object using a non-public constructor.
 
 <a id="ERR_INCOMPATIBLE_OPTION_PAIR"></a>
 ### `ERR_INCOMPATIBLE_OPTION_PAIR`
@@ -1727,6 +1832,13 @@ entries to match in order to resolve this error. See the documentation for
 
 A policy manifest resource had an invalid value for one of its fields. Update
 the manifest entry to match in order to resolve this error. See the
+documentation for [policy][] manifests for more information.
+
+<a id="ERR_MANIFEST_INVALID_SPECIFIER"></a>
+### `ERR_MANIFEST_INVALID_SPECIFIER`
+
+A policy manifest resource had an invalid value for one of its dependency
+mappings. Update the manifest entry to match to resolve this error. See the
 documentation for [policy][] manifests for more information.
 
 <a id="ERR_MANIFEST_PARSE_POLICY"></a>
@@ -2415,11 +2527,11 @@ changes:
      - v10.15.0
     commit: 186035243fad247e3955f
     pr-url: https://github.com/nodejs-private/node-private/pull/143
-    description: Max header size in `http_parser` was set to 8KB.
+    description: Max header size in `http_parser` was set to 8 KB.
 -->
 
 Too much HTTP header data was received. In order to protect against malicious or
-malconfigured clients, if more than 8KB of HTTP header data is received then
+malconfigured clients, if more than 8 KB of HTTP header data is received then
 HTTP parsing will abort without a request or response object being created, and
 an `Error` with this code will be emitted.
 
@@ -2459,16 +2571,6 @@ removed: v12.5.0
 
 The value passed to `postMessage()` contained an object that is not supported
 for transferring.
-
-<a id="ERR_CLOSED_MESSAGE_PORT"></a>
-### `ERR_CLOSED_MESSAGE_PORT`
-<!-- YAML
-added: v10.5.0
-removed: v11.12.0
--->
-
-There was an attempt to use a `MessagePort` instance in a closed
-state, usually after `.close()` has been called.
 
 <a id="ERR_CRYPTO_HASH_DIGEST_NO_UTF16"></a>
 ### `ERR_CRYPTO_HASH_DIGEST_NO_UTF16`
@@ -2787,6 +2889,7 @@ The native call from `process.cpuUsage` could not be processed.
 [`dgram.remoteAddress()`]: dgram.md#dgram_socket_remoteaddress
 [`errno`(3) man page]: https://man7.org/linux/man-pages/man3/errno.3.html
 [`fs.Dir`]: fs.md#fs_class_fs_dir
+[`fs.cp()`]: fs.md#fs_fs_cp_src_dest_options_callback
 [`fs.readFileSync`]: fs.md#fs_fs_readfilesync_path_options
 [`fs.readdir`]: fs.md#fs_fs_readdir_path_options_callback
 [`fs.symlink()`]: fs.md#fs_fs_symlink_target_path_type_callback
@@ -2803,7 +2906,7 @@ The native call from `process.cpuUsage` could not be processed.
 [`new URLSearchParams(iterable)`]: url.md#url_new_urlsearchparams_iterable
 [`package.json`]: packages.md#packages_node_js_package_json_field_definitions
 [`postMessage()`]: worker_threads.md#worker_threads_port_postmessage_value_transferlist
-[`process.on('exit')`]: process.md#Event:-`'exit'`
+[`process.on('exit')`]: process.md#process_event_exit
 [`process.send()`]: process.md#process_process_send_message_sendhandle_options_callback
 [`process.setUncaughtExceptionCaptureCallback()`]: process.md#process_process_setuncaughtexceptioncapturecallback_fn
 [`readable._read()`]: stream.md#stream_readable_read_size_1
@@ -2821,6 +2924,7 @@ The native call from `process.cpuUsage` could not be processed.
 [`util.getSystemErrorName(error.errno)`]: util.md#util_util_getsystemerrorname_err
 [`zlib`]: zlib.md
 [crypto digest algorithm]: crypto.md#crypto_crypto_gethashes
+[debugger]: debugger.md
 [define a custom subpath]: packages.md#packages_subpath_exports
 [domains]: domain.md
 [event emitter-based]: events.md#events_class_eventemitter

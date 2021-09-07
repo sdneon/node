@@ -51,6 +51,47 @@ a command-line flag. Experimental features may also emit a [warning][].
 
 ## Stability overview
 <!-- STABILITY_OVERVIEW_SLOT_BEGIN -->
+| API | Stability |
+| --- | --------- |
+| [assert](assert.html) | (2) Stable |
+| [async_hooks](async_hooks.html) | (1) Experimental |
+| [asynchronous_context_tracking](async_context.html) | (2) Stable |
+| [buffer](buffer.html) | (2) Stable |
+| [child_process](child_process.html) | (2) Stable |
+| [cluster](cluster.html) | (2) Stable |
+| [console](console.html) | (2) Stable |
+| [crypto](crypto.html) | (2) Stable |
+| [dgram](dgram.html) | (2) Stable |
+| [diagnostics_channel](diagnostics_channel.html) | (1) Experimental |
+| [dns](dns.html) | (2) Stable |
+| [domain](domain.html) | (0) Deprecated |
+| [fs](fs.html) | (2) Stable |
+| [http](http.html) | (2) Stable |
+| [http/2](http2.html) | (2) Stable |
+| [https](https.html) | (2) Stable |
+| [inspector](inspector.html) | (2) Stable |
+| [module](modules.html) | (2) Stable |
+| [os](os.html) | (2) Stable |
+| [path](path.html) | (2) Stable |
+| [performance_measurement_apis](perf_hooks.html) | (2) Stable |
+| [punycode](punycode.html) | (0) Deprecated |
+| [querystring](querystring.html) | (3) Legacy |
+| [readline](readline.html) | (2) Stable |
+| [repl](repl.html) | (2) Stable |
+| [stream](stream.html) | (2) Stable |
+| [string_decoder](string_decoder.html) | (2) Stable |
+| [timers](timers.html) | (2) Stable |
+| [tls_(ssl)](tls.html) | (2) Stable |
+| [trace_events](tracing.html) | (1) Experimental |
+| [tty](tty.html) | (2) Stable |
+| [url](url.html) | (2) Stable |
+| [util](util.html) | (2) Stable |
+| [vm](vm.html) | (2) Stable |
+| [web_crypto_api](webcrypto.html) | (1) Experimental |
+| [web_streams_api](webstreams.html) | (1) Experimental |
+| [webassembly_system_interface_(wasi)](wasi.html) | (1) Experimental |
+| [worker_threads](worker_threads.html) | (2) Stable |
+| [zlib](zlib.html) | (2) Stable |
 <!-- STABILITY_OVERVIEW_SLOT_END -->
 
 ## JSON output

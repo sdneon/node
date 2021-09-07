@@ -7,10 +7,13 @@ const describeAll = () => {
   const sort = ([keya, {deprecated: depa}], [keyb, {deprecated: depb}]) => {
     return depa && !depb ? 1
       : !depa && depb ? -1
-      : keya.localeCompare(keyb)
+      : keya.localeCompare(keyb, 'en')
   }
   return Object.entries(definitions).sort(sort)
     .map(([key, def]) => def.describe())
-    .join('\n\n')
+    .join(
+      '\n\n<!-- automatically generated, do not edit manually -->\n' +
+        '<!-- see lib/utils/config/definitions.js -->\n\n'
+    )
 }
 module.exports = describeAll

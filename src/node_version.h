@@ -23,7 +23,7 @@
 #define SRC_NODE_VERSION_H_
 
 #define NODE_MAJOR_VERSION 16
-#define NODE_MINOR_VERSION 0
+#define NODE_MINOR_VERSION 8
 #define NODE_PATCH_VERSION 0
 
 #define NODE_VERSION_IS_LTS 0
@@ -64,13 +64,6 @@
 
 #define NODE_VERSION "v" NODE_VERSION_STRING
 
-#define D_MAJOR_VERSION 1
-#define D_MINOR_VERSION 0
-#define D_PATCH_VERSION 0
-#define D_VERSION_STRING  NODE_STRINGIFY(D_MAJOR_VERSION) "." \
-                            NODE_STRINGIFY(D_MINOR_VERSION) "." \
-                            NODE_STRINGIFY(D_PATCH_VERSION)
-#define D_VERSION "v" D_VERSION_STRING
 
 #define NODE_VERSION_AT_LEAST(major, minor, patch) \
   (( (major) < NODE_MAJOR_VERSION) \
@@ -91,7 +84,7 @@
  * if it can be made ABI compatible with the previous version.
  *
  * The registry of used NODE_MODULE_VERSION numbers is located at
- *   https://github.com/nodejs/node/blob/master/doc/abi_version_registry.json
+ *   https://github.com/nodejs/node/blob/HEAD/doc/abi_version_registry.json
  * Extenders, embedders and other consumers of Node.js that require ABI
  * version matching should open a pull request to reserve a number in this
  * registry.

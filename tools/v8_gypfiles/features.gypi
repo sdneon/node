@@ -62,6 +62,12 @@
       }, {
         'is_component_build': 0,
       }],
+      ['OS == "win" or OS == "mac"', {
+        # Sets -DSYSTEM_INSTRUMENTATION. Enables OS-dependent event tracing
+        'v8_enable_system_instrumentation': 1,
+      }, {
+        'v8_enable_system_instrumentation': 0,
+      }],
     ],
     'is_debug%': 0,
 
@@ -123,9 +129,6 @@
     'v8_enable_pointer_compression%': 0,
     'v8_enable_31bit_smis_on_64bit_arch%': 0,
 
-    # Reverse JS arguments order in the stack (sets -dV8_REVERSE_JSARGS).
-    'v8_enable_reverse_jsargs%': 0,
-
     # Sets -dOBJECT_PRINT.
     'v8_enable_object_print%': 0,
 
@@ -162,10 +165,6 @@
 
     # Controls the threshold for on-heap/off-heap Typed Arrays.
     'v8_typed_array_max_size_in_heap%': 64,
-
-    # Temporary flag to allow embedders to update their microtasks scopes
-    # while rolling in a new version of V8.
-    'v8_check_microtasks_scopes_consistency%': 0,
 
     # Enable mitigations for executing untrusted code.
     'v8_untrusted_code_mitigations%': 1,
@@ -262,7 +261,10 @@
         'defines': ['ENABLE_MINOR_MC',],
       }],
       ['v8_enable_pointer_compression==1', {
-        'defines': ['V8_COMPRESS_POINTERS',],
+        'defines': [
+          'V8_COMPRESS_POINTERS',
+          'V8_COMPRESS_POINTERS_IN_ISOLATE_CAGE',
+        ],
       }],
       ['v8_enable_pointer_compression==1 or v8_enable_31bit_smis_on_64bit_arch==1', {
         'defines': ['V8_31BIT_SMIS_ON_64BIT_ARCH',],
@@ -308,9 +310,6 @@
       },{
         'defines!': ['V8_IMMINENT_DEPRECATION_WARNINGS',],
       }],
-      ['v8_enable_reverse_jsargs==1', {
-        'defines': ['V8_REVERSE_JSARGS',],
-      }],
       ['v8_enable_i18n_support==1', {
         'defines': ['V8_INTL_SUPPORT',],
       }],
@@ -332,9 +331,6 @@
       }],
       ['v8_enable_lazy_source_positions==1', {
         'defines': ['V8_ENABLE_LAZY_SOURCE_POSITIONS',],
-      }],
-      ['v8_check_microtasks_scopes_consistency==1', {
-        'defines': ['V8_CHECK_MICROTASKS_SCOPES_CONSISTENCY',],
       }],
       ['v8_use_siphash==1', {
         'defines': ['V8_USE_SIPHASH',],
@@ -365,6 +361,9 @@
       }],
       ['v8_enable_precise_zone_stats==1', {
         'defines': ['V8_ENABLE_PRECISE_ZONE_STATS',],
+      }],
+      ['v8_enable_system_instrumentation==1', {
+        'defines': ['V8_ENABLE_SYSTEM_INSTRUMENTATION',],
       }],
       ['v8_enable_webassembly==1', {
         'defines': ['V8_ENABLE_WEBASSEMBLY',],

@@ -11,10 +11,12 @@ namespace node {
 
 class Environment;
 struct EnvSerializeInfo;
+struct SnapshotData;
 
 #define SERIALIZABLE_OBJECT_TYPES(V)                                           \
   V(fs_binding_data, fs::BindingData)                                          \
-  V(v8_binding_data, v8_utils::BindingData)
+  V(v8_binding_data, v8_utils::BindingData)                                    \
+  V(blob_binding_data, BlobBindingData)
 
 enum class EmbedderObjectType : uint8_t {
   k_default = 0,
@@ -119,6 +121,15 @@ void SerializeBindingData(Environment* env,
                           EnvSerializeInfo* info);
 
 bool IsSnapshotableType(FastStringKey key);
+
+class SnapshotBuilder {
+ public:
+  static std::string Generate(const std::vector<std::string> args,
+                              const std::vector<std::string> exec_args);
+  static void Generate(SnapshotData* out,
+                       const std::vector<std::string> args,
+                       const std::vector<std::string> exec_args);
+};
 }  // namespace node
 
 #endif  // defined(NODE_WANT_INTERNALS) && NODE_WANT_INTERNALS

@@ -194,9 +194,10 @@ class String : public TorqueGeneratedString<String, Name> {
   const byte* AddressOfCharacterAt(int start_index,
                                    const DisallowGarbageCollection& no_gc);
 
-  // Get and set the length of the string using acquire loads and release
-  // stores.
-  DECL_SYNCHRONIZED_INT_ACCESSORS(length)
+  // Forward declare the non-atomic (set_)length defined in torque.
+  using TorqueGeneratedString::length;
+  using TorqueGeneratedString::set_length;
+  DECL_RELEASE_ACQUIRE_INT_ACCESSORS(length)
 
   // Returns whether this string has only one-byte chars, i.e. all of them can
   // be one-byte encoded.  This might be the case even if the string is
@@ -326,8 +327,15 @@ class String : public TorqueGeneratedString<String, Name> {
   // The Isolate is passed as "evidence" that this call is on the main thread,
   // and to distiguish from the LocalIsolate overload.
   template <EqualityType kEqType = EqualityType::kWholeString, typename Char>
-  inline bool IsEqualTo(Vector<const Char> str,
-                        Isolate* isolate = nullptr) const;
+  inline bool IsEqualTo(Vector<const Char> str, Isolate* isolate) const;
+
+  // Check if this string matches the given vector of characters, either as a
+  // whole string or just a prefix.
+  //
+  // This is main-thread only, like the Isolate* overload, but additionally
+  // computes the PtrComprCageBase for IsEqualToImpl.
+  template <EqualityType kEqType = EqualityType::kWholeString, typename Char>
+  inline bool IsEqualTo(Vector<const Char> str) const;
 
   // Check if this string matches the given vector of characters, either as a
   // whole string or just a prefix.
@@ -402,7 +410,7 @@ class String : public TorqueGeneratedString<String, Name> {
   const char* PrefixForDebugPrint() const;
   const char* SuffixForDebugPrint() const;
   void StringShortPrint(StringStream* accumulator);
-  void PrintUC16(std::ostream& os, int start = 0, int end = -1);  // NOLINT
+  void PrintUC16(std::ostream& os, int start = 0, int end = -1);
   void PrintUC16(StringStream* accumulator, int start, int end);
 
   // Dispatched behavior.
@@ -523,8 +531,8 @@ class String : public TorqueGeneratedString<String, Name> {
       Visitor* visitor, String string, int offset,
       const SharedStringAccessGuardIfNeeded& access_guard);
 
-  template <typename LocalIsolate>
-  static Handle<FixedArray> CalculateLineEnds(LocalIsolate* isolate,
+  template <typename IsolateT>
+  static Handle<FixedArray> CalculateLineEnds(IsolateT* isolate,
                                               Handle<String> string,
                                               bool include_ending_line);
 
@@ -539,8 +547,15 @@ class String : public TorqueGeneratedString<String, Name> {
   // Implementation of the IsEqualTo() public methods. Do not use directly.
   template <EqualityType kEqType, typename Char>
   V8_INLINE bool IsEqualToImpl(
-      Vector<const Char> str,
+      Vector<const Char> str, PtrComprCageBase cage_base,
       const SharedStringAccessGuardIfNeeded& access_guard) const;
+
+  // Out-of-line IsEqualToImpl for ConsString.
+  template <typename Char>
+  V8_NOINLINE static bool IsConsStringEqualToImpl(
+      ConsString string, int slice_offset, Vector<const Char> str,
+      PtrComprCageBase cage_base,
+      const SharedStringAccessGuardIfNeeded& access_guard);
 
   V8_EXPORT_PRIVATE static Handle<String> SlowFlatten(
       Isolate* isolate, Handle<ConsString> cons, AllocationType allocation);

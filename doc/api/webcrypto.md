@@ -275,7 +275,7 @@ async function pbkdf2Key(pass, salt, iterations = 1000, length = 256) {
     ec.encode(pass),
     'PBKDF2',
     false,
-    ['deriveBits']);
+    ['deriveKey']);
   const key = await subtle.deriveKey({
     name: 'PBKDF2',
     hash: 'SHA-512',
@@ -360,6 +360,16 @@ Generates cryptographically strong random values. The given `typedArray` is
 filled with random values, and a reference to `typedArray` is returned.
 
 An error will be thrown if the given `typedArray` is larger than 65,536 bytes.
+
+### `crypto.randomUUID()`
+<!-- YAML
+added: v16.7.0
+-->
+
+* Returns: {string}
+
+Generates a random [RFC 4122][] version 4 UUID. The UUID is generated using a
+cryptographic pseudorandom number generator.
 
 ## Class: `CryptoKey`
 <!-- YAML
@@ -536,7 +546,7 @@ added: v15.0.0
 * `derivedKeyAlgorithm`: {HmacKeyGenParams|AesKeyGenParams}
 * `extractable`: {boolean}
 * `keyUsages`: {string[]} See [Key usages][].
-* Returns: {Promise} containing {ArrayBuffer}
+* Returns: {Promise} containing {CryptoKey}
 <!--lint enable maximum-line-length remark-lint-->
 
 Using the method and parameters specified in `algorithm`, and the keying
@@ -992,7 +1002,7 @@ added: v15.0.0
 added: v15.0.0
 -->
 
-#### 'aesImportParams.name`
+#### `aesImportParams.name`
 <!-- YAML
 added: v15.0.0
 -->
@@ -1175,7 +1185,7 @@ added: v15.0.0
 * Type: {ArrayBuffer|TypedArray|DataView|Buffer}
 
 The salt value significantly improves the strength of the HKDF algorithm.
-It should be random or pseudo-random and should be the same length as the
+It should be random or pseudorandom and should be the same length as the
 output of the digest function (for instance, if using `'SHA-256'` as the
 digest, the salt should be 256-bits of random data).
 
@@ -1268,7 +1278,7 @@ added: v15.0.0
 added: v15.0.0
 -->
 
-* Type: {string} Must be `'HMAC`.
+* Type: {string} Must be `'HMAC'`.
 
 ### Class: `Pbkdf2ImportParams`
 <!-- YAML
@@ -1327,7 +1337,7 @@ added: v15.0.0
 
 * Type: {ArrayBuffer|TypedArray|DataView|Buffer}
 
-Should be at least 16 random or pseudo-random bytes.
+Should be at least 16 random or pseudorandom bytes.
 
 ### Class: `RsaHashedImportParams`
 <!-- YAML
@@ -1771,4 +1781,5 @@ added: v15.0.0
 
 [JSON Web Key]: https://tools.ietf.org/html/rfc7517
 [Key usages]: #webcrypto_cryptokey_usages
+[RFC 4122]: https://www.rfc-editor.org/rfc/rfc4122.txt
 [Web Crypto API]: https://www.w3.org/TR/WebCryptoAPI/

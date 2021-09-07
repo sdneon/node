@@ -1,6 +1,5 @@
 const t = require('tap')
 
-const requireInject = require('require-inject')
 const { EventEmitter } = require('events')
 
 const redactCwd = (path) => {
@@ -48,8 +47,11 @@ const defaults = {
 const cliConfig = {
   editor: 'vi',
   json: false,
+  location: 'user',
   long: false,
-  global: false,
+  cat: true,
+  chai: true,
+  dog: true,
 }
 
 const npm = {
@@ -84,7 +86,7 @@ const mocks = {
   '../../lib/utils/usage.js': usageUtil,
 }
 
-const Config = requireInject('../../lib/config.js', mocks)
+const Config = t.mock('../../lib/config.js', mocks)
 const config = new Config(npm)
 
 t.test('config no args', t => {
@@ -121,7 +123,7 @@ t.test('config list', t => {
   })
 
   config.exec(['list'], (err) => {
-    t.ifError(err, 'npm config list')
+    t.error(err, 'npm config list')
     t.matchSnapshot(result, 'should list configs')
   })
 })
@@ -147,7 +149,7 @@ t.test('config list overrides', t => {
   })
 
   config.exec(['list'], (err) => {
-    t.ifError(err, 'npm config list')
+    t.error(err, 'npm config list')
     t.matchSnapshot(result, 'should list overridden configs')
   })
 })
@@ -165,7 +167,7 @@ t.test('config list --long', t => {
   })
 
   config.exec(['list'], (err) => {
-    t.ifError(err, 'npm config list --long')
+    t.error(err, 'npm config list --long')
     t.matchSnapshot(result, 'should list all configs')
   })
 })
@@ -190,14 +192,17 @@ t.test('config list --json', t => {
   })
 
   config.exec(['list'], (err) => {
-    t.ifError(err, 'npm config list --json')
-    t.deepEqual(
+    t.error(err, 'npm config list --json')
+    t.same(
       JSON.parse(result),
       {
         editor: 'vi',
         json: true,
+        location: 'user',
         long: false,
-        global: false,
+        cat: true,
+        chai: true,
+        dog: true,
       },
       'should list configs usin json'
     )
@@ -224,7 +229,7 @@ t.test('config delete key', t => {
   }
 
   config.exec(['delete', 'foo'], (err) => {
-    t.ifError(err, 'npm config delete key')
+    t.error(err, 'npm config delete key')
   })
 
   t.teardown(() => {
@@ -251,7 +256,7 @@ t.test('config delete multiple key', t => {
   }
 
   config.exec(['delete', 'foo', 'bar'], (err) => {
-    t.ifError(err, 'npm config delete keys')
+    t.error(err, 'npm config delete keys')
   })
 
   t.teardown(() => {
@@ -260,7 +265,7 @@ t.test('config delete multiple key', t => {
   })
 })
 
-t.test('config delete key --global', t => {
+t.test('config delete key --location=global', t => {
   t.plan(4)
 
   npm.config.delete = (key, where) => {
@@ -272,13 +277,13 @@ t.test('config delete key --global', t => {
     t.equal(where, 'global', 'should save global config post-delete')
   }
 
-  cliConfig.global = true
+  cliConfig.location = 'global'
   config.exec(['delete', 'foo'], (err) => {
-    t.ifError(err, 'npm config delete key --global')
+    t.error(err, 'npm config delete key --location=global')
   })
 
   t.teardown(() => {
-    cliConfig.global = false
+    cliConfig.location = 'user'
     delete npm.config.delete
     delete npm.config.save
   })
@@ -305,7 +310,7 @@ t.test('config set key', t => {
   }
 
   config.exec(['set', 'foo', 'bar'], (err) => {
-    t.ifError(err, 'npm config set key')
+    t.error(err, 'npm config set key')
   })
 
   t.teardown(() => {
@@ -328,7 +333,7 @@ t.test('config set key=val', t => {
   }
 
   config.exec(['set', 'foo=bar'], (err) => {
-    t.ifError(err, 'npm config set key')
+    t.error(err, 'npm config set key')
   })
 
   t.teardown(() => {
@@ -359,7 +364,7 @@ t.test('config set multiple keys', t => {
   }
 
   config.exec(['set', ...args], (err) => {
-    t.ifError(err, 'npm config set key')
+    t.error(err, 'npm config set key')
   })
 
   t.teardown(() => {
@@ -382,7 +387,7 @@ t.test('config set key to empty value', t => {
   }
 
   config.exec(['set', 'foo'], (err) => {
-    t.ifError(err, 'npm config set key to empty value')
+    t.error(err, 'npm config set key to empty value')
   })
 
   t.teardown(() => {
@@ -410,11 +415,11 @@ t.test('config set invalid key', t => {
   })
 
   config.exec(['set', 'foo', 'bar'], (err) => {
-    t.ifError(err, 'npm config set invalid key')
+    t.error(err, 'npm config set invalid key')
   })
 })
 
-t.test('config set key --global', t => {
+t.test('config set key --location=global', t => {
   t.plan(5)
 
   npm.config.set = (key, val, where) => {
@@ -427,13 +432,13 @@ t.test('config set key --global', t => {
     t.equal(where, 'global', 'should save global config')
   }
 
-  cliConfig.global = true
+  cliConfig.location = 'global'
   config.exec(['set', 'foo', 'bar'], (err) => {
-    t.ifError(err, 'npm config set key --global')
+    t.error(err, 'npm config set key --location=global')
   })
 
   t.teardown(() => {
-    cliConfig.global = false
+    cliConfig.location = 'user'
     delete npm.config.set
     delete npm.config.save
   })
@@ -450,7 +455,7 @@ t.test('config get no args', t => {
   })
 
   config.exec(['get'], (err) => {
-    t.ifError(err, 'npm config get no args')
+    t.error(err, 'npm config get no args')
     t.matchSnapshot(result, 'should list configs on config get no args')
   })
 })
@@ -469,7 +474,7 @@ t.test('config get key', t => {
   }
 
   config.exec(['get', 'foo'], (err) => {
-    t.ifError(err, 'npm config get key')
+    t.error(err, 'npm config get key')
   })
 
   t.teardown(() => {
@@ -497,7 +502,7 @@ t.test('config get multiple keys', t => {
   }
 
   config.exec(['get', 'foo', 'bar'], (err) => {
-    t.ifError(err, 'npm config get multiple keys')
+    t.error(err, 'npm config get multiple keys')
     t.equal(result, 'foo=asdf\nbar=asdf')
   })
 
@@ -555,20 +560,20 @@ sign-git-commit=true`
       },
     },
   }
-  const Config = requireInject('../../lib/config.js', editMocks)
+  const Config = t.mock('../../lib/config.js', editMocks)
   const config = new Config(npm)
 
   config.exec(['edit'], (err) => {
-    t.ifError(err, 'npm config edit')
+    t.error(err, 'npm config edit')
 
     // test no config file result
     editMocks.fs.readFile = (p, e, cb) => {
       cb(new Error('ERR'))
     }
-    const Config = requireInject('../../lib/config.js', editMocks)
+    const Config = t.mock('../../lib/config.js', editMocks)
     const config = new Config(npm)
     config.exec(['edit'], (err) => {
-      t.ifError(err, 'npm config edit')
+      t.error(err, 'npm config edit')
     })
   })
 
@@ -578,10 +583,10 @@ sign-git-commit=true`
   })
 })
 
-t.test('config edit --global', t => {
+t.test('config edit --location=global', t => {
   t.plan(6)
 
-  cliConfig.global = true
+  cliConfig.location = 'global'
   const npmrc = 'init.author.name=Foo'
   npm.config.data.set('global', {
     source: '/etc/npmrc',
@@ -614,14 +619,14 @@ t.test('config edit --global', t => {
       },
     },
   }
-  const Config = requireInject('../../lib/config.js', editMocks)
+  const Config = t.mock('../../lib/config.js', editMocks)
   const config = new Config(npm)
   config.exec(['edit'], (err) => {
     t.match(err, /exited with code: 137/, 'propagated exit code from editor')
   })
 
   t.teardown(() => {
-    cliConfig.global = false
+    cliConfig.location = 'user'
     npm.config.data.delete('user')
     delete npm.config.save
   })

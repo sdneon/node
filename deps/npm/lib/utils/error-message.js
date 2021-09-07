@@ -1,12 +1,11 @@
-const npm = require('../npm.js')
 const { format } = require('util')
 const { resolve } = require('path')
 const nameValidator = require('validate-npm-package-name')
 const npmlog = require('npmlog')
 const replaceInfo = require('./replace-info.js')
-const { report: explainEresolve } = require('./explain-eresolve.js')
+const { report } = require('./explain-eresolve.js')
 
-module.exports = (er) => {
+module.exports = (er, npm) => {
   const short = []
   const detail = []
 
@@ -19,7 +18,7 @@ module.exports = (er) => {
     case 'ERESOLVE':
       short.push(['ERESOLVE', er.message])
       detail.push(['', ''])
-      detail.push(['', explainEresolve(er)])
+      detail.push(['', report(er, npm.color, resolve(npm.cache, 'eresolve-report.txt'))])
       break
 
     case 'ENOLOCK': {
@@ -100,9 +99,9 @@ module.exports = (er) => {
 
     case 'EJSONPARSE':
       // Check whether we ran into a conflict in our own package.json
-      if (er.file === resolve(npm.prefix, 'package.json')) {
+      if (er.path === resolve(npm.prefix, 'package.json')) {
         const { isDiff } = require('parse-conflict-json')
-        const txt = require('fs').readFileSync(er.file, 'utf8')
+        const txt = require('fs').readFileSync(er.path, 'utf8')
           .replace(/\r\n/g, '\n')
         if (isDiff(txt)) {
           detail.push([
@@ -110,9 +109,7 @@ module.exports = (er) => {
             [
               'Merge conflict detected in your package.json.',
               '',
-              'Please resolve the package.json conflict and retry the command:',
-              '',
-              `$ ${process.argv.join(' ')}`,
+              'Please resolve the package.json conflict and retry.',
             ].join('\n'),
           ])
           break
@@ -270,6 +267,7 @@ module.exports = (er) => {
     case 'ECONNRESET':
     case 'ENOTFOUND':
     case 'ETIMEDOUT':
+    case 'ERR_SOCKET_TIMEOUT':
     case 'EAI_FAIL':
       short.push(['network', er.message])
       detail.push([

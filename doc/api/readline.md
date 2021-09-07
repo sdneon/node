@@ -544,7 +544,7 @@ the current position of the cursor down.
 <!-- YAML
 added: v0.1.98
 changes:
-  - version: REPLACEME
+  - version: v15.14.0
     pr-url: https://github.com/nodejs/node/pull/37932
     description: The `signal` option is supported now.
   - version: v15.8.0
@@ -971,8 +971,8 @@ const { createInterface } = require('readline');
 [TTY]: tty.md
 [TTY keybindings]: #readline_tty_keybindings
 [Writable]: stream.md#stream_writable_streams
-[`'SIGCONT'`]: readline.md#readline_event_sigcont
-[`'SIGTSTP'`]: readline.md#readline_event_sigtstp
+[`'SIGCONT'`]: #readline_event_sigcont
+[`'SIGTSTP'`]: #readline_event_sigtstp
 [`'line'`]: #readline_event_line
 [`fs.ReadStream`]: fs.md#fs_class_fs_readstream
 [`process.stdin`]: process.md#process_process_stdin

@@ -18,7 +18,7 @@ that are part of the JavaScript language itself, which are also globally
 accessible.
 
 ## Class: `AbortController`
-<!--YAML
+<!-- YAML
 added: v15.0.0
 changes:
   - version: v15.4.0
@@ -148,7 +148,7 @@ This variable may appear to be global but is not. See [`__filename`][].
 
 ## `atob(data)`
 <!-- YAML
-added: REPLACEME
+added: v16.0.0
 -->
 
 > Stability: 3 - Legacy. Use `Buffer.from(data, 'base64')` instead.
@@ -157,7 +157,7 @@ Global alias for [`buffer.atob()`][].
 
 ## `btoa(data)`
 <!-- YAML
-added: REPLACEME
+added: v16.0.0
 -->
 
 > Stability: 3 - Legacy. Use `buf.toString('base64')` instead.
@@ -319,7 +319,7 @@ within each turn of the Node.js event loop.
 // before any other promise jobs.
 
 DataHandler.prototype.load = async function load(key) {
-  const hit = this._cache.get(url);
+  const hit = this._cache.get(key);
   if (hit !== undefined) {
     queueMicrotask(() => {
       this.emit('load', hit);
@@ -328,7 +328,7 @@ DataHandler.prototype.load = async function load(key) {
   }
 
   const data = await fetchData(key);
-  this._cache.set(url, data);
+  this._cache.set(key, data);
   this.emit('load', data);
 };
 ```
