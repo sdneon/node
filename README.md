@@ -15,9 +15,12 @@ This is a *fun* mod of Node.JS that initially embedded a modified version of dco
 Thanks to the inspiration from dcodeIO et al =D
 
 # Current build(s)
-Latest is Node.JS+ 16.8.0.1.
+Latest is Node.JS+ 16.8.0.2.
 
 ## Changelog
+* 16.8.0.2: 
+  * Minor patch so coffeescript.VERSION is correct.
+  * Add `src_packs` folder containing the packed transpilers for cs & ts of various versions in case anyone needs them. Contain minified and non-minified ones.
 * 16.8.0.1: update to TypeScript 4.4.2, and glob 7.1.7. So it embeds:
   * CS v2.5.1.
   * TS v4.4.2.
@@ -51,7 +54,7 @@ The mod thus allows Node.JS+ to run .ds, .cs and .ts scripts directly for D Scri
 * Preprocessor directives are only available for D at the moment, but not for CS & TS.
 * `#ds`: D scripts can be identified by file extension of .ds, or CJS files with initial 3 characters of `#ds`.
   *  `#ds colors`: declares a D script file and imports [colors](https://github.com/marak/colors.js/) with basic color mapping:
-  ```
+  ```javascript
   require('colors').setTheme({
       silly: 'rainbow',
       input: 'grey',
@@ -93,7 +96,7 @@ The mod thus allows Node.JS+ to run .ds, .cs and .ts scripts directly for D Scri
   #end
   ```
   expands to:
-  ```
+  ```javascript
   (async () => {
       const exported_name = await import('<ESM module path>');
       <callback content>
@@ -106,7 +109,7 @@ The mod thus allows Node.JS+ to run .ds, .cs and .ts scripts directly for D Scri
   #end
   ```
   expands to:
-  ```
+  ```javascript
   (async () => {
       const {exported_names} = await import('<ESM module path>');
       <callback content>
@@ -118,22 +121,38 @@ The mod thus allows Node.JS+ to run .ds, .cs and .ts scripts directly for D Scri
 ### Exports
 The transpilers are made available in `global.transpiler`. I.e. the transpiler functions are: `transpiler.dscript.transpile`, `transpiler.coffeescript.compile`, and `transpiler.typescript.transpile`.
 Example:
-```
+```javascript
 const dCode = '...'; //<- your code goes here
 const outputCode = global.transpiler.dscript.transpile(dCode);
 ```
 Example:
-```
+```javascript
 const coffeeCode = '...'; //<- your code goes here
 const outputCode = global.transpiler.coffeescript.compile(
     coffeeCode,
     { bare: true }); //<- this option is to exclude function wrapper
 ```
 Example:
-```
+```javascript
 const typescriptCode = '...'; //<- your code goes here
 const outputCode = global.transpiler.typescript.transpile(typescriptCode);
 ```
+
+### Replacing Transpilers At Runtime
+You can replace the cs & ts transpilers at runtime, say if you wish to try different versions other than the latest embedded in Node.JS+. A few versions are provided in `src_packs` folder.
+* *.packed.js are the _non-minified_ ones good for digging into the innards of the transpiler.
+* *.packed._min_.js are the compact, _minified_ ones.
+
+To make the swap, for example in REPL, simple do this:
+```javascript
+//backup if need to restore latest later:
+global.transpiler.typescript_latest = global.transpiler.typescript;
+
+//override with alternate version:
+global.transpiler.typescript = require('path_to_alternate_src/src_packs/ts/4.2.3/TypeScript.packed.min.js');
+```
+
+`src_packs` folder is not used in Node.JS build. It's purely provided for playing around with.
 
 ### REPL mode for D Script, CoffeeScript and TypeScript
 REPL mode for D Script, CoffeeScript and TypeScript is activated by setting environment variable `NODE_REPL_SCRIPT` to 'ds', 'cs' or 'ts' respectively.
