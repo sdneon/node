@@ -246,6 +246,7 @@
                                          'lib/internal/source_map/source_map_cache.js',
                                          'lib/internal/streams/add-abort-signal.js',
                                          'lib/internal/streams/buffer_list.js',
+                                         'lib/internal/streams/compose.js',
                                          'lib/internal/streams/destroy.js',
                                          'lib/internal/streams/duplex.js',
                                          'lib/internal/streams/duplexify.js',

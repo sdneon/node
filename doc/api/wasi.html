@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v16.8.0">
-  <title>WebAssembly System Interface (WASI) | Node.js v16.8.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v16.9.1">
+  <title>WebAssembly System Interface (WASI) | Node.js v16.9.1 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -35,6 +35,7 @@
 <li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
 <li><a href="cli.html" class="nav-cli">Command-line options</a></li>
 <li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="corepack.html" class="nav-corepack">Corepack</a></li>
 <li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
 <li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
 <li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
@@ -91,7 +92,7 @@
     <div id="column1" data-id="wasi" class="interior">
       <header>
         <div class="header-container">
-          <h1>Node.js v16.8.0 documentation</h1>
+          <h1>Node.js v16.9.1 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -150,12 +151,12 @@
         <h2>WebAssembly System Interface (WASI)<span><a class="mark" href="#wasi_webassembly_system_interface_wasi" id="wasi_webassembly_system_interface_wasi">#</a></span></h2>
 
 <p></p><div class="api_stability api_stability_1"><a href="documentation.html#documentation_stability_index">Stability: 1</a> - Experimental</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v16.8.0/lib/wasi.js">lib/wasi.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v16.9.1/lib/wasi.js">lib/wasi.js</a></p>
 <p>The WASI API provides an implementation of the <a href="https://wasi.dev/">WebAssembly System Interface</a>
 specification. WASI gives sandboxed WebAssembly applications access to the
 underlying operating system via a collection of POSIX-like functions.</p>
 
-<pre><input class="js-flavor-selector" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> fs <span class="hljs-keyword">from</span> <span class="hljs-string">'fs'</span>;
+<pre><input class="js-flavor-selector" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { readFile } <span class="hljs-keyword">from</span> <span class="hljs-string">'fs/promises'</span>;
 <span class="hljs-keyword">import</span> { <span class="hljs-variable constant_">WASI</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'wasi'</span>;
 <span class="hljs-keyword">import</span> { argv, env } <span class="hljs-keyword">from</span> <span class="hljs-string">'process'</span>;
 
@@ -166,15 +167,21 @@ underlying operating system via a collection of POSIX-like functions.</p>
     <span class="hljs-string">'/sandbox'</span>: <span class="hljs-string">'/some/real/path/that/wasm/can/access'</span>
   }
 });
+
+<span class="hljs-comment">// Some WASI binaries require:</span>
+<span class="hljs-comment">//   const importObject = { wasi_unstable: wasi.wasiImport };</span>
 <span class="hljs-keyword">const</span> importObject = { <span class="hljs-attr">wasi_snapshot_preview1</span>: wasi.<span class="hljs-property">wasiImport</span> };
 
-<span class="hljs-keyword">const</span> wasm = <span class="hljs-keyword">await</span> <span class="hljs-title class_">WebAssembly</span>.<span class="hljs-title function_">compile</span>(fs.<span class="hljs-title function_">readFileSync</span>(<span class="hljs-string">'./demo.wasm'</span>));
+<span class="hljs-keyword">const</span> wasm = <span class="hljs-keyword">await</span> <span class="hljs-title class_">WebAssembly</span>.<span class="hljs-title function_">compile</span>(
+  <span class="hljs-keyword">await</span> <span class="hljs-title function_">readFile</span>(<span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'./demo.wasm'</span>, <span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">url</span>))
+);
 <span class="hljs-keyword">const</span> instance = <span class="hljs-keyword">await</span> <span class="hljs-title class_">WebAssembly</span>.<span class="hljs-title function_">instantiate</span>(wasm, importObject);
 
 wasi.<span class="hljs-title function_">start</span>(instance);</code><code class="language-js cjs"><span class="hljs-meta">'use strict'</span>;
-<span class="hljs-keyword">const</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'fs'</span>);
+<span class="hljs-keyword">const</span> { readFile } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'fs/promises'</span>);
 <span class="hljs-keyword">const</span> { <span class="hljs-variable constant_">WASI</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'wasi'</span>);
 <span class="hljs-keyword">const</span> { argv, env } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'process'</span>);
+<span class="hljs-keyword">const</span> { join } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'path'</span>);
 
 <span class="hljs-keyword">const</span> wasi = <span class="hljs-keyword">new</span> <span class="hljs-title function_">WASI</span>({
   <span class="hljs-attr">args</span>: argv,
@@ -183,10 +190,15 @@ wasi.<span class="hljs-title function_">start</span>(instance);</code><code clas
     <span class="hljs-string">'/sandbox'</span>: <span class="hljs-string">'/some/real/path/that/wasm/can/access'</span>
   }
 });
+
+<span class="hljs-comment">// Some WASI binaries require:</span>
+<span class="hljs-comment">//   const importObject = { wasi_unstable: wasi.wasiImport };</span>
 <span class="hljs-keyword">const</span> importObject = { <span class="hljs-attr">wasi_snapshot_preview1</span>: wasi.<span class="hljs-property">wasiImport</span> };
 
 (<span class="hljs-keyword">async</span> () => {
-  <span class="hljs-keyword">const</span> wasm = <span class="hljs-keyword">await</span> <span class="hljs-title class_">WebAssembly</span>.<span class="hljs-title function_">compile</span>(fs.<span class="hljs-title function_">readFileSync</span>(<span class="hljs-string">'./demo.wasm'</span>));
+  <span class="hljs-keyword">const</span> wasm = <span class="hljs-keyword">await</span> <span class="hljs-title class_">WebAssembly</span>.<span class="hljs-title function_">compile</span>(
+    <span class="hljs-keyword">await</span> <span class="hljs-title function_">readFile</span>(<span class="hljs-title function_">join</span>(__dirname, <span class="hljs-string">'demo.wasm'</span>))
+  );
   <span class="hljs-keyword">const</span> instance = <span class="hljs-keyword">await</span> <span class="hljs-title class_">WebAssembly</span>.<span class="hljs-title function_">instantiate</span>(wasm, importObject);
 
   wasi.<span class="hljs-title function_">start</span>(instance);

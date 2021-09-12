@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v16.8.0">
-  <title>Stream | Node.js v16.8.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v16.9.1">
+  <title>Stream | Node.js v16.9.1 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -35,6 +35,7 @@
 <li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
 <li><a href="cli.html" class="nav-cli">Command-line options</a></li>
 <li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="corepack.html" class="nav-corepack">Corepack</a></li>
 <li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
 <li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
 <li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
@@ -91,7 +92,7 @@
     <div id="column1" data-id="stream" class="interior">
       <header>
         <div class="header-container">
-          <h1>Node.js v16.8.0 documentation</h1>
+          <h1>Node.js v16.9.1 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -225,7 +226,11 @@
 </li>
 <li><a href="#stream_duplex_and_transform_streams">Duplex and transform streams</a>
 <ul>
-<li><a href="#stream_class_stream_duplex">Class: <code>stream.Duplex</code></a></li>
+<li><a href="#stream_class_stream_duplex">Class: <code>stream.Duplex</code></a>
+<ul>
+<li><a href="#stream_duplex_allowhalfopen"><code>duplex.allowHalfOpen</code></a></li>
+</ul>
+</li>
 <li><a href="#stream_class_stream_transform">Class: <code>stream.Transform</code></a>
 <ul>
 <li><a href="#stream_transform_destroy_error"><code>transform.destroy([error])</code></a></li>
@@ -236,6 +241,7 @@
 <li><a href="#stream_stream_finished_stream_options_callback"><code>stream.finished(stream[, options], callback)</code></a></li>
 <li><a href="#stream_stream_pipeline_source_transforms_destination_callback"><code>stream.pipeline(source[, ...transforms], destination, callback)</code></a></li>
 <li><a href="#stream_stream_pipeline_streams_callback"><code>stream.pipeline(streams, callback)</code></a></li>
+<li><span class="stability_1"><a href="#stream_stream_compose_streams"><code>stream.compose(...streams)</code></a></span></li>
 <li><a href="#stream_stream_readable_from_iterable_options"><code>stream.Readable.from(iterable, [options])</code></a></li>
 <li><span class="stability_1"><a href="#stream_stream_readable_isdisturbed_stream"><code>stream.Readable.isDisturbed(stream)</code></a></span></li>
 <li><a href="#stream_stream_duplex_from_src"><code>stream.Duplex.from(src)</code></a></li>
@@ -308,10 +314,10 @@
 </ul></details>
 
       <div id="apicontent">
-        <h2>Stream<a class="srclink" href="https://github.com/nodejs/node/blob/93553dc3c3c79e4aa37e1448182623669b4eeb23/lib/stream.js#L38">[src]</a><span><a class="mark" href="#stream_stream" id="stream_stream">#</a></span></h2>
+        <h2>Stream<a class="srclink" href="https://github.com/nodejs/node/blob/711e073596f29b047086e2f3d4ab3706b98462f7/lib/stream.js#L40">[src]</a><span><a class="mark" href="#stream_stream" id="stream_stream">#</a></span></h2>
 
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#documentation_stability_index">Stability: 2</a> - Stable</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v16.8.0/lib/stream.js">lib/stream.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v16.9.1/lib/stream.js">lib/stream.js</a></p>
 <p>A stream is an abstract interface for working with streaming data in Node.js.
 The <code>stream</code> module provides an API for implementing the stream interface.</p>
 <p>There are many stream objects provided by Node.js. For instance, a
@@ -1714,6 +1720,19 @@ emitted an error during iteration.</p>
 <li><a href="zlib.html">zlib streams</a></li>
 <li><a href="crypto.html">crypto streams</a></li>
 </ul>
+<h6><code>duplex.allowHalfOpen</code><span><a class="mark" href="#stream_duplex_allowhalfopen" id="stream_duplex_allowhalfopen">#</a></span></h6>
+<div class="api_metadata">
+<span>Added in: v0.9.4</span>
+</div>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+</ul>
+<p>If <code>false</code> then the stream will automatically end the writable side when the
+readable side ends. Set initially by the <code>allowHalfOpen</code> constructor option,
+which defaults to <code>false</code>.</p>
+<p>This can be changed manually to change the half-open behavior of an existing
+<code>Duplex</code> stream instance, but must be changed before the <code>'end'</code> event is
+emitted.</p>
 <h5>Class: <code>stream.Transform</code><span><a class="mark" href="#stream_class_stream_transform" id="stream_class_stream_transform">#</a></span></h5>
 <div class="api_metadata">
 <span>Added in: v0.9.4</span>
@@ -1961,6 +1980,85 @@ as the last argument:</p>
 <p><code>stream.pipeline()</code> leaves dangling event listeners on the streams
 after the <code>callback</code> has been invoked. In the case of reuse of streams after
 failure, this can cause event listener leaks and swallowed errors.</p>
+<h4><code>stream.compose(...streams)</code><span><a class="mark" href="#stream_stream_compose_streams" id="stream_stream_compose_streams">#</a></span></h4>
+<div class="api_metadata">
+<span>Added in: v16.9.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#documentation_stability_index">Stability: 1</a> - <code>stream.compose</code> is experimental.</div><p></p>
+<ul>
+<li><code>streams</code> <a href="stream.html#stream_stream" class="type">&#x3C;Stream[]></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols#The_iterable_protocol" class="type">&#x3C;Iterable[]></a> | <a href="https://tc39.github.io/ecma262/#sec-asynciterable-interface" class="type">&#x3C;AsyncIterable[]></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function[]></a></li>
+<li>Returns: <a href="stream.html#stream_class_stream_duplex" class="type">&#x3C;stream.Duplex></a></li>
+</ul>
+<p>Combines two or more streams into a <code>Duplex</code> stream that writes to the
+first stream and reads from the last. Each provided stream is piped into
+the next, using <code>stream.pipeline</code>. If any of the streams error then all
+are destroyed, including the outer <code>Duplex</code> stream.</p>
+<p>Because <code>stream.compose</code> returns a new stream that in turn can (and
+should) be piped into other streams, it enables composition. In contrast,
+when passing streams to <code>stream.pipeline</code>, typically the first stream is
+a readable stream and the last a writable stream, forming a closed
+circuit.</p>
+<p>If passed a <code>Function</code> it must be a factory method taking a <code>source</code>
+<code>Iterable</code>.</p>
+<pre><code class="language-js mjs"><span class="hljs-keyword">import</span> { compose, <span class="hljs-title class_">Transform</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'stream'</span>;
+
+<span class="hljs-keyword">const</span> removeSpaces = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Transform</span>({
+  <span class="hljs-title function_">transform</span>(<span class="hljs-params">chunk, encoding, callback</span>) {
+    <span class="hljs-title function_">callback</span>(<span class="hljs-literal">null</span>, <span class="hljs-title class_">String</span>(chunk).<span class="hljs-title function_">replace</span>(<span class="hljs-string">' '</span>, <span class="hljs-string">''</span>));
+  }
+});
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span>* <span class="hljs-title function_">toUpper</span>(<span class="hljs-params">source</span>) {
+  <span class="hljs-keyword">for</span> <span class="hljs-keyword">await</span> (<span class="hljs-keyword">const</span> chunk <span class="hljs-keyword">of</span> source) {
+    <span class="hljs-keyword">yield</span> <span class="hljs-title class_">String</span>(chunk).<span class="hljs-title function_">toUpperCase</span>();
+  }
+}
+
+<span class="hljs-keyword">let</span> res = <span class="hljs-string">''</span>;
+<span class="hljs-keyword">for</span> <span class="hljs-keyword">await</span> (<span class="hljs-keyword">const</span> buf <span class="hljs-keyword">of</span> <span class="hljs-title function_">compose</span>(removeSpaces, toUpper).<span class="hljs-title function_">end</span>(<span class="hljs-string">'hello world'</span>)) {
+  res += buf;
+}
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(res); <span class="hljs-comment">// prints 'HELLOWORLD'</span></code></pre>
+<p><code>stream.compose</code> can be used to convert async iterables, generators and
+functions into streams.</p>
+<ul>
+<li><code>AsyncIterable</code> converts into a readable <code>Duplex</code>. Cannot yield
+<code>null</code>.</li>
+<li><code>AsyncGeneratorFunction</code> converts into a readable/writable transform <code>Duplex</code>.
+Must take a source <code>AsyncIterable</code> as first parameter. Cannot yield
+<code>null</code>.</li>
+<li><code>AsyncFunction</code> converts into a writable <code>Duplex</code>. Must return
+either <code>null</code> or <code>undefined</code>.</li>
+</ul>
+<pre><code class="language-js mjs"><span class="hljs-keyword">import</span> { compose } <span class="hljs-keyword">from</span> <span class="hljs-string">'stream'</span>;
+<span class="hljs-keyword">import</span> { finished } <span class="hljs-keyword">from</span> <span class="hljs-string">'stream/promises'</span>;
+
+<span class="hljs-comment">// Convert AsyncIterable into readable Duplex.</span>
+<span class="hljs-keyword">const</span> s1 = <span class="hljs-title function_">compose</span>(<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span>*() {
+  <span class="hljs-keyword">yield</span> <span class="hljs-string">'Hello'</span>;
+  <span class="hljs-keyword">yield</span> <span class="hljs-string">'World'</span>;
+}());
+
+<span class="hljs-comment">// Convert AsyncGenerator into transform Duplex.</span>
+<span class="hljs-keyword">const</span> s2 = <span class="hljs-title function_">compose</span>(<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span>*(source) {
+  <span class="hljs-keyword">for</span> <span class="hljs-keyword">await</span> (<span class="hljs-keyword">const</span> chunk <span class="hljs-keyword">of</span> source) {
+    <span class="hljs-keyword">yield</span> <span class="hljs-title class_">String</span>(chunk).<span class="hljs-title function_">toUpperCase</span>();
+  }
+});
+
+<span class="hljs-keyword">let</span> res = <span class="hljs-string">''</span>;
+
+<span class="hljs-comment">// Convert AsyncFunction into writable Duplex.</span>
+<span class="hljs-keyword">const</span> s3 = <span class="hljs-title function_">compose</span>(<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span>(<span class="hljs-params">source</span>) {
+  <span class="hljs-keyword">for</span> <span class="hljs-keyword">await</span> (<span class="hljs-keyword">const</span> chunk <span class="hljs-keyword">of</span> source) {
+    res += chunk;
+  }
+});
+
+<span class="hljs-keyword">await</span> <span class="hljs-title function_">finished</span>(<span class="hljs-title function_">compose</span>(s1, s2, s3));
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(res); <span class="hljs-comment">// prints 'HELLOWORLD'</span></code></pre>
 <h4><code>stream.Readable.from(iterable, [options])</code><span><a class="mark" href="#stream_stream_readable_from_iterable_options" id="stream_stream_readable_from_iterable_options">#</a></span></h4>
 <div class="api_metadata">
 <span>Added in: v12.3.0, v10.17.0</span>
