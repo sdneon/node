@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v16.9.1/lib/http.js\">lib/http.js</a></p>\n<p>To use the HTTP server and client one must <code>require('http')</code>.</p>\n<p>The HTTP interfaces in Node.js are designed to support many features\nof the protocol which have been traditionally difficult to use.\nIn particular, large, possibly chunk-encoded, messages. The interface is\ncareful to never buffer entire requests or responses, so the\nuser is able to stream data.</p>\n<p>HTTP message headers are represented by an object like this:</p>\n<!-- eslint-skip -->\n<pre><code class=\"language-js\">{ 'content-length': '123',\n  'content-type': 'text/plain',\n  'connection': 'keep-alive',\n  'host': 'mysite.com',\n  'accept': '*/*' }\n</code></pre>\n<p>Keys are lowercased. Values are not modified.</p>\n<p>In order to support the full spectrum of possible HTTP applications, the Node.js\nHTTP API is very low-level. It deals with stream handling and message\nparsing only. It parses a message into headers and body but it does not\nparse the actual headers or the body.</p>\n<p>See <a href=\"#http_message_headers\"><code>message.headers</code></a> for details on how duplicate headers are handled.</p>\n<p>The raw headers as they were received are retained in the <code>rawHeaders</code>\nproperty, which is an array of <code>[key, value, key2, value2, ...]</code>. For\nexample, the previous message header object might have a <code>rawHeaders</code>\nlist like the following:</p>\n<!-- eslint-disable semi -->\n<pre><code class=\"language-js\">[ 'ConTent-Length', '123456',\n  'content-LENGTH', '123',\n  'content-type', 'text/plain',\n  'CONNECTION', 'keep-alive',\n  'Host', 'mysite.com',\n  'accepT', '*/*' ]\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v16.10.0/lib/http.js\">lib/http.js</a></p>\n<p>To use the HTTP server and client one must <code>require('http')</code>.</p>\n<p>The HTTP interfaces in Node.js are designed to support many features\nof the protocol which have been traditionally difficult to use.\nIn particular, large, possibly chunk-encoded, messages. The interface is\ncareful to never buffer entire requests or responses, so the\nuser is able to stream data.</p>\n<p>HTTP message headers are represented by an object like this:</p>\n<!-- eslint-skip -->\n<pre><code class=\"language-js\">{ 'content-length': '123',\n  'content-type': 'text/plain',\n  'connection': 'keep-alive',\n  'host': 'mysite.com',\n  'accept': '*/*' }\n</code></pre>\n<p>Keys are lowercased. Values are not modified.</p>\n<p>In order to support the full spectrum of possible HTTP applications, the Node.js\nHTTP API is very low-level. It deals with stream handling and message\nparsing only. It parses a message into headers and body but it does not\nparse the actual headers or the body.</p>\n<p>See <a href=\"#http_message_headers\"><code>message.headers</code></a> for details on how duplicate headers are handled.</p>\n<p>The raw headers as they were received are retained in the <code>rawHeaders</code>\nproperty, which is an array of <code>[key, value, key2, value2, ...]</code>. For\nexample, the previous message header object might have a <code>rawHeaders</code>\nlist like the following:</p>\n<!-- eslint-disable semi -->\n<pre><code class=\"language-js\">[ 'ConTent-Length', '123456',\n  'content-LENGTH', '123',\n  'content-type', 'text/plain',\n  'CONNECTION', 'keep-alive',\n  'Host', 'mysite.com',\n  'accepT', '*/*' ]\n</code></pre>",
       "classes": [
         {
           "textRaw": "Class: `http.Agent`",
@@ -1429,6 +1429,20 @@
               "desc": "<p>Sets the timeout value in milliseconds for receiving the entire request from\nthe client.</p>\n<p>If the timeout expires, the server responds with status 408 without\nforwarding the request to the request listener and then closes the connection.</p>\n<p>It must be set to a non-zero value (e.g. 120 seconds) to protect against\npotential Denial-of-Service attacks in case the server is deployed without a\nreverse proxy in front.</p>"
             },
             {
+              "textRaw": "`maxRequestsPerSocket` {number} Requests per socket. **Default:** null (no limit)",
+              "type": "number",
+              "name": "maxRequestsPerSocket",
+              "meta": {
+                "added": [
+                  "v16.10.0"
+                ],
+                "changes": []
+              },
+              "default": "null (no limit)",
+              "desc": "<p>The maximum number of requests socket can handle\nbefore closing keep alive connection.</p>\n<p>A value of <code>null</code> will disable the limit.</p>\n<p>When limit is reach it will set <code>Connection</code> header value to <code>closed</code>,\nbut will not actually close the connection, subsequent requests sent\nafter the limit is reached will get <code>503 Service Unavailable</code> as a response.</p>",
+              "shortDesc": "Requests per socket."
+            },
+            {
               "textRaw": "`timeout` {number} Timeout in milliseconds. **Default:** 0 (no timeout)",
               "type": "number",
               "name": "timeout",
@@ -2742,6 +2756,11 @@
               },
               "signatures": [
                 {
+                  "return": {
+                    "textRaw": "Returns: {this}",
+                    "name": "return",
+                    "type": "this"
+                  },
                   "params": [
                     {
                       "textRaw": "`msesc` {number}",
@@ -2749,15 +2768,15 @@
                       "type": "number"
                     },
                     {
-                      "textRaw": "`callback` {Function} Optional function to be called when a timeout",
+                      "textRaw": "`callback` {Function} Optional function to be called when a timeout occurs. Same as binding to the `timeout` event.",
                       "name": "callback",
                       "type": "Function",
-                      "desc": "Optional function to be called when a timeout"
+                      "desc": "Optional function to be called when a timeout occurs. Same as binding to the `timeout` event."
                     }
                   ]
                 }
               ],
-              "desc": "<p>occurs, Same as binding to the <code>timeout</code> event.</p>\n<ul>\n<li>Returns: <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this\" class=\"type\">&lt;this&gt;</a></li>\n</ul>\n<p>Once a socket is associated with the message and is connected,\n<a href=\"net.html#net_socket_settimeout_timeout_callback\"><code>socket.setTimeout()</code></a> will be called with <code>msecs</code> as the first parameter.</p>"
+              "desc": "<p>Once a socket is associated with the message and is connected,\n<a href=\"net.html#net_socket_settimeout_timeout_callback\"><code>socket.setTimeout()</code></a> will be called with <code>msecs</code> as the first parameter.</p>"
             },
             {
               "textRaw": "`outgoingMessage.uncork()`",

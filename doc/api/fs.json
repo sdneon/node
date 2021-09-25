@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v16.9.1/lib/fs.js\">lib/fs.js</a></p>\n<p>The <code>fs</code> module enables interacting with the file system in a\nway modeled on standard POSIX functions.</p>\n<p>To use the promise-based APIs:</p>\n<pre><code class=\"language-mjs\">import * as fs from 'fs/promises';\n</code></pre>\n<pre><code class=\"language-cjs\">const fs = require('fs/promises');\n</code></pre>\n<p>To use the callback and sync APIs:</p>\n<pre><code class=\"language-mjs\">import * as fs from 'fs';\n</code></pre>\n<pre><code class=\"language-cjs\">const fs = require('fs');\n</code></pre>\n<p>All file system operations have synchronous, callback, and promise-based\nforms, and are accessible using both CommonJS syntax and ES6 Modules (ESM).</p>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v16.10.0/lib/fs.js\">lib/fs.js</a></p>\n<p>The <code>fs</code> module enables interacting with the file system in a\nway modeled on standard POSIX functions.</p>\n<p>To use the promise-based APIs:</p>\n<pre><code class=\"language-mjs\">import * as fs from 'fs/promises';\n</code></pre>\n<pre><code class=\"language-cjs\">const fs = require('fs/promises');\n</code></pre>\n<p>To use the callback and sync APIs:</p>\n<pre><code class=\"language-mjs\">import * as fs from 'fs';\n</code></pre>\n<pre><code class=\"language-cjs\">const fs = require('fs');\n</code></pre>\n<p>All file system operations have synchronous, callback, and promise-based\nforms, and are accessible using both CommonJS syntax and ES6 Modules (ESM).</p>",
       "modules": [
         {
           "textRaw": "Promise example",
@@ -282,17 +282,15 @@
                           "desc": "A buffer that will be filled with the file data read."
                         },
                         {
-                          "textRaw": "`offset` {integer} The location in the buffer at which to start filling. **Default:** `0`",
+                          "textRaw": "`offset` {integer} The location in the buffer at which to start filling.",
                           "name": "offset",
                           "type": "integer",
-                          "default": "`0`",
                           "desc": "The location in the buffer at which to start filling."
                         },
                         {
-                          "textRaw": "`length` {integer} The number of bytes to read. **Default:** `buffer.byteLength`",
+                          "textRaw": "`length` {integer} The number of bytes to read.",
                           "name": "length",
                           "type": "integer",
-                          "default": "`buffer.byteLength`",
                           "desc": "The number of bytes to read."
                         },
                         {
@@ -1615,7 +1613,10 @@
                 ],
                 "changes": [
                   {
-                    "version": "v15.2.0",
+                    "version": [
+                      "v15.2.0",
+                      "v14.17.0"
+                    ],
                     "pr-url": "https://github.com/nodejs/node/pull/35911",
                     "description": "The options argument may include an AbortSignal to abort an ongoing readFile request."
                   }
@@ -2223,7 +2224,10 @@
                     "description": "The `data` argument supports `AsyncIterable`, `Iterable` and `Stream`."
                   },
                   {
-                    "version": "v15.2.0",
+                    "version": [
+                      "v15.2.0",
+                      "v14.17.0"
+                    ],
                     "pr-url": "https://github.com/nodejs/node/pull/35993",
                     "description": "The options argument may include an AbortSignal to abort an ongoing writeFile request."
                   },
@@ -2766,6 +2770,16 @@
                 ],
                 "changes": [
                   {
+                    "version": "v16.10.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/40013",
+                    "description": "The `fs` option does not need `open` method if an `fd` was provided."
+                  },
+                  {
+                    "version": "v16.10.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/40013",
+                    "description": "The `fs` option does not need `close` method if `autoClose` is `false`."
+                  },
+                  {
                     "version": [
                       "v15.4.0"
                     ],
@@ -2896,7 +2910,7 @@
                   ]
                 }
               ],
-              "desc": "<p>Unlike the 16 kb default <code>highWaterMark</code> for a readable stream, the stream\nreturned by this method has a default <code>highWaterMark</code> of 64 kb.</p>\n<p><code>options</code> can include <code>start</code> and <code>end</code> values to read a range of bytes from\nthe file instead of the entire file. Both <code>start</code> and <code>end</code> are inclusive and\nstart counting at 0, allowed values are in the\n[0, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/MAX_SAFE_INTEGER\"><code>Number.MAX_SAFE_INTEGER</code></a>] range. If <code>fd</code> is specified and <code>start</code> is\nomitted or <code>undefined</code>, <code>fs.createReadStream()</code> reads sequentially from the\ncurrent file position. The <code>encoding</code> can be any one of those accepted by\n<a href=\"buffer.html#buffer_class_buffer\" class=\"type\">&lt;Buffer&gt;</a>.</p>\n<p>If <code>fd</code> is specified, <code>ReadStream</code> will ignore the <code>path</code> argument and will use\nthe specified file descriptor. This means that no <code>'open'</code> event will be\nemitted. <code>fd</code> should be blocking; non-blocking <code>fd</code>s should be passed to\n<a href=\"net.html#net_class_net_socket\" class=\"type\">&lt;net.Socket&gt;</a>.</p>\n<p>If <code>fd</code> points to a character device that only supports blocking reads\n(such as keyboard or sound card), read operations do not finish until data is\navailable. This can prevent the process from exiting and the stream from\nclosing naturally.</p>\n<p>By default, the stream will emit a <code>'close'</code> event after it has been\ndestroyed, like most <code>Readable</code> streams.  Set the <code>emitClose</code> option to\n<code>false</code> to change this behavior.</p>\n<p>By providing the <code>fs</code> option, it is possible to override the corresponding <code>fs</code>\nimplementations for <code>open</code>, <code>read</code>, and <code>close</code>. When providing the <code>fs</code> option,\noverrides for <code>open</code>, <code>read</code>, and <code>close</code> are required.</p>\n<pre><code class=\"language-mjs\">import { createReadStream } from 'fs';\n\n// Create a stream from some character device.\nconst stream = createReadStream('/dev/input/event0');\nsetTimeout(() => {\n  stream.close(); // This may not close the stream.\n  // Artificially marking end-of-stream, as if the underlying resource had\n  // indicated end-of-file by itself, allows the stream to close.\n  // This does not cancel pending read operations, and if there is such an\n  // operation, the process may still not be able to exit successfully\n  // until it finishes.\n  stream.push(null);\n  stream.read(0);\n}, 100);\n</code></pre>\n<p>If <code>autoClose</code> is false, then the file descriptor won't be closed, even if\nthere's an error. It is the application's responsibility to close it and make\nsure there's no file descriptor leak. If <code>autoClose</code> is set to true (default\nbehavior), on <code>'error'</code> or <code>'end'</code> the file descriptor will be closed\nautomatically.</p>\n<p><code>mode</code> sets the file mode (permission and sticky bits), but only if the\nfile was created.</p>\n<p>An example to read the last 10 bytes of a file which is 100 bytes long:</p>\n<pre><code class=\"language-mjs\">import { createReadStream } from 'fs';\n\ncreateReadStream('sample.txt', { start: 90, end: 99 });\n</code></pre>\n<p>If <code>options</code> is a string, then it specifies the encoding.</p>"
+              "desc": "<p>Unlike the 16 kb default <code>highWaterMark</code> for a readable stream, the stream\nreturned by this method has a default <code>highWaterMark</code> of 64 kb.</p>\n<p><code>options</code> can include <code>start</code> and <code>end</code> values to read a range of bytes from\nthe file instead of the entire file. Both <code>start</code> and <code>end</code> are inclusive and\nstart counting at 0, allowed values are in the\n[0, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/MAX_SAFE_INTEGER\"><code>Number.MAX_SAFE_INTEGER</code></a>] range. If <code>fd</code> is specified and <code>start</code> is\nomitted or <code>undefined</code>, <code>fs.createReadStream()</code> reads sequentially from the\ncurrent file position. The <code>encoding</code> can be any one of those accepted by\n<a href=\"buffer.html#buffer_class_buffer\" class=\"type\">&lt;Buffer&gt;</a>.</p>\n<p>If <code>fd</code> is specified, <code>ReadStream</code> will ignore the <code>path</code> argument and will use\nthe specified file descriptor. This means that no <code>'open'</code> event will be\nemitted. <code>fd</code> should be blocking; non-blocking <code>fd</code>s should be passed to\n<a href=\"net.html#net_class_net_socket\" class=\"type\">&lt;net.Socket&gt;</a>.</p>\n<p>If <code>fd</code> points to a character device that only supports blocking reads\n(such as keyboard or sound card), read operations do not finish until data is\navailable. This can prevent the process from exiting and the stream from\nclosing naturally.</p>\n<p>By default, the stream will emit a <code>'close'</code> event after it has been\ndestroyed, like most <code>Readable</code> streams.  Set the <code>emitClose</code> option to\n<code>false</code> to change this behavior.</p>\n<p>By providing the <code>fs</code> option, it is possible to override the corresponding <code>fs</code>\nimplementations for <code>open</code>, <code>read</code>, and <code>close</code>. When providing the <code>fs</code> option,\nan override for <code>read</code> is required. If no <code>fd</code> is provided, an override for\n<code>open</code> is also required. If <code>autoClose</code> is <code>true</code>, an override for <code>close</code> is\nalso required.</p>\n<pre><code class=\"language-mjs\">import { createReadStream } from 'fs';\n\n// Create a stream from some character device.\nconst stream = createReadStream('/dev/input/event0');\nsetTimeout(() => {\n  stream.close(); // This may not close the stream.\n  // Artificially marking end-of-stream, as if the underlying resource had\n  // indicated end-of-file by itself, allows the stream to close.\n  // This does not cancel pending read operations, and if there is such an\n  // operation, the process may still not be able to exit successfully\n  // until it finishes.\n  stream.push(null);\n  stream.read(0);\n}, 100);\n</code></pre>\n<p>If <code>autoClose</code> is false, then the file descriptor won't be closed, even if\nthere's an error. It is the application's responsibility to close it and make\nsure there's no file descriptor leak. If <code>autoClose</code> is set to true (default\nbehavior), on <code>'error'</code> or <code>'end'</code> the file descriptor will be closed\nautomatically.</p>\n<p><code>mode</code> sets the file mode (permission and sticky bits), but only if the\nfile was created.</p>\n<p>An example to read the last 10 bytes of a file which is 100 bytes long:</p>\n<pre><code class=\"language-mjs\">import { createReadStream } from 'fs';\n\ncreateReadStream('sample.txt', { start: 90, end: 99 });\n</code></pre>\n<p>If <code>options</code> is a string, then it specifies the encoding.</p>"
             },
             {
               "textRaw": "`fs.createWriteStream(path[, options])`",
@@ -2907,6 +2921,16 @@
                   "v0.1.31"
                 ],
                 "changes": [
+                  {
+                    "version": "v16.10.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/40013",
+                    "description": "The `fs` option does not need `open` method if an `fd` was provided."
+                  },
+                  {
+                    "version": "v16.10.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/40013",
+                    "description": "The `fs` option does not need `close` method if `autoClose` is `false`."
+                  },
                   {
                     "version": [
                       "v15.4.0"
@@ -3026,7 +3050,7 @@
                   ]
                 }
               ],
-              "desc": "<p><code>options</code> may also include a <code>start</code> option to allow writing data at some\nposition past the beginning of the file, allowed values are in the\n[0, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/MAX_SAFE_INTEGER\"><code>Number.MAX_SAFE_INTEGER</code></a>] range. Modifying a file rather than replacing\nit may require the <code>flags</code> option to be set to <code>r+</code> rather than the default <code>w</code>.\nThe <code>encoding</code> can be any one of those accepted by <a href=\"buffer.html#buffer_class_buffer\" class=\"type\">&lt;Buffer&gt;</a>.</p>\n<p>If <code>autoClose</code> is set to true (default behavior) on <code>'error'</code> or <code>'finish'</code>\nthe file descriptor will be closed automatically. If <code>autoClose</code> is false,\nthen the file descriptor won't be closed, even if there's an error.\nIt is the application's responsibility to close it and make sure there's no\nfile descriptor leak.</p>\n<p>By default, the stream will emit a <code>'close'</code> event after it has been\ndestroyed, like most <code>Writable</code> streams.  Set the <code>emitClose</code> option to\n<code>false</code> to change this behavior.</p>\n<p>By providing the <code>fs</code> option it is possible to override the corresponding <code>fs</code>\nimplementations for <code>open</code>, <code>write</code>, <code>writev</code> and <code>close</code>. Overriding <code>write()</code>\nwithout <code>writev()</code> can reduce performance as some optimizations (<code>_writev()</code>)\nwill be disabled. When providing the <code>fs</code> option,  overrides for <code>open</code>,\n<code>close</code>, and at least one of <code>write</code> and <code>writev</code> are required.</p>\n<p>Like <a href=\"fs.html#fs_class_fs_readstream\" class=\"type\">&lt;fs.ReadStream&gt;</a>, if <code>fd</code> is specified, <a href=\"fs.html#fs_class_fs_writestream\" class=\"type\">&lt;fs.WriteStream&gt;</a> will ignore the\n<code>path</code> argument and will use the specified file descriptor. This means that no\n<code>'open'</code> event will be emitted. <code>fd</code> should be blocking; non-blocking <code>fd</code>s\nshould be passed to <a href=\"net.html#net_class_net_socket\" class=\"type\">&lt;net.Socket&gt;</a>.</p>\n<p>If <code>options</code> is a string, then it specifies the encoding.</p>"
+              "desc": "<p><code>options</code> may also include a <code>start</code> option to allow writing data at some\nposition past the beginning of the file, allowed values are in the\n[0, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/MAX_SAFE_INTEGER\"><code>Number.MAX_SAFE_INTEGER</code></a>] range. Modifying a file rather than replacing\nit may require the <code>flags</code> option to be set to <code>r+</code> rather than the default <code>w</code>.\nThe <code>encoding</code> can be any one of those accepted by <a href=\"buffer.html#buffer_class_buffer\" class=\"type\">&lt;Buffer&gt;</a>.</p>\n<p>If <code>autoClose</code> is set to true (default behavior) on <code>'error'</code> or <code>'finish'</code>\nthe file descriptor will be closed automatically. If <code>autoClose</code> is false,\nthen the file descriptor won't be closed, even if there's an error.\nIt is the application's responsibility to close it and make sure there's no\nfile descriptor leak.</p>\n<p>By default, the stream will emit a <code>'close'</code> event after it has been\ndestroyed, like most <code>Writable</code> streams.  Set the <code>emitClose</code> option to\n<code>false</code> to change this behavior.</p>\n<p>By providing the <code>fs</code> option it is possible to override the corresponding <code>fs</code>\nimplementations for <code>open</code>, <code>write</code>, <code>writev</code> and <code>close</code>. Overriding <code>write()</code>\nwithout <code>writev()</code> can reduce performance as some optimizations (<code>_writev()</code>)\nwill be disabled. When providing the <code>fs</code> option, overrides for at least one of\n<code>write</code> and <code>writev</code> are required. If no <code>fd</code> option is supplied, an override\nfor <code>open</code> is also required. If <code>autoClose</code> is <code>true</code>, an override for <code>close</code>\nis also required.</p>\n<p>Like <a href=\"fs.html#fs_class_fs_readstream\" class=\"type\">&lt;fs.ReadStream&gt;</a>, if <code>fd</code> is specified, <a href=\"fs.html#fs_class_fs_writestream\" class=\"type\">&lt;fs.WriteStream&gt;</a> will ignore the\n<code>path</code> argument and will use the specified file descriptor. This means that no\n<code>'open'</code> event will be emitted. <code>fd</code> should be blocking; non-blocking <code>fd</code>s\nshould be passed to <a href=\"net.html#net_class_net_socket\" class=\"type\">&lt;net.Socket&gt;</a>.</p>\n<p>If <code>options</code> is a string, then it specifies the encoding.</p>"
             },
             {
               "textRaw": "`fs.exists(path, callback)`",
@@ -3833,7 +3857,7 @@
                   ]
                 }
               ],
-              "desc": "<p>Asynchronously creates a directory.</p>\n<p>The callback is given a possible exception and, if <code>recursive</code> is <code>true</code>, the\nfirst directory path created, <code>(err, [path])</code>.\n<code>path</code> can still be <code>undefined</code> when <code>recursive</code> is <code>true</code>, if no directory was\ncreated.</p>\n<p>The optional <code>options</code> argument can be an integer specifying <code>mode</code> (permission\nand sticky bits), or an object with a <code>mode</code> property and a <code>recursive</code>\nproperty indicating whether parent directories should be created. Calling\n<code>fs.mkdir()</code> when <code>path</code> is a directory that exists results in an error only\nwhen <code>recursive</code> is false.</p>\n<pre><code class=\"language-mjs\">import { mkdir } from 'fs';\n\n// Creates /tmp/a/apple, regardless of whether `/tmp` and /tmp/a exist.\nmkdir('/tmp/a/apple', { recursive: true }, (err) => {\n  if (err) throw err;\n});\n</code></pre>\n<p>On Windows, using <code>fs.mkdir()</code> on the root directory even with recursion will\nresult in an error:</p>\n<pre><code class=\"language-mjs\">import { mkdir } from 'fs';\n\nmkdir('/', { recursive: true }, (err) => {\n  // => [Error: EPERM: operation not permitted, mkdir 'C:\\']\n});\n</code></pre>\n<p>See the POSIX <a href=\"http://man7.org/linux/man-pages/man2/mkdir.2.html\"><code>mkdir(2)</code></a> documentation for more details.</p>"
+              "desc": "<p>Asynchronously creates a directory.</p>\n<p>The callback is given a possible exception and, if <code>recursive</code> is <code>true</code>, the\nfirst directory path created, <code>(err[, path])</code>.\n<code>path</code> can still be <code>undefined</code> when <code>recursive</code> is <code>true</code>, if no directory was\ncreated.</p>\n<p>The optional <code>options</code> argument can be an integer specifying <code>mode</code> (permission\nand sticky bits), or an object with a <code>mode</code> property and a <code>recursive</code>\nproperty indicating whether parent directories should be created. Calling\n<code>fs.mkdir()</code> when <code>path</code> is a directory that exists results in an error only\nwhen <code>recursive</code> is false.</p>\n<pre><code class=\"language-mjs\">import { mkdir } from 'fs';\n\n// Creates /tmp/a/apple, regardless of whether `/tmp` and /tmp/a exist.\nmkdir('/tmp/a/apple', { recursive: true }, (err) => {\n  if (err) throw err;\n});\n</code></pre>\n<p>On Windows, using <code>fs.mkdir()</code> on the root directory even with recursion will\nresult in an error:</p>\n<pre><code class=\"language-mjs\">import { mkdir } from 'fs';\n\nmkdir('/', { recursive: true }, (err) => {\n  // => [Error: EPERM: operation not permitted, mkdir 'C:\\']\n});\n</code></pre>\n<p>See the POSIX <a href=\"http://man7.org/linux/man-pages/man2/mkdir.2.html\"><code>mkdir(2)</code></a> documentation for more details.</p>"
             },
             {
               "textRaw": "`fs.mkdtemp(prefix[, options], callback)`",
@@ -4082,24 +4106,21 @@
                       "type": "integer"
                     },
                     {
-                      "textRaw": "`buffer` {Buffer|TypedArray|DataView} The buffer that the data will be written to. **Default:** `Buffer.alloc(16384)`",
+                      "textRaw": "`buffer` {Buffer|TypedArray|DataView} The buffer that the data will be written to.",
                       "name": "buffer",
                       "type": "Buffer|TypedArray|DataView",
-                      "default": "`Buffer.alloc(16384)`",
                       "desc": "The buffer that the data will be written to."
                     },
                     {
-                      "textRaw": "`offset` {integer} The position in `buffer` to write the data to. **Default:** `0`",
+                      "textRaw": "`offset` {integer} The position in `buffer` to write the data to.",
                       "name": "offset",
                       "type": "integer",
-                      "default": "`0`",
                       "desc": "The position in `buffer` to write the data to."
                     },
                     {
-                      "textRaw": "`length` {integer} The number of bytes to read. **Default:** `buffer.byteLength`",
+                      "textRaw": "`length` {integer} The number of bytes to read.",
                       "name": "length",
                       "type": "integer",
-                      "default": "`buffer.byteLength`",
                       "desc": "The number of bytes to read."
                     },
                     {
@@ -6577,7 +6598,10 @@
                 ],
                 "changes": [
                   {
-                    "version": "v15.3.0",
+                    "version": [
+                      "v15.3.0",
+                      "v14.17.0"
+                    ],
                     "pr-url": "https://github.com/nodejs/node/pull/33716",
                     "description": "Accepts a `throwIfNoEntry` option to specify whether an exception should be thrown if the entry does not exist."
                   },
@@ -7084,7 +7108,7 @@
               "desc": "<p>Returns the number of <code>bytesRead</code>.</p>\n<p>For detailed information, see the documentation of the asynchronous version of\nthis API: <a href=\"#fs_fs_read_fd_buffer_offset_length_position_callback\"><code>fs.read()</code></a>.</p>"
             },
             {
-              "textRaw": "`fs.readSync(fd, buffer, [options])`",
+              "textRaw": "`fs.readSync(fd, buffer[, options])`",
               "type": "method",
               "name": "readSync",
               "meta": {
@@ -7486,7 +7510,10 @@
                 ],
                 "changes": [
                   {
-                    "version": "v15.3.0",
+                    "version": [
+                      "v15.3.0",
+                      "v14.17.0"
+                    ],
                     "pr-url": "https://github.com/nodejs/node/pull/33716",
                     "description": "Accepts a `throwIfNoEntry` option to specify whether an exception should be thrown if the entry does not exist."
                   },

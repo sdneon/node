@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v16.9.1">
-  <title>Modules: Packages | Node.js v16.9.1 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v16.10.0">
+  <title>Modules: Packages | Node.js v16.10.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -92,7 +92,7 @@
     <div id="column1" data-id="packages" class="interior">
       <header>
         <div class="header-container">
-          <h1>Node.js v16.9.1 documentation</h1>
+          <h1>Node.js v16.10.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -593,6 +593,11 @@ formats include CommonJS, JSON, and native addons but not ES modules as
 <li><code>"node"</code> - matches for any Node.js environment. Can be a CommonJS or ES
 module file. <em>This condition should always come after <code>"import"</code> or
 <code>"require"</code>.</em></li>
+<li><code>"node-addons"</code> - similar to <code>"node"</code> and matches for any Node.js environment.
+This condition can be used to provide an entry point which uses native C++
+addons as opposed to an entry point which is more universal and doesn't rely
+on native addons. This condition can be disabled via the
+<a href="cli.html#cli_no_addons"><code>--no-addons</code> flag</a>.</li>
 <li><code>"default"</code> - the generic fallback that always matches. Can be a CommonJS
 or ES module file. <em>This condition should always come last.</em></li>
 </ul>
@@ -649,13 +654,18 @@ conditions behave analogously to nested JavaScript <code>if</code> statements.</
 <code>--conditions</code> flag:</p>
 <pre><code class="language-bash">node --conditions=development main.js</code></pre>
 <p>which would then resolve the <code>"development"</code> condition in package imports and
-exports, while resolving the existing <code>"node"</code>, <code>"default"</code>, <code>"import"</code>, and
-<code>"require"</code> conditions as appropriate.</p>
+exports, while resolving the existing <code>"node"</code>, <code>"node-addons"</code>, <code>"default"</code>,
+<code>"import"</code>, and <code>"require"</code> conditions as appropriate.</p>
 <p>Any number of custom conditions can be set with repeat flags.</p>
 <h4>Conditions Definitions<span><a class="mark" href="#packages_conditions_definitions" id="packages_conditions_definitions">#</a></span></h4>
-<p>The <code>"import"</code>, <code>"require"</code>, <code>"node"</code> and <code>"default"</code> conditions are defined
-and implemented in Node.js core,
+<p>The <code>"import"</code> , <code>"require"</code> , <code>"node"</code> , <code>"node-addons"</code> and <code>"default"</code>
+conditions are defined and implemented in Node.js core,
 <a href="#packages_conditional_exports">as specified above</a>.</p>
+<p>The <code>"node-addons"</code> condition can be used to provide an entry point which
+uses native C++ addons. However, this condition can be disabled via the
+<a href="cli.html#cli_no_addons"><code>--no-addons</code> flag</a>. When using <code>"node-addons"</code>, it's recommended to treat
+<code>"default"</code> as an enhancement that provides a more universal entry point, e.g.
+using WebAssembly instead of a native addon.</p>
 <p>Other condition strings are unknown to Node.js and thus ignored by default.
 Runtimes or tools other than Node.js can use them at their discretion.</p>
 <p>These user conditions can be enabled in Node.js via the <a href="#packages_resolving_user_conditions"><code>--conditions</code>
@@ -738,9 +748,9 @@ code will also work:</p>
   <span class="hljs-attr">"name"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"@my/package"</span><span class="hljs-punctuation">,</span>
   <span class="hljs-attr">"exports"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./index.js"</span>
 <span class="hljs-punctuation">}</span></code></pre>
-
-<pre><input class="js-flavor-selector" type="checkbox" checked aria-label="Show modern ES modules syntax"><pre><code class="language-js cjs"><span class="hljs-comment">// ./index.js</span>
-<span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = <span class="hljs-number">42</span>;</code></pre><code class="language-js cjs"><span class="hljs-comment">// ./other.js</span>
+<pre><code class="language-js cjs"><span class="hljs-comment">// ./index.js</span>
+<span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = <span class="hljs-number">42</span>;</code></pre>
+<pre><code class="language-js cjs"><span class="hljs-comment">// ./other.js</span>
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-built_in">require</span>(<span class="hljs-string">'@my/package'</span>));</code></pre>
 <pre><code class="language-console"><span class="hljs-meta">$ </span><span class="language-bash">node other.js</span>
 42</code></pre>

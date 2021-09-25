@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v16.9.1">
-  <title>HTTP | Node.js v16.9.1 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v16.10.0">
+  <title>HTTP | Node.js v16.10.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -92,7 +92,7 @@
     <div id="column1" data-id="http" class="interior">
       <header>
         <div class="header-container">
-          <h1>Node.js v16.9.1 documentation</h1>
+          <h1>Node.js v16.10.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -218,6 +218,7 @@
 <li><a href="#http_server_maxheaderscount"><code>server.maxHeadersCount</code></a></li>
 <li><a href="#http_server_requesttimeout"><code>server.requestTimeout</code></a></li>
 <li><a href="#http_server_settimeout_msecs_callback"><code>server.setTimeout([msecs][, callback])</code></a></li>
+<li><a href="#http_server_maxrequestspersocket"><code>server.maxRequestsPerSocket</code></a></li>
 <li><a href="#http_server_timeout"><code>server.timeout</code></a></li>
 <li><a href="#http_server_keepalivetimeout"><code>server.keepAliveTimeout</code></a></li>
 </ul>
@@ -325,7 +326,7 @@
         <h2>HTTP<span><a class="mark" href="#http_http" id="http_http">#</a></span></h2>
 
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#documentation_stability_index">Stability: 2</a> - Stable</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v16.9.1/lib/http.js">lib/http.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v16.10.0/lib/http.js">lib/http.js</a></p>
 <p>To use the HTTP server and client one must <code>require('http')</code>.</p>
 <p>The HTTP interfaces in Node.js are designed to support many features
 of the protocol which have been traditionally difficult to use.
@@ -1488,6 +1489,19 @@ will be called with the timed-out socket as an argument.</p>
 <p>By default, the Server does not timeout sockets. However, if a callback
 is assigned to the Server's <code>'timeout'</code> event, timeouts must be handled
 explicitly.</p>
+<h4><code>server.maxRequestsPerSocket</code><span><a class="mark" href="#http_server_maxrequestspersocket" id="http_server_maxrequestspersocket">#</a></span></h4>
+<div class="api_metadata">
+<span>Added in: v16.10.0</span>
+</div>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> Requests per socket. <strong>Default:</strong> null (no limit)</li>
+</ul>
+<p>The maximum number of requests socket can handle
+before closing keep alive connection.</p>
+<p>A value of <code>null</code> will disable the limit.</p>
+<p>When limit is reach it will set <code>Connection</code> header value to <code>closed</code>,
+but will not actually close the connection, subsequent requests sent
+after the limit is reached will get <code>503 Service Unavailable</code> as a response.</p>
 <h4><code>server.timeout</code><span><a class="mark" href="#http_server_timeout" id="http_server_timeout">#</a></span></h4>
 <div class="api_metadata">
 <details class="changelog"><summary>History</summary>
@@ -2414,10 +2428,8 @@ it inherits from <code>Stream</code>.</p>
 </div>
 <ul>
 <li><code>msesc</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
-<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> Optional function to be called when a timeout</li>
-</ul>
-<p>occurs, Same as binding to the <code>timeout</code> event.</p>
-<ul>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> Optional function to be called when a timeout
+occurs. Same as binding to the <code>timeout</code> event.</li>
 <li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this" class="type">&#x3C;this></a></li>
 </ul>
 <p>Once a socket is associated with the message and is connected,
@@ -2597,8 +2609,7 @@ the maximum length of request headers in bytes.
 <p>Returns a new instance of <a href="#http_class_http_server"><code>http.Server</code></a>.</p>
 <p>The <code>requestListener</code> is a function which is automatically
 added to the <a href="#http_event_request"><code>'request'</code></a> event.</p>
-
-<pre><input class="js-flavor-selector" type="checkbox" checked aria-label="Show modern ES modules syntax"><pre><code class="language-js cjs"><span class="hljs-keyword">const</span> http = <span class="hljs-built_in">require</span>(<span class="hljs-string">'http'</span>);
+<pre><code class="language-js cjs"><span class="hljs-keyword">const</span> http = <span class="hljs-built_in">require</span>(<span class="hljs-string">'http'</span>);
 
 <span class="hljs-comment">// Create a local server to receive data from</span>
 <span class="hljs-keyword">const</span> server = http.<span class="hljs-title function_">createServer</span>(<span class="hljs-function">(<span class="hljs-params">req, res</span>) =></span> {
@@ -2608,7 +2619,8 @@ added to the <a href="#http_event_request"><code>'request'</code></a> event.</p>
   }));
 });
 
-server.<span class="hljs-title function_">listen</span>(<span class="hljs-number">8000</span>);</code></pre><code class="language-js cjs"><span class="hljs-keyword">const</span> http = <span class="hljs-built_in">require</span>(<span class="hljs-string">'http'</span>);
+server.<span class="hljs-title function_">listen</span>(<span class="hljs-number">8000</span>);</code></pre>
+<pre><code class="language-js cjs"><span class="hljs-keyword">const</span> http = <span class="hljs-built_in">require</span>(<span class="hljs-string">'http'</span>);
 
 <span class="hljs-comment">// Create a local server to receive data from</span>
 <span class="hljs-keyword">const</span> server = http.<span class="hljs-title function_">createServer</span>();

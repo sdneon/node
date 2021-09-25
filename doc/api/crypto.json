@@ -8,7 +8,7 @@
       "introduced_in": "v0.3.6",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v16.9.1/lib/crypto.js\">lib/crypto.js</a></p>\n<p>The <code>crypto</code> module provides cryptographic functionality that includes a set of\nwrappers for OpenSSL's hash, HMAC, cipher, decipher, sign, and verify functions.</p>\n<pre><code class=\"language-mjs\">const { createHmac } = await import('crypto');\n\nconst secret = 'abcdefg';\nconst hash = createHmac('sha256', secret)\n               .update('I love cupcakes')\n               .digest('hex');\nconsole.log(hash);\n// Prints:\n//   c0fa1bc00531bd78ef38c628449c5102aeabd49b5dc3a2a516ea6ea959d6658e\n</code></pre>\n<pre><code class=\"language-cjs\">const crypto = require('crypto');\n\nconst secret = 'abcdefg';\nconst hash = crypto.createHmac('sha256', secret)\n                   .update('I love cupcakes')\n                   .digest('hex');\nconsole.log(hash);\n// Prints:\n//   c0fa1bc00531bd78ef38c628449c5102aeabd49b5dc3a2a516ea6ea959d6658e\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v16.10.0/lib/crypto.js\">lib/crypto.js</a></p>\n<p>The <code>crypto</code> module provides cryptographic functionality that includes a set of\nwrappers for OpenSSL's hash, HMAC, cipher, decipher, sign, and verify functions.</p>\n<pre><code class=\"language-mjs\">const { createHmac } = await import('crypto');\n\nconst secret = 'abcdefg';\nconst hash = createHmac('sha256', secret)\n               .update('I love cupcakes')\n               .digest('hex');\nconsole.log(hash);\n// Prints:\n//   c0fa1bc00531bd78ef38c628449c5102aeabd49b5dc3a2a516ea6ea959d6658e\n</code></pre>\n<pre><code class=\"language-cjs\">const crypto = require('crypto');\n\nconst secret = 'abcdefg';\nconst hash = crypto.createHmac('sha256', secret)\n                   .update('I love cupcakes')\n                   .digest('hex');\nconsole.log(hash);\n// Prints:\n//   c0fa1bc00531bd78ef38c628449c5102aeabd49b5dc3a2a516ea6ea959d6658e\n</code></pre>",
       "modules": [
         {
           "textRaw": "Determining if crypto support is unavailable",
@@ -981,6 +981,11 @@
                 ],
                 "changes": [
                   {
+                    "version": "v16.10.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/39927",
+                    "description": "Add ability to define `RSASSA-PSS-params` sequence parameters for RSA-PSS keys pairs."
+                  },
+                  {
                     "version": [
                       "v13.9.0",
                       "v12.17.0"
@@ -1036,6 +1041,24 @@
                           "type": "number",
                           "default": "`0x10001`",
                           "desc": "Public exponent (RSA)."
+                        },
+                        {
+                          "textRaw": "`hashAlgorithm`: {string} Name of the message digest (RSA-PSS).",
+                          "name": "hashAlgorithm",
+                          "type": "string",
+                          "desc": "Name of the message digest (RSA-PSS)."
+                        },
+                        {
+                          "textRaw": "`mgf1HashAlgorithm`: {string} Name of the message digest used by MGF1 (RSA-PSS).",
+                          "name": "mgf1HashAlgorithm",
+                          "type": "string",
+                          "desc": "Name of the message digest used by MGF1 (RSA-PSS)."
+                        },
+                        {
+                          "textRaw": "`saltLength`: {number} Minimal salt length in bytes (RSA-PSS).",
+                          "name": "saltLength",
+                          "type": "number",
+                          "desc": "Minimal salt length in bytes (RSA-PSS)."
                         },
                         {
                           "textRaw": "`divisorLength`: {number} Size of `q` in bits (DSA).",
@@ -1125,6 +1148,11 @@
                 ],
                 "changes": [
                   {
+                    "version": "v16.10.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/39927",
+                    "description": "Add ability to define `RSASSA-PSS-params` sequence parameters for RSA-PSS keys pairs."
+                  },
+                  {
                     "version": [
                       "v13.9.0",
                       "v12.17.0"
@@ -1197,6 +1225,24 @@
                           "type": "number",
                           "default": "`0x10001`",
                           "desc": "Public exponent (RSA)."
+                        },
+                        {
+                          "textRaw": "`hashAlgorithm`: {string} Name of the message digest (RSA-PSS).",
+                          "name": "hashAlgorithm",
+                          "type": "string",
+                          "desc": "Name of the message digest (RSA-PSS)."
+                        },
+                        {
+                          "textRaw": "`mgf1HashAlgorithm`: {string} Name of the message digest used by MGF1 (RSA-PSS).",
+                          "name": "mgf1HashAlgorithm",
+                          "type": "string",
+                          "desc": "Name of the message digest used by MGF1 (RSA-PSS)."
+                        },
+                        {
+                          "textRaw": "`saltLength`: {number} Minimal salt length in bytes (RSA-PSS).",
+                          "name": "saltLength",
+                          "type": "number",
+                          "desc": "Minimal salt length in bytes (RSA-PSS)."
                         },
                         {
                           "textRaw": "`divisorLength`: {number} Size of `q` in bits (DSA).",
@@ -2739,7 +2785,7 @@
             {
               "textRaw": "CCM mode",
               "name": "ccm_mode",
-              "desc": "<p>CCM is one of the supported <a href=\"https://en.wikipedia.org/wiki/Authenticated_encryption\">AEAD algorithms</a>. Applications which use this\nmode must adhere to certain restrictions when using the cipher API:</p>\n<ul>\n<li>The authentication tag length must be specified during cipher creation by\nsetting the <code>authTagLength</code> option and must be one of 4, 6, 8, 10, 12, 14 or\n16 bytes.</li>\n<li>The length of the initialization vector (nonce) <code>N</code> must be between 7 and 13\nbytes (<code>7 ≤ N ≤ 13</code>).</li>\n<li>The length of the plaintext is limited to <code>2 ** (8 * (15 - N))</code> bytes.</li>\n<li>When decrypting, the authentication tag must be set via <code>setAuthTag()</code> before\ncalling <code>update()</code>.\nOtherwise, decryption will fail and <code>final()</code> will throw an error in\ncompliance with section 2.6 of <a href=\"https://www.rfc-editor.org/rfc/rfc3610.txt\">RFC 3610</a>.</li>\n<li>Using stream methods such as <code>write(data)</code>, <code>end(data)</code> or <code>pipe()</code> in CCM\nmode might fail as CCM cannot handle more than one chunk of data per instance.</li>\n<li>When passing additional authenticated data (AAD), the length of the actual\nmessage in bytes must be passed to <code>setAAD()</code> via the <code>plaintextLength</code>\noption.\nMany crypto libraries include the authentication tag in the ciphertext,\nwhich means that they produce ciphertexts of the length\n<code>plaintextLength + authTagLength</code>. Node.js does not include the authentication\ntag, so the ciphertext length is always <code>plaintextLength</code>.\nThis is not necessary if no AAD is used.</li>\n<li>As CCM processes the whole message at once, <code>update()</code> must be called exactly\nonce.</li>\n<li>Even though calling <code>update()</code> is sufficient to encrypt/decrypt the message,\napplications <em>must</em> call <code>final()</code> to compute or verify the\nauthentication tag.</li>\n</ul>\n<pre><code class=\"language-mjs\">import { Buffer } from 'buffer';\nconst {\n  createCipheriv,\n  createDecipheriv,\n  randomBytes\n} = await import('crypto');\n\nconst key = 'keykeykeykeykeykeykeykey';\nconst nonce = randomBytes(12);\n\nconst aad = Buffer.from('0123456789', 'hex');\n\nconst cipher = createCipheriv('aes-192-ccm', key, nonce, {\n  authTagLength: 16\n});\nconst plaintext = 'Hello world';\ncipher.setAAD(aad, {\n  plaintextLength: Buffer.byteLength(plaintext)\n});\nconst ciphertext = cipher.update(plaintext, 'utf8');\ncipher.final();\nconst tag = cipher.getAuthTag();\n\n// Now transmit { ciphertext, nonce, tag }.\n\nconst decipher = createDecipheriv('aes-192-ccm', key, nonce, {\n  authTagLength: 16\n});\ndecipher.setAuthTag(tag);\ndecipher.setAAD(aad, {\n  plaintextLength: ciphertext.length\n});\nconst receivedPlaintext = decipher.update(ciphertext, null, 'utf8');\n\ntry {\n  decipher.final();\n} catch (err) {\n  console.error('Authentication failed!');\n  return;\n}\n\nconsole.log(receivedPlaintext);\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  createCipheriv,\n  createDecipheriv,\n  randomBytes,\n} = require('crypto');\nconst { Buffer } = require('buffer');\n\nconst key = 'keykeykeykeykeykeykeykey';\nconst nonce = randomBytes(12);\n\nconst aad = Buffer.from('0123456789', 'hex');\n\nconst cipher = createCipheriv('aes-192-ccm', key, nonce, {\n  authTagLength: 16\n});\nconst plaintext = 'Hello world';\ncipher.setAAD(aad, {\n  plaintextLength: Buffer.byteLength(plaintext)\n});\nconst ciphertext = cipher.update(plaintext, 'utf8');\ncipher.final();\nconst tag = cipher.getAuthTag();\n\n// Now transmit { ciphertext, nonce, tag }.\n\nconst decipher = createDecipheriv('aes-192-ccm', key, nonce, {\n  authTagLength: 16\n});\ndecipher.setAuthTag(tag);\ndecipher.setAAD(aad, {\n  plaintextLength: ciphertext.length\n});\nconst receivedPlaintext = decipher.update(ciphertext, null, 'utf8');\n\ntry {\n  decipher.final();\n} catch (err) {\n  console.error('Authentication failed!');\n  return;\n}\n\nconsole.log(receivedPlaintext);\n</code></pre>",
+              "desc": "<p>CCM is one of the supported <a href=\"https://en.wikipedia.org/wiki/Authenticated_encryption\">AEAD algorithms</a>. Applications which use this\nmode must adhere to certain restrictions when using the cipher API:</p>\n<ul>\n<li>The authentication tag length must be specified during cipher creation by\nsetting the <code>authTagLength</code> option and must be one of 4, 6, 8, 10, 12, 14 or\n16 bytes.</li>\n<li>The length of the initialization vector (nonce) <code>N</code> must be between 7 and 13\nbytes (<code>7 ≤ N ≤ 13</code>).</li>\n<li>The length of the plaintext is limited to <code>2 ** (8 * (15 - N))</code> bytes.</li>\n<li>When decrypting, the authentication tag must be set via <code>setAuthTag()</code> before\ncalling <code>update()</code>.\nOtherwise, decryption will fail and <code>final()</code> will throw an error in\ncompliance with section 2.6 of <a href=\"https://www.rfc-editor.org/rfc/rfc3610.txt\">RFC 3610</a>.</li>\n<li>Using stream methods such as <code>write(data)</code>, <code>end(data)</code> or <code>pipe()</code> in CCM\nmode might fail as CCM cannot handle more than one chunk of data per instance.</li>\n<li>When passing additional authenticated data (AAD), the length of the actual\nmessage in bytes must be passed to <code>setAAD()</code> via the <code>plaintextLength</code>\noption.\nMany crypto libraries include the authentication tag in the ciphertext,\nwhich means that they produce ciphertexts of the length\n<code>plaintextLength + authTagLength</code>. Node.js does not include the authentication\ntag, so the ciphertext length is always <code>plaintextLength</code>.\nThis is not necessary if no AAD is used.</li>\n<li>As CCM processes the whole message at once, <code>update()</code> must be called exactly\nonce.</li>\n<li>Even though calling <code>update()</code> is sufficient to encrypt/decrypt the message,\napplications <em>must</em> call <code>final()</code> to compute or verify the\nauthentication tag.</li>\n</ul>\n<pre><code class=\"language-mjs\">import { Buffer } from 'buffer';\nconst {\n  createCipheriv,\n  createDecipheriv,\n  randomBytes\n} = await import('crypto');\n\nconst key = 'keykeykeykeykeykeykeykey';\nconst nonce = randomBytes(12);\n\nconst aad = Buffer.from('0123456789', 'hex');\n\nconst cipher = createCipheriv('aes-192-ccm', key, nonce, {\n  authTagLength: 16\n});\nconst plaintext = 'Hello world';\ncipher.setAAD(aad, {\n  plaintextLength: Buffer.byteLength(plaintext)\n});\nconst ciphertext = cipher.update(plaintext, 'utf8');\ncipher.final();\nconst tag = cipher.getAuthTag();\n\n// Now transmit { ciphertext, nonce, tag }.\n\nconst decipher = createDecipheriv('aes-192-ccm', key, nonce, {\n  authTagLength: 16\n});\ndecipher.setAuthTag(tag);\ndecipher.setAAD(aad, {\n  plaintextLength: ciphertext.length\n});\nconst receivedPlaintext = decipher.update(ciphertext, null, 'utf8');\n\ntry {\n  decipher.final();\n} catch (err) {\n  throw new Error('Authentication failed!', { cause: err });\n}\n\nconsole.log(receivedPlaintext);\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  createCipheriv,\n  createDecipheriv,\n  randomBytes,\n} = require('crypto');\nconst { Buffer } = require('buffer');\n\nconst key = 'keykeykeykeykeykeykeykey';\nconst nonce = randomBytes(12);\n\nconst aad = Buffer.from('0123456789', 'hex');\n\nconst cipher = createCipheriv('aes-192-ccm', key, nonce, {\n  authTagLength: 16\n});\nconst plaintext = 'Hello world';\ncipher.setAAD(aad, {\n  plaintextLength: Buffer.byteLength(plaintext)\n});\nconst ciphertext = cipher.update(plaintext, 'utf8');\ncipher.final();\nconst tag = cipher.getAuthTag();\n\n// Now transmit { ciphertext, nonce, tag }.\n\nconst decipher = createDecipheriv('aes-192-ccm', key, nonce, {\n  authTagLength: 16\n});\ndecipher.setAuthTag(tag);\ndecipher.setAAD(aad, {\n  plaintextLength: ciphertext.length\n});\nconst receivedPlaintext = decipher.update(ciphertext, null, 'utf8');\n\ntry {\n  decipher.final();\n} catch (err) {\n  throw new Error('Authentication failed!', { cause: err });\n}\n\nconsole.log(receivedPlaintext);\n</code></pre>",
               "type": "module",
               "displayName": "CCM mode"
             }

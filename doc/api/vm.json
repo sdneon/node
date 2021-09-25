@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v16.9.1/lib/vm.js\">lib/vm.js</a></p>\n<p>The <code>vm</code> module enables compiling and running code within V8 Virtual\nMachine contexts. <strong>The <code>vm</code> module is not a security mechanism. Do\nnot use it to run untrusted code.</strong></p>\n<p>JavaScript code can be compiled and run immediately or\ncompiled, saved, and run later.</p>\n<p>A common use case is to run the code in a different V8 Context. This means\ninvoked code has a different global object than the invoking code.</p>\n<p>One can provide the context by <a href=\"#vm_what_does_it_mean_to_contextify_an_object\"><em>contextifying</em></a> an\nobject. The invoked code treats any property in the context like a\nglobal variable. Any changes to global variables caused by the invoked\ncode are reflected in the context object.</p>\n<pre><code class=\"language-js\">const vm = require('vm');\n\nconst x = 1;\n\nconst context = { x: 2 };\nvm.createContext(context); // Contextify the object.\n\nconst code = 'x += 40; var y = 17;';\n// `x` and `y` are global variables in the context.\n// Initially, x has the value 2 because that is the value of context.x.\nvm.runInContext(code, context);\n\nconsole.log(context.x); // 42\nconsole.log(context.y); // 17\n\nconsole.log(x); // 1; y is not defined.\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v16.10.0/lib/vm.js\">lib/vm.js</a></p>\n<p>The <code>vm</code> module enables compiling and running code within V8 Virtual\nMachine contexts. <strong>The <code>vm</code> module is not a security mechanism. Do\nnot use it to run untrusted code.</strong></p>\n<p>JavaScript code can be compiled and run immediately or\ncompiled, saved, and run later.</p>\n<p>A common use case is to run the code in a different V8 Context. This means\ninvoked code has a different global object than the invoking code.</p>\n<p>One can provide the context by <a href=\"#vm_what_does_it_mean_to_contextify_an_object\"><em>contextifying</em></a> an\nobject. The invoked code treats any property in the context like a\nglobal variable. Any changes to global variables caused by the invoked\ncode are reflected in the context object.</p>\n<pre><code class=\"language-js\">const vm = require('vm');\n\nconst x = 1;\n\nconst context = { x: 2 };\nvm.createContext(context); // Contextify the object.\n\nconst code = 'x += 40; var y = 17;';\n// `x` and `y` are global variables in the context.\n// Initially, x has the value 2 because that is the value of context.x.\nvm.runInContext(code, context);\n\nconsole.log(context.x); // 42\nconsole.log(context.y); // 17\n\nconsole.log(x); // 1; y is not defined.\n</code></pre>",
       "classes": [
         {
           "textRaw": "Class: `vm.Script`",
@@ -697,15 +697,21 @@
                   "desc": "Called when the module is evaluated."
                 },
                 {
-                  "textRaw": "`options`**Default:** `'vm:module(i)'` where `i` is a context-specific ascending index.",
+                  "textRaw": "`options`",
                   "name": "options",
-                  "default": "`'vm:module(i)'` where `i` is a context-specific ascending index",
                   "options": [
                     {
-                      "textRaw": "`identifier` {string} String used in stack traces.",
+                      "textRaw": "`identifier` {string} String used in stack traces. **Default:** `'vm:module(i)'` where `i` is a context-specific ascending index.",
                       "name": "identifier",
                       "type": "string",
+                      "default": "`'vm:module(i)'` where `i` is a context-specific ascending index",
                       "desc": "String used in stack traces."
+                    },
+                    {
+                      "textRaw": "`context` {Object} The [contextified][] object as returned by the `vm.createContext()` method, to compile and evaluate this `Module` in.",
+                      "name": "context",
+                      "type": "Object",
+                      "desc": "The [contextified][] object as returned by the `vm.createContext()` method, to compile and evaluate this `Module` in."
                     }
                   ]
                 }
