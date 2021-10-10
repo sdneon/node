@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v16.10.0">
-  <title>File system | Node.js v16.10.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v16.11.0">
+  <title>File system | Node.js v16.11.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -92,7 +92,7 @@
     <div id="column1" data-id="fs" class="interior">
       <header>
         <div class="header-container">
-          <h1>Node.js v16.10.0 documentation</h1>
+          <h1>Node.js v16.11.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -157,6 +157,8 @@
 <li><a href="#fs_filehandle_chmod_mode"><code>filehandle.chmod(mode)</code></a></li>
 <li><a href="#fs_filehandle_chown_uid_gid"><code>filehandle.chown(uid, gid)</code></a></li>
 <li><a href="#fs_filehandle_close"><code>filehandle.close()</code></a></li>
+<li><a href="#fs_filehandle_createreadstream_options"><code>filehandle.createReadStream([options])</code></a></li>
+<li><a href="#fs_filehandle_createwritestream_options"><code>filehandle.createWriteStream([options])</code></a></li>
 <li><a href="#fs_filehandle_datasync"><code>filehandle.datasync()</code></a></li>
 <li><a href="#fs_filehandle_fd"><code>filehandle.fd</code></a></li>
 <li><a href="#fs_filehandle_read_buffer_offset_length_position"><code>filehandle.read(buffer, offset, length, position)</code></a></li>
@@ -469,7 +471,7 @@
 
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#documentation_stability_index">Stability: 2</a> - Stable</div><p></p>
 
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v16.10.0/lib/fs.js">lib/fs.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v16.11.0/lib/fs.js">lib/fs.js</a></p>
 <p>The <code>fs</code> module enables interacting with the file system in a
 way modeled on standard POSIX functions.</p>
 <p>To use the promise-based APIs:</p>
@@ -636,6 +638,90 @@ complete.</p>
 } <span class="hljs-keyword">finally</span> {
   <span class="hljs-keyword">await</span> filehandle?.<span class="hljs-title function_">close</span>();
 }</code></pre>
+<h5><code>filehandle.createReadStream([options])</code><span><a class="mark" href="#fs_filehandle_createreadstream_options" id="fs_filehandle_createreadstream_options">#</a></span></h5>
+<div class="api_metadata">
+<span>Added in: v16.11.0</span>
+</div>
+<ul>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>encoding</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> <strong>Default:</strong> <code>null</code></li>
+<li><code>autoClose</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> <strong>Default:</strong> <code>true</code></li>
+<li><code>emitClose</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> <strong>Default:</strong> <code>true</code></li>
+<li><code>start</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a></li>
+<li><code>end</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a> <strong>Default:</strong> <code>Infinity</code></li>
+<li><code>highWaterMark</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a> <strong>Default:</strong> <code>64 * 1024</code></li>
+</ul>
+</li>
+<li>Returns: <a href="fs.html#fs_class_fs_readstream" class="type">&#x3C;fs.ReadStream></a></li>
+</ul>
+<p>Unlike the 16 kb default <code>highWaterMark</code> for a <a href="stream.html#stream_class_stream_readable" class="type">&#x3C;stream.Readable></a>, the stream
+returned by this method has a default <code>highWaterMark</code> of 64 kb.</p>
+<p><code>options</code> can include <code>start</code> and <code>end</code> values to read a range of bytes from
+the file instead of the entire file. Both <code>start</code> and <code>end</code> are inclusive and
+start counting at 0, allowed values are in the
+[0, <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/MAX_SAFE_INTEGER"><code>Number.MAX_SAFE_INTEGER</code></a>] range. If <code>start</code> is
+omitted or <code>undefined</code>, <code>filehandle.createReadStream()</code> reads sequentially from
+the current file position. The <code>encoding</code> can be any one of those accepted by
+<a href="buffer.html#buffer_class_buffer" class="type">&#x3C;Buffer></a>.</p>
+<p>If the <code>FileHandle</code> points to a character device that only supports blocking
+reads (such as keyboard or sound card), read operations do not finish until data
+is available. This can prevent the process from exiting and the stream from
+closing naturally.</p>
+<p>By default, the stream will emit a <code>'close'</code> event after it has been
+destroyed.  Set the <code>emitClose</code> option to <code>false</code> to change this behavior.</p>
+<pre><code class="language-js mjs"><span class="hljs-keyword">import</span> { open } <span class="hljs-keyword">from</span> <span class="hljs-string">'fs/promises'</span>;
+
+<span class="hljs-keyword">const</span> fd = <span class="hljs-keyword">await</span> <span class="hljs-title function_">open</span>(<span class="hljs-string">'/dev/input/event0'</span>);
+<span class="hljs-comment">// Create a stream from some character device.</span>
+<span class="hljs-keyword">const</span> stream = fd.<span class="hljs-title function_">createReadStream</span>();
+<span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =></span> {
+  stream.<span class="hljs-title function_">close</span>(); <span class="hljs-comment">// This may not close the stream.</span>
+  <span class="hljs-comment">// Artificially marking end-of-stream, as if the underlying resource had</span>
+  <span class="hljs-comment">// indicated end-of-file by itself, allows the stream to close.</span>
+  <span class="hljs-comment">// This does not cancel pending read operations, and if there is such an</span>
+  <span class="hljs-comment">// operation, the process may still not be able to exit successfully</span>
+  <span class="hljs-comment">// until it finishes.</span>
+  stream.<span class="hljs-title function_">push</span>(<span class="hljs-literal">null</span>);
+  stream.<span class="hljs-title function_">read</span>(<span class="hljs-number">0</span>);
+}, <span class="hljs-number">100</span>);</code></pre>
+<p>If <code>autoClose</code> is false, then the file descriptor won't be closed, even if
+there's an error. It is the application's responsibility to close it and make
+sure there's no file descriptor leak. If <code>autoClose</code> is set to true (default
+behavior), on <code>'error'</code> or <code>'end'</code> the file descriptor will be closed
+automatically.</p>
+<p>An example to read the last 10 bytes of a file which is 100 bytes long:</p>
+<pre><code class="language-js mjs"><span class="hljs-keyword">import</span> { open } <span class="hljs-keyword">from</span> <span class="hljs-string">'fs/promises'</span>;
+
+<span class="hljs-keyword">const</span> fd = <span class="hljs-keyword">await</span> <span class="hljs-title function_">open</span>(<span class="hljs-string">'sample.txt'</span>);
+fd.<span class="hljs-title function_">createReadStream</span>({ <span class="hljs-attr">start</span>: <span class="hljs-number">90</span>, <span class="hljs-attr">end</span>: <span class="hljs-number">99</span> });</code></pre>
+<h5><code>filehandle.createWriteStream([options])</code><span><a class="mark" href="#fs_filehandle_createwritestream_options" id="fs_filehandle_createwritestream_options">#</a></span></h5>
+<div class="api_metadata">
+<span>Added in: v16.11.0</span>
+</div>
+<ul>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>encoding</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> <strong>Default:</strong> <code>'utf8'</code></li>
+<li><code>autoClose</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> <strong>Default:</strong> <code>true</code></li>
+<li><code>emitClose</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> <strong>Default:</strong> <code>true</code></li>
+<li><code>start</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a></li>
+</ul>
+</li>
+<li>Returns: <a href="fs.html#fs_class_fs_writestream" class="type">&#x3C;fs.WriteStream></a></li>
+</ul>
+<p><code>options</code> may also include a <code>start</code> option to allow writing data at some
+position past the beginning of the file, allowed values are in the
+[0, <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/MAX_SAFE_INTEGER"><code>Number.MAX_SAFE_INTEGER</code></a>] range. Modifying a file rather than replacing
+it may require the <code>flags</code> <code>open</code> option to be set to <code>r+</code> rather than the
+default <code>r</code>. The <code>encoding</code> can be any one of those accepted by <a href="buffer.html#buffer_class_buffer" class="type">&#x3C;Buffer></a>.</p>
+<p>If <code>autoClose</code> is set to true (default behavior) on <code>'error'</code> or <code>'finish'</code>
+the file descriptor will be closed automatically. If <code>autoClose</code> is false,
+then the file descriptor won't be closed, even if there's an error.
+It is the application's responsibility to close it and make sure there's no
+file descriptor leak.</p>
+<p>By default, the stream will emit a <code>'close'</code> event after it has been
+destroyed.  Set the <code>emitClose</code> option to <code>false</code> to change this behavior.</p>
 <h5><code>filehandle.datasync()</code><span><a class="mark" href="#fs_filehandle_datasync" id="fs_filehandle_datasync">#</a></span></h5>
 <div class="api_metadata">
 <span>Added in: v10.0.0</span>
@@ -2315,9 +2401,9 @@ behavior is similar to <code>cp dir1/ dir2/</code>.</p>
 <li><code>fs</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a> <strong>Default:</strong> <code>null</code></li>
 </ul>
 </li>
-<li>Returns: <a href="fs.html#fs_class_fs_readstream" class="type">&#x3C;fs.ReadStream></a> See <a href="stream.html#stream_class_stream_readable">Readable Stream</a>.</li>
+<li>Returns: <a href="fs.html#fs_class_fs_readstream" class="type">&#x3C;fs.ReadStream></a></li>
 </ul>
-<p>Unlike the 16 kb default <code>highWaterMark</code> for a readable stream, the stream
+<p>Unlike the 16 kb default <code>highWaterMark</code> for a <a href="stream.html#stream_class_stream_readable" class="type">&#x3C;stream.Readable></a>, the stream
 returned by this method has a default <code>highWaterMark</code> of 64 kb.</p>
 <p><code>options</code> can include <code>start</code> and <code>end</code> values to read a range of bytes from
 the file instead of the entire file. Both <code>start</code> and <code>end</code> are inclusive and
@@ -2335,8 +2421,7 @@ emitted. <code>fd</code> should be blocking; non-blocking <code>fd</code>s shoul
 available. This can prevent the process from exiting and the stream from
 closing naturally.</p>
 <p>By default, the stream will emit a <code>'close'</code> event after it has been
-destroyed, like most <code>Readable</code> streams.  Set the <code>emitClose</code> option to
-<code>false</code> to change this behavior.</p>
+destroyed.  Set the <code>emitClose</code> option to <code>false</code> to change this behavior.</p>
 <p>By providing the <code>fs</code> option, it is possible to override the corresponding <code>fs</code>
 implementations for <code>open</code>, <code>read</code>, and <code>close</code>. When providing the <code>fs</code> option,
 an override for <code>read</code> is required. If no <code>fd</code> is provided, an override for
@@ -2413,7 +2498,7 @@ file was created.</p>
 <li><code>fs</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a> <strong>Default:</strong> <code>null</code></li>
 </ul>
 </li>
-<li>Returns: <a href="fs.html#fs_class_fs_writestream" class="type">&#x3C;fs.WriteStream></a> See <a href="stream.html#stream_class_stream_writable">Writable Stream</a>.</li>
+<li>Returns: <a href="fs.html#fs_class_fs_writestream" class="type">&#x3C;fs.WriteStream></a></li>
 </ul>
 <p><code>options</code> may also include a <code>start</code> option to allow writing data at some
 position past the beginning of the file, allowed values are in the
@@ -2426,8 +2511,7 @@ then the file descriptor won't be closed, even if there's an error.
 It is the application's responsibility to close it and make sure there's no
 file descriptor leak.</p>
 <p>By default, the stream will emit a <code>'close'</code> event after it has been
-destroyed, like most <code>Writable</code> streams.  Set the <code>emitClose</code> option to
-<code>false</code> to change this behavior.</p>
+destroyed.  Set the <code>emitClose</code> option to <code>false</code> to change this behavior.</p>
 <p>By providing the <code>fs</code> option it is possible to override the corresponding <code>fs</code>
 implementations for <code>open</code>, <code>write</code>, <code>writev</code> and <code>close</code>. Overriding <code>write()</code>
 without <code>writev()</code> can reduce performance as some optimizations (<code>_writev()</code>)
@@ -4077,7 +4161,7 @@ stat object:</p>
 <p>These stat objects are instances of <code>fs.Stat</code>. If the <code>bigint</code> option is <code>true</code>,
 the numeric values in these objects are specified as <code>BigInt</code>s.</p>
 <p>To be notified when the file was modified, not just accessed, it is necessary
-to compare <code>curr.mtime</code> and <code>prev.mtime</code>.</p>
+to compare <code>curr.mtimeMs</code> and <code>prev.mtimeMs</code>.</p>
 <p>When an <code>fs.watchFile</code> operation results in an <code>ENOENT</code> error, it
 will invoke the listener once, with all the fields zeroed (or, for dates, the
 Unix Epoch). If the file is created later on, the listener will be called
@@ -5763,7 +5847,8 @@ no effect.</p>
 <p>The path to the file the stream is reading from as specified in the first
 argument to <code>fs.createReadStream()</code>. If <code>path</code> is passed as a string, then
 <code>readStream.path</code> will be a string. If <code>path</code> is passed as a <a href="buffer.html#buffer_class_buffer" class="type">&#x3C;Buffer></a>, then
-<code>readStream.path</code> will be a <a href="buffer.html#buffer_class_buffer" class="type">&#x3C;Buffer></a>.</p>
+<code>readStream.path</code> will be a <a href="buffer.html#buffer_class_buffer" class="type">&#x3C;Buffer></a>. If <code>fd</code> is specified, then
+<code>readStream.path</code> will be <code>undefined</code>.</p>
 <h5><code>readStream.pending</code><span><a class="mark" href="#fs_readstream_pending" id="fs_readstream_pending">#</a></span></h5>
 <div class="api_metadata">
 <span>Added in: v11.2.0, v10.16.0</span>
@@ -6486,7 +6571,7 @@ of the <code>fs.rename()</code> operation:</p>
 <p>Most <code>fs</code> operations accept file paths that may be specified in the form of
 a string, a <a href="buffer.html#buffer_class_buffer" class="type">&#x3C;Buffer></a>, or a <a href="url.html#url_the_whatwg_url_api" class="type">&#x3C;URL></a> object using the <code>file:</code> protocol.</p>
 <h5>String paths<span><a class="mark" href="#fs_string_paths" id="fs_string_paths">#</a></span></h5>
-<p>String form paths are interpreted as UTF-8 character sequences identifying
+<p>String paths are interpreted as UTF-8 character sequences identifying
 the absolute or relative filename. Relative paths will be resolved relative
 to the current working directory as determined by calling <code>process.cwd()</code>.</p>
 <p>Example using an absolute path on POSIX:</p>

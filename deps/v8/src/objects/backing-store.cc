@@ -267,6 +267,7 @@ std::unique_ptr<BackingStore> BackingStore::Allocate(
 
   auto result = new BackingStore(buffer_start,                  // start
                                  byte_length,                   // length
+                                 byte_length,                   // max length
                                  byte_length,                   // capacity
                                  shared,                        // shared
                                  ResizableFlag::kNotResizable,  // resizable
@@ -305,8 +306,9 @@ std::unique_ptr<BackingStore> BackingStore::TryAllocateWasmMemory(
   maximum_pages = std::min(engine_max_pages, maximum_pages);
 
   auto result = TryAllocateAndPartiallyCommitMemory(
-      isolate, initial_pages * wasm::kWasmPageSize, wasm::kWasmPageSize,
-      initial_pages, maximum_pages, true, shared);
+      isolate, initial_pages * wasm::kWasmPageSize,
+      maximum_pages * wasm::kWasmPageSize, wasm::kWasmPageSize, initial_pages,
+      maximum_pages, true, shared);
   // Shared Wasm memories need an anchor for the memory object list.
   if (result && shared == SharedFlag::kShared) {
     result->type_specific_data_.shared_wasm_memory_data =
@@ -336,9 +338,9 @@ void BackingStore::ReleaseReservation(uint64_t num_bytes) {
 }
 
 std::unique_ptr<BackingStore> BackingStore::TryAllocateAndPartiallyCommitMemory(
-    Isolate* isolate, size_t byte_length, size_t page_size,
-    size_t initial_pages, size_t maximum_pages, bool is_wasm_memory,
-    SharedFlag shared) {
+    Isolate* isolate, size_t byte_length, size_t max_byte_length,
+    size_t page_size, size_t initial_pages, size_t maximum_pages,
+    bool is_wasm_memory, SharedFlag shared) {
   // Enforce engine limitation on the maximum number of pages.
   if (maximum_pages > std::numeric_limits<size_t>::max() / page_size) {
     return nullptr;
@@ -445,16 +447,17 @@ std::unique_ptr<BackingStore> BackingStore::TryAllocateAndPartiallyCommitMemory(
   ResizableFlag resizable =
       is_wasm_memory ? ResizableFlag::kNotResizable : ResizableFlag::kResizable;
 
-  auto result = new BackingStore(buffer_start,    // start
-                                 byte_length,     // length
-                                 byte_capacity,   // capacity
-                                 shared,          // shared
-                                 resizable,       // resizable
-                                 is_wasm_memory,  // is_wasm_memory
-                                 true,            // free_on_destruct
-                                 guards,          // has_guard_regions
-                                 false,           // custom_deleter
-                                 false);          // empty_deleter
+  auto result = new BackingStore(buffer_start,     // start
+                                 byte_length,      // length
+                                 max_byte_length,  // max_byte_length
+                                 byte_capacity,    // capacity
+                                 shared,           // shared
+                                 resizable,        // resizable
+                                 is_wasm_memory,   // is_wasm_memory
+                                 true,             // free_on_destruct
+                                 guards,           // has_guard_regions
+                                 false,            // custom_deleter
+                                 false);           // empty_deleter
 
   TRACE_BS(
       "BSw:alloc bs=%p mem=%p (length=%zu, capacity=%zu, reservation=%zu)\n",
@@ -707,6 +710,7 @@ std::unique_ptr<BackingStore> BackingStore::WrapAllocation(
     SharedFlag shared, bool free_on_destruct) {
   auto result = new BackingStore(allocation_base,               // start
                                  allocation_length,             // length
+                                 allocation_length,             // max length
                                  allocation_length,             // capacity
                                  shared,                        // shared
                                  ResizableFlag::kNotResizable,  // resizable
@@ -728,6 +732,7 @@ std::unique_ptr<BackingStore> BackingStore::WrapAllocation(
   bool is_empty_deleter = (deleter == v8::BackingStore::EmptyDeleter);
   auto result = new BackingStore(allocation_base,               // start
                                  allocation_length,             // length
+                                 allocation_length,             // max length
                                  allocation_length,             // capacity
                                  shared,                        // shared
                                  ResizableFlag::kNotResizable,  // resizable
@@ -746,6 +751,7 @@ std::unique_ptr<BackingStore> BackingStore::EmptyBackingStore(
     SharedFlag shared) {
   auto result = new BackingStore(nullptr,                       // start
                                  0,                             // length
+                                 0,                             // max length
                                  0,                             // capacity
                                  shared,                        // shared
                                  ResizableFlag::kNotResizable,  // resizable
@@ -760,7 +766,7 @@ std::unique_ptr<BackingStore> BackingStore::EmptyBackingStore(
 
 bool BackingStore::Reallocate(Isolate* isolate, size_t new_byte_length) {
   CHECK(!is_wasm_memory_ && !custom_deleter_ && !globally_registered_ &&
-        free_on_destruct_);
+        free_on_destruct_ && !is_resizable_);
   auto allocator = get_v8_api_array_buffer_allocator();
   CHECK_EQ(isolate->array_buffer_allocator(), allocator);
   CHECK_EQ(byte_length_, byte_capacity_);
@@ -770,6 +776,7 @@ bool BackingStore::Reallocate(Isolate* isolate, size_t new_byte_length) {
   buffer_start_ = new_start;
   byte_capacity_ = new_byte_length;
   byte_length_ = new_byte_length;
+  max_byte_length_ = new_byte_length;
   return true;
 }
 

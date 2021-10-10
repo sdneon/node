@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v16.10.0/lib/stream.js\">lib/stream.js</a></p>\n<p>A stream is an abstract interface for working with streaming data in Node.js.\nThe <code>stream</code> module provides an API for implementing the stream interface.</p>\n<p>There are many stream objects provided by Node.js. For instance, a\n<a href=\"http.html#http_class_http_incomingmessage\">request to an HTTP server</a> and <a href=\"process.html#process_process_stdout\"><code>process.stdout</code></a>\nare both stream instances.</p>\n<p>Streams can be readable, writable, or both. All streams are instances of\n<a href=\"events.html#events_class_eventemitter\"><code>EventEmitter</code></a>.</p>\n<p>To access the <code>stream</code> module:</p>\n<pre><code class=\"language-js\">const stream = require('stream');\n</code></pre>\n<p>The <code>stream</code> module is useful for creating new types of stream instances. It is\nusually not necessary to use the <code>stream</code> module to consume streams.</p>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v16.11.0/lib/stream.js\">lib/stream.js</a></p>\n<p>A stream is an abstract interface for working with streaming data in Node.js.\nThe <code>stream</code> module provides an API for implementing the stream interface.</p>\n<p>There are many stream objects provided by Node.js. For instance, a\n<a href=\"http.html#http_class_http_incomingmessage\">request to an HTTP server</a> and <a href=\"process.html#process_process_stdout\"><code>process.stdout</code></a>\nare both stream instances.</p>\n<p>Streams can be readable, writable, or both. All streams are instances of\n<a href=\"events.html#events_class_eventemitter\"><code>EventEmitter</code></a>.</p>\n<p>To access the <code>stream</code> module:</p>\n<pre><code class=\"language-js\">const stream = require('stream');\n</code></pre>\n<p>The <code>stream</code> module is useful for creating new types of stream instances. It is\nusually not necessary to use the <code>stream</code> module to consume streams.</p>",
       "modules": [
         {
           "textRaw": "Organization of this document",
@@ -418,6 +418,62 @@
             }
           ],
           "desc": "<p>A utility method for creating readable streams out of iterators.</p>\n<pre><code class=\"language-js\">const { Readable } = require('stream');\n\nasync function * generate() {\n  yield 'hello';\n  yield 'streams';\n}\n\nconst readable = Readable.from(generate());\n\nreadable.on('data', (chunk) => {\n  console.log(chunk);\n});\n</code></pre>\n<p>Calling <code>Readable.from(string)</code> or <code>Readable.from(buffer)</code> will not have\nthe strings or buffers be iterated to match the other streams semantics\nfor performance reasons.</p>"
+        },
+        {
+          "textRaw": "`stream.Readable.fromWeb(readableStream[, options])`",
+          "type": "method",
+          "name": "fromWeb",
+          "meta": {
+            "added": [
+              "v16.11.0"
+            ],
+            "changes": []
+          },
+          "stability": 1,
+          "stabilityText": "Experimental",
+          "signatures": [
+            {
+              "return": {
+                "textRaw": "Returns: {stream.Readable}",
+                "name": "return",
+                "type": "stream.Readable"
+              },
+              "params": [
+                {
+                  "textRaw": "`readableStream` {ReadableStream}",
+                  "name": "readableStream",
+                  "type": "ReadableStream"
+                },
+                {
+                  "textRaw": "`options` {Object}",
+                  "name": "options",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`encoding` {string}",
+                      "name": "encoding",
+                      "type": "string"
+                    },
+                    {
+                      "textRaw": "`highWaterMark` {number}",
+                      "name": "highWaterMark",
+                      "type": "number"
+                    },
+                    {
+                      "textRaw": "`objectMode` {boolean}",
+                      "name": "objectMode",
+                      "type": "boolean"
+                    },
+                    {
+                      "textRaw": "`signal` {AbortSignal}",
+                      "name": "signal",
+                      "type": "AbortSignal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         },
         {
           "textRaw": "`stream.Readable.isDisturbed(stream)`",
@@ -1134,7 +1190,7 @@
                         ]
                       },
                       "params": [],
-                      "desc": "<p>The <code>'readable'</code> event is emitted when there is data available to be read from\nthe stream. In some cases, attaching a listener for the <code>'readable'</code> event will\ncause some amount of data to be read into an internal buffer.</p>\n<pre><code class=\"language-js\">const readable = getReadableStreamSomehow();\nreadable.on('readable', function() {\n  // There is some data to read now.\n  let data;\n\n  while (data = this.read()) {\n    console.log(data);\n  }\n});\n</code></pre>\n<p>The <code>'readable'</code> event will also be emitted once the end of the stream data\nhas been reached but before the <code>'end'</code> event is emitted.</p>\n<p>Effectively, the <code>'readable'</code> event indicates that the stream has new\ninformation: either new data is available or the end of the stream has been\nreached. In the former case, <a href=\"#stream_readable_read_size\"><code>stream.read()</code></a> will return the\navailable data. In the latter case, <a href=\"#stream_readable_read_size\"><code>stream.read()</code></a> will return\n<code>null</code>. For instance, in the following example, <code>foo.txt</code> is an empty file:</p>\n<pre><code class=\"language-js\">const fs = require('fs');\nconst rr = fs.createReadStream('foo.txt');\nrr.on('readable', () => {\n  console.log(`readable: ${rr.read()}`);\n});\nrr.on('end', () => {\n  console.log('end');\n});\n</code></pre>\n<p>The output of running this script is:</p>\n<pre><code class=\"language-console\">$ node test.js\nreadable: null\nend\n</code></pre>\n<p>In general, the <code>readable.pipe()</code> and <code>'data'</code> event mechanisms are easier to\nunderstand than the <code>'readable'</code> event. However, handling <code>'readable'</code> might\nresult in increased throughput.</p>\n<p>If both <code>'readable'</code> and <a href=\"#stream_event_data\"><code>'data'</code></a> are used at the same time, <code>'readable'</code>\ntakes precedence in controlling the flow, i.e. <code>'data'</code> will be emitted\nonly when <a href=\"#stream_readable_read_size\"><code>stream.read()</code></a> is called. The\n<code>readableFlowing</code> property would become <code>false</code>.\nIf there are <code>'data'</code> listeners when <code>'readable'</code> is removed, the stream\nwill start flowing, i.e. <code>'data'</code> events will be emitted without calling\n<code>.resume()</code>.</p>"
+                      "desc": "<p>The <code>'readable'</code> event is emitted when there is data available to be read from\nthe stream or when the end of the stream has been reached. Effectively, the\n<code>'readable'</code> event indicates that the stream has new information. If data is\navailable, <a href=\"#stream_readable_read_size\"><code>stream.read()</code></a> will return that data.</p>\n<pre><code class=\"language-js\">const readable = getReadableStreamSomehow();\nreadable.on('readable', function() {\n  // There is some data to read now.\n  let data;\n\n  while (data = this.read()) {\n    console.log(data);\n  }\n});\n</code></pre>\n<p>If the end of the stream has been reached, calling\n<a href=\"#stream_readable_read_size\"><code>stream.read()</code></a> will return <code>null</code> and trigger the <code>'end'</code>\nevent. This is also true if there never was any data to be read. For instance,\nin the following example, <code>foo.txt</code> is an empty file:</p>\n<pre><code class=\"language-js\">const fs = require('fs');\nconst rr = fs.createReadStream('foo.txt');\nrr.on('readable', () => {\n  console.log(`readable: ${rr.read()}`);\n});\nrr.on('end', () => {\n  console.log('end');\n});\n</code></pre>\n<p>The output of running this script is:</p>\n<pre><code class=\"language-console\">$ node test.js\nreadable: null\nend\n</code></pre>\n<p>In some cases, attaching a listener for the <code>'readable'</code> event will cause some\namount of data to be read into an internal buffer.</p>\n<p>In general, the <code>readable.pipe()</code> and <code>'data'</code> event mechanisms are easier to\nunderstand than the <code>'readable'</code> event. However, handling <code>'readable'</code> might\nresult in increased throughput.</p>\n<p>If both <code>'readable'</code> and <a href=\"#stream_event_data\"><code>'data'</code></a> are used at the same time, <code>'readable'</code>\ntakes precedence in controlling the flow, i.e. <code>'data'</code> will be emitted\nonly when <a href=\"#stream_readable_read_size\"><code>stream.read()</code></a> is called. The\n<code>readableFlowing</code> property would become <code>false</code>.\nIf there are <code>'data'</code> listeners when <code>'readable'</code> is removed, the stream\nwill start flowing, i.e. <code>'data'</code> events will be emitted without calling\n<code>.resume()</code>.</p>"
                     },
                     {
                       "textRaw": "Event: `'resume'`",
@@ -2115,6 +2171,62 @@
                 }
               ],
               "desc": "<p>A utility method for creating readable streams out of iterators.</p>\n<pre><code class=\"language-js\">const { Readable } = require('stream');\n\nasync function * generate() {\n  yield 'hello';\n  yield 'streams';\n}\n\nconst readable = Readable.from(generate());\n\nreadable.on('data', (chunk) => {\n  console.log(chunk);\n});\n</code></pre>\n<p>Calling <code>Readable.from(string)</code> or <code>Readable.from(buffer)</code> will not have\nthe strings or buffers be iterated to match the other streams semantics\nfor performance reasons.</p>"
+            },
+            {
+              "textRaw": "`stream.Readable.fromWeb(readableStream[, options])`",
+              "type": "method",
+              "name": "fromWeb",
+              "meta": {
+                "added": [
+                  "v16.11.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "signatures": [
+                {
+                  "return": {
+                    "textRaw": "Returns: {stream.Readable}",
+                    "name": "return",
+                    "type": "stream.Readable"
+                  },
+                  "params": [
+                    {
+                      "textRaw": "`readableStream` {ReadableStream}",
+                      "name": "readableStream",
+                      "type": "ReadableStream"
+                    },
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`encoding` {string}",
+                          "name": "encoding",
+                          "type": "string"
+                        },
+                        {
+                          "textRaw": "`highWaterMark` {number}",
+                          "name": "highWaterMark",
+                          "type": "number"
+                        },
+                        {
+                          "textRaw": "`objectMode` {boolean}",
+                          "name": "objectMode",
+                          "type": "boolean"
+                        },
+                        {
+                          "textRaw": "`signal` {AbortSignal}",
+                          "name": "signal",
+                          "type": "AbortSignal"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
             },
             {
               "textRaw": "`stream.Readable.isDisturbed(stream)`",

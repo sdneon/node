@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v16.10.0/lib/fs.js\">lib/fs.js</a></p>\n<p>The <code>fs</code> module enables interacting with the file system in a\nway modeled on standard POSIX functions.</p>\n<p>To use the promise-based APIs:</p>\n<pre><code class=\"language-mjs\">import * as fs from 'fs/promises';\n</code></pre>\n<pre><code class=\"language-cjs\">const fs = require('fs/promises');\n</code></pre>\n<p>To use the callback and sync APIs:</p>\n<pre><code class=\"language-mjs\">import * as fs from 'fs';\n</code></pre>\n<pre><code class=\"language-cjs\">const fs = require('fs');\n</code></pre>\n<p>All file system operations have synchronous, callback, and promise-based\nforms, and are accessible using both CommonJS syntax and ES6 Modules (ESM).</p>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v16.11.0/lib/fs.js\">lib/fs.js</a></p>\n<p>The <code>fs</code> module enables interacting with the file system in a\nway modeled on standard POSIX functions.</p>\n<p>To use the promise-based APIs:</p>\n<pre><code class=\"language-mjs\">import * as fs from 'fs/promises';\n</code></pre>\n<pre><code class=\"language-cjs\">const fs = require('fs/promises');\n</code></pre>\n<p>To use the callback and sync APIs:</p>\n<pre><code class=\"language-mjs\">import * as fs from 'fs';\n</code></pre>\n<pre><code class=\"language-cjs\">const fs = require('fs');\n</code></pre>\n<p>All file system operations have synchronous, callback, and promise-based\nforms, and are accessible using both CommonJS syntax and ES6 Modules (ESM).</p>",
       "modules": [
         {
           "textRaw": "Promise example",
@@ -218,6 +218,124 @@
                     }
                   ],
                   "desc": "<p>Closes the file handle after waiting for any pending operation on the handle to\ncomplete.</p>\n<pre><code class=\"language-mjs\">import { open } from 'fs/promises';\n\nlet filehandle;\ntry {\n  filehandle = await open('thefile.txt', 'r');\n} finally {\n  await filehandle?.close();\n}\n</code></pre>"
+                },
+                {
+                  "textRaw": "`filehandle.createReadStream([options])`",
+                  "type": "method",
+                  "name": "createReadStream",
+                  "meta": {
+                    "added": [
+                      "v16.11.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "return": {
+                        "textRaw": "Returns: {fs.ReadStream}",
+                        "name": "return",
+                        "type": "fs.ReadStream"
+                      },
+                      "params": [
+                        {
+                          "textRaw": "`options` {Object}",
+                          "name": "options",
+                          "type": "Object",
+                          "options": [
+                            {
+                              "textRaw": "`encoding` {string} **Default:** `null`",
+                              "name": "encoding",
+                              "type": "string",
+                              "default": "`null`"
+                            },
+                            {
+                              "textRaw": "`autoClose` {boolean} **Default:** `true`",
+                              "name": "autoClose",
+                              "type": "boolean",
+                              "default": "`true`"
+                            },
+                            {
+                              "textRaw": "`emitClose` {boolean} **Default:** `true`",
+                              "name": "emitClose",
+                              "type": "boolean",
+                              "default": "`true`"
+                            },
+                            {
+                              "textRaw": "`start` {integer}",
+                              "name": "start",
+                              "type": "integer"
+                            },
+                            {
+                              "textRaw": "`end` {integer} **Default:** `Infinity`",
+                              "name": "end",
+                              "type": "integer",
+                              "default": "`Infinity`"
+                            },
+                            {
+                              "textRaw": "`highWaterMark` {integer} **Default:** `64 * 1024`",
+                              "name": "highWaterMark",
+                              "type": "integer",
+                              "default": "`64 * 1024`"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>Unlike the 16 kb default <code>highWaterMark</code> for a <a href=\"stream.html#stream_class_stream_readable\" class=\"type\">&lt;stream.Readable&gt;</a>, the stream\nreturned by this method has a default <code>highWaterMark</code> of 64 kb.</p>\n<p><code>options</code> can include <code>start</code> and <code>end</code> values to read a range of bytes from\nthe file instead of the entire file. Both <code>start</code> and <code>end</code> are inclusive and\nstart counting at 0, allowed values are in the\n[0, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/MAX_SAFE_INTEGER\"><code>Number.MAX_SAFE_INTEGER</code></a>] range. If <code>start</code> is\nomitted or <code>undefined</code>, <code>filehandle.createReadStream()</code> reads sequentially from\nthe current file position. The <code>encoding</code> can be any one of those accepted by\n<a href=\"buffer.html#buffer_class_buffer\" class=\"type\">&lt;Buffer&gt;</a>.</p>\n<p>If the <code>FileHandle</code> points to a character device that only supports blocking\nreads (such as keyboard or sound card), read operations do not finish until data\nis available. This can prevent the process from exiting and the stream from\nclosing naturally.</p>\n<p>By default, the stream will emit a <code>'close'</code> event after it has been\ndestroyed.  Set the <code>emitClose</code> option to <code>false</code> to change this behavior.</p>\n<pre><code class=\"language-mjs\">import { open } from 'fs/promises';\n\nconst fd = await open('/dev/input/event0');\n// Create a stream from some character device.\nconst stream = fd.createReadStream();\nsetTimeout(() => {\n  stream.close(); // This may not close the stream.\n  // Artificially marking end-of-stream, as if the underlying resource had\n  // indicated end-of-file by itself, allows the stream to close.\n  // This does not cancel pending read operations, and if there is such an\n  // operation, the process may still not be able to exit successfully\n  // until it finishes.\n  stream.push(null);\n  stream.read(0);\n}, 100);\n</code></pre>\n<p>If <code>autoClose</code> is false, then the file descriptor won't be closed, even if\nthere's an error. It is the application's responsibility to close it and make\nsure there's no file descriptor leak. If <code>autoClose</code> is set to true (default\nbehavior), on <code>'error'</code> or <code>'end'</code> the file descriptor will be closed\nautomatically.</p>\n<p>An example to read the last 10 bytes of a file which is 100 bytes long:</p>\n<pre><code class=\"language-mjs\">import { open } from 'fs/promises';\n\nconst fd = await open('sample.txt');\nfd.createReadStream({ start: 90, end: 99 });\n</code></pre>"
+                },
+                {
+                  "textRaw": "`filehandle.createWriteStream([options])`",
+                  "type": "method",
+                  "name": "createWriteStream",
+                  "meta": {
+                    "added": [
+                      "v16.11.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "return": {
+                        "textRaw": "Returns: {fs.WriteStream}",
+                        "name": "return",
+                        "type": "fs.WriteStream"
+                      },
+                      "params": [
+                        {
+                          "textRaw": "`options` {Object}",
+                          "name": "options",
+                          "type": "Object",
+                          "options": [
+                            {
+                              "textRaw": "`encoding` {string} **Default:** `'utf8'`",
+                              "name": "encoding",
+                              "type": "string",
+                              "default": "`'utf8'`"
+                            },
+                            {
+                              "textRaw": "`autoClose` {boolean} **Default:** `true`",
+                              "name": "autoClose",
+                              "type": "boolean",
+                              "default": "`true`"
+                            },
+                            {
+                              "textRaw": "`emitClose` {boolean} **Default:** `true`",
+                              "name": "emitClose",
+                              "type": "boolean",
+                              "default": "`true`"
+                            },
+                            {
+                              "textRaw": "`start` {integer}",
+                              "name": "start",
+                              "type": "integer"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p><code>options</code> may also include a <code>start</code> option to allow writing data at some\nposition past the beginning of the file, allowed values are in the\n[0, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/MAX_SAFE_INTEGER\"><code>Number.MAX_SAFE_INTEGER</code></a>] range. Modifying a file rather than replacing\nit may require the <code>flags</code> <code>open</code> option to be set to <code>r+</code> rather than the\ndefault <code>r</code>. The <code>encoding</code> can be any one of those accepted by <a href=\"buffer.html#buffer_class_buffer\" class=\"type\">&lt;Buffer&gt;</a>.</p>\n<p>If <code>autoClose</code> is set to true (default behavior) on <code>'error'</code> or <code>'finish'</code>\nthe file descriptor will be closed automatically. If <code>autoClose</code> is false,\nthen the file descriptor won't be closed, even if there's an error.\nIt is the application's responsibility to close it and make sure there's no\nfile descriptor leak.</p>\n<p>By default, the stream will emit a <code>'close'</code> event after it has been\ndestroyed.  Set the <code>emitClose</code> option to <code>false</code> to change this behavior.</p>"
                 },
                 {
                   "textRaw": "`filehandle.datasync()`",
@@ -2829,10 +2947,9 @@
               "signatures": [
                 {
                   "return": {
-                    "textRaw": "Returns: {fs.ReadStream} See [Readable Stream][].",
+                    "textRaw": "Returns: {fs.ReadStream}",
                     "name": "return",
-                    "type": "fs.ReadStream",
-                    "desc": "See [Readable Stream][]."
+                    "type": "fs.ReadStream"
                   },
                   "params": [
                     {
@@ -2910,7 +3027,7 @@
                   ]
                 }
               ],
-              "desc": "<p>Unlike the 16 kb default <code>highWaterMark</code> for a readable stream, the stream\nreturned by this method has a default <code>highWaterMark</code> of 64 kb.</p>\n<p><code>options</code> can include <code>start</code> and <code>end</code> values to read a range of bytes from\nthe file instead of the entire file. Both <code>start</code> and <code>end</code> are inclusive and\nstart counting at 0, allowed values are in the\n[0, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/MAX_SAFE_INTEGER\"><code>Number.MAX_SAFE_INTEGER</code></a>] range. If <code>fd</code> is specified and <code>start</code> is\nomitted or <code>undefined</code>, <code>fs.createReadStream()</code> reads sequentially from the\ncurrent file position. The <code>encoding</code> can be any one of those accepted by\n<a href=\"buffer.html#buffer_class_buffer\" class=\"type\">&lt;Buffer&gt;</a>.</p>\n<p>If <code>fd</code> is specified, <code>ReadStream</code> will ignore the <code>path</code> argument and will use\nthe specified file descriptor. This means that no <code>'open'</code> event will be\nemitted. <code>fd</code> should be blocking; non-blocking <code>fd</code>s should be passed to\n<a href=\"net.html#net_class_net_socket\" class=\"type\">&lt;net.Socket&gt;</a>.</p>\n<p>If <code>fd</code> points to a character device that only supports blocking reads\n(such as keyboard or sound card), read operations do not finish until data is\navailable. This can prevent the process from exiting and the stream from\nclosing naturally.</p>\n<p>By default, the stream will emit a <code>'close'</code> event after it has been\ndestroyed, like most <code>Readable</code> streams.  Set the <code>emitClose</code> option to\n<code>false</code> to change this behavior.</p>\n<p>By providing the <code>fs</code> option, it is possible to override the corresponding <code>fs</code>\nimplementations for <code>open</code>, <code>read</code>, and <code>close</code>. When providing the <code>fs</code> option,\nan override for <code>read</code> is required. If no <code>fd</code> is provided, an override for\n<code>open</code> is also required. If <code>autoClose</code> is <code>true</code>, an override for <code>close</code> is\nalso required.</p>\n<pre><code class=\"language-mjs\">import { createReadStream } from 'fs';\n\n// Create a stream from some character device.\nconst stream = createReadStream('/dev/input/event0');\nsetTimeout(() => {\n  stream.close(); // This may not close the stream.\n  // Artificially marking end-of-stream, as if the underlying resource had\n  // indicated end-of-file by itself, allows the stream to close.\n  // This does not cancel pending read operations, and if there is such an\n  // operation, the process may still not be able to exit successfully\n  // until it finishes.\n  stream.push(null);\n  stream.read(0);\n}, 100);\n</code></pre>\n<p>If <code>autoClose</code> is false, then the file descriptor won't be closed, even if\nthere's an error. It is the application's responsibility to close it and make\nsure there's no file descriptor leak. If <code>autoClose</code> is set to true (default\nbehavior), on <code>'error'</code> or <code>'end'</code> the file descriptor will be closed\nautomatically.</p>\n<p><code>mode</code> sets the file mode (permission and sticky bits), but only if the\nfile was created.</p>\n<p>An example to read the last 10 bytes of a file which is 100 bytes long:</p>\n<pre><code class=\"language-mjs\">import { createReadStream } from 'fs';\n\ncreateReadStream('sample.txt', { start: 90, end: 99 });\n</code></pre>\n<p>If <code>options</code> is a string, then it specifies the encoding.</p>"
+              "desc": "<p>Unlike the 16 kb default <code>highWaterMark</code> for a <a href=\"stream.html#stream_class_stream_readable\" class=\"type\">&lt;stream.Readable&gt;</a>, the stream\nreturned by this method has a default <code>highWaterMark</code> of 64 kb.</p>\n<p><code>options</code> can include <code>start</code> and <code>end</code> values to read a range of bytes from\nthe file instead of the entire file. Both <code>start</code> and <code>end</code> are inclusive and\nstart counting at 0, allowed values are in the\n[0, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/MAX_SAFE_INTEGER\"><code>Number.MAX_SAFE_INTEGER</code></a>] range. If <code>fd</code> is specified and <code>start</code> is\nomitted or <code>undefined</code>, <code>fs.createReadStream()</code> reads sequentially from the\ncurrent file position. The <code>encoding</code> can be any one of those accepted by\n<a href=\"buffer.html#buffer_class_buffer\" class=\"type\">&lt;Buffer&gt;</a>.</p>\n<p>If <code>fd</code> is specified, <code>ReadStream</code> will ignore the <code>path</code> argument and will use\nthe specified file descriptor. This means that no <code>'open'</code> event will be\nemitted. <code>fd</code> should be blocking; non-blocking <code>fd</code>s should be passed to\n<a href=\"net.html#net_class_net_socket\" class=\"type\">&lt;net.Socket&gt;</a>.</p>\n<p>If <code>fd</code> points to a character device that only supports blocking reads\n(such as keyboard or sound card), read operations do not finish until data is\navailable. This can prevent the process from exiting and the stream from\nclosing naturally.</p>\n<p>By default, the stream will emit a <code>'close'</code> event after it has been\ndestroyed.  Set the <code>emitClose</code> option to <code>false</code> to change this behavior.</p>\n<p>By providing the <code>fs</code> option, it is possible to override the corresponding <code>fs</code>\nimplementations for <code>open</code>, <code>read</code>, and <code>close</code>. When providing the <code>fs</code> option,\nan override for <code>read</code> is required. If no <code>fd</code> is provided, an override for\n<code>open</code> is also required. If <code>autoClose</code> is <code>true</code>, an override for <code>close</code> is\nalso required.</p>\n<pre><code class=\"language-mjs\">import { createReadStream } from 'fs';\n\n// Create a stream from some character device.\nconst stream = createReadStream('/dev/input/event0');\nsetTimeout(() => {\n  stream.close(); // This may not close the stream.\n  // Artificially marking end-of-stream, as if the underlying resource had\n  // indicated end-of-file by itself, allows the stream to close.\n  // This does not cancel pending read operations, and if there is such an\n  // operation, the process may still not be able to exit successfully\n  // until it finishes.\n  stream.push(null);\n  stream.read(0);\n}, 100);\n</code></pre>\n<p>If <code>autoClose</code> is false, then the file descriptor won't be closed, even if\nthere's an error. It is the application's responsibility to close it and make\nsure there's no file descriptor leak. If <code>autoClose</code> is set to true (default\nbehavior), on <code>'error'</code> or <code>'end'</code> the file descriptor will be closed\nautomatically.</p>\n<p><code>mode</code> sets the file mode (permission and sticky bits), but only if the\nfile was created.</p>\n<p>An example to read the last 10 bytes of a file which is 100 bytes long:</p>\n<pre><code class=\"language-mjs\">import { createReadStream } from 'fs';\n\ncreateReadStream('sample.txt', { start: 90, end: 99 });\n</code></pre>\n<p>If <code>options</code> is a string, then it specifies the encoding.</p>"
             },
             {
               "textRaw": "`fs.createWriteStream(path[, options])`",
@@ -2981,10 +3098,9 @@
               "signatures": [
                 {
                   "return": {
-                    "textRaw": "Returns: {fs.WriteStream} See [Writable Stream][].",
+                    "textRaw": "Returns: {fs.WriteStream}",
                     "name": "return",
-                    "type": "fs.WriteStream",
-                    "desc": "See [Writable Stream][]."
+                    "type": "fs.WriteStream"
                   },
                   "params": [
                     {
@@ -3050,7 +3166,7 @@
                   ]
                 }
               ],
-              "desc": "<p><code>options</code> may also include a <code>start</code> option to allow writing data at some\nposition past the beginning of the file, allowed values are in the\n[0, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/MAX_SAFE_INTEGER\"><code>Number.MAX_SAFE_INTEGER</code></a>] range. Modifying a file rather than replacing\nit may require the <code>flags</code> option to be set to <code>r+</code> rather than the default <code>w</code>.\nThe <code>encoding</code> can be any one of those accepted by <a href=\"buffer.html#buffer_class_buffer\" class=\"type\">&lt;Buffer&gt;</a>.</p>\n<p>If <code>autoClose</code> is set to true (default behavior) on <code>'error'</code> or <code>'finish'</code>\nthe file descriptor will be closed automatically. If <code>autoClose</code> is false,\nthen the file descriptor won't be closed, even if there's an error.\nIt is the application's responsibility to close it and make sure there's no\nfile descriptor leak.</p>\n<p>By default, the stream will emit a <code>'close'</code> event after it has been\ndestroyed, like most <code>Writable</code> streams.  Set the <code>emitClose</code> option to\n<code>false</code> to change this behavior.</p>\n<p>By providing the <code>fs</code> option it is possible to override the corresponding <code>fs</code>\nimplementations for <code>open</code>, <code>write</code>, <code>writev</code> and <code>close</code>. Overriding <code>write()</code>\nwithout <code>writev()</code> can reduce performance as some optimizations (<code>_writev()</code>)\nwill be disabled. When providing the <code>fs</code> option, overrides for at least one of\n<code>write</code> and <code>writev</code> are required. If no <code>fd</code> option is supplied, an override\nfor <code>open</code> is also required. If <code>autoClose</code> is <code>true</code>, an override for <code>close</code>\nis also required.</p>\n<p>Like <a href=\"fs.html#fs_class_fs_readstream\" class=\"type\">&lt;fs.ReadStream&gt;</a>, if <code>fd</code> is specified, <a href=\"fs.html#fs_class_fs_writestream\" class=\"type\">&lt;fs.WriteStream&gt;</a> will ignore the\n<code>path</code> argument and will use the specified file descriptor. This means that no\n<code>'open'</code> event will be emitted. <code>fd</code> should be blocking; non-blocking <code>fd</code>s\nshould be passed to <a href=\"net.html#net_class_net_socket\" class=\"type\">&lt;net.Socket&gt;</a>.</p>\n<p>If <code>options</code> is a string, then it specifies the encoding.</p>"
+              "desc": "<p><code>options</code> may also include a <code>start</code> option to allow writing data at some\nposition past the beginning of the file, allowed values are in the\n[0, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/MAX_SAFE_INTEGER\"><code>Number.MAX_SAFE_INTEGER</code></a>] range. Modifying a file rather than replacing\nit may require the <code>flags</code> option to be set to <code>r+</code> rather than the default <code>w</code>.\nThe <code>encoding</code> can be any one of those accepted by <a href=\"buffer.html#buffer_class_buffer\" class=\"type\">&lt;Buffer&gt;</a>.</p>\n<p>If <code>autoClose</code> is set to true (default behavior) on <code>'error'</code> or <code>'finish'</code>\nthe file descriptor will be closed automatically. If <code>autoClose</code> is false,\nthen the file descriptor won't be closed, even if there's an error.\nIt is the application's responsibility to close it and make sure there's no\nfile descriptor leak.</p>\n<p>By default, the stream will emit a <code>'close'</code> event after it has been\ndestroyed.  Set the <code>emitClose</code> option to <code>false</code> to change this behavior.</p>\n<p>By providing the <code>fs</code> option it is possible to override the corresponding <code>fs</code>\nimplementations for <code>open</code>, <code>write</code>, <code>writev</code> and <code>close</code>. Overriding <code>write()</code>\nwithout <code>writev()</code> can reduce performance as some optimizations (<code>_writev()</code>)\nwill be disabled. When providing the <code>fs</code> option, overrides for at least one of\n<code>write</code> and <code>writev</code> are required. If no <code>fd</code> option is supplied, an override\nfor <code>open</code> is also required. If <code>autoClose</code> is <code>true</code>, an override for <code>close</code>\nis also required.</p>\n<p>Like <a href=\"fs.html#fs_class_fs_readstream\" class=\"type\">&lt;fs.ReadStream&gt;</a>, if <code>fd</code> is specified, <a href=\"fs.html#fs_class_fs_writestream\" class=\"type\">&lt;fs.WriteStream&gt;</a> will ignore the\n<code>path</code> argument and will use the specified file descriptor. This means that no\n<code>'open'</code> event will be emitted. <code>fd</code> should be blocking; non-blocking <code>fd</code>s\nshould be passed to <a href=\"net.html#net_class_net_socket\" class=\"type\">&lt;net.Socket&gt;</a>.</p>\n<p>If <code>options</code> is a string, then it specifies the encoding.</p>"
             },
             {
               "textRaw": "`fs.exists(path, callback)`",
@@ -5488,7 +5604,7 @@
                   ]
                 }
               ],
-              "desc": "<p>Watch for changes on <code>filename</code>. The callback <code>listener</code> will be called each\ntime the file is accessed.</p>\n<p>The <code>options</code> argument may be omitted. If provided, it should be an object. The\n<code>options</code> object may contain a boolean named <code>persistent</code> that indicates\nwhether the process should continue to run as long as files are being watched.\nThe <code>options</code> object may specify an <code>interval</code> property indicating how often the\ntarget should be polled in milliseconds.</p>\n<p>The <code>listener</code> gets two arguments the current stat object and the previous\nstat object:</p>\n<pre><code class=\"language-mjs\">import { watchFile } from 'fs';\n\nwatchFile('message.text', (curr, prev) => {\n  console.log(`the current mtime is: ${curr.mtime}`);\n  console.log(`the previous mtime was: ${prev.mtime}`);\n});\n</code></pre>\n<p>These stat objects are instances of <code>fs.Stat</code>. If the <code>bigint</code> option is <code>true</code>,\nthe numeric values in these objects are specified as <code>BigInt</code>s.</p>\n<p>To be notified when the file was modified, not just accessed, it is necessary\nto compare <code>curr.mtime</code> and <code>prev.mtime</code>.</p>\n<p>When an <code>fs.watchFile</code> operation results in an <code>ENOENT</code> error, it\nwill invoke the listener once, with all the fields zeroed (or, for dates, the\nUnix Epoch). If the file is created later on, the listener will be called\nagain, with the latest stat objects. This is a change in functionality since\nv0.10.</p>\n<p>Using <a href=\"#fs_fs_watch_filename_options_listener\"><code>fs.watch()</code></a> is more efficient than <code>fs.watchFile</code> and\n<code>fs.unwatchFile</code>. <code>fs.watch</code> should be used instead of <code>fs.watchFile</code> and\n<code>fs.unwatchFile</code> when possible.</p>\n<p>When a file being watched by <code>fs.watchFile()</code> disappears and reappears,\nthen the contents of <code>previous</code> in the second callback event (the file's\nreappearance) will be the same as the contents of <code>previous</code> in the first\ncallback event (its disappearance).</p>\n<p>This happens when:</p>\n<ul>\n<li>the file is deleted, followed by a restore</li>\n<li>the file is renamed and then renamed a second time back to its original name</li>\n</ul>"
+              "desc": "<p>Watch for changes on <code>filename</code>. The callback <code>listener</code> will be called each\ntime the file is accessed.</p>\n<p>The <code>options</code> argument may be omitted. If provided, it should be an object. The\n<code>options</code> object may contain a boolean named <code>persistent</code> that indicates\nwhether the process should continue to run as long as files are being watched.\nThe <code>options</code> object may specify an <code>interval</code> property indicating how often the\ntarget should be polled in milliseconds.</p>\n<p>The <code>listener</code> gets two arguments the current stat object and the previous\nstat object:</p>\n<pre><code class=\"language-mjs\">import { watchFile } from 'fs';\n\nwatchFile('message.text', (curr, prev) => {\n  console.log(`the current mtime is: ${curr.mtime}`);\n  console.log(`the previous mtime was: ${prev.mtime}`);\n});\n</code></pre>\n<p>These stat objects are instances of <code>fs.Stat</code>. If the <code>bigint</code> option is <code>true</code>,\nthe numeric values in these objects are specified as <code>BigInt</code>s.</p>\n<p>To be notified when the file was modified, not just accessed, it is necessary\nto compare <code>curr.mtimeMs</code> and <code>prev.mtimeMs</code>.</p>\n<p>When an <code>fs.watchFile</code> operation results in an <code>ENOENT</code> error, it\nwill invoke the listener once, with all the fields zeroed (or, for dates, the\nUnix Epoch). If the file is created later on, the listener will be called\nagain, with the latest stat objects. This is a change in functionality since\nv0.10.</p>\n<p>Using <a href=\"#fs_fs_watch_filename_options_listener\"><code>fs.watch()</code></a> is more efficient than <code>fs.watchFile</code> and\n<code>fs.unwatchFile</code>. <code>fs.watch</code> should be used instead of <code>fs.watchFile</code> and\n<code>fs.unwatchFile</code> when possible.</p>\n<p>When a file being watched by <code>fs.watchFile()</code> disappears and reappears,\nthen the contents of <code>previous</code> in the second callback event (the file's\nreappearance) will be the same as the contents of <code>previous</code> in the first\ncallback event (its disappearance).</p>\n<p>This happens when:</p>\n<ul>\n<li>the file is deleted, followed by a restore</li>\n<li>the file is renamed and then renamed a second time back to its original name</li>\n</ul>"
             },
             {
               "textRaw": "`fs.write(fd, buffer[, offset[, length[, position]]], callback)`",
@@ -8645,7 +8761,7 @@
                     ],
                     "changes": []
                   },
-                  "desc": "<p>The path to the file the stream is reading from as specified in the first\nargument to <code>fs.createReadStream()</code>. If <code>path</code> is passed as a string, then\n<code>readStream.path</code> will be a string. If <code>path</code> is passed as a <a href=\"buffer.html#buffer_class_buffer\" class=\"type\">&lt;Buffer&gt;</a>, then\n<code>readStream.path</code> will be a <a href=\"buffer.html#buffer_class_buffer\" class=\"type\">&lt;Buffer&gt;</a>.</p>"
+                  "desc": "<p>The path to the file the stream is reading from as specified in the first\nargument to <code>fs.createReadStream()</code>. If <code>path</code> is passed as a string, then\n<code>readStream.path</code> will be a string. If <code>path</code> is passed as a <a href=\"buffer.html#buffer_class_buffer\" class=\"type\">&lt;Buffer&gt;</a>, then\n<code>readStream.path</code> will be a <a href=\"buffer.html#buffer_class_buffer\" class=\"type\">&lt;Buffer&gt;</a>. If <code>fd</code> is specified, then\n<code>readStream.path</code> will be <code>undefined</code>.</p>"
                 },
                 {
                   "textRaw": "`pending` {boolean}",
@@ -9256,7 +9372,7 @@
                 {
                   "textRaw": "String paths",
                   "name": "string_paths",
-                  "desc": "<p>String form paths are interpreted as UTF-8 character sequences identifying\nthe absolute or relative filename. Relative paths will be resolved relative\nto the current working directory as determined by calling <code>process.cwd()</code>.</p>\n<p>Example using an absolute path on POSIX:</p>\n<pre><code class=\"language-mjs\">import { open } from 'fs/promises';\n\nlet fd;\ntry {\n  fd = await open('/open/some/file.txt', 'r');\n  // Do something with the file\n} finally {\n  await fd.close();\n}\n</code></pre>\n<p>Example using a relative path on POSIX (relative to <code>process.cwd()</code>):</p>\n<pre><code class=\"language-mjs\">import { open } from 'fs/promises';\n\nlet fd;\ntry {\n  fd = await open('file.txt', 'r');\n  // Do something with the file\n} finally {\n  await fd.close();\n}\n</code></pre>",
+                  "desc": "<p>String paths are interpreted as UTF-8 character sequences identifying\nthe absolute or relative filename. Relative paths will be resolved relative\nto the current working directory as determined by calling <code>process.cwd()</code>.</p>\n<p>Example using an absolute path on POSIX:</p>\n<pre><code class=\"language-mjs\">import { open } from 'fs/promises';\n\nlet fd;\ntry {\n  fd = await open('/open/some/file.txt', 'r');\n  // Do something with the file\n} finally {\n  await fd.close();\n}\n</code></pre>\n<p>Example using a relative path on POSIX (relative to <code>process.cwd()</code>):</p>\n<pre><code class=\"language-mjs\">import { open } from 'fs/promises';\n\nlet fd;\ntry {\n  fd = await open('file.txt', 'r');\n  // Do something with the file\n} finally {\n  await fd.close();\n}\n</code></pre>",
                   "type": "module",
                   "displayName": "String paths"
                 },

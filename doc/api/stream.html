@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v16.10.0">
-  <title>Stream | Node.js v16.10.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v16.11.0">
+  <title>Stream | Node.js v16.11.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -92,7 +92,7 @@
     <div id="column1" data-id="stream" class="interior">
       <header>
         <div class="header-container">
-          <h1>Node.js v16.10.0 documentation</h1>
+          <h1>Node.js v16.11.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -243,6 +243,7 @@
 <li><a href="#stream_stream_pipeline_streams_callback"><code>stream.pipeline(streams, callback)</code></a></li>
 <li><span class="stability_1"><a href="#stream_stream_compose_streams"><code>stream.compose(...streams)</code></a></span></li>
 <li><a href="#stream_stream_readable_from_iterable_options"><code>stream.Readable.from(iterable[, options])</code></a></li>
+<li><span class="stability_1"><a href="#stream_stream_readable_fromweb_readablestream_options"><code>stream.Readable.fromWeb(readableStream[, options])</code></a></span></li>
 <li><span class="stability_1"><a href="#stream_stream_readable_isdisturbed_stream"><code>stream.Readable.isDisturbed(stream)</code></a></span></li>
 <li><a href="#stream_stream_duplex_from_src"><code>stream.Duplex.from(src)</code></a></li>
 <li><a href="#stream_stream_addabortsignal_signal_stream"><code>stream.addAbortSignal(signal, stream)</code></a></li>
@@ -314,10 +315,10 @@
 </ul></details>
 
       <div id="apicontent">
-        <h2>Stream<a class="srclink" href="https://github.com/nodejs/node/blob/aff2a0a4754ddba26e161bc66cd4392fc28dd146/lib/stream.js#L40">[src]</a><span><a class="mark" href="#stream_stream" id="stream_stream">#</a></span></h2>
+        <h2>Stream<a class="srclink" href="https://github.com/nodejs/node/blob/f1ae6fb104e0aa5d02a0e1230b9c1944673b00f1/lib/stream.js#L40">[src]</a><span><a class="mark" href="#stream_stream" id="stream_stream">#</a></span></h2>
 
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#documentation_stability_index">Stability: 2</a> - Stable</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v16.10.0/lib/stream.js">lib/stream.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v16.11.0/lib/stream.js">lib/stream.js</a></p>
 <p>A stream is an abstract interface for working with streaming data in Node.js.
 The <code>stream</code> module provides an API for implementing the stream interface.</p>
 <p>There are many stream objects provided by Node.js. For instance, a
@@ -1122,8 +1123,9 @@ and <code>readableFlowing</code> is not <code>false</code>.</p>
 </details>
 </div>
 <p>The <code>'readable'</code> event is emitted when there is data available to be read from
-the stream. In some cases, attaching a listener for the <code>'readable'</code> event will
-cause some amount of data to be read into an internal buffer.</p>
+the stream or when the end of the stream has been reached. Effectively, the
+<code>'readable'</code> event indicates that the stream has new information. If data is
+available, <a href="#stream_readable_read_size"><code>stream.read()</code></a> will return that data.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> readable = <span class="hljs-title function_">getReadableStreamSomehow</span>();
 readable.<span class="hljs-title function_">on</span>(<span class="hljs-string">'readable'</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
   <span class="hljs-comment">// There is some data to read now.</span>
@@ -1133,13 +1135,10 @@ readable.<span class="hljs-title function_">on</span>(<span class="hljs-string">
     <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(data);
   }
 });</code></pre>
-<p>The <code>'readable'</code> event will also be emitted once the end of the stream data
-has been reached but before the <code>'end'</code> event is emitted.</p>
-<p>Effectively, the <code>'readable'</code> event indicates that the stream has new
-information: either new data is available or the end of the stream has been
-reached. In the former case, <a href="#stream_readable_read_size"><code>stream.read()</code></a> will return the
-available data. In the latter case, <a href="#stream_readable_read_size"><code>stream.read()</code></a> will return
-<code>null</code>. For instance, in the following example, <code>foo.txt</code> is an empty file:</p>
+<p>If the end of the stream has been reached, calling
+<a href="#stream_readable_read_size"><code>stream.read()</code></a> will return <code>null</code> and trigger the <code>'end'</code>
+event. This is also true if there never was any data to be read. For instance,
+in the following example, <code>foo.txt</code> is an empty file:</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'fs'</span>);
 <span class="hljs-keyword">const</span> rr = fs.<span class="hljs-title function_">createReadStream</span>(<span class="hljs-string">'foo.txt'</span>);
 rr.<span class="hljs-title function_">on</span>(<span class="hljs-string">'readable'</span>, <span class="hljs-function">() =></span> {
@@ -1152,6 +1151,8 @@ rr.<span class="hljs-title function_">on</span>(<span class="hljs-string">'end'<
 <pre><code class="language-console"><span class="hljs-meta">$ </span><span class="language-bash">node test.js</span>
 readable: null
 end</code></pre>
+<p>In some cases, attaching a listener for the <code>'readable'</code> event will cause some
+amount of data to be read into an internal buffer.</p>
 <p>In general, the <code>readable.pipe()</code> and <code>'data'</code> event mechanisms are easier to
 understand than the <code>'readable'</code> event. However, handling <code>'readable'</code> might
 result in increased throughput.</p>
@@ -2104,6 +2105,23 @@ readable.<span class="hljs-title function_">on</span>(<span class="hljs-string">
 <p>Calling <code>Readable.from(string)</code> or <code>Readable.from(buffer)</code> will not have
 the strings or buffers be iterated to match the other streams semantics
 for performance reasons.</p>
+<h4><code>stream.Readable.fromWeb(readableStream[, options])</code><span><a class="mark" href="#stream_stream_readable_fromweb_readablestream_options" id="stream_stream_readable_fromweb_readablestream_options">#</a></span></h4>
+<div class="api_metadata">
+<span>Added in: v16.11.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#documentation_stability_index">Stability: 1</a> - Experimental</div><p></p>
+<ul>
+<li><code>readableStream</code> <a href="webstreams.md#webstreamsapi_class_readablestream" class="type">&#x3C;ReadableStream></a></li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>encoding</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li><code>highWaterMark</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+<li><code>objectMode</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+<li><code>signal</code> <a href="globals.html#globals_class_abortsignal" class="type">&#x3C;AbortSignal></a></li>
+</ul>
+</li>
+<li>Returns: <a href="stream.html#stream_class_stream_readable" class="type">&#x3C;stream.Readable></a></li>
+</ul>
 <h4><code>stream.Readable.isDisturbed(stream)</code><span><a class="mark" href="#stream_stream_readable_isdisturbed_stream" id="stream_stream_readable_isdisturbed_stream">#</a></span></h4>
 <div class="api_metadata">
 <span>Added in: v16.8.0</span>

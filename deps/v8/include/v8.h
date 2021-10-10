@@ -1441,7 +1441,7 @@ class ScriptOriginOptions {
 class ScriptOrigin {
  public:
 #if defined(_MSC_VER) && _MSC_VER >= 1910 /* Disable on VS2015 */
-  V8_DEPRECATE_SOON("Use constructor with primitive C++ types")
+  V8_DEPRECATED("Use constructor with primitive C++ types")
 #endif
   V8_INLINE explicit ScriptOrigin(
       Local<Value> resource_name, Local<Integer> resource_line_offset,
@@ -1454,7 +1454,7 @@ class ScriptOrigin {
       Local<Boolean> is_module = Local<Boolean>(),
       Local<PrimitiveArray> host_defined_options = Local<PrimitiveArray>());
 #if defined(_MSC_VER) && _MSC_VER >= 1910 /* Disable on VS2015 */
-  V8_DEPRECATE_SOON("Use constructor that takes an isolate")
+  V8_DEPRECATED("Use constructor that takes an isolate")
 #endif
   V8_INLINE explicit ScriptOrigin(
       Local<Value> resource_name, int resource_line_offset = 0,
@@ -1474,11 +1474,11 @@ class ScriptOrigin {
       Local<PrimitiveArray> host_defined_options = Local<PrimitiveArray>());
 
   V8_INLINE Local<Value> ResourceName() const;
-  V8_DEPRECATE_SOON("Use getter with primitvie C++ types.")
+  V8_DEPRECATED("Use getter with primitvie C++ types.")
   V8_INLINE Local<Integer> ResourceLineOffset() const;
-  V8_DEPRECATE_SOON("Use getter with primitvie C++ types.")
+  V8_DEPRECATED("Use getter with primitvie C++ types.")
   V8_INLINE Local<Integer> ResourceColumnOffset() const;
-  V8_DEPRECATE_SOON("Use getter with primitvie C++ types.")
+  V8_DEPRECATED("Use getter with primitvie C++ types.")
   V8_INLINE Local<Integer> ScriptID() const;
   V8_INLINE int LineOffset() const;
   V8_INLINE int ColumnOffset() const;
@@ -1630,14 +1630,14 @@ class V8_EXPORT Module : public Data {
   /**
    * Returns the number of modules requested by this module.
    */
-  V8_DEPRECATE_SOON("Use Module::GetModuleRequests() and FixedArray::Length().")
+  V8_DEPRECATED("Use Module::GetModuleRequests() and FixedArray::Length().")
   int GetModuleRequestsLength() const;
 
   /**
    * Returns the ith module specifier in this module.
    * i must be < GetModuleRequestsLength() and >= 0.
    */
-  V8_DEPRECATE_SOON(
+  V8_DEPRECATED(
       "Use Module::GetModuleRequests() and ModuleRequest::GetSpecifier().")
   Local<String> GetModuleRequest(int i) const;
 
@@ -1645,7 +1645,7 @@ class V8_EXPORT Module : public Data {
    * Returns the source location (line number and column number) of the ith
    * module specifier's first occurrence in this module.
    */
-  V8_DEPRECATE_SOON(
+  V8_DEPRECATED(
       "Use Module::GetModuleRequests(), ModuleRequest::GetSourceOffset(), and "
       "Module::SourceOffsetToLocation().")
   Location GetModuleRequestLocation(int i) const;
@@ -1680,7 +1680,7 @@ class V8_EXPORT Module : public Data {
    * instantiation. (In the case where the callback throws an exception, that
    * exception is propagated.)
    */
-  V8_DEPRECATE_SOON(
+  V8_DEPRECATED(
       "Use the version of InstantiateModule that takes a ResolveModuleCallback "
       "parameter")
   V8_WARN_UNUSED_RESULT Maybe<bool> InstantiateModule(Local<Context> context,
@@ -4311,11 +4311,13 @@ class V8_EXPORT Object : public Value {
   /**
    * Returns the context in which the object was created.
    */
+  // TODO(chromium:1166077): Mark as deprecate once users are updated.
   V8_DEPRECATE_SOON("Use MaybeLocal<Context> GetCreationContext()")
   Local<Context> CreationContext();
   MaybeLocal<Context> GetCreationContext();
 
   /** Same as above, but works for Persistents */
+  // TODO(chromium:1166077): Mark as deprecate once users are updated.
   V8_DEPRECATE_SOON(
       "Use MaybeLocal<Context> GetCreationContext(const "
       "PersistentBase<Object>& object)")
@@ -7507,7 +7509,9 @@ using MessageCallback = void (*)(Local<Message> message, Local<Value> data);
 
 // --- Tracing ---
 
-using LogEventCallback = void (*)(const char* name, int event);
+enum LogEventStatus : int { kStart = 0, kEnd = 1, kStamp = 2 };
+using LogEventCallback = void (*)(const char* name,
+                                  int /* LogEventStatus */ status);
 
 /**
  * Create new error objects by calling the corresponding error object
@@ -8973,7 +8977,7 @@ class V8_EXPORT Isolate {
    * This specifies the callback called by the upcoming dynamic
    * import() language feature to load modules.
    */
-  V8_DEPRECATE_SOON(
+  V8_DEPRECATED(
       "Use the version of SetHostImportModuleDynamicallyCallback that takes a "
       "HostImportModuleDynamicallyWithImportAssertionsCallback instead")
   void SetHostImportModuleDynamicallyCallback(

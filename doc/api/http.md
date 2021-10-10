@@ -1353,14 +1353,14 @@ explicitly.
 added: v16.10.0
 -->
 
-* {number} Requests per socket. **Default:** null (no limit)
+* {number} Requests per socket. **Default:** 0 (no limit)
 
 The maximum number of requests socket can handle
 before closing keep alive connection.
 
-A value of `null` will disable the limit.
+A value of `0` will disable the limit.
 
-When limit is reach it will set `Connection` header value to `closed`,
+When the limit is reached it will set the `Connection` header value to `close`,
 but will not actually close the connection, subsequent requests sent
 after the limit is reached will get `503 Service Unavailable` as a response.
 
@@ -2905,7 +2905,7 @@ changes:
   * `localPort` {number} Local port to connect from.
   * `lookup` {Function} Custom lookup function. **Default:** [`dns.lookup()`][].
   * `maxHeaderSize` {number} Optionally overrides the value of
-    [`--max-http-header-size`][] for requests received from the server, i.e.
+    [`--max-http-header-size`][] for responses received from the server, i.e.
     the maximum length of response headers in bytes.
     **Default:** 16384 (16 KB).
   * `method` {string} A string specifying the HTTP request method. **Default:**

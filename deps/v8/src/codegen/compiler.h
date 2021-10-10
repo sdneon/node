@@ -36,11 +36,12 @@ class ParseInfo;
 class Parser;
 class RuntimeCallStats;
 class ScriptData;
-struct ScriptStreamingData;
 class TimedHistogram;
 class UnoptimizedCompilationInfo;
 class UnoptimizedCompilationJob;
 class WorkerThreadRuntimeCallStats;
+struct ScriptDetails;
+struct ScriptStreamingData;
 
 using UnoptimizedCompilationJobList =
     std::forward_list<std::unique_ptr<UnoptimizedCompilationJob>>;
@@ -130,29 +131,12 @@ class V8_EXPORT_PRIVATE Compiler : public AllStatic {
       ParseRestriction restriction, int parameters_end_pos,
       int eval_scope_position, int eval_position);
 
-  struct ScriptDetails {
-    ScriptDetails()
-        : line_offset(0), column_offset(0), repl_mode(REPLMode::kNo) {}
-    explicit ScriptDetails(Handle<Object> script_name)
-        : line_offset(0),
-          column_offset(0),
-          name_obj(script_name),
-          repl_mode(REPLMode::kNo) {}
-
-    int line_offset;
-    int column_offset;
-    i::MaybeHandle<i::Object> name_obj;
-    i::MaybeHandle<i::Object> source_map_url;
-    i::MaybeHandle<i::FixedArray> host_defined_options;
-    REPLMode repl_mode;
-  };
-
   // Create a function that results from wrapping |source| in a function,
   // with |arguments| being a list of parameters for that function.
   V8_WARN_UNUSED_RESULT static MaybeHandle<JSFunction> GetWrappedFunction(
       Handle<String> source, Handle<FixedArray> arguments,
       Handle<Context> context, const ScriptDetails& script_details,
-      ScriptOriginOptions origin_options, ScriptData* cached_data,
+      ScriptData* cached_data,
       v8::ScriptCompiler::CompileOptions compile_options,
       v8::ScriptCompiler::NoCacheReason no_cache_reason);
 
@@ -176,9 +160,8 @@ class V8_EXPORT_PRIVATE Compiler : public AllStatic {
   // Create a shared function info object for a String source.
   static MaybeHandle<SharedFunctionInfo> GetSharedFunctionInfoForScript(
       Isolate* isolate, Handle<String> source,
-      const ScriptDetails& script_details, ScriptOriginOptions origin_options,
-      v8::Extension* extension, ScriptData* cached_data,
-      ScriptCompiler::CompileOptions compile_options,
+      const ScriptDetails& script_details, v8::Extension* extension,
+      ScriptData* cached_data, ScriptCompiler::CompileOptions compile_options,
       ScriptCompiler::NoCacheReason no_cache_reason,
       NativesFlag is_natives_code);
 
@@ -189,8 +172,7 @@ class V8_EXPORT_PRIVATE Compiler : public AllStatic {
   // owned by the caller.
   static MaybeHandle<SharedFunctionInfo> GetSharedFunctionInfoForStreamedScript(
       Isolate* isolate, Handle<String> source,
-      const ScriptDetails& script_details, ScriptOriginOptions origin_options,
-      ScriptStreamingData* streaming_data);
+      const ScriptDetails& script_details, ScriptStreamingData* streaming_data);
 
   // Create a shared function info object for the given function literal
   // node (the code may be lazily compiled).

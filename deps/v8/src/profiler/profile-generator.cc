@@ -936,6 +936,7 @@ void CpuProfilesCollection::AddPathToCurrentProfiles(
   // method, we don't bother minimizing the duration of lock holding,
   // e.g. copying contents of the list to a local vector.
   current_profiles_semaphore_.Wait();
+  const ProfileStackTrace empty_path;
   for (const std::unique_ptr<CpuProfile>& profile : current_profiles_) {
     profile->AddPath(timestamp, path, src_line, update_stats,
                      sampling_interval);
