@@ -16,9 +16,12 @@ This is a *fun* mod of Node.JS that initially embedded a modified version of dco
 Thanks to the inspiration from dcodeIO et al =D
 
 # Current build(s)
-Latest is Node.JS+ 16.11.0.
+Latest is Node.JS+ 16.12.0.
 
 ## Changelog
+* 16.12.0: Update to Node.JS 16.12.0 baseline and TypeScript 4.4.4. So it embeds:
+  * CS v2.6.1.
+  * TS v4.4.4.
 * 16.11.0: Update to Node.JS 16.11.0 baseline and CoffeeScript 2.6.1. So it embeds:
   * CS v2.6.1.
   * TS v4.4.3.
@@ -377,7 +380,7 @@ For information about the governance of the Node.js project, see
 * [targos](https://github.com/targos) -
   **Michaël Zasso** \<targos@protonmail.com> (he/him)
 * [tniessen](https://github.com/tniessen) -
-  **Tobias Nießen** \<tniessen@tnie.de>
+  **Tobias Nießen** \<tniessen@tnie.de> (he/him)
 * [Trott](https://github.com/Trott) -
   **Rich Trott** \<rtrott@gmail.com> (he/him)
 
@@ -613,7 +616,7 @@ For information about the governance of the Node.js project, see
 * [TimothyGu](https://github.com/TimothyGu) -
   **Tiancheng "Timothy" Gu** \<timothygu99@gmail.com> (he/him)
 * [tniessen](https://github.com/tniessen) -
-  **Tobias Nießen** \<tniessen@tnie.de>
+  **Tobias Nießen** \<tniessen@tnie.de> (he/him)
 * [trivikr](https://github.com/trivikr) -
   **Trivikram Kamat** \<trivikr.dev@gmail.com>
 * [Trott](https://github.com/Trott) -

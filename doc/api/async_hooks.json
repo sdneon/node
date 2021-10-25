@@ -8,12 +8,12 @@
       "introduced_in": "v8.1.0",
       "stability": 1,
       "stabilityText": "Experimental",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v16.11.1/lib/async_hooks.js\">lib/async_hooks.js</a></p>\n<p>The <code>async_hooks</code> module provides an API to track asynchronous resources. It\ncan be accessed using:</p>\n<pre><code class=\"language-mjs\">import async_hooks from 'async_hooks';\n</code></pre>\n<pre><code class=\"language-cjs\">const async_hooks = require('async_hooks');\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v16.12.0/lib/async_hooks.js\">lib/async_hooks.js</a></p>\n<p>The <code>async_hooks</code> module provides an API to track asynchronous resources. It\ncan be accessed using:</p>\n<pre><code class=\"language-mjs\">import async_hooks from 'async_hooks';\n</code></pre>\n<pre><code class=\"language-cjs\">const async_hooks = require('async_hooks');\n</code></pre>",
       "modules": [
         {
           "textRaw": "Terminology",
           "name": "terminology",
-          "desc": "<p>An asynchronous resource represents an object with an associated callback.\nThis callback may be called multiple times, for example, the <code>'connection'</code>\nevent in <code>net.createServer()</code>, or just a single time like in <code>fs.open()</code>.\nA resource can also be closed before the callback is called. <code>AsyncHook</code> does\nnot explicitly distinguish between these different cases but will represent them\nas the abstract concept that is a resource.</p>\n<p>If <a href=\"worker_threads.html#worker_threads_class_worker\"><code>Worker</code></a>s are used, each thread has an independent <code>async_hooks</code>\ninterface, and each thread will use a new set of async IDs.</p>",
+          "desc": "<p>An asynchronous resource represents an object with an associated callback.\nThis callback may be called multiple times, for example, the <code>'connection'</code>\nevent in <code>net.createServer()</code>, or just a single time like in <code>fs.open()</code>.\nA resource can also be closed before the callback is called. <code>AsyncHook</code> does\nnot explicitly distinguish between these different cases but will represent them\nas the abstract concept that is a resource.</p>\n<p>If <a href=\"worker_threads.html#class-worker\"><code>Worker</code></a>s are used, each thread has an independent <code>async_hooks</code>\ninterface, and each thread will use a new set of async IDs.</p>",
           "type": "module",
           "displayName": "Terminology"
         },
@@ -40,7 +40,7 @@
               "textRaw": "Class: `AsyncResource`",
               "type": "class",
               "name": "AsyncResource",
-              "desc": "<p>The documentation for this class has moved <a href=\"async_context.html#async_context_class_asyncresource\"><code>AsyncResource</code></a>.</p>"
+              "desc": "<p>The documentation for this class has moved <a href=\"async_context.html#class-asyncresource\"><code>AsyncResource</code></a>.</p>"
             }
           ],
           "type": "module",
@@ -108,7 +108,7 @@
               ]
             }
           ],
-          "desc": "<p>Registers functions to be called for different lifetime events of each async\noperation.</p>\n<p>The callbacks <code>init()</code>/<code>before()</code>/<code>after()</code>/<code>destroy()</code> are called for the\nrespective asynchronous event during a resource's lifetime.</p>\n<p>All callbacks are optional. For example, if only resource cleanup needs to\nbe tracked, then only the <code>destroy</code> callback needs to be passed. The\nspecifics of all functions that can be passed to <code>callbacks</code> is in the\n<a href=\"#async_hooks_hook_callbacks\">Hook Callbacks</a> section.</p>\n<pre><code class=\"language-mjs\">import { createHook } from 'async_hooks';\n\nconst asyncHook = createHook({\n  init(asyncId, type, triggerAsyncId, resource) { },\n  destroy(asyncId) { }\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const async_hooks = require('async_hooks');\n\nconst asyncHook = async_hooks.createHook({\n  init(asyncId, type, triggerAsyncId, resource) { },\n  destroy(asyncId) { }\n});\n</code></pre>\n<p>The callbacks will be inherited via the prototype chain:</p>\n<pre><code class=\"language-js\">class MyAsyncCallbacks {\n  init(asyncId, type, triggerAsyncId, resource) { }\n  destroy(asyncId) {}\n}\n\nclass MyAddedCallbacks extends MyAsyncCallbacks {\n  before(asyncId) { }\n  after(asyncId) { }\n}\n\nconst asyncHook = async_hooks.createHook(new MyAddedCallbacks());\n</code></pre>\n<p>Because promises are asynchronous resources whose lifecycle is tracked\nvia the async hooks mechanism, the <code>init()</code>, <code>before()</code>, <code>after()</code>, and\n<code>destroy()</code> callbacks <em>must not</em> be async functions that return promises.</p>",
+          "desc": "<p>Registers functions to be called for different lifetime events of each async\noperation.</p>\n<p>The callbacks <code>init()</code>/<code>before()</code>/<code>after()</code>/<code>destroy()</code> are called for the\nrespective asynchronous event during a resource's lifetime.</p>\n<p>All callbacks are optional. For example, if only resource cleanup needs to\nbe tracked, then only the <code>destroy</code> callback needs to be passed. The\nspecifics of all functions that can be passed to <code>callbacks</code> is in the\n<a href=\"#hook-callbacks\">Hook Callbacks</a> section.</p>\n<pre><code class=\"language-mjs\">import { createHook } from 'async_hooks';\n\nconst asyncHook = createHook({\n  init(asyncId, type, triggerAsyncId, resource) { },\n  destroy(asyncId) { }\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const async_hooks = require('async_hooks');\n\nconst asyncHook = async_hooks.createHook({\n  init(asyncId, type, triggerAsyncId, resource) { },\n  destroy(asyncId) { }\n});\n</code></pre>\n<p>The callbacks will be inherited via the prototype chain:</p>\n<pre><code class=\"language-js\">class MyAsyncCallbacks {\n  init(asyncId, type, triggerAsyncId, resource) { }\n  destroy(asyncId) {}\n}\n\nclass MyAddedCallbacks extends MyAsyncCallbacks {\n  before(asyncId) { }\n  after(asyncId) { }\n}\n\nconst asyncHook = async_hooks.createHook(new MyAddedCallbacks());\n</code></pre>\n<p>Because promises are asynchronous resources whose lifecycle is tracked\nvia the async hooks mechanism, the <code>init()</code>, <code>before()</code>, <code>after()</code>, and\n<code>destroy()</code> callbacks <em>must not</em> be async functions that return promises.</p>",
           "modules": [
             {
               "textRaw": "Error handling",
@@ -219,7 +219,7 @@
                   "params": []
                 }
               ],
-              "desc": "<pre><code class=\"language-mjs\">import { executionAsyncId } from 'async_hooks';\n\nconsole.log(executionAsyncId());  // 1 - bootstrap\nfs.open(path, 'r', (err, fd) => {\n  console.log(executionAsyncId());  // 6 - open()\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const async_hooks = require('async_hooks');\n\nconsole.log(async_hooks.executionAsyncId());  // 1 - bootstrap\nfs.open(path, 'r', (err, fd) => {\n  console.log(async_hooks.executionAsyncId());  // 6 - open()\n});\n</code></pre>\n<p>The ID returned from <code>executionAsyncId()</code> is related to execution timing, not\ncausality (which is covered by <code>triggerAsyncId()</code>):</p>\n<pre><code class=\"language-js\">const server = net.createServer((conn) => {\n  // Returns the ID of the server, not of the new connection, because the\n  // callback runs in the execution scope of the server's MakeCallback().\n  async_hooks.executionAsyncId();\n\n}).listen(port, () => {\n  // Returns the ID of a TickObject (process.nextTick()) because all\n  // callbacks passed to .listen() are wrapped in a nextTick().\n  async_hooks.executionAsyncId();\n});\n</code></pre>\n<p>Promise contexts may not get precise <code>executionAsyncIds</code> by default.\nSee the section on <a href=\"#async_hooks_promise_execution_tracking\">promise execution tracking</a>.</p>"
+              "desc": "<pre><code class=\"language-mjs\">import { executionAsyncId } from 'async_hooks';\n\nconsole.log(executionAsyncId());  // 1 - bootstrap\nfs.open(path, 'r', (err, fd) => {\n  console.log(executionAsyncId());  // 6 - open()\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const async_hooks = require('async_hooks');\n\nconsole.log(async_hooks.executionAsyncId());  // 1 - bootstrap\nfs.open(path, 'r', (err, fd) => {\n  console.log(async_hooks.executionAsyncId());  // 6 - open()\n});\n</code></pre>\n<p>The ID returned from <code>executionAsyncId()</code> is related to execution timing, not\ncausality (which is covered by <code>triggerAsyncId()</code>):</p>\n<pre><code class=\"language-js\">const server = net.createServer((conn) => {\n  // Returns the ID of the server, not of the new connection, because the\n  // callback runs in the execution scope of the server's MakeCallback().\n  async_hooks.executionAsyncId();\n\n}).listen(port, () => {\n  // Returns the ID of a TickObject (process.nextTick()) because all\n  // callbacks passed to .listen() are wrapped in a nextTick().\n  async_hooks.executionAsyncId();\n});\n</code></pre>\n<p>Promise contexts may not get precise <code>executionAsyncIds</code> by default.\nSee the section on <a href=\"#promise-execution-tracking\">promise execution tracking</a>.</p>"
             },
             {
               "textRaw": "`async_hooks.triggerAsyncId()`",
@@ -236,7 +236,7 @@
                   "params": []
                 }
               ],
-              "desc": "<pre><code class=\"language-js\">const server = net.createServer((conn) => {\n  // The resource that caused (or triggered) this callback to be called\n  // was that of the new connection. Thus the return value of triggerAsyncId()\n  // is the asyncId of \"conn\".\n  async_hooks.triggerAsyncId();\n\n}).listen(port, () => {\n  // Even though all callbacks passed to .listen() are wrapped in a nextTick()\n  // the callback itself exists because the call to the server's .listen()\n  // was made. So the return value would be the ID of the server.\n  async_hooks.triggerAsyncId();\n});\n</code></pre>\n<p>Promise contexts may not get valid <code>triggerAsyncId</code>s by default. See\nthe section on <a href=\"#async_hooks_promise_execution_tracking\">promise execution tracking</a>.</p>"
+              "desc": "<pre><code class=\"language-js\">const server = net.createServer((conn) => {\n  // The resource that caused (or triggered) this callback to be called\n  // was that of the new connection. Thus the return value of triggerAsyncId()\n  // is the asyncId of \"conn\".\n  async_hooks.triggerAsyncId();\n\n}).listen(port, () => {\n  // Even though all callbacks passed to .listen() are wrapped in a nextTick()\n  // the callback itself exists because the call to the server's .listen()\n  // was made. So the return value would be the ID of the server.\n  async_hooks.triggerAsyncId();\n});\n</code></pre>\n<p>Promise contexts may not get valid <code>triggerAsyncId</code>s by default. See\nthe section on <a href=\"#promise-execution-tracking\">promise execution tracking</a>.</p>"
             }
           ],
           "modules": [
@@ -395,7 +395,7 @@
           "textRaw": "Class: `AsyncLocalStorage`",
           "type": "class",
           "name": "AsyncLocalStorage",
-          "desc": "<p>The documentation for this class has moved <a href=\"async_context.html#async_context_class_asynclocalstorage\"><code>AsyncLocalStorage</code></a>.</p>"
+          "desc": "<p>The documentation for this class has moved <a href=\"async_context.html#class-asynclocalstorage\"><code>AsyncLocalStorage</code></a>.</p>"
         }
       ],
       "type": "module",

@@ -182,7 +182,7 @@
                       ]
                     }
                   ],
-                  "desc": "<p>Connects this <a href=\"webstreams.md#webstreamsapi_class_readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> to the pair of <a href=\"webstreams.md#webstreamsapi_class_readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> and\n<a href=\"webstreams.md#webstreamsapi_class_writablestream\" class=\"type\">&lt;WritableStream&gt;</a> provided in the <code>transform</code> argument such that the\ndata from this <a href=\"webstreams.md#webstreamsapi_class_readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> is written in to <code>transform.writable</code>,\npossibly transformed, then pushed to <code>transform.readable</code>. Once the\npipeline is configured, <code>transform.readable</code> is returned.</p>\n<p>Causes the <code>readableStream.locked</code> to be <code>true</code> while the pipe operation\nis active.</p>\n<pre><code class=\"language-mjs\">import {\n  ReadableStream,\n  TransformStream,\n} from 'node:stream/web';\n\nconst stream = new ReadableStream({\n  start(controller) {\n    controller.enqueue('a');\n  },\n});\n\nconst transform = new TransformStream({\n  transform(chunk, controller) {\n    controller.enqueue(chunk.toUpperCase());\n  }\n});\n\nconst transformedStream = stream.pipeThrough(transform);\n\nfor await (const chunk of transformedStream)\n  console.log(chunk);\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  ReadableStream,\n  TransformStream,\n} = require('stream/web');\n\nconst stream = new ReadableStream({\n  start(controller) {\n    controller.enqueue('a');\n  },\n});\n\nconst transform = new TransformStream({\n  transform(chunk, controller) {\n    controller.enqueue(chunk.toUpperCase());\n  }\n});\n\nconst transformedStream = stream.pipeThrough(transform);\n\n(async () => {\n  for await (const chunk of transformedStream)\n    console.log(chunk);\n})();\n</code></pre>"
+                  "desc": "<p>Connects this <a href=\"webstreams.md#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> to the pair of <a href=\"webstreams.md#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> and\n<a href=\"webstreams.md#class-writablestream\" class=\"type\">&lt;WritableStream&gt;</a> provided in the <code>transform</code> argument such that the\ndata from this <a href=\"webstreams.md#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> is written in to <code>transform.writable</code>,\npossibly transformed, then pushed to <code>transform.readable</code>. Once the\npipeline is configured, <code>transform.readable</code> is returned.</p>\n<p>Causes the <code>readableStream.locked</code> to be <code>true</code> while the pipe operation\nis active.</p>\n<pre><code class=\"language-mjs\">import {\n  ReadableStream,\n  TransformStream,\n} from 'node:stream/web';\n\nconst stream = new ReadableStream({\n  start(controller) {\n    controller.enqueue('a');\n  },\n});\n\nconst transform = new TransformStream({\n  transform(chunk, controller) {\n    controller.enqueue(chunk.toUpperCase());\n  }\n});\n\nconst transformedStream = stream.pipeThrough(transform);\n\nfor await (const chunk of transformedStream)\n  console.log(chunk);\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  ReadableStream,\n  TransformStream,\n} = require('stream/web');\n\nconst stream = new ReadableStream({\n  start(controller) {\n    controller.enqueue('a');\n  },\n});\n\nconst transform = new TransformStream({\n  transform(chunk, controller) {\n    controller.enqueue(chunk.toUpperCase());\n  }\n});\n\nconst transformedStream = stream.pipeThrough(transform);\n\n(async () => {\n  for await (const chunk of transformedStream)\n    console.log(chunk);\n})();\n</code></pre>"
                 },
                 {
                   "textRaw": "`readableStream.pipeTo(destination, options)`",
@@ -264,7 +264,7 @@
                       "params": []
                     }
                   ],
-                  "desc": "<p>Returns a pair of new <a href=\"webstreams.md#webstreamsapi_class_readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> instances to which this\n<code>ReadableStream</code>'s data will be forwarded. Each will receive the\nsame data.</p>\n<p>Causes the <code>readableStream.locked</code> to be <code>true</code>.</p>"
+                  "desc": "<p>Returns a pair of new <a href=\"webstreams.md#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> instances to which this\n<code>ReadableStream</code>'s data will be forwarded. Each will receive the\nsame data.</p>\n<p>Causes the <code>readableStream.locked</code> to be <code>true</code>.</p>"
                 },
                 {
                   "textRaw": "`readableStream.values([options])`",
@@ -302,14 +302,14 @@
                 {
                   "textRaw": "Async Iteration",
                   "name": "async_iteration",
-                  "desc": "<p>The <a href=\"webstreams.md#webstreamsapi_class_readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> object supports the async iterator protocol using\n<code>for await</code> syntax.</p>\n<pre><code class=\"language-mjs\">import { Buffer } from 'buffer';\n\nconst stream = new ReadableStream(getSomeSource());\n\nfor await (const chunk of stream)\n  console.log(Buffer.from(chunk).toString());\n</code></pre>\n<p>The async iterator will consume the <a href=\"webstreams.md#webstreamsapi_class_readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> until it terminates.</p>\n<p>By default, if the async iterator exits early (via either a <code>break</code>,\n<code>return</code>, or a <code>throw</code>), the <a href=\"webstreams.md#webstreamsapi_class_readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> will be closed. To prevent\nautomatic closing of the <a href=\"webstreams.md#webstreamsapi_class_readablestream\" class=\"type\">&lt;ReadableStream&gt;</a>, use the <code>readableStream.values()</code>\nmethod to acquire the async iterator and set the <code>preventCancel</code> option to\n<code>true</code>.</p>\n<p>The <a href=\"webstreams.md#webstreamsapi_class_readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> must not be locked (that is, it must not have an existing\nactive reader). During the async iteration, the <a href=\"webstreams.md#webstreamsapi_class_readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> will be locked.</p>",
+                  "desc": "<p>The <a href=\"webstreams.md#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> object supports the async iterator protocol using\n<code>for await</code> syntax.</p>\n<pre><code class=\"language-mjs\">import { Buffer } from 'buffer';\n\nconst stream = new ReadableStream(getSomeSource());\n\nfor await (const chunk of stream)\n  console.log(Buffer.from(chunk).toString());\n</code></pre>\n<p>The async iterator will consume the <a href=\"webstreams.md#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> until it terminates.</p>\n<p>By default, if the async iterator exits early (via either a <code>break</code>,\n<code>return</code>, or a <code>throw</code>), the <a href=\"webstreams.md#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> will be closed. To prevent\nautomatic closing of the <a href=\"webstreams.md#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a>, use the <code>readableStream.values()</code>\nmethod to acquire the async iterator and set the <code>preventCancel</code> option to\n<code>true</code>.</p>\n<p>The <a href=\"webstreams.md#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> must not be locked (that is, it must not have an existing\nactive reader). During the async iteration, the <a href=\"webstreams.md#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> will be locked.</p>",
                   "type": "module",
                   "displayName": "Async Iteration"
                 },
                 {
                   "textRaw": "Transferring with `postMessage()`",
                   "name": "transferring_with_`postmessage()`",
-                  "desc": "<p>A <a href=\"webstreams.md#webstreamsapi_class_readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> instance can be transferred using a <a href=\"worker_threads.html#worker_threads_class_messageport\" class=\"type\">&lt;MessagePort&gt;</a>.</p>\n<pre><code class=\"language-js\">const stream = new ReadableStream(getReadableSourceSomehow());\n\nconst { port1, port2 } = new MessageChannel();\n\nport1.onmessage = ({ data }) => {\n  data.getReader().read().then((chunk) => {\n    console.log(chunk);\n  });\n};\n\nport2.postMessage(stream, [stream]);\n</code></pre>",
+                  "desc": "<p>A <a href=\"webstreams.md#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> instance can be transferred using a <a href=\"worker_threads.html#class-messageport\" class=\"type\">&lt;MessagePort&gt;</a>.</p>\n<pre><code class=\"language-js\">const stream = new ReadableStream(getReadableSourceSomehow());\n\nconst { port1, port2 } = new MessageChannel();\n\nport1.onmessage = ({ data }) => {\n  data.getReader().read().then((chunk) => {\n    console.log(chunk);\n  });\n};\n\nport2.postMessage(stream, [stream]);\n</code></pre>",
                   "type": "module",
                   "displayName": "Transferring with `postMessage()`"
                 }
@@ -317,7 +317,7 @@
               "signatures": [
                 {
                   "params": [],
-                  "desc": "<!--lint disable maximum-line-length remark-lint-->\n<ul>\n<li><code>underlyingSource</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a>\n<ul>\n<li><code>start</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function\" class=\"type\">&lt;Function&gt;</a> A user-defined function that is invoked immediately when\nthe <code>ReadableStream</code> is created.\n<ul>\n<li><code>controller</code> <a href=\"webstreams.md#webstreamsapi_class_readablestreamdefaultcontroller\" class=\"type\">&lt;ReadableStreamDefaultController&gt;</a> | <a href=\"webstreams.md#webstreamsapi_class_readablebytestreamcontroller\" class=\"type\">&lt;ReadableByteStreamController&gt;</a></li>\n<li>Returns: <code>undefined</code> or a promise fulfilled with <code>undefined</code>.</li>\n</ul>\n</li>\n<li><code>pull</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function\" class=\"type\">&lt;Function&gt;</a> A user-defined function that is called repeatedly when the\n<code>ReadableStream</code> internal queue is not full. The operation may be sync or\nasync. If async, the function will not be called again until the previously\nreturned promise is fulfilled.\n<ul>\n<li><code>controller</code> <a href=\"webstreams.md#webstreamsapi_class_readablestreamdefaultcontroller\" class=\"type\">&lt;ReadableStreamDefaultController&gt;</a> | <a href=\"webstreams.md#webstreamsapi_class_readablebytestreamcontroller\" class=\"type\">&lt;ReadableByteStreamController&gt;</a></li>\n<li>Returns: A promise fulfilled with <code>undefined</code>.</li>\n</ul>\n</li>\n<li><code>cancel</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function\" class=\"type\">&lt;Function&gt;</a> A user-defined function that is called when the\n<code>ReadableStream</code> is canceled.\n<ul>\n<li><code>reason</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types\" class=\"type\">&lt;any&gt;</a></li>\n<li>Returns: A promise fulfilled with <code>undefined</code>.</li>\n</ul>\n</li>\n<li><code>type</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> Must be <code>'bytes'</code> or <code>undefined</code>.</li>\n<li><code>autoAllocateChunkSize</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> Used only when <code>type</code> is equal to\n<code>'bytes'</code>.</li>\n</ul>\n</li>\n<li><code>strategy</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a>\n<ul>\n<li><code>highWaterMark</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> The maximum internal queue size before backpressure\nis applied.</li>\n<li><code>size</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function\" class=\"type\">&lt;Function&gt;</a> A user-defined function used to identify the size of each\nchunk of data.\n<ul>\n<li><code>chunk</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types\" class=\"type\">&lt;any&gt;</a></li>\n<li>Returns: <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a></li>\n</ul>\n</li>\n</ul>\n</li>\n</ul>\n<!--lint enable maximum-line-length remark-lint-->"
+                  "desc": "<!--lint disable maximum-line-length remark-lint-->\n<ul>\n<li><code>underlyingSource</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a>\n<ul>\n<li><code>start</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function\" class=\"type\">&lt;Function&gt;</a> A user-defined function that is invoked immediately when\nthe <code>ReadableStream</code> is created.\n<ul>\n<li><code>controller</code> <a href=\"webstreams.md#class-readablestreamdefaultcontroller\" class=\"type\">&lt;ReadableStreamDefaultController&gt;</a> | <a href=\"webstreams.md#class-readablebytestreamcontroller\" class=\"type\">&lt;ReadableByteStreamController&gt;</a></li>\n<li>Returns: <code>undefined</code> or a promise fulfilled with <code>undefined</code>.</li>\n</ul>\n</li>\n<li><code>pull</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function\" class=\"type\">&lt;Function&gt;</a> A user-defined function that is called repeatedly when the\n<code>ReadableStream</code> internal queue is not full. The operation may be sync or\nasync. If async, the function will not be called again until the previously\nreturned promise is fulfilled.\n<ul>\n<li><code>controller</code> <a href=\"webstreams.md#class-readablestreamdefaultcontroller\" class=\"type\">&lt;ReadableStreamDefaultController&gt;</a> | <a href=\"webstreams.md#class-readablebytestreamcontroller\" class=\"type\">&lt;ReadableByteStreamController&gt;</a></li>\n<li>Returns: A promise fulfilled with <code>undefined</code>.</li>\n</ul>\n</li>\n<li><code>cancel</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function\" class=\"type\">&lt;Function&gt;</a> A user-defined function that is called when the\n<code>ReadableStream</code> is canceled.\n<ul>\n<li><code>reason</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types\" class=\"type\">&lt;any&gt;</a></li>\n<li>Returns: A promise fulfilled with <code>undefined</code>.</li>\n</ul>\n</li>\n<li><code>type</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> Must be <code>'bytes'</code> or <code>undefined</code>.</li>\n<li><code>autoAllocateChunkSize</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> Used only when <code>type</code> is equal to\n<code>'bytes'</code>.</li>\n</ul>\n</li>\n<li><code>strategy</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a>\n<ul>\n<li><code>highWaterMark</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> The maximum internal queue size before backpressure\nis applied.</li>\n<li><code>size</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function\" class=\"type\">&lt;Function&gt;</a> A user-defined function used to identify the size of each\nchunk of data.\n<ul>\n<li><code>chunk</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types\" class=\"type\">&lt;any&gt;</a></li>\n<li>Returns: <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a></li>\n</ul>\n</li>\n</ul>\n</li>\n</ul>\n<!--lint enable maximum-line-length remark-lint-->"
                 }
               ]
             },
@@ -331,7 +331,7 @@
                 ],
                 "changes": []
               },
-              "desc": "<p>By default, calling <code>readableStream.getReader()</code> with no arguments\nwill return an instance of <code>ReadableStreamDefaultReader</code>. The default\nreader treats the chunks of data passed through the stream as opaque\nvalues, which allows the <a href=\"webstreams.md#webstreamsapi_class_readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> to work with generally any\nJavaScript value.</p>",
+              "desc": "<p>By default, calling <code>readableStream.getReader()</code> with no arguments\nwill return an instance of <code>ReadableStreamDefaultReader</code>. The default\nreader treats the chunks of data passed through the stream as opaque\nvalues, which allows the <a href=\"webstreams.md#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> to work with generally any\nJavaScript value.</p>",
               "methods": [
                 {
                   "textRaw": "`readableStreamDefaultReader.cancel([reason])`",
@@ -359,7 +359,7 @@
                       ]
                     }
                   ],
-                  "desc": "<p>Cancels the <a href=\"webstreams.md#webstreamsapi_class_readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> and returns a promise that is fulfilled\nwhen the underlying stream has been canceled.</p>"
+                  "desc": "<p>Cancels the <a href=\"webstreams.md#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> and returns a promise that is fulfilled\nwhen the underlying stream has been canceled.</p>"
                 },
                 {
                   "textRaw": "`readableStreamDefaultReader.read()`",
@@ -393,7 +393,7 @@
                       "params": []
                     }
                   ],
-                  "desc": "<p>Requests the next chunk of data from the underlying <a href=\"webstreams.md#webstreamsapi_class_readablestream\" class=\"type\">&lt;ReadableStream&gt;</a>\nand returns a promise that is fulfilled with the data once it is\navailable.</p>"
+                  "desc": "<p>Requests the next chunk of data from the underlying <a href=\"webstreams.md#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a>\nand returns a promise that is fulfilled with the data once it is\navailable.</p>"
                 },
                 {
                   "textRaw": "`readableStreamDefaultReader.releaseLock()`",
@@ -410,7 +410,7 @@
                       "params": []
                     }
                   ],
-                  "desc": "<p>Releases this reader's lock on the underlying <a href=\"webstreams.md#webstreamsapi_class_readablestream\" class=\"type\">&lt;ReadableStream&gt;</a>.</p>"
+                  "desc": "<p>Releases this reader's lock on the underlying <a href=\"webstreams.md#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a>.</p>"
                 }
               ],
               "properties": [
@@ -436,7 +436,7 @@
                       "type": "ReadableStream"
                     }
                   ],
-                  "desc": "<p>Creates a new <a href=\"webstreams.md#webstreamsapi_class_readablestreamdefaultreader\" class=\"type\">&lt;ReadableStreamDefaultReader&gt;</a> that is locked to the\ngiven <a href=\"webstreams.md#webstreamsapi_class_readablestream\" class=\"type\">&lt;ReadableStream&gt;</a>.</p>"
+                  "desc": "<p>Creates a new <a href=\"webstreams.md#class-readablestreamdefaultreader\" class=\"type\">&lt;ReadableStreamDefaultReader&gt;</a> that is locked to the\ngiven <a href=\"webstreams.md#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a>.</p>"
                 }
               ]
             },
@@ -450,7 +450,7 @@
                 ],
                 "changes": []
               },
-              "desc": "<p>The <code>ReadableStreamBYOBReader</code> is an alternative consumer for\nbyte-oriented <a href=\"webstreams.md#webstreamsapi_class_readablestream\" class=\"type\">&lt;ReadableStream&gt;</a>'s (those that are created with\n<code>underlyingSource.type</code> set equal to <code>'bytes`` when the </code>ReadableStream` was created).</p>\n<p>The <code>BYOB</code> is short for \"bring your own buffer\". This is a\npattern that allows for more efficient reading of byte-oriented\ndata that avoids extraneous copying.</p>\n<pre><code class=\"language-mjs\">import {\n  open\n} from 'node:fs/promises';\n\nimport {\n  ReadableStream\n} from 'node:stream/web';\n\nimport { Buffer } from 'node:buffer';\n\nclass Source {\n  type = 'bytes';\n  autoAllocateChunkSize = 1024;\n\n  async start(controller) {\n    this.file = await open(new URL(import.meta.url));\n    this.controller = controller;\n  }\n\n  async pull(controller) {\n    const view = controller.byobRequest?.view;\n    const {\n      bytesRead,\n    } = await this.file.read({\n      buffer: view,\n      offset: view.byteOffset,\n      length: view.byteLength\n    });\n\n    if (bytesRead === 0) {\n      await this.file.close();\n      this.controller.close();\n    }\n    controller.byobRequest.respond(bytesRead);\n  }\n}\n\nconst stream = new ReadableStream(new Source());\n\nasync function read(stream) {\n  const reader = stream.getReader({ mode: 'byob' });\n\n  const chunks = [];\n  let result;\n  do {\n    result = await reader.read(Buffer.alloc(100));\n    if (result.value !== undefined)\n      chunks.push(Buffer.from(result.value));\n  } while (!result.done);\n\n  return Buffer.concat(chunks);\n}\n\nconst data = await read(stream);\nconsole.log(Buffer.from(data).toString());\n</code></pre>",
+              "desc": "<p>The <code>ReadableStreamBYOBReader</code> is an alternative consumer for\nbyte-oriented <a href=\"webstreams.md#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a>'s (those that are created with\n<code>underlyingSource.type</code> set equal to <code>'bytes`` when the </code>ReadableStream` was created).</p>\n<p>The <code>BYOB</code> is short for \"bring your own buffer\". This is a\npattern that allows for more efficient reading of byte-oriented\ndata that avoids extraneous copying.</p>\n<pre><code class=\"language-mjs\">import {\n  open\n} from 'node:fs/promises';\n\nimport {\n  ReadableStream\n} from 'node:stream/web';\n\nimport { Buffer } from 'node:buffer';\n\nclass Source {\n  type = 'bytes';\n  autoAllocateChunkSize = 1024;\n\n  async start(controller) {\n    this.file = await open(new URL(import.meta.url));\n    this.controller = controller;\n  }\n\n  async pull(controller) {\n    const view = controller.byobRequest?.view;\n    const {\n      bytesRead,\n    } = await this.file.read({\n      buffer: view,\n      offset: view.byteOffset,\n      length: view.byteLength\n    });\n\n    if (bytesRead === 0) {\n      await this.file.close();\n      this.controller.close();\n    }\n    controller.byobRequest.respond(bytesRead);\n  }\n}\n\nconst stream = new ReadableStream(new Source());\n\nasync function read(stream) {\n  const reader = stream.getReader({ mode: 'byob' });\n\n  const chunks = [];\n  let result;\n  do {\n    result = await reader.read(Buffer.alloc(100));\n    if (result.value !== undefined)\n      chunks.push(Buffer.from(result.value));\n  } while (!result.done);\n\n  return Buffer.concat(chunks);\n}\n\nconst data = await read(stream);\nconsole.log(Buffer.from(data).toString());\n</code></pre>",
               "methods": [
                 {
                   "textRaw": "`readableStreamBYOBReader.cancel([reason])`",
@@ -478,7 +478,7 @@
                       ]
                     }
                   ],
-                  "desc": "<p>Cancels the <a href=\"webstreams.md#webstreamsapi_class_readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> and returns a promise that is fulfilled\nwhen the underlying stream has been canceled.</p>"
+                  "desc": "<p>Cancels the <a href=\"webstreams.md#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> and returns a promise that is fulfilled\nwhen the underlying stream has been canceled.</p>"
                 },
                 {
                   "textRaw": "`readableStreamBYOBReader.read(view)`",
@@ -518,7 +518,7 @@
                       ]
                     }
                   ],
-                  "desc": "<p>Requests the next chunk of data from the underlying <a href=\"webstreams.md#webstreamsapi_class_readablestream\" class=\"type\">&lt;ReadableStream&gt;</a>\nand returns a promise that is fulfilled with the data once it is\navailable.</p>\n<p>Do not pass a pooled <a href=\"buffer.html#buffer_class_buffer\" class=\"type\">&lt;Buffer&gt;</a> object instance in to this method.\nPooled <code>Buffer</code> objects are created using <code>Buffer.allocUnsafe()</code>,\nor <code>Buffer.from()</code>, or are often returned by various <code>fs</code> module\ncallbacks. These types of <code>Buffer</code>s use a shared underlying\n<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer\" class=\"type\">&lt;ArrayBuffer&gt;</a> object that contains all of the data from all of\nthe pooled <code>Buffer</code> instances. When a <code>Buffer</code>, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\" class=\"type\">&lt;TypedArray&gt;</a>,\nor <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView\" class=\"type\">&lt;DataView&gt;</a> is passed in to <code>readableStreamBYOBReader.read()</code>,\nthe view's underlying <code>ArrayBuffer</code> is <em>detached</em>, invalidating\nall existing views that may exist on that <code>ArrayBuffer</code>. This\ncan have disastrous consequences for your application.</p>"
+                  "desc": "<p>Requests the next chunk of data from the underlying <a href=\"webstreams.md#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a>\nand returns a promise that is fulfilled with the data once it is\navailable.</p>\n<p>Do not pass a pooled <a href=\"buffer.html#class-buffer\" class=\"type\">&lt;Buffer&gt;</a> object instance in to this method.\nPooled <code>Buffer</code> objects are created using <code>Buffer.allocUnsafe()</code>,\nor <code>Buffer.from()</code>, or are often returned by various <code>fs</code> module\ncallbacks. These types of <code>Buffer</code>s use a shared underlying\n<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer\" class=\"type\">&lt;ArrayBuffer&gt;</a> object that contains all of the data from all of\nthe pooled <code>Buffer</code> instances. When a <code>Buffer</code>, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\" class=\"type\">&lt;TypedArray&gt;</a>,\nor <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView\" class=\"type\">&lt;DataView&gt;</a> is passed in to <code>readableStreamBYOBReader.read()</code>,\nthe view's underlying <code>ArrayBuffer</code> is <em>detached</em>, invalidating\nall existing views that may exist on that <code>ArrayBuffer</code>. This\ncan have disastrous consequences for your application.</p>"
                 },
                 {
                   "textRaw": "`readableStreamBYOBReader.releaseLock()`",
@@ -535,7 +535,7 @@
                       "params": []
                     }
                   ],
-                  "desc": "<p>Releases this reader's lock on the underlying <a href=\"webstreams.md#webstreamsapi_class_readablestream\" class=\"type\">&lt;ReadableStream&gt;</a>.</p>"
+                  "desc": "<p>Releases this reader's lock on the underlying <a href=\"webstreams.md#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a>.</p>"
                 }
               ],
               "properties": [
@@ -561,7 +561,7 @@
                       "type": "ReadableStream"
                     }
                   ],
-                  "desc": "<p>Creates a new <code>ReadableStreamBYOBReader</code> that is locked to the\ngiven <a href=\"webstreams.md#webstreamsapi_class_readablestream\" class=\"type\">&lt;ReadableStream&gt;</a>.</p>"
+                  "desc": "<p>Creates a new <code>ReadableStreamBYOBReader</code> that is locked to the\ngiven <a href=\"webstreams.md#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a>.</p>"
                 }
               ]
             },
@@ -575,7 +575,7 @@
                 ],
                 "changes": []
               },
-              "desc": "<p>Every <a href=\"webstreams.md#webstreamsapi_class_readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> has a controller that is responsible for\nthe internal state and management of the stream's queue. The\n<code>ReadableStreamDefaultController</code> is the default controller\nimplementation for <code>ReadableStream</code>s that are not byte-oriented.</p>",
+              "desc": "<p>Every <a href=\"webstreams.md#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> has a controller that is responsible for\nthe internal state and management of the stream's queue. The\n<code>ReadableStreamDefaultController</code> is the default controller\nimplementation for <code>ReadableStream</code>s that are not byte-oriented.</p>",
               "methods": [
                 {
                   "textRaw": "`readableStreamDefaultController.close()`",
@@ -592,7 +592,7 @@
                       "params": []
                     }
                   ],
-                  "desc": "<p>Closes the <a href=\"webstreams.md#webstreamsapi_class_readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> to which this controller is associated.</p>"
+                  "desc": "<p>Closes the <a href=\"webstreams.md#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> to which this controller is associated.</p>"
                 },
                 {
                   "textRaw": "`readableStreamDefaultController.enqueue(chunk)`",
@@ -615,7 +615,7 @@
                       ]
                     }
                   ],
-                  "desc": "<p>Appends a new chunk of data to the <a href=\"webstreams.md#webstreamsapi_class_readablestream\" class=\"type\">&lt;ReadableStream&gt;</a>'s queue.</p>"
+                  "desc": "<p>Appends a new chunk of data to the <a href=\"webstreams.md#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a>'s queue.</p>"
                 },
                 {
                   "textRaw": "`readableStreamDefaultController.error(error)`",
@@ -638,7 +638,7 @@
                       ]
                     }
                   ],
-                  "desc": "<p>Signals an error that causes the <a href=\"webstreams.md#webstreamsapi_class_readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> to error and close.</p>"
+                  "desc": "<p>Signals an error that causes the <a href=\"webstreams.md#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> to error and close.</p>"
                 }
               ],
               "properties": [
@@ -652,7 +652,7 @@
                     ],
                     "changes": []
                   },
-                  "desc": "<p>Returns the amount of data remaining to fill the <a href=\"webstreams.md#webstreamsapi_class_readablestream\" class=\"type\">&lt;ReadableStream&gt;</a>'s\nqueue.</p>"
+                  "desc": "<p>Returns the amount of data remaining to fill the <a href=\"webstreams.md#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a>'s\nqueue.</p>"
                 }
               ]
             },
@@ -666,7 +666,7 @@
                 ],
                 "changes": []
               },
-              "desc": "<p>Every <a href=\"webstreams.md#webstreamsapi_class_readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> has a controller that is responsible for\nthe internal state and management of the stream's queue. The\n<code>ReadableByteStreamController</code> is for byte-oriented <code>ReadableStream</code>s.</p>",
+              "desc": "<p>Every <a href=\"webstreams.md#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> has a controller that is responsible for\nthe internal state and management of the stream's queue. The\n<code>ReadableByteStreamController</code> is for byte-oriented <code>ReadableStream</code>s.</p>",
               "properties": [
                 {
                   "textRaw": "`byobRequest` Type: {ReadableStreamBYOBRequest}",
@@ -678,7 +678,7 @@
                     ],
                     "changes": []
                   },
-                  "desc": "<p>Returns the amount of data remaining to fill the <a href=\"webstreams.md#webstreamsapi_class_readablestream\" class=\"type\">&lt;ReadableStream&gt;</a>'s\nqueue.</p>"
+                  "desc": "<p>Returns the amount of data remaining to fill the <a href=\"webstreams.md#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a>'s\nqueue.</p>"
                 },
                 {
                   "textRaw": "`desiredSize` Type: {number}",
@@ -690,7 +690,7 @@
                     ],
                     "changes": []
                   },
-                  "desc": "<p>Returns the amount of data remaining to fill the <a href=\"webstreams.md#webstreamsapi_class_readablestream\" class=\"type\">&lt;ReadableStream&gt;</a>'s\nqueue.</p>"
+                  "desc": "<p>Returns the amount of data remaining to fill the <a href=\"webstreams.md#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a>'s\nqueue.</p>"
                 }
               ],
               "methods": [
@@ -709,7 +709,7 @@
                       "params": []
                     }
                   ],
-                  "desc": "<p>Closes the <a href=\"webstreams.md#webstreamsapi_class_readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> to which this controller is associated.</p>"
+                  "desc": "<p>Closes the <a href=\"webstreams.md#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> to which this controller is associated.</p>"
                 },
                 {
                   "textRaw": "`readableByteStreamController.enqueue(chunk)`",
@@ -732,7 +732,7 @@
                       ]
                     }
                   ],
-                  "desc": "<p>Appends a new chunk of data to the <a href=\"webstreams.md#webstreamsapi_class_readablestream\" class=\"type\">&lt;ReadableStream&gt;</a>'s queue.</p>"
+                  "desc": "<p>Appends a new chunk of data to the <a href=\"webstreams.md#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a>'s queue.</p>"
                 },
                 {
                   "textRaw": "`readableByteStreamController.error(error)`",
@@ -755,7 +755,7 @@
                       ]
                     }
                   ],
-                  "desc": "<p>Signals an error that causes the <a href=\"webstreams.md#webstreamsapi_class_readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> to error and close.</p>"
+                  "desc": "<p>Signals an error that causes the <a href=\"webstreams.md#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> to error and close.</p>"
                 }
               ]
             },
@@ -935,7 +935,7 @@
                 {
                   "textRaw": "Transferring with postMessage()",
                   "name": "transferring_with_postmessage()",
-                  "desc": "<p>A <a href=\"webstreams.md#webstreamsapi_class_writablestream\" class=\"type\">&lt;WritableStream&gt;</a> instance can be transferred using a <a href=\"worker_threads.html#worker_threads_class_messageport\" class=\"type\">&lt;MessagePort&gt;</a>.</p>\n<pre><code class=\"language-js\">const stream = new WritableStream(getWritableSinkSomehow());\n\nconst { port1, port2 } = new MessageChannel();\n\nport1.onmessage = ({ data }) => {\n  data.getWriter().write('hello');\n};\n\nport2.postMessage(stream, [stream]);\n</code></pre>",
+                  "desc": "<p>A <a href=\"webstreams.md#class-writablestream\" class=\"type\">&lt;WritableStream&gt;</a> instance can be transferred using a <a href=\"worker_threads.html#class-messageport\" class=\"type\">&lt;MessagePort&gt;</a>.</p>\n<pre><code class=\"language-js\">const stream = new WritableStream(getWritableSinkSomehow());\n\nconst { port1, port2 } = new MessageChannel();\n\nport1.onmessage = ({ data }) => {\n  data.getWriter().write('hello');\n};\n\nport2.postMessage(stream, [stream]);\n</code></pre>",
                   "type": "module",
                   "displayName": "Transferring with postMessage()"
                 }
@@ -1139,7 +1139,7 @@
                       "params": []
                     }
                   ],
-                  "desc": "<p>Releases this writer's lock on the underlying <a href=\"webstreams.md#webstreamsapi_class_readablestream\" class=\"type\">&lt;ReadableStream&gt;</a>.</p>"
+                  "desc": "<p>Releases this writer's lock on the underlying <a href=\"webstreams.md#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a>.</p>"
                 },
                 {
                   "textRaw": "`writableStreamDefaultWriter.write([chunk])`",
@@ -1167,7 +1167,7 @@
                       ]
                     }
                   ],
-                  "desc": "<p>Appends a new chunk of data to the <a href=\"webstreams.md#webstreamsapi_class_writablestream\" class=\"type\">&lt;WritableStream&gt;</a>'s queue.</p>"
+                  "desc": "<p>Appends a new chunk of data to the <a href=\"webstreams.md#class-writablestream\" class=\"type\">&lt;WritableStream&gt;</a>'s queue.</p>"
                 }
               ],
               "properties": [
@@ -1192,7 +1192,7 @@
                     ],
                     "changes": []
                   },
-                  "desc": "<p>The amount of data required to fill the <a href=\"webstreams.md#webstreamsapi_class_writablestream\" class=\"type\">&lt;WritableStream&gt;</a>'s queue.</p>"
+                  "desc": "<p>The amount of data required to fill the <a href=\"webstreams.md#class-writablestream\" class=\"type\">&lt;WritableStream&gt;</a>'s queue.</p>"
                 },
                 {
                   "textRaw": "`ready` type: A promise that is fulfilled with `undefined` when the writer is ready to be used.",
@@ -1229,7 +1229,7 @@
                 ],
                 "changes": []
               },
-              "desc": "<p>The <code>WritableStreamDefaultController</code> manage's the <a href=\"webstreams.md#webstreamsapi_class_writablestream\" class=\"type\">&lt;WritableStream&gt;</a>'s\ninternal state.</p>",
+              "desc": "<p>The <code>WritableStreamDefaultController</code> manage's the <a href=\"webstreams.md#class-writablestream\" class=\"type\">&lt;WritableStream&gt;</a>'s\ninternal state.</p>",
               "properties": [
                 {
                   "textRaw": "`abortReason` Type: {any} The `reason` value passed to `writableStream.abort()`.",
@@ -1266,7 +1266,7 @@
                       ]
                     }
                   ],
-                  "desc": "<p>Called by user-code to signal that an error has occurred while processing\nthe <code>WritableStream</code> data. When called, the <a href=\"webstreams.md#webstreamsapi_class_writablestream\" class=\"type\">&lt;WritableStream&gt;</a> will be aborted,\nwith currently pending writes canceled.</p>"
+                  "desc": "<p>Called by user-code to signal that an error has occurred while processing\nthe <code>WritableStream</code> data. When called, the <a href=\"webstreams.md#class-writablestream\" class=\"type\">&lt;WritableStream&gt;</a> will be aborted,\nwith currently pending writes canceled.</p>"
                 }
               ]
             },
@@ -1280,7 +1280,7 @@
                 ],
                 "changes": []
               },
-              "desc": "<p>A <code>TransformStream</code> consists of a <a href=\"webstreams.md#webstreamsapi_class_readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> and a <a href=\"webstreams.md#webstreamsapi_class_writablestream\" class=\"type\">&lt;WritableStream&gt;</a> that\nare connected such that the data written to the <code>WritableStream</code> is received,\nand potentially transformed, before being pushed into the <code>ReadableStream</code>'s\nqueue.</p>\n<pre><code class=\"language-mjs\">import {\n  TransformStream\n} from 'node:stream/web';\n\nconst transform = new TransformStream({\n  transform(chunk, controller) {\n    controller.enqueue(chunk.toUpperCase());\n  }\n});\n\nawait Promise.all([\n  transform.writable.getWriter().write('A'),\n  transform.readable.getReader().read(),\n]);\n</code></pre>",
+              "desc": "<p>A <code>TransformStream</code> consists of a <a href=\"webstreams.md#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> and a <a href=\"webstreams.md#class-writablestream\" class=\"type\">&lt;WritableStream&gt;</a> that\nare connected such that the data written to the <code>WritableStream</code> is received,\nand potentially transformed, before being pushed into the <code>ReadableStream</code>'s\nqueue.</p>\n<pre><code class=\"language-mjs\">import {\n  TransformStream\n} from 'node:stream/web';\n\nconst transform = new TransformStream({\n  transform(chunk, controller) {\n    controller.enqueue(chunk.toUpperCase());\n  }\n});\n\nawait Promise.all([\n  transform.writable.getWriter().write('A'),\n  transform.readable.getReader().read(),\n]);\n</code></pre>",
               "properties": [
                 {
                   "textRaw": "`readable` Type: {ReadableStream}",
@@ -1309,7 +1309,7 @@
                 {
                   "textRaw": "Transferring with postMessage()",
                   "name": "transferring_with_postmessage()",
-                  "desc": "<p>A <a href=\"webstreams.md#webstreamsapi_class_transformstream\" class=\"type\">&lt;TransformStream&gt;</a> instance can be transferred using a <a href=\"worker_threads.html#worker_threads_class_messageport\" class=\"type\">&lt;MessagePort&gt;</a>.</p>\n<pre><code class=\"language-js\">const stream = new TransformStream();\n\nconst { port1, port2 } = new MessageChannel();\n\nport1.onmessage = ({ data }) => {\n  const { writable, readable } = data;\n  // ...\n};\n\nport2.postMessage(stream, [stream]);\n</code></pre>",
+                  "desc": "<p>A <a href=\"webstreams.md#class-transformstream\" class=\"type\">&lt;TransformStream&gt;</a> instance can be transferred using a <a href=\"worker_threads.html#class-messageport\" class=\"type\">&lt;MessagePort&gt;</a>.</p>\n<pre><code class=\"language-js\">const stream = new TransformStream();\n\nconst { port1, port2 } = new MessageChannel();\n\nport1.onmessage = ({ data }) => {\n  const { writable, readable } = data;\n  // ...\n};\n\nport2.postMessage(stream, [stream]);\n</code></pre>",
                   "type": "module",
                   "displayName": "Transferring with postMessage()"
                 }
