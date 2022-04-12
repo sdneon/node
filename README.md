@@ -1,26 +1,22 @@
-<!--lint disable no-literal-urls-->
-
-<p align="center">
-  <a href="https://nodejs.org/">
-    <img
-      alt="Node.js"
-      src="https://nodejs.org/static/images/logo-light.svg"
-      width="400"
-    />
-  </a>
-</p>
+# Node.js
 
 # About this mod
 This is a *fun* mod of Node.JS that initially embedded a modified version of dcodeIO’s defunct  [pre-processor.js](https://github.com/dcodeIO/Preprocessor.js/), to allow use of simple C++ like preprocessor directives in CJS modules. Subsequently, it also embedded [CoffeeScript](https://coffeescript.org/) and [TypeScript](https://www.typescriptlang.org/).
 
 Thanks to the inspiration from dcodeIO et al =D
 
-Latest: Node.JS+ 17.7.2
+Latest: Node.JS+ 17.9.0.1
 
 ## Changelog
-* 17.7.2: Update to 17.7.2 baseline for critical OpenSSL patch. It embeds:
+* 17.9.1: Update to D Script 1.2.0. It embeds:
+  * DS v1.2.0.
+    * Allow use of preprocessor directives in #import/#cs/#ts/#include code blocks and ESM modules.
+    * Added #undef.
   * CS v2.6.1.
-  * TS v4.6.2.
+  * TS v4.6.3.
+* 17.9.0: Update to 17.9.0 baseline. It embeds:
+  * CS v2.6.1.
+  * TS v4.6.3.
 * 16.12.0: Update to Node.JS 16.12.0 baseline and TypeScript 4.4.4. So it embeds:
   * CS v2.6.1.
   * TS v4.4.4.
@@ -31,7 +27,12 @@ The mod thus allows Node.JS+ to run .ds, .cs and .ts scripts directly for D Scri
 
 ### Main Directives
 * Preprocessor directives are only available for D at the moment, but not for CS & TS.
+  * v1.2.0: #import/#cs/#ts/#include code blocks can now use preprocessor directives within.
+    * Each code block is transpiled (recursively) at the point of inclusion, and uses the `#define`'d variables at that point in time.
+    * The effects of `#define` and `#undef` within the code blocks carry back to the main/parent code.
+  * D transpiler does Not parse JS et al syntax, so it does Not recognise comments, and Will evaluate preprocessor directives in comment blocks as well.
 * `#ds`: D scripts can be identified by file extension of .ds, or CJS files with initial 3 characters of `#ds`.
+  *  From v1.2.0, ESM modules can also specify `#ds` to use preprocessor directives.
   *  `#ds colors`: declares a D script file and imports [colors](https://github.com/marak/colors.js/) with basic color mapping:
   ```javascript
   require('colors').setTheme({
@@ -56,11 +57,13 @@ The mod thus allows Node.JS+ to run .ds, .cs and .ts scripts directly for D Scri
   #end
   console.log('2 squared='.bold.info, square(2));
   ```
-  * From 16.2.0, to allow for `#private_member` syntax in TypeScript, all #'s that is not #end are ignored.
+  * To allow for `#private_member` syntax in TypeScript, all preprocessor directives must start the line. I.e. #'s that are not the 1st character of a line are ignored and not evaluated as preprocessor directives.
 * `#define`: declares preprocessor variables for use with `#ifdef`s et al.
   * Does not support elaborate C++ like marco function definitions.
   * Can declare variables via `DS_DEFINES` environment variable.
     * Windows OS example: set DS_DEFINES=VERBOSE=false;DETAILS=true
+  * Evaluation is simplistic: all `#define` and `#undef` for the same variable are tallied till the end, where the final value is used to evaluate #if's et al.
+* `#undef`: (Since v1.2.0) undefines/removes preprocessor variables.
 * `#ifdef`, `#ifndef`, `#if`, `#elif`, `#else`, `#endif`: conditional code blocks
 * `#put`: [pre-processor.js](https://github.com/dcodeIO/Preprocessor.js/)' version of inline expressions.
 * `#include`, `#include_once`: inline one or more files, using simple path or [glob](https://github.com/isaacs/node-glob/) pattern.
@@ -139,12 +142,13 @@ REPL mode for D Script, CoffeeScript and TypeScript is activated by setting envi
   * E.g. enter this command in REPL to switch to CoffeeScript: `process.env.NODE_REPL_SCRIPT = 'cs'`
 * You should also use **_editor_** mode for entering multi-lines code blocks.
   * Simply enter this command in REPL: `.editor`
+  * Paste or type in your code.
   * To end and execute the code block, use shortcut: CTRL-D
   * To cancel and exit editor, use shortcut: CTRL-C
 
 ## Simple Steps to Build Your Own
-* Grab original Node.JS source codes for specific baseline, unzip. E.g.: [original Node.JS 16.2.0 source codes](https://github.com/nodejs/node/archive/refs/tags/v16.2.0.tar.gz)
-* Grab min archive of this mod's source codes from Releases page. E.g. [mod for 16.2.0.2+](https://github.com/sdneon/node/releases/download/16.2.0.2%2B/node-16.2.0.2_src.7z)
+* Grab original Node.JS source codes for specific baseline, unzip. E.g.: [original Node.JS 17.9.0 source codes](https://github.com/nodejs/node/archive/refs/tags/v17.9.0.tar.gz)
+* Grab min archive of this mod's source codes from Releases page. E.g. [mod for 17.9.0+](https://github.com/sdneon/node/releases/download/17.9.0%2B/node-17.9.0_src.7z)
   * Unzip and override Node.JS source.
      * Jsut 2 _essential_ files changed/overwritten: `lib/internal/modules/cjs/loader.js` and `lib/repl.js`
 * Build as usual per Node.JS
@@ -163,7 +167,7 @@ The Node.js project uses an [open governance model](./GOVERNANCE.md). The
 
 **This project has a [Code of Conduct][].**
 
-# Table of contents
+## Table of contents
 
 * [Support](#support)
 * [Release types](#release-types)
@@ -205,7 +209,7 @@ Looking for help? Check out the
 * **Nightly**: Code from the Current branch built every 24-hours when there are
   changes. Use with caution.
 
-Current and LTS releases follow [Semantic Versioning](https://semver.org). A
+Current and LTS releases follow [semantic versioning](https://semver.org). A
 member of the Release Team [signs](#release-keys) each Current and LTS release.
 For more information, see the
 [Release README](https://github.com/nodejs/Release#readme).
@@ -267,7 +271,7 @@ import the keys:
 $ gpg --keyserver hkps://keys.openpgp.org --recv-keys DD8F2338BAE7501E3DD5AC78C273792F7D83545D
 ```
 
-See the bottom of this README for a full script to import active release keys.
+See [Release keys](#release-keys) for a script to import active release keys.
 
 Next, download the `SHASUMS256.txt.sig` for the release:
 
@@ -486,8 +490,6 @@ For information about the governance of the Node.js project, see
   **Guy Bedford** <<guybedford@gmail.com>> (he/him)
 * [HarshithaKP](https://github.com/HarshithaKP) -
   **Harshitha K P** <<harshitha014@gmail.com>> (she/her)
-* [hashseed](https://github.com/hashseed) -
-  **Yang Guo** <<yangguo@chromium.org>> (he/him)
 * [himself65](https://github.com/himself65) -
   **Zeyu Yang** <<himself65@outlook.com>> (he/him)
 * [hiroppy](https://github.com/hiroppy) -
@@ -528,6 +530,8 @@ For information about the governance of the Node.js project, see
   **Akhil Marsonya** <<akhil.marsonya27@gmail.com>> (he/him)
 * [mcollina](https://github.com/mcollina) -
   **Matteo Collina** <<matteo.collina@gmail.com>> (he/him)
+* [meixg](https://github.com/meixg) -
+  **Xuguang Mei** <<meixuguang@gmail.com>> (he/him)
 * [Mesteery](https://github.com/Mesteery) -
   **Mestery** <<mestery@protonmail.com>> (he/him)
 * [mhdawson](https://github.com/mhdawson) -
@@ -572,6 +576,8 @@ For information about the governance of the Node.js project, see
   **Santiago Gimeno** <<santiago.gimeno@gmail.com>>
 * [shisama](https://github.com/shisama) -
   **Masashi Hirano** <<shisama07@gmail.com>> (he/him)
+* [ShogunPanda](https://github.com/ShogunPanda) -
+  **Paolo Insogna** <<paolo@cowtech.it>> (he/him)
 * [srl295](https://github.com/srl295) -
   **Steven R Loomis** <<srloomis@us.ibm.com>>
 * [starkwang](https://github.com/starkwang) -
@@ -654,6 +660,8 @@ For information about the governance of the Node.js project, see
   **Gibson Fahnestock** <<gibfahn@gmail.com>> (he/him)
 * [glentiki](https://github.com/glentiki) -
   **Glen Keane** <<glenkeane.94@gmail.com>> (he/him)
+* [hashseed](https://github.com/hashseed) -
+  **Yang Guo** <<yangguo@chromium.org>> (he/him)
 * [iarna](https://github.com/iarna) -
   **Rebecca Turner** <<me@re-becca.org>>
 * [imran-iq](https://github.com/imran-iq) -
@@ -797,7 +805,7 @@ maintaining the Node.js project.
 * [marsonya](https://github.com/marsonya) -
   **Akhil Marsonya** <<akhil.marsonya27@gmail.com>> (he/him)
 * [meixg](https://github.com/meixg) -
-  **Xuguang Mei** <<meixg@foxmail.com>> (he/him)
+  **Xuguang Mei** <<meixuguang@gmail.com>> (he/him)
 * [Mesteery](https://github.com/Mesteery) -
   **Mestery** <<mestery@protonmail.com>> (he/him)
 * [PoojaDurgad](https://github.com/PoojaDurgad) -
@@ -854,8 +862,8 @@ gpg --keyserver hkps://keys.openpgp.org --recv-keys 108F52B48DB57BB0CC439B2997B0
 gpg --keyserver hkps://keys.openpgp.org --recv-keys B9E2F5981AA6E0CD28160D9FF13993A75599653C
 ```
 
-See the section above on [Verifying binaries](#verifying-binaries) for how to
-use these keys to verify a downloaded file.
+See [Verifying binaries](#verifying-binaries) for how to use these keys to
+verify a downloaded file.
 
 <details>
 
