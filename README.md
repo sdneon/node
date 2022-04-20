@@ -5,16 +5,17 @@ This is a *fun* mod of Node.JS that initially embedded a modified version of dco
 
 Thanks to the inspiration from dcodeIO et al =D
 
-Latest: Node.JS+ 17.9.0.1
+Latest: Node.JS+ 18.0.0
 
 ## Changelog
+* 18.0.0: Update to Node.JS 18.0.0 baseline. It embeds:
+  * DS v1.2.0.
+  * CS v2.6.1.
+  * TS v4.6.3.
 * 17.9.1: Update to D Script 1.2.0. It embeds:
   * DS v1.2.0.
     * Allow use of preprocessor directives in #import/#cs/#ts/#include code blocks and ESM modules.
     * Added #undef.
-  * CS v2.6.1.
-  * TS v4.6.3.
-* 17.9.0: Update to 17.9.0 baseline. It embeds:
   * CS v2.6.1.
   * TS v4.6.3.
 * 16.12.0: Update to Node.JS 16.12.0 baseline and TypeScript 4.4.4. So it embeds:
@@ -444,8 +445,6 @@ For information about the governance of the Node.js project, see
   **Tierney Cyren** <<hello@bnb.im>> (they/he)
 * [bnoordhuis](https://github.com/bnoordhuis) -
   **Ben Noordhuis** <<info@bnoordhuis.nl>>
-* [boneskull](https://github.com/boneskull) -
-  **Christopher Hiller** <<boneskull@boneskull.com>> (he/him)
 * [BridgeAR](https://github.com/BridgeAR) -
   **Ruben Bridgewater** <<ruben@bridgewater.de>> (he/him)
 * [bzoz](https://github.com/bzoz) -
@@ -556,6 +555,8 @@ For information about the governance of the Node.js project, see
   **Andrey Pechkurov** <<apechkurov@gmail.com>> (he/him)
 * [Qard](https://github.com/Qard) -
   **Stephen Belanger** <<admin@stephenbelanger.com>> (he/him)
+* [RafaelGSS](https://github.com/RafaelGSS) -
+  **Rafael Gonzaga** <<rafael.nunu@hotmail.com>> (he/him)
 * [RaisinTen](https://github.com/RaisinTen) -
   **Darshan Sen** <<raisinten@gmail.com>> (he/him)
 * [rexagod](https://github.com/rexagod) -
@@ -628,6 +629,8 @@ For information about the governance of the Node.js project, see
   **Alexey Orlenko** <<eaglexrlnk@gmail.com>> (he/him)
 * [bmeurer](https://github.com/bmeurer) -
   **Benedikt Meurer** <<benedikt.meurer@gmail.com>>
+* [boneskull](https://github.com/boneskull) -
+  **Christopher Hiller** <<boneskull@boneskull.com>> (he/him)
 * [brendanashworth](https://github.com/brendanashworth) -
   **Brendan Ashworth** <<brendan.ashworth@me.com>>
 * [calvinmetcalf](https://github.com/calvinmetcalf) -
