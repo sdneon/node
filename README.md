@@ -5,24 +5,20 @@ This is a *fun* mod of Node.JS that initially embedded a modified version of dco
 
 Thanks to the inspiration from dcodeIO et al =D
 
-Latest: Node.JS+ 18.2.0
+Latest: Node.JS+ 18.4.0
 
-## Changelog
-* 18.2.0: Update to Node.JS 18.2.0 baseline, CS 2.7.0 and TS 4.7.2. It embeds:
+## Versions
+* 18.4.0: Update to Node.JS 18.4.0 baseline, and TS 4.7.4. It embeds:
   * DS v1.2.0.
   * CS v2.7.0.
-  * TS v4.7.2.
-* 18.1.0: Update to Node.JS 18.1.0 baseline. It embeds:
-  * DS v1.2.0.
-  * CS v2.6.1.
-  * TS v4.6.4.
+  * TS v4.7.4.
 * 17.9.1: Update to D Script 1.2.0. It embeds:
   * DS v1.2.0.
     * Allow use of preprocessor directives in #import/#cs/#ts/#include code blocks and ESM modules.
     * Added #undef.
   * CS v2.6.1.
   * TS v4.6.3.
-* 16.12.0: Update to Node.JS 16.12.0 baseline and TypeScript 4.4.4. So it embeds:
+* 16.12.0: Update to Node.JS 16.12.0 baseline and TypeScript 4.4.4. It embeds:
   * CS v2.6.1.
   * TS v4.4.4.
 * Refer to prior readmes for old changes.
@@ -449,8 +445,6 @@ For information about the governance of the Node.js project, see
   **Ben Noordhuis** <<info@bnoordhuis.nl>>
 * [BridgeAR](https://github.com/BridgeAR) -
   **Ruben Bridgewater** <<ruben@bridgewater.de>> (he/him)
-* [bzoz](https://github.com/bzoz) -
-  **Bartosz Sosnowski** <<bartosz@janeasystems.com>>
 * [cclauss](https://github.com/cclauss) -
   **Christian Clauss** <<cclauss@me.com>> (he/him)
 * [ChALkeR](https://github.com/ChALkeR) -
@@ -493,8 +487,6 @@ For information about the governance of the Node.js project, see
   **Harshitha K P** <<harshitha014@gmail.com>> (she/her)
 * [himself65](https://github.com/himself65) -
   **Zeyu "Alex" Yang** <<himself65@outlook.com>> (he/him)
-* [hiroppy](https://github.com/hiroppy) -
-  **Yuta Hiroto** <<hello@hiroppy.me>> (he/him)
 * [iansu](https://github.com/iansu) -
   **Ian Sutherland** <<ian@iansutherland.ca>>
 * [indutny](https://github.com/indutny) -
@@ -527,8 +519,6 @@ For information about the governance of the Node.js project, see
   **LiviaMedeiros** <<livia@cirno.name>>
 * [lpinca](https://github.com/lpinca) -
   **Luigi Pinca** <<luigipinca@gmail.com>> (he/him)
-* [lundibundi](https://github.com/lundibundi) -
-  **Denys Otrishko** <<shishugi@gmail.com>> (he/him)
 * [Lxxyx](https://github.com/Lxxyx) -
   **Zijian Liu** <<lxxyxzj@gmail.com>> (he/him)
 * [marsonya](https://github.com/marsonya) -
@@ -637,6 +627,8 @@ For information about the governance of the Node.js project, see
   **Christopher Hiller** <<boneskull@boneskull.com>> (he/him)
 * [brendanashworth](https://github.com/brendanashworth) -
   **Brendan Ashworth** <<brendan.ashworth@me.com>>
+* [bzoz](https://github.com/bzoz) -
+  **Bartosz Sosnowski** <<bartosz@janeasystems.com>>
 * [calvinmetcalf](https://github.com/calvinmetcalf) -
   **Calvin Metcalf** <<calvin.metcalf@gmail.com>>
 * [chrisdickinson](https://github.com/chrisdickinson) -
@@ -669,6 +661,8 @@ For information about the governance of the Node.js project, see
   **Glen Keane** <<glenkeane.94@gmail.com>> (he/him)
 * [hashseed](https://github.com/hashseed) -
   **Yang Guo** <<yangguo@chromium.org>> (he/him)
+* [hiroppy](https://github.com/hiroppy) -
+  **Yuta Hiroto** <<hello@hiroppy.me>> (he/him)
 * [iarna](https://github.com/iarna) -
   **Rebecca Turner** <<me@re-becca.org>>
 * [imran-iq](https://github.com/imran-iq) -
@@ -701,6 +695,8 @@ For information about the governance of the Node.js project, see
   **Lance Ball** <<lball@redhat.com>> (he/him)
 * [lucamaraschi](https://github.com/lucamaraschi) -
   **Luca Maraschi** <<luca.maraschi@gmail.com>> (he/him)
+* [lundibundi](https://github.com/lundibundi) -
+  **Denys Otrishko** <<shishugi@gmail.com>> (he/him)
 * [lxe](https://github.com/lxe) -
   **Aleksey Smolenchuk** <<lxe@lxe.co>>
 * [maclover7](https://github.com/maclover7) -
@@ -809,6 +805,8 @@ maintaining the Node.js project.
 
 * [Ayase-252](https://github.com/Ayase-252) -
   **Qingyu Deng** <<i@ayase-lab.com>>
+* [F3n67u](https://github.com/F3n67u) -
+  **Feng Yu** <<F3n67u@outlook.com>> (he/him)
 * [himadriganguly](https://github.com/himadriganguly) -
   **Himadri Ganguly** <<himadri.tech@gmail.com>> (he/him)
 * [iam-frankqiu](https://github.com/iam-frankqiu) -
@@ -846,6 +844,8 @@ Primary GPG keys for Node.js Releasers (some Releasers sign with subkeys):
   `8FCCA13FEF1D0C2E91008E09770F7A9A5AE15600`
 * **Myles Borins** <<myles.borins@gmail.com>>
   `C4F0DFFF4E8C1A8236409D08E73BC641CC11F4C8`
+* **RafaelGSS** <<rafael.nunu@hotmail.com>>
+  `890C08DB8579162FEE0DF9DB8BEAB4DFCF555EF4`
 * **Richard Lau** <<rlau@redhat.com>>
   `C82FA3AE1CBEDC6BE46B9360C43CEC45C17AB93C`
 * **Rod Vagg** <<rod@vagg.org>>
@@ -869,6 +869,7 @@ gpg --keyserver hkps://keys.openpgp.org --recv-keys 71DCFD284A79C3B38668286BC97E
 gpg --keyserver hkps://keys.openpgp.org --recv-keys 61FC681DFB92A079F1685E77973F295594EC4689
 gpg --keyserver hkps://keys.openpgp.org --recv-keys 8FCCA13FEF1D0C2E91008E09770F7A9A5AE15600
 gpg --keyserver hkps://keys.openpgp.org --recv-keys C4F0DFFF4E8C1A8236409D08E73BC641CC11F4C8
+gpg --keyserver hkps://keys.openpgp.org --recv-keys 890C08DB8579162FEE0DF9DB8BEAB4DFCF555EF4
 gpg --keyserver hkps://keys.openpgp.org --recv-keys C82FA3AE1CBEDC6BE46B9360C43CEC45C17AB93C
 gpg --keyserver hkps://keys.openpgp.org --recv-keys DD8F2338BAE7501E3DD5AC78C273792F7D83545D
 gpg --keyserver hkps://keys.openpgp.org --recv-keys A48C2BEE680E841632CD4E44F07496B3EB3C1762
