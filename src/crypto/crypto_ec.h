@@ -3,12 +3,11 @@
 
 #if defined(NODE_WANT_INTERNALS) && NODE_WANT_INTERNALS
 
-#include "crypto/crypto_keys.h"
-#include "crypto/crypto_keygen.h"
-#include "crypto/crypto_util.h"
-#include "allocated_buffer.h"
 #include "async_wrap.h"
 #include "base_object.h"
+#include "crypto/crypto_keygen.h"
+#include "crypto/crypto_keys.h"
+#include "crypto/crypto_util.h"
 #include "env.h"
 #include "memory_tracker.h"
 #include "node_internals.h"
@@ -24,6 +23,8 @@ class ECDH final : public BaseObject {
   ~ECDH() override;
 
   static void Initialize(Environment* env, v8::Local<v8::Object> target);
+  static void RegisterExternalReferences(ExternalReferenceRegistry* registry);
+
   static ECPointPointer BufferToPoint(Environment* env,
                                       const EC_GROUP* group,
                                       v8::Local<v8::Value> buf);
@@ -142,7 +143,7 @@ struct ECKeyExportTraits final {
 
 using ECKeyExportJob = KeyExportJob<ECKeyExportTraits>;
 
-v8::Maybe<bool> ExportJWKEcKey(
+v8::Maybe<void> ExportJWKEcKey(
     Environment* env,
     std::shared_ptr<KeyObjectData> key,
     v8::Local<v8::Object> target);

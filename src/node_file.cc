@@ -277,13 +277,13 @@ inline void FileHandle::Close() {
                        detail.fd);
     if (env->filehandle_close_warning()) {
       env->set_filehandle_close_warning(false);
-      ProcessEmitDeprecationWarning(
+      USE(ProcessEmitDeprecationWarning(
           env,
           "Closing a FileHandle object on garbage collection is deprecated. "
           "Please close FileHandle objects explicitly using "
           "FileHandle.prototype.close(). In the future, an error will be "
           "thrown if a file descriptor is closed during garbage collection.",
-          "DEP0137").IsNothing();
+          "DEP0137"));
     }
   }, CallbackFlags::kUnrefed);
 }
@@ -714,24 +714,19 @@ void FromNamespacedPath(std::string* path) {
 void AfterMkdirp(uv_fs_t* req) {
   FSReqBase* req_wrap = FSReqBase::from_req(req);
   FSReqAfterScope after(req_wrap, req);
-
-  MaybeLocal<Value> path;
-  Local<Value> error;
-
   if (after.Proceed()) {
-    if (!req_wrap->continuation_data()->first_path().empty()) {
-      std::string first_path(req_wrap->continuation_data()->first_path());
-      FromNamespacedPath(&first_path);
-      path = StringBytes::Encode(req_wrap->env()->isolate(), first_path.c_str(),
-                                 req_wrap->encoding(),
-                                 &error);
-      if (path.IsEmpty())
-        req_wrap->Reject(error);
-      else
-        req_wrap->Resolve(path.ToLocalChecked());
-    } else {
-      req_wrap->Resolve(Undefined(req_wrap->env()->isolate()));
+    std::string first_path(req_wrap->continuation_data()->first_path());
+    if (first_path.empty())
+      return req_wrap->Resolve(Undefined(req_wrap->env()->isolate()));
+    FromNamespacedPath(&first_path);
+    Local<Value> path;
+    Local<Value> error;
+    if (!StringBytes::Encode(req_wrap->env()->isolate(), first_path.c_str(),
+                             req_wrap->encoding(),
+                             &error).ToLocal(&path)) {
+      return req_wrap->Reject(error);
     }
+    return req_wrap->Resolve(path);
   }
 }
 
@@ -1387,6 +1382,7 @@ int MKDirpSync(uv_loop_t* loop,
           }
           break;
         case UV_EACCES:
+        case UV_ENOSPC:
         case UV_ENOTDIR:
         case UV_EPERM: {
           return err;
@@ -2453,9 +2449,6 @@ InternalFieldInfo* BindingData::Serialize(int index) {
   InternalFieldInfo* info = InternalFieldInfo::New(type());
   return info;
 }
-
-// TODO(addaleax): Remove once we're on C++17.
-constexpr FastStringKey BindingData::type_name;
 
 void Initialize(Local<Object> target,
                 Local<Value> unused,

@@ -3,12 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v16.12.0">
-  <title>REPL | Node.js v16.12.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v18.5.0">
+  <title>REPL | Node.js v18.5.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
   <link rel="canonical" href="https://nodejs.org/api/repl.html">
+  <script async defer src="assets/api.js" type="text/javascript"></script>
 </head>
 <body class="alt apidoc" id="api-section-repl">
   <div id="content" class="clearfix">
@@ -25,7 +26,7 @@
 <hr class="line">
 <ul>
 <li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
-<li><a href="async_context.html" class="nav-async_context">Async_context</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
 <li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
 <li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
 <li><a href="addons.html" class="nav-addons">C++ addons</a></li>
@@ -53,7 +54,7 @@
 <li><a href="intl.html" class="nav-intl">Internationalization</a></li>
 <li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
 <li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
-<li><a href="module.html" class="nav-module">Modules: <code>module</code> API</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
 <li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
 <li><a href="net.html" class="nav-net">Net</a></li>
 <li><a href="os.html" class="nav-os">OS</a></li>
@@ -68,6 +69,7 @@
 <li><a href="report.html" class="nav-report">Report</a></li>
 <li><a href="stream.html" class="nav-stream">Stream</a></li>
 <li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
 <li><a href="timers.html" class="nav-timers">Timers</a></li>
 <li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
 <li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
@@ -90,9 +92,9 @@
     </div>
 
     <div id="column1" data-id="repl" class="interior">
-      <header>
+      <header class="header">
         <div class="header-container">
-          <h1>Node.js v16.12.0 documentation</h1>
+          <h1>Node.js v18.5.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -107,20 +109,158 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li>
-              <a href="index.html">Index</a>
-            </li>
-            <li>
-              <a href="all.html">View on single page</a>
-            </li>
-            <li>
-              <a href="repl.json">View as JSON</a>
-            </li>
+            <li class="pinned-header">Node.js v18.5.0</li>
             
-    <li class="version-picker">
-      <a href="#">View another version <span>&#x25bc;</span></a>
-      <ol class="version-picker"><li><a href="https://nodejs.org/docs/latest-v17.x/api/repl.html">17.x</a></li>
-<li><a href="https://nodejs.org/docs/latest-v16.x/api/repl.html">16.x</a></li>
+    <li class="picker-header">
+      <a href="#">
+        <span class="collapsed-arrow">&#x25ba;</span><span class="expanded-arrow">&#x25bc;</span>
+        Table of contents
+      </a>
+
+      <div class="picker"><div class="toc"><ul>
+<li><span class="stability_2"><a href="#repl">REPL</a></span>
+<ul>
+<li><a href="#design-and-features">Design and features</a>
+<ul>
+<li><a href="#commands-and-special-keys">Commands and special keys</a></li>
+<li><a href="#default-evaluation">Default evaluation</a>
+<ul>
+<li><a href="#javascript-expressions">JavaScript expressions</a></li>
+<li><a href="#global-and-local-scope">Global and local scope</a></li>
+<li><a href="#accessing-core-nodejs-modules">Accessing core Node.js modules</a></li>
+<li><a href="#global-uncaught-exceptions">Global uncaught exceptions</a></li>
+<li><a href="#assignment-of-the-_-underscore-variable">Assignment of the <code>_</code> (underscore) variable</a></li>
+<li><a href="#await-keyword"><code>await</code> keyword</a></li>
+</ul>
+</li>
+<li><a href="#reverse-i-search">Reverse-i-search</a></li>
+<li><a href="#custom-evaluation-functions">Custom evaluation functions</a>
+<ul>
+<li><a href="#recoverable-errors">Recoverable errors</a></li>
+</ul>
+</li>
+<li><a href="#customizing-repl-output">Customizing REPL output</a></li>
+</ul>
+</li>
+<li><a href="#class-replserver">Class: <code>REPLServer</code></a>
+<ul>
+<li><a href="#event-exit">Event: <code>'exit'</code></a></li>
+<li><a href="#event-reset">Event: <code>'reset'</code></a></li>
+<li><a href="#replserverdefinecommandkeyword-cmd"><code>replServer.defineCommand(keyword, cmd)</code></a></li>
+<li><a href="#replserverdisplaypromptpreservecursor"><code>replServer.displayPrompt([preserveCursor])</code></a></li>
+<li><a href="#replserverclearbufferedcommand"><code>replServer.clearBufferedCommand()</code></a></li>
+<li><span class="stability_0"><a href="#replserverparsereplkeywordkeyword-rest"><code>replServer.parseREPLKeyword(keyword[, rest])</code></a></span></li>
+<li><a href="#replserversetuphistoryhistorypath-callback"><code>replServer.setupHistory(historyPath, callback)</code></a></li>
+</ul>
+</li>
+<li><a href="#replbuiltinmodules"><code>repl.builtinModules</code></a></li>
+<li><a href="#replstartoptions"><code>repl.start([options])</code></a></li>
+<li><a href="#the-nodejs-repl">The Node.js REPL</a>
+<ul>
+<li><a href="#environment-variable-options">Environment variable options</a></li>
+<li><a href="#persistent-history">Persistent history</a></li>
+<li><a href="#using-the-nodejs-repl-with-advanced-line-editors">Using the Node.js REPL with advanced line-editors</a></li>
+<li><a href="#starting-multiple-repl-instances-against-a-single-running-instance">Starting multiple REPL instances against a single running instance</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></div></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#">
+        <span class="collapsed-arrow">&#x25ba;</span><span class="expanded-arrow">&#x25bc;</span>
+        Index
+      </a>
+
+      <div class="picker"><ul>
+<li><a href="documentation.html" class="nav-documentation">About this documentation</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">Usage and example</a></li>
+
+      <li>
+        <a href="index.html">Index</a>
+      </li>
+    </ul>
+  
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="corepack.html" class="nav-corepack">Corepack</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
+<li><a href="policy.html" class="nav-policy">Policies</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline">Readline</a></li>
+<li><a href="repl.html" class="nav-repl active">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers">Timers</a></li>
+<li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#">
+        <span class="collapsed-arrow">&#x25ba;</span><span class="expanded-arrow">&#x25bc;</span>
+        Other versions
+      </a>
+      <div class="picker"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v18.x/api/repl.html">18.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v17.x/api/repl.html">17.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v16.x/api/repl.html">16.x <b>LTS</b></a></li>
 <li><a href="https://nodejs.org/docs/latest-v15.x/api/repl.html">15.x</a></li>
 <li><a href="https://nodejs.org/docs/latest-v14.x/api/repl.html">14.x <b>LTS</b></a></li>
 <li><a href="https://nodejs.org/docs/latest-v13.x/api/repl.html">13.x</a></li>
@@ -134,10 +274,27 @@
 <li><a href="https://nodejs.org/docs/latest-v5.x/api/repl.html">5.x</a></li>
 <li><a href="https://nodejs.org/docs/latest-v4.x/api/repl.html">4.x</a></li>
 <li><a href="https://nodejs.org/docs/latest-v0.12.x/api/repl.html">0.12.x</a></li>
-<li><a href="https://nodejs.org/docs/latest-v0.10.x/api/repl.html">0.10.x</a></li></ol>
+<li><a href="https://nodejs.org/docs/latest-v0.10.x/api/repl.html">0.10.x</a></li></ol></div>
     </li>
   
-            <li class="edit_on_github"><a href="https://github.com/nodejs/node/edit/master/doc/api/repl.md">Edit on GitHub</a></li>
+            <li class="picker-header">
+              <a href="#">
+                <span class="collapsed-arrow">&#x25ba;</span><span class="expanded-arrow">&#x25bc;</span>
+                Options
+              </a>
+        
+              <div class="picker">
+                <ul>
+                  <li>
+                    <a href="all.html">View on single page</a>
+                  </li>
+                  <li>
+                    <a href="repl.json">View as JSON</a>
+                  </li>
+                  <li class="edit_on_github"><a href="https://github.com/nodejs/node/edit/master/doc/api/repl.md">Edit on GitHub</a></li>    
+                </ul>
+              </div>
+            </li>
           </ul>
         </div>
         <hr>
@@ -197,13 +354,13 @@
         <h2>REPL<span><a class="mark" href="#repl" id="repl">#</a></span><a aria-hidden="true" class="legacy" id="repl_repl"></a></h2>
 
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v16.12.0/lib/repl.js">lib/repl.js</a></p>
-<p>The <code>repl</code> module provides a Read-Eval-Print-Loop (REPL) implementation that
-is available both as a standalone program or includible in other applications.
-It can be accessed using:</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> repl = <span class="hljs-built_in">require</span>(<span class="hljs-string">'repl'</span>);</code></pre>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v18.5.0/lib/repl.js">lib/repl.js</a></p>
+<p>The <code>node:repl</code> module provides a Read-Eval-Print-Loop (REPL) implementation
+that is available both as a standalone program or includible in other
+applications. It can be accessed using:</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> repl = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:repl'</span>);</code></pre>
 <section><h3>Design and features<span><a class="mark" href="#design-and-features" id="design-and-features">#</a></span><a aria-hidden="true" class="legacy" id="repl_design_and_features"></a></h3>
-<p>The <code>repl</code> module exports the <a href="#class-replserver"><code>repl.REPLServer</code></a> class. While running,
+<p>The <code>node:repl</code> module exports the <a href="#class-replserver"><code>repl.REPLServer</code></a> class. While running,
 instances of <a href="#class-replserver"><code>repl.REPLServer</code></a> will accept individual lines of user input,
 evaluate those according to a user-defined evaluation function, then output the
 result. Input and output may be from <code>stdin</code> and <code>stdout</code>, respectively, or may
@@ -229,10 +386,10 @@ multi-line expression being input.</li>
 <code>> .save ./file/to/save.js</code></li>
 <li><code>.load</code>: Load a file into the current REPL session.
 <code>> .load ./file/to/load.js</code></li>
-<li><code>.editor</code>: Enter editor mode (<kbd>Ctrl</kbd>+<kbd>D</kbd> to finish,
-<kbd>Ctrl</kbd>+<kbd>C</kbd> to cancel).</li>
+<li><code>.editor</code>: Enter editor mode (<kbd>Ctrl</kbd>+<kbd>D</kbd> to
+finish, <kbd>Ctrl</kbd>+<kbd>C</kbd> to cancel).</li>
 </ul>
-<pre><code class="language-console"><span class="hljs-meta">> </span><span class="language-bash">.editor</span>
+<pre><code class="language-console"><span class="hljs-meta prompt_">> </span><span class="language-bash">.editor</span>
 // Entering editor mode (^D to finish, ^C to cancel)
 function welcome(name) {
   return `Hello ${name}!`;
@@ -242,7 +399,7 @@ welcome('Node.js User');
 
 // ^D
 'Hello Node.js User!'
-<span class="hljs-meta">></span></code></pre>
+<span class="hljs-meta prompt_">></span></code></pre>
 <p>The following key combinations in the REPL have these special effects:</p>
 <ul>
 <li><kbd>Ctrl</kbd>+<kbd>C</kbd>: When pressed once, has the same effect as the
@@ -250,8 +407,8 @@ welcome('Node.js User');
 When pressed twice on a blank line, has the same effect as the <code>.exit</code>
 command.</li>
 <li><kbd>Ctrl</kbd>+<kbd>D</kbd>: Has the same effect as the <code>.exit</code> command.</li>
-<li><kbd>Tab</kbd>: When pressed on a blank line, displays global and local (scope)
-variables. When pressed while entering other input, displays relevant
+<li><kbd>Tab</kbd>: When pressed on a blank line, displays global and local
+(scope) variables. When pressed while entering other input, displays relevant
 autocompletion options.</li>
 </ul>
 <p>For key bindings related to the reverse-i-search, see <a href="#reverse-i-search"><code>reverse-i-search</code></a>.
@@ -263,11 +420,11 @@ modules. This default behavior can be overridden by passing in an alternative
 evaluation function when the <a href="#class-replserver"><code>repl.REPLServer</code></a> instance is created.</p>
 <h5>JavaScript expressions<span><a class="mark" href="#javascript-expressions" id="javascript-expressions">#</a></span><a aria-hidden="true" class="legacy" id="repl_javascript_expressions"></a></h5>
 <p>The default evaluator supports direct evaluation of JavaScript expressions:</p>
-<pre><code class="language-console"><span class="hljs-meta">> </span><span class="language-bash">1 + 1</span>
+<pre><code class="language-console"><span class="hljs-meta prompt_">> </span><span class="language-bash">1 + 1</span>
 2
-<span class="hljs-meta">> </span><span class="language-bash">const m = 2</span>
+<span class="hljs-meta prompt_">> </span><span class="language-bash">const m = 2</span>
 undefined
-<span class="hljs-meta">> </span><span class="language-bash">m + 1</span>
+<span class="hljs-meta prompt_">> </span><span class="language-bash">m + 1</span>
 3</code></pre>
 <p>Unless otherwise scoped within blocks or functions, variables declared
 either implicitly or using the <code>const</code>, <code>let</code>, or <code>var</code> keywords
@@ -276,17 +433,17 @@ are declared at the global scope.</p>
 <p>The default evaluator provides access to any variables that exist in the global
 scope. It is possible to expose a variable to the REPL explicitly by assigning
 it to the <code>context</code> object associated with each <code>REPLServer</code>:</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> repl = <span class="hljs-built_in">require</span>(<span class="hljs-string">'repl'</span>);
+<pre><code class="language-js"><span class="hljs-keyword">const</span> repl = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:repl'</span>);
 <span class="hljs-keyword">const</span> msg = <span class="hljs-string">'message'</span>;
 
 repl.<span class="hljs-title function_">start</span>(<span class="hljs-string">'> '</span>).<span class="hljs-property">context</span>.<span class="hljs-property">m</span> = msg;</code></pre>
 <p>Properties in the <code>context</code> object appear as local within the REPL:</p>
-<pre><code class="language-console"><span class="hljs-meta">$ </span><span class="language-bash">node repl_test.js</span>
-<span class="hljs-meta">> </span><span class="language-bash">m</span>
+<pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">node repl_test.js</span>
+<span class="hljs-meta prompt_">> </span><span class="language-bash">m</span>
 'message'</code></pre>
 <p>Context properties are not read-only by default. To specify read-only globals,
 context properties must be defined using <code>Object.defineProperty()</code>:</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> repl = <span class="hljs-built_in">require</span>(<span class="hljs-string">'repl'</span>);
+<pre><code class="language-js"><span class="hljs-keyword">const</span> repl = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:repl'</span>);
 <span class="hljs-keyword">const</span> msg = <span class="hljs-string">'message'</span>;
 
 <span class="hljs-keyword">const</span> r = repl.<span class="hljs-title function_">start</span>(<span class="hljs-string">'> '</span>);
@@ -299,8 +456,8 @@ context properties must be defined using <code>Object.defineProperty()</code>:</
 <p>The default evaluator will automatically load Node.js core modules into the
 REPL environment when used. For instance, unless otherwise declared as a
 global or scoped variable, the input <code>fs</code> will be evaluated on-demand as
-<code>global.fs = require('fs')</code>.</p>
-<pre><code class="language-console"><span class="hljs-meta">> </span><span class="language-bash">fs.createReadStream(<span class="hljs-string">'./some/file'</span>);</span></code></pre>
+<code>global.fs = require('node:fs')</code>.</p>
+<pre><code class="language-console"><span class="hljs-meta prompt_">> </span><span class="language-bash">fs.createReadStream(<span class="hljs-string">'./some/file'</span>);</span></code></pre>
 <h5>Global uncaught exceptions<span><a class="mark" href="#global-uncaught-exceptions" id="global-uncaught-exceptions">#</a></span><a aria-hidden="true" class="legacy" id="repl_global_uncaught_exceptions"></a></h5>
 <div class="api_metadata">
 <details class="changelog"><summary>History</summary>
@@ -346,46 +503,46 @@ an <a href="errors.html#err_domain_cannot_set_uncaught_exception_capture"><code>
 <p>The default evaluator will, by default, assign the result of the most recently
 evaluated expression to the special variable <code>_</code> (underscore).
 Explicitly setting <code>_</code> to a value will disable this behavior.</p>
-<pre><code class="language-console"><span class="hljs-meta">> </span><span class="language-bash">[ <span class="hljs-string">'a'</span>, <span class="hljs-string">'b'</span>, <span class="hljs-string">'c'</span> ]</span>
+<pre><code class="language-console"><span class="hljs-meta prompt_">> </span><span class="language-bash">[ <span class="hljs-string">'a'</span>, <span class="hljs-string">'b'</span>, <span class="hljs-string">'c'</span> ]</span>
 [ 'a', 'b', 'c' ]
-<span class="hljs-meta">> </span><span class="language-bash">_.length</span>
+<span class="hljs-meta prompt_">> </span><span class="language-bash">_.length</span>
 3
-<span class="hljs-meta">> </span><span class="language-bash">_ += 1</span>
+<span class="hljs-meta prompt_">> </span><span class="language-bash">_ += 1</span>
 Expression assignment to _ now disabled.
 4
-<span class="hljs-meta">> </span><span class="language-bash">1 + 1</span>
+<span class="hljs-meta prompt_">> </span><span class="language-bash">1 + 1</span>
 2
-<span class="hljs-meta">> </span><span class="language-bash">_</span>
+<span class="hljs-meta prompt_">> </span><span class="language-bash">_</span>
 4</code></pre>
 <p>Similarly, <code>_error</code> will refer to the last seen error, if there was any.
 Explicitly setting <code>_error</code> to a value will disable this behavior.</p>
-<pre><code class="language-console"><span class="hljs-meta">> </span><span class="language-bash">throw new Error(<span class="hljs-string">'foo'</span>);</span>
+<pre><code class="language-console"><span class="hljs-meta prompt_">> </span><span class="language-bash">throw new Error(<span class="hljs-string">'foo'</span>);</span>
 Error: foo
-<span class="hljs-meta">> </span><span class="language-bash">_error.message</span>
+<span class="hljs-meta prompt_">> </span><span class="language-bash">_error.message</span>
 'foo'</code></pre>
 <h5><code>await</code> keyword<span><a class="mark" href="#await-keyword" id="await-keyword">#</a></span><a aria-hidden="true" class="legacy" id="repl_await_keyword"></a></h5>
 <p>Support for the <code>await</code> keyword is enabled at the top level.</p>
-<pre><code class="language-console"><span class="hljs-meta">> </span><span class="language-bash">await Promise.resolve(123)</span>
+<pre><code class="language-console"><span class="hljs-meta prompt_">> </span><span class="language-bash">await Promise.resolve(123)</span>
 123
-<span class="hljs-meta">> </span><span class="language-bash">await Promise.reject(new Error(<span class="hljs-string">'REPL await'</span>))</span>
+<span class="hljs-meta prompt_">> </span><span class="language-bash">await Promise.reject(new Error(<span class="hljs-string">'REPL await'</span>))</span>
 Error: REPL await
     at repl:1:45
-<span class="hljs-meta">> </span><span class="language-bash">const timeout = util.promisify(setTimeout);</span>
+<span class="hljs-meta prompt_">> </span><span class="language-bash">const <span class="hljs-built_in">timeout</span> = util.promisify(setTimeout);</span>
 undefined
-<span class="hljs-meta">> </span><span class="language-bash">const old = Date.now(); await timeout(1000); console.log(Date.now() - old);</span>
+<span class="hljs-meta prompt_">> </span><span class="language-bash">const old = Date.now(); await <span class="hljs-built_in">timeout</span>(1000); console.log(Date.now() - old);</span>
 1002
 undefined</code></pre>
 <p>One known limitation of using the <code>await</code> keyword in the REPL is that
 it will invalidate the lexical scoping of the <code>const</code> and <code>let</code>
 keywords.</p>
 <p>For example:</p>
-<pre><code class="language-console"><span class="hljs-meta">> </span><span class="language-bash">const m = await Promise.resolve(123)</span>
+<pre><code class="language-console"><span class="hljs-meta prompt_">> </span><span class="language-bash">const m = await Promise.resolve(123)</span>
 undefined
-<span class="hljs-meta">> </span><span class="language-bash">m</span>
+<span class="hljs-meta prompt_">> </span><span class="language-bash">m</span>
 123
-<span class="hljs-meta">> </span><span class="language-bash">const m = await Promise.resolve(234)</span>
+<span class="hljs-meta prompt_">> </span><span class="language-bash">const m = await Promise.resolve(234)</span>
 undefined
-<span class="hljs-meta">> </span><span class="language-bash">m</span>
+<span class="hljs-meta prompt_">> </span><span class="language-bash">m</span>
 234</code></pre>
 <p><a href="cli.html#--no-experimental-repl-await"><code>--no-experimental-repl-await</code></a> shall disable top-level await in REPL.</p>
 <h4>Reverse-i-search<span><a class="mark" href="#reverse-i-search" id="reverse-i-search">#</a></span><a aria-hidden="true" class="legacy" id="repl_reverse_i_search"></a></h4>
@@ -393,13 +550,12 @@ undefined
 <span>Added in: v13.6.0, v12.17.0</span>
 </div>
 <p>The REPL supports bi-directional reverse-i-search similar to <a href="https://en.wikipedia.org/wiki/Z_shell">ZSH</a>. It is
-triggered with <kbd>Ctrl</kbd>+<kbd>R</kbd> to search backward and
-<kbd>Ctrl</kbd>+<kbd>S</kbd> to search
-forwards.</p>
+triggered with <kbd>Ctrl</kbd>+<kbd>R</kbd> to search backward
+and <kbd>Ctrl</kbd>+<kbd>S</kbd> to search forwards.</p>
 <p>Duplicated history entries will be skipped.</p>
 <p>Entries are accepted as soon as any key is pressed that doesn't correspond
-with the reverse search. Cancelling is possible by pressing <kbd>Esc</kbd> or
-<kbd>Ctrl</kbd>+<kbd>C</kbd>.</p>
+with the reverse search. Cancelling is possible by pressing <kbd>Esc</kbd>
+or <kbd>Ctrl</kbd>+<kbd>C</kbd>.</p>
 <p>Changing the direction immediately searches for the next entry in the expected
 direction from the current position on.</p>
 <h4>Custom evaluation functions<span><a class="mark" href="#custom-evaluation-functions" id="custom-evaluation-functions">#</a></span><a aria-hidden="true" class="legacy" id="repl_custom_evaluation_functions"></a></h4>
@@ -408,7 +564,7 @@ provided. This can be used, for instance, to implement fully customized REPL
 applications.</p>
 <p>The following illustrates a hypothetical example of a REPL that performs
 translation of text from one language to another:</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> repl = <span class="hljs-built_in">require</span>(<span class="hljs-string">'repl'</span>);
+<pre><code class="language-js"><span class="hljs-keyword">const</span> repl = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:repl'</span>);
 <span class="hljs-keyword">const</span> { <span class="hljs-title class_">Translator</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'translator'</span>);
 
 <span class="hljs-keyword">const</span> myTranslator = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Translator</span>(<span class="hljs-string">'en'</span>, <span class="hljs-string">'fr'</span>);
@@ -453,17 +609,17 @@ default writer to use ANSI style codes to colorize the output from the
 REPL's <a href="util.html#utilinspectobject-options">inspection defaults</a> from inside the REPL by using the
 <code>inspect.replDefaults</code> property which mirrors the <code>defaultOptions</code> from
 <a href="util.html#utilinspectobject-options"><code>util.inspect()</code></a>.</p>
-<pre><code class="language-console"><span class="hljs-meta">> </span><span class="language-bash">util.inspect.replDefaults.compact = <span class="hljs-literal">false</span>;</span>
+<pre><code class="language-console"><span class="hljs-meta prompt_">> </span><span class="language-bash">util.inspect.replDefaults.compact = <span class="hljs-literal">false</span>;</span>
 false
-<span class="hljs-meta">> </span><span class="language-bash">[1]</span>
+<span class="hljs-meta prompt_">> </span><span class="language-bash">[1]</span>
 [
   1
 ]
-<span class="hljs-meta">></span></code></pre>
+<span class="hljs-meta prompt_">></span></code></pre>
 <p>To fully customize the output of a <a href="#class-replserver"><code>repl.REPLServer</code></a> instance pass in a new
 function for the <code>writer</code> option on construction. The following example, for
 instance, simply converts any input text to upper case:</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> repl = <span class="hljs-built_in">require</span>(<span class="hljs-string">'repl'</span>);
+<pre><code class="language-js"><span class="hljs-keyword">const</span> repl = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:repl'</span>);
 
 <span class="hljs-keyword">const</span> r = repl.<span class="hljs-title function_">start</span>({ <span class="hljs-attr">prompt</span>: <span class="hljs-string">'> '</span>, <span class="hljs-attr">eval</span>: myEval, <span class="hljs-attr">writer</span>: myWriter });
 
@@ -480,16 +636,16 @@ instance, simply converts any input text to upper case:</p>
 </div>
 <ul>
 <li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> See <a href="#replstartoptions"><code>repl.start()</code></a></li>
-<li>Extends: <a href="readline.html#class-interface" class="type">&#x3C;readline.Interface></a></li>
+<li>Extends: <a href="readline.html#class-readlineinterface" class="type">&#x3C;readline.Interface></a></li>
 </ul>
 <p>Instances of <code>repl.REPLServer</code> are created using the <a href="#replstartoptions"><code>repl.start()</code></a> method
 or directly using the JavaScript <code>new</code> keyword.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> repl = <span class="hljs-built_in">require</span>(<span class="hljs-string">'repl'</span>);
+<pre><code class="language-js"><span class="hljs-keyword">const</span> repl = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:repl'</span>);
 
 <span class="hljs-keyword">const</span> options = { <span class="hljs-attr">useColors</span>: <span class="hljs-literal">true</span> };
 
 <span class="hljs-keyword">const</span> firstInstance = repl.<span class="hljs-title function_">start</span>(options);
-<span class="hljs-keyword">const</span> secondInstance = <span class="hljs-keyword">new</span> repl.<span class="hljs-title function_">REPLServer</span>(options);</code></pre>
+<span class="hljs-keyword">const</span> secondInstance = <span class="hljs-keyword">new</span> repl.<span class="hljs-title class_">REPLServer</span>(options);</code></pre>
 <h4>Event: <code>'exit'</code><span><a class="mark" href="#event-exit" id="event-exit">#</a></span><a aria-hidden="true" class="legacy" id="repl_event_exit"></a></h4>
 <div class="api_metadata">
 <span>Added in: v0.7.7</span>
@@ -515,7 +671,7 @@ the default evaluator and the <code>repl.REPLServer</code> instance was created 
 reference to the <code>context</code> object as the only argument.</p>
 <p>This can be used primarily to re-initialize REPL context to some pre-defined
 state:</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> repl = <span class="hljs-built_in">require</span>(<span class="hljs-string">'repl'</span>);
+<pre><code class="language-js"><span class="hljs-keyword">const</span> repl = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:repl'</span>);
 
 <span class="hljs-keyword">function</span> <span class="hljs-title function_">initializeContext</span>(<span class="hljs-params">context</span>) {
   context.<span class="hljs-property">m</span> = <span class="hljs-string">'test'</span>;
@@ -527,18 +683,18 @@ state:</p>
 r.<span class="hljs-title function_">on</span>(<span class="hljs-string">'reset'</span>, initializeContext);</code></pre>
 <p>When this code is executed, the global <code>'m'</code> variable can be modified but then
 reset to its initial value using the <code>.clear</code> command:</p>
-<pre><code class="language-console"><span class="hljs-meta">$ </span><span class="language-bash">./node example.js</span>
-<span class="hljs-meta">> </span><span class="language-bash">m</span>
+<pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">./node example.js</span>
+<span class="hljs-meta prompt_">> </span><span class="language-bash">m</span>
 'test'
-<span class="hljs-meta">> </span><span class="language-bash">m = 1</span>
+<span class="hljs-meta prompt_">> </span><span class="language-bash">m = 1</span>
 1
-<span class="hljs-meta">> </span><span class="language-bash">m</span>
+<span class="hljs-meta prompt_">> </span><span class="language-bash">m</span>
 1
-<span class="hljs-meta">> </span><span class="language-bash">.clear</span>
+<span class="hljs-meta prompt_">> </span><span class="language-bash">.clear</span>
 Clearing context...
-<span class="hljs-meta">> </span><span class="language-bash">m</span>
+<span class="hljs-meta prompt_">> </span><span class="language-bash">m</span>
 'test'
-<span class="hljs-meta">></span></code></pre>
+<span class="hljs-meta prompt_">></span></code></pre>
 <h4><code>replServer.defineCommand(keyword, cmd)</code><span><a class="mark" href="#replserverdefinecommandkeyword-cmd" id="replserverdefinecommandkeyword-cmd">#</a></span><a aria-hidden="true" class="legacy" id="repl_replserver_definecommand_keyword_cmd"></a></h4>
 <div class="api_metadata">
 <span>Added in: v0.3.0</span>
@@ -557,7 +713,7 @@ properties:</p>
 string argument.</li>
 </ul>
 <p>The following example shows two new commands added to the REPL instance:</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> repl = <span class="hljs-built_in">require</span>(<span class="hljs-string">'repl'</span>);
+<pre><code class="language-js"><span class="hljs-keyword">const</span> repl = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:repl'</span>);
 
 <span class="hljs-keyword">const</span> replServer = repl.<span class="hljs-title function_">start</span>({ <span class="hljs-attr">prompt</span>: <span class="hljs-string">'> '</span> });
 replServer.<span class="hljs-title function_">defineCommand</span>(<span class="hljs-string">'sayhello'</span>, {
@@ -573,9 +729,9 @@ replServer.<span class="hljs-title function_">defineCommand</span>(<span class="
   <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">close</span>();
 });</code></pre>
 <p>The new commands can then be used from within the REPL instance:</p>
-<pre><code class="language-console"><span class="hljs-meta">> </span><span class="language-bash">.sayhello Node.js User</span>
+<pre><code class="language-console"><span class="hljs-meta prompt_">> </span><span class="language-bash">.sayhello Node.js User</span>
 Hello, Node.js User!
-<span class="hljs-meta">> </span><span class="language-bash">.saybye</span>
+<span class="hljs-meta prompt_">> </span><span class="language-bash">.saybye</span>
 Goodbye!</code></pre>
 <h4><code>replServer.displayPrompt([preserveCursor])</code><span><a class="mark" href="#replserverdisplaypromptpreservecursor" id="replserverdisplaypromptpreservecursor">#</a></span><a aria-hidden="true" class="legacy" id="repl_replserver_displayprompt_preservecursor"></a></h4>
 <div class="api_metadata">
@@ -715,20 +871,20 @@ there are no previews and the value of <code>preview</code> has no effect.</li>
 </ul>
 <p>The <code>repl.start()</code> method creates and starts a <a href="#class-replserver"><code>repl.REPLServer</code></a> instance.</p>
 <p>If <code>options</code> is a string, then it specifies the input prompt:</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> repl = <span class="hljs-built_in">require</span>(<span class="hljs-string">'repl'</span>);
+<pre><code class="language-js"><span class="hljs-keyword">const</span> repl = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:repl'</span>);
 
 <span class="hljs-comment">// a Unix style prompt</span>
 repl.<span class="hljs-title function_">start</span>(<span class="hljs-string">'$ '</span>);</code></pre>
 </section><section><h3>The Node.js REPL<span><a class="mark" href="#the-nodejs-repl" id="the-nodejs-repl">#</a></span><a aria-hidden="true" class="legacy" id="repl_the_node_js_repl"></a></h3>
-<p>Node.js itself uses the <code>repl</code> module to provide its own interactive interface
-for executing JavaScript. This can be used by executing the Node.js binary
-without passing any arguments (or by passing the <code>-i</code> argument):</p>
-<pre><code class="language-console"><span class="hljs-meta">$ </span><span class="language-bash">node</span>
-<span class="hljs-meta">> </span><span class="language-bash">const a = [1, 2, 3];</span>
+<p>Node.js itself uses the <code>node:repl</code> module to provide its own interactive
+interface for executing JavaScript. This can be used by executing the Node.js
+binary without passing any arguments (or by passing the <code>-i</code> argument):</p>
+<pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">node</span>
+<span class="hljs-meta prompt_">> </span><span class="language-bash">const a = [1, 2, 3];</span>
 undefined
-<span class="hljs-meta">> </span><span class="language-bash">a</span>
+<span class="hljs-meta prompt_">> </span><span class="language-bash">a</span>
 [ 1, 2, 3 ]
-<span class="hljs-meta">> </span><span class="language-bash">a.forEach((v) => {</span>
+<span class="hljs-meta prompt_">> </span><span class="language-bash">a.forEach((v) => {</span>
 ...   console.log(v);
 ...   });
 1
@@ -767,8 +923,8 @@ running instance of Node.js that share a single <code>global</code> object but h
 separate I/O interfaces.</p>
 <p>The following example, for instance, provides separate REPLs on <code>stdin</code>, a Unix
 socket, and a TCP socket:</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> net = <span class="hljs-built_in">require</span>(<span class="hljs-string">'net'</span>);
-<span class="hljs-keyword">const</span> repl = <span class="hljs-built_in">require</span>(<span class="hljs-string">'repl'</span>);
+<pre><code class="language-js"><span class="hljs-keyword">const</span> net = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:net'</span>);
+<span class="hljs-keyword">const</span> repl = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:repl'</span>);
 <span class="hljs-keyword">let</span> connections = <span class="hljs-number">0</span>;
 
 repl.<span class="hljs-title function_">start</span>({
@@ -813,41 +969,5 @@ a <code>net.Server</code> and <code>net.Socket</code> instance, see:
       </div>
     </div>
   </div>
-  <script>
-    'use strict';
-    {
-      const kCustomPreference = 'customDarkTheme';
-      const userSettings = sessionStorage.getItem(kCustomPreference);
-      const themeToggleButton = document.getElementById('theme-toggle-btn');
-      if (userSettings === null && window.matchMedia) {
-        const mq = window.matchMedia('(prefers-color-scheme: dark)');
-        if ('onchange' in mq) {
-          function mqChangeListener(e) {
-            document.body.classList.toggle('dark-mode', e.matches);
-          }
-          mq.addEventListener('change', mqChangeListener);
-          if (themeToggleButton) {
-            themeToggleButton.addEventListener('click', function() {
-              mq.removeEventListener('change', mqChangeListener);
-            }, { once: true });
-          }
-        }
-        if (mq.matches) {
-          document.body.classList.add('dark-mode');
-        }
-      } else if (userSettings === 'true') {
-        document.body.classList.add('dark-mode');
-      }
-      if (themeToggleButton) {
-        themeToggleButton.hidden = false;
-        themeToggleButton.addEventListener('click', function() {
-          sessionStorage.setItem(
-            kCustomPreference,
-            document.body.classList.toggle('dark-mode')
-          );
-        });
-      }
-    }
-  </script>
 </body>
 </html>

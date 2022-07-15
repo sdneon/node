@@ -3,6 +3,11 @@
 .align	4
 _OPENSSL_ia32_cpuid:
 L_OPENSSL_ia32_cpuid_begin:
+	%ifdef __CET__
+
+.byte	243,15,30,251
+	%endif
+
 	pushl	%ebp
 	pushl	%ebx
 	pushl	%esi
@@ -145,6 +150,11 @@ L000nocpuid:
 .align	4
 _OPENSSL_rdtsc:
 L_OPENSSL_rdtsc_begin:
+	%ifdef __CET__
+
+.byte	243,15,30,251
+	%endif
+
 	xorl	%eax,%eax
 	xorl	%edx,%edx
 	call	L009PIC_me_up
@@ -160,6 +170,11 @@ L010notsc:
 .align	4
 _OPENSSL_instrument_halt:
 L_OPENSSL_instrument_halt_begin:
+	%ifdef __CET__
+
+.byte	243,15,30,251
+	%endif
+
 	call	L011PIC_me_up
 L011PIC_me_up:
 	popl	%ecx
@@ -190,6 +205,11 @@ L012nohalt:
 .align	4
 _OPENSSL_far_spin:
 L_OPENSSL_far_spin_begin:
+	%ifdef __CET__
+
+.byte	243,15,30,251
+	%endif
+
 	pushfl
 	popl	%eax
 	btl	$9,%eax
@@ -215,6 +235,11 @@ L013nospin:
 .align	4
 _OPENSSL_wipe_cpu:
 L_OPENSSL_wipe_cpu_begin:
+	%ifdef __CET__
+
+.byte	243,15,30,251
+	%endif
+
 	xorl	%eax,%eax
 	xorl	%edx,%edx
 	call	L015PIC_me_up
@@ -244,6 +269,11 @@ L016no_x87:
 .align	4
 _OPENSSL_atomic_add:
 L_OPENSSL_atomic_add_begin:
+	%ifdef __CET__
+
+.byte	243,15,30,251
+	%endif
+
 	movl	4(%esp),%edx
 	movl	8(%esp),%ecx
 	pushl	%ebx
@@ -261,6 +291,11 @@ L018spin:
 .align	4
 _OPENSSL_cleanse:
 L_OPENSSL_cleanse_begin:
+	%ifdef __CET__
+
+.byte	243,15,30,251
+	%endif
+
 	movl	4(%esp),%edx
 	movl	8(%esp),%ecx
 	xorl	%eax,%eax
@@ -296,6 +331,11 @@ L022aligned:
 .align	4
 _CRYPTO_memcmp:
 L_CRYPTO_memcmp_begin:
+	%ifdef __CET__
+
+.byte	243,15,30,251
+	%endif
+
 	pushl	%esi
 	pushl	%edi
 	movl	12(%esp),%esi
@@ -323,6 +363,11 @@ L023no_data:
 .align	4
 _OPENSSL_instrument_bus:
 L_OPENSSL_instrument_bus_begin:
+	%ifdef __CET__
+
+.byte	243,15,30,251
+	%endif
+
 	pushl	%ebp
 	pushl	%ebx
 	pushl	%esi
@@ -369,6 +414,11 @@ L026nogo:
 .align	4
 _OPENSSL_instrument_bus2:
 L_OPENSSL_instrument_bus2_begin:
+	%ifdef __CET__
+
+.byte	243,15,30,251
+	%endif
+
 	pushl	%ebp
 	pushl	%ebx
 	pushl	%esi
@@ -428,6 +478,11 @@ L029nogo:
 .align	4
 _OPENSSL_ia32_rdrand_bytes:
 L_OPENSSL_ia32_rdrand_bytes_begin:
+	%ifdef __CET__
+
+.byte	243,15,30,251
+	%endif
+
 	pushl	%edi
 	pushl	%ebx
 	xorl	%eax,%eax
@@ -469,6 +524,11 @@ L032done:
 .align	4
 _OPENSSL_ia32_rdseed_bytes:
 L_OPENSSL_ia32_rdseed_bytes_begin:
+	%ifdef __CET__
+
+.byte	243,15,30,251
+	%endif
+
 	pushl	%edi
 	pushl	%ebx
 	xorl	%eax,%eax

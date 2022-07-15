@@ -8,7 +8,7 @@
 
 The `timer` module exposes a global API for scheduling functions to
 be called at some future period of time. Because the timer functions are
-globals, there is no need to call `require('timers')` to use the API.
+globals, there is no need to call `require('node:timers')` to use the API.
 
 The timer functions within Node.js implement a similar API as the timers API
 provided by Web Browsers but use a different internal implementation that is
@@ -26,6 +26,7 @@ running as long as the immediate is active. The `Immediate` object returned by
 functions that can be used to control this default behavior.
 
 ### `immediate.hasRef()`
+
 <!-- YAML
 added: v11.0.0
 -->
@@ -35,13 +36,14 @@ added: v11.0.0
 If true, the `Immediate` object will keep the Node.js event loop active.
 
 ### `immediate.ref()`
+
 <!-- YAML
 added: v9.7.0
 -->
 
 * Returns: {Immediate} a reference to `immediate`
 
-When called, requests that the Node.js event loop *not* exit so long as the
+When called, requests that the Node.js event loop _not_ exit so long as the
 `Immediate` is active. Calling `immediate.ref()` multiple times will have no
 effect.
 
@@ -49,6 +51,7 @@ By default, all `Immediate` objects are "ref'ed", making it normally unnecessary
 to call `immediate.ref()` unless `immediate.unref()` had been called previously.
 
 ### `immediate.unref()`
+
 <!-- YAML
 added: v9.7.0
 -->
@@ -73,6 +76,7 @@ export both `timeout.ref()` and `timeout.unref()` functions that can be used to
 control this default behavior.
 
 ### `timeout.close()`
+
 <!-- YAML
 added: v0.9.1
 -->
@@ -84,6 +88,7 @@ added: v0.9.1
 Cancels the timeout.
 
 ### `timeout.hasRef()`
+
 <!-- YAML
 added: v11.0.0
 -->
@@ -93,19 +98,21 @@ added: v11.0.0
 If true, the `Timeout` object will keep the Node.js event loop active.
 
 ### `timeout.ref()`
+
 <!-- YAML
 added: v0.9.1
 -->
 
 * Returns: {Timeout} a reference to `timeout`
 
-When called, requests that the Node.js event loop *not* exit so long as the
+When called, requests that the Node.js event loop _not_ exit so long as the
 `Timeout` is active. Calling `timeout.ref()` multiple times will have no effect.
 
 By default, all `Timeout` objects are "ref'ed", making it normally unnecessary
 to call `timeout.ref()` unless `timeout.unref()` had been called previously.
 
 ### `timeout.refresh()`
+
 <!-- YAML
 added: v10.2.0
 -->
@@ -121,6 +128,7 @@ Using this on a timer that has already called its callback will reactivate the
 timer.
 
 ### `timeout.unref()`
+
 <!-- YAML
 added: v0.9.1
 -->
@@ -132,11 +140,8 @@ to remain active. If there is no other activity keeping the event loop running,
 the process may exit before the `Timeout` object's callback is invoked. Calling
 `timeout.unref()` multiple times will have no effect.
 
-Calling `timeout.unref()` creates an internal timer that will wake the Node.js
-event loop. Creating too many of these can adversely impact performance
-of the Node.js application.
-
 ### `timeout[Symbol.toPrimitive]()`
+
 <!-- YAML
 added:
   - v14.9.0
@@ -160,8 +165,15 @@ which method was used to create the timer and what other work the Node.js
 event loop is doing.
 
 ### `setImmediate(callback[, ...args])`
+
 <!-- YAML
 added: v0.9.1
+changes:
+  - version: v18.0.0
+    pr-url: https://github.com/nodejs/node/pull/41678
+    description: Passing an invalid callback to the `callback` argument
+                 now throws `ERR_INVALID_ARG_TYPE` instead of
+                 `ERR_INVALID_CALLBACK`.
 -->
 
 * `callback` {Function} The function to call at the end of this turn of
@@ -184,8 +196,15 @@ This method has a custom variant for promises that is available using
 [`timersPromises.setImmediate()`][].
 
 ### `setInterval(callback[, delay[, ...args]])`
+
 <!-- YAML
 added: v0.0.1
+changes:
+  - version: v18.0.0
+    pr-url: https://github.com/nodejs/node/pull/41678
+    description: Passing an invalid callback to the `callback` argument
+                 now throws `ERR_INVALID_ARG_TYPE` instead of
+                 `ERR_INVALID_CALLBACK`.
 -->
 
 * `callback` {Function} The function to call when the timer elapses.
@@ -205,8 +224,15 @@ This method has a custom variant for promises that is available using
 [`timersPromises.setInterval()`][].
 
 ### `setTimeout(callback[, delay[, ...args]])`
+
 <!-- YAML
 added: v0.0.1
+changes:
+  - version: v18.0.0
+    pr-url: https://github.com/nodejs/node/pull/41678
+    description: Passing an invalid callback to the `callback` argument
+                 now throws `ERR_INVALID_ARG_TYPE` instead of
+                 `ERR_INVALID_CALLBACK`.
 -->
 
 * `callback` {Function} The function to call when the timer elapses.
@@ -243,7 +269,7 @@ returned Promises will be rejected with an `'AbortError'`.
 For `setImmediate()`:
 
 ```js
-const { setImmediate: setImmediatePromise } = require('timers/promises');
+const { setImmediate: setImmediatePromise } = require('node:timers/promises');
 
 const ac = new AbortController();
 const signal = ac.signal;
@@ -261,7 +287,7 @@ ac.abort();
 For `setTimeout()`:
 
 ```js
-const { setTimeout: setTimeoutPromise } = require('timers/promises');
+const { setTimeout: setTimeoutPromise } = require('node:timers/promises');
 
 const ac = new AbortController();
 const signal = ac.signal;
@@ -277,6 +303,7 @@ ac.abort();
 ```
 
 ### `clearImmediate(immediate)`
+
 <!-- YAML
 added: v0.9.1
 -->
@@ -287,6 +314,7 @@ added: v0.9.1
 Cancels an `Immediate` object created by [`setImmediate()`][].
 
 ### `clearInterval(timeout)`
+
 <!-- YAML
 added: v0.0.1
 -->
@@ -297,6 +325,7 @@ added: v0.0.1
 Cancels a `Timeout` object created by [`setInterval()`][].
 
 ### `clearTimeout(timeout)`
+
 <!-- YAML
 added: v0.0.1
 -->
@@ -307,6 +336,7 @@ added: v0.0.1
 Cancels a `Timeout` object created by [`setTimeout()`][].
 
 ## Timers Promises API
+
 <!-- YAML
 added: v15.0.0
 changes:
@@ -317,7 +347,7 @@ changes:
 
 The `timers/promises` API provides an alternative set of timer functions
 that return `Promise` objects. The API is accessible via
-`require('timers/promises')`.
+`require('node:timers/promises')`.
 
 ```mjs
 import {
@@ -332,10 +362,11 @@ const {
   setTimeout,
   setImmediate,
   setInterval,
-} = require('timers/promises');
+} = require('node:timers/promises');
 ```
 
 ### `timersPromises.setTimeout([delay[, value[, options]]])`
+
 <!-- YAML
 added: v15.0.0
 -->
@@ -363,7 +394,7 @@ console.log(res);  // Prints 'result'
 ```cjs
 const {
   setTimeout,
-} = require('timers/promises');
+} = require('node:timers/promises');
 
 setTimeout(100, 'result').then((res) => {
   console.log(res);  // Prints 'result'
@@ -371,6 +402,7 @@ setTimeout(100, 'result').then((res) => {
 ```
 
 ### `timersPromises.setImmediate([value[, options]])`
+
 <!-- YAML
 added: v15.0.0
 -->
@@ -396,7 +428,7 @@ console.log(res);  // Prints 'result'
 ```cjs
 const {
   setImmediate,
-} = require('timers/promises');
+} = require('node:timers/promises');
 
 setImmediate('result').then((res) => {
   console.log(res);  // Prints 'result'
@@ -404,6 +436,7 @@ setImmediate('result').then((res) => {
 ```
 
 ### `timersPromises.setInterval([delay[, value[, options]]])`
+
 <!-- YAML
 added: v15.9.0
 -->
@@ -411,7 +444,7 @@ added: v15.9.0
 Returns an async iterator that generates values in an interval of `delay` ms.
 
 * `delay` {number} The number of milliseconds to wait between iterations.
-   **Default:** `1`.
+  **Default:** `1`.
 * `value` {any} A value with which the iterator returns.
 * `options` {Object}
   * `ref` {boolean} Set to `false` to indicate that the scheduled `Timeout`
@@ -439,7 +472,7 @@ console.log(Date.now());
 ```cjs
 const {
   setInterval,
-} = require('timers/promises');
+} = require('node:timers/promises');
 const interval = 100;
 
 (async function() {
@@ -453,7 +486,56 @@ const interval = 100;
 })();
 ```
 
+### `timersPromises.scheduler.wait(delay[, options])`
+
+<!-- YAML
+added:
+  - v17.3.0
+  - v16.14.0
+-->
+
+> Stability: 1 - Experimental
+
+* `delay` {number} The number of milliseconds to wait before resolving the
+  promise.
+* `options` {Object}
+  * `signal` {AbortSignal} An optional `AbortSignal` that can be used to
+    cancel waiting.
+* Returns: {Promise}
+
+An experimental API defined by the [Scheduling APIs][] draft specification
+being developed as a standard Web Platform API.
+
+Calling `timersPromises.scheduler.wait(delay, options)` is roughly equivalent
+to calling `timersPromises.setTimeout(delay, undefined, options)` except that
+the `ref` option is not supported.
+
+```mjs
+import { scheduler } from 'node:timers/promises';
+
+await scheduler.wait(1000); // Wait one second before continuing
+```
+
+### `timersPromises.scheduler.yield()`
+
+<!-- YAML
+added:
+  - v17.3.0
+  - v16.14.0
+-->
+
+> Stability: 1 - Experimental
+
+* Returns: {Promise}
+
+An experimental API defined by the [Scheduling APIs][] draft specification
+being developed as a standard Web Platform API.
+
+Calling `timersPromises.scheduler.yield()` is equivalent to calling
+`timersPromises.setImmediate()` with no arguments.
+
 [Event Loop]: https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/#setimmediate-vs-settimeout
+[Scheduling APIs]: https://github.com/WICG/scheduling-apis
 [`AbortController`]: globals.md#class-abortcontroller
 [`TypeError`]: errors.md#class-typeerror
 [`clearImmediate()`]: #clearimmediateimmediate

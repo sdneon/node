@@ -29,11 +29,9 @@ This directory contains modules used to test the Node.js implementation.
 
 The `benchmark` module is used by tests to run benchmarks.
 
-### `runBenchmark(name, args, env)`
+### `runBenchmark(name, env)`
 
 * `name` [\<string>][<string>] Name of benchmark suite to be run.
-* `args` [\<Array>][<Array>] Array of environment variable key/value pairs (ex:
-  `n=1`) to be applied via `--set`.
 * `env` [\<Object>][<Object>] Environment variables to be applied during the
   run.
 
@@ -61,7 +59,7 @@ On non-Windows platforms, this always returns `true`.
 
 ### `createZeroFilledFile(filename)`
 
-Creates a 10 MB file of all null characters.
+Creates a 10 MiB file of all null characters.
 
 ### `enoughTestMem`
 
@@ -361,7 +359,7 @@ Platform normalized `pwd` command options. Usage example:
 
 ```js
 const common = require('../common');
-const { spawn } = require('child_process');
+const { spawn } = require('node:child_process');
 
 spawn(...common.pwdCommand, { stdio: ['pipe'] });
 ```
@@ -1000,7 +998,7 @@ an `emitReceived()` API for actin as if data has been received on it.
 `makeUDPPair` returns an object `{ clientSide, serverSide }` where each side
 is an `FakeUDPWrap` connected to the other side.
 
-There is no difference between cient or server side beyond their names.
+There is no difference between client or server side beyond their names.
 
 ## WPT Module
 
@@ -1033,5 +1031,5 @@ See [the WPT tests README][] for details.
 [Web Platform Tests]: https://github.com/web-platform-tests/wpt
 [`hijackstdio.hijackStdErr()`]: #hijackstderrlistener
 [`hijackstdio.hijackStdOut()`]: #hijackstdoutlistener
-[internationalization]: https://github.com/nodejs/node/wiki/Intl
+[internationalization]: ../../doc/api/intl.md
 [the WPT tests README]: ../wpt/README.md

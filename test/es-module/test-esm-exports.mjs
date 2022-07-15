@@ -11,8 +11,6 @@ import fromInside from '../fixtures/node_modules/pkgexports/lib/hole.js';
   const validSpecifiers = new Map([
     // A simple mapping of a path.
     ['pkgexports/valid-cjs', { default: 'asdf' }],
-    // A directory mapping, pointing to the package root.
-    ['pkgexports/sub/asdf.js', { default: 'asdf' }],
     // A mapping pointing to a file that needs special encoding (%20) in URLs.
     ['pkgexports/space', { default: 'encoded path' }],
     // Verifying that normal packages still work with exports turned on.
@@ -47,15 +45,7 @@ import fromInside from '../fixtures/node_modules/pkgexports/lib/hole.js';
      { default: 'trailing-pattern-slash' }],
   ]);
 
-  if (isRequire) {
-    validSpecifiers.set('pkgexports/subpath/file', { default: 'file' });
-    validSpecifiers.set('pkgexports/subpath/dir1', { default: 'main' });
-    // Deprecated:
-    validSpecifiers.set('pkgexports/subpath/dir1/', { default: 'main' });
-    validSpecifiers.set('pkgexports/subpath/dir2', { default: 'index' });
-    // Deprecated:
-    validSpecifiers.set('pkgexports/subpath/dir2/', { default: 'index' });
-  } else {
+  if (!isRequire) {
     // No exports or main field
     validSpecifiers.set('no_exports', { default: 'index' });
     // Main field without extension
@@ -93,8 +83,6 @@ import fromInside from '../fixtures/node_modules/pkgexports/lib/hole.js';
   ]);
 
   const invalidExports = new Map([
-    // Directory mappings require a trailing / to work
-    ['pkgexports/missingtrailer/x', './missingtrailer/'],
     // This path steps back inside the package but goes through an exports
     // target that escapes the package, so we still catch that as invalid
     ['pkgexports/belowdir/pkgexports/asdf.js', './belowdir/'],
@@ -116,6 +104,10 @@ import fromInside from '../fixtures/node_modules/pkgexports/lib/hole.js';
     // Even though 'pkgexports/sub/asdf.js' works, alternate "path-like"
     // variants do not to prevent confusion and accidental loopholes.
     ['pkgexports/sub/./../asdf.js', './sub/./../asdf.js'],
+    // Cannot reach into node_modules, even percent encoded
+    ['pkgexports/sub/no%64e_modules', './sub/no%64e_modules'],
+    // Cannot backtrack below exposed path, even with percent encoded "."
+    ['pkgexports/sub/%2e./asdf', './asdf'],
   ]);
 
   for (const [specifier, subpath] of undefinedExports) {
@@ -171,7 +163,6 @@ import fromInside from '../fixtures/node_modules/pkgexports/lib/hole.js';
       strictEqual(err.code, 'ERR_UNSUPPORTED_DIR_IMPORT');
       assertStartsWith(err.message, 'Directory import');
     };
-    notFoundExports.set('pkgexports/subpath/file', 'pkgexports/subpath/file');
     loadFixture('pkgexports/subpath/dir1').catch(mustCall(onDirectoryImport));
     loadFixture('pkgexports/subpath/dir2').catch(mustCall(onDirectoryImport));
   }
@@ -184,8 +175,11 @@ import fromInside from '../fixtures/node_modules/pkgexports/lib/hole.js';
     }));
   }
 
-  // The use of %2F escapes in paths fails loading
+  // The use of %2F and %5C escapes in paths fails loading
   loadFixture('pkgexports/sub/..%2F..%2Fbar.js').catch(mustCall((err) => {
+    strictEqual(err.code, 'ERR_INVALID_MODULE_SPECIFIER');
+  }));
+  loadFixture('pkgexports/sub/..%5C..%5Cbar.js').catch(mustCall((err) => {
     strictEqual(err.code, 'ERR_INVALID_MODULE_SPECIFIER');
   }));
 

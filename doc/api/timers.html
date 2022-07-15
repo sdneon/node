@@ -3,12 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v16.12.0">
-  <title>Timers | Node.js v16.12.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v18.5.0">
+  <title>Timers | Node.js v18.5.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
   <link rel="canonical" href="https://nodejs.org/api/timers.html">
+  <script async defer src="assets/api.js" type="text/javascript"></script>
 </head>
 <body class="alt apidoc" id="api-section-timers">
   <div id="content" class="clearfix">
@@ -25,7 +26,7 @@
 <hr class="line">
 <ul>
 <li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
-<li><a href="async_context.html" class="nav-async_context">Async_context</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
 <li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
 <li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
 <li><a href="addons.html" class="nav-addons">C++ addons</a></li>
@@ -53,7 +54,7 @@
 <li><a href="intl.html" class="nav-intl">Internationalization</a></li>
 <li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
 <li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
-<li><a href="module.html" class="nav-module">Modules: <code>module</code> API</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
 <li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
 <li><a href="net.html" class="nav-net">Net</a></li>
 <li><a href="os.html" class="nav-os">OS</a></li>
@@ -68,6 +69,7 @@
 <li><a href="report.html" class="nav-report">Report</a></li>
 <li><a href="stream.html" class="nav-stream">Stream</a></li>
 <li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
 <li><a href="timers.html" class="nav-timers active">Timers</a></li>
 <li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
 <li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
@@ -90,9 +92,9 @@
     </div>
 
     <div id="column1" data-id="timers" class="interior">
-      <header>
+      <header class="header">
         <div class="header-container">
-          <h1>Node.js v16.12.0 documentation</h1>
+          <h1>Node.js v18.5.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -107,20 +109,155 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li>
-              <a href="index.html">Index</a>
-            </li>
-            <li>
-              <a href="all.html">View on single page</a>
-            </li>
-            <li>
-              <a href="timers.json">View as JSON</a>
-            </li>
+            <li class="pinned-header">Node.js v18.5.0</li>
             
-    <li class="version-picker">
-      <a href="#">View another version <span>&#x25bc;</span></a>
-      <ol class="version-picker"><li><a href="https://nodejs.org/docs/latest-v17.x/api/timers.html">17.x</a></li>
-<li><a href="https://nodejs.org/docs/latest-v16.x/api/timers.html">16.x</a></li>
+    <li class="picker-header">
+      <a href="#">
+        <span class="collapsed-arrow">&#x25ba;</span><span class="expanded-arrow">&#x25bc;</span>
+        Table of contents
+      </a>
+
+      <div class="picker"><div class="toc"><ul>
+<li><span class="stability_2"><a href="#timers">Timers</a></span>
+<ul>
+<li><a href="#class-immediate">Class: <code>Immediate</code></a>
+<ul>
+<li><a href="#immediatehasref"><code>immediate.hasRef()</code></a></li>
+<li><a href="#immediateref"><code>immediate.ref()</code></a></li>
+<li><a href="#immediateunref"><code>immediate.unref()</code></a></li>
+</ul>
+</li>
+<li><a href="#class-timeout">Class: <code>Timeout</code></a>
+<ul>
+<li><span class="stability_3"><a href="#timeoutclose"><code>timeout.close()</code></a></span></li>
+<li><a href="#timeouthasref"><code>timeout.hasRef()</code></a></li>
+<li><a href="#timeoutref"><code>timeout.ref()</code></a></li>
+<li><a href="#timeoutrefresh"><code>timeout.refresh()</code></a></li>
+<li><a href="#timeoutunref"><code>timeout.unref()</code></a></li>
+<li><a href="#timeoutsymboltoprimitive"><code>timeout[Symbol.toPrimitive]()</code></a></li>
+</ul>
+</li>
+<li><a href="#scheduling-timers">Scheduling timers</a>
+<ul>
+<li><a href="#setimmediatecallback-args"><code>setImmediate(callback[, ...args])</code></a></li>
+<li><a href="#setintervalcallback-delay-args"><code>setInterval(callback[, delay[, ...args]])</code></a></li>
+<li><a href="#settimeoutcallback-delay-args"><code>setTimeout(callback[, delay[, ...args]])</code></a></li>
+</ul>
+</li>
+<li><a href="#cancelling-timers">Cancelling timers</a>
+<ul>
+<li><a href="#clearimmediateimmediate"><code>clearImmediate(immediate)</code></a></li>
+<li><a href="#clearintervaltimeout"><code>clearInterval(timeout)</code></a></li>
+<li><a href="#cleartimeouttimeout"><code>clearTimeout(timeout)</code></a></li>
+</ul>
+</li>
+<li><a href="#timers-promises-api">Timers Promises API</a>
+<ul>
+<li><a href="#timerspromisessettimeoutdelay-value-options"><code>timersPromises.setTimeout([delay[, value[, options]]])</code></a></li>
+<li><a href="#timerspromisessetimmediatevalue-options"><code>timersPromises.setImmediate([value[, options]])</code></a></li>
+<li><a href="#timerspromisessetintervaldelay-value-options"><code>timersPromises.setInterval([delay[, value[, options]]])</code></a></li>
+<li><span class="stability_1"><a href="#timerspromisesschedulerwaitdelay-options"><code>timersPromises.scheduler.wait(delay[, options])</code></a></span></li>
+<li><span class="stability_1"><a href="#timerspromisesscheduleryield"><code>timersPromises.scheduler.yield()</code></a></span></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></div></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#">
+        <span class="collapsed-arrow">&#x25ba;</span><span class="expanded-arrow">&#x25bc;</span>
+        Index
+      </a>
+
+      <div class="picker"><ul>
+<li><a href="documentation.html" class="nav-documentation">About this documentation</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">Usage and example</a></li>
+
+      <li>
+        <a href="index.html">Index</a>
+      </li>
+    </ul>
+  
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="corepack.html" class="nav-corepack">Corepack</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
+<li><a href="policy.html" class="nav-policy">Policies</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline">Readline</a></li>
+<li><a href="repl.html" class="nav-repl">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers active">Timers</a></li>
+<li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#">
+        <span class="collapsed-arrow">&#x25ba;</span><span class="expanded-arrow">&#x25bc;</span>
+        Other versions
+      </a>
+      <div class="picker"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v18.x/api/timers.html">18.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v17.x/api/timers.html">17.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v16.x/api/timers.html">16.x <b>LTS</b></a></li>
 <li><a href="https://nodejs.org/docs/latest-v15.x/api/timers.html">15.x</a></li>
 <li><a href="https://nodejs.org/docs/latest-v14.x/api/timers.html">14.x <b>LTS</b></a></li>
 <li><a href="https://nodejs.org/docs/latest-v13.x/api/timers.html">13.x</a></li>
@@ -134,10 +271,27 @@
 <li><a href="https://nodejs.org/docs/latest-v5.x/api/timers.html">5.x</a></li>
 <li><a href="https://nodejs.org/docs/latest-v4.x/api/timers.html">4.x</a></li>
 <li><a href="https://nodejs.org/docs/latest-v0.12.x/api/timers.html">0.12.x</a></li>
-<li><a href="https://nodejs.org/docs/latest-v0.10.x/api/timers.html">0.10.x</a></li></ol>
+<li><a href="https://nodejs.org/docs/latest-v0.10.x/api/timers.html">0.10.x</a></li></ol></div>
     </li>
   
-            <li class="edit_on_github"><a href="https://github.com/nodejs/node/edit/master/doc/api/timers.md">Edit on GitHub</a></li>
+            <li class="picker-header">
+              <a href="#">
+                <span class="collapsed-arrow">&#x25ba;</span><span class="expanded-arrow">&#x25bc;</span>
+                Options
+              </a>
+        
+              <div class="picker">
+                <ul>
+                  <li>
+                    <a href="all.html">View on single page</a>
+                  </li>
+                  <li>
+                    <a href="timers.json">View as JSON</a>
+                  </li>
+                  <li class="edit_on_github"><a href="https://github.com/nodejs/node/edit/master/doc/api/timers.md">Edit on GitHub</a></li>    
+                </ul>
+              </div>
+            </li>
           </ul>
         </div>
         <hr>
@@ -182,6 +336,8 @@
 <li><a href="#timerspromisessettimeoutdelay-value-options"><code>timersPromises.setTimeout([delay[, value[, options]]])</code></a></li>
 <li><a href="#timerspromisessetimmediatevalue-options"><code>timersPromises.setImmediate([value[, options]])</code></a></li>
 <li><a href="#timerspromisessetintervaldelay-value-options"><code>timersPromises.setInterval([delay[, value[, options]]])</code></a></li>
+<li><span class="stability_1"><a href="#timerspromisesschedulerwaitdelay-options"><code>timersPromises.scheduler.wait(delay[, options])</code></a></span></li>
+<li><span class="stability_1"><a href="#timerspromisesscheduleryield"><code>timersPromises.scheduler.yield()</code></a></span></li>
 </ul>
 </li>
 </ul>
@@ -192,10 +348,10 @@
         <h2>Timers<span><a class="mark" href="#timers" id="timers">#</a></span><a aria-hidden="true" class="legacy" id="timers_timers"></a></h2>
 
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v16.12.0/lib/timers.js">lib/timers.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v18.5.0/lib/timers.js">lib/timers.js</a></p>
 <p>The <code>timer</code> module exposes a global API for scheduling functions to
 be called at some future period of time. Because the timer functions are
-globals, there is no need to call <code>require('timers')</code> to use the API.</p>
+globals, there is no need to call <code>require('node:timers')</code> to use the API.</p>
 <p>The timer functions within Node.js implement a similar API as the timers API
 provided by Web Browsers but use a different internal implementation that is
 built around the Node.js <a href="https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/#setimmediate-vs-settimeout">Event Loop</a>.</p>
@@ -299,9 +455,6 @@ timer.</p>
 to remain active. If there is no other activity keeping the event loop running,
 the process may exit before the <code>Timeout</code> object's callback is invoked. Calling
 <code>timeout.unref()</code> multiple times will have no effect.</p>
-<p>Calling <code>timeout.unref()</code> creates an internal timer that will wake the Node.js
-event loop. Creating too many of these can adversely impact performance
-of the Node.js application.</p>
 <h4><code>timeout[Symbol.toPrimitive]()</code><span><a class="mark" href="#timeoutsymboltoprimitive" id="timeoutsymboltoprimitive">#</a></span><a aria-hidden="true" class="legacy" id="timers_timeout_symbol_toprimitive"></a></h4>
 <div class="api_metadata">
 <span>Added in: v14.9.0, v12.19.0</span>
@@ -322,7 +475,15 @@ which method was used to create the timer and what other work the Node.js
 event loop is doing.</p>
 <h4><code>setImmediate(callback[, ...args])</code><span><a class="mark" href="#setimmediatecallback-args" id="setimmediatecallback-args">#</a></span><a aria-hidden="true" class="legacy" id="timers_setimmediate_callback_args"></a></h4>
 <div class="api_metadata">
-<span>Added in: v0.9.1</span>
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v18.0.0</td>
+<td><p>Passing an invalid callback to the <code>callback</code> argument now throws <code>ERR_INVALID_ARG_TYPE</code> instead of <code>ERR_INVALID_CALLBACK</code>.</p></td></tr>
+<tr><td>v0.9.1</td>
+<td><p><span>Added in: v0.9.1</span></p></td></tr>
+</tbody></table>
+</details>
 </div>
 <ul>
 <li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> The function to call at the end of this turn of
@@ -342,7 +503,15 @@ next event loop iteration.</p>
 <a href="#timerspromisessetimmediatevalue-options"><code>timersPromises.setImmediate()</code></a>.</p>
 <h4><code>setInterval(callback[, delay[, ...args]])</code><span><a class="mark" href="#setintervalcallback-delay-args" id="setintervalcallback-delay-args">#</a></span><a aria-hidden="true" class="legacy" id="timers_setinterval_callback_delay_args"></a></h4>
 <div class="api_metadata">
-<span>Added in: v0.0.1</span>
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v18.0.0</td>
+<td><p>Passing an invalid callback to the <code>callback</code> argument now throws <code>ERR_INVALID_ARG_TYPE</code> instead of <code>ERR_INVALID_CALLBACK</code>.</p></td></tr>
+<tr><td>v0.0.1</td>
+<td><p><span>Added in: v0.0.1</span></p></td></tr>
+</tbody></table>
+</details>
 </div>
 <ul>
 <li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> The function to call when the timer elapses.</li>
@@ -359,7 +528,15 @@ set to <code>1</code>. Non-integer delays are truncated to an integer.</p>
 <a href="#timerspromisessetintervaldelay-value-options"><code>timersPromises.setInterval()</code></a>.</p>
 <h4><code>setTimeout(callback[, delay[, ...args]])</code><span><a class="mark" href="#settimeoutcallback-delay-args" id="settimeoutcallback-delay-args">#</a></span><a aria-hidden="true" class="legacy" id="timers_settimeout_callback_delay_args"></a></h4>
 <div class="api_metadata">
-<span>Added in: v0.0.1</span>
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v18.0.0</td>
+<td><p>Passing an invalid callback to the <code>callback</code> argument now throws <code>ERR_INVALID_ARG_TYPE</code> instead of <code>ERR_INVALID_CALLBACK</code>.</p></td></tr>
+<tr><td>v0.0.1</td>
+<td><p><span>Added in: v0.0.1</span></p></td></tr>
+</tbody></table>
+</details>
 </div>
 <ul>
 <li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> The function to call when the timer elapses.</li>
@@ -386,7 +563,7 @@ cancel the timer and prevent it from triggering.</p>
 an <a href="globals.html#class-abortcontroller"><code>AbortController</code></a> may be used to cancel the timer. When canceled, the
 returned Promises will be rejected with an <code>'AbortError'</code>.</p>
 <p>For <code>setImmediate()</code>:</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> { <span class="hljs-attr">setImmediate</span>: setImmediatePromise } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'timers/promises'</span>);
+<pre><code class="language-js"><span class="hljs-keyword">const</span> { <span class="hljs-attr">setImmediate</span>: setImmediatePromise } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:timers/promises'</span>);
 
 <span class="hljs-keyword">const</span> ac = <span class="hljs-keyword">new</span> <span class="hljs-title class_">AbortController</span>();
 <span class="hljs-keyword">const</span> signal = ac.<span class="hljs-property">signal</span>;
@@ -400,7 +577,7 @@ returned Promises will be rejected with an <code>'AbortError'</code>.</p>
 
 ac.<span class="hljs-title function_">abort</span>();</code></pre>
 <p>For <code>setTimeout()</code>:</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> { <span class="hljs-attr">setTimeout</span>: setTimeoutPromise } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'timers/promises'</span>);
+<pre><code class="language-js"><span class="hljs-keyword">const</span> { <span class="hljs-attr">setTimeout</span>: setTimeoutPromise } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:timers/promises'</span>);
 
 <span class="hljs-keyword">const</span> ac = <span class="hljs-keyword">new</span> <span class="hljs-title class_">AbortController</span>();
 <span class="hljs-keyword">const</span> signal = ac.<span class="hljs-property">signal</span>;
@@ -454,7 +631,7 @@ or the <a href="#timeoutsymboltoprimitive">primitive</a> of the <code>Timeout</c
 </div>
 <p>The <code>timers/promises</code> API provides an alternative set of timer functions
 that return <code>Promise</code> objects. The API is accessible via
-<code>require('timers/promises')</code>.</p>
+<code>require('node:timers/promises')</code>.</p>
 
 <pre><input class="js-flavor-selector" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> {
   <span class="hljs-built_in">setTimeout</span>,
@@ -464,7 +641,7 @@ that return <code>Promise</code> objects. The API is accessible via
   <span class="hljs-built_in">setTimeout</span>,
   setImmediate,
   <span class="hljs-built_in">setInterval</span>,
-} = <span class="hljs-built_in">require</span>(<span class="hljs-string">'timers/promises'</span>);</code></pre>
+} = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:timers/promises'</span>);</code></pre>
 <h4><code>timersPromises.setTimeout([delay[, value[, options]]])</code><span><a class="mark" href="#timerspromisessettimeoutdelay-value-options" id="timerspromisessettimeoutdelay-value-options">#</a></span><a aria-hidden="true" class="legacy" id="timers_timerspromises_settimeout_delay_value_options"></a></h4>
 <div class="api_metadata">
 <span>Added in: v15.0.0</span>
@@ -492,7 +669,7 @@ cancel the scheduled <code>Timeout</code>.</li>
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(res);  <span class="hljs-comment">// Prints 'result'</span></code><code class="language-js cjs"><span class="hljs-keyword">const</span> {
   <span class="hljs-built_in">setTimeout</span>,
-} = <span class="hljs-built_in">require</span>(<span class="hljs-string">'timers/promises'</span>);
+} = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:timers/promises'</span>);
 
 <span class="hljs-built_in">setTimeout</span>(<span class="hljs-number">100</span>, <span class="hljs-string">'result'</span>).<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">res</span>) =></span> {
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(res);  <span class="hljs-comment">// Prints 'result'</span>
@@ -522,7 +699,7 @@ cancel the scheduled <code>Immediate</code>.</li>
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(res);  <span class="hljs-comment">// Prints 'result'</span></code><code class="language-js cjs"><span class="hljs-keyword">const</span> {
   setImmediate,
-} = <span class="hljs-built_in">require</span>(<span class="hljs-string">'timers/promises'</span>);
+} = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:timers/promises'</span>);
 
 <span class="hljs-title function_">setImmediate</span>(<span class="hljs-string">'result'</span>).<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">res</span>) =></span> {
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(res);  <span class="hljs-comment">// Prints 'result'</span>
@@ -561,7 +738,7 @@ cancel the scheduled <code>Timeout</code> between operations.</li>
 }
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title class_">Date</span>.<span class="hljs-title function_">now</span>());</code><code class="language-js cjs"><span class="hljs-keyword">const</span> {
   <span class="hljs-built_in">setInterval</span>,
-} = <span class="hljs-built_in">require</span>(<span class="hljs-string">'timers/promises'</span>);
+} = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:timers/promises'</span>);
 <span class="hljs-keyword">const</span> interval = <span class="hljs-number">100</span>;
 
 (<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
@@ -572,46 +749,46 @@ cancel the scheduled <code>Timeout</code> between operations.</li>
       <span class="hljs-keyword">break</span>;
   }
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title class_">Date</span>.<span class="hljs-title function_">now</span>());
-})();</code></pre></section>
+})();</code></pre>
+<h4><code>timersPromises.scheduler.wait(delay[, options])</code><span><a class="mark" href="#timerspromisesschedulerwaitdelay-options" id="timerspromisesschedulerwaitdelay-options">#</a></span><a aria-hidden="true" class="legacy" id="timers_timerspromises_scheduler_wait_delay_options"></a></h4>
+<div class="api_metadata">
+<span>Added in: v17.3.0, v16.14.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<ul>
+<li><code>delay</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The number of milliseconds to wait before resolving the
+promise.</li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>signal</code> <a href="globals.html#class-abortsignal" class="type">&#x3C;AbortSignal></a> An optional <code>AbortSignal</code> that can be used to
+cancel waiting.</li>
+</ul>
+</li>
+<li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" class="type">&#x3C;Promise></a></li>
+</ul>
+<p>An experimental API defined by the <a href="https://github.com/WICG/scheduling-apis">Scheduling APIs</a> draft specification
+being developed as a standard Web Platform API.</p>
+<p>Calling <code>timersPromises.scheduler.wait(delay, options)</code> is roughly equivalent
+to calling <code>timersPromises.setTimeout(delay, undefined, options)</code> except that
+the <code>ref</code> option is not supported.</p>
+<pre><code class="language-js mjs"><span class="hljs-keyword">import</span> { scheduler } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:timers/promises'</span>;
+
+<span class="hljs-keyword">await</span> scheduler.<span class="hljs-title function_">wait</span>(<span class="hljs-number">1000</span>); <span class="hljs-comment">// Wait one second before continuing</span></code></pre>
+<h4><code>timersPromises.scheduler.yield()</code><span><a class="mark" href="#timerspromisesscheduleryield" id="timerspromisesscheduleryield">#</a></span><a aria-hidden="true" class="legacy" id="timers_timerspromises_scheduler_yield"></a></h4>
+<div class="api_metadata">
+<span>Added in: v17.3.0, v16.14.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<ul>
+<li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" class="type">&#x3C;Promise></a></li>
+</ul>
+<p>An experimental API defined by the <a href="https://github.com/WICG/scheduling-apis">Scheduling APIs</a> draft specification
+being developed as a standard Web Platform API.</p>
+<p>Calling <code>timersPromises.scheduler.yield()</code> is equivalent to calling
+<code>timersPromises.setImmediate()</code> with no arguments.</p></section>
         <!-- API END -->
       </div>
     </div>
   </div>
-  <script>
-    'use strict';
-    {
-      const kCustomPreference = 'customDarkTheme';
-      const userSettings = sessionStorage.getItem(kCustomPreference);
-      const themeToggleButton = document.getElementById('theme-toggle-btn');
-      if (userSettings === null && window.matchMedia) {
-        const mq = window.matchMedia('(prefers-color-scheme: dark)');
-        if ('onchange' in mq) {
-          function mqChangeListener(e) {
-            document.body.classList.toggle('dark-mode', e.matches);
-          }
-          mq.addEventListener('change', mqChangeListener);
-          if (themeToggleButton) {
-            themeToggleButton.addEventListener('click', function() {
-              mq.removeEventListener('change', mqChangeListener);
-            }, { once: true });
-          }
-        }
-        if (mq.matches) {
-          document.body.classList.add('dark-mode');
-        }
-      } else if (userSettings === 'true') {
-        document.body.classList.add('dark-mode');
-      }
-      if (themeToggleButton) {
-        themeToggleButton.hidden = false;
-        themeToggleButton.addEventListener('click', function() {
-          sessionStorage.setItem(
-            kCustomPreference,
-            document.body.classList.toggle('dark-mode')
-          );
-        });
-      }
-    }
-  </script>
 </body>
 </html>

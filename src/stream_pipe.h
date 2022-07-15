@@ -9,11 +9,13 @@ namespace node {
 
 class StreamPipe : public AsyncWrap {
  public:
-  StreamPipe(StreamBase* source, StreamBase* sink, v8::Local<v8::Object> obj);
   ~StreamPipe() override;
 
   void Unpipe(bool is_in_deletion = false);
 
+  static v8::Maybe<StreamPipe*> New(StreamBase* source,
+                                    StreamBase* sink,
+                                    v8::Local<v8::Object> obj);
   static void New(const v8::FunctionCallbackInfo<v8::Value>& args);
   static void Start(const v8::FunctionCallbackInfo<v8::Value>& args);
   static void Unpipe(const v8::FunctionCallbackInfo<v8::Value>& args);
@@ -25,6 +27,8 @@ class StreamPipe : public AsyncWrap {
   SET_SELF_SIZE(StreamPipe)
 
  private:
+  StreamPipe(StreamBase* source, StreamBase* sink, v8::Local<v8::Object> obj);
+
   inline StreamBase* source();
   inline StreamBase* sink();
 
@@ -67,6 +71,6 @@ class StreamPipe : public AsyncWrap {
 
 }  // namespace node
 
-#endif
+#endif  // defined(NODE_WANT_INTERNALS) && NODE_WANT_INTERNALS
 
 #endif  // SRC_STREAM_PIPE_H_

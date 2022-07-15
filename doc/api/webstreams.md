@@ -2,25 +2,17 @@
 
 <!--introduced_in=v16.5.0-->
 
-> Stability: 1 - Experimental
+<!-- YAML
+added: v16.5.0
+changes:
+  - version: v18.0.0
+    pr-url: https://github.com/nodejs/node/pull/42225
+    description: Use of this API no longer emit a runtime warning.
+-->
+
+> Stability: 1 - Experimental.
 
 An implementation of the [WHATWG Streams Standard][].
-
-```mjs
-import {
-  ReadableStream,
-  WritableStream,
-  TransformStream,
-} from 'node:stream/web';
-```
-
-```cjs
-const {
-  ReadableStream,
-  WritableStream,
-  TransformStream,
-} = require('stream/web');
-```
 
 ## Overview
 
@@ -29,7 +21,7 @@ streaming data. It is similar to the Node.js [Streams][] API but emerged later
 and has become the "standard" API for streaming data across many JavaScript
 environments.
 
-There are three primary types of objects
+There are three primary types of objects:
 
 * `ReadableStream` - Represents a source of streaming data.
 * `WritableStream` - Represents a destination for streaming data.
@@ -70,15 +62,15 @@ for await (const value of stream)
 ```cjs
 const {
   ReadableStream
-} = require('stream/web');
+} = require('node:stream/web');
 
 const {
   setInterval: every
-} = require('timers/promises');
+} = require('node:timers/promises');
 
 const {
   performance
-} = require('perf_hooks');
+} = require('node:perf_hooks');
 
 const SECOND = 1000;
 
@@ -98,16 +90,23 @@ const stream = new ReadableStream({
 ## API
 
 ### Class: `ReadableStream`
+
 <!-- YAML
 added: v16.5.0
+changes:
+  - version: v18.0.0
+    pr-url: https://github.com/nodejs/node/pull/42225
+    description: This class is now exposed on the global object.
 -->
 
 #### `new ReadableStream([underlyingSource [, strategy]])`
+
 <!-- YAML
 added: v16.5.0
 -->
 
 <!--lint disable maximum-line-length remark-lint-->
+
 * `underlyingSource` {Object}
   * `start` {Function} A user-defined function that is invoked immediately when
     the `ReadableStream` is created.
@@ -133,9 +132,11 @@ added: v16.5.0
     chunk of data.
     * `chunk` {any}
     * Returns: {number}
+
 <!--lint enable maximum-line-length remark-lint-->
 
 #### `readableStream.locked`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -144,10 +145,11 @@ added: v16.5.0
   {ReadableStream}.
 
 The `readableStream.locked` property is `false` by default, and is
-switch to `true` while there is an active reader consuming the
+switched to `true` while there is an active reader consuming the
 stream's data.
 
 #### `readableStream.cancel([reason])`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -157,6 +159,7 @@ added: v16.5.0
   been completed.
 
 #### `readableStream.getReader([options])`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -176,7 +179,7 @@ console.log(await reader.read());
 ```
 
 ```cjs
-const { ReadableStream } = require('stream/web');
+const { ReadableStream } = require('node:stream/web');
 
 const stream = new ReadableStream();
 
@@ -188,6 +191,7 @@ reader.read().then(console.log);
 Causes the `readableStream.locked` to be `true`.
 
 #### `readableStream.pipeThrough(transform[, options])`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -202,10 +206,10 @@ added: v16.5.0
   * `preventAbort` {boolean} When `true`, errors in this `ReadableStream`
     will not cause `transform.writable` to be aborted.
   * `preventCancel` {boolean} When `true`, errors in the destination
-    `transform.writable` is not cause this `ReadableStream` to be
+    `transform.writable` do not cause this `ReadableStream` to be
     canceled.
   * `preventClose` {boolean} When `true`, closing this `ReadableStream`
-    will no cause `transform.writable` to be closed.
+    does not cause `transform.writable` to be closed.
   * `signal` {AbortSignal} Allows the transfer of data to be canceled
     using an {AbortController}.
 * Returns: {ReadableStream} From `transform.readable`.
@@ -247,7 +251,7 @@ for await (const chunk of transformedStream)
 const {
   ReadableStream,
   TransformStream,
-} = require('stream/web');
+} = require('node:stream/web');
 
 const stream = new ReadableStream({
   start(controller) {
@@ -270,6 +274,7 @@ const transformedStream = stream.pipeThrough(transform);
 ```
 
 #### `readableStream.pipeTo(destination, options)`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -278,12 +283,11 @@ added: v16.5.0
   `ReadableStream`'s data will be written.
 * `options` {Object}
   * `preventAbort` {boolean} When `true`, errors in this `ReadableStream`
-    will not cause `transform.writable` to be aborted.
-  * `preventCancel` {boolean} When `true`, errors in the destination
-    `transform.writable` is not cause this `ReadableStream` to be
-    canceled.
+    will not cause `destination` to be aborted.
+  * `preventCancel` {boolean} When `true`, errors in the `destination`
+    will not cause this `ReadableStream` to be canceled.
   * `preventClose` {boolean} When `true`, closing this `ReadableStream`
-    will no cause `transform.writable` to be closed.
+    does not cause `destination` to be closed.
   * `signal` {AbortSignal} Allows the transfer of data to be canceled
     using an {AbortController}.
 * Returns: A promise fulfilled with `undefined`
@@ -292,11 +296,12 @@ Causes the `readableStream.locked` to be `true` while the pipe operation
 is active.
 
 #### `readableStream.tee()`
+
 <!-- YAML
 added: v16.5.0
 -->
 
-* Returns: {ReadableStream[]}
+* Returns: {ReadableStream\[]}
 
 Returns a pair of new {ReadableStream} instances to which this
 `ReadableStream`'s data will be forwarded. Each will receive the
@@ -305,6 +310,7 @@ same data.
 Causes the `readableStream.locked` to be `true`.
 
 #### `readableStream.values([options])`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -312,7 +318,7 @@ added: v16.5.0
 * `options` {Object}
   * `preventCancel` {boolean} When `true`, prevents the {ReadableStream}
     from being closed when the async iterator abruptly terminates.
-    **Defaults**: `false`
+    **Default**: `false`.
 
 Creates and returns an async iterator usable for consuming this
 `ReadableStream`'s data.
@@ -335,7 +341,7 @@ The {ReadableStream} object supports the async iterator protocol using
 `for await` syntax.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const stream = new ReadableStream(getSomeSource());
 
@@ -373,8 +379,13 @@ port2.postMessage(stream, [stream]);
 ```
 
 ### Class: `ReadableStreamDefaultReader`
+
 <!-- YAML
 added: v16.5.0
+changes:
+  - version: v18.0.0
+    pr-url: https://github.com/nodejs/node/pull/42225
+    description: This class is now exposed on the global object.
 -->
 
 By default, calling `readableStream.getReader()` with no arguments
@@ -384,6 +395,7 @@ values, which allows the {ReadableStream} to work with generally any
 JavaScript value.
 
 #### `new ReadableStreamDefaultReader(stream)`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -394,6 +406,7 @@ Creates a new {ReadableStreamDefaultReader} that is locked to the
 given {ReadableStream}.
 
 #### `readableStreamDefaultReader.cancel([reason])`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -405,14 +418,17 @@ Cancels the {ReadableStream} and returns a promise that is fulfilled
 when the underlying stream has been canceled.
 
 #### `readableStreamDefaultReader.closed`
+
 <!-- YAML
 added: v16.5.0
 -->
 
 * Type: {Promise} Fulfilled with `undefined` when the associated
-  {ReadableStream} is closed or this reader's lock is released.
+  {ReadableStream} is closed or rejected if the stream errors or the reader's
+  lock is released before the stream finishes closing.
 
 #### `readableStreamDefaultReader.read()`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -426,6 +442,7 @@ and returns a promise that is fulfilled with the data once it is
 available.
 
 #### `readableStreamDefaultReader.releaseLock()`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -433,13 +450,18 @@ added: v16.5.0
 Releases this reader's lock on the underlying {ReadableStream}.
 
 ### Class: `ReadableStreamBYOBReader`
+
 <!-- YAML
 added: v16.5.0
+changes:
+  - version: v18.0.0
+    pr-url: https://github.com/nodejs/node/pull/42225
+    description: This class is now exposed on the global object.
 -->
 
 The `ReadableStreamBYOBReader` is an alternative consumer for
-byte-oriented {ReadableStream}'s (those that are created with
-`underlyingSource.type` set equal to `'bytes`` when the
+byte-oriented {ReadableStream}s (those that are created with
+`underlyingSource.type` set equal to `'bytes'` when the
 `ReadableStream` was created).
 
 The `BYOB` is short for "bring your own buffer". This is a
@@ -505,6 +527,7 @@ console.log(Buffer.from(data).toString());
 ```
 
 #### `new ReadableStreamBYOBReader(stream)`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -515,6 +538,7 @@ Creates a new `ReadableStreamBYOBReader` that is locked to the
 given {ReadableStream}.
 
 #### `readableStreamBYOBReader.cancel([reason])`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -526,14 +550,17 @@ Cancels the {ReadableStream} and returns a promise that is fulfilled
 when the underlying stream has been canceled.
 
 #### `readableStreamBYOBReader.closed`
+
 <!-- YAML
 added: v16.5.0
 -->
 
 * Type: {Promise} Fulfilled with `undefined` when the associated
-  {ReadableStream} is closed or this reader's lock is released.
+  {ReadableStream} is closed or rejected if the stream errors or the reader's
+  lock is released before the stream finishes closing.
 
 #### `readableStreamBYOBReader.read(view)`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -549,16 +576,17 @@ available.
 
 Do not pass a pooled {Buffer} object instance in to this method.
 Pooled `Buffer` objects are created using `Buffer.allocUnsafe()`,
-or `Buffer.from()`, or are often returned by various `fs` module
+or `Buffer.from()`, or are often returned by various `node:fs` module
 callbacks. These types of `Buffer`s use a shared underlying
 {ArrayBuffer} object that contains all of the data from all of
 the pooled `Buffer` instances. When a `Buffer`, {TypedArray},
 or {DataView} is passed in to `readableStreamBYOBReader.read()`,
-the view's underlying `ArrayBuffer` is *detached*, invalidating
+the view's underlying `ArrayBuffer` is _detached_, invalidating
 all existing views that may exist on that `ArrayBuffer`. This
 can have disastrous consequences for your application.
 
 #### `readableStreamBYOBReader.releaseLock()`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -566,6 +594,7 @@ added: v16.5.0
 Releases this reader's lock on the underlying {ReadableStream}.
 
 ### Class: `ReadableStreamDefaultController`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -576,6 +605,7 @@ the internal state and management of the stream's queue. The
 implementation for `ReadableStream`s that are not byte-oriented.
 
 #### `readableStreamDefaultController.close()`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -583,6 +613,7 @@ added: v16.5.0
 Closes the {ReadableStream} to which this controller is associated.
 
 #### `readableStreamDefaultController.desiredSize`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -593,6 +624,7 @@ Returns the amount of data remaining to fill the {ReadableStream}'s
 queue.
 
 #### `readableStreamDefaultController.enqueue(chunk)`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -602,6 +634,7 @@ added: v16.5.0
 Appends a new chunk of data to the {ReadableStream}'s queue.
 
 #### `readableStreamDefaultController.error(error)`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -611,6 +644,7 @@ added: v16.5.0
 Signals an error that causes the {ReadableStream} to error and close.
 
 ### Class: `ReadableByteStreamController`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -620,6 +654,7 @@ the internal state and management of the stream's queue. The
 `ReadableByteStreamController` is for byte-oriented `ReadableStream`s.
 
 #### `readableByteStreamController.byobRequest`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -627,6 +662,7 @@ added: v16.5.0
 * Type: {ReadableStreamBYOBRequest}
 
 #### `readableByteStreamController.close()`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -634,6 +670,7 @@ added: v16.5.0
 Closes the {ReadableStream} to which this controller is associated.
 
 #### `readableByteStreamController.desiredSize`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -644,6 +681,7 @@ Returns the amount of data remaining to fill the {ReadableStream}'s
 queue.
 
 #### `readableByteStreamController.enqueue(chunk)`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -653,6 +691,7 @@ added: v16.5.0
 Appends a new chunk of data to the {ReadableStream}'s queue.
 
 #### `readableByteStreamController.error(error)`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -662,8 +701,13 @@ added: v16.5.0
 Signals an error that causes the {ReadableStream} to error and close.
 
 ### Class: `ReadableStreamBYOBRequest`
+
 <!-- YAML
 added: v16.5.0
+changes:
+  - version: v18.0.0
+    pr-url: https://github.com/nodejs/node/pull/42225
+    description: This class is now exposed on the global object.
 -->
 
 When using `ReadableByteStreamController` in byte-oriented
@@ -677,6 +721,7 @@ and provides methods for signaling that the data has
 been provided.
 
 #### `readableStreamBYOBRequest.respond(bytesWritten)`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -687,6 +732,7 @@ Signals that a `bytesWritten` number of bytes have been written
 to `readableStreamBYOBRequest.view`.
 
 #### `readableStreamBYOBRequest.respondWithNewView(view)`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -697,6 +743,7 @@ Signals that the request has been fulfilled with bytes written
 to a new `Buffer`, `TypedArray`, or `DataView`.
 
 #### `readableStreamBYOBRequest.view`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -704,8 +751,13 @@ added: v16.5.0
 * Type: {Buffer|TypedArray|DataView}
 
 ### Class: `WritableStream`
+
 <!-- YAML
 added: v16.5.0
+changes:
+  - version: v18.0.0
+    pr-url: https://github.com/nodejs/node/pull/42225
+    description: This class is now exposed on the global object.
 -->
 
 The `WritableStream` is a destination to which stream data is sent.
@@ -725,6 +777,7 @@ await stream.getWriter().write('Hello World');
 ```
 
 #### `new WritableStream([underlyingSink[, strategy]])`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -746,7 +799,7 @@ added: v16.5.0
     the `WritableStream`.
     * `reason` {any}
     * Returns: A promise fulfilled with `undefined`.
-  * `type` {any} The `type` option is reserved for future use and *must* be
+  * `type` {any} The `type` option is reserved for future use and _must_ be
     undefined.
 * `strategy` {Object}
   * `highWaterMark` {number} The maximum internal queue size before backpressure
@@ -757,6 +810,7 @@ added: v16.5.0
     * Returns: {number}
 
 #### `writableStream.abort([reason])`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -768,6 +822,7 @@ Abruptly terminates the `WritableStream`. All queued writes will be
 canceled with their associated promises rejected.
 
 #### `writableStream.close()`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -777,6 +832,7 @@ added: v16.5.0
 Closes the `WritableStream` when no additional writes are expected.
 
 #### `writableStream.getWriter()`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -787,6 +843,7 @@ Creates and creates a new writer instance that can be used to write
 data into the `WritableStream`.
 
 #### `writableStream.locked`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -814,11 +871,17 @@ port2.postMessage(stream, [stream]);
 ```
 
 ### Class: `WritableStreamDefaultWriter`
+
 <!-- YAML
 added: v16.5.0
+changes:
+  - version: v18.0.0
+    pr-url: https://github.com/nodejs/node/pull/42225
+    description: This class is now exposed on the global object.
 -->
 
 #### `new WritableStreamDefaultWriter(stream)`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -829,6 +892,7 @@ Creates a new `WritableStreamDefaultWriter` that is locked to the given
 `WritableStream`.
 
 #### `writableStreamDefaultWriter.abort([reason])`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -840,6 +904,7 @@ Abruptly terminates the `WritableStream`. All queued writes will be
 canceled with their associated promises rejected.
 
 #### `writableStreamDefaultWriter.close()`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -849,15 +914,17 @@ added: v16.5.0
 Closes the `WritableStream` when no additional writes are expected.
 
 #### `writableStreamDefaultWriter.closed`
+
 <!-- YAML
 added: v16.5.0
 -->
 
-* Type: A promise that is fulfilled with `undefined` when the
-  associated {WritableStream} is closed or this writer's lock is
-  released.
+* Type: {Promise} Fulfilled with `undefined` when the associated
+  {WritableStream} is closed or rejected if the stream errors or the writer's
+  lock is released before the stream finishes closing.
 
 #### `writableStreamDefaultWriter.desiredSize`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -867,6 +934,7 @@ added: v16.5.0
 The amount of data required to fill the {WritableStream}'s queue.
 
 #### `writableStreamDefaultWriter.ready`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -875,6 +943,7 @@ added: v16.5.0
   writer is ready to be used.
 
 #### `writableStreamDefaultWriter.releaseLock()`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -882,6 +951,7 @@ added: v16.5.0
 Releases this writer's lock on the underlying {ReadableStream}.
 
 #### `writableStreamDefaultWriter.write([chunk])`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -892,8 +962,13 @@ added: v16.5.0
 Appends a new chunk of data to the {WritableStream}'s queue.
 
 ### Class: `WritableStreamDefaultController`
+
 <!-- YAML
 added: v16.5.0
+changes:
+  - version: v18.0.0
+    pr-url: https://github.com/nodejs/node/pull/42225
+    description: This class is now exposed on the global object.
 -->
 
 The `WritableStreamDefaultController` manage's the {WritableStream}'s
@@ -904,6 +979,7 @@ internal state.
 * Type: {any} The `reason` value passed to `writableStream.abort()`.
 
 #### `writableStreamDefaultController.error(error)`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -920,8 +996,13 @@ with currently pending writes canceled.
   write or close operations when a {WritableStream} is aborted.
 
 ### Class: `TransformStream`
+
 <!-- YAML
 added: v16.5.0
+changes:
+  - version: v18.0.0
+    pr-url: https://github.com/nodejs/node/pull/42225
+    description: This class is now exposed on the global object.
 -->
 
 A `TransformStream` consists of a {ReadableStream} and a {WritableStream} that
@@ -947,6 +1028,7 @@ await Promise.all([
 ```
 
 #### `new TransformStream([transformer[, writableStrategy[, readableStrategy]]])`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -968,9 +1050,9 @@ added: v16.5.0
     * `controller` {TransformStreamDefaultController}
     * Returns: A promise fulfilled with `undefined`.
   * `readableType` {any} the `readableType` option is reserved for future use
-    and *must* be `undefined.
+    and _must_ be `undefined`.
   * `writableType` {any} the `writableType` option is reserved for future use
-    and *must* be `undefined.
+    and _must_ be `undefined`.
 * `writableStrategy` {Object}
   * `highWaterMark` {number} The maximum internal queue size before backpressure
     is applied.
@@ -987,6 +1069,7 @@ added: v16.5.0
     * Returns: {number}
 
 #### `transformStream.readable`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -994,6 +1077,7 @@ added: v16.5.0
 * Type: {ReadableStream}
 
 #### `transformStream.writable`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -1018,14 +1102,20 @@ port2.postMessage(stream, [stream]);
 ```
 
 ### Class: `TransformStreamDefaultController`
+
 <!-- YAML
 added: v16.5.0
+changes:
+  - version: v18.0.0
+    pr-url: https://github.com/nodejs/node/pull/42225
+    description: This class is now exposed on the global object.
 -->
 
 The `TransformStreamDefaultController` manages the internal state
 of the `TransformStream`.
 
 #### `transformStreamDefaultController.desiredSize`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -1035,6 +1125,7 @@ added: v16.5.0
 The amount of data required to fill the readable side's queue.
 
 #### `transformStreamDefaultController.enqueue([chunk])`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -1044,6 +1135,7 @@ added: v16.5.0
 Appends a chunk of data to the readable side's queue.
 
 #### `transformStreamDefaultController.error([reason])`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -1055,6 +1147,7 @@ while processing the transform data, causing both sides to be abruptly
 closed.
 
 #### `transformStreamDefaultController.terminate()`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -1063,11 +1156,17 @@ Closes the readable side of the transport and causes the writable side
 to be abruptly closed with an error.
 
 ### Class: `ByteLengthQueuingStrategy`
+
 <!-- YAML
 added: v16.5.0
+changes:
+  - version: v18.0.0
+    pr-url: https://github.com/nodejs/node/pull/42225
+    description: This class is now exposed on the global object.
 -->
 
 #### `new ByteLengthQueuingStrategy(options)`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -1076,6 +1175,7 @@ added: v16.5.0
   * `highWaterMark` {number}
 
 #### `byteLengthQueuingStrategy.highWaterMark`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -1083,6 +1183,7 @@ added: v16.5.0
 * Type: {number}
 
 #### `byteLengthQueuingStrategy.size`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -1092,11 +1193,17 @@ added: v16.5.0
   * Returns: {number}
 
 ### Class: `CountQueuingStrategy`
+
 <!-- YAML
 added: v16.5.0
+changes:
+  - version: v18.0.0
+    pr-url: https://github.com/nodejs/node/pull/42225
+    description: This class is now exposed on the global object.
 -->
 
 #### `new CountQueuingStrategy(options)`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -1105,6 +1212,7 @@ added: v16.5.0
   * `highWaterMark` {number}
 
 #### `countQueuingStrategy.highWaterMark`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -1112,6 +1220,7 @@ added: v16.5.0
 * Type: {number}
 
 #### `countQueuingStrategy.size`
+
 <!-- YAML
 added: v16.5.0
 -->
@@ -1121,11 +1230,17 @@ added: v16.5.0
   * Returns: {number}
 
 ### Class: `TextEncoderStream`
+
 <!-- YAML
 added: v16.6.0
+changes:
+  - version: v18.0.0
+    pr-url: https://github.com/nodejs/node/pull/42225
+    description: This class is now exposed on the global object.
 -->
 
 #### `new TextEncoderStream()`
+
 <!-- YAML
 added: v16.6.0
 -->
@@ -1133,6 +1248,7 @@ added: v16.6.0
 Creates a new `TextEncoderStream` instance.
 
 #### `textEncoderStream.encoding`
+
 <!-- YAML
 added: v16.6.0
 -->
@@ -1142,6 +1258,7 @@ added: v16.6.0
 The encoding supported by the `TextEncoderStream` instance.
 
 #### `textEncoderStream.readable`
+
 <!-- YAML
 added: v16.6.0
 -->
@@ -1149,6 +1266,7 @@ added: v16.6.0
 * Type: {ReadableStream}
 
 #### `textEncoderStream.writable`
+
 <!-- YAML
 added: v16.6.0
 -->
@@ -1156,11 +1274,17 @@ added: v16.6.0
 * Type: {WritableStream}
 
 ### Class: `TextDecoderStream`
+
 <!-- YAML
 added: v16.6.0
+changes:
+  - version: v18.0.0
+    pr-url: https://github.com/nodejs/node/pull/42225
+    description: This class is now exposed on the global object.
 -->
 
 #### `new TextDecoderStream([encoding[, options]])`
+
 <!-- YAML
 added: v16.6.0
 -->
@@ -1172,11 +1296,12 @@ added: v16.6.0
   * `ignoreBOM` {boolean} When `true`, the `TextDecoderStream` will include the
     byte order mark in the decoded result. When `false`, the byte order mark
     will be removed from the output. This option is only used when `encoding` is
-    `'utf-8'`, `'utf-16be'` or `'utf-16le'`. **Default:** `false`.
+    `'utf-8'`, `'utf-16be'`, or `'utf-16le'`. **Default:** `false`.
 
 Creates a new `TextDecoderStream` instance.
 
 #### `textDecoderStream.encoding`
+
 <!-- YAML
 added: v16.6.0
 -->
@@ -1186,6 +1311,7 @@ added: v16.6.0
 The encoding supported by the `TextDecoderStream` instance.
 
 #### `textDecoderStream.fatal`
+
 <!-- YAML
 added: v16.6.0
 -->
@@ -1196,6 +1322,7 @@ The value will be `true` if decoding errors result in a `TypeError` being
 thrown.
 
 #### `textDecoderStream.ignoreBOM`
+
 <!-- YAML
 added: v16.6.0
 -->
@@ -1206,6 +1333,7 @@ The value will be `true` if the decoding result will include the byte order
 mark.
 
 #### `textDecoderStream.readable`
+
 <!-- YAML
 added: v16.6.0
 -->
@@ -1213,13 +1341,83 @@ added: v16.6.0
 * Type: {ReadableStream}
 
 #### `textDecoderStream.writable`
+
 <!-- YAML
 added: v16.6.0
 -->
 
 * Type: {WritableStream}
 
+### Class: `CompressionStream`
+
+<!-- YAML
+added: v17.0.0
+changes:
+  - version: v18.0.0
+    pr-url: https://github.com/nodejs/node/pull/42225
+    description: This class is now exposed on the global object.
+-->
+
+#### `new CompressionStream(format)`
+
+<!-- YAML
+added: v17.0.0
+-->
+
+* `format` {string} One of either `'deflate'` or `'gzip'`.
+
+#### `compressionStream.readable`
+
+<!-- YAML
+added: v17.0.0
+-->
+
+* Type: {ReadableStream}
+
+#### `compressionStream.writable`
+
+<!-- YAML
+added: v17.0.0
+-->
+
+* Type: {WritableStream}
+
+### Class: `DecompressionStream`
+
+<!-- YAML
+added: v17.0.0
+changes:
+  - version: v18.0.0
+    pr-url: https://github.com/nodejs/node/pull/42225
+    description: This class is now exposed on the global object.
+-->
+
+#### `new DecompressionStream(format)`
+
+<!-- YAML
+added: v17.0.0
+-->
+
+* `format` {string} One of either `'deflate'` or `'gzip'`.
+
+#### `decompressionStream.readable`
+
+<!-- YAML
+added: v17.0.0
+-->
+
+* Type: {ReadableStream}
+
+#### `decompressionStream.writable`
+
+<!-- YAML
+added: v17.0.0
+-->
+
+* Type: {WritableStream}
+
 ### Utility Consumers
+
 <!-- YAML
 added: v16.7.0
 -->
@@ -1233,6 +1431,7 @@ They are accessed using:
 import {
   arrayBuffer,
   blob,
+  buffer,
   json,
   text,
 } from 'node:stream/consumers';
@@ -1242,12 +1441,14 @@ import {
 const {
   arrayBuffer,
   blob,
+  buffer,
   json,
   text,
-} = require('stream/consumers');
+} = require('node:stream/consumers');
 ```
 
 #### `streamConsumers.arrayBuffer(stream)`
+
 <!-- YAML
 added: v16.7.0
 -->
@@ -1257,6 +1458,7 @@ added: v16.7.0
   contents of the stream.
 
 #### `streamConsumers.blob(stream)`
+
 <!-- YAML
 added: v16.7.0
 -->
@@ -1266,6 +1468,7 @@ added: v16.7.0
   of the stream.
 
 #### `streamConsumers.buffer(stream)`
+
 <!-- YAML
 added: v16.7.0
 -->
@@ -1275,6 +1478,7 @@ added: v16.7.0
   contents of the stream.
 
 #### `streamConsumers.json(stream)`
+
 <!-- YAML
 added: v16.7.0
 -->
@@ -1284,6 +1488,7 @@ added: v16.7.0
   UTF-8 encoded string that is then passed through `JSON.parse()`.
 
 #### `streamConsumers.text(stream)`
+
 <!-- YAML
 added: v16.7.0
 -->

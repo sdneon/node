@@ -55,7 +55,7 @@
           "textRaw": "`stack` {string}",
           "type": "string",
           "name": "stack",
-          "desc": "<p>The <code>error.stack</code> property is a string describing the point in the code at which\nthe <code>Error</code> was instantiated.</p>\n<pre><code class=\"language-console\">Error: Things keep happening!\n   at /home/gbusey/file.js:525:2\n   at Frobnicator.refrobulate (/home/gbusey/business-logic.js:424:21)\n   at Actor.&#x3C;anonymous> (/home/gbusey/actors.js:400:8)\n   at increaseSynergy (/home/gbusey/actors.js:701:6)\n</code></pre>\n<p>The first line is formatted as <code>&#x3C;error class name>: &#x3C;error message></code>, and\nis followed by a series of stack frames (each line beginning with \"at \").\nEach frame describes a call site within the code that lead to the error being\ngenerated. V8 attempts to display a name for each function (by variable name,\nfunction name, or object method name), but occasionally it will not be able to\nfind a suitable name. If V8 cannot determine a name for the function, only\nlocation information will be displayed for that frame. Otherwise, the\ndetermined function name will be displayed with location information appended\nin parentheses.</p>\n<p>Frames are only generated for JavaScript functions. If, for example, execution\nsynchronously passes through a C++ addon function called <code>cheetahify</code> which\nitself calls a JavaScript function, the frame representing the <code>cheetahify</code> call\nwill not be present in the stack traces:</p>\n<pre><code class=\"language-js\">const cheetahify = require('./native-binding.node');\n\nfunction makeFaster() {\n  // `cheetahify()` *synchronously* calls speedy.\n  cheetahify(function speedy() {\n    throw new Error('oh no!');\n  });\n}\n\nmakeFaster();\n// will throw:\n//   /home/gbusey/file.js:6\n//       throw new Error('oh no!');\n//           ^\n//   Error: oh no!\n//       at speedy (/home/gbusey/file.js:6:11)\n//       at makeFaster (/home/gbusey/file.js:5:3)\n//       at Object.&#x3C;anonymous> (/home/gbusey/file.js:10:1)\n//       at Module._compile (module.js:456:26)\n//       at Object.Module._extensions..js (module.js:474:10)\n//       at Module.load (module.js:356:32)\n//       at Function.Module._load (module.js:312:12)\n//       at Function.Module.runMain (module.js:497:10)\n//       at startup (node.js:119:16)\n//       at node.js:906:3\n</code></pre>\n<p>The location information will be one of:</p>\n<ul>\n<li><code>native</code>, if the frame represents a call internal to V8 (as in <code>[].forEach</code>).</li>\n<li><code>plain-filename.js:line:column</code>, if the frame represents a call internal\nto Node.js.</li>\n<li><code>/absolute/path/to/file.js:line:column</code>, if the frame represents a call in\na user program, or its dependencies.</li>\n</ul>\n<p>The string representing the stack trace is lazily generated when the\n<code>error.stack</code> property is <strong>accessed</strong>.</p>\n<p>The number of frames captured by the stack trace is bounded by the smaller of\n<code>Error.stackTraceLimit</code> or the number of available frames on the current event\nloop tick.</p>"
+          "desc": "<p>The <code>error.stack</code> property is a string describing the point in the code at which\nthe <code>Error</code> was instantiated.</p>\n<pre><code class=\"language-console\">Error: Things keep happening!\n   at /home/gbusey/file.js:525:2\n   at Frobnicator.refrobulate (/home/gbusey/business-logic.js:424:21)\n   at Actor.&#x3C;anonymous> (/home/gbusey/actors.js:400:8)\n   at increaseSynergy (/home/gbusey/actors.js:701:6)\n</code></pre>\n<p>The first line is formatted as <code>&#x3C;error class name>: &#x3C;error message></code>, and\nis followed by a series of stack frames (each line beginning with \"at \").\nEach frame describes a call site within the code that lead to the error being\ngenerated. V8 attempts to display a name for each function (by variable name,\nfunction name, or object method name), but occasionally it will not be able to\nfind a suitable name. If V8 cannot determine a name for the function, only\nlocation information will be displayed for that frame. Otherwise, the\ndetermined function name will be displayed with location information appended\nin parentheses.</p>\n<p>Frames are only generated for JavaScript functions. If, for example, execution\nsynchronously passes through a C++ addon function called <code>cheetahify</code> which\nitself calls a JavaScript function, the frame representing the <code>cheetahify</code> call\nwill not be present in the stack traces:</p>\n<pre><code class=\"language-js\">const cheetahify = require('./native-binding.node');\n\nfunction makeFaster() {\n  // `cheetahify()` *synchronously* calls speedy.\n  cheetahify(function speedy() {\n    throw new Error('oh no!');\n  });\n}\n\nmakeFaster();\n// will throw:\n//   /home/gbusey/file.js:6\n//       throw new Error('oh no!');\n//           ^\n//   Error: oh no!\n//       at speedy (/home/gbusey/file.js:6:11)\n//       at makeFaster (/home/gbusey/file.js:5:3)\n//       at Object.&#x3C;anonymous> (/home/gbusey/file.js:10:1)\n//       at Module._compile (module.js:456:26)\n//       at Object.Module._extensions..js (module.js:474:10)\n//       at Module.load (module.js:356:32)\n//       at Function.Module._load (module.js:312:12)\n//       at Function.Module.runMain (module.js:497:10)\n//       at startup (node.js:119:16)\n//       at node.js:906:3\n</code></pre>\n<p>The location information will be one of:</p>\n<ul>\n<li><code>native</code>, if the frame represents a call internal to V8 (as in <code>[].forEach</code>).</li>\n<li><code>plain-filename.js:line:column</code>, if the frame represents a call internal\nto Node.js.</li>\n<li><code>/absolute/path/to/file.js:line:column</code>, if the frame represents a call in\na user program (using CommonJS module system), or its dependencies.</li>\n<li><code>&#x3C;transport-protocol>:///url/to/module/file.mjs:line:column</code>, if the frame\nrepresents a call in a user program (using ES module system), or\nits dependencies.</li>\n</ul>\n<p>The string representing the stack trace is lazily generated when the\n<code>error.stack</code> property is <strong>accessed</strong>.</p>\n<p>The number of frames captured by the stack trace is bounded by the smaller of\n<code>Error.stackTraceLimit</code> or the number of available frames on the current event\nloop tick.</p>"
         }
       ],
       "signatures": [
@@ -81,7 +81,7 @@
       "textRaw": "Class: `RangeError`",
       "type": "class",
       "name": "RangeError",
-      "desc": "<ul>\n<li>Extends: <a href=\"errors.html#class-error\" class=\"type\">&lt;errors.Error&gt;</a></li>\n</ul>\n<p>Indicates that a provided argument was not within the set or range of\nacceptable values for a function; whether that is a numeric range, or\noutside the set of options for a given function parameter.</p>\n<pre><code class=\"language-js\">require('net').connect(-1);\n// Throws \"RangeError: \"port\" option should be >= 0 and &#x3C; 65536: -1\"\n</code></pre>\n<p>Node.js will generate and throw <code>RangeError</code> instances <em>immediately</em> as a form\nof argument validation.</p>"
+      "desc": "<ul>\n<li>Extends: <a href=\"errors.html#class-error\" class=\"type\">&lt;errors.Error&gt;</a></li>\n</ul>\n<p>Indicates that a provided argument was not within the set or range of\nacceptable values for a function; whether that is a numeric range, or\noutside the set of options for a given function parameter.</p>\n<pre><code class=\"language-js\">require('node:net').connect(-1);\n// Throws \"RangeError: \"port\" option should be >= 0 and &#x3C; 65536: -1\"\n</code></pre>\n<p>Node.js will generate and throw <code>RangeError</code> instances <em>immediately</em> as a form\nof argument validation.</p>"
     },
     {
       "textRaw": "Class: `ReferenceError`",
@@ -93,7 +93,7 @@
       "textRaw": "Class: `SyntaxError`",
       "type": "class",
       "name": "SyntaxError",
-      "desc": "<ul>\n<li>Extends: <a href=\"errors.html#class-error\" class=\"type\">&lt;errors.Error&gt;</a></li>\n</ul>\n<p>Indicates that a program is not valid JavaScript. These errors may only be\ngenerated and propagated as a result of code evaluation. Code evaluation may\nhappen as a result of <code>eval</code>, <code>Function</code>, <code>require</code>, or <a href=\"vm.html\">vm</a>. These errors\nare almost always indicative of a broken program.</p>\n<pre><code class=\"language-js\">try {\n  require('vm').runInThisContext('binary ! isNotOk');\n} catch (err) {\n  // 'err' will be a SyntaxError.\n}\n</code></pre>\n<p><code>SyntaxError</code> instances are unrecoverable in the context that created them –\nthey may only be caught by other contexts.</p>"
+      "desc": "<ul>\n<li>Extends: <a href=\"errors.html#class-error\" class=\"type\">&lt;errors.Error&gt;</a></li>\n</ul>\n<p>Indicates that a program is not valid JavaScript. These errors may only be\ngenerated and propagated as a result of code evaluation. Code evaluation may\nhappen as a result of <code>eval</code>, <code>Function</code>, <code>require</code>, or <a href=\"vm.html\">vm</a>. These errors\nare almost always indicative of a broken program.</p>\n<pre><code class=\"language-js\">try {\n  require('node:vm').runInThisContext('binary ! isNotOk');\n} catch (err) {\n  // 'err' will be a SyntaxError.\n}\n</code></pre>\n<p><code>SyntaxError</code> instances are unrecoverable in the context that created them –\nthey may only be caught by other contexts.</p>"
     },
     {
       "textRaw": "Class: `SystemError`",
@@ -170,7 +170,7 @@
       "textRaw": "Class: `TypeError`",
       "type": "class",
       "name": "TypeError",
-      "desc": "<ul>\n<li>Extends <a href=\"errors.html#class-error\" class=\"type\">&lt;errors.Error&gt;</a></li>\n</ul>\n<p>Indicates that a provided argument is not an allowable type. For example,\npassing a function to a parameter which expects a string would be a <code>TypeError</code>.</p>\n<pre><code class=\"language-js\">require('url').parse(() => { });\n// Throws TypeError, since it expected a string.\n</code></pre>\n<p>Node.js will generate and throw <code>TypeError</code> instances <em>immediately</em> as a form\nof argument validation.</p>"
+      "desc": "<ul>\n<li>Extends <a href=\"errors.html#class-error\" class=\"type\">&lt;errors.Error&gt;</a></li>\n</ul>\n<p>Indicates that a provided argument is not an allowable type. For example,\npassing a function to a parameter which expects a string would be a <code>TypeError</code>.</p>\n<pre><code class=\"language-js\">require('node:url').parse(() => { });\n// Throws TypeError, since it expected a string.\n</code></pre>\n<p>Node.js will generate and throw <code>TypeError</code> instances <em>immediately</em> as a form\nof argument validation.</p>"
     }
   ],
   "miscs": [
@@ -179,19 +179,19 @@
       "name": "Errors",
       "introduced_in": "v4.0.0",
       "type": "misc",
-      "desc": "<p>Applications running in Node.js will generally experience four categories of\nerrors:</p>\n<ul>\n<li>Standard JavaScript errors such as <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/EvalError\" class=\"type\">&lt;EvalError&gt;</a>, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SyntaxError\" class=\"type\">&lt;SyntaxError&gt;</a>, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RangeError\" class=\"type\">&lt;RangeError&gt;</a>,\n<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ReferenceError\" class=\"type\">&lt;ReferenceError&gt;</a>, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypeError\" class=\"type\">&lt;TypeError&gt;</a>, and <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/URIError\" class=\"type\">&lt;URIError&gt;</a>.</li>\n<li>System errors triggered by underlying operating system constraints such\nas attempting to open a file that does not exist or attempting to send data\nover a closed socket.</li>\n<li>User-specified errors triggered by application code.</li>\n<li><code>AssertionError</code>s are a special class of error that can be triggered when\nNode.js detects an exceptional logic violation that should never occur. These\nare raised typically by the <code>assert</code> module.</li>\n</ul>\n<p>All JavaScript and system errors raised by Node.js inherit from, or are\ninstances of, the standard JavaScript <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error\" class=\"type\">&lt;Error&gt;</a> class and are guaranteed\nto provide <em>at least</em> the properties available on that class.</p>",
+      "desc": "<p>Applications running in Node.js will generally experience four categories of\nerrors:</p>\n<ul>\n<li>Standard JavaScript errors such as <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/EvalError\" class=\"type\">&lt;EvalError&gt;</a>, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SyntaxError\" class=\"type\">&lt;SyntaxError&gt;</a>, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RangeError\" class=\"type\">&lt;RangeError&gt;</a>,\n<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ReferenceError\" class=\"type\">&lt;ReferenceError&gt;</a>, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypeError\" class=\"type\">&lt;TypeError&gt;</a>, and <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/URIError\" class=\"type\">&lt;URIError&gt;</a>.</li>\n<li>System errors triggered by underlying operating system constraints such\nas attempting to open a file that does not exist or attempting to send data\nover a closed socket.</li>\n<li>User-specified errors triggered by application code.</li>\n<li><code>AssertionError</code>s are a special class of error that can be triggered when\nNode.js detects an exceptional logic violation that should never occur. These\nare raised typically by the <code>node:assert</code> module.</li>\n</ul>\n<p>All JavaScript and system errors raised by Node.js inherit from, or are\ninstances of, the standard JavaScript <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error\" class=\"type\">&lt;Error&gt;</a> class and are guaranteed\nto provide <em>at least</em> the properties available on that class.</p>",
       "miscs": [
         {
           "textRaw": "Error propagation and interception",
           "name": "Error propagation and interception",
           "type": "misc",
-          "desc": "<p>Node.js supports several mechanisms for propagating and handling errors that\noccur while an application is running. How these errors are reported and\nhandled depends entirely on the type of <code>Error</code> and the style of the API that is\ncalled.</p>\n<p>All JavaScript errors are handled as exceptions that <em>immediately</em> generate\nand throw an error using the standard JavaScript <code>throw</code> mechanism. These\nare handled using the <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch\"><code>try…catch</code> construct</a> provided by the\nJavaScript language.</p>\n<pre><code class=\"language-js\">// Throws with a ReferenceError because z is not defined.\ntry {\n  const m = 1;\n  const n = m + z;\n} catch (err) {\n  // Handle the error here.\n}\n</code></pre>\n<p>Any use of the JavaScript <code>throw</code> mechanism will raise an exception that\n<em>must</em> be handled using <code>try…catch</code> or the Node.js process will exit\nimmediately.</p>\n<p>With few exceptions, <em>Synchronous</em> APIs (any blocking method that does not\naccept a <code>callback</code> function, such as <a href=\"fs.html#fsreadfilesyncpath-options\"><code>fs.readFileSync</code></a>), will use <code>throw</code>\nto report errors.</p>\n<p>Errors that occur within <em>Asynchronous APIs</em> may be reported in multiple ways:</p>\n<ul>\n<li>Most asynchronous methods that accept a <code>callback</code> function will accept an\n<code>Error</code> object passed as the first argument to that function. If that first\nargument is not <code>null</code> and is an instance of <code>Error</code>, then an error occurred\nthat should be handled.</li>\n</ul>\n<!-- eslint-disable no-useless-return -->\n<pre><code class=\"language-js\">const fs = require('fs');\nfs.readFile('a file that does not exist', (err, data) => {\n  if (err) {\n    console.error('There was an error reading the file!', err);\n    return;\n  }\n  // Otherwise handle the data\n});\n</code></pre>\n<ul>\n<li>\n<p>When an asynchronous method is called on an object that is an\n<a href=\"events.html#class-eventemitter\"><code>EventEmitter</code></a>, errors can be routed to that object's <code>'error'</code> event.</p>\n<pre><code class=\"language-js\">const net = require('net');\nconst connection = net.connect('localhost');\n\n// Adding an 'error' event handler to a stream:\nconnection.on('error', (err) => {\n  // If the connection is reset by the server, or if it can't\n  // connect at all, or on any sort of error encountered by\n  // the connection, the error will be sent here.\n  console.error(err);\n});\n\nconnection.pipe(process.stdout);\n</code></pre>\n</li>\n<li>\n<p>A handful of typically asynchronous methods in the Node.js API may still\nuse the <code>throw</code> mechanism to raise exceptions that must be handled using\n<code>try…catch</code>. There is no comprehensive list of such methods; please\nrefer to the documentation of each method to determine the appropriate\nerror handling mechanism required.</p>\n</li>\n</ul>\n<p>The use of the <code>'error'</code> event mechanism is most common for <a href=\"stream.html\">stream-based</a>\nand <a href=\"events.html#class-eventemitter\">event emitter-based</a> APIs, which themselves represent a series of\nasynchronous operations over time (as opposed to a single operation that may\npass or fail).</p>\n<p>For <em>all</em> <a href=\"events.html#class-eventemitter\"><code>EventEmitter</code></a> objects, if an <code>'error'</code> event handler is not\nprovided, the error will be thrown, causing the Node.js process to report an\nuncaught exception and crash unless either: The <a href=\"domain.html\"><code>domain</code></a> module is\nused appropriately or a handler has been registered for the\n<a href=\"process.html#event-uncaughtexception\"><code>'uncaughtException'</code></a> event.</p>\n<pre><code class=\"language-js\">const EventEmitter = require('events');\nconst ee = new EventEmitter();\n\nsetImmediate(() => {\n  // This will crash the process because no 'error' event\n  // handler has been added.\n  ee.emit('error', new Error('This will crash'));\n});\n</code></pre>\n<p>Errors generated in this way <em>cannot</em> be intercepted using <code>try…catch</code> as\nthey are thrown <em>after</em> the calling code has already exited.</p>\n<p>Developers must refer to the documentation for each method to determine\nexactly how errors raised by those methods are propagated.</p>",
+          "desc": "<p>Node.js supports several mechanisms for propagating and handling errors that\noccur while an application is running. How these errors are reported and\nhandled depends entirely on the type of <code>Error</code> and the style of the API that is\ncalled.</p>\n<p>All JavaScript errors are handled as exceptions that <em>immediately</em> generate\nand throw an error using the standard JavaScript <code>throw</code> mechanism. These\nare handled using the <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch\"><code>try…catch</code> construct</a> provided by the\nJavaScript language.</p>\n<pre><code class=\"language-js\">// Throws with a ReferenceError because z is not defined.\ntry {\n  const m = 1;\n  const n = m + z;\n} catch (err) {\n  // Handle the error here.\n}\n</code></pre>\n<p>Any use of the JavaScript <code>throw</code> mechanism will raise an exception that\n<em>must</em> be handled using <code>try…catch</code> or the Node.js process will exit\nimmediately.</p>\n<p>With few exceptions, <em>Synchronous</em> APIs (any blocking method that does not\naccept a <code>callback</code> function, such as <a href=\"fs.html#fsreadfilesyncpath-options\"><code>fs.readFileSync</code></a>), will use <code>throw</code>\nto report errors.</p>\n<p>Errors that occur within <em>Asynchronous APIs</em> may be reported in multiple ways:</p>\n<ul>\n<li>\n<p>Most asynchronous methods that accept a <code>callback</code> function will accept an\n<code>Error</code> object passed as the first argument to that function. If that first\nargument is not <code>null</code> and is an instance of <code>Error</code>, then an error occurred\nthat should be handled.</p>\n<!-- eslint-disable no-useless-return -->\n<pre><code class=\"language-js\">const fs = require('node:fs');\nfs.readFile('a file that does not exist', (err, data) => {\n  if (err) {\n    console.error('There was an error reading the file!', err);\n    return;\n  }\n  // Otherwise handle the data\n});\n</code></pre>\n</li>\n<li>\n<p>When an asynchronous method is called on an object that is an\n<a href=\"events.html#class-eventemitter\"><code>EventEmitter</code></a>, errors can be routed to that object's <code>'error'</code> event.</p>\n<pre><code class=\"language-js\">const net = require('node:net');\nconst connection = net.connect('localhost');\n\n// Adding an 'error' event handler to a stream:\nconnection.on('error', (err) => {\n  // If the connection is reset by the server, or if it can't\n  // connect at all, or on any sort of error encountered by\n  // the connection, the error will be sent here.\n  console.error(err);\n});\n\nconnection.pipe(process.stdout);\n</code></pre>\n</li>\n<li>\n<p>A handful of typically asynchronous methods in the Node.js API may still\nuse the <code>throw</code> mechanism to raise exceptions that must be handled using\n<code>try…catch</code>. There is no comprehensive list of such methods; please\nrefer to the documentation of each method to determine the appropriate\nerror handling mechanism required.</p>\n</li>\n</ul>\n<p>The use of the <code>'error'</code> event mechanism is most common for <a href=\"stream.html\">stream-based</a>\nand <a href=\"events.html#class-eventemitter\">event emitter-based</a> APIs, which themselves represent a series of\nasynchronous operations over time (as opposed to a single operation that may\npass or fail).</p>\n<p>For <em>all</em> <a href=\"events.html#class-eventemitter\"><code>EventEmitter</code></a> objects, if an <code>'error'</code> event handler is not\nprovided, the error will be thrown, causing the Node.js process to report an\nuncaught exception and crash unless either: The <a href=\"domain.html\"><code>domain</code></a> module is\nused appropriately or a handler has been registered for the\n<a href=\"process.html#event-uncaughtexception\"><code>'uncaughtException'</code></a> event.</p>\n<pre><code class=\"language-js\">const EventEmitter = require('node:events');\nconst ee = new EventEmitter();\n\nsetImmediate(() => {\n  // This will crash the process because no 'error' event\n  // handler has been added.\n  ee.emit('error', new Error('This will crash'));\n});\n</code></pre>\n<p>Errors generated in this way <em>cannot</em> be intercepted using <code>try…catch</code> as\nthey are thrown <em>after</em> the calling code has already exited.</p>\n<p>Developers must refer to the documentation for each method to determine\nexactly how errors raised by those methods are propagated.</p>",
           "miscs": [
             {
               "textRaw": "Error-first callbacks",
               "name": "Error-first callbacks",
               "type": "misc",
-              "desc": "<p>Most asynchronous methods exposed by the Node.js core API follow an idiomatic\npattern referred to as an <em>error-first callback</em>. With this pattern, a callback\nfunction is passed to the method as an argument. When the operation either\ncompletes or an error is raised, the callback function is called with the\n<code>Error</code> object (if any) passed as the first argument. If no error was raised,\nthe first argument will be passed as <code>null</code>.</p>\n<pre><code class=\"language-js\">const fs = require('fs');\n\nfunction errorFirstCallback(err, data) {\n  if (err) {\n    console.error('There was an error', err);\n    return;\n  }\n  console.log(data);\n}\n\nfs.readFile('/some/file/that/does-not-exist', errorFirstCallback);\nfs.readFile('/some/file/that/does-exist', errorFirstCallback);\n</code></pre>\n<p>The JavaScript <code>try…catch</code> mechanism <strong>cannot</strong> be used to intercept errors\ngenerated by asynchronous APIs. A common mistake for beginners is to try to\nuse <code>throw</code> inside an error-first callback:</p>\n<pre><code class=\"language-js\">// THIS WILL NOT WORK:\nconst fs = require('fs');\n\ntry {\n  fs.readFile('/some/file/that/does-not-exist', (err, data) => {\n    // Mistaken assumption: throwing here...\n    if (err) {\n      throw err;\n    }\n  });\n} catch (err) {\n  // This will not catch the throw!\n  console.error(err);\n}\n</code></pre>\n<p>This will not work because the callback function passed to <code>fs.readFile()</code> is\ncalled asynchronously. By the time the callback has been called, the\nsurrounding code, including the <code>try…catch</code> block, will have already exited.\nThrowing an error inside the callback <strong>can crash the Node.js process</strong> in most\ncases. If <a href=\"domain.html\">domains</a> are enabled, or a handler has been registered with\n<code>process.on('uncaughtException')</code>, such errors can be intercepted.</p>"
+              "desc": "<p>Most asynchronous methods exposed by the Node.js core API follow an idiomatic\npattern referred to as an <em>error-first callback</em>. With this pattern, a callback\nfunction is passed to the method as an argument. When the operation either\ncompletes or an error is raised, the callback function is called with the\n<code>Error</code> object (if any) passed as the first argument. If no error was raised,\nthe first argument will be passed as <code>null</code>.</p>\n<pre><code class=\"language-js\">const fs = require('node:fs');\n\nfunction errorFirstCallback(err, data) {\n  if (err) {\n    console.error('There was an error', err);\n    return;\n  }\n  console.log(data);\n}\n\nfs.readFile('/some/file/that/does-not-exist', errorFirstCallback);\nfs.readFile('/some/file/that/does-exist', errorFirstCallback);\n</code></pre>\n<p>The JavaScript <code>try…catch</code> mechanism <strong>cannot</strong> be used to intercept errors\ngenerated by asynchronous APIs. A common mistake for beginners is to try to\nuse <code>throw</code> inside an error-first callback:</p>\n<pre><code class=\"language-js\">// THIS WILL NOT WORK:\nconst fs = require('node:fs');\n\ntry {\n  fs.readFile('/some/file/that/does-not-exist', (err, data) => {\n    // Mistaken assumption: throwing here...\n    if (err) {\n      throw err;\n    }\n  });\n} catch (err) {\n  // This will not catch the throw!\n  console.error(err);\n}\n</code></pre>\n<p>This will not work because the callback function passed to <code>fs.readFile()</code> is\ncalled asynchronously. By the time the callback has been called, the\nsurrounding code, including the <code>try…catch</code> block, will have already exited.\nThrowing an error inside the callback <strong>can crash the Node.js process</strong> in most\ncases. If <a href=\"domain.html\">domains</a> are enabled, or a handler has been registered with\n<code>process.on('uncaughtException')</code>, such errors can be intercepted.</p>"
             }
           ]
         },
@@ -251,7 +251,7 @@
             {
               "textRaw": "`ERR_AMBIGUOUS_ARGUMENT`",
               "name": "`err_ambiguous_argument`",
-              "desc": "<p>A function argument is being used in a way that suggests that the function\nsignature may be misunderstood. This is thrown by the <code>assert</code> module when the\n<code>message</code> parameter in <code>assert.throws(block, message)</code> matches the error message\nthrown by <code>block</code> because that usage suggests that the user believes <code>message</code>\nis the expected message rather than the message the <code>AssertionError</code> will\ndisplay if <code>block</code> does not throw.</p>\n<p><a id=\"ERR_ARG_NOT_ITERABLE\"></a></p>",
+              "desc": "<p>A function argument is being used in a way that suggests that the function\nsignature may be misunderstood. This is thrown by the <code>node:assert</code> module when\nthe <code>message</code> parameter in <code>assert.throws(block, message)</code> matches the error\nmessage thrown by <code>block</code> because that usage suggests that the user believes\n<code>message</code> is the expected message rather than the message the <code>AssertionError</code>\nwill display if <code>block</code> does not throw.</p>\n<p><a id=\"ERR_ARG_NOT_ITERABLE\"></a></p>",
               "type": "module",
               "displayName": "`ERR_AMBIGUOUS_ARGUMENT`"
             },
@@ -265,7 +265,7 @@
             {
               "textRaw": "`ERR_ASSERTION`",
               "name": "`err_assertion`",
-              "desc": "<p>A special type of error that can be triggered whenever Node.js detects an\nexceptional logic violation that should never occur. These are raised typically\nby the <code>assert</code> module.</p>\n<p><a id=\"ERR_ASYNC_CALLBACK\"></a></p>",
+              "desc": "<p>A special type of error that can be triggered whenever Node.js detects an\nexceptional logic violation that should never occur. These are raised typically\nby the <code>node:assert</code> module.</p>\n<p><a id=\"ERR_ASYNC_CALLBACK\"></a></p>",
               "type": "module",
               "displayName": "`ERR_ASSERTION`"
             },
@@ -349,7 +349,7 @@
             {
               "textRaw": "`ERR_CLOSED_MESSAGE_PORT`",
               "name": "`err_closed_message_port`",
-              "desc": "<!--\nadded: v16.2.0\nchanges:\n  - version: 11.12.0\n    pr-url: https://github.com/nodejs/node/pull/26487\n    description: The error message was removed.\n  - version: v16.2.0\n    pr-url: https://github.com/nodejs/node/pull/38510\n    description: The error message was reintroduced.\n-->\n<p>There was an attempt to use a <code>MessagePort</code> instance in a closed\nstate, usually after <code>.close()</code> has been called.</p>\n<p><a id=\"ERR_CONSOLE_WRITABLE_STREAM\"></a></p>",
+              "desc": "<!--\nadded:\n  - v16.2.0\n  - v14.17.1\nchanges:\n  - version: 11.12.0\n    pr-url: https://github.com/nodejs/node/pull/26487\n    description: The error message was removed.\n  - version:\n      - v16.2.0\n      - v14.17.1\n    pr-url: https://github.com/nodejs/node/pull/38510\n    description: The error message was reintroduced.\n-->\n<p>There was an attempt to use a <code>MessagePort</code> instance in a closed\nstate, usually after <code>.close()</code> has been called.</p>\n<p><a id=\"ERR_CONSOLE_WRITABLE_STREAM\"></a></p>",
               "type": "module",
               "displayName": "`ERR_CLOSED_MESSAGE_PORT`"
             },
@@ -405,14 +405,14 @@
             {
               "textRaw": "`ERR_CRYPTO_ENGINE_UNKNOWN`",
               "name": "`err_crypto_engine_unknown`",
-              "desc": "<p>An invalid crypto engine identifier was passed to\n<a href=\"crypto.html#cryptosetengineengine-flags\"><code>require('crypto').setEngine()</code></a>.</p>\n<p><a id=\"ERR_CRYPTO_FIPS_FORCED\"></a></p>",
+              "desc": "<p>An invalid crypto engine identifier was passed to\n<a href=\"crypto.html#cryptosetengineengine-flags\"><code>require('node:crypto').setEngine()</code></a>.</p>\n<p><a id=\"ERR_CRYPTO_FIPS_FORCED\"></a></p>",
               "type": "module",
               "displayName": "`ERR_CRYPTO_ENGINE_UNKNOWN`"
             },
             {
               "textRaw": "`ERR_CRYPTO_FIPS_FORCED`",
               "name": "`err_crypto_fips_forced`",
-              "desc": "<p>The <a href=\"cli.html#--force-fips\"><code>--force-fips</code></a> command-line argument was used but there was an attempt\nto enable or disable FIPS mode in the <code>crypto</code> module.</p>\n<p><a id=\"ERR_CRYPTO_FIPS_UNAVAILABLE\"></a></p>",
+              "desc": "<p>The <a href=\"cli.html#--force-fips\"><code>--force-fips</code></a> command-line argument was used but there was an attempt\nto enable or disable FIPS mode in the <code>node:crypto</code> module.</p>\n<p><a id=\"ERR_CRYPTO_FIPS_UNAVAILABLE\"></a></p>",
               "type": "module",
               "displayName": "`ERR_CRYPTO_FIPS_FORCED`"
             },
@@ -722,7 +722,8 @@
               "name": "`err_crypto_unsupported_operation`",
               "meta": {
                 "added": [
-                  "v15.0.0"
+                  "v15.0.0",
+                  "v14.18.0"
                 ],
                 "changes": []
               },
@@ -735,7 +736,8 @@
               "name": "`err_debugger_error`",
               "meta": {
                 "added": [
-                  "v16.4.0"
+                  "v16.4.0",
+                  "v14.17.4"
                 ],
                 "changes": []
               },
@@ -748,7 +750,8 @@
               "name": "`err_debugger_startup_error`",
               "meta": {
                 "added": [
-                  "v16.4.0"
+                  "v16.4.0",
+                  "v14.17.4"
                 ],
                 "changes": []
               },
@@ -761,7 +764,8 @@
               "name": "`err_dlopen_disabled`",
               "meta": {
                 "added": [
-                  "v16.10.0"
+                  "v16.10.0",
+                  "v14.19.0"
                 ],
                 "changes": []
               },
@@ -812,14 +816,14 @@
             {
               "textRaw": "`ERR_DOMAIN_CALLBACK_NOT_AVAILABLE`",
               "name": "`err_domain_callback_not_available`",
-              "desc": "<p>The <code>domain</code> module was not usable since it could not establish the required\nerror handling hooks, because\n<a href=\"process.html#processsetuncaughtexceptioncapturecallbackfn\"><code>process.setUncaughtExceptionCaptureCallback()</code></a> had been called at an\nearlier point in time.</p>\n<p><a id=\"ERR_DOMAIN_CANNOT_SET_UNCAUGHT_EXCEPTION_CAPTURE\"></a></p>",
+              "desc": "<p>The <code>node:domain</code> module was not usable since it could not establish the\nrequired error handling hooks, because\n<a href=\"process.html#processsetuncaughtexceptioncapturecallbackfn\"><code>process.setUncaughtExceptionCaptureCallback()</code></a> had been called at an\nearlier point in time.</p>\n<p><a id=\"ERR_DOMAIN_CANNOT_SET_UNCAUGHT_EXCEPTION_CAPTURE\"></a></p>",
               "type": "module",
               "displayName": "`ERR_DOMAIN_CALLBACK_NOT_AVAILABLE`"
             },
             {
               "textRaw": "`ERR_DOMAIN_CANNOT_SET_UNCAUGHT_EXCEPTION_CAPTURE`",
               "name": "`err_domain_cannot_set_uncaught_exception_capture`",
-              "desc": "<p><a href=\"process.html#processsetuncaughtexceptioncapturecallbackfn\"><code>process.setUncaughtExceptionCaptureCallback()</code></a> could not be called\nbecause the <code>domain</code> module has been loaded at an earlier point in time.</p>\n<p>The stack trace is extended to include the point in time at which the\n<code>domain</code> module had been loaded.</p>\n<p><a id=\"ERR_ENCODING_INVALID_ENCODED_DATA\"></a></p>",
+              "desc": "<p><a href=\"process.html#processsetuncaughtexceptioncapturecallbackfn\"><code>process.setUncaughtExceptionCaptureCallback()</code></a> could not be called\nbecause the <code>node:domain</code> module has been loaded at an earlier point in time.</p>\n<p>The stack trace is extended to include the point in time at which the\n<code>node:domain</code> module had been loaded.</p>\n<p><a id=\"ERR_ENCODING_INVALID_ENCODED_DATA\"></a></p>",
               "type": "module",
               "displayName": "`ERR_DOMAIN_CANNOT_SET_UNCAUGHT_EXCEPTION_CAPTURE`"
             },
@@ -1322,9 +1326,51 @@
             {
               "textRaw": "`ERR_ILLEGAL_CONSTRUCTOR`",
               "name": "`err_illegal_constructor`",
-              "desc": "<p>An attempt was made to construct an object using a non-public constructor.</p>\n<p><a id=\"ERR_INCOMPATIBLE_OPTION_PAIR\"></a></p>",
+              "desc": "<p>An attempt was made to construct an object using a non-public constructor.</p>\n<p><a id=\"ERR_IMPORT_ASSERTION_TYPE_FAILED\"></a></p>",
               "type": "module",
               "displayName": "`ERR_ILLEGAL_CONSTRUCTOR`"
+            },
+            {
+              "textRaw": "`ERR_IMPORT_ASSERTION_TYPE_FAILED`",
+              "name": "`err_import_assertion_type_failed`",
+              "meta": {
+                "added": [
+                  "v17.1.0",
+                  "v16.14.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>An import assertion has failed, preventing the specified module to be imported.</p>\n<p><a id=\"ERR_IMPORT_ASSERTION_TYPE_MISSING\"></a></p>",
+              "type": "module",
+              "displayName": "`ERR_IMPORT_ASSERTION_TYPE_FAILED`"
+            },
+            {
+              "textRaw": "`ERR_IMPORT_ASSERTION_TYPE_MISSING`",
+              "name": "`err_import_assertion_type_missing`",
+              "meta": {
+                "added": [
+                  "v17.1.0",
+                  "v16.14.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>An import assertion is missing, preventing the specified module to be imported.</p>\n<p><a id=\"ERR_IMPORT_ASSERTION_TYPE_UNSUPPORTED\"></a></p>",
+              "type": "module",
+              "displayName": "`ERR_IMPORT_ASSERTION_TYPE_MISSING`"
+            },
+            {
+              "textRaw": "`ERR_IMPORT_ASSERTION_TYPE_UNSUPPORTED`",
+              "name": "`err_import_assertion_type_unsupported`",
+              "meta": {
+                "added": [
+                  "v17.1.0",
+                  "v16.14.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>An import assertion is not supported by this version of Node.js.</p>\n<p><a id=\"ERR_INCOMPATIBLE_OPTION_PAIR\"></a></p>",
+              "type": "module",
+              "displayName": "`ERR_IMPORT_ASSERTION_TYPE_UNSUPPORTED`"
             },
             {
               "textRaw": "`ERR_INCOMPATIBLE_OPTION_PAIR`",
@@ -1338,35 +1384,35 @@
               "name": "`err_input_type_not_allowed`",
               "stability": 1,
               "stabilityText": "Experimental",
-              "desc": "<p>The <code>--input-type</code> flag was used to attempt to execute a file. This flag can\nonly be used with input via <code>--eval</code>, <code>--print</code> or <code>STDIN</code>.</p>\n<p><a id=\"ERR_INSPECTOR_ALREADY_ACTIVATED\"></a></p>",
+              "desc": "<p>The <code>--input-type</code> flag was used to attempt to execute a file. This flag can\nonly be used with input via <code>--eval</code>, <code>--print</code>, or <code>STDIN</code>.</p>\n<p><a id=\"ERR_INSPECTOR_ALREADY_ACTIVATED\"></a></p>",
               "type": "module",
               "displayName": "`ERR_INPUT_TYPE_NOT_ALLOWED`"
             },
             {
               "textRaw": "`ERR_INSPECTOR_ALREADY_ACTIVATED`",
               "name": "`err_inspector_already_activated`",
-              "desc": "<p>While using the <code>inspector</code> module, an attempt was made to activate the\ninspector when it already started to listen on a port. Use <code>inspector.close()</code>\nbefore activating it on a different address.</p>\n<p><a id=\"ERR_INSPECTOR_ALREADY_CONNECTED\"></a></p>",
+              "desc": "<p>While using the <code>node:inspector</code> module, an attempt was made to activate the\ninspector when it already started to listen on a port. Use <code>inspector.close()</code>\nbefore activating it on a different address.</p>\n<p><a id=\"ERR_INSPECTOR_ALREADY_CONNECTED\"></a></p>",
               "type": "module",
               "displayName": "`ERR_INSPECTOR_ALREADY_ACTIVATED`"
             },
             {
               "textRaw": "`ERR_INSPECTOR_ALREADY_CONNECTED`",
               "name": "`err_inspector_already_connected`",
-              "desc": "<p>While using the <code>inspector</code> module, an attempt was made to connect when the\ninspector was already connected.</p>\n<p><a id=\"ERR_INSPECTOR_CLOSED\"></a></p>",
+              "desc": "<p>While using the <code>node:inspector</code> module, an attempt was made to connect when the\ninspector was already connected.</p>\n<p><a id=\"ERR_INSPECTOR_CLOSED\"></a></p>",
               "type": "module",
               "displayName": "`ERR_INSPECTOR_ALREADY_CONNECTED`"
             },
             {
               "textRaw": "`ERR_INSPECTOR_CLOSED`",
               "name": "`err_inspector_closed`",
-              "desc": "<p>While using the <code>inspector</code> module, an attempt was made to use the inspector\nafter the session had already closed.</p>\n<p><a id=\"ERR_INSPECTOR_COMMAND\"></a></p>",
+              "desc": "<p>While using the <code>node:inspector</code> module, an attempt was made to use the\ninspector after the session had already closed.</p>\n<p><a id=\"ERR_INSPECTOR_COMMAND\"></a></p>",
               "type": "module",
               "displayName": "`ERR_INSPECTOR_CLOSED`"
             },
             {
               "textRaw": "`ERR_INSPECTOR_COMMAND`",
               "name": "`err_inspector_command`",
-              "desc": "<p>An error occurred while issuing a command via the <code>inspector</code> module.</p>\n<p><a id=\"ERR_INSPECTOR_NOT_ACTIVE\"></a></p>",
+              "desc": "<p>An error occurred while issuing a command via the <code>node:inspector</code> module.</p>\n<p><a id=\"ERR_INSPECTOR_NOT_ACTIVE\"></a></p>",
               "type": "module",
               "displayName": "`ERR_INSPECTOR_COMMAND`"
             },
@@ -1380,14 +1426,14 @@
             {
               "textRaw": "`ERR_INSPECTOR_NOT_AVAILABLE`",
               "name": "`err_inspector_not_available`",
-              "desc": "<p>The <code>inspector</code> module is not available for use.</p>\n<p><a id=\"ERR_INSPECTOR_NOT_CONNECTED\"></a></p>",
+              "desc": "<p>The <code>node:inspector</code> module is not available for use.</p>\n<p><a id=\"ERR_INSPECTOR_NOT_CONNECTED\"></a></p>",
               "type": "module",
               "displayName": "`ERR_INSPECTOR_NOT_AVAILABLE`"
             },
             {
               "textRaw": "`ERR_INSPECTOR_NOT_CONNECTED`",
               "name": "`err_inspector_not_connected`",
-              "desc": "<p>While using the <code>inspector</code> module, an attempt was made to use the inspector\nbefore it was connected.</p>\n<p><a id=\"ERR_INSPECTOR_NOT_WORKER\"></a></p>",
+              "desc": "<p>While using the <code>node:inspector</code> module, an attempt was made to use the\ninspector before it was connected.</p>\n<p><a id=\"ERR_INSPECTOR_NOT_WORKER\"></a></p>",
               "type": "module",
               "displayName": "`ERR_INSPECTOR_NOT_CONNECTED`"
             },
@@ -1436,16 +1482,9 @@
             {
               "textRaw": "`ERR_INVALID_BUFFER_SIZE`",
               "name": "`err_invalid_buffer_size`",
-              "desc": "<p>A swap was performed on a <code>Buffer</code> but its size was not compatible with the\noperation.</p>\n<p><a id=\"ERR_INVALID_CALLBACK\"></a></p>",
+              "desc": "<p>A swap was performed on a <code>Buffer</code> but its size was not compatible with the\noperation.</p>\n<p><a id=\"ERR_INVALID_CHAR\"></a></p>",
               "type": "module",
               "displayName": "`ERR_INVALID_BUFFER_SIZE`"
-            },
-            {
-              "textRaw": "`ERR_INVALID_CALLBACK`",
-              "name": "`err_invalid_callback`",
-              "desc": "<p>A callback function was required but was not been provided to a Node.js API.</p>\n<p><a id=\"ERR_INVALID_CHAR\"></a></p>",
-              "type": "module",
-              "displayName": "`ERR_INVALID_CALLBACK`"
             },
             {
               "textRaw": "`ERR_INVALID_CHAR`",
@@ -1515,7 +1554,8 @@
               "name": "`err_invalid_module`",
               "meta": {
                 "added": [
-                  "v15.0.0"
+                  "v15.0.0",
+                  "v14.18.0"
                 ],
                 "changes": []
               },
@@ -1526,9 +1566,16 @@
             {
               "textRaw": "`ERR_INVALID_MODULE_SPECIFIER`",
               "name": "`err_invalid_module_specifier`",
-              "desc": "<p>The imported module string is an invalid URL, package name, or package subpath\nspecifier.</p>\n<p><a id=\"ERR_INVALID_PACKAGE_CONFIG\"></a></p>",
+              "desc": "<p>The imported module string is an invalid URL, package name, or package subpath\nspecifier.</p>\n<p><a id=\"ERR_INVALID_OBJECT_DEFINE_PROPERTY\"></a></p>",
               "type": "module",
               "displayName": "`ERR_INVALID_MODULE_SPECIFIER`"
+            },
+            {
+              "textRaw": "`ERR_INVALID_OBJECT_DEFINE_PROPERTY`",
+              "name": "`err_invalid_object_define_property`",
+              "desc": "<p>An error occurred while setting an invalid attribute on the property of\nan object.</p>\n<p><a id=\"ERR_INVALID_PACKAGE_CONFIG\"></a></p>",
+              "type": "module",
+              "displayName": "`ERR_INVALID_OBJECT_DEFINE_PROPERTY`"
             },
             {
               "textRaw": "`ERR_INVALID_PACKAGE_CONFIG`",
@@ -1609,7 +1656,7 @@
             {
               "textRaw": "`ERR_INVALID_SYNC_FORK_INPUT`",
               "name": "`err_invalid_sync_fork_input`",
-              "desc": "<p>A <code>Buffer</code>, <code>TypedArray</code>, <code>DataView</code> or <code>string</code> was provided as stdio input to\nan asynchronous fork. See the documentation for the <a href=\"child_process.html\"><code>child_process</code></a> module\nfor more information.</p>\n<p><a id=\"ERR_INVALID_THIS\"></a></p>",
+              "desc": "<p>A <code>Buffer</code>, <code>TypedArray</code>, <code>DataView</code>, or <code>string</code> was provided as stdio input to\nan asynchronous fork. See the documentation for the <a href=\"child_process.html\"><code>child_process</code></a> module\nfor more information.</p>\n<p><a id=\"ERR_INVALID_THIS\"></a></p>",
               "type": "module",
               "displayName": "`ERR_INVALID_SYNC_FORK_INPUT`"
             },
@@ -1644,7 +1691,7 @@
             {
               "textRaw": "`ERR_INVALID_URL`",
               "name": "`err_invalid_url`",
-              "desc": "<p>An invalid URL was passed to the <a href=\"url.html#the-whatwg-url-api\">WHATWG</a>\n<a href=\"url.html#new-urlinput-base\"><code>URL</code> constructor</a> to be parsed. The thrown error object\ntypically has an additional property <code>'input'</code> that contains the URL that failed\nto parse.</p>\n<p><a id=\"ERR_INVALID_URL_SCHEME\"></a></p>",
+              "desc": "<p>An invalid URL was passed to the <a href=\"url.html#the-whatwg-url-api\">WHATWG</a> <a href=\"url.html#new-urlinput-base\"><code>URL</code>\nconstructor</a> or the legacy <a href=\"url.html#urlparseurlstring-parsequerystring-slashesdenotehost\"><code>url.parse()</code></a> to be parsed.\nThe thrown error object typically has an additional property <code>'input'</code> that\ncontains the URL that failed to parse.</p>\n<p><a id=\"ERR_INVALID_URL_SCHEME\"></a></p>",
               "type": "module",
               "displayName": "`ERR_INVALID_URL`"
             },
@@ -1811,9 +1858,7 @@
             {
               "textRaw": "`ERR_MODULE_NOT_FOUND`",
               "name": "`err_module_not_found`",
-              "stability": 1,
-              "stabilityText": "Experimental",
-              "desc": "<p>An <a href=\"esm.html\">ES Module</a> could not be resolved.</p>\n<p><a id=\"ERR_MULTIPLE_CALLBACK\"></a></p>",
+              "desc": "<p>A module file could not be resolved by the ECMAScript modules loader while\nattempting an <code>import</code> operation or when loading the program entry point.</p>\n<p><a id=\"ERR_MULTIPLE_CALLBACK\"></a></p>",
               "type": "module",
               "displayName": "`ERR_MODULE_NOT_FOUND`"
             },
@@ -1918,9 +1963,48 @@
             {
               "textRaw": "`ERR_PACKAGE_PATH_NOT_EXPORTED`",
               "name": "`err_package_path_not_exported`",
-              "desc": "<p>The <code>package.json</code> <a href=\"packages.html#exports\"><code>\"exports\"</code></a> field does not export the requested subpath.\nBecause exports are encapsulated, private internal modules that are not exported\ncannot be imported through the package resolution, unless using an absolute URL.</p>\n<p><a id=\"ERR_PERFORMANCE_INVALID_TIMESTAMP\"></a></p>",
+              "desc": "<p>The <code>package.json</code> <a href=\"packages.html#exports\"><code>\"exports\"</code></a> field does not export the requested subpath.\nBecause exports are encapsulated, private internal modules that are not exported\ncannot be imported through the package resolution, unless using an absolute URL.</p>\n<p><a id=\"ERR_PARSE_ARGS_INVALID_OPTION_VALUE\"></a></p>",
               "type": "module",
               "displayName": "`ERR_PACKAGE_PATH_NOT_EXPORTED`"
+            },
+            {
+              "textRaw": "`ERR_PARSE_ARGS_INVALID_OPTION_VALUE`",
+              "name": "`err_parse_args_invalid_option_value`",
+              "meta": {
+                "added": [
+                  "v18.3.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>When <code>strict</code> set to <code>true</code>, thrown by <a href=\"util.html#utilparseargsconfig\"><code>util.parseArgs()</code></a> if a <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type\" class=\"type\">&lt;boolean&gt;</a>\nvalue is provided for an option of type <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a>, or if a <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a>\nvalue is provided for an option of type <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type\" class=\"type\">&lt;boolean&gt;</a>.</p>\n<p><a id=\"ERR_PARSE_ARGS_UNEXPECTED_POSITIONAL\"></a></p>",
+              "type": "module",
+              "displayName": "`ERR_PARSE_ARGS_INVALID_OPTION_VALUE`"
+            },
+            {
+              "textRaw": "`ERR_PARSE_ARGS_UNEXPECTED_POSITIONAL`",
+              "name": "`err_parse_args_unexpected_positional`",
+              "meta": {
+                "added": [
+                  "v18.3.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>Thrown by <a href=\"util.html#utilparseargsconfig\"><code>util.parseArgs()</code></a>, when a postional argument is provided and\n<code>allowPositionals</code> is set to <code>false</code>.</p>\n<p><a id=\"ERR_PARSE_ARGS_UNKNOWN_OPTION\"></a></p>",
+              "type": "module",
+              "displayName": "`ERR_PARSE_ARGS_UNEXPECTED_POSITIONAL`"
+            },
+            {
+              "textRaw": "`ERR_PARSE_ARGS_UNKNOWN_OPTION`",
+              "name": "`err_parse_args_unknown_option`",
+              "meta": {
+                "added": [
+                  "v18.3.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>When <code>strict</code> set to <code>true</code>, thrown by <a href=\"util.html#utilparseargsconfig\"><code>util.parseArgs()</code></a> if an argument\nis not configured in <code>options</code>.</p>\n<p><a id=\"ERR_PERFORMANCE_INVALID_TIMESTAMP\"></a></p>",
+              "type": "module",
+              "displayName": "`ERR_PARSE_ARGS_UNKNOWN_OPTION`"
             },
             {
               "textRaw": "`ERR_PERFORMANCE_INVALID_TIMESTAMP`",
@@ -1955,7 +2039,7 @@
             {
               "textRaw": "`ERR_SCRIPT_EXECUTION_INTERRUPTED`",
               "name": "`err_script_execution_interrupted`",
-              "desc": "<p>Script execution was interrupted by <code>SIGINT</code> (For example,\n<kbd>Ctrl</kbd>+<kbd>C</kbd> was pressed.)</p>\n<p><a id=\"ERR_SCRIPT_EXECUTION_TIMEOUT\"></a></p>",
+              "desc": "<p>Script execution was interrupted by <code>SIGINT</code> (For\nexample, <kbd>Ctrl</kbd>+<kbd>C</kbd> was pressed.)</p>\n<p><a id=\"ERR_SCRIPT_EXECUTION_TIMEOUT\"></a></p>",
               "type": "module",
               "displayName": "`ERR_SCRIPT_EXECUTION_INTERRUPTED`"
             },
@@ -2102,7 +2186,7 @@
             {
               "textRaw": "`ERR_STREAM_WRAP`",
               "name": "`err_stream_wrap`",
-              "desc": "<p>Prevents an abort if a string decoder was set on the Socket or if the decoder\nis in <code>objectMode</code>.</p>\n<pre><code class=\"language-js\">const Socket = require('net').Socket;\nconst instance = new Socket();\n\ninstance.setEncoding('utf8');\n</code></pre>\n<p><a id=\"ERR_STREAM_WRITE_AFTER_END\"></a></p>",
+              "desc": "<p>Prevents an abort if a string decoder was set on the Socket or if the decoder\nis in <code>objectMode</code>.</p>\n<pre><code class=\"language-js\">const Socket = require('node:net').Socket;\nconst instance = new Socket();\n\ninstance.setEncoding('utf8');\n</code></pre>\n<p><a id=\"ERR_STREAM_WRITE_AFTER_END\"></a></p>",
               "type": "module",
               "displayName": "`ERR_STREAM_WRAP`"
             },
@@ -2130,9 +2214,23 @@
             {
               "textRaw": "`ERR_SYSTEM_ERROR`",
               "name": "`err_system_error`",
-              "desc": "<p>An unspecified or non-specific system error has occurred within the Node.js\nprocess. The error object will have an <code>err.info</code> object property with\nadditional details.</p>\n<p><a id=\"ERR_TLS_CERT_ALTNAME_INVALID\"></a></p>",
+              "desc": "<p>An unspecified or non-specific system error has occurred within the Node.js\nprocess. The error object will have an <code>err.info</code> object property with\nadditional details.</p>\n<p><a id=\"ERR_TEST_FAILURE\"></a></p>",
               "type": "module",
               "displayName": "`ERR_SYSTEM_ERROR`"
+            },
+            {
+              "textRaw": "`ERR_TEST_FAILURE`",
+              "name": "`err_test_failure`",
+              "desc": "<p>This error represents a failed test. Additional information about the failure\nis available via the <code>cause</code> property. The <code>failureType</code> property specifies\nwhat the test was doing when the failure occurred.</p>\n<p><a id=\"ERR_TLS_CERT_ALTNAME_FORMAT\"></a></p>",
+              "type": "module",
+              "displayName": "`ERR_TEST_FAILURE`"
+            },
+            {
+              "textRaw": "`ERR_TLS_CERT_ALTNAME_FORMAT`",
+              "name": "`err_tls_cert_altname_format`",
+              "desc": "<p>This error is thrown by <code>checkServerIdentity</code> if a user-supplied\n<code>subjectaltname</code> property violates encoding rules. Certificate objects produced\nby Node.js itself always comply with encoding rules and will never cause\nthis error.</p>\n<p><a id=\"ERR_TLS_CERT_ALTNAME_INVALID\"></a></p>",
+              "type": "module",
+              "displayName": "`ERR_TLS_CERT_ALTNAME_FORMAT`"
             },
             {
               "textRaw": "`ERR_TLS_CERT_ALTNAME_INVALID`",
@@ -2248,7 +2346,7 @@
             {
               "textRaw": "`ERR_TRACE_EVENTS_UNAVAILABLE`",
               "name": "`err_trace_events_unavailable`",
-              "desc": "<p>The <code>trace_events</code> module could not be loaded because Node.js was compiled with\nthe <code>--without-v8-platform</code> flag.</p>\n<p><a id=\"ERR_TRANSFORM_ALREADY_TRANSFORMING\"></a></p>",
+              "desc": "<p>The <code>node:trace_events</code> module could not be loaded because Node.js was compiled\nwith the <code>--without-v8-platform</code> flag.</p>\n<p><a id=\"ERR_TRANSFORM_ALREADY_TRANSFORMING\"></a></p>",
               "type": "module",
               "displayName": "`ERR_TRACE_EVENTS_UNAVAILABLE`"
             },
@@ -2357,9 +2455,18 @@
             {
               "textRaw": "`ERR_UNSUPPORTED_ESM_URL_SCHEME`",
               "name": "`err_unsupported_esm_url_scheme`",
-              "desc": "<p><code>import</code> with URL schemes other than <code>file</code> and <code>data</code> is unsupported.</p>\n<p><a id=\"ERR_VALID_PERFORMANCE_ENTRY_TYPE\"></a></p>",
+              "desc": "<p><code>import</code> with URL schemes other than <code>file</code> and <code>data</code> is unsupported.</p>\n<p><a id=\"ERR_USE_AFTER_CLOSE\"></a></p>",
               "type": "module",
               "displayName": "`ERR_UNSUPPORTED_ESM_URL_SCHEME`"
+            },
+            {
+              "textRaw": "`ERR_USE_AFTER_CLOSE`",
+              "name": "`err_use_after_close`",
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "desc": "<p>An attempt was made to use something that was already closed.</p>\n<p><a id=\"ERR_VALID_PERFORMANCE_ENTRY_TYPE\"></a></p>",
+              "type": "module",
+              "displayName": "`ERR_USE_AFTER_CLOSE`"
             },
             {
               "textRaw": "`ERR_VALID_PERFORMANCE_ENTRY_TYPE`",
@@ -2399,16 +2506,9 @@
             {
               "textRaw": "`ERR_VM_MODULE_DIFFERENT_CONTEXT`",
               "name": "`err_vm_module_different_context`",
-              "desc": "<p>The module being returned from the linker function is from a different context\nthan the parent module. Linked modules must share the same context.</p>\n<p><a id=\"ERR_VM_MODULE_LINKING_ERRORED\"></a></p>",
+              "desc": "<p>The module being returned from the linker function is from a different context\nthan the parent module. Linked modules must share the same context.</p>\n<p><a id=\"ERR_VM_MODULE_LINK_FAILURE\"></a></p>",
               "type": "module",
               "displayName": "`ERR_VM_MODULE_DIFFERENT_CONTEXT`"
-            },
-            {
-              "textRaw": "`ERR_VM_MODULE_LINKING_ERRORED`",
-              "name": "`err_vm_module_linking_errored`",
-              "desc": "<p>The linker function returned a module for which linking has failed.</p>\n<p><a id=\"ERR_VM_MODULE_LINK_FAILURE\"></a></p>",
-              "type": "module",
-              "displayName": "`ERR_VM_MODULE_LINKING_ERRORED`"
             },
             {
               "textRaw": "`ERR_VM_MODULE_LINK_FAILURE`",
@@ -2441,9 +2541,22 @@
             {
               "textRaw": "`ERR_WASI_NOT_STARTED`",
               "name": "`err_wasi_not_started`",
-              "desc": "<p>The WASI instance has not been started.</p>\n<p><a id=\"ERR_WORKER_INIT_FAILED\"></a></p>",
+              "desc": "<p>The WASI instance has not been started.</p>\n<p><a id=\"ERR_WEBASSEMBLY_RESPONSE\"></a></p>",
               "type": "module",
               "displayName": "`ERR_WASI_NOT_STARTED`"
+            },
+            {
+              "textRaw": "`ERR_WEBASSEMBLY_RESPONSE`",
+              "name": "`err_webassembly_response`",
+              "meta": {
+                "added": [
+                  "v18.1.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>The <code>Response</code> that has been passed to <code>WebAssembly.compileStreaming</code> or to\n<code>WebAssembly.instantiateStreaming</code> is not a valid WebAssembly response.</p>\n<p><a id=\"ERR_WORKER_INIT_FAILED\"></a></p>",
+              "type": "module",
+              "displayName": "`ERR_WEBASSEMBLY_RESPONSE`"
             },
             {
               "textRaw": "`ERR_WORKER_INIT_FAILED`",
@@ -2513,11 +2626,11 @@
                     ],
                     "commit": "186035243fad247e3955f",
                     "pr-url": "https://github.com/nodejs-private/node-private/pull/143",
-                    "description": "Max header size in `http_parser` was set to 8 KB."
+                    "description": "Max header size in `http_parser` was set to 8 KiB."
                   }
                 ]
               },
-              "desc": "<p>Too much HTTP header data was received. In order to protect against malicious or\nmalconfigured clients, if more than 8 KB of HTTP header data is received then\nHTTP parsing will abort without a request or response object being created, and\nan <code>Error</code> with this code will be emitted.</p>\n<p><a id=\"HPE_UNEXPECTED_CONTENT_LENGTH\"></a></p>",
+              "desc": "<p>Too much HTTP header data was received. In order to protect against malicious or\nmalconfigured clients, if more than 8 KiB of HTTP header data is received then\nHTTP parsing will abort without a request or response object being created, and\nan <code>Error</code> with this code will be emitted.</p>\n<p><a id=\"HPE_UNEXPECTED_CONTENT_LENGTH\"></a></p>",
               "type": "module",
               "displayName": "`HPE_HEADER_OVERFLOW`"
             },
@@ -2540,7 +2653,7 @@
                   }
                 ]
               },
-              "desc": "<p>A module file could not be resolved while attempting a <a href=\"modules.html#requireid\"><code>require()</code></a> or\n<code>import</code> operation.</p>",
+              "desc": "<p>A module file could not be resolved by the CommonJS modules loader while\nattempting a <a href=\"modules.html#requireid\"><code>require()</code></a> operation or when loading the program entry point.</p>",
               "type": "module",
               "displayName": "`MODULE_NOT_FOUND`"
             }
@@ -2747,9 +2860,27 @@
                 ],
                 "changes": []
               },
-              "desc": "<p>Used by the <code>Node-API</code> when <code>Constructor.prototype</code> is not an object.</p>\n<p><a id=\"ERR_NO_LONGER_SUPPORTED\"></a></p>",
+              "desc": "<p>Used by the <code>Node-API</code> when <code>Constructor.prototype</code> is not an object.</p>\n<p><a id=\"ERR_NETWORK_IMPORT_BAD_RESPONSE\"></a></p>",
               "type": "module",
               "displayName": "`ERR_NAPI_CONS_PROTOTYPE_OBJECT`"
+            },
+            {
+              "textRaw": "`ERR_NETWORK_IMPORT_BAD_RESPONSE`",
+              "name": "`err_network_import_bad_response`",
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "desc": "<p>Response was received but was invalid when importing a module over the network.</p>\n<p><a id=\"ERR_NETWORK_IMPORT_DISALLOWED\"></a></p>",
+              "type": "module",
+              "displayName": "`ERR_NETWORK_IMPORT_BAD_RESPONSE`"
+            },
+            {
+              "textRaw": "`ERR_NETWORK_IMPORT_DISALLOWED`",
+              "name": "`err_network_import_disallowed`",
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "desc": "<p>A network module attempted to load another module that it is not allowed to\nload. Likely this restriction is for security reasons.</p>\n<p><a id=\"ERR_NO_LONGER_SUPPORTED\"></a></p>",
+              "type": "module",
+              "displayName": "`ERR_NETWORK_IMPORT_DISALLOWED`"
             },
             {
               "textRaw": "`ERR_NO_LONGER_SUPPORTED`",
@@ -2799,7 +2930,7 @@
                 ],
                 "changes": []
               },
-              "desc": "<p>The <code>repl</code> module was unable to parse data from the REPL history file.</p>\n<p><a id=\"ERR_SOCKET_CANNOT_SEND\"></a></p>",
+              "desc": "<p>The <code>node:repl</code> module was unable to parse data from the REPL history file.</p>\n<p><a id=\"ERR_SOCKET_CANNOT_SEND\"></a></p>",
               "type": "module",
               "displayName": "`ERR_PARSE_HISTORY_DATA`"
             },
@@ -2963,9 +3094,25 @@
             {
               "textRaw": "`ERR_VM_MODULE_NOT_LINKED`",
               "name": "`err_vm_module_not_linked`",
-              "desc": "<p>The module must be successfully linked before instantiation.</p>\n<p><a id=\"ERR_WORKER_UNSUPPORTED_EXTENSION\"></a></p>",
+              "desc": "<p>The module must be successfully linked before instantiation.</p>\n<p><a id=\"ERR_VM_MODULE_LINKING_ERRORED\"></a></p>",
               "type": "module",
               "displayName": "`ERR_VM_MODULE_NOT_LINKED`"
+            },
+            {
+              "textRaw": "`ERR_VM_MODULE_LINKING_ERRORED`",
+              "name": "`err_vm_module_linking_errored`",
+              "meta": {
+                "added": [
+                  "v10.0.0"
+                ],
+                "removed": [
+                  "v18.1.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>The linker function returned a module for which linking has failed.</p>\n<p><a id=\"ERR_WORKER_UNSUPPORTED_EXTENSION\"></a></p>",
+              "type": "module",
+              "displayName": "`ERR_VM_MODULE_LINKING_ERRORED`"
             },
             {
               "textRaw": "`ERR_WORKER_UNSUPPORTED_EXTENSION`",
@@ -3070,7 +3217,7 @@
               "textRaw": "`stack` {string}",
               "type": "string",
               "name": "stack",
-              "desc": "<p>The <code>error.stack</code> property is a string describing the point in the code at which\nthe <code>Error</code> was instantiated.</p>\n<pre><code class=\"language-console\">Error: Things keep happening!\n   at /home/gbusey/file.js:525:2\n   at Frobnicator.refrobulate (/home/gbusey/business-logic.js:424:21)\n   at Actor.&#x3C;anonymous> (/home/gbusey/actors.js:400:8)\n   at increaseSynergy (/home/gbusey/actors.js:701:6)\n</code></pre>\n<p>The first line is formatted as <code>&#x3C;error class name>: &#x3C;error message></code>, and\nis followed by a series of stack frames (each line beginning with \"at \").\nEach frame describes a call site within the code that lead to the error being\ngenerated. V8 attempts to display a name for each function (by variable name,\nfunction name, or object method name), but occasionally it will not be able to\nfind a suitable name. If V8 cannot determine a name for the function, only\nlocation information will be displayed for that frame. Otherwise, the\ndetermined function name will be displayed with location information appended\nin parentheses.</p>\n<p>Frames are only generated for JavaScript functions. If, for example, execution\nsynchronously passes through a C++ addon function called <code>cheetahify</code> which\nitself calls a JavaScript function, the frame representing the <code>cheetahify</code> call\nwill not be present in the stack traces:</p>\n<pre><code class=\"language-js\">const cheetahify = require('./native-binding.node');\n\nfunction makeFaster() {\n  // `cheetahify()` *synchronously* calls speedy.\n  cheetahify(function speedy() {\n    throw new Error('oh no!');\n  });\n}\n\nmakeFaster();\n// will throw:\n//   /home/gbusey/file.js:6\n//       throw new Error('oh no!');\n//           ^\n//   Error: oh no!\n//       at speedy (/home/gbusey/file.js:6:11)\n//       at makeFaster (/home/gbusey/file.js:5:3)\n//       at Object.&#x3C;anonymous> (/home/gbusey/file.js:10:1)\n//       at Module._compile (module.js:456:26)\n//       at Object.Module._extensions..js (module.js:474:10)\n//       at Module.load (module.js:356:32)\n//       at Function.Module._load (module.js:312:12)\n//       at Function.Module.runMain (module.js:497:10)\n//       at startup (node.js:119:16)\n//       at node.js:906:3\n</code></pre>\n<p>The location information will be one of:</p>\n<ul>\n<li><code>native</code>, if the frame represents a call internal to V8 (as in <code>[].forEach</code>).</li>\n<li><code>plain-filename.js:line:column</code>, if the frame represents a call internal\nto Node.js.</li>\n<li><code>/absolute/path/to/file.js:line:column</code>, if the frame represents a call in\na user program, or its dependencies.</li>\n</ul>\n<p>The string representing the stack trace is lazily generated when the\n<code>error.stack</code> property is <strong>accessed</strong>.</p>\n<p>The number of frames captured by the stack trace is bounded by the smaller of\n<code>Error.stackTraceLimit</code> or the number of available frames on the current event\nloop tick.</p>"
+              "desc": "<p>The <code>error.stack</code> property is a string describing the point in the code at which\nthe <code>Error</code> was instantiated.</p>\n<pre><code class=\"language-console\">Error: Things keep happening!\n   at /home/gbusey/file.js:525:2\n   at Frobnicator.refrobulate (/home/gbusey/business-logic.js:424:21)\n   at Actor.&#x3C;anonymous> (/home/gbusey/actors.js:400:8)\n   at increaseSynergy (/home/gbusey/actors.js:701:6)\n</code></pre>\n<p>The first line is formatted as <code>&#x3C;error class name>: &#x3C;error message></code>, and\nis followed by a series of stack frames (each line beginning with \"at \").\nEach frame describes a call site within the code that lead to the error being\ngenerated. V8 attempts to display a name for each function (by variable name,\nfunction name, or object method name), but occasionally it will not be able to\nfind a suitable name. If V8 cannot determine a name for the function, only\nlocation information will be displayed for that frame. Otherwise, the\ndetermined function name will be displayed with location information appended\nin parentheses.</p>\n<p>Frames are only generated for JavaScript functions. If, for example, execution\nsynchronously passes through a C++ addon function called <code>cheetahify</code> which\nitself calls a JavaScript function, the frame representing the <code>cheetahify</code> call\nwill not be present in the stack traces:</p>\n<pre><code class=\"language-js\">const cheetahify = require('./native-binding.node');\n\nfunction makeFaster() {\n  // `cheetahify()` *synchronously* calls speedy.\n  cheetahify(function speedy() {\n    throw new Error('oh no!');\n  });\n}\n\nmakeFaster();\n// will throw:\n//   /home/gbusey/file.js:6\n//       throw new Error('oh no!');\n//           ^\n//   Error: oh no!\n//       at speedy (/home/gbusey/file.js:6:11)\n//       at makeFaster (/home/gbusey/file.js:5:3)\n//       at Object.&#x3C;anonymous> (/home/gbusey/file.js:10:1)\n//       at Module._compile (module.js:456:26)\n//       at Object.Module._extensions..js (module.js:474:10)\n//       at Module.load (module.js:356:32)\n//       at Function.Module._load (module.js:312:12)\n//       at Function.Module.runMain (module.js:497:10)\n//       at startup (node.js:119:16)\n//       at node.js:906:3\n</code></pre>\n<p>The location information will be one of:</p>\n<ul>\n<li><code>native</code>, if the frame represents a call internal to V8 (as in <code>[].forEach</code>).</li>\n<li><code>plain-filename.js:line:column</code>, if the frame represents a call internal\nto Node.js.</li>\n<li><code>/absolute/path/to/file.js:line:column</code>, if the frame represents a call in\na user program (using CommonJS module system), or its dependencies.</li>\n<li><code>&#x3C;transport-protocol>:///url/to/module/file.mjs:line:column</code>, if the frame\nrepresents a call in a user program (using ES module system), or\nits dependencies.</li>\n</ul>\n<p>The string representing the stack trace is lazily generated when the\n<code>error.stack</code> property is <strong>accessed</strong>.</p>\n<p>The number of frames captured by the stack trace is bounded by the smaller of\n<code>Error.stackTraceLimit</code> or the number of available frames on the current event\nloop tick.</p>"
             }
           ],
           "signatures": [
@@ -3096,7 +3243,7 @@
           "textRaw": "Class: `RangeError`",
           "type": "class",
           "name": "RangeError",
-          "desc": "<ul>\n<li>Extends: <a href=\"errors.html#class-error\" class=\"type\">&lt;errors.Error&gt;</a></li>\n</ul>\n<p>Indicates that a provided argument was not within the set or range of\nacceptable values for a function; whether that is a numeric range, or\noutside the set of options for a given function parameter.</p>\n<pre><code class=\"language-js\">require('net').connect(-1);\n// Throws \"RangeError: \"port\" option should be >= 0 and &#x3C; 65536: -1\"\n</code></pre>\n<p>Node.js will generate and throw <code>RangeError</code> instances <em>immediately</em> as a form\nof argument validation.</p>"
+          "desc": "<ul>\n<li>Extends: <a href=\"errors.html#class-error\" class=\"type\">&lt;errors.Error&gt;</a></li>\n</ul>\n<p>Indicates that a provided argument was not within the set or range of\nacceptable values for a function; whether that is a numeric range, or\noutside the set of options for a given function parameter.</p>\n<pre><code class=\"language-js\">require('node:net').connect(-1);\n// Throws \"RangeError: \"port\" option should be >= 0 and &#x3C; 65536: -1\"\n</code></pre>\n<p>Node.js will generate and throw <code>RangeError</code> instances <em>immediately</em> as a form\nof argument validation.</p>"
         },
         {
           "textRaw": "Class: `ReferenceError`",
@@ -3108,7 +3255,7 @@
           "textRaw": "Class: `SyntaxError`",
           "type": "class",
           "name": "SyntaxError",
-          "desc": "<ul>\n<li>Extends: <a href=\"errors.html#class-error\" class=\"type\">&lt;errors.Error&gt;</a></li>\n</ul>\n<p>Indicates that a program is not valid JavaScript. These errors may only be\ngenerated and propagated as a result of code evaluation. Code evaluation may\nhappen as a result of <code>eval</code>, <code>Function</code>, <code>require</code>, or <a href=\"vm.html\">vm</a>. These errors\nare almost always indicative of a broken program.</p>\n<pre><code class=\"language-js\">try {\n  require('vm').runInThisContext('binary ! isNotOk');\n} catch (err) {\n  // 'err' will be a SyntaxError.\n}\n</code></pre>\n<p><code>SyntaxError</code> instances are unrecoverable in the context that created them –\nthey may only be caught by other contexts.</p>"
+          "desc": "<ul>\n<li>Extends: <a href=\"errors.html#class-error\" class=\"type\">&lt;errors.Error&gt;</a></li>\n</ul>\n<p>Indicates that a program is not valid JavaScript. These errors may only be\ngenerated and propagated as a result of code evaluation. Code evaluation may\nhappen as a result of <code>eval</code>, <code>Function</code>, <code>require</code>, or <a href=\"vm.html\">vm</a>. These errors\nare almost always indicative of a broken program.</p>\n<pre><code class=\"language-js\">try {\n  require('node:vm').runInThisContext('binary ! isNotOk');\n} catch (err) {\n  // 'err' will be a SyntaxError.\n}\n</code></pre>\n<p><code>SyntaxError</code> instances are unrecoverable in the context that created them –\nthey may only be caught by other contexts.</p>"
         },
         {
           "textRaw": "Class: `SystemError`",
@@ -3185,7 +3332,7 @@
           "textRaw": "Class: `TypeError`",
           "type": "class",
           "name": "TypeError",
-          "desc": "<ul>\n<li>Extends <a href=\"errors.html#class-error\" class=\"type\">&lt;errors.Error&gt;</a></li>\n</ul>\n<p>Indicates that a provided argument is not an allowable type. For example,\npassing a function to a parameter which expects a string would be a <code>TypeError</code>.</p>\n<pre><code class=\"language-js\">require('url').parse(() => { });\n// Throws TypeError, since it expected a string.\n</code></pre>\n<p>Node.js will generate and throw <code>TypeError</code> instances <em>immediately</em> as a form\nof argument validation.</p>"
+          "desc": "<ul>\n<li>Extends <a href=\"errors.html#class-error\" class=\"type\">&lt;errors.Error&gt;</a></li>\n</ul>\n<p>Indicates that a provided argument is not an allowable type. For example,\npassing a function to a parameter which expects a string would be a <code>TypeError</code>.</p>\n<pre><code class=\"language-js\">require('node:url').parse(() => { });\n// Throws TypeError, since it expected a string.\n</code></pre>\n<p>Node.js will generate and throw <code>TypeError</code> instances <em>immediately</em> as a form\nof argument validation.</p>"
         }
       ]
     }

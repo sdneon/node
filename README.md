@@ -5,22 +5,13 @@ This is a *fun* mod of Node.JS that initially embedded a modified version of dco
 
 Thanks to the inspiration from dcodeIO et al =D
 
-Latest: Node.JS+ 18.4.0
+## Version 18.5.0
+Update to Node.JS 18.5.0 baseline.
 
-## Versions
-* 18.4.0: Update to Node.JS 18.4.0 baseline, and TS 4.7.4. It embeds:
-  * DS v1.2.0.
-  * CS v2.7.0.
-  * TS v4.7.4.
-* 17.9.1: Update to D Script 1.2.0. It embeds:
-  * DS v1.2.0.
-    * Allow use of preprocessor directives in #import/#cs/#ts/#include code blocks and ESM modules.
-    * Added #undef.
-  * CS v2.6.1.
-  * TS v4.6.3.
-* 16.12.0: Update to Node.JS 16.12.0 baseline and TypeScript 4.4.4. It embeds:
-  * CS v2.6.1.
-  * TS v4.4.4.
+It embeds:
+* DS v1.2.0.
+* CS v2.7.0.
+* TS v4.7.4.
 * Refer to prior readmes for old changes.
 
 ## Usage

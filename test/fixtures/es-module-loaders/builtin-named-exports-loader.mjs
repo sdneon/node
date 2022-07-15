@@ -13,12 +13,13 @@ export function globalPreload() {
 `;
 }
 
-export function resolve(specifier, context, next) {
-  const def = next(specifier, context);
+export async function resolve(specifier, context, next) {
+  const def = await next(specifier, context);
 
   if (def.url.startsWith('node:')) {
     return {
       url: `custom-${def.url}`,
+      importAssertions: context.importAssertions,
     };
   }
   return def;

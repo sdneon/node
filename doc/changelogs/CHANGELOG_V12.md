@@ -9,6 +9,17 @@
 </tr>
 <tr>
 <td valign="top">
+<a href="#12.22.12">12.22.12</a><br/>
+<a href="#12.22.11">12.22.11</a><br/>
+<a href="#12.22.10">12.22.10</a><br/>
+<a href="#12.22.9">12.22.9</a><br/>
+<a href="#12.22.8">12.22.8</a><br/>
+<a href="#12.22.7">12.22.7</a><br/>
+<a href="#12.22.6">12.22.6</a><br/>
+<a href="#12.22.5">12.22.5</a><br/>
+<a href="#12.22.4">12.22.4</a><br/>
+<a href="#12.22.3">12.22.3</a><br/>
+<a href="#12.22.2">12.22.2</a><br/>
 <a href="#12.22.1">12.22.1</a><br/>
 <a href="#12.22.0">12.22.0</a><br/>
 <a href="#12.21.0">12.21.0</a><br/>
@@ -56,22 +67,330 @@
 </table>
 
 * Other Versions
-  * [16.x](CHANGELOG\_V16.md)
-  * [15.x](CHANGELOG\_V15.md)
-  * [14.x](CHANGELOG\_V14.md)
-  * [13.x](CHANGELOG\_V13.md)
-  * [11.x](CHANGELOG\_V11.md)
-  * [10.x](CHANGELOG\_V10.md)
-  * [9.x](CHANGELOG\_V9.md)
-  * [8.x](CHANGELOG\_V8.md)
-  * [7.x](CHANGELOG\_V7.md)
-  * [6.x](CHANGELOG\_V6.md)
-  * [5.x](CHANGELOG\_V5.md)
-  * [4.x](CHANGELOG\_V4.md)
-  * [0.12.x](CHANGELOG\_V012.md)
-  * [0.10.x](CHANGELOG\_V010.md)
-  * [io.js](CHANGELOG\_IOJS.md)
-  * [Archive](CHANGELOG\_ARCHIVE.md)
+  * [18.x](CHANGELOG_V18.md)
+  * [17.x](CHANGELOG_V17.md)
+  * [16.x](CHANGELOG_V16.md)
+  * [15.x](CHANGELOG_V15.md)
+  * [14.x](CHANGELOG_V14.md)
+  * [13.x](CHANGELOG_V13.md)
+  * [11.x](CHANGELOG_V11.md)
+  * [10.x](CHANGELOG_V10.md)
+  * [9.x](CHANGELOG_V9.md)
+  * [8.x](CHANGELOG_V8.md)
+  * [7.x](CHANGELOG_V7.md)
+  * [6.x](CHANGELOG_V6.md)
+  * [5.x](CHANGELOG_V5.md)
+  * [4.x](CHANGELOG_V4.md)
+  * [0.12.x](CHANGELOG_V012.md)
+  * [0.10.x](CHANGELOG_V010.md)
+  * [io.js](CHANGELOG_IOJS.md)
+  * [Archive](CHANGELOG_ARCHIVE.md)
+
+<a id="12.22.12"></a>
+
+## 2022-04-05, Version 12.22.12 'Erbium' (LTS), @richardlau
+
+### Notable Changes
+
+This is planned to be the final Node.js 12 release. Node.js 12 will
+reach End-of-Life status on 30 April 2022, after which it will no
+receive updates. You are strongly advised to migrate your applications
+to Node.js 16 or 14 (both of which are Long Term Support (LTS) releases)
+to continue to receive future security updates beyond 30 April 2022.
+
+This release fixes a shutdown crash in Node-API (formerly N-API) and a
+potential stack overflow when using `vm.runInNewContext()`.
+
+The list of GPG keys used to sign releases and instructions on how to
+fetch the keys for verifying binaries has been synchronized with the
+main branch.
+
+### Commits
+
+* \[[`1193290f3f`](https://github.com/nodejs/node/commit/1193290f3f)] - **deps**: V8: cherry-pick cc9a8a37445e (devsnek) [#42065](https://github.com/nodejs/node/pull/42065)
+* \[[`333eda8d03`](https://github.com/nodejs/node/commit/333eda8d03)] - **doc**: add a note about possible missing lines to readline.asyncIterator (Igor Mikhalev) [#34675](https://github.com/nodejs/node/pull/34675)
+* \[[`518a49c0c6`](https://github.com/nodejs/node/commit/518a49c0c6)] - **doc**: use openpgp.org for keyserver examples (Nick Schonning) [#39227](https://github.com/nodejs/node/pull/39227)
+* \[[`11aef2ad03`](https://github.com/nodejs/node/commit/11aef2ad03)] - **doc**: update release key for Danielle Adams (Danielle Adams) [#36793](https://github.com/nodejs/node/pull/36793)
+* \[[`a9c38f1003`](https://github.com/nodejs/node/commit/a9c38f1003)] - **doc**: add release key for Danielle Adams (Danielle Adams) [#35545](https://github.com/nodejs/node/pull/35545)
+* \[[`a35f553889`](https://github.com/nodejs/node/commit/a35f553889)] - **doc**: add release key for Bryan English (Bryan English) [#42102](https://github.com/nodejs/node/pull/42102)
+* \[[`5f104e3218`](https://github.com/nodejs/node/commit/5f104e3218)] - **node-api**: cctest on v8impl::Reference (legendecas) [#38970](https://github.com/nodejs/node/pull/38970)
+* \[[`e23c04f0dc`](https://github.com/nodejs/node/commit/e23c04f0dc)] - **node-api**: avoid SecondPassCallback crash (Michael Dawson) [#38899](https://github.com/nodejs/node/pull/38899)
+* \[[`a7224c9559`](https://github.com/nodejs/node/commit/a7224c9559)] - **node-api**: fix shutdown crashes (Michael Dawson) [#38492](https://github.com/nodejs/node/pull/38492)
+* \[[`81b4dc88f1`](https://github.com/nodejs/node/commit/81b4dc88f1)] - **node-api**: make reference weak parameter an indirect link to references (Chengzhong Wu) [#38000](https://github.com/nodejs/node/pull/38000)
+* \[[`2aa9ca1ea9`](https://github.com/nodejs/node/commit/2aa9ca1ea9)] - **node-api**: fix crash in finalization (Michael Dawson) [#37876](https://github.com/nodejs/node/pull/37876)
+* \[[`a2f4206415`](https://github.com/nodejs/node/commit/a2f4206415)] - **node-api**: stop ref gc during environment teardown (Gabriel Schulhof) [#37616](https://github.com/nodejs/node/pull/37616)
+* \[[`171bb66ccc`](https://github.com/nodejs/node/commit/171bb66ccc)] - **node-api**: force env shutdown deferring behavior (Gabriel Schulhof) [#37303](https://github.com/nodejs/node/pull/37303)
+* \[[`e707514c80`](https://github.com/nodejs/node/commit/e707514c80)] - **src**: fix finalization crash (James M Snell) [#38250](https://github.com/nodejs/node/pull/38250)
+
+<a id="12.22.11"></a>
+
+## 2022-03-17, Version 12.22.11 'Erbium' (LTS), @richardlau
+
+This is a security release.
+
+### Notable changes
+
+Update to OpenSSL 1.1.1n, which addresses the following vulnerability:
+
+* Infinite loop in `BN_mod_sqrt()` reachable when parsing certificates (High)(CVE-2022-0778)
+  More details are available at <https://www.openssl.org/news/secadv/20220315.txt>
+
+Fix for building Node.js 12.x with Visual Studio 2019 to allow us to continue to
+run CI tests.
+
+### Commits
+
+* \[[`e3e5bf11ba`](https://github.com/nodejs/node/commit/e3e5bf11ba)] - **build**: pin Windows GitHub runner to windows-2019 (Richard Lau) [#42349](https://github.com/nodejs/node/pull/42349)
+* \[[`f41e7771bf`](https://github.com/nodejs/node/commit/f41e7771bf)] - **build**: fix detection of Visual Studio 2019 (Richard Lau) [#42349](https://github.com/nodejs/node/pull/42349)
+* \[[`c372ec207d`](https://github.com/nodejs/node/commit/c372ec207d)] - **deps**: update archs files for OpenSSL-1.1.n (Richard Lau) [#42348](https://github.com/nodejs/node/pull/42348)
+* \[[`d574a1dccb`](https://github.com/nodejs/node/commit/d574a1dccb)] - **deps**: upgrade openssl sources to 1.1.1n (Richard Lau) [#42348](https://github.com/nodejs/node/pull/42348)
+
+<a id="12.22.10"></a>
+
+## 2022-02-01, Version 12.22.10 'Erbium' (LTS), @ruyadorno
+
+### Notable changes
+
+* Upgrade npm to 6.14.16
+* Updated ICU time zone data
+
+### Commits
+
+* \[[`33899b435d`](https://github.com/nodejs/node/commit/33899b435d)] - **deps**: upgrade npm to 6.14.16 (Ruy Adorno) [#41601](https://github.com/nodejs/node/pull/41601)
+* \[[`d9237c46ca`](https://github.com/nodejs/node/commit/d9237c46ca)] - **tools**: update tzdata to 2021a4 (Albert Wang) [#41443](https://github.com/nodejs/node/pull/41443)
+
+<a id="12.22.9"></a>
+
+## 2022-01-10, Version 12.22.9 'Erbium' (LTS), @richardlau
+
+This is a security release.
+
+### Notable changes
+
+#### Improper handling of URI Subject Alternative Names (Medium)(CVE-2021-44531)
+
+Accepting arbitrary Subject Alternative Name (SAN) types, unless a PKI is specifically defined to use a particular SAN type, can result in bypassing name-constrained intermediates. Node.js was accepting URI SAN types, which PKIs are often not defined to use. Additionally, when a protocol allows URI SANs, Node.js did not match the URI correctly.
+
+Versions of Node.js with the fix for this disable the URI SAN type when checking a certificate against a hostname. This behavior can be reverted through the `--security-revert` command-line option.
+
+More details will be available at [CVE-2021-44531](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-44531) after publication.
+
+#### Certificate Verification Bypass via String Injection (Medium)(CVE-2021-44532)
+
+Node.js converts SANs (Subject Alternative Names) to a string format. It uses this string to check peer certificates against hostnames when validating connections. The string format was subject to an injection vulnerability when name constraints were used within a certificate chain, allowing the bypass of these name constraints.
+
+Versions of Node.js with the fix for this escape SANs containing the problematic characters in order to prevent the injection. This behavior can be reverted through the `--security-revert` command-line option.
+
+More details will be available at [CVE-2021-44532](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-44532) after publication.
+
+#### Incorrect handling of certificate subject and issuer fields (Medium)(CVE-2021-44533)
+
+Node.js did not handle multi-value Relative Distinguished Names correctly. Attackers could craft certificate subjects containing a single-value Relative Distinguished Name that would be interpreted as a multi-value Relative Distinguished Name, for example, in order to inject a Common Name that would allow bypassing the certificate subject verification.
+
+Affected versions of Node.js do not accept multi-value Relative Distinguished Names and are thus not vulnerable to such attacks themselves. However, third-party code that uses node's ambiguous presentation of certificate subjects may be vulnerable.
+
+More details will be available at [CVE-2021-44533](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-44533) after publication.
+
+#### Prototype pollution via `console.table` properties (Low)(CVE-2022-21824)
+
+Due to the formatting logic of the `console.table()` function it was not safe to allow user controlled input to be passed to the `properties` parameter while simultaneously passing a plain object with at least one property as the first parameter, which could be `__proto__`. The prototype pollution has very limited control, in that it only allows an empty string to be assigned numerical keys of the object prototype.
+
+Versions of Node.js with the fix for this use a null protoype for the object these properties are being assigned to.
+
+More details will be available at [CVE-2022-21824](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2022-21824) after publication.
+
+Thanks to Patrik Oldsberg (rugvip) for reporting this vulnerability.
+
+### Commits
+
+* \[[`be69403528`](https://github.com/nodejs/node/commit/be69403528)] - **console**: fix prototype pollution via console.table (Tobias Nießen) [nodejs-private/node-private#307](https://github.com/nodejs-private/node-private/pull/307)
+* \[[`19873abfb2`](https://github.com/nodejs/node/commit/19873abfb2)] - **crypto,tls**: implement safe x509 GeneralName format (Tobias Nießen and Akshay Kumar) [nodejs-private/node-private#300](https://github.com/nodejs-private/node-private/pull/300)
+* \[[`ff9ac7d757`](https://github.com/nodejs/node/commit/ff9ac7d757)] - **doc**: fix date for v12.22.8 (Richard Lau) [#41213](https://github.com/nodejs/node/pull/41213)
+* \[[`a5c7843cab`](https://github.com/nodejs/node/commit/a5c7843cab)] - **src**: add cve reverts and associated tests (Michael Dawson and Akshay Kumar) [nodejs-private/node-private#300](https://github.com/nodejs-private/node-private/pull/300)
+* \[[`d4e5d1b9ca`](https://github.com/nodejs/node/commit/d4e5d1b9ca)] - **src**: remove unused x509 functions (Tobias Nießen and Akshay Kumar) [nodejs-private/node-private#300](https://github.com/nodejs-private/node-private/pull/300)
+* \[[`8c2db2c86b`](https://github.com/nodejs/node/commit/8c2db2c86b)] - **tls**: fix handling of x509 subject and issuer (Tobias Nießen and Akshay Kumar) [nodejs-private/node-private#300](https://github.com/nodejs-private/node-private/pull/300)
+* \[[`e0fe6a635e`](https://github.com/nodejs/node/commit/e0fe6a635e)] - **tls**: drop support for URI alternative names (Tobias Nießen and Akshay Kumar) [nodejs-private/node-private#300](https://github.com/nodejs-private/node-private/pull/300)
+
+<a id="12.22.8"></a>
+
+## 2021-12-16, Version 12.22.8 'Erbium' (LTS), @richardlau
+
+### Notable Changes
+
+This release contains a c-ares update to fix a regression introduced in
+Node.js 12.22.5 resolving CNAME records containing underscores
+[#39780](https://github.com/nodejs/node/issues/39780).
+
+Root certificates have been updated to those from Mozilla's Network
+Security Services 3.71 [#40281](https://github.com/nodejs/node/pull/40280).
+
+### Commits
+
+* \[[`2d42295d2a`](https://github.com/nodejs/node/commit/2d42295d2a)] - **build**: pin macOS GitHub runner to macos-10.15 (Richard Lau) [#41124](https://github.com/nodejs/node/pull/41124)
+* \[[`41e09ec71b`](https://github.com/nodejs/node/commit/41e09ec71b)] - **child\_process**: retain reference to data with advanced serialization (Anna Henningsen) [#38728](https://github.com/nodejs/node/pull/38728)
+* \[[`f0be07796e`](https://github.com/nodejs/node/commit/f0be07796e)] - **crypto**: update root certificates (Richard Lau) [#40280](https://github.com/nodejs/node/pull/40280)
+* \[[`4c9f920d34`](https://github.com/nodejs/node/commit/4c9f920d34)] - **deps**: update archs files for OpenSSL-1.1.1m (Richard Lau) [#41172](https://github.com/nodejs/node/pull/41172)
+* \[[`60d7d4171e`](https://github.com/nodejs/node/commit/60d7d4171e)] - **deps**: upgrade openssl sources to 1.1.1m (Richard Lau) [#41172](https://github.com/nodejs/node/pull/41172)
+* \[[`7feff67419`](https://github.com/nodejs/node/commit/7feff67419)] - **deps**: add -fno-strict-aliasing flag to libuv (Daniel Bevenius) [#40631](https://github.com/nodejs/node/pull/40631)
+* \[[`534ac7c7c6`](https://github.com/nodejs/node/commit/534ac7c7c6)] - **deps**: update c-ares to 1.18.1 (Richard Lau) [#40660](https://github.com/nodejs/node/pull/40660)
+* \[[`c019fa9b70`](https://github.com/nodejs/node/commit/c019fa9b70)] - **deps**: update to cjs-module-lexer\@1.2.2 (Guy Bedford) [#39402](https://github.com/nodejs/node/pull/39402)
+* \[[`b13340eff4`](https://github.com/nodejs/node/commit/b13340eff4)] - **doc**: add alternative version links to the packages page (Filip Skokan) [#36915](https://github.com/nodejs/node/pull/36915)
+* \[[`243b2fbfdb`](https://github.com/nodejs/node/commit/243b2fbfdb)] - **lib**: fix regular expression to detect \`/\` and \`\\\` (Francesco Trotta) [#40325](https://github.com/nodejs/node/pull/40325)
+* \[[`70e094a26b`](https://github.com/nodejs/node/commit/70e094a26b)] - **repl**: fix error message printing (Anna Henningsen) [#38209](https://github.com/nodejs/node/pull/38209)
+* \[[`02b432a704`](https://github.com/nodejs/node/commit/02b432a704)] - **src**: fix crash in AfterGetAddrInfo (Anna Henningsen) [#39735](https://github.com/nodejs/node/pull/39735)
+* \[[`7479447d6a`](https://github.com/nodejs/node/commit/7479447d6a)] - **test**: deflake child-process-pipe-dataflow (Luigi Pinca) [#40838](https://github.com/nodejs/node/pull/40838)
+* \[[`833e199393`](https://github.com/nodejs/node/commit/833e199393)] - **tools**: update certdata.txt (Richard Lau) [#40280](https://github.com/nodejs/node/pull/40280)
+* \[[`e4339fe286`](https://github.com/nodejs/node/commit/e4339fe286)] - **tools**: add script to update c-ares (Richard Lau) [#40660](https://github.com/nodejs/node/pull/40660)
+* \[[`f50b9c1e8a`](https://github.com/nodejs/node/commit/f50b9c1e8a)] - **worker**: avoid potential deadlock on NearHeapLimit (Santiago Gimeno) [#38403](https://github.com/nodejs/node/pull/38403)
+
+<a id="12.22.7"></a>
+
+## 2021-10-12, Version 12.22.7 'Erbium' (LTS), @danielleadams
+
+This is a security release.
+
+### Notable changes
+
+* **CVE-2021-22959**: HTTP Request Smuggling due to spaced in headers (Medium)
+  * The http parser accepts requests with a space (SP) right after the header name before the colon. This can lead to HTTP Request Smuggling (HRS). More details will be available at [CVE-2021-22959](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-22959) after publication.
+* **CVE-2021-22960**: HTTP Request Smuggling when parsing the body (Medium)
+  * The http parser ignores chunk extensions when parsing the body of chunked requests. This leads to HTTP Request Smuggling (HRS) under certain conditions. More details will be available at [CVE-2021-22960](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-22960) after publication.
+
+### Commits
+
+* \[[`21a2e554e3`](https://github.com/nodejs/node/commit/21a2e554e3)] - **deps**: update llhttp to 2.1.4 (Fedor Indutny) [nodejs-private/node-private#286](https://github.com/nodejs-private/node-private/pull/286)
+* \[[`d5d3a03246`](https://github.com/nodejs/node/commit/d5d3a03246)] - **http**: add regression test for smuggling content length (Matteo Collina) [nodejs-private/node-private#286](https://github.com/nodejs-private/node-private/pull/286)
+* \[[`0858587f21`](https://github.com/nodejs/node/commit/0858587f21)] - **http**: add regression test for chunked smuggling (Matteo Collina) [nodejs-private/node-private#286](https://github.com/nodejs-private/node-private/pull/286)
+
+<a id="12.22.6"></a>
+
+## 2021-08-31, Version 12.22.6 'Erbium' (LTS), @MylesBorins
+
+This is a security release.
+
+### Notable Changes
+
+These are vulnerabilities in the node-tar, arborist, and npm cli modules which
+are related to the initial reports and subsequent remediation of node-tar
+vulnerabilities [CVE-2021-32803](https://github.com/advisories/GHSA-r628-mhmh-qjhw)
+and [CVE-2021-32804](https://github.com/advisories/GHSA-3jfq-g458-7qm9).
+Subsequent internal security review of node-tar and additional external bounty
+reports have resulted in another 5 CVE being remediated in core npm CLI
+dependencies including node-tar, and npm arborist.
+
+You can read more about it in:
+
+* [CVE-2021-37701](https://github.com/npm/node-tar/security/advisories/GHSA-9r2w-394v-53qc)
+* [CVE-2021-37712](https://github.com/npm/node-tar/security/advisories/GHSA-qq89-hq3f-393p)
+* [CVE-2021-37713](https://github.com/npm/node-tar/security/advisories/GHSA-5955-9wpr-37jh)
+* [CVE-2021-39134](https://github.com/npm/arborist/security/advisories/GHSA-2h3h-q99f-3fhc)
+* [CVE-2021-39135](https://github.com/npm/arborist/security/advisories/GHSA-gmw6-94gg-2rc2)
+
+### Commits
+
+* \[[`a0154b586b`](https://github.com/nodejs/node/commit/a0154b586b)] - **deps**: update archs files for OpenSSL-1.1.1l (Richard Lau) [#39869](https://github.com/nodejs/node/pull/39869)
+* \[[`7a95637eb7`](https://github.com/nodejs/node/commit/7a95637eb7)] - **deps**: upgrade openssl sources to 1.1.1l (Richard Lau) [#39869](https://github.com/nodejs/node/pull/39869)
+* \[[`840b0ffff6`](https://github.com/nodejs/node/commit/840b0ffff6)] - **deps**: upgrade npm to 6.14.15 (Darcy Clarke) [#39856](https://github.com/nodejs/node/pull/39856)
+
+<a id="12.22.5"></a>
+
+## 2021-08-11, Version 12.22.5 'Erbium' (LTS), @BethGriggs
+
+This is a security release.
+
+### Notable Changes
+
+* **CVE-2021-3672/CVE-2021-22931**: Improper handling of untypical characters in domain names (High)
+  * Node.js was vulnerable to Remote Code Execution, XSS, application crashes due to missing input validation of hostnames returned by Domain Name Servers in the Node.js DNS library which can lead to the output of wrong hostnames (leading to Domain Hijacking) and injection vulnerabilities in applications using the library. You can read more about it at <https://nvd.nist.gov/vuln/detail/CVE-2021-22931>.
+* **CVE-2021-22940**: Use after free on close http2 on stream canceling (High)
+  * Node.js was vulnerable to a use after free attack where an attacker might be able to exploit memory corruption to change process behavior. This release includes a follow-up fix for CVE-2021-22930 as the issue was not completely resolved by the previous fix. You can read more about it at <https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-22940>.
+* **CVE-2021-22939**: Incomplete validation of rejectUnauthorized parameter (Low)
+  * If the Node.js HTTPS API was used incorrectly and "undefined" was in passed for the "rejectUnauthorized" parameter, no error was returned and connections to servers with an expired certificate would have been accepted. You can read more about it at <https://nvd.nist.gov/vuln/detail/CVE-2021-22939>.
+
+### Commits
+
+* \[[`5f947db68c`](https://github.com/nodejs/node/commit/5f947db68c)] - **deps**: update c-ares to 1.17.2 (Beth Griggs) [#39724](https://github.com/nodejs/node/pull/39724)
+* \[[`42695ea34b`](https://github.com/nodejs/node/commit/42695ea34b)] - **deps**: reflect c-ares source tree (Beth Griggs) [#39653](https://github.com/nodejs/node/pull/39653)
+* \[[`e4c9156b32`](https://github.com/nodejs/node/commit/e4c9156b32)] - **deps**: apply missed updates from c-ares 1.17.1 (Beth Griggs) [#39653](https://github.com/nodejs/node/pull/39653)
+* \[[`9cd1f53103`](https://github.com/nodejs/node/commit/9cd1f53103)] - **http2**: add tests for cancel event while client is paused reading (Akshay K) [#39622](https://github.com/nodejs/node/pull/39622)
+* \[[`2008c9722f`](https://github.com/nodejs/node/commit/2008c9722f)] - **http2**: update handling of rst\_stream with error code NGHTTP2\_CANCEL (Akshay K) [#39622](https://github.com/nodejs/node/pull/39622)
+* \[[`1780bbc329`](https://github.com/nodejs/node/commit/1780bbc329)] - **tls**: validate "rejectUnauthorized: undefined" (Matteo Collina) [nodejs-private/node-private#276](https://github.com/nodejs-private/node-private/pull/276)
+
+<a id="12.22.4"></a>
+
+## 2021-07-29, Version 12.22.4 'Erbium' (LTS), @richardlau
+
+This is a security release.
+
+### Notable Changes
+
+* **CVE-2021-22930**: Use after free on close http2 on stream canceling (High)
+  * Node.js is vulnerable to a use after free attack where an attacker might be able to exploit the memory corruption, to change process behavior. You can read more about it in <https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-22930>
+
+### Commits
+
+* \[[`499e56babe`](https://github.com/nodejs/node/commit/499e56babe)] - **build**: fix label-pr workflow (Michaël Zasso) [#38399](https://github.com/nodejs/node/pull/38399)
+* \[[`98ac3c4108`](https://github.com/nodejs/node/commit/98ac3c4108)] - **build**: label PRs with GitHub Action instead of nodejs-github-bot (Phillip Johnsen) [#38301](https://github.com/nodejs/node/pull/38301)
+* \[[`ddc8dde150`](https://github.com/nodejs/node/commit/ddc8dde150)] - **deps**: upgrade npm to 6.14.14 (Darcy Clarke) [#39553](https://github.com/nodejs/node/pull/39553)
+* \[[`e11a862eed`](https://github.com/nodejs/node/commit/e11a862eed)] - **deps**: update to c-ares 1.17.1 (Danny Sonnenschein) [#36207](https://github.com/nodejs/node/pull/36207)
+* \[[`39e9cd540f`](https://github.com/nodejs/node/commit/39e9cd540f)] - **deps**: restore minimum ICU version to 65 (Richard Lau) [#39068](https://github.com/nodejs/node/pull/39068)
+* \[[`e459c79b02`](https://github.com/nodejs/node/commit/e459c79b02)] - **deps**: V8: cherry-pick 035c305ce776 (Michaël Zasso) [#38497](https://github.com/nodejs/node/pull/38497)
+* \[[`b3c698a5d8`](https://github.com/nodejs/node/commit/b3c698a5d8)] - **deps**: update to cjs-module-lexer\@1.2.1 (Guy Bedford) [#38450](https://github.com/nodejs/node/pull/38450)
+* \[[`7d5a2f9588`](https://github.com/nodejs/node/commit/7d5a2f9588)] - **deps**: update to cjs-module-lexer\@1.1.1 (Guy Bedford) [#37992](https://github.com/nodejs/node/pull/37992)
+* \[[`906b43e586`](https://github.com/nodejs/node/commit/906b43e586)] - **deps**: V8: update build dependencies (Michaël Zasso) [#39245](https://github.com/nodejs/node/pull/39245)
+* \[[`15b91fa3fa`](https://github.com/nodejs/node/commit/15b91fa3fa)] - **deps**: V8: backport 895949419186 (Michaël Zasso) [#39245](https://github.com/nodejs/node/pull/39245)
+* \[[`8046daf09f`](https://github.com/nodejs/node/commit/8046daf09f)] - **deps**: V8: cherry-pick 0b3a4ecf7083 (Michaël Zasso) [#39245](https://github.com/nodejs/node/pull/39245)
+* \[[`f4377b13a6`](https://github.com/nodejs/node/commit/f4377b13a6)] - **deps**: V8: cherry-pick 7c182bd65f42 (Michaël Zasso) [#39245](https://github.com/nodejs/node/pull/39245)
+* \[[`add7b5b4c2`](https://github.com/nodejs/node/commit/add7b5b4c2)] - **deps**: V8: cherry-pick cc641f6be756 (Michaël Zasso) [#39245](https://github.com/nodejs/node/pull/39245)
+* \[[`a73275f056`](https://github.com/nodejs/node/commit/a73275f056)] - **deps**: V8: cherry-pick 7b3332844212 (Michaël Zasso) [#39245](https://github.com/nodejs/node/pull/39245)
+* \[[`492b0d6b37`](https://github.com/nodejs/node/commit/492b0d6b37)] - **deps**: V8: cherry-pick e6f62a41f5ee (Michaël Zasso) [#39245](https://github.com/nodejs/node/pull/39245)
+* \[[`2b54156260`](https://github.com/nodejs/node/commit/2b54156260)] - **deps**: V8: cherry-pick 92e6d3317082 (Michaël Zasso) [#39245](https://github.com/nodejs/node/pull/39245)
+* \[[`bbceab4d91`](https://github.com/nodejs/node/commit/bbceab4d91)] - **deps**: V8: backport 1b1eda0876aa (Michaël Zasso) [#39245](https://github.com/nodejs/node/pull/39245)
+* \[[`93a1a3c5ae`](https://github.com/nodejs/node/commit/93a1a3c5ae)] - **deps**: V8: cherry-pick 530080c44af2 (Milad Fa) [#38509](https://github.com/nodejs/node/pull/38509)
+* \[[`b263f2585a`](https://github.com/nodejs/node/commit/b263f2585a)] - **http2**: on receiving rst\_stream with cancel code add it to pending list (Akshay K) [#39423](https://github.com/nodejs/node/pull/39423)
+* \[[`3e4bc1b0d3`](https://github.com/nodejs/node/commit/3e4bc1b0d3)] - **module**: fix legacy `node` specifier resolution to resolve `"main"` field (Antoine du Hamel) [#38979](https://github.com/nodejs/node/pull/38979)
+* \[[`f552c45676`](https://github.com/nodejs/node/commit/f552c45676)] - **src**: move CHECK in AddIsolateFinishedCallback (Fedor Indutny) [#38010](https://github.com/nodejs/node/pull/38010)
+* \[[`30ce0e66ae`](https://github.com/nodejs/node/commit/30ce0e66ae)] - **src**: update cares\_wrap OpenBSD defines (Anna Henningsen) [#38670](https://github.com/nodejs/node/pull/38670)
+
+<a id="12.22.3"></a>
+
+## 2021-07-05, Version 12.22.3 'Erbium' (LTS), @richardlau
+
+### Notable Changes
+
+Node.js 12.22.2 introduced a regression in the Windows installer on
+non-English locales that is being fixed in this release. There is no
+need to download this release if you are not using the Windows
+installer.
+
+### Commits
+
+* \[[`182f86a4d4`](https://github.com/nodejs/node/commit/182f86a4d4)] - **win,msi**: use localized "Authenticated Users" name (Richard Lau) [#39241](https://github.com/nodejs/node/pull/39241)
+
+<a id="12.22.2"></a>
+
+## 2021-07-01, Version 12.22.2 'Erbium' (LTS), @richardlau
+
+This is a security release.
+
+### Notable Changes
+
+Vulnerabilities fixed:
+
+* **CVE-2021-22918**: libuv upgrade - Out of bounds read (Medium)
+  * Node.js is vulnerable to out-of-bounds read in libuv's uv\_\_idna\_toascii() function which is used to convert strings to ASCII. This is called by Node's dns module's lookup() function and can lead to information disclosures or crashes. You can read more about it in <https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-22918>
+* **CVE-2021-22921**: Windows installer - Node Installer Local Privilege Escalation (Medium)
+  * Node.js is vulnerable to local privilege escalation attacks under certain conditions on Windows platforms. More specifically, improper configuration of permissions in the installation directory allows an attacker to perform two different escalation attacks: PATH and DLL hijacking. You can read more about it in <https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-22921>
+* **CVE-2021-27290**: npm upgrade - ssri Regular Expression Denial of Service (ReDoS) (High)
+  * This is a vulnerability in the ssri npm mudule which may be vulnerable to denial of service attacks. You can read more about it in <https://github.com/advisories/GHSA-vx3p-948g-6vhq>
+* **CVE-2021-23362**: npm upgrade - hosted-git-info Regular Expression Denial of Service (ReDoS) (Medium)
+  * This is a vulnerability in the hosted-git-info npm mudule which may be vulnerable to denial of service attacks. You can read more about it in <https://nvd.nist.gov/vuln/detail/CVE-2021-23362>
+
+### Commits
+
+* \[[`623fd1fcb5`](https://github.com/nodejs/node/commit/623fd1fcb5)] - **deps**: uv: cherry-pick 99c29c9c2c9b (Ben Noordhuis) [nodejs-private/node-private#267](https://github.com/nodejs-private/node-private/pull/267)
+* \[[`923b3760f8`](https://github.com/nodejs/node/commit/923b3760f8)] - **deps**: upgrade npm to 6.14.13 (Ruy Adorno) [#38214](https://github.com/nodejs/node/pull/38214)
+* \[[`a52790cba0`](https://github.com/nodejs/node/commit/a52790cba0)] - **win,msi**: set install directory permission (AkshayK) [nodejs-private/node-private#269](https://github.com/nodejs-private/node-private/pull/269)
 
 <a id="12.22.1"></a>
 
@@ -120,7 +439,7 @@ The default HTTP parser based on llhttp is not affected. By default it is
 stricter than the now deprecated legacy HTTP parser. If interoperability with
 HTTP implementations that send invalid HTTP headers is required, the HTTP
 parser can be started in a less secure mode with the
-[`--insecure-http-parser`](https://nodejs.org/docs/latest-v12.x/api/cli.html#cli\_insecure\_http\_parser)
+[`--insecure-http-parser`](https://nodejs.org/docs/latest-v12.x/api/cli.html#cli_insecure_http_parser)
 command line option.
 
 Contributed by Beth Griggs [#37603](https://github.com/nodejs/node/pull/37603).
@@ -1405,7 +1724,7 @@ Contributed by Ruben Bridgewater - [#30907](https://github.com/nodejs/node/pull/
 #### REPL reverse-i-search
 
 The REPL supports bi-directional reverse-i-search similar to
-[ZSH](https://en.wikipedia.org/wiki/Z\_shell). It is triggered with `<ctrl> + R`
+[ZSH](https://en.wikipedia.org/wiki/Z_shell). It is triggered with `<ctrl> + R`
 to search backwards and `<ctrl> + S` to search forwards.
 
 Entries are accepted as soon as any button is pressed that doesn't correspond
@@ -1533,18 +1852,18 @@ Contributed by rosaxny - [#32392](https://github.com/nodejs/node/pull/32392).
 
 The following N-API features are now stable as part of the N-API 6 release:
 
-* [`napi_set_instance_data`](https://nodejs.org/dist/latest-v12.x/docs/api/n-api.html#n\_api\_napi\_set\_instance\_data)
-* [`napi_get_instance_data`](https://nodejs.org/dist/latest-v12.x/docs/api/n-api.html#n\_api\_napi\_get\_instance\_data)
-* [`napi_key_collection_mode`](https://nodejs.org/dist/latest-v12.x/docs/api/n-api.html#n\_api\_napi\_key\_collection\_mode)
-* [`napi_key_filter`](https://nodejs.org/dist/latest-v12.x/docs/api/n-api.html#n\_api\_napi\_key\_filter)
-* [`napi_key_conversion`](https://nodejs.org/dist/latest-v12.x/docs/api/n-api.html#n\_api\_napi\_key\_conversion)
-* [`napi_create_bigint_int64`](https://nodejs.org/dist/latest-v12.x/docs/api/n-api.html#n\_api\_napi\_create\_bigint\_int64)
-* [`napi_create_bigint_uint64`](https://nodejs.org/dist/latest-v12.x/docs/api/n-api.html#n\_api\_napi\_create\_bigint\_uint64)
-* [`napi_create_bigint_words`](https://nodejs.org/dist/latest-v12.x/docs/api/n-api.html#n\_api\_napi\_create\_bigint\_words)
-* [`napi_get_value_bigint_int64`](https://nodejs.org/dist/latest-v12.x/docs/api/n-api.html#n\_api\_napi\_get\_value\_bigint\_int64)
-* [`napi_get_value_bigint_uint64`](https://nodejs.org/dist/latest-v12.x/docs/api/n-api.html#n\_api\_napi\_get\_value\_bigint\_uint64)
-* [`napi_get_value_bigint_words`](https://nodejs.org/dist/latest-v12.x/docs/api/n-api.html#n\_api\_napi\_get\_value\_bigint\_words)
-* [`napi_get_all_property_names`](https://nodejs.org/dist/latest-v12.x/docs/api/n-api.html#n\_api\_napi\_get\_all\_property\_names)
+* [`napi_set_instance_data`](https://nodejs.org/dist/latest-v12.x/docs/api/n-api.html#n_api_napi_set_instance_data)
+* [`napi_get_instance_data`](https://nodejs.org/dist/latest-v12.x/docs/api/n-api.html#n_api_napi_get_instance_data)
+* [`napi_key_collection_mode`](https://nodejs.org/dist/latest-v12.x/docs/api/n-api.html#n_api_napi_key_collection_mode)
+* [`napi_key_filter`](https://nodejs.org/dist/latest-v12.x/docs/api/n-api.html#n_api_napi_key_filter)
+* [`napi_key_conversion`](https://nodejs.org/dist/latest-v12.x/docs/api/n-api.html#n_api_napi_key_conversion)
+* [`napi_create_bigint_int64`](https://nodejs.org/dist/latest-v12.x/docs/api/n-api.html#n_api_napi_create_bigint_int64)
+* [`napi_create_bigint_uint64`](https://nodejs.org/dist/latest-v12.x/docs/api/n-api.html#n_api_napi_create_bigint_uint64)
+* [`napi_create_bigint_words`](https://nodejs.org/dist/latest-v12.x/docs/api/n-api.html#n_api_napi_create_bigint_words)
+* [`napi_get_value_bigint_int64`](https://nodejs.org/dist/latest-v12.x/docs/api/n-api.html#n_api_napi_get_value_bigint_int64)
+* [`napi_get_value_bigint_uint64`](https://nodejs.org/dist/latest-v12.x/docs/api/n-api.html#n_api_napi_get_value_bigint_uint64)
+* [`napi_get_value_bigint_words`](https://nodejs.org/dist/latest-v12.x/docs/api/n-api.html#n_api_napi_get_value_bigint_words)
+* [`napi_get_all_property_names`](https://nodejs.org/dist/latest-v12.x/docs/api/n-api.html#n_api_napi_get_all_property_names)
 
 #### Stable diagnostic reports
 
@@ -2649,7 +2968,7 @@ two values:
 * `'json'` (default): `JSON.stringify()` and `JSON.parse()` are used. This is
   how message serialization was done before.
 * `'advanced'`: The serialization API of the `v8` module is used. It is based on
-  the [HTML structured clone algorithm](https://developer.mozilla.org/en-US/docs/Web/API/Web\_Workers\_API/Structured\_clone\_algorithm)
+  the [HTML structured clone algorithm](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm)
   and is able to serialize more built-in JavaScript object types, such as
   `BigInt`, `Map`, `Set` etc. as well as circular data structures.
 
@@ -4201,7 +4520,7 @@ This release fixes two regressions in the **http** module:
   * Updated V8 to 7.6.303.29 (Michaël Zasso) [#28955](https://github.com/nodejs/node/pull/28955).
     * Improves the performance of various APIs such as `JSON.parse` and methods
       called on frozen arrays.
-    * Adds the [`Promise.allSettled`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global\_Objects/Promise/allSettled) method.
+    * Adds the [`Promise.allSettled`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/allSettled) method.
     * Improves support of `BigInt` in `Intl` methods.
     * For more information: <https://v8.dev/blog/v8-release-76>
   * Updated libuv to 1.31.0 (cjihrig) [#29070](https://github.com/nodejs/node/pull/29070).
@@ -4494,7 +4813,7 @@ Vulnerabilities fixed:
     we would use the physical memory size to estimate the necessary V8 heap sizes. The physical memory size
     is not necessarily the correct limit, e.g. if the process is running inside a docker container or is otherwise
     constrained. This change adds the ability to get a memory limit set by linux cgroups, which is used by
-    [docker containers to set resource constraints](https://docs.docker.com/config/containers/resource\_constraints/)
+    [docker containers to set resource constraints](https://docs.docker.com/config/containers/resource_constraints/)
     (Kelvin Jin) [#27508](https://github.com/nodejs/node/pull/27508).
 
 ### Commits

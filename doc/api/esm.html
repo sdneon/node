@@ -3,12 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v16.12.0">
-  <title>Modules: ECMAScript modules | Node.js v16.12.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v18.5.0">
+  <title>Modules: ECMAScript modules | Node.js v18.5.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
   <link rel="canonical" href="https://nodejs.org/api/esm.html">
+  <script async defer src="assets/api.js" type="text/javascript"></script>
 </head>
 <body class="alt apidoc" id="api-section-esm">
   <div id="content" class="clearfix">
@@ -25,7 +26,7 @@
 <hr class="line">
 <ul>
 <li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
-<li><a href="async_context.html" class="nav-async_context">Async_context</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
 <li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
 <li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
 <li><a href="addons.html" class="nav-addons">C++ addons</a></li>
@@ -53,7 +54,7 @@
 <li><a href="intl.html" class="nav-intl">Internationalization</a></li>
 <li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
 <li><a href="esm.html" class="nav-esm active">Modules: ECMAScript modules</a></li>
-<li><a href="module.html" class="nav-module">Modules: <code>module</code> API</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
 <li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
 <li><a href="net.html" class="nav-net">Net</a></li>
 <li><a href="os.html" class="nav-os">OS</a></li>
@@ -68,6 +69,7 @@
 <li><a href="report.html" class="nav-report">Report</a></li>
 <li><a href="stream.html" class="nav-stream">Stream</a></li>
 <li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
 <li><a href="timers.html" class="nav-timers">Timers</a></li>
 <li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
 <li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
@@ -90,9 +92,9 @@
     </div>
 
     <div id="column1" data-id="esm" class="interior">
-      <header>
+      <header class="header">
         <div class="header-container">
-          <h1>Node.js v16.12.0 documentation</h1>
+          <h1>Node.js v18.5.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -107,20 +109,196 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li>
-              <a href="index.html">Index</a>
-            </li>
-            <li>
-              <a href="all.html">View on single page</a>
-            </li>
-            <li>
-              <a href="esm.json">View as JSON</a>
-            </li>
+            <li class="pinned-header">Node.js v18.5.0</li>
             
-    <li class="version-picker">
-      <a href="#">View another version <span>&#x25bc;</span></a>
-      <ol class="version-picker"><li><a href="https://nodejs.org/docs/latest-v17.x/api/esm.html">17.x</a></li>
-<li><a href="https://nodejs.org/docs/latest-v16.x/api/esm.html">16.x</a></li>
+    <li class="picker-header">
+      <a href="#">
+        <span class="collapsed-arrow">&#x25ba;</span><span class="expanded-arrow">&#x25bc;</span>
+        Table of contents
+      </a>
+
+      <div class="picker"><div class="toc"><ul>
+<li><a href="#modules-ecmascript-modules">Modules: ECMAScript modules</a>
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#enabling">Enabling</a></li>
+<li><a href="#packages">Packages</a></li>
+<li><a href="#import-specifiers"><code>import</code> Specifiers</a>
+<ul>
+<li><a href="#terminology">Terminology</a></li>
+<li><a href="#mandatory-file-extensions">Mandatory file extensions</a></li>
+<li><a href="#urls">URLs</a>
+<ul>
+<li><a href="#file-urls"><code>file:</code> URLs</a></li>
+<li><a href="#data-imports"><code>data:</code> imports</a></li>
+<li><a href="#node-imports"><code>node:</code> imports</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="stability_1"><a href="#import-assertions">Import assertions</a></span></li>
+<li><a href="#builtin-modules">Builtin modules</a></li>
+<li><a href="#import-expressions"><code>import()</code> expressions</a></li>
+<li><a href="#importmeta"><code>import.meta</code></a>
+<ul>
+<li><a href="#importmetaurl"><code>import.meta.url</code></a></li>
+<li><span class="stability_1"><a href="#importmetaresolvespecifier-parent"><code>import.meta.resolve(specifier[, parent])</code></a></span></li>
+</ul>
+</li>
+<li><a href="#interoperability-with-commonjs">Interoperability with CommonJS</a>
+<ul>
+<li><a href="#import-statements"><code>import</code> statements</a></li>
+<li><a href="#require"><code>require</code></a></li>
+<li><a href="#commonjs-namespaces">CommonJS Namespaces</a></li>
+<li><a href="#differences-between-es-modules-and-commonjs">Differences between ES modules and CommonJS</a>
+<ul>
+<li><a href="#no-require-exports-or-moduleexports">No <code>require</code>, <code>exports</code>, or <code>module.exports</code></a></li>
+<li><a href="#no-__filename-or-__dirname">No <code>__filename</code> or <code>__dirname</code></a></li>
+<li><a href="#no-native-module-loading">No Native Module Loading</a></li>
+<li><a href="#no-requireresolve">No <code>require.resolve</code></a></li>
+<li><a href="#no-node_path">No <code>NODE_PATH</code></a></li>
+<li><a href="#no-requireextensions">No <code>require.extensions</code></a></li>
+<li><a href="#no-requirecache">No <code>require.cache</code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="stability_1"><a href="#json-modules">JSON modules</a></span></li>
+<li><span class="stability_1"><a href="#wasm-modules">Wasm modules</a></span></li>
+<li><a href="#top-level-await">Top-level <code>await</code></a></li>
+<li><span class="stability_1"><a href="#https-and-http-imports">HTTPS and HTTP imports</a></span>
+<ul>
+<li><a href="#imports-are-limited-to-http1">Imports are limited to HTTP/1</a></li>
+<li><a href="#http-is-limited-to-loopback-addresses">HTTP is limited to loopback addresses</a></li>
+<li><a href="#authentication-is-never-sent-to-the-destination-server">Authentication is never sent to the destination server.</a></li>
+<li><a href="#cors-is-never-checked-on-the-destination-server">CORS is never checked on the destination server</a></li>
+<li><a href="#cannot-load-non-network-dependencies">Cannot load non-network dependencies</a></li>
+<li><a href="#network-based-loading-is-not-enabled-by-default">Network-based loading is not enabled by default</a></li>
+</ul>
+</li>
+<li><span class="stability_1"><a href="#loaders">Loaders</a></span>
+<ul>
+<li><a href="#hooks">Hooks</a>
+<ul>
+<li><a href="#resolvespecifier-context-defaultresolve"><code>resolve(specifier, context, defaultResolve)</code></a></li>
+<li><a href="#loadurl-context-defaultload"><code>load(url, context, defaultLoad)</code></a></li>
+<li><a href="#globalpreload"><code>globalPreload()</code></a></li>
+</ul>
+</li>
+<li><a href="#examples">Examples</a>
+<ul>
+<li><a href="#https-loader">HTTPS loader</a></li>
+<li><a href="#transpiler-loader">Transpiler loader</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#resolution-algorithm">Resolution algorithm</a>
+<ul>
+<li><a href="#features">Features</a></li>
+<li><a href="#resolver-algorithm">Resolver algorithm</a></li>
+<li><a href="#resolver-algorithm-specification">Resolver Algorithm Specification</a></li>
+<li><span class="stability_1"><a href="#customizing-esm-specifier-resolution-algorithm">Customizing ESM specifier resolution algorithm</a></span></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></div></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#">
+        <span class="collapsed-arrow">&#x25ba;</span><span class="expanded-arrow">&#x25bc;</span>
+        Index
+      </a>
+
+      <div class="picker"><ul>
+<li><a href="documentation.html" class="nav-documentation">About this documentation</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">Usage and example</a></li>
+
+      <li>
+        <a href="index.html">Index</a>
+      </li>
+    </ul>
+  
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="corepack.html" class="nav-corepack">Corepack</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm active">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
+<li><a href="policy.html" class="nav-policy">Policies</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline">Readline</a></li>
+<li><a href="repl.html" class="nav-repl">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers">Timers</a></li>
+<li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#">
+        <span class="collapsed-arrow">&#x25ba;</span><span class="expanded-arrow">&#x25bc;</span>
+        Other versions
+      </a>
+      <div class="picker"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v18.x/api/esm.html">18.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v17.x/api/esm.html">17.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v16.x/api/esm.html">16.x <b>LTS</b></a></li>
 <li><a href="https://nodejs.org/docs/latest-v15.x/api/esm.html">15.x</a></li>
 <li><a href="https://nodejs.org/docs/latest-v14.x/api/esm.html">14.x <b>LTS</b></a></li>
 <li><a href="https://nodejs.org/docs/latest-v13.x/api/esm.html">13.x</a></li>
@@ -128,10 +306,27 @@
 <li><a href="https://nodejs.org/docs/latest-v11.x/api/esm.html">11.x</a></li>
 <li><a href="https://nodejs.org/docs/latest-v10.x/api/esm.html">10.x</a></li>
 <li><a href="https://nodejs.org/docs/latest-v9.x/api/esm.html">9.x</a></li>
-<li><a href="https://nodejs.org/docs/latest-v8.x/api/esm.html">8.x</a></li></ol>
+<li><a href="https://nodejs.org/docs/latest-v8.x/api/esm.html">8.x</a></li></ol></div>
     </li>
   
-            <li class="edit_on_github"><a href="https://github.com/nodejs/node/edit/master/doc/api/esm.md">Edit on GitHub</a></li>
+            <li class="picker-header">
+              <a href="#">
+                <span class="collapsed-arrow">&#x25ba;</span><span class="expanded-arrow">&#x25bc;</span>
+                Options
+              </a>
+        
+              <div class="picker">
+                <ul>
+                  <li>
+                    <a href="all.html">View on single page</a>
+                  </li>
+                  <li>
+                    <a href="esm.json">View as JSON</a>
+                  </li>
+                  <li class="edit_on_github"><a href="https://github.com/nodejs/node/edit/master/doc/api/esm.md">Edit on GitHub</a></li>    
+                </ul>
+              </div>
+            </li>
           </ul>
         </div>
         <hr>
@@ -150,12 +345,13 @@
 <li><a href="#urls">URLs</a>
 <ul>
 <li><a href="#file-urls"><code>file:</code> URLs</a></li>
-<li><a href="#data-imports"><code>data:</code> Imports</a></li>
-<li><a href="#node-imports"><code>node:</code> Imports</a></li>
+<li><a href="#data-imports"><code>data:</code> imports</a></li>
+<li><a href="#node-imports"><code>node:</code> imports</a></li>
 </ul>
 </li>
 </ul>
 </li>
+<li><span class="stability_1"><a href="#import-assertions">Import assertions</a></span></li>
 <li><a href="#builtin-modules">Builtin modules</a></li>
 <li><a href="#import-expressions"><code>import()</code> expressions</a></li>
 <li><a href="#importmeta"><code>import.meta</code></a>
@@ -171,9 +367,8 @@
 <li><a href="#commonjs-namespaces">CommonJS Namespaces</a></li>
 <li><a href="#differences-between-es-modules-and-commonjs">Differences between ES modules and CommonJS</a>
 <ul>
-<li><a href="#no-require-exports-or-moduleexports">No <code>require</code>, <code>exports</code> or <code>module.exports</code></a></li>
+<li><a href="#no-require-exports-or-moduleexports">No <code>require</code>, <code>exports</code>, or <code>module.exports</code></a></li>
 <li><a href="#no-__filename-or-__dirname">No <code>__filename</code> or <code>__dirname</code></a></li>
-<li><a href="#no-json-module-loading">No JSON Module Loading</a></li>
 <li><a href="#no-native-module-loading">No Native Module Loading</a></li>
 <li><a href="#no-requireresolve">No <code>require.resolve</code></a></li>
 <li><a href="#no-node_path">No <code>NODE_PATH</code></a></li>
@@ -185,7 +380,17 @@
 </li>
 <li><span class="stability_1"><a href="#json-modules">JSON modules</a></span></li>
 <li><span class="stability_1"><a href="#wasm-modules">Wasm modules</a></span></li>
-<li><span class="stability_1"><a href="#top-level-await">Top-level <code>await</code></a></span></li>
+<li><a href="#top-level-await">Top-level <code>await</code></a></li>
+<li><span class="stability_1"><a href="#https-and-http-imports">HTTPS and HTTP imports</a></span>
+<ul>
+<li><a href="#imports-are-limited-to-http1">Imports are limited to HTTP/1</a></li>
+<li><a href="#http-is-limited-to-loopback-addresses">HTTP is limited to loopback addresses</a></li>
+<li><a href="#authentication-is-never-sent-to-the-destination-server">Authentication is never sent to the destination server.</a></li>
+<li><a href="#cors-is-never-checked-on-the-destination-server">CORS is never checked on the destination server</a></li>
+<li><a href="#cannot-load-non-network-dependencies">Cannot load non-network dependencies</a></li>
+<li><a href="#network-based-loading-is-not-enabled-by-default">Network-based loading is not enabled by default</a></li>
+</ul>
+</li>
 <li><span class="stability_1"><a href="#loaders">Loaders</a></span>
 <ul>
 <li><a href="#hooks">Hooks</a>
@@ -223,11 +428,13 @@
 <details class="changelog"><summary>History</summary>
 <table>
 <tbody><tr><th>Version</th><th>Changes</th></tr>
-<tr><td>v16.12.0</td>
+<tr><td>v17.1.0, v16.14.0</td>
+<td><p>Add support for import assertions.</p></td></tr>
+<tr><td>v17.0.0, v16.12.0</td>
 <td><p>Consolidate loader hooks, removed <code>getFormat</code>, <code>getSource</code>, <code>transformSource</code>, and <code>getGlobalPreloadCode</code> hooks added <code>load</code> and <code>globalPreload</code> hooks allowed returning <code>format</code> from either <code>resolve</code> or <code>load</code> hooks.</p></td></tr>
 <tr><td>v14.8.0</td>
 <td><p>Unflag Top-Level Await.</p></td></tr>
-<tr><td>v15.3.0, v12.22.0</td>
+<tr><td>v15.3.0, v14.17.0, v12.22.0</td>
 <td><p>Stabilize modules implementation.</p></td></tr>
 <tr><td>v14.13.0, v12.20.0</td>
 <td><p>Support for detection of CommonJS named exports.</p></td></tr>
@@ -265,39 +472,24 @@ code for reuse. Modules are defined using a variety of <a href="https://develope
 provides interoperability between them and its original module format,
 <a href="modules.html">CommonJS</a>.</p>
 <!-- Anchors to make sure old links find a target -->
-<p><i id="esm_package_json_type_field"></i>
-<i id="esm_package_scope_and_file_extensions"></i>
-<i id="esm_input_type_flag"></i></p>
+<p><i id="esm_package_json_type_field"></i><i id="esm_package_scope_and_file_extensions"></i><i id="esm_input_type_flag"></i></p>
 </section><section><h3>Enabling<span><a class="mark" href="#enabling" id="enabling">#</a></span><a aria-hidden="true" class="legacy" id="esm_enabling"></a></h3>
 
-<p>Node.js treats JavaScript code as CommonJS modules by default.
-Authors can tell Node.js to treat JavaScript code as ECMAScript modules
+<p>Node.js has two module systems: <a href="modules.html">CommonJS</a> modules and ECMAScript modules.</p>
+<p>Authors can tell Node.js to use the ECMAScript modules loader
 via the <code>.mjs</code> file extension, the <code>package.json</code> <a href="packages.html#type"><code>"type"</code></a> field, or the
-<code>--input-type</code> flag. See
-<a href="packages.html#determining-module-system">Modules: Packages</a> for more
-details.</p>
+<a href="cli.html#--input-typetype"><code>--input-type</code></a> flag. Outside of those cases, Node.js will use the CommonJS
+module loader. See <a href="packages.html#determining-module-system">Determining module system</a> for more details.</p>
 <!-- Anchors to make sure old links find a target -->
-<p><i id="esm_package_entry_points"></i>
-<i id="esm_main_entry_point_export"></i>
-<i id="esm_subpath_exports"></i>
-<i id="esm_package_exports_fallbacks"></i>
-<i id="esm_exports_sugar"></i>
-<i id="esm_conditional_exports"></i>
-<i id="esm_nested_conditions"></i>
-<i id="esm_self_referencing_a_package_using_its_name"></i>
-<i id="esm_internal_package_imports"></i>
-<i id="esm_dual_commonjs_es_module_packages"></i>
-<i id="esm_dual_package_hazard"></i>
-<i id="esm_writing_dual_packages_while_avoiding_or_minimizing_hazards"></i>
-<i id="esm_approach_1_use_an_es_module_wrapper"></i>
-<i id="esm_approach_2_isolate_state"></i></p>
+<p><i id="esm_package_entry_points"></i><i id="esm_main_entry_point_export"></i><i id="esm_subpath_exports"></i><i id="esm_package_exports_fallbacks"></i><i id="esm_exports_sugar"></i><i id="esm_conditional_exports"></i><i id="esm_nested_conditions"></i><i id="esm_self_referencing_a_package_using_its_name"></i><i id="esm_internal_package_imports"></i><i id="esm_dual_commonjs_es_module_packages"></i><i id="esm_dual_package_hazard"></i><i id="esm_writing_dual_packages_while_avoiding_or_minimizing_hazards"></i><i id="esm_approach_1_use_an_es_module_wrapper"></i><i id="esm_approach_2_isolate_state"></i></p>
 </section><section><h3>Packages<span><a class="mark" href="#packages" id="packages">#</a></span><a aria-hidden="true" class="legacy" id="esm_packages"></a></h3>
 <p>This section was moved to <a href="packages.html">Modules: Packages</a>.</p>
 </section><section><h3><code>import</code> Specifiers<span><a class="mark" href="#import-specifiers" id="import-specifiers">#</a></span><a aria-hidden="true" class="legacy" id="esm_import_specifiers"></a></h3>
 <h4>Terminology<span><a class="mark" href="#terminology" id="terminology">#</a></span><a aria-hidden="true" class="legacy" id="esm_terminology"></a></h4>
 <p>The <em>specifier</em> of an <code>import</code> statement is the string after the <code>from</code> keyword,
-e.g. <code>'path'</code> in <code>import { sep } from 'path'</code>. Specifiers are also used in
-<code>export from</code> statements, and as the argument to an <code>import()</code> expression.</p>
+e.g. <code>'node:path'</code> in <code>import { sep } from 'node:path'</code>. Specifiers are also
+used in <code>export from</code> statements, and as the argument to an <code>import()</code>
+expression.</p>
 <p>There are three types of specifiers:</p>
 <ul>
 <li>
@@ -321,7 +513,7 @@ directly and explicitly to a full path.</p>
 algorithm</a>. All other specifier resolutions are always only resolved with
 the standard relative <a href="https://url.spec.whatwg.org/">URL</a> resolution semantics.</p>
 <p>Like in CommonJS, module files within packages can be accessed by appending a
-path to the package name unless the package’s <a href="packages.html#nodejs-packagejson-field-definitions"><code>package.json</code></a> contains an
+path to the package name unless the package's <a href="packages.html#nodejs-packagejson-field-definitions"><code>package.json</code></a> contains an
 <a href="packages.html#exports"><code>"exports"</code></a> field, in which case files within packages can only be accessed
 via the paths defined in <a href="packages.html#exports"><code>"exports"</code></a>.</p>
 <p>For details on these package resolution rules that apply to bare specifiers in
@@ -333,8 +525,8 @@ must also be fully specified.</p>
 <p>This behavior matches how <code>import</code> behaves in browser environments, assuming a
 typically configured server.</p>
 <h4>URLs<span><a class="mark" href="#urls" id="urls">#</a></span><a aria-hidden="true" class="legacy" id="esm_urls"></a></h4>
-<p>ES modules are resolved and cached as URLs. This means that files containing
-special characters such as <code>#</code> and <code>?</code> need to be escaped.</p>
+<p>ES modules are resolved and cached as URLs. This means that special characters
+must be <a href="url.html#percent-encoding-in-urls">percent-encoded</a>, such as <code>#</code> with <code>%23</code> and <code>?</code> with <code>%3F</code>.</p>
 <p><code>file:</code>, <code>node:</code>, and <code>data:</code> URL schemes are supported. A specifier like
 <code>'https://example.com/app.js'</code> is not supported natively in Node.js unless using
 a <a href="#https-loader">custom HTTPS loader</a>.</p>
@@ -343,34 +535,33 @@ a <a href="#https-loader">custom HTTPS loader</a>.</p>
 them has a different query or fragment.</p>
 <pre><code class="language-js"><span class="hljs-keyword">import</span> <span class="hljs-string">'./foo.mjs?query=1'</span>; <span class="hljs-comment">// loads ./foo.mjs with query of "?query=1"</span>
 <span class="hljs-keyword">import</span> <span class="hljs-string">'./foo.mjs?query=2'</span>; <span class="hljs-comment">// loads ./foo.mjs with query of "?query=2"</span></code></pre>
-<p>The volume root may be referenced via <code>/</code>, <code>//</code> or <code>file:///</code>. Given the
+<p>The volume root may be referenced via <code>/</code>, <code>//</code>, or <code>file:///</code>. Given the
 differences between <a href="https://url.spec.whatwg.org/">URL</a> and path resolution (such as percent encoding
 details), it is recommended to use <a href="url.html#urlpathtofileurlpath">url.pathToFileURL</a> when importing a path.</p>
-<h5><code>data:</code> Imports<span><a class="mark" href="#data-imports" id="data-imports">#</a></span><a aria-hidden="true" class="legacy" id="esm_data_imports"></a></h5>
+<h5><code>data:</code> imports<span><a class="mark" href="#data-imports" id="data-imports">#</a></span><a aria-hidden="true" class="legacy" id="esm_data_imports"></a></h5>
 <div class="api_metadata">
 <span>Added in: v12.10.0</span>
 </div>
 <p><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs"><code>data:</code> URLs</a> are supported for importing with the following MIME types:</p>
 <ul>
-<li><code>text/javascript</code> for ES Modules</li>
+<li><code>text/javascript</code> for ES modules</li>
 <li><code>application/json</code> for JSON</li>
 <li><code>application/wasm</code> for Wasm</li>
 </ul>
-<p><code>data:</code> URLs only resolve <a href="#terminology"><em>Bare specifiers</em></a> for builtin modules
-and <a href="#terminology"><em>Absolute specifiers</em></a>. Resolving
-<a href="#terminology"><em>Relative specifiers</em></a> does not work because <code>data:</code> is not a
+<pre><code class="language-js"><span class="hljs-keyword">import</span> <span class="hljs-string">'data:text/javascript,console.log("hello!");'</span>;
+<span class="hljs-keyword">import</span> _ <span class="hljs-keyword">from</span> <span class="hljs-string">'data:application/json,"world!"'</span> assert { <span class="hljs-attr">type</span>: <span class="hljs-string">'json'</span> };</code></pre>
+<p><code>data:</code> URLs only resolve <a href="#terminology">bare specifiers</a> for builtin modules
+and <a href="#terminology">absolute specifiers</a>. Resolving
+<a href="#terminology">relative specifiers</a> does not work because <code>data:</code> is not a
 <a href="https://url.spec.whatwg.org/#special-scheme">special scheme</a>. For example, attempting to load <code>./foo</code>
 from <code>data:text/javascript,import "./foo";</code> fails to resolve because there
-is no concept of relative resolution for <code>data:</code> URLs. An example of a <code>data:</code>
-URLs being used is:</p>
-<pre><code class="language-js"><span class="hljs-keyword">import</span> <span class="hljs-string">'data:text/javascript,console.log("hello!");'</span>;
-<span class="hljs-keyword">import</span> _ <span class="hljs-keyword">from</span> <span class="hljs-string">'data:application/json,"world!"'</span>;</code></pre>
-<h5><code>node:</code> Imports<span><a class="mark" href="#node-imports" id="node-imports">#</a></span><a aria-hidden="true" class="legacy" id="esm_node_imports"></a></h5>
+is no concept of relative resolution for <code>data:</code> URLs.</p>
+<h5><code>node:</code> imports<span><a class="mark" href="#node-imports" id="node-imports">#</a></span><a aria-hidden="true" class="legacy" id="esm_node_imports"></a></h5>
 <div class="api_metadata">
 <details class="changelog"><summary>History</summary>
 <table>
 <tbody><tr><th>Version</th><th>Changes</th></tr>
-<tr><td>v16.0.0</td>
+<tr><td>v16.0.0, v14.18.0</td>
 <td><p>Added <code>node:</code> import support to <code>require(...)</code>.</p></td></tr>
 <tr><td>v14.13.1, v12.20.0</td>
 <td><p><span>Added in: v14.13.1, v12.20.0</span></p></td></tr>
@@ -381,15 +572,42 @@ URLs being used is:</p>
 modules. This URL scheme allows for builtin modules to be referenced by valid
 absolute URL strings.</p>
 <pre><code class="language-js"><span class="hljs-keyword">import</span> fs <span class="hljs-keyword">from</span> <span class="hljs-string">'node:fs/promises'</span>;</code></pre>
+</section><section><h3>Import assertions<span><a class="mark" href="#import-assertions" id="import-assertions">#</a></span><a aria-hidden="true" class="legacy" id="esm_import_assertions"></a></h3>
+<div class="api_metadata">
+<span>Added in: v17.1.0, v16.14.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<p>The <a href="https://github.com/tc39/proposal-import-assertions">Import Assertions proposal</a> adds an inline syntax for module import
+statements to pass on more information alongside the module specifier.</p>
+<pre><code class="language-js"><span class="hljs-keyword">import</span> fooData <span class="hljs-keyword">from</span> <span class="hljs-string">'./foo.json'</span> assert { <span class="hljs-attr">type</span>: <span class="hljs-string">'json'</span> };
+
+<span class="hljs-keyword">const</span> { <span class="hljs-attr">default</span>: barData } =
+  <span class="hljs-keyword">await</span> <span class="hljs-title function_">import</span>(<span class="hljs-string">'./bar.json'</span>, { <span class="hljs-attr">assert</span>: { <span class="hljs-attr">type</span>: <span class="hljs-string">'json'</span> } });</code></pre>
+<p>Node.js supports the following <code>type</code> values, for which the assertion is
+mandatory:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Assertion <code>type</code></th><th>Needed for</th></tr></thead><tbody><tr><td><code>'json'</code></td><td><a href="#json-modules">JSON modules</a></td></tr></tbody></table>
 </section><section><h3>Builtin modules<span><a class="mark" href="#builtin-modules" id="builtin-modules">#</a></span><a aria-hidden="true" class="legacy" id="esm_builtin_modules"></a></h3>
 <p><a href="modules.html#core-modules">Core modules</a> provide named exports of their public API. A
 default export is also provided which is the value of the CommonJS exports.
 The default export can be used for, among other things, modifying the named
 exports. Named exports of builtin modules are updated only by calling
 <a href="module.html#modulesyncbuiltinesmexports"><code>module.syncBuiltinESMExports()</code></a>.</p>
-<pre><code class="language-js"><span class="hljs-keyword">import</span> <span class="hljs-title class_">EventEmitter</span> <span class="hljs-keyword">from</span> <span class="hljs-string">'events'</span>;
+<pre><code class="language-js"><span class="hljs-keyword">import</span> <span class="hljs-title class_">EventEmitter</span> <span class="hljs-keyword">from</span> <span class="hljs-string">'node:events'</span>;
 <span class="hljs-keyword">const</span> e = <span class="hljs-keyword">new</span> <span class="hljs-title class_">EventEmitter</span>();</code></pre>
-<pre><code class="language-js"><span class="hljs-keyword">import</span> { readFile } <span class="hljs-keyword">from</span> <span class="hljs-string">'fs'</span>;
+<pre><code class="language-js"><span class="hljs-keyword">import</span> { readFile } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:fs'</span>;
 <span class="hljs-title function_">readFile</span>(<span class="hljs-string">'./foo.txt'</span>, <span class="hljs-function">(<span class="hljs-params">err, source</span>) =></span> {
   <span class="hljs-keyword">if</span> (err) {
     <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(err);
@@ -397,9 +615,9 @@ exports. Named exports of builtin modules are updated only by calling
     <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(source);
   }
 });</code></pre>
-<pre><code class="language-js"><span class="hljs-keyword">import</span> fs, { readFileSync } <span class="hljs-keyword">from</span> <span class="hljs-string">'fs'</span>;
-<span class="hljs-keyword">import</span> { syncBuiltinESMExports } <span class="hljs-keyword">from</span> <span class="hljs-string">'module'</span>;
-<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Buffer</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'buffer'</span>;
+<pre><code class="language-js"><span class="hljs-keyword">import</span> fs, { readFileSync } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:fs'</span>;
+<span class="hljs-keyword">import</span> { syncBuiltinESMExports } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:module'</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Buffer</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:buffer'</span>;
 
 fs.<span class="hljs-property">readFileSync</span> = <span class="hljs-function">() =></span> <span class="hljs-title class_">Buffer</span>.<span class="hljs-title function_">from</span>(<span class="hljs-string">'Hello, ESM'</span>);
 <span class="hljs-title function_">syncBuiltinESMExports</span>();
@@ -421,7 +639,7 @@ properties.</p>
 <p>This is defined exactly the same as it is in browsers providing the URL of the
 current module file.</p>
 <p>This enables useful patterns such as relative file loading:</p>
-<pre><code class="language-js"><span class="hljs-keyword">import</span> { readFileSync } <span class="hljs-keyword">from</span> <span class="hljs-string">'fs'</span>;
+<pre><code class="language-js"><span class="hljs-keyword">import</span> { readFileSync } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:fs'</span>;
 <span class="hljs-keyword">const</span> buffer = <span class="hljs-title function_">readFileSync</span>(<span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'./data.proto'</span>, <span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">url</span>));</code></pre>
 <h4><code>import.meta.resolve(specifier[, parent])</code><span><a class="mark" href="#importmetaresolvespecifier-parent" id="importmetaresolvespecifier-parent">#</a></span><a aria-hidden="true" class="legacy" id="esm_import_meta_resolve_specifier_parent"></a></h4>
 <!--
@@ -429,7 +647,9 @@ added:
   - v13.9.0
   - v12.16.2
 changes:
-  - version: v16.2.0
+  - version:
+      - v16.2.0
+      - v14.18.0
     pr-url: https://github.com/nodejs/node/pull/38587
     description: Add support for WHATWG `URL` object to `parentURL` parameter.
 -->
@@ -523,10 +743,10 @@ for these named exports.</p>
 always correctly detect named exports. In these cases, using the default
 import form described above can be a better option.</p>
 <p>Named exports detection covers many common export patterns, reexport patterns
-and build tool and transpiler outputs. See <a href="https://github.com/guybedford/cjs-module-lexer/tree/1.2.2">cjs-module-lexer</a> for the exact
+and build tool and transpiler outputs. See <a href="https://github.com/nodejs/cjs-module-lexer/tree/1.2.2">cjs-module-lexer</a> for the exact
 semantics implemented.</p>
 <h4>Differences between ES modules and CommonJS<span><a class="mark" href="#differences-between-es-modules-and-commonjs" id="differences-between-es-modules-and-commonjs">#</a></span><a aria-hidden="true" class="legacy" id="esm_differences_between_es_modules_and_commonjs"></a></h4>
-<h5>No <code>require</code>, <code>exports</code> or <code>module.exports</code><span><a class="mark" href="#no-require-exports-or-moduleexports" id="no-require-exports-or-moduleexports">#</a></span><a aria-hidden="true" class="legacy" id="esm_no_require_exports_or_module_exports"></a></h5>
+<h5>No <code>require</code>, <code>exports</code>, or <code>module.exports</code><span><a class="mark" href="#no-require-exports-or-moduleexports" id="no-require-exports-or-moduleexports">#</a></span><a aria-hidden="true" class="legacy" id="esm_no_require_exports_or_module_exports"></a></h5>
 <p>In most cases, the ES module <code>import</code> can be used to load CommonJS modules.</p>
 <p>If needed, a <code>require</code> function can be constructed within an ES module using
 <a href="module.html#modulecreaterequirefilename"><code>module.createRequire()</code></a>.</p>
@@ -534,14 +754,6 @@ semantics implemented.</p>
 <p>These CommonJS variables are not available in ES modules.</p>
 <p><code>__filename</code> and <code>__dirname</code> use cases can be replicated via
 <a href="#importmetaurl"><code>import.meta.url</code></a>.</p>
-<h5>No JSON Module Loading<span><a class="mark" href="#no-json-module-loading" id="no-json-module-loading">#</a></span><a aria-hidden="true" class="legacy" id="esm_no_json_module_loading"></a></h5>
-<p>JSON imports are still experimental and only supported via the
-<code>--experimental-json-modules</code> flag.</p>
-<p>Local JSON files can be loaded relative to <code>import.meta.url</code> with <code>fs</code> directly:</p>
-<!-- eslint-skip -->
-<pre><code class="language-js"><span class="hljs-keyword">import</span> { readFile } <span class="hljs-keyword">from</span> <span class="hljs-string">'fs/promises'</span>;
-<span class="hljs-keyword">const</span> json = <span class="hljs-variable constant_">JSON</span>.<span class="hljs-title function_">parse</span>(<span class="hljs-keyword">await</span> <span class="hljs-title function_">readFile</span>(<span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'./dat.json'</span>, <span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">url</span>)));</code></pre>
-<p>Alternatively <code>module.createRequire()</code> can be used.</p>
 <h5>No Native Module Loading<span><a class="mark" href="#no-native-module-loading" id="no-native-module-loading">#</a></span><a aria-hidden="true" class="legacy" id="esm_no_native_module_loading"></a></h5>
 <p>Native modules are not currently supported with ES module imports.</p>
 <p>They can instead be loaded with <a href="module.html#modulecreaterequirefilename"><code>module.createRequire()</code></a> or
@@ -563,32 +775,21 @@ separate cache.</p>
 <p><i id="esm_experimental_json_modules"></i></p>
 </section><section><h3>JSON modules<span><a class="mark" href="#json-modules" id="json-modules">#</a></span><a aria-hidden="true" class="legacy" id="esm_json_modules"></a></h3>
 <p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
-<p>Currently importing JSON modules are only supported in the <code>commonjs</code> mode
-and are loaded using the CJS loader. <a href="https://html.spec.whatwg.org/#creating-a-json-module-script">WHATWG JSON modules specification</a> are
-still being standardized, and are experimentally supported by including the
-additional flag <code>--experimental-json-modules</code> when running Node.js.</p>
-<p>When the <code>--experimental-json-modules</code> flag is included, both the
-<code>commonjs</code> and <code>module</code> mode use the new experimental JSON
-loader. The imported JSON only exposes a <code>default</code>. There is no
-support for named exports. A cache entry is created in the CommonJS
-cache to avoid duplication. The same object is returned in
-CommonJS if the JSON module has already been imported from the
-same path.</p>
-<p>Assuming an <code>index.mjs</code> with</p>
-<!-- eslint-skip -->
-<pre><code class="language-js"><span class="hljs-keyword">import</span> packageConfig <span class="hljs-keyword">from</span> <span class="hljs-string">'./package.json'</span>;</code></pre>
-<p>The <code>--experimental-json-modules</code> flag is needed for the module
-to work.</p>
-<pre><code class="language-bash">node index.mjs <span class="hljs-comment"># fails</span>
-node --experimental-json-modules index.mjs <span class="hljs-comment"># works</span></code></pre>
+<p>JSON files can be referenced by <code>import</code>:</p>
+<pre><code class="language-js"><span class="hljs-keyword">import</span> packageConfig <span class="hljs-keyword">from</span> <span class="hljs-string">'./package.json'</span> assert { <span class="hljs-attr">type</span>: <span class="hljs-string">'json'</span> };</code></pre>
+<p>The <code>assert { type: 'json' }</code> syntax is mandatory; see <a href="#import-assertions">Import Assertions</a>.</p>
+<p>The imported JSON only exposes a <code>default</code> export. There is no support for named
+exports. A cache entry is created in the CommonJS cache to avoid duplication.
+The same object is returned in CommonJS if the JSON module has already been
+imported from the same path.</p>
 <p><i id="esm_experimental_wasm_modules"></i></p>
 </section><section><h3>Wasm modules<span><a class="mark" href="#wasm-modules" id="wasm-modules">#</a></span><a aria-hidden="true" class="legacy" id="esm_wasm_modules"></a></h3>
 <p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
-<p>Importing Web Assembly modules is supported under the
+<p>Importing WebAssembly modules is supported under the
 <code>--experimental-wasm-modules</code> flag, allowing any <code>.wasm</code> files to be
 imported as normal modules while also supporting their module imports.</p>
 <p>This integration is in line with the
-<a href="https://github.com/webassembly/esm-integration">ES Module Integration Proposal for Web Assembly</a>.</p>
+<a href="https://github.com/webassembly/esm-integration">ES Module Integration Proposal for WebAssembly</a>.</p>
 <p>For example, an <code>index.mjs</code> containing:</p>
 <pre><code class="language-js"><span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> M <span class="hljs-keyword">from</span> <span class="hljs-string">'./module.wasm'</span>;
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(M);</code></pre>
@@ -597,30 +798,109 @@ imported as normal modules while also supporting their module imports.</p>
 <p>would provide the exports interface for the instantiation of <code>module.wasm</code>.</p>
 <p><i id="esm_experimental_top_level_await"></i></p>
 </section><section><h3>Top-level <code>await</code><span><a class="mark" href="#top-level-await" id="top-level-await">#</a></span><a aria-hidden="true" class="legacy" id="esm_top_level_await"></a></h3>
-<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
-<p>The <code>await</code> keyword may be used in the top level (outside of async functions)
-within modules as per the <a href="https://github.com/tc39/proposal-top-level-await/">ECMAScript Top-Level <code>await</code> proposal</a>.</p>
+<div class="api_metadata">
+<span>Added in: v14.8.0</span>
+</div>
+<p>The <code>await</code> keyword may be used in the top level body of an ECMAScript module.</p>
 <p>Assuming an <code>a.mjs</code> with</p>
-<!-- eslint-skip -->
 <pre><code class="language-js"><span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> five = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">resolve</span>(<span class="hljs-number">5</span>);</code></pre>
 <p>And a <code>b.mjs</code> with</p>
 <pre><code class="language-js"><span class="hljs-keyword">import</span> { five } <span class="hljs-keyword">from</span> <span class="hljs-string">'./a.mjs'</span>;
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(five); <span class="hljs-comment">// Logs `5`</span></code></pre>
 <pre><code class="language-bash">node b.mjs <span class="hljs-comment"># works</span></code></pre>
+<p>If a top level <code>await</code> expression never resolves, the <code>node</code> process will exit
+with a <code>13</code> <a href="process.html#exit-codes">status code</a>.</p>
+<pre><code class="language-js"><span class="hljs-keyword">import</span> { spawn } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:child_process'</span>;
+<span class="hljs-keyword">import</span> { execPath } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:process'</span>;
+
+<span class="hljs-title function_">spawn</span>(execPath, [
+  <span class="hljs-string">'--input-type=module'</span>,
+  <span class="hljs-string">'--eval'</span>,
+  <span class="hljs-comment">// Never-resolving Promise:</span>
+  <span class="hljs-string">'await new Promise(() => {})'</span>,
+]).<span class="hljs-title function_">once</span>(<span class="hljs-string">'exit'</span>, <span class="hljs-function">(<span class="hljs-params">code</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(code); <span class="hljs-comment">// Logs `13`</span>
+});</code></pre>
+</section><section><h3>HTTPS and HTTP imports<span><a class="mark" href="#https-and-http-imports" id="https-and-http-imports">#</a></span><a aria-hidden="true" class="legacy" id="esm_https_and_http_imports"></a></h3>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<p>Importing network based modules using <code>https:</code> and <code>http:</code> is supported under
+the <code>--experimental-network-imports</code> flag. This allows web browser-like imports
+to work in Node.js with a few differences due to application stability and
+security concerns that are different when running in a privileged environment
+instead of a browser sandbox.</p>
+<h4>Imports are limited to HTTP/1<span><a class="mark" href="#imports-are-limited-to-http1" id="imports-are-limited-to-http1">#</a></span><a aria-hidden="true" class="legacy" id="esm_imports_are_limited_to_http_1"></a></h4>
+<p>Automatic protocol negotiation for HTTP/2 and HTTP/3 is not yet supported.</p>
+<h4>HTTP is limited to loopback addresses<span><a class="mark" href="#http-is-limited-to-loopback-addresses" id="http-is-limited-to-loopback-addresses">#</a></span><a aria-hidden="true" class="legacy" id="esm_http_is_limited_to_loopback_addresses"></a></h4>
+<p><code>http:</code> is vulnerable to man-in-the-middle attacks and is not allowed to be
+used for addresses outside of the IPv4 address <code>127.0.0.0/8</code> (<code>127.0.0.1</code> to
+<code>127.255.255.255</code>) and the IPv6 address <code>::1</code>. Support for <code>http:</code> is intended
+to be used for local development.</p>
+<h4>Authentication is never sent to the destination server.<span><a class="mark" href="#authentication-is-never-sent-to-the-destination-server" id="authentication-is-never-sent-to-the-destination-server">#</a></span><a aria-hidden="true" class="legacy" id="esm_authentication_is_never_sent_to_the_destination_server"></a></h4>
+<p><code>Authorization</code>, <code>Cookie</code>, and <code>Proxy-Authorization</code> headers are not sent to the
+server. Avoid including user info in parts of imported URLs. A security model
+for safely using these on the server is being worked on.</p>
+<h4>CORS is never checked on the destination server<span><a class="mark" href="#cors-is-never-checked-on-the-destination-server" id="cors-is-never-checked-on-the-destination-server">#</a></span><a aria-hidden="true" class="legacy" id="esm_cors_is_never_checked_on_the_destination_server"></a></h4>
+<p>CORS is designed to allow a server to limit the consumers of an API to a
+specific set of hosts. This is not supported as it does not make sense for a
+server-based implementation.</p>
+<h4>Cannot load non-network dependencies<span><a class="mark" href="#cannot-load-non-network-dependencies" id="cannot-load-non-network-dependencies">#</a></span><a aria-hidden="true" class="legacy" id="esm_cannot_load_non_network_dependencies"></a></h4>
+<p>These modules cannot access other modules that are not over <code>http:</code> or <code>https:</code>.
+To still access local modules while avoiding the security concern, pass in
+references to the local dependencies:</p>
+<pre><code class="language-js mjs"><span class="hljs-comment">// file.mjs</span>
+<span class="hljs-keyword">import</span> worker_threads <span class="hljs-keyword">from</span> <span class="hljs-string">'node:worker_threads'</span>;
+<span class="hljs-keyword">import</span> { configure, resize } <span class="hljs-keyword">from</span> <span class="hljs-string">'https://example.com/imagelib.mjs'</span>;
+<span class="hljs-title function_">configure</span>({ worker_threads });</code></pre>
+<pre><code class="language-js mjs"><span class="hljs-comment">// https://example.com/imagelib.mjs</span>
+<span class="hljs-keyword">let</span> worker_threads;
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">configure</span>(<span class="hljs-params">opts</span>) {
+  worker_threads = opts.<span class="hljs-property">worker_threads</span>;
+}
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">resize</span>(<span class="hljs-params">img, size</span>) {
+  <span class="hljs-comment">// Perform resizing in worker_thread to avoid main thread blocking</span>
+}</code></pre>
+<h4>Network-based loading is not enabled by default<span><a class="mark" href="#network-based-loading-is-not-enabled-by-default" id="network-based-loading-is-not-enabled-by-default">#</a></span><a aria-hidden="true" class="legacy" id="esm_network_based_loading_is_not_enabled_by_default"></a></h4>
+<p>For now, the <code>--experimental-network-imports</code> flag is required to enable loading
+resources over <code>http:</code> or <code>https:</code>. In the future, a different mechanism will be
+used to enforce this. Opt-in is required to prevent transitive dependencies
+inadvertently using potentially mutable state that could affect reliability
+of Node.js applications.</p>
 <p><i id="esm_experimental_loaders"></i></p>
 </section><section><h3>Loaders<span><a class="mark" href="#loaders" id="loaders">#</a></span><a aria-hidden="true" class="legacy" id="esm_loaders"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v16.12.0</td>
+<td><p>Removed <code>getFormat</code>, <code>getSource</code>, <code>transformSource</code>, and <code>globalPreload</code>; added <code>load</code> hook and <code>getGlobalPreload</code> hook.</p></td></tr>
+<tr><td>v8.8.0</td>
+<td><p><span>Added in: v8.8.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
 <p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
-<p><strong>Note: This API is currently being redesigned and will still change.</strong></p>
+<blockquote>
+<p>This API is currently being redesigned and will still change.</p>
+</blockquote>
 
 <p>To customize the default module resolution, loader hooks can optionally be
 provided via a <code>--experimental-loader ./loader-name.mjs</code> argument to Node.js.</p>
-<p>When hooks are used they only apply to ES module loading and not to any
-CommonJS modules loaded.</p>
+<p>When hooks are used they apply to the entry point and all <code>import</code> calls. They
+won't apply to <code>require</code> calls; those still follow <a href="modules.html">CommonJS</a> rules.</p>
 <h4>Hooks<span><a class="mark" href="#hooks" id="hooks">#</a></span><a aria-hidden="true" class="legacy" id="esm_hooks"></a></h4>
 <h5><code>resolve(specifier, context, defaultResolve)</code><span><a class="mark" href="#resolvespecifier-context-defaultresolve" id="resolvespecifier-context-defaultresolve">#</a></span><a aria-hidden="true" class="legacy" id="esm_resolve_specifier_context_defaultresolve"></a></h5>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v17.1.0, v16.14.0</td>
+<td><p>Add support for import assertions.</p></td></tr>
+</tbody></table>
+</details>
+</div>
 <blockquote>
-<p>Note: The loaders API is being redesigned. This hook may disappear or its
+<p>The loaders API is being redesigned. This hook may disappear or its
 signature may change. Do not rely on the API described below.</p>
 </blockquote>
 <ul>
@@ -628,6 +908,7 @@ signature may change. Do not rely on the API described below.</p>
 <li><code>context</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
 <ul>
 <li><code>conditions</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a></li>
+<li><code>importAssertions</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
 <li><code>parentURL</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a></li>
 </ul>
 </li>
@@ -662,8 +943,8 @@ Node.js module specifier resolution behavior</em> when calling <code>defaultReso
 <pre><code class="language-js"><span class="hljs-comment">/**
  * <span class="hljs-doctag">@param</span> {<span class="hljs-type">string</span>} <span class="hljs-variable">specifier</span>
  * <span class="hljs-doctag">@param</span> {<span class="hljs-type">{
- *   conditions: !Array&#x3C;string>,
- *   parentURL: !(string | undefined),
+ *   conditions: string[],
+ *   parentURL: string | undefined,
  * </span>}} context
  * <span class="hljs-doctag">@param</span> {<span class="hljs-type">Function</span>} <span class="hljs-variable">defaultResolve</span>
  * <span class="hljs-doctag">@returns</span> {<span class="hljs-type">Promise&#x3C;{ url: string </span>}>}
@@ -692,11 +973,11 @@ Node.js module specifier resolution behavior</em> when calling <code>defaultReso
 }</code></pre>
 <h5><code>load(url, context, defaultLoad)</code><span><a class="mark" href="#loadurl-context-defaultload" id="loadurl-context-defaultload">#</a></span><a aria-hidden="true" class="legacy" id="esm_load_url_context_defaultload"></a></h5>
 <blockquote>
-<p>Note: The loaders API is being redesigned. This hook may disappear or its
+<p>The loaders API is being redesigned. This hook may disappear or its
 signature may change. Do not rely on the API described below.</p>
 </blockquote>
 <blockquote>
-<p>Note: In a previous version of this API, this was split across 3 separate, now
+<p>In a previous version of this API, this was split across 3 separate, now
 deprecated, hooks (<code>getFormat</code>, <code>getSource</code>, and <code>transformSource</code>).</p>
 </blockquote>
 <ul>
@@ -705,6 +986,7 @@ deprecated, hooks (<code>getFormat</code>, <code>getSource</code>, and <code>tra
 <ul>
 <li><code>format</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> The format optionally supplied by the
 <code>resolve</code> hook.</li>
+<li><code>importAssertions</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
 </ul>
 </li>
 <li><code>defaultLoad</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a></li>
@@ -716,7 +998,8 @@ deprecated, hooks (<code>getFormat</code>, <code>getSource</code>, and <code>tra
 </li>
 </ul>
 <p>The <code>load</code> hook provides a way to define a custom method of determining how
-a URL should be interpreted, retrieved, and parsed.</p>
+a URL should be interpreted, retrieved, and parsed. It is also in charge of
+validating the import assertion.</p>
 <p>The final value of <code>format</code> must be one of the following:</p>
 
 
@@ -766,7 +1049,7 @@ are incompatible. Attempting to use them together will result in an empty
 object from the import. This may be addressed in the future.</p>
 </blockquote>
 <blockquote>
-<p>Note: These types all correspond to classes defined in ECMAScript.</p>
+<p>These types all correspond to classes defined in ECMAScript.</p>
 </blockquote>
 <ul>
 <li>The specific <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer"><code>ArrayBuffer</code></a> object is a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer"><code>SharedArrayBuffer</code></a>.</li>
@@ -785,8 +1068,8 @@ format to a supported one, for example <code>yaml</code> to <code>module</code>.
   </span>}} context If resolve settled with a `format`, that value is included here.
  * <span class="hljs-doctag">@param</span> {<span class="hljs-type">Function</span>} <span class="hljs-variable">defaultLoad</span>
  * <span class="hljs-doctag">@returns</span> {<span class="hljs-type">Promise&#x3C;{
-    format: !string,
-    source: !(string | ArrayBuffer | SharedArrayBuffer | Uint8Array),
+    format: string,
+    source: string | ArrayBuffer | SharedArrayBuffer | Uint8Array,
   </span>}>}
  */</span>
 <span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">load</span>(<span class="hljs-params">url, context, defaultLoad</span>) {
@@ -811,11 +1094,11 @@ format to a supported one, for example <code>yaml</code> to <code>module</code>.
 source to a supported one (see <a href="#examples">Examples</a> below).</p>
 <h5><code>globalPreload()</code><span><a class="mark" href="#globalpreload" id="globalpreload">#</a></span><a aria-hidden="true" class="legacy" id="esm_globalpreload"></a></h5>
 <blockquote>
-<p>Note: The loaders API is being redesigned. This hook may disappear or its
+<p>The loaders API is being redesigned. This hook may disappear or its
 signature may change. Do not rely on the API described below.</p>
 </blockquote>
 <blockquote>
-<p>Note: In a previous version of this API, this hook was named
+<p>In a previous version of this API, this hook was named
 <code>getGlobalPreloadCode</code>.</p>
 </blockquote>
 <ul>
@@ -830,9 +1113,12 @@ builtins like "fs": <code>getBuiltin(request: string)</code>.</p>
 <p>If the code needs more advanced <code>require</code> features, it has to construct
 its own <code>require</code> using  <code>module.createRequire()</code>.</p>
 <pre><code class="language-js"><span class="hljs-comment">/**
+ * <span class="hljs-doctag">@param</span> {<span class="hljs-type">{
+     port: MessagePort,
+   </span>}} utilities Things that preload code might find useful
  * <span class="hljs-doctag">@returns</span> {<span class="hljs-type">string</span>} Code to run before application startup
  */</span>
-<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">globalPreload</span>(<span class="hljs-params"></span>) {
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">globalPreload</span>(<span class="hljs-params">utilities</span>) {
   <span class="hljs-keyword">return</span> <span class="hljs-string">`\
 globalThis.someInjectedProperty = 42;
 console.log('I just set some globals!');
@@ -844,9 +1130,34 @@ const require = createRequire(cwd() + '/&#x3C;preload>');
 // [...]
 `</span>;
 }</code></pre>
+<p>In order to allow communication between the application and the loader, another
+argument is provided to the preload code: <code>port</code>. This is available as a
+parameter to the loader hook and inside of the source text returned by the hook.
+Some care must be taken in order to properly call <a href="https://nodejs.org/dist/latest-v17.x/docs/api/worker_threads.html#portref"><code>port.ref()</code></a> and
+<a href="https://nodejs.org/dist/latest-v17.x/docs/api/worker_threads.html#portunref"><code>port.unref()</code></a> to prevent a process from being in a state where it won't
+close normally.</p>
+<pre><code class="language-js"><span class="hljs-comment">/**
+ * This example has the application context send a message to the loader
+ * and sends the message back to the application context
+ * <span class="hljs-doctag">@param</span> {<span class="hljs-type">{
+     port: MessagePort,
+   </span>}} utilities Things that preload code might find useful
+ * <span class="hljs-doctag">@returns</span> {<span class="hljs-type">string</span>} Code to run before application startup
+ */</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">globalPreload</span>(<span class="hljs-params">{ port }</span>) {
+  port.<span class="hljs-property">onmessage</span> = <span class="hljs-function">(<span class="hljs-params">evt</span>) =></span> {
+    port.<span class="hljs-title function_">postMessage</span>(evt.<span class="hljs-property">data</span>);
+  };
+  <span class="hljs-keyword">return</span> <span class="hljs-string">`\
+    port.postMessage('console.log("I went to the Loader and back");');
+    port.onmessage = (evt) => {
+      eval(evt.data);
+    };
+  `</span>;
+}</code></pre>
 <h4>Examples<span><a class="mark" href="#examples" id="examples">#</a></span><a aria-hidden="true" class="legacy" id="esm_examples"></a></h4>
 <p>The various loader hooks can be used together to accomplish wide-ranging
-customizations of Node.js’ code loading and evaluation behaviors.</p>
+customizations of the Node.js code loading and evaluation behaviors.</p>
 <h5>HTTPS loader<span><a class="mark" href="#https-loader" id="https-loader">#</a></span><a aria-hidden="true" class="legacy" id="esm_https_loader"></a></h5>
 <p>In current Node.js, specifiers starting with <code>https://</code> are unsupported. The
 loader below registers hooks to enable rudimentary support for such specifiers.
@@ -855,7 +1166,7 @@ functionality, there are substantial downsides to actually using this loader:
 performance is much slower than loading files from disk, there is no caching,
 and there is no security.</p>
 <pre><code class="language-js"><span class="hljs-comment">// https-loader.mjs</span>
-<span class="hljs-keyword">import</span> { get } <span class="hljs-keyword">from</span> <span class="hljs-string">'https'</span>;
+<span class="hljs-keyword">import</span> { get } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:https'</span>;
 
 <span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">resolve</span>(<span class="hljs-params">specifier, context, defaultResolve</span>) {
   <span class="hljs-keyword">const</span> { parentURL = <span class="hljs-literal">null</span> } = context;
@@ -907,26 +1218,23 @@ and there is no security.</p>
 prints the current version of CoffeeScript per the module at the URL in
 <code>main.mjs</code>.</p>
 <h5>Transpiler loader<span><a class="mark" href="#transpiler-loader" id="transpiler-loader">#</a></span><a aria-hidden="true" class="legacy" id="esm_transpiler_loader"></a></h5>
-<p>Sources that are in formats Node.js doesn’t understand can be converted into
+<p>Sources that are in formats Node.js doesn't understand can be converted into
 JavaScript using the <a href="#loadurl-context-defaultload"><code>load</code> hook</a>. Before that hook gets called,
-however, a <a href="#resolvespecifier-context-defaultresolve"><code>resolve</code> hook</a> hook needs to tell Node.js not to
+however, a <a href="#resolvespecifier-context-defaultresolve"><code>resolve</code> hook</a> needs to tell Node.js not to
 throw an error on unknown file types.</p>
 <p>This is less performant than transpiling source files before running
 Node.js; a transpiler loader should only be used for development and testing
 purposes.</p>
 <pre><code class="language-js"><span class="hljs-comment">// coffeescript-loader.mjs</span>
-<span class="hljs-keyword">import</span> { readFile } <span class="hljs-keyword">from</span> <span class="hljs-string">'fs/promises'</span>;
-<span class="hljs-keyword">import</span> { readFileSync } <span class="hljs-keyword">from</span> <span class="hljs-string">'fs'</span>;
-<span class="hljs-keyword">import</span> { createRequire } <span class="hljs-keyword">from</span> <span class="hljs-string">'module'</span>;
-<span class="hljs-keyword">import</span> { dirname, extname, resolve <span class="hljs-keyword">as</span> resolvePath } <span class="hljs-keyword">from</span> <span class="hljs-string">'path'</span>;
-<span class="hljs-keyword">import</span> { cwd } <span class="hljs-keyword">from</span> <span class="hljs-string">'process'</span>;
-<span class="hljs-keyword">import</span> { fileURLToPath, pathToFileURL } <span class="hljs-keyword">from</span> <span class="hljs-string">'url'</span>;
-
+<span class="hljs-keyword">import</span> { readFile } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:fs/promises'</span>;
+<span class="hljs-keyword">import</span> { dirname, extname, resolve <span class="hljs-keyword">as</span> resolvePath } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:path'</span>;
+<span class="hljs-keyword">import</span> { cwd } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:process'</span>;
+<span class="hljs-keyword">import</span> { fileURLToPath, pathToFileURL } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:url'</span>;
 <span class="hljs-keyword">import</span> <span class="hljs-title class_">CoffeeScript</span> <span class="hljs-keyword">from</span> <span class="hljs-string">'coffeescript'</span>;
 
-<span class="hljs-keyword">const</span> baseURL = <span class="hljs-title function_">pathToFileURL</span>(<span class="hljs-string">`<span class="hljs-subst">${cwd}</span>/`</span>).<span class="hljs-property">href</span>;
+<span class="hljs-keyword">const</span> baseURL = <span class="hljs-title function_">pathToFileURL</span>(<span class="hljs-string">`<span class="hljs-subst">${cwd()}</span>/`</span>).<span class="hljs-property">href</span>;
 
-<span class="hljs-comment">// CoffeeScript files end in .coffee, .litcoffee or .coffee.md.</span>
+<span class="hljs-comment">// CoffeeScript files end in .coffee, .litcoffee, or .coffee.md.</span>
 <span class="hljs-keyword">const</span> extensionsRegex = <span class="hljs-regexp">/\.coffee$|\.litcoffee$|\.coffee\.md$/</span>;
 
 <span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">resolve</span>(<span class="hljs-params">specifier, context, defaultResolve</span>) {
@@ -990,7 +1298,7 @@ purposes.</p>
   <span class="hljs-comment">// required by the spec</span>
   <span class="hljs-comment">// this simple truthy check for whether `url` contains a file extension will</span>
   <span class="hljs-comment">// work for most projects but does not cover some edge-cases (such as</span>
-  <span class="hljs-comment">// extension-less files or a url ending in a trailing space)</span>
+  <span class="hljs-comment">// extensionless files or a url ending in a trailing space)</span>
   <span class="hljs-keyword">const</span> isFilePath = !!<span class="hljs-title function_">extname</span>(url);
   <span class="hljs-comment">// If it is a file path, get the directory it's in</span>
   <span class="hljs-keyword">const</span> dir = isFilePath ?
@@ -1001,7 +1309,7 @@ purposes.</p>
   <span class="hljs-keyword">const</span> packagePath = <span class="hljs-title function_">resolvePath</span>(dir, <span class="hljs-string">'package.json'</span>);
   <span class="hljs-comment">// Try to read the possibly nonexistent package.json</span>
   <span class="hljs-keyword">const</span> type = <span class="hljs-keyword">await</span> <span class="hljs-title function_">readFile</span>(packagePath, { <span class="hljs-attr">encoding</span>: <span class="hljs-string">'utf8'</span> })
-    .<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">filestring</span>) =></span> <span class="hljs-variable constant_">JSON</span>.<span class="hljs-title function_">parse</span>(filestring).<span class="hljs-property">type</span>)
+    .<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">filestring</span>) =></span> <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">parse</span>(filestring).<span class="hljs-property">type</span>)
     .<span class="hljs-title function_">catch</span>(<span class="hljs-function">(<span class="hljs-params">err</span>) =></span> {
       <span class="hljs-keyword">if</span> (err?.<span class="hljs-property">code</span> !== <span class="hljs-string">'ENOENT'</span>) <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(err);
     });
@@ -1015,7 +1323,7 @@ purposes.</p>
 <span class="hljs-keyword">import</span> { scream } <span class="hljs-keyword">from</span> <span class="hljs-string">'./scream.coffee'</span>
 console.log scream <span class="hljs-string">'hello, world'</span>
 
-<span class="hljs-keyword">import</span> { version } <span class="hljs-keyword">from</span> <span class="hljs-string">'process'</span>
+<span class="hljs-keyword">import</span> { version } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:process'</span>
 console.log <span class="hljs-string">"Brought to you by Node.js version <span class="hljs-subst">#{version}</span>"</span></code></pre>
 <pre><code class="language-coffee"><span class="hljs-comment"># scream.coffee</span>
 <span class="hljs-keyword">export</span> scream = <span class="hljs-function"><span class="hljs-params">(str)</span> -></span> str.toUpperCase()</code></pre>
@@ -1076,7 +1384,7 @@ which is not a supported target for module imports.</li>
 <em>specifier</em> as a URL.</li>
 </ol>
 </li>
-<li>Otherwise, if <em>specifier</em> starts with <em>"/"</em>, <em>"./"</em> or <em>"../"</em>, then
+<li>Otherwise, if <em>specifier</em> starts with <em>"/"</em>, <em>"./"</em>, or <em>"../"</em>, then
 <ol>
 <li>Set <em>resolved</em> to the URL resolution of <em>specifier</em> relative to
 <em>parentURL</em>.</li>
@@ -1084,9 +1392,9 @@ which is not a supported target for module imports.</li>
 </li>
 <li>Otherwise, if <em>specifier</em> starts with <em>"#"</em>, then
 <ol>
-<li>Set <em>resolved</em> to the destructured value of the result of
-<strong>PACKAGE_IMPORTS_RESOLVE</strong>(<em>specifier</em>, <em>parentURL</em>,
-<em>defaultConditions</em>).</li>
+<li>Set <em>resolved</em> to the result of
+<strong>PACKAGE_IMPORTS_RESOLVE</strong>(<em>specifier</em>,
+<em>parentURL</em>, <em>defaultConditions</em>).</li>
 </ol>
 </li>
 <li>Otherwise,
@@ -1096,7 +1404,10 @@ which is not a supported target for module imports.</li>
 <strong>PACKAGE_RESOLVE</strong>(<em>specifier</em>, <em>parentURL</em>).</li>
 </ol>
 </li>
-<li>If <em>resolved</em> contains any percent encodings of <em>"/"</em> or <em>"\"</em> (<em>"%2f"</em>
+<li>Let <em>format</em> be <strong>undefined</strong>.</li>
+<li>If <em>resolved</em> is a <em>"file:"</em> URL, then
+<ol>
+<li>If <em>resolved</em> contains any percent encodings of <em>"/"</em> or <em>"\"</em> (<em>"%2F"</em>
 and <em>"%5C"</em> respectively), then
 <ol>
 <li>Throw an <em>Invalid Module Specifier</em> error.</li>
@@ -1112,10 +1423,18 @@ and <em>"%5C"</em> respectively), then
 <li>Throw a <em>Module Not Found</em> error.</li>
 </ol>
 </li>
-<li>Set <em>resolved</em> to the real path of <em>resolved</em>.</li>
-<li>Let <em>format</em> be the result of <strong>ESM_FORMAT</strong>(<em>resolved</em>).</li>
+<li>Set <em>resolved</em> to the real path of <em>resolved</em>, maintaining the
+same URL querystring and fragment components.</li>
+<li>Set <em>format</em> to the result of <strong>ESM_FILE_FORMAT</strong>(<em>resolved</em>).</li>
+</ol>
+</li>
+<li>Otherwise,
+<ol>
+<li>Set <em>format</em> the module format of the content type associated with the
+URL <em>resolved</em>.</li>
+</ol>
+</li>
 <li>Load <em>resolved</em> as module format, <em>format</em>.</li>
-<li>Return <em>resolved</em>.</li>
 </ol>
 </blockquote>
 <p><strong>PACKAGE_RESOLVE</strong>(<em>packageSpecifier</em>, <em>parentURL</em>)</p>
@@ -1125,6 +1444,11 @@ and <em>"%5C"</em> respectively), then
 <li>If <em>packageSpecifier</em> is an empty string, then
 <ol>
 <li>Throw an <em>Invalid Module Specifier</em> error.</li>
+</ol>
+</li>
+<li>If <em>packageSpecifier</em> is a Node.js builtin module name, then
+<ol>
+<li>Return the string <em>"node:"</em> concatenated with <em>packageSpecifier</em>.</li>
 </ol>
 </li>
 <li>If <em>packageSpecifier</em> does not start with <em>"@"</em>, then
@@ -1151,15 +1475,14 @@ until the second <em>"/"</em> separator or the end of the string.</li>
 </li>
 <li>Let <em>packageSubpath</em> be <em>"."</em> concatenated with the substring of
 <em>packageSpecifier</em> from the position at the length of <em>packageName</em>.</li>
+<li>If <em>packageSubpath</em> ends in <em>"/"</em>, then
+<ol>
+<li>Throw an <em>Invalid Module Specifier</em> error.</li>
+</ol>
+</li>
 <li>Let <em>selfUrl</em> be the result of
 <strong>PACKAGE_SELF_RESOLVE</strong>(<em>packageName</em>, <em>packageSubpath</em>, <em>parentURL</em>).</li>
 <li>If <em>selfUrl</em> is not <strong>undefined</strong>, return <em>selfUrl</em>.</li>
-<li>If <em>packageSubpath</em> is <em>"."</em> and <em>packageName</em> is a Node.js builtin
-module, then
-<ol>
-<li>Return the string <em>"node:"</em> concatenated with <em>packageSpecifier</em>.</li>
-</ol>
-</li>
 <li>While <em>parentURL</em> is not the file system root,
 <ol>
 <li>Let <em>packageURL</em> be the URL resolution of <em>"node_modules/"</em>
@@ -1167,7 +1490,6 @@ concatenated with <em>packageSpecifier</em>, relative to <em>parentURL</em>.</li
 <li>Set <em>parentURL</em> to the parent folder URL of <em>parentURL</em>.</li>
 <li>If the folder at <em>packageURL</em> does not exist, then
 <ol>
-<li>Set <em>parentURL</em> to the parent URL path of <em>parentURL</em>.</li>
 <li>Continue the next loop iteration.</li>
 </ol>
 </li>
@@ -1175,17 +1497,17 @@ concatenated with <em>packageSpecifier</em>, relative to <em>parentURL</em>.</li
 <li>If <em>pjson</em> is not <strong>null</strong> and <em>pjson</em>.<em>exports</em> is not <strong>null</strong> or
 <strong>undefined</strong>, then
 <ol>
-<li>Let <em>exports</em> be <em>pjson.exports</em>.</li>
-<li>Return the <em>resolved</em> destructured value of the result of
-<strong>PACKAGE_EXPORTS_RESOLVE</strong>(<em>packageURL</em>, <em>packageSubpath</em>,
-<em>pjson.exports</em>, <em>defaultConditions</em>).</li>
+<li>Return the result of <strong>PACKAGE_EXPORTS_RESOLVE</strong>(<em>packageURL</em>,
+<em>packageSubpath</em>, <em>pjson.exports</em>, <em>defaultConditions</em>).</li>
 </ol>
 </li>
 <li>Otherwise, if <em>packageSubpath</em> is equal to <em>"."</em>, then
 <ol>
-<li>Return the result applying the legacy <strong>LOAD_AS_DIRECTORY</strong>
-CommonJS resolver to <em>packageURL</em>, throwing a <em>Module Not Found</em>
-error for no resolution.</li>
+<li>If <em>pjson.main</em> is a string, then
+<ol>
+<li>Return the URL resolution of <em>main</em> in <em>packageURL</em>.</li>
+</ol>
+</li>
 </ol>
 </li>
 <li>Otherwise,
@@ -1201,7 +1523,7 @@ error for no resolution.</li>
 <p><strong>PACKAGE_SELF_RESOLVE</strong>(<em>packageName</em>, <em>packageSubpath</em>, <em>parentURL</em>)</p>
 <blockquote>
 <ol>
-<li>Let <em>packageURL</em> be the result of <strong>READ_PACKAGE_SCOPE</strong>(<em>parentURL</em>).</li>
+<li>Let <em>packageURL</em> be the result of <strong>LOOKUP_PACKAGE_SCOPE</strong>(<em>parentURL</em>).</li>
 <li>If <em>packageURL</em> is <strong>null</strong>, then
 <ol>
 <li>Return <strong>undefined</strong>.</li>
@@ -1216,9 +1538,8 @@ error for no resolution.</li>
 </li>
 <li>If <em>pjson.name</em> is equal to <em>packageName</em>, then
 <ol>
-<li>Return the <em>resolved</em> destructured value of the result of
-<strong>PACKAGE_EXPORTS_RESOLVE</strong>(<em>packageURL</em>, <em>packageSubpath</em>,
-<em>pjson.exports</em>, <em>defaultConditions</em>).</li>
+<li>Return the result of <strong>PACKAGE_EXPORTS_RESOLVE</strong>(<em>packageURL</em>,
+<em>packageSubpath</em>, <em>pjson.exports</em>, <em>defaultConditions</em>).</li>
 </ol>
 </li>
 <li>Otherwise, return <strong>undefined</strong>.</li>
@@ -1248,11 +1569,7 @@ starting with <em>"."</em>, then
 <li>Let <em>resolved</em> be the result of <strong>PACKAGE_TARGET_RESOLVE</strong>(
 <em>packageURL</em>, <em>mainExport</em>, <em>""</em>, <strong>false</strong>, <strong>false</strong>,
 <em>conditions</em>).</li>
-<li>If <em>resolved</em> is not <strong>null</strong> or <strong>undefined</strong>, then
-<ol>
-<li>Return <em>resolved</em>.</li>
-</ol>
-</li>
+<li>If <em>resolved</em> is not <strong>null</strong> or <strong>undefined</strong>, return <em>resolved</em>.</li>
 </ol>
 </li>
 </ol>
@@ -1261,13 +1578,9 @@ starting with <em>"."</em>, then
 <em>"."</em>, then
 <ol>
 <li>Let <em>matchKey</em> be the string <em>"./"</em> concatenated with <em>subpath</em>.</li>
-<li>Let <em>resolvedMatch</em> be result of <strong>PACKAGE_IMPORTS_EXPORTS_RESOLVE</strong>(
+<li>Let <em>resolved</em> be the result of <strong>PACKAGE_IMPORTS_EXPORTS_RESOLVE</strong>(
 <em>matchKey</em>, <em>exports</em>, <em>packageURL</em>, <strong>false</strong>, <em>conditions</em>).</li>
-<li>If <em>resolvedMatch</em>.<em>resolve</em> is not <strong>null</strong> or <strong>undefined</strong>, then
-<ol>
-<li>Return <em>resolvedMatch</em>.</li>
-</ol>
-</li>
+<li>If <em>resolved</em> is not <strong>null</strong> or <strong>undefined</strong>, return <em>resolved</em>.</li>
 </ol>
 </li>
 <li>Throw a <em>Package Path Not Exported</em> error.</li>
@@ -1282,20 +1595,16 @@ starting with <em>"."</em>, then
 <li>Throw an <em>Invalid Module Specifier</em> error.</li>
 </ol>
 </li>
-<li>Let <em>packageURL</em> be the result of <strong>READ_PACKAGE_SCOPE</strong>(<em>parentURL</em>).</li>
+<li>Let <em>packageURL</em> be the result of <strong>LOOKUP_PACKAGE_SCOPE</strong>(<em>parentURL</em>).</li>
 <li>If <em>packageURL</em> is not <strong>null</strong>, then
 <ol>
 <li>Let <em>pjson</em> be the result of <strong>READ_PACKAGE_JSON</strong>(<em>packageURL</em>).</li>
 <li>If <em>pjson.imports</em> is a non-null Object, then
 <ol>
-<li>Let <em>resolvedMatch</em> be the result of
-<strong>PACKAGE_IMPORTS_EXPORTS_RESOLVE</strong>(<em>specifier</em>, <em>pjson.imports</em>,
-<em>packageURL</em>, <strong>true</strong>, <em>conditions</em>).</li>
-<li>If <em>resolvedMatch</em>.<em>resolve</em> is not <strong>null</strong> or <strong>undefined</strong>, then
-<ol>
-<li>Return <em>resolvedMatch</em>.</li>
-</ol>
-</li>
+<li>Let <em>resolved</em> be the result of
+<strong>PACKAGE_IMPORTS_EXPORTS_RESOLVE</strong>(
+<em>specifier</em>, <em>pjson.imports</em>, <em>packageURL</em>, <strong>true</strong>, <em>conditions</em>).</li>
+<li>If <em>resolved</em> is not <strong>null</strong> or <strong>undefined</strong>, return <em>resolved</em>.</li>
 </ol>
 </li>
 </ol>
@@ -1307,28 +1616,22 @@ starting with <em>"."</em>, then
 <em>isImports</em>, <em>conditions</em>)</p>
 <blockquote>
 <ol>
-<li>If <em>matchKey</em> is a key of <em>matchObj</em> and does not end in <em>"/"</em> or contain
-<em>"*"</em>, then
+<li>If <em>matchKey</em> is a key of <em>matchObj</em> and does not contain <em>"*"</em>, then
 <ol>
 <li>Let <em>target</em> be the value of <em>matchObj</em>[<em>matchKey</em>].</li>
-<li>Let <em>resolved</em> be the result of <strong>PACKAGE_TARGET_RESOLVE</strong>(
-<em>packageURL</em>, <em>target</em>, <em>""</em>, <strong>false</strong>, <em>isImports</em>, <em>conditions</em>).</li>
-<li>Return the object <em>{ resolved, exact: <strong>true</strong> }</em>.</li>
+<li>Return the result of <strong>PACKAGE_TARGET_RESOLVE</strong>(<em>packageURL</em>,
+<em>target</em>, <em>""</em>, <strong>false</strong>, <em>isImports</em>, <em>conditions</em>).</li>
 </ol>
 </li>
-<li>Let <em>expansionKeys</em> be the list of keys of <em>matchObj</em> either ending in
-<em>"/"</em> or containing only a single <em>"*"</em>, sorted by the sorting function
-<strong>PATTERN_KEY_COMPARE</strong> which orders in descending order of specificity.</li>
+<li>Let <em>expansionKeys</em> be the list of keys of <em>matchObj</em> containing only a
+single <em>"*"</em>, sorted by the sorting function <strong>PATTERN_KEY_COMPARE</strong>
+which orders in descending order of specificity.</li>
 <li>For each key <em>expansionKey</em> in <em>expansionKeys</em>, do
 <ol>
-<li>Let <em>patternBase</em> be <strong>null</strong>.</li>
-<li>If <em>expansionKey</em> contains <em>"*"</em>, set <em>patternBase</em> to the substring of
-<em>expansionKey</em> up to but excluding the first <em>"*"</em> character.</li>
-<li>If <em>patternBase</em> is not <strong>null</strong> and <em>matchKey</em> starts with but is not
-equal to <em>patternBase</em>, then
+<li>Let <em>patternBase</em> be the substring of <em>expansionKey</em> up to but excluding
+the first <em>"*"</em> character.</li>
+<li>If <em>matchKey</em> starts with but is not equal to <em>patternBase</em>, then
 <ol>
-<li>If <em>matchKey</em> ends with <em>"/"</em>, throw an <em>Invalid Module Specifier</em>
-error.</li>
 <li>Let <em>patternTrailer</em> be the substring of <em>expansionKey</em> from the
 index after the first <em>"*"</em> character.</li>
 <li>If <em>patternTrailer</em> has zero length, or if <em>matchKey</em> ends with
@@ -1339,29 +1642,15 @@ equal to the length of <em>expansionKey</em>, then
 <li>Let <em>subpath</em> be the substring of <em>matchKey</em> starting at the
 index of the length of <em>patternBase</em> up to the length of
 <em>matchKey</em> minus the length of <em>patternTrailer</em>.</li>
-<li>Let <em>resolved</em> be the result of <strong>PACKAGE_TARGET_RESOLVE</strong>(
-<em>packageURL</em>, <em>target</em>, <em>subpath</em>, <strong>true</strong>, <em>isImports</em>,
-<em>conditions</em>).</li>
-<li>Return the object <em>{ resolved, exact: <strong>true</strong> }</em>.</li>
+<li>Return the result of <strong>PACKAGE_TARGET_RESOLVE</strong>(<em>packageURL</em>,
+<em>target</em>, <em>subpath</em>, <strong>true</strong>, <em>isImports</em>, <em>conditions</em>).</li>
 </ol>
 </li>
 </ol>
 </li>
-<li>Otherwise if <em>patternBase</em> is <strong>null</strong> and <em>matchKey</em> starts with
-<em>expansionKey</em>, then
-<ol>
-<li>Let <em>target</em> be the value of <em>matchObj</em>[<em>expansionKey</em>].</li>
-<li>Let <em>subpath</em> be the substring of <em>matchKey</em> starting at the
-index of the length of <em>expansionKey</em>.</li>
-<li>Let <em>resolved</em> be the result of <strong>PACKAGE_TARGET_RESOLVE</strong>(
-<em>packageURL</em>, <em>target</em>, <em>subpath</em>, <strong>false</strong>, <em>isImports</em>,
-<em>conditions</em>).</li>
-<li>Return the object <em>{ resolved, exact: <strong>false</strong> }</em>.</li>
 </ol>
 </li>
-</ol>
-</li>
-<li>Return the object <em>{ resolved: <strong>null</strong>, exact: <strong>true</strong> }</em>.</li>
+<li>Return <strong>null</strong>.</li>
 </ol>
 </blockquote>
 <p><strong>PATTERN_KEY_COMPARE</strong>(<em>keyA</em>, <em>keyB</em>)</p>
@@ -1398,24 +1687,26 @@ does not end with <em>"/"</em>, throw an <em>Invalid Module Specifier</em> error
 <li>If <em>pattern</em> is <strong>true</strong>, then
 <ol>
 <li>Return <strong>PACKAGE_RESOLVE</strong>(<em>target</em> with every instance of
-<em>"*"</em> replaced by <em>subpath</em>, <em>packageURL</em> + <em>"/"</em>)_.</li>
+<em>"*"</em> replaced by <em>subpath</em>, <em>packageURL</em> + <em>"/"</em>).</li>
 </ol>
 </li>
 <li>Return <strong>PACKAGE_RESOLVE</strong>(<em>target</em> + <em>subpath</em>,
-<em>packageURL</em> + <em>"/"</em>)_.</li>
+<em>packageURL</em> + <em>"/"</em>).</li>
 </ol>
 </li>
 <li>Otherwise, throw an <em>Invalid Package Target</em> error.</li>
 </ol>
 </li>
-<li>If <em>target</em> split on <em>"/"</em> or <em>"\"</em> contains any <em>"."</em>, <em>".."</em> or
-<em>"node_modules"</em> segments after the first segment, throw an
-<em>Invalid Package Target</em> error.</li>
+<li>If <em>target</em> split on <em>"/"</em> or <em>"\"</em> contains any <em>"."</em>, <em>".."</em>, or
+<em>"node_modules"</em> segments after the first segment, case insensitive and
+including percent encoded variants, throw an <em>Invalid Package Target</em>
+error.</li>
 <li>Let <em>resolvedTarget</em> be the URL resolution of the concatenation of
 <em>packageURL</em> and <em>target</em>.</li>
 <li>Assert: <em>resolvedTarget</em> is contained in <em>packageURL</em>.</li>
-<li>If <em>subpath</em> split on <em>"/"</em> or <em>"\"</em> contains any <em>"."</em>, <em>".."</em> or
-<em>"node_modules"</em> segments, throw an <em>Invalid Module Specifier</em> error.</li>
+<li>If <em>subpath</em> split on <em>"/"</em> or <em>"\"</em> contains any <em>"."</em>, <em>".."</em>, or
+<em>"node_modules"</em> segments, case insensitive and including percent
+encoded variants, throw an <em>Invalid Module Specifier</em> error.</li>
 <li>If <em>pattern</em> is <strong>true</strong>, then
 <ol>
 <li>Return the URL resolution of <em>resolvedTarget</em> with every instance of
@@ -1472,11 +1763,10 @@ error.</li>
 <li>Otherwise throw an <em>Invalid Package Target</em> error.</li>
 </ol>
 </blockquote>
-<p><strong>ESM_FORMAT</strong>(<em>url</em>)</p>
+<p><strong>ESM_FILE_FORMAT</strong>(<em>url</em>)</p>
 <blockquote>
 <ol>
 <li>Assert: <em>url</em> corresponds to an existing file.</li>
-<li>Let <em>pjson</em> be the result of <strong>READ_PACKAGE_SCOPE</strong>(<em>url</em>).</li>
 <li>If <em>url</em> ends in <em>".mjs"</em>, then
 <ol>
 <li>Return <em>"module"</em>.</li>
@@ -1487,6 +1777,13 @@ error.</li>
 <li>Return <em>"commonjs"</em>.</li>
 </ol>
 </li>
+<li>If <em>url</em> ends in <em>".json"</em>, then
+<ol>
+<li>Return <em>"json"</em>.</li>
+</ol>
+</li>
+<li>Let <em>packageURL</em> be the result of <strong>LOOKUP_PACKAGE_SCOPE</strong>(<em>url</em>).</li>
+<li>Let <em>pjson</em> be the result of <strong>READ_PACKAGE_JSON</strong>(<em>packageURL</em>).</li>
 <li>If <em>pjson?.type</em> exists and is <em>"module"</em>, then
 <ol>
 <li>If <em>url</em> ends in <em>".js"</em>, then
@@ -1504,7 +1801,7 @@ error.</li>
 </li>
 </ol>
 </blockquote>
-<p><strong>READ_PACKAGE_SCOPE</strong>(<em>url</em>)</p>
+<p><strong>LOOKUP_PACKAGE_SCOPE</strong>(<em>url</em>)</p>
 <blockquote>
 <ol>
 <li>Let <em>scopeURL</em> be <em>url</em>.</li>
@@ -1512,10 +1809,11 @@ error.</li>
 <ol>
 <li>Set <em>scopeURL</em> to the parent URL of <em>scopeURL</em>.</li>
 <li>If <em>scopeURL</em> ends in a <em>"node_modules"</em> path segment, return <strong>null</strong>.</li>
-<li>Let <em>pjson</em> be the result of <strong>READ_PACKAGE_JSON</strong>(<em>scopeURL</em>).</li>
-<li>If <em>pjson</em> is not <strong>null</strong>, then
+<li>Let <em>pjsonURL</em> be the resolution of <em>"package.json"</em> within
+<em>scopeURL</em>.</li>
+<li>if the file at <em>pjsonURL</em> exists, then
 <ol>
-<li>Return <em>pjson</em>.</li>
+<li>Return <em>scopeURL</em>.</li>
 </ol>
 </li>
 </ol>
@@ -1542,6 +1840,11 @@ error.</li>
 </blockquote>
 <h4>Customizing ESM specifier resolution algorithm<span><a class="mark" href="#customizing-esm-specifier-resolution-algorithm" id="customizing-esm-specifier-resolution-algorithm">#</a></span><a aria-hidden="true" class="legacy" id="esm_customizing_esm_specifier_resolution_algorithm"></a></h4>
 <p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<blockquote>
+<p>Do not rely on this flag. We plan to remove it once the
+<a href="#loaders">Loaders API</a> has advanced to the point that equivalent functionality can
+be achieved via custom loaders.</p>
+</blockquote>
 <p>The current specifier resolution does not support all default behavior of
 the CommonJS loader. One of the behavior differences is automatic resolution
 of file extensions and the ability to import directories that have an index
@@ -1551,52 +1854,16 @@ the extension resolution algorithm. The default mode is <code>explicit</code>, w
 requires the full path to a module be provided to the loader. To enable the
 automatic extension resolution and importing from directories that include an
 index file use the <code>node</code> mode.</p>
-<pre><code class="language-console"><span class="hljs-meta">$ </span><span class="language-bash">node index.mjs</span>
+<pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">node index.mjs</span>
 success!
-<span class="hljs-meta">$ </span><span class="language-bash">node index <span class="hljs-comment"># Failure!</span></span>
+<span class="hljs-meta prompt_">$ </span><span class="language-bash">node index <span class="hljs-comment"># Failure!</span></span>
 Error: Cannot find module
-<span class="hljs-meta">$ </span><span class="language-bash">node --experimental-specifier-resolution=node index</span>
+<span class="hljs-meta prompt_">$ </span><span class="language-bash">node --experimental-specifier-resolution=node index</span>
 success!</code></pre>
 <!-- Note: The cjs-module-lexer link should be kept in-sync with the deps version --></section>
         <!-- API END -->
       </div>
     </div>
   </div>
-  <script>
-    'use strict';
-    {
-      const kCustomPreference = 'customDarkTheme';
-      const userSettings = sessionStorage.getItem(kCustomPreference);
-      const themeToggleButton = document.getElementById('theme-toggle-btn');
-      if (userSettings === null && window.matchMedia) {
-        const mq = window.matchMedia('(prefers-color-scheme: dark)');
-        if ('onchange' in mq) {
-          function mqChangeListener(e) {
-            document.body.classList.toggle('dark-mode', e.matches);
-          }
-          mq.addEventListener('change', mqChangeListener);
-          if (themeToggleButton) {
-            themeToggleButton.addEventListener('click', function() {
-              mq.removeEventListener('change', mqChangeListener);
-            }, { once: true });
-          }
-        }
-        if (mq.matches) {
-          document.body.classList.add('dark-mode');
-        }
-      } else if (userSettings === 'true') {
-        document.body.classList.add('dark-mode');
-      }
-      if (themeToggleButton) {
-        themeToggleButton.hidden = false;
-        themeToggleButton.addEventListener('click', function() {
-          sessionStorage.setItem(
-            kCustomPreference,
-            document.body.classList.toggle('dark-mode')
-          );
-        });
-      }
-    }
-  </script>
 </body>
 </html>

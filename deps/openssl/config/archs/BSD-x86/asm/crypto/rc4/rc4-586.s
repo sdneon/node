@@ -4,6 +4,11 @@
 .align	4
 _RC4:
 L_RC4_begin:
+	%ifdef __CET__
+
+.byte	243,15,30,251
+	%endif
+
 	pushl	%ebp
 	pushl	%ebx
 	pushl	%esi
@@ -270,6 +275,11 @@ L000abort:
 .align	4
 _RC4_set_key:
 L_RC4_set_key_begin:
+	%ifdef __CET__
+
+.byte	243,15,30,251
+	%endif
+
 	pushl	%ebp
 	pushl	%ebx
 	pushl	%esi
@@ -348,6 +358,11 @@ L015exit:
 .align	4
 _RC4_options:
 L_RC4_options_begin:
+	%ifdef __CET__
+
+.byte	243,15,30,251
+	%endif
+
 	call	L018pic_point
 L018pic_point:
 	popl	%eax

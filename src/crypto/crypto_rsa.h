@@ -7,7 +7,6 @@
 #include "crypto/crypto_keygen.h"
 #include "crypto/crypto_keys.h"
 #include "crypto/crypto_util.h"
-#include "allocated_buffer.h"
 #include "env.h"
 #include "memory_tracker.h"
 #include "v8.h"
@@ -133,6 +132,7 @@ v8::Maybe<bool> GetRsaKeyDetail(
 
 namespace RSAAlg {
 void Initialize(Environment* env, v8::Local<v8::Object> target);
+void RegisterExternalReferences(ExternalReferenceRegistry* registry);
 }  // namespace RSAAlg
 }  // namespace crypto
 }  // namespace node

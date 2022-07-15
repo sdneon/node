@@ -17,7 +17,7 @@ While the `Buffer` class is available within the global scope, it is still
 recommended to explicitly reference it via an import or require statement.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 // Creates a zero-filled Buffer of length 10.
 const buf1 = Buffer.alloc(10);
@@ -50,7 +50,7 @@ const buf7 = Buffer.from('tést', 'latin1');
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 // Creates a zero-filled Buffer of length 10.
 const buf1 = Buffer.alloc(10);
@@ -83,9 +83,12 @@ const buf7 = Buffer.from('tést', 'latin1');
 ```
 
 ## Buffers and character encodings
+
 <!-- YAML
 changes:
-  - version: v15.7.0
+  - version:
+      - v15.7.0
+      - v14.18.0
     pr-url: https://github.com/nodejs/node/pull/36952
     description: Introduced `base64url` encoding.
   - version: v6.4.0
@@ -101,7 +104,7 @@ specified. If no character encoding is specified, UTF-8 will be used as the
 default.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.from('hello world', 'utf8');
 
@@ -117,7 +120,7 @@ console.log(Buffer.from('fhqwhgads', 'utf16le'));
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.from('hello world', 'utf8');
 
@@ -133,7 +136,7 @@ console.log(Buffer.from('fhqwhgads', 'utf16le'));
 ```
 
 Node.js buffers accept all case variations of encoding strings that they
-receive. For example, UTF-8 can be specified as `'utf8'`, `'UTF8'` or `'uTf8'`.
+receive. For example, UTF-8 can be specified as `'utf8'`, `'UTF8'`, or `'uTf8'`.
 
 The character encodings currently supported by Node.js are the following:
 
@@ -172,8 +175,8 @@ string into a `Buffer` as decoding.
   encoding a `Buffer` to a string, this encoding will omit padding.
 
 * `'hex'`: Encode each byte as two hexadecimal characters. Data truncation
-  may occur when decoding strings that do exclusively contain valid hexadecimal
-  characters. See below for an example.
+  may occur when decoding strings that do not exclusively consist of an even
+  number of hexadecimal characters. See below for an example.
 
 The following legacy character encodings are also supported:
 
@@ -196,13 +199,13 @@ The following legacy character encodings are also supported:
   U+FFFF. In Node.js, these code points are always supported.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
-Buffer.from('1ag', 'hex');
+Buffer.from('1ag123', 'hex');
 // Prints <Buffer 1a>, data truncated when first non-hexadecimal value
 // ('g') encountered.
 
-Buffer.from('1a7g', 'hex');
+Buffer.from('1a7', 'hex');
 // Prints <Buffer 1a>, data truncated when data ends in single digit ('7').
 
 Buffer.from('1634', 'hex');
@@ -210,13 +213,13 @@ Buffer.from('1634', 'hex');
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
-Buffer.from('1ag', 'hex');
+Buffer.from('1ag123', 'hex');
 // Prints <Buffer 1a>, data truncated when first non-hexadecimal value
 // ('g') encountered.
 
-Buffer.from('1a7g', 'hex');
+Buffer.from('1a7', 'hex');
 // Prints <Buffer 1a>, data truncated when data ends in single digit ('7').
 
 Buffer.from('1634', 'hex');
@@ -231,6 +234,7 @@ the WHATWG specification it is possible that the server actually returned
 the characters.
 
 ## Buffers and TypedArrays
+
 <!-- YAML
 changes:
   - version: v3.0.0
@@ -250,7 +254,7 @@ In particular:
   without copying. This behavior can be surprising, and only exists for legacy
   compatibility. [`TypedArray.prototype.subarray()`][] can be used to achieve
   the behavior of [`Buffer.prototype.slice()`][`buf.slice()`] on both `Buffer`s
-  and other `TypedArray`s.
+  and other `TypedArray`s and should be preferred.
 * [`buf.toString()`][] is incompatible with its `TypedArray` equivalent.
 * A number of methods, e.g. [`buf.indexOf()`][], support additional arguments.
 
@@ -261,7 +265,7 @@ There are two ways to create new [`TypedArray`][] instances from a `Buffer`:
   of the target type.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.from([1, 2, 3, 4]);
 const uint32array = new Uint32Array(buf);
@@ -272,7 +276,7 @@ console.log(uint32array);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.from([1, 2, 3, 4]);
 const uint32array = new Uint32Array(buf);
@@ -286,7 +290,7 @@ console.log(uint32array);
   [`TypedArray`][] that shares its memory with the `Buffer`.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.from('hello', 'utf16le');
 const uint16array = new Uint16Array(
@@ -300,7 +304,7 @@ console.log(uint16array);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.from('hello', 'utf16le');
 const uint16array = new Uint16Array(
@@ -314,12 +318,12 @@ console.log(uint16array);
 ```
 
 It is possible to create a new `Buffer` that shares the same allocated
-memory as a [`TypedArray`][] instance by using the `TypedArray` object’s
+memory as a [`TypedArray`][] instance by using the `TypedArray` object's
 `.buffer` property in the same way. [`Buffer.from()`][`Buffer.from(arrayBuf)`]
 behaves like `new Uint8Array()` in this context.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const arr = new Uint16Array(2);
 
@@ -346,7 +350,7 @@ console.log(buf2);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const arr = new Uint16Array(2);
 
@@ -377,7 +381,7 @@ possible to use only a portion of the underlying [`ArrayBuffer`][] by passing in
 `byteOffset` and `length` parameters.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const arr = new Uint16Array(20);
 const buf = Buffer.from(arr.buffer, 0, 16);
@@ -387,7 +391,7 @@ console.log(buf.length);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const arr = new Uint16Array(20);
 const buf = Buffer.from(arr.buffer, 0, 16);
@@ -416,7 +420,7 @@ function:
 `Buffer` instances can be iterated over using `for..of` syntax:
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.from([1, 2, 3]);
 
@@ -430,7 +434,7 @@ for (const b of buf) {
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.from([1, 2, 3]);
 
@@ -447,18 +451,26 @@ Additionally, the [`buf.values()`][], [`buf.keys()`][], and
 [`buf.entries()`][] methods can be used to create iterators.
 
 ## Class: `Blob`
-<!-- YAML
-added: v15.7.0
--->
 
-> Stability: 1 - Experimental
+<!-- YAML
+added:
+  - v15.7.0
+  - v14.18.0
+changes:
+  - version: v18.0.0
+    pr-url: https://github.com/nodejs/node/pull/41270
+    description: No longer experimental.
+-->
 
 A [`Blob`][] encapsulates immutable, raw data that can be safely shared across
 multiple worker threads.
 
 ### `new buffer.Blob([sources[, options]])`
+
 <!-- YAML
-added: v15.7.0
+added:
+  - v15.7.0
+  - v14.18.0
 changes:
   - version: v16.7.0
     pr-url: https://github.com/nodejs/node/pull/39708
@@ -466,13 +478,13 @@ changes:
                  and removed the non-standard `encoding` option.
 -->
 
-* `sources` {string[]|ArrayBuffer[]|TypedArray[]|DataView[]|Blob[]} An array
-  of string, {ArrayBuffer}, {TypedArray}, {DataView}, or {Blob} objects, or
-  any mix of such objects, that will be stored within the `Blob`.
+* `sources` {string\[]|ArrayBuffer\[]|TypedArray\[]|DataView\[]|Blob\[]} An
+  array of string, {ArrayBuffer}, {TypedArray}, {DataView}, or {Blob} objects,
+  or any mix of such objects, that will be stored within the `Blob`.
 * `options` {Object}
   * `endings` {string} One of either `'transparent'` or `'native'`. When set
     to `'native'`, line endings in string source parts will be converted to
-    the platform native line-ending as specified by `require('os').EOL`.
+    the platform native line-ending as specified by `require('node:os').EOL`.
   * `type` {string} The Blob content-type. The intent is for `type` to convey
     the MIME media type of the data, however no validation of the type format
     is performed.
@@ -487,8 +499,11 @@ Unmatched surrogate pairs within each string part will be replaced by Unicode
 U+FFFD replacement characters.
 
 ### `blob.arrayBuffer()`
+
 <!-- YAML
-added: v15.7.0
+added:
+  - v15.7.0
+  - v14.18.0
 -->
 
 * Returns: {Promise}
@@ -497,15 +512,21 @@ Returns a promise that fulfills with an {ArrayBuffer} containing a copy of
 the `Blob` data.
 
 ### `blob.size`
+
 <!-- YAML
-added: v15.7.0
+added:
+  - v15.7.0
+  - v14.18.0
 -->
 
 The total size of the `Blob` in bytes.
 
-### `blob.slice([start, [end, [type]]])`
+### `blob.slice([start[, end[, type]]])`
+
 <!-- YAML
-added: v15.7.0
+added:
+  - v15.7.0
+  - v14.18.0
 -->
 
 * `start` {number} The starting index.
@@ -516,6 +537,7 @@ Creates and returns a new `Blob` containing a subset of this `Blob` objects
 data. The original `Blob` is not altered.
 
 ### `blob.stream()`
+
 <!-- YAML
 added: v16.7.0
 -->
@@ -525,8 +547,11 @@ added: v16.7.0
 Returns a new `ReadableStream` that allows the content of the `Blob` to be read.
 
 ### `blob.text()`
+
 <!-- YAML
-added: v15.7.0
+added:
+  - v15.7.0
+  - v14.18.0
 -->
 
 * Returns: {Promise}
@@ -535,8 +560,11 @@ Returns a promise that fulfills with the contents of the `Blob` decoded as a
 UTF-8 string.
 
 ### `blob.type`
+
 <!-- YAML
-added: v15.7.0
+added:
+  - v15.7.0
+  - v14.18.0
 -->
 
 * Type: {string}
@@ -551,8 +579,8 @@ contained by the `Blob` is copied only when the `arrayBuffer()` or `text()`
 methods are called.
 
 ```mjs
-import { Blob, Buffer } from 'buffer';
-import { setTimeout as delay } from 'timers/promises';
+import { Blob, Buffer } from 'node:buffer';
+import { setTimeout as delay } from 'node:timers/promises';
 
 const blob = new Blob(['hello there']);
 
@@ -578,8 +606,8 @@ blob.text().then(console.log);
 ```
 
 ```cjs
-const { Blob, Buffer } = require('buffer');
-const { setTimeout: delay } = require('timers/promises');
+const { Blob, Buffer } = require('node:buffer');
+const { setTimeout: delay } = require('node:timers/promises');
 
 const blob = new Blob(['hello there']);
 
@@ -610,6 +638,7 @@ The `Buffer` class is a global type for dealing with binary data directly.
 It can be constructed in a variety of ways.
 
 ### Static method: `Buffer.alloc(size[, fill[, encoding]])`
+
 <!-- YAML
 added: v5.10.0
 changes:
@@ -641,7 +670,7 @@ Allocates a new `Buffer` of `size` bytes. If `fill` is `undefined`, the
 `Buffer` will be zero-filled.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.alloc(5);
 
@@ -650,7 +679,7 @@ console.log(buf);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.alloc(5);
 
@@ -666,7 +695,7 @@ If `fill` is specified, the allocated `Buffer` will be initialized by calling
 [`buf.fill(fill)`][`buf.fill()`].
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.alloc(5, 'a');
 
@@ -675,7 +704,7 @@ console.log(buf);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.alloc(5, 'a');
 
@@ -687,7 +716,7 @@ If both `fill` and `encoding` are specified, the allocated `Buffer` will be
 initialized by calling [`buf.fill(fill, encoding)`][`buf.fill()`].
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.alloc(11, 'aGVsbG8gd29ybGQ=', 'base64');
 
@@ -696,7 +725,7 @@ console.log(buf);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.alloc(11, 'aGVsbG8gd29ybGQ=', 'base64');
 
@@ -712,6 +741,7 @@ data that might not have been allocated for `Buffer`s.
 A `TypeError` will be thrown if `size` is not a number.
 
 ### Static method: `Buffer.allocUnsafe(size)`
+
 <!-- YAML
 added: v5.10.0
 changes:
@@ -730,13 +760,13 @@ Allocates a new `Buffer` of `size` bytes. If `size` is larger than
 [`buffer.constants.MAX_LENGTH`][] or smaller than 0, [`ERR_INVALID_ARG_VALUE`][]
 is thrown.
 
-The underlying memory for `Buffer` instances created in this way is *not
-initialized*. The contents of the newly created `Buffer` are unknown and
-*may contain sensitive data*. Use [`Buffer.alloc()`][] instead to initialize
+The underlying memory for `Buffer` instances created in this way is _not
+initialized_. The contents of the newly created `Buffer` are unknown and
+_may contain sensitive data_. Use [`Buffer.alloc()`][] instead to initialize
 `Buffer` instances with zeroes.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.allocUnsafe(10);
 
@@ -750,7 +780,7 @@ console.log(buf);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.allocUnsafe(10);
 
@@ -774,13 +804,14 @@ to `Buffer.poolSize >> 1` (floor of [`Buffer.poolSize`][] divided by two).
 
 Use of this pre-allocated internal memory pool is a key difference between
 calling `Buffer.alloc(size, fill)` vs. `Buffer.allocUnsafe(size).fill(fill)`.
-Specifically, `Buffer.alloc(size, fill)` will *never* use the internal `Buffer`
-pool, while `Buffer.allocUnsafe(size).fill(fill)` *will* use the internal
+Specifically, `Buffer.alloc(size, fill)` will _never_ use the internal `Buffer`
+pool, while `Buffer.allocUnsafe(size).fill(fill)` _will_ use the internal
 `Buffer` pool if `size` is less than or equal to half [`Buffer.poolSize`][]. The
 difference is subtle but can be important when an application requires the
 additional performance that [`Buffer.allocUnsafe()`][] provides.
 
 ### Static method: `Buffer.allocUnsafeSlow(size)`
+
 <!-- YAML
 added: v5.12.0
 changes:
@@ -796,13 +827,13 @@ Allocates a new `Buffer` of `size` bytes. If `size` is larger than
 [`buffer.constants.MAX_LENGTH`][] or smaller than 0, [`ERR_INVALID_ARG_VALUE`][]
 is thrown. A zero-length `Buffer` is created if `size` is 0.
 
-The underlying memory for `Buffer` instances created in this way is *not
-initialized*. The contents of the newly created `Buffer` are unknown and
-*may contain sensitive data*. Use [`buf.fill(0)`][`buf.fill()`] to initialize
+The underlying memory for `Buffer` instances created in this way is _not
+initialized_. The contents of the newly created `Buffer` are unknown and
+_may contain sensitive data_. Use [`buf.fill(0)`][`buf.fill()`] to initialize
 such `Buffer` instances with zeroes.
 
 When using [`Buffer.allocUnsafe()`][] to allocate new `Buffer` instances,
-allocations under 4 KB are sliced from a single pre-allocated `Buffer`. This
+allocations under 4 KiB are sliced from a single pre-allocated `Buffer`. This
 allows applications to avoid the garbage collection overhead of creating many
 individually allocated `Buffer` instances. This approach improves both
 performance and memory usage by eliminating the need to track and clean up as
@@ -814,7 +845,7 @@ to create an un-pooled `Buffer` instance using `Buffer.allocUnsafeSlow()` and
 then copying out the relevant bits.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 // Need to keep around a few small chunks of memory.
 const store = [];
@@ -834,7 +865,7 @@ socket.on('readable', () => {
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 // Need to keep around a few small chunks of memory.
 const store = [];
@@ -856,6 +887,7 @@ socket.on('readable', () => {
 A `TypeError` will be thrown if `size` is not a number.
 
 ### Static method: `Buffer.byteLength(string[, encoding])`
+
 <!-- YAML
 added: v0.1.90
 changes:
@@ -884,7 +916,7 @@ return value might be greater than the length of a `Buffer` created from the
 string.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const str = '\u00bd + \u00bc = \u00be';
 
@@ -894,7 +926,7 @@ console.log(`${str}: ${str.length} characters, ` +
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const str = '\u00bd + \u00bc = \u00be';
 
@@ -908,6 +940,7 @@ When `string` is a `Buffer`/[`DataView`][]/[`TypedArray`][]/[`ArrayBuffer`][]/
 is returned.
 
 ### Static method: `Buffer.compare(buf1, buf2)`
+
 <!-- YAML
 added: v0.11.13
 changes:
@@ -926,7 +959,7 @@ Compares `buf1` to `buf2`, typically for the purpose of sorting arrays of
 [`buf1.compare(buf2)`][`buf.compare()`].
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf1 = Buffer.from('1234');
 const buf2 = Buffer.from('0123');
@@ -938,7 +971,7 @@ console.log(arr.sort(Buffer.compare));
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf1 = Buffer.from('1234');
 const buf2 = Buffer.from('0123');
@@ -950,6 +983,7 @@ console.log(arr.sort(Buffer.compare));
 ```
 
 ### Static method: `Buffer.concat(list[, totalLength])`
+
 <!-- YAML
 added: v0.7.11
 changes:
@@ -958,7 +992,7 @@ changes:
     description: The elements of `list` can now be `Uint8Array`s.
 -->
 
-* `list` {Buffer[] | Uint8Array[]} List of `Buffer` or [`Uint8Array`][]
+* `list` {Buffer\[] | Uint8Array\[]} List of `Buffer` or [`Uint8Array`][]
   instances to concatenate.
 * `totalLength` {integer} Total length of the `Buffer` instances in `list`
   when concatenated.
@@ -978,7 +1012,7 @@ combined length of the `Buffer`s in `list` exceeds `totalLength`, the result is
 truncated to `totalLength`.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 // Create a single `Buffer` from a list of three `Buffer` instances.
 
@@ -999,7 +1033,7 @@ console.log(bufA.length);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 // Create a single `Buffer` from a list of three `Buffer` instances.
 
@@ -1023,24 +1057,25 @@ console.log(bufA.length);
 [`Buffer.allocUnsafe()`][] does.
 
 ### Static method: `Buffer.from(array)`
+
 <!-- YAML
 added: v5.10.0
 -->
 
-* `array` {integer[]}
+* `array` {integer\[]}
 
 Allocates a new `Buffer` using an `array` of bytes in the range `0` – `255`.
 Array entries outside that range will be truncated to fit into it.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 // Creates a new Buffer containing the UTF-8 bytes of the string 'buffer'.
 const buf = Buffer.from([0x62, 0x75, 0x66, 0x66, 0x65, 0x72]);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 // Creates a new Buffer containing the UTF-8 bytes of the string 'buffer'.
 const buf = Buffer.from([0x62, 0x75, 0x66, 0x66, 0x65, 0x72]);
@@ -1053,6 +1088,7 @@ appropriate for `Buffer.from()` variants.
 `Buffer` pool like [`Buffer.allocUnsafe()`][] does.
 
 ### Static method: `Buffer.from(arrayBuffer[, byteOffset[, length]])`
+
 <!-- YAML
 added: v5.10.0
 -->
@@ -1070,7 +1106,7 @@ memory. For example, when passed a reference to the `.buffer` property of a
 allocated memory as the [`TypedArray`][]'s underlying `ArrayBuffer`.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const arr = new Uint16Array(2);
 
@@ -1091,7 +1127,7 @@ console.log(buf);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const arr = new Uint16Array(2);
 
@@ -1115,7 +1151,7 @@ The optional `byteOffset` and `length` arguments specify a memory range within
 the `arrayBuffer` that will be shared by the `Buffer`.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const ab = new ArrayBuffer(10);
 const buf = Buffer.from(ab, 0, 2);
@@ -1125,7 +1161,7 @@ console.log(buf.length);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const ab = new ArrayBuffer(10);
 const buf = Buffer.from(ab, 0, 2);
@@ -1144,7 +1180,7 @@ of memory that extends beyond the bounds of a `TypedArray` view. A new
 beyond the range of the `TypedArray`:
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const arrA = Uint8Array.from([0x63, 0x64, 0x65, 0x66]); // 4 elements
 const arrB = new Uint8Array(arrA.buffer, 1, 2); // 2 elements
@@ -1156,7 +1192,7 @@ console.log(buf);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const arrA = Uint8Array.from([0x63, 0x64, 0x65, 0x66]); // 4 elements
 const arrB = new Uint8Array(arrA.buffer, 1, 2); // 2 elements
@@ -1168,6 +1204,7 @@ console.log(buf);
 ```
 
 ### Static method: `Buffer.from(buffer)`
+
 <!-- YAML
 added: v5.10.0
 -->
@@ -1178,7 +1215,7 @@ added: v5.10.0
 Copies the passed `buffer` data onto a new `Buffer` instance.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf1 = Buffer.from('buffer');
 const buf2 = Buffer.from(buf1);
@@ -1192,7 +1229,7 @@ console.log(buf2.toString());
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf1 = Buffer.from('buffer');
 const buf2 = Buffer.from(buf1);
@@ -1209,6 +1246,7 @@ A `TypeError` will be thrown if `buffer` is not a `Buffer` or another type
 appropriate for `Buffer.from()` variants.
 
 ### Static method: `Buffer.from(object[, offsetOrEncoding[, length]])`
+
 <!-- YAML
 added: v8.2.0
 -->
@@ -1221,14 +1259,14 @@ For objects whose `valueOf()` function returns a value not strictly equal to
 `object`, returns `Buffer.from(object.valueOf(), offsetOrEncoding, length)`.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.from(new String('this is a test'));
 // Prints: <Buffer 74 68 69 73 20 69 73 20 61 20 74 65 73 74>
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.from(new String('this is a test'));
 // Prints: <Buffer 74 68 69 73 20 69 73 20 61 20 74 65 73 74>
@@ -1238,7 +1276,7 @@ For objects that support `Symbol.toPrimitive`, returns
 `Buffer.from(object[Symbol.toPrimitive]('string'), offsetOrEncoding)`.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 class Foo {
   [Symbol.toPrimitive]() {
@@ -1251,7 +1289,7 @@ const buf = Buffer.from(new Foo(), 'utf8');
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 class Foo {
   [Symbol.toPrimitive]() {
@@ -1267,6 +1305,7 @@ A `TypeError` will be thrown if `object` does not have the mentioned methods or
 is not of another type appropriate for `Buffer.from()` variants.
 
 ### Static method: `Buffer.from(string[, encoding])`
+
 <!-- YAML
 added: v5.10.0
 -->
@@ -1278,7 +1317,7 @@ Creates a new `Buffer` containing `string`. The `encoding` parameter identifies
 the character encoding to be used when converting `string` into bytes.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf1 = Buffer.from('this is a tést');
 const buf2 = Buffer.from('7468697320697320612074c3a97374', 'hex');
@@ -1292,7 +1331,7 @@ console.log(buf1.toString('latin1'));
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf1 = Buffer.from('this is a tést');
 const buf2 = Buffer.from('7468697320697320612074c3a97374', 'hex');
@@ -1309,6 +1348,7 @@ A `TypeError` will be thrown if `string` is not a string or another type
 appropriate for `Buffer.from()` variants.
 
 ### Static method: `Buffer.isBuffer(obj)`
+
 <!-- YAML
 added: v0.1.101
 -->
@@ -1319,7 +1359,7 @@ added: v0.1.101
 Returns `true` if `obj` is a `Buffer`, `false` otherwise.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 Buffer.isBuffer(Buffer.alloc(10)); // true
 Buffer.isBuffer(Buffer.from('foo')); // true
@@ -1329,7 +1369,7 @@ Buffer.isBuffer(new Uint8Array(1024)); // false
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 Buffer.isBuffer(Buffer.alloc(10)); // true
 Buffer.isBuffer(Buffer.from('foo')); // true
@@ -1339,6 +1379,7 @@ Buffer.isBuffer(new Uint8Array(1024)); // false
 ```
 
 ### Static method: `Buffer.isEncoding(encoding)`
+
 <!-- YAML
 added: v0.9.1
 -->
@@ -1350,7 +1391,7 @@ Returns `true` if `encoding` is the name of a supported character encoding,
 or `false` otherwise.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 console.log(Buffer.isEncoding('utf8'));
 // Prints: true
@@ -1366,7 +1407,7 @@ console.log(Buffer.isEncoding(''));
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 console.log(Buffer.isEncoding('utf8'));
 // Prints: true
@@ -1382,6 +1423,7 @@ console.log(Buffer.isEncoding(''));
 ```
 
 ### Class property: `Buffer.poolSize`
+
 <!-- YAML
 added: v0.11.3
 -->
@@ -1406,7 +1448,7 @@ access is the same as `Uint8Array`. In other words, `buf[index]` returns
 `>= buf.length`.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 // Copy an ASCII string into a `Buffer` one byte at a time.
 // (This only works for ASCII-only strings. In general, one should use
@@ -1424,7 +1466,7 @@ console.log(buf.toString('utf8'));
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 // Copy an ASCII string into a `Buffer` one byte at a time.
 // (This only works for ASCII-only strings. In general, one should use
@@ -1450,7 +1492,7 @@ This `ArrayBuffer` is not guaranteed to correspond exactly to the original
 `Buffer`. See the notes on `buf.byteOffset` for details.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const arrayBuffer = new ArrayBuffer(16);
 const buffer = Buffer.from(arrayBuffer);
@@ -1460,7 +1502,7 @@ console.log(buffer.buffer === arrayBuffer);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const arrayBuffer = new ArrayBuffer(16);
 const buffer = Buffer.from(arrayBuffer);
@@ -1485,10 +1527,10 @@ A common issue when creating a `TypedArray` object that shares its memory with
 a `Buffer` is that in this case one needs to specify the `byteOffset` correctly:
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 // Create a buffer smaller than `Buffer.poolSize`.
-const nodeBuffer = new Buffer.from([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+const nodeBuffer = Buffer.from([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
 
 // When casting the Node.js Buffer to an Int8Array, use the byteOffset
 // to refer only to the part of `nodeBuffer.buffer` that contains the memory
@@ -1497,10 +1539,10 @@ new Int8Array(nodeBuffer.buffer, nodeBuffer.byteOffset, nodeBuffer.length);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 // Create a buffer smaller than `Buffer.poolSize`.
-const nodeBuffer = new Buffer.from([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+const nodeBuffer = Buffer.from([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
 
 // When casting the Node.js Buffer to an Int8Array, use the byteOffset
 // to refer only to the part of `nodeBuffer.buffer` that contains the memory
@@ -1509,6 +1551,7 @@ new Int8Array(nodeBuffer.buffer, nodeBuffer.byteOffset, nodeBuffer.length);
 ```
 
 ### `buf.compare(target[, targetStart[, targetEnd[, sourceStart[, sourceEnd]]]])`
+
 <!-- YAML
 added: v0.11.13
 changes:
@@ -1537,11 +1580,11 @@ comes before, after, or is the same as `target` in sort order.
 Comparison is based on the actual sequence of bytes in each `Buffer`.
 
 * `0` is returned if `target` is the same as `buf`
-* `1` is returned if `target` should come *before* `buf` when sorted.
-* `-1` is returned if `target` should come *after* `buf` when sorted.
+* `1` is returned if `target` should come _before_ `buf` when sorted.
+* `-1` is returned if `target` should come _after_ `buf` when sorted.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf1 = Buffer.from('ABC');
 const buf2 = Buffer.from('BCD');
@@ -1563,7 +1606,7 @@ console.log([buf1, buf2, buf3].sort(Buffer.compare));
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf1 = Buffer.from('ABC');
 const buf2 = Buffer.from('BCD');
@@ -1589,7 +1632,7 @@ arguments can be used to limit the comparison to specific ranges within `target`
 and `buf` respectively.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf1 = Buffer.from([1, 2, 3, 4, 5, 6, 7, 8, 9]);
 const buf2 = Buffer.from([5, 6, 7, 8, 9, 1, 2, 3, 4]);
@@ -1603,7 +1646,7 @@ console.log(buf1.compare(buf2, 5, 6, 5));
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf1 = Buffer.from([1, 2, 3, 4, 5, 6, 7, 8, 9]);
 const buf2 = Buffer.from([5, 6, 7, 8, 9, 1, 2, 3, 4]);
@@ -1620,6 +1663,7 @@ console.log(buf1.compare(buf2, 5, 6, 5));
 `targetEnd > target.byteLength`, or `sourceEnd > source.byteLength`.
 
 ### `buf.copy(target[, targetStart[, sourceStart[, sourceEnd]]])`
+
 <!-- YAML
 added: v0.1.90
 -->
@@ -1641,7 +1685,7 @@ for all TypedArrays, including Node.js `Buffer`s, although it takes
 different function arguments.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 // Create two `Buffer` instances.
 const buf1 = Buffer.allocUnsafe(26);
@@ -1662,7 +1706,7 @@ console.log(buf2.toString('ascii', 0, 25));
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 // Create two `Buffer` instances.
 const buf1 = Buffer.allocUnsafe(26);
@@ -1683,7 +1727,7 @@ console.log(buf2.toString('ascii', 0, 25));
 ```
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 // Create a `Buffer` and copy data from one region to an overlapping region
 // within the same `Buffer`.
@@ -1702,7 +1746,7 @@ console.log(buf.toString());
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 // Create a `Buffer` and copy data from one region to an overlapping region
 // within the same `Buffer`.
@@ -1721,6 +1765,7 @@ console.log(buf.toString());
 ```
 
 ### `buf.entries()`
+
 <!-- YAML
 added: v1.1.0
 -->
@@ -1731,7 +1776,7 @@ Creates and returns an [iterator][] of `[index, byte]` pairs from the contents
 of `buf`.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 // Log the entire contents of a `Buffer`.
 
@@ -1750,7 +1795,7 @@ for (const pair of buf.entries()) {
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 // Log the entire contents of a `Buffer`.
 
@@ -1769,6 +1814,7 @@ for (const pair of buf.entries()) {
 ```
 
 ### `buf.equals(otherBuffer)`
+
 <!-- YAML
 added: v0.11.13
 changes:
@@ -1786,7 +1832,7 @@ Returns `true` if both `buf` and `otherBuffer` have exactly the same bytes,
 [`buf.compare(otherBuffer) === 0`][`buf.compare()`].
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf1 = Buffer.from('ABC');
 const buf2 = Buffer.from('414243', 'hex');
@@ -1799,7 +1845,7 @@ console.log(buf1.equals(buf3));
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf1 = Buffer.from('ABC');
 const buf2 = Buffer.from('414243', 'hex');
@@ -1812,6 +1858,7 @@ console.log(buf1.equals(buf3));
 ```
 
 ### `buf.fill(value[, offset[, end]][, encoding])`
+
 <!-- YAML
 added: v0.5.0
 changes:
@@ -1847,7 +1894,7 @@ Fills `buf` with the specified `value`. If the `offset` and `end` are not given,
 the entire `buf` will be filled:
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 // Fill a `Buffer` with the ASCII character 'h'.
 
@@ -1858,7 +1905,7 @@ console.log(b.toString());
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 // Fill a `Buffer` with the ASCII character 'h'.
 
@@ -1876,7 +1923,7 @@ If the final write of a `fill()` operation falls on a multi-byte character,
 then only the bytes of that character that fit into `buf` are written:
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 // Fill a `Buffer` with character that takes up two bytes in UTF-8.
 
@@ -1885,7 +1932,7 @@ console.log(Buffer.allocUnsafe(5).fill('\u0222'));
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 // Fill a `Buffer` with character that takes up two bytes in UTF-8.
 
@@ -1897,7 +1944,7 @@ If `value` contains invalid characters, it is truncated; if no valid
 fill data remains, an exception is thrown:
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.allocUnsafe(5);
 
@@ -1910,7 +1957,7 @@ console.log(buf.fill('zz', 'hex'));
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.allocUnsafe(5);
 
@@ -1923,6 +1970,7 @@ console.log(buf.fill('zz', 'hex'));
 ```
 
 ### `buf.includes(value[, byteOffset][, encoding])`
+
 <!-- YAML
 added: v5.3.0
 -->
@@ -1937,7 +1985,7 @@ added: v5.3.0
 Equivalent to [`buf.indexOf() !== -1`][`buf.indexOf()`].
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.from('this is a buffer');
 
@@ -1958,7 +2006,7 @@ console.log(buf.includes('this', 4));
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.from('this is a buffer');
 
@@ -1979,6 +2027,7 @@ console.log(buf.includes('this', 4));
 ```
 
 ### `buf.indexOf(value[, byteOffset][, encoding])`
+
 <!-- YAML
 added: v1.5.0
 changes:
@@ -2007,12 +2056,12 @@ If `value` is:
 * a string, `value` is interpreted according to the character encoding in
   `encoding`.
 * a `Buffer` or [`Uint8Array`][], `value` will be used in its entirety.
-  To compare a partial `Buffer`, use [`buf.slice()`][].
+  To compare a partial `Buffer`, use [`buf.subarray`][].
 * a number, `value` will be interpreted as an unsigned 8-bit integer
   value between `0` and `255`.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.from('this is a buffer');
 
@@ -2038,7 +2087,7 @@ console.log(utf16Buffer.indexOf('\u03a3', -4, 'utf16le'));
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.from('this is a buffer');
 
@@ -2072,7 +2121,7 @@ of coercion is `NaN` or `0`, then the entire buffer will be searched. This
 behavior matches [`String.prototype.indexOf()`][].
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const b = Buffer.from('abcdef');
 
@@ -2090,7 +2139,7 @@ console.log(b.indexOf('b', []));
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const b = Buffer.from('abcdef');
 
@@ -2112,6 +2161,7 @@ than `buf.length`, `byteOffset` will be returned. If `value` is empty and
 `byteOffset` is at least `buf.length`, `buf.length` will be returned.
 
 ### `buf.keys()`
+
 <!-- YAML
 added: v1.1.0
 -->
@@ -2121,7 +2171,7 @@ added: v1.1.0
 Creates and returns an [iterator][] of `buf` keys (indices).
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.from('buffer');
 
@@ -2138,7 +2188,7 @@ for (const key of buf.keys()) {
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.from('buffer');
 
@@ -2155,6 +2205,7 @@ for (const key of buf.keys()) {
 ```
 
 ### `buf.lastIndexOf(value[, byteOffset][, encoding])`
+
 <!-- YAML
 added: v6.0.0
 changes:
@@ -2177,7 +2228,7 @@ Identical to [`buf.indexOf()`][], except the last occurrence of `value` is found
 rather than the first occurrence.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.from('this buffer is a buffer');
 
@@ -2205,7 +2256,7 @@ console.log(utf16Buffer.lastIndexOf('\u03a3', -5, 'utf16le'));
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.from('this buffer is a buffer');
 
@@ -2241,7 +2292,7 @@ that coerce to `NaN`, like `{}` or `undefined`, will search the whole buffer.
 This behavior matches [`String.prototype.lastIndexOf()`][].
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const b = Buffer.from('abcdef');
 
@@ -2262,7 +2313,7 @@ console.log(b.lastIndexOf('b', []));
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const b = Buffer.from('abcdef');
 
@@ -2285,6 +2336,7 @@ console.log(b.lastIndexOf('b', []));
 If `value` is an empty string or empty `Buffer`, `byteOffset` will be returned.
 
 ### `buf.length`
+
 <!-- YAML
 added: v0.1.90
 -->
@@ -2294,7 +2346,7 @@ added: v0.1.90
 Returns the number of bytes in `buf`.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 // Create a `Buffer` and write a shorter string to it using UTF-8.
 
@@ -2310,7 +2362,7 @@ console.log(buf.length);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 // Create a `Buffer` and write a shorter string to it using UTF-8.
 
@@ -2326,6 +2378,7 @@ console.log(buf.length);
 ```
 
 ### `buf.parent`
+
 <!-- YAML
 deprecated: v8.0.0
 -->
@@ -2335,6 +2388,7 @@ deprecated: v8.0.0
 The `buf.parent` property is a deprecated alias for `buf.buffer`.
 
 ### `buf.readBigInt64BE([offset])`
+
 <!-- YAML
 added:
  - v12.0.0
@@ -2351,6 +2405,7 @@ Integers read from a `Buffer` are interpreted as two's complement signed
 values.
 
 ### `buf.readBigInt64LE([offset])`
+
 <!-- YAML
 added:
  - v12.0.0
@@ -2368,6 +2423,7 @@ Integers read from a `Buffer` are interpreted as two's complement signed
 values.
 
 ### `buf.readBigUInt64BE([offset])`
+
 <!-- YAML
 added:
  - v12.0.0
@@ -2390,7 +2446,7 @@ Reads an unsigned, big-endian 64-bit integer from `buf` at the specified
 This function is also available under the `readBigUint64BE` alias.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.from([0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff]);
 
@@ -2399,7 +2455,7 @@ console.log(buf.readBigUInt64BE(0));
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.from([0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff]);
 
@@ -2408,6 +2464,7 @@ console.log(buf.readBigUInt64BE(0));
 ```
 
 ### `buf.readBigUInt64LE([offset])`
+
 <!-- YAML
 added:
  - v12.0.0
@@ -2430,7 +2487,7 @@ Reads an unsigned, little-endian 64-bit integer from `buf` at the specified
 This function is also available under the `readBigUint64LE` alias.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.from([0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff]);
 
@@ -2439,7 +2496,7 @@ console.log(buf.readBigUInt64LE(0));
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.from([0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff]);
 
@@ -2448,6 +2505,7 @@ console.log(buf.readBigUInt64LE(0));
 ```
 
 ### `buf.readDoubleBE([offset])`
+
 <!-- YAML
 added: v0.11.15
 changes:
@@ -2464,7 +2522,7 @@ changes:
 Reads a 64-bit, big-endian double from `buf` at the specified `offset`.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.from([1, 2, 3, 4, 5, 6, 7, 8]);
 
@@ -2473,7 +2531,7 @@ console.log(buf.readDoubleBE(0));
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.from([1, 2, 3, 4, 5, 6, 7, 8]);
 
@@ -2482,6 +2540,7 @@ console.log(buf.readDoubleBE(0));
 ```
 
 ### `buf.readDoubleLE([offset])`
+
 <!-- YAML
 added: v0.11.15
 changes:
@@ -2498,7 +2557,7 @@ changes:
 Reads a 64-bit, little-endian double from `buf` at the specified `offset`.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.from([1, 2, 3, 4, 5, 6, 7, 8]);
 
@@ -2509,7 +2568,7 @@ console.log(buf.readDoubleLE(1));
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.from([1, 2, 3, 4, 5, 6, 7, 8]);
 
@@ -2520,6 +2579,7 @@ console.log(buf.readDoubleLE(1));
 ```
 
 ### `buf.readFloatBE([offset])`
+
 <!-- YAML
 added: v0.11.15
 changes:
@@ -2536,7 +2596,7 @@ changes:
 Reads a 32-bit, big-endian float from `buf` at the specified `offset`.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.from([1, 2, 3, 4]);
 
@@ -2545,7 +2605,7 @@ console.log(buf.readFloatBE(0));
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.from([1, 2, 3, 4]);
 
@@ -2554,6 +2614,7 @@ console.log(buf.readFloatBE(0));
 ```
 
 ### `buf.readFloatLE([offset])`
+
 <!-- YAML
 added: v0.11.15
 changes:
@@ -2570,7 +2631,7 @@ changes:
 Reads a 32-bit, little-endian float from `buf` at the specified `offset`.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.from([1, 2, 3, 4]);
 
@@ -2581,7 +2642,7 @@ console.log(buf.readFloatLE(1));
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.from([1, 2, 3, 4]);
 
@@ -2592,6 +2653,7 @@ console.log(buf.readFloatLE(1));
 ```
 
 ### `buf.readInt8([offset])`
+
 <!-- YAML
 added: v0.5.0
 changes:
@@ -2610,7 +2672,7 @@ Reads a signed 8-bit integer from `buf` at the specified `offset`.
 Integers read from a `Buffer` are interpreted as two's complement signed values.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.from([-1, 5]);
 
@@ -2623,7 +2685,7 @@ console.log(buf.readInt8(2));
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.from([-1, 5]);
 
@@ -2636,6 +2698,7 @@ console.log(buf.readInt8(2));
 ```
 
 ### `buf.readInt16BE([offset])`
+
 <!-- YAML
 added: v0.5.5
 changes:
@@ -2654,7 +2717,7 @@ Reads a signed, big-endian 16-bit integer from `buf` at the specified `offset`.
 Integers read from a `Buffer` are interpreted as two's complement signed values.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.from([0, 5]);
 
@@ -2663,7 +2726,7 @@ console.log(buf.readInt16BE(0));
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.from([0, 5]);
 
@@ -2672,6 +2735,7 @@ console.log(buf.readInt16BE(0));
 ```
 
 ### `buf.readInt16LE([offset])`
+
 <!-- YAML
 added: v0.5.5
 changes:
@@ -2691,7 +2755,7 @@ Reads a signed, little-endian 16-bit integer from `buf` at the specified
 Integers read from a `Buffer` are interpreted as two's complement signed values.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.from([0, 5]);
 
@@ -2702,7 +2766,7 @@ console.log(buf.readInt16LE(1));
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.from([0, 5]);
 
@@ -2713,6 +2777,7 @@ console.log(buf.readInt16LE(1));
 ```
 
 ### `buf.readInt32BE([offset])`
+
 <!-- YAML
 added: v0.5.5
 changes:
@@ -2731,7 +2796,7 @@ Reads a signed, big-endian 32-bit integer from `buf` at the specified `offset`.
 Integers read from a `Buffer` are interpreted as two's complement signed values.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.from([0, 0, 0, 5]);
 
@@ -2740,7 +2805,7 @@ console.log(buf.readInt32BE(0));
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.from([0, 0, 0, 5]);
 
@@ -2749,6 +2814,7 @@ console.log(buf.readInt32BE(0));
 ```
 
 ### `buf.readInt32LE([offset])`
+
 <!-- YAML
 added: v0.5.5
 changes:
@@ -2768,7 +2834,7 @@ Reads a signed, little-endian 32-bit integer from `buf` at the specified
 Integers read from a `Buffer` are interpreted as two's complement signed values.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.from([0, 0, 0, 5]);
 
@@ -2779,7 +2845,7 @@ console.log(buf.readInt32LE(1));
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.from([0, 0, 0, 5]);
 
@@ -2790,6 +2856,7 @@ console.log(buf.readInt32LE(1));
 ```
 
 ### `buf.readIntBE(offset, byteLength)`
+
 <!-- YAML
 added: v0.11.15
 changes:
@@ -2810,7 +2877,7 @@ and interprets the result as a big-endian, two's complement signed value
 supporting up to 48 bits of accuracy.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.from([0x12, 0x34, 0x56, 0x78, 0x90, 0xab]);
 
@@ -2823,7 +2890,7 @@ console.log(buf.readIntBE(1, 0).toString(16));
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.from([0x12, 0x34, 0x56, 0x78, 0x90, 0xab]);
 
@@ -2836,6 +2903,7 @@ console.log(buf.readIntBE(1, 0).toString(16));
 ```
 
 ### `buf.readIntLE(offset, byteLength)`
+
 <!-- YAML
 added: v0.11.15
 changes:
@@ -2856,7 +2924,7 @@ and interprets the result as a little-endian, two's complement signed value
 supporting up to 48 bits of accuracy.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.from([0x12, 0x34, 0x56, 0x78, 0x90, 0xab]);
 
@@ -2865,7 +2933,7 @@ console.log(buf.readIntLE(0, 6).toString(16));
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.from([0x12, 0x34, 0x56, 0x78, 0x90, 0xab]);
 
@@ -2874,6 +2942,7 @@ console.log(buf.readIntLE(0, 6).toString(16));
 ```
 
 ### `buf.readUInt8([offset])`
+
 <!-- YAML
 added: v0.5.0
 changes:
@@ -2897,7 +2966,7 @@ Reads an unsigned 8-bit integer from `buf` at the specified `offset`.
 This function is also available under the `readUint8` alias.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.from([1, -2]);
 
@@ -2910,7 +2979,7 @@ console.log(buf.readUInt8(2));
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.from([1, -2]);
 
@@ -2923,6 +2992,7 @@ console.log(buf.readUInt8(2));
 ```
 
 ### `buf.readUInt16BE([offset])`
+
 <!-- YAML
 added: v0.5.5
 changes:
@@ -2947,7 +3017,7 @@ Reads an unsigned, big-endian 16-bit integer from `buf` at the specified
 This function is also available under the `readUint16BE` alias.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.from([0x12, 0x34, 0x56]);
 
@@ -2958,7 +3028,7 @@ console.log(buf.readUInt16BE(1).toString(16));
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.from([0x12, 0x34, 0x56]);
 
@@ -2969,6 +3039,7 @@ console.log(buf.readUInt16BE(1).toString(16));
 ```
 
 ### `buf.readUInt16LE([offset])`
+
 <!-- YAML
 added: v0.5.5
 changes:
@@ -2993,7 +3064,7 @@ Reads an unsigned, little-endian 16-bit integer from `buf` at the specified
 This function is also available under the `readUint16LE` alias.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.from([0x12, 0x34, 0x56]);
 
@@ -3006,7 +3077,7 @@ console.log(buf.readUInt16LE(2).toString(16));
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.from([0x12, 0x34, 0x56]);
 
@@ -3019,6 +3090,7 @@ console.log(buf.readUInt16LE(2).toString(16));
 ```
 
 ### `buf.readUInt32BE([offset])`
+
 <!-- YAML
 added: v0.5.5
 changes:
@@ -3043,7 +3115,7 @@ Reads an unsigned, big-endian 32-bit integer from `buf` at the specified
 This function is also available under the `readUint32BE` alias.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.from([0x12, 0x34, 0x56, 0x78]);
 
@@ -3052,7 +3124,7 @@ console.log(buf.readUInt32BE(0).toString(16));
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.from([0x12, 0x34, 0x56, 0x78]);
 
@@ -3061,6 +3133,7 @@ console.log(buf.readUInt32BE(0).toString(16));
 ```
 
 ### `buf.readUInt32LE([offset])`
+
 <!-- YAML
 added: v0.5.5
 changes:
@@ -3085,7 +3158,7 @@ Reads an unsigned, little-endian 32-bit integer from `buf` at the specified
 This function is also available under the `readUint32LE` alias.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.from([0x12, 0x34, 0x56, 0x78]);
 
@@ -3096,7 +3169,7 @@ console.log(buf.readUInt32LE(1).toString(16));
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.from([0x12, 0x34, 0x56, 0x78]);
 
@@ -3107,6 +3180,7 @@ console.log(buf.readUInt32LE(1).toString(16));
 ```
 
 ### `buf.readUIntBE(offset, byteLength)`
+
 <!-- YAML
 added: v0.11.15
 changes:
@@ -3134,7 +3208,7 @@ up to 48 bits of accuracy.
 This function is also available under the `readUintBE` alias.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.from([0x12, 0x34, 0x56, 0x78, 0x90, 0xab]);
 
@@ -3145,7 +3219,7 @@ console.log(buf.readUIntBE(1, 6).toString(16));
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.from([0x12, 0x34, 0x56, 0x78, 0x90, 0xab]);
 
@@ -3156,6 +3230,7 @@ console.log(buf.readUIntBE(1, 6).toString(16));
 ```
 
 ### `buf.readUIntLE(offset, byteLength)`
+
 <!-- YAML
 added: v0.11.15
 changes:
@@ -3183,7 +3258,7 @@ up to 48 bits of accuracy.
 This function is also available under the `readUintLE` alias.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.from([0x12, 0x34, 0x56, 0x78, 0x90, 0xab]);
 
@@ -3192,7 +3267,7 @@ console.log(buf.readUIntLE(0, 6).toString(16));
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.from([0x12, 0x34, 0x56, 0x78, 0x90, 0xab]);
 
@@ -3201,6 +3276,7 @@ console.log(buf.readUIntLE(0, 6).toString(16));
 ```
 
 ### `buf.subarray([start[, end]])`
+
 <!-- YAML
 added: v3.0.0
 -->
@@ -3222,7 +3298,7 @@ Modifying the new `Buffer` slice will modify the memory in the original `Buffer`
 because the allocated memory of the two objects overlap.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 // Create a `Buffer` with the ASCII alphabet, take a slice, and modify one byte
 // from the original `Buffer`.
@@ -3246,7 +3322,7 @@ console.log(buf2.toString('ascii', 0, buf2.length));
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 // Create a `Buffer` with the ASCII alphabet, take a slice, and modify one byte
 // from the original `Buffer`.
@@ -3273,7 +3349,7 @@ Specifying negative indexes causes the slice to be generated relative to the
 end of `buf` rather than the beginning.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.from('buffer');
 
@@ -3291,7 +3367,7 @@ console.log(buf.subarray(-5, -2).toString());
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.from('buffer');
 
@@ -3309,9 +3385,13 @@ console.log(buf.subarray(-5, -2).toString());
 ```
 
 ### `buf.slice([start[, end]])`
+
 <!-- YAML
 added: v0.3.0
 changes:
+  - version: v17.5.0
+    pr-url: https://github.com/nodejs/node/pull/41596
+    description: The buf.slice() method has been deprecated.
   - version:
     - v7.1.0
     - v6.9.2
@@ -3329,17 +3409,17 @@ changes:
   **Default:** [`buf.length`][].
 * Returns: {Buffer}
 
+> Stability: 0 - Deprecated: Use [`buf.subarray`][] instead.
+
 Returns a new `Buffer` that references the same memory as the original, but
 offset and cropped by the `start` and `end` indices.
-
-This is the same behavior as `buf.subarray()`.
 
 This method is not compatible with the `Uint8Array.prototype.slice()`,
 which is a superclass of `Buffer`. To copy the slice, use
 `Uint8Array.prototype.slice()`.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.from('buffer');
 
@@ -3350,10 +3430,18 @@ console.log(copiedBuf.toString());
 
 console.log(buf.toString());
 // Prints: buffer
+
+// With buf.slice(), the original buffer is modified.
+const notReallyCopiedBuf = buf.slice();
+notReallyCopiedBuf[0]++;
+console.log(notReallyCopiedBuf.toString());
+// Prints: cuffer
+console.log(buf.toString());
+// Also prints: cuffer (!)
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.from('buffer');
 
@@ -3364,9 +3452,18 @@ console.log(copiedBuf.toString());
 
 console.log(buf.toString());
 // Prints: buffer
+
+// With buf.slice(), the original buffer is modified.
+const notReallyCopiedBuf = buf.slice();
+notReallyCopiedBuf[0]++;
+console.log(notReallyCopiedBuf.toString());
+// Prints: cuffer
+console.log(buf.toString());
+// Also prints: cuffer (!)
 ```
 
 ### `buf.swap16()`
+
 <!-- YAML
 added: v5.10.0
 -->
@@ -3374,11 +3471,11 @@ added: v5.10.0
 * Returns: {Buffer} A reference to `buf`.
 
 Interprets `buf` as an array of unsigned 16-bit integers and swaps the
-byte order *in-place*. Throws [`ERR_INVALID_BUFFER_SIZE`][] if [`buf.length`][]
+byte order _in-place_. Throws [`ERR_INVALID_BUFFER_SIZE`][] if [`buf.length`][]
 is not a multiple of 2.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf1 = Buffer.from([0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8]);
 
@@ -3397,7 +3494,7 @@ buf2.swap16();
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf1 = Buffer.from([0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8]);
 
@@ -3419,20 +3516,21 @@ One convenient use of `buf.swap16()` is to perform a fast in-place conversion
 between UTF-16 little-endian and UTF-16 big-endian:
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.from('This is little-endian UTF-16', 'utf16le');
 buf.swap16(); // Convert to big-endian UTF-16 text.
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.from('This is little-endian UTF-16', 'utf16le');
 buf.swap16(); // Convert to big-endian UTF-16 text.
 ```
 
 ### `buf.swap32()`
+
 <!-- YAML
 added: v5.10.0
 -->
@@ -3440,11 +3538,11 @@ added: v5.10.0
 * Returns: {Buffer} A reference to `buf`.
 
 Interprets `buf` as an array of unsigned 32-bit integers and swaps the
-byte order *in-place*. Throws [`ERR_INVALID_BUFFER_SIZE`][] if [`buf.length`][]
+byte order _in-place_. Throws [`ERR_INVALID_BUFFER_SIZE`][] if [`buf.length`][]
 is not a multiple of 4.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf1 = Buffer.from([0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8]);
 
@@ -3463,7 +3561,7 @@ buf2.swap32();
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf1 = Buffer.from([0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8]);
 
@@ -3482,17 +3580,18 @@ buf2.swap32();
 ```
 
 ### `buf.swap64()`
+
 <!-- YAML
 added: v6.3.0
 -->
 
 * Returns: {Buffer} A reference to `buf`.
 
-Interprets `buf` as an array of 64-bit numbers and swaps byte order *in-place*.
+Interprets `buf` as an array of 64-bit numbers and swaps byte order _in-place_.
 Throws [`ERR_INVALID_BUFFER_SIZE`][] if [`buf.length`][] is not a multiple of 8.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf1 = Buffer.from([0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8]);
 
@@ -3511,7 +3610,7 @@ buf2.swap64();
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf1 = Buffer.from([0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8]);
 
@@ -3530,6 +3629,7 @@ buf2.swap64();
 ```
 
 ### `buf.toJSON()`
+
 <!-- YAML
 added: v0.9.2
 -->
@@ -3543,7 +3643,7 @@ this function when stringifying a `Buffer` instance.
 In particular, `Buffer.from(buf.toJSON())` works like `Buffer.from(buf)`.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.from([0x1, 0x2, 0x3, 0x4, 0x5]);
 const json = JSON.stringify(buf);
@@ -3562,7 +3662,7 @@ console.log(copy);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.from([0x1, 0x2, 0x3, 0x4, 0x5]);
 const json = JSON.stringify(buf);
@@ -3581,6 +3681,7 @@ console.log(copy);
 ```
 
 ### `buf.toString([encoding[, start[, end]]])`
+
 <!-- YAML
 added: v0.1.90
 -->
@@ -3601,7 +3702,7 @@ The maximum length of a string instance (in UTF-16 code units) is available
 as [`buffer.constants.MAX_STRING_LENGTH`][].
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf1 = Buffer.allocUnsafe(26);
 
@@ -3626,7 +3727,7 @@ console.log(buf2.toString(undefined, 0, 3));
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf1 = Buffer.allocUnsafe(26);
 
@@ -3651,6 +3752,7 @@ console.log(buf2.toString(undefined, 0, 3));
 ```
 
 ### `buf.values()`
+
 <!-- YAML
 added: v1.1.0
 -->
@@ -3661,7 +3763,7 @@ Creates and returns an [iterator][] for `buf` values (bytes). This function is
 called automatically when a `Buffer` is used in a `for..of` statement.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.from('buffer');
 
@@ -3689,7 +3791,7 @@ for (const value of buf) {
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.from('buffer');
 
@@ -3717,6 +3819,7 @@ for (const value of buf) {
 ```
 
 ### `buf.write(string[, offset[, length]][, encoding])`
+
 <!-- YAML
 added: v0.1.90
 -->
@@ -3735,7 +3838,7 @@ not contain enough space to fit the entire string, only part of `string` will be
 written. However, partially encoded characters will not be written.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.alloc(256);
 
@@ -3753,7 +3856,7 @@ console.log(`${length} bytes: ${buffer.toString('utf8', 8, 10)}`);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.alloc(256);
 
@@ -3771,6 +3874,7 @@ console.log(`${length} bytes: ${buffer.toString('utf8', 8, 10)}`);
 ```
 
 ### `buf.writeBigInt64BE(value[, offset])`
+
 <!-- YAML
 added:
  - v12.0.0
@@ -3787,7 +3891,7 @@ Writes `value` to `buf` at the specified `offset` as big-endian.
 `value` is interpreted and written as a two's complement signed integer.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.allocUnsafe(8);
 
@@ -3798,7 +3902,7 @@ console.log(buf);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.allocUnsafe(8);
 
@@ -3809,6 +3913,7 @@ console.log(buf);
 ```
 
 ### `buf.writeBigInt64LE(value[, offset])`
+
 <!-- YAML
 added:
  - v12.0.0
@@ -3825,7 +3930,7 @@ Writes `value` to `buf` at the specified `offset` as little-endian.
 `value` is interpreted and written as a two's complement signed integer.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.allocUnsafe(8);
 
@@ -3836,7 +3941,7 @@ console.log(buf);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.allocUnsafe(8);
 
@@ -3847,6 +3952,7 @@ console.log(buf);
 ```
 
 ### `buf.writeBigUInt64BE(value[, offset])`
+
 <!-- YAML
 added:
  - v12.0.0
@@ -3869,7 +3975,7 @@ Writes `value` to `buf` at the specified `offset` as big-endian.
 This function is also available under the `writeBigUint64BE` alias.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.allocUnsafe(8);
 
@@ -3880,7 +3986,7 @@ console.log(buf);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.allocUnsafe(8);
 
@@ -3891,6 +3997,7 @@ console.log(buf);
 ```
 
 ### `buf.writeBigUInt64LE(value[, offset])`
+
 <!-- YAML
 added:
  - v12.0.0
@@ -3911,7 +4018,7 @@ changes:
 Writes `value` to `buf` at the specified `offset` as little-endian
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.allocUnsafe(8);
 
@@ -3922,7 +4029,7 @@ console.log(buf);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.allocUnsafe(8);
 
@@ -3935,6 +4042,7 @@ console.log(buf);
 This function is also available under the `writeBigUint64LE` alias.
 
 ### `buf.writeDoubleBE(value[, offset])`
+
 <!-- YAML
 added: v0.11.15
 changes:
@@ -3954,7 +4062,7 @@ must be a JavaScript number. Behavior is undefined when `value` is anything
 other than a JavaScript number.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.allocUnsafe(8);
 
@@ -3965,7 +4073,7 @@ console.log(buf);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.allocUnsafe(8);
 
@@ -3976,6 +4084,7 @@ console.log(buf);
 ```
 
 ### `buf.writeDoubleLE(value[, offset])`
+
 <!-- YAML
 added: v0.11.15
 changes:
@@ -3995,7 +4104,7 @@ must be a JavaScript number. Behavior is undefined when `value` is anything
 other than a JavaScript number.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.allocUnsafe(8);
 
@@ -4006,7 +4115,7 @@ console.log(buf);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.allocUnsafe(8);
 
@@ -4017,6 +4126,7 @@ console.log(buf);
 ```
 
 ### `buf.writeFloatBE(value[, offset])`
+
 <!-- YAML
 added: v0.11.15
 changes:
@@ -4035,7 +4145,7 @@ Writes `value` to `buf` at the specified `offset` as big-endian. Behavior is
 undefined when `value` is anything other than a JavaScript number.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.allocUnsafe(4);
 
@@ -4046,7 +4156,7 @@ console.log(buf);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.allocUnsafe(4);
 
@@ -4057,6 +4167,7 @@ console.log(buf);
 ```
 
 ### `buf.writeFloatLE(value[, offset])`
+
 <!-- YAML
 added: v0.11.15
 changes:
@@ -4075,7 +4186,7 @@ Writes `value` to `buf` at the specified `offset` as little-endian. Behavior is
 undefined when `value` is anything other than a JavaScript number.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.allocUnsafe(4);
 
@@ -4086,7 +4197,7 @@ console.log(buf);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.allocUnsafe(4);
 
@@ -4097,6 +4208,7 @@ console.log(buf);
 ```
 
 ### `buf.writeInt8(value[, offset])`
+
 <!-- YAML
 added: v0.5.0
 changes:
@@ -4118,7 +4230,7 @@ a signed 8-bit integer.
 `value` is interpreted and written as a two's complement signed integer.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.allocUnsafe(2);
 
@@ -4130,7 +4242,7 @@ console.log(buf);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.allocUnsafe(2);
 
@@ -4142,6 +4254,7 @@ console.log(buf);
 ```
 
 ### `buf.writeInt16BE(value[, offset])`
+
 <!-- YAML
 added: v0.5.5
 changes:
@@ -4163,7 +4276,7 @@ anything other than a signed 16-bit integer.
 The `value` is interpreted and written as a two's complement signed integer.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.allocUnsafe(2);
 
@@ -4174,7 +4287,7 @@ console.log(buf);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.allocUnsafe(2);
 
@@ -4185,6 +4298,7 @@ console.log(buf);
 ```
 
 ### `buf.writeInt16LE(value[, offset])`
+
 <!-- YAML
 added: v0.5.5
 changes:
@@ -4206,7 +4320,7 @@ anything other than a signed 16-bit integer.
 The `value` is interpreted and written as a two's complement signed integer.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.allocUnsafe(2);
 
@@ -4217,7 +4331,7 @@ console.log(buf);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.allocUnsafe(2);
 
@@ -4228,6 +4342,7 @@ console.log(buf);
 ```
 
 ### `buf.writeInt32BE(value[, offset])`
+
 <!-- YAML
 added: v0.5.5
 changes:
@@ -4249,7 +4364,7 @@ anything other than a signed 32-bit integer.
 The `value` is interpreted and written as a two's complement signed integer.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.allocUnsafe(4);
 
@@ -4260,7 +4375,7 @@ console.log(buf);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.allocUnsafe(4);
 
@@ -4271,6 +4386,7 @@ console.log(buf);
 ```
 
 ### `buf.writeInt32LE(value[, offset])`
+
 <!-- YAML
 added: v0.5.5
 changes:
@@ -4292,7 +4408,7 @@ anything other than a signed 32-bit integer.
 The `value` is interpreted and written as a two's complement signed integer.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.allocUnsafe(4);
 
@@ -4303,7 +4419,7 @@ console.log(buf);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.allocUnsafe(4);
 
@@ -4314,6 +4430,7 @@ console.log(buf);
 ```
 
 ### `buf.writeIntBE(value, offset, byteLength)`
+
 <!-- YAML
 added: v0.11.15
 changes:
@@ -4335,7 +4452,7 @@ as big-endian. Supports up to 48 bits of accuracy. Behavior is undefined when
 `value` is anything other than a signed integer.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.allocUnsafe(6);
 
@@ -4346,7 +4463,7 @@ console.log(buf);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.allocUnsafe(6);
 
@@ -4357,6 +4474,7 @@ console.log(buf);
 ```
 
 ### `buf.writeIntLE(value, offset, byteLength)`
+
 <!-- YAML
 added: v0.11.15
 changes:
@@ -4378,7 +4496,7 @@ as little-endian. Supports up to 48 bits of accuracy. Behavior is undefined
 when `value` is anything other than a signed integer.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.allocUnsafe(6);
 
@@ -4389,7 +4507,7 @@ console.log(buf);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.allocUnsafe(6);
 
@@ -4400,6 +4518,7 @@ console.log(buf);
 ```
 
 ### `buf.writeUInt8(value[, offset])`
+
 <!-- YAML
 added: v0.5.0
 changes:
@@ -4426,7 +4545,7 @@ other than an unsigned 8-bit integer.
 This function is also available under the `writeUint8` alias.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.allocUnsafe(4);
 
@@ -4440,7 +4559,7 @@ console.log(buf);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.allocUnsafe(4);
 
@@ -4454,6 +4573,7 @@ console.log(buf);
 ```
 
 ### `buf.writeUInt16BE(value[, offset])`
+
 <!-- YAML
 added: v0.5.5
 changes:
@@ -4480,7 +4600,7 @@ is anything other than an unsigned 16-bit integer.
 This function is also available under the `writeUint16BE` alias.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.allocUnsafe(4);
 
@@ -4492,7 +4612,7 @@ console.log(buf);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.allocUnsafe(4);
 
@@ -4504,6 +4624,7 @@ console.log(buf);
 ```
 
 ### `buf.writeUInt16LE(value[, offset])`
+
 <!-- YAML
 added: v0.5.5
 changes:
@@ -4530,7 +4651,7 @@ anything other than an unsigned 16-bit integer.
 This function is also available under the `writeUint16LE` alias.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.allocUnsafe(4);
 
@@ -4542,7 +4663,7 @@ console.log(buf);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.allocUnsafe(4);
 
@@ -4554,6 +4675,7 @@ console.log(buf);
 ```
 
 ### `buf.writeUInt32BE(value[, offset])`
+
 <!-- YAML
 added: v0.5.5
 changes:
@@ -4580,7 +4702,7 @@ is anything other than an unsigned 32-bit integer.
 This function is also available under the `writeUint32BE` alias.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.allocUnsafe(4);
 
@@ -4591,7 +4713,7 @@ console.log(buf);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.allocUnsafe(4);
 
@@ -4602,6 +4724,7 @@ console.log(buf);
 ```
 
 ### `buf.writeUInt32LE(value[, offset])`
+
 <!-- YAML
 added: v0.5.5
 changes:
@@ -4628,7 +4751,7 @@ anything other than an unsigned 32-bit integer.
 This function is also available under the `writeUint32LE` alias.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.allocUnsafe(4);
 
@@ -4639,7 +4762,7 @@ console.log(buf);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.allocUnsafe(4);
 
@@ -4650,6 +4773,7 @@ console.log(buf);
 ```
 
 ### `buf.writeUIntBE(value, offset, byteLength)`
+
 <!-- YAML
 added: v0.5.5
 changes:
@@ -4678,7 +4802,7 @@ when `value` is anything other than an unsigned integer.
 This function is also available under the `writeUintBE` alias.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.allocUnsafe(6);
 
@@ -4689,7 +4813,7 @@ console.log(buf);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.allocUnsafe(6);
 
@@ -4700,6 +4824,7 @@ console.log(buf);
 ```
 
 ### `buf.writeUIntLE(value, offset, byteLength)`
+
 <!-- YAML
 added: v0.5.5
 changes:
@@ -4728,7 +4853,7 @@ when `value` is anything other than an unsigned integer.
 This function is also available under the `writeUintLE` alias.
 
 ```mjs
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 const buf = Buffer.allocUnsafe(6);
 
@@ -4739,7 +4864,7 @@ console.log(buf);
 ```
 
 ```cjs
-const { Buffer } = require('buffer');
+const { Buffer } = require('node:buffer');
 
 const buf = Buffer.allocUnsafe(6);
 
@@ -4750,6 +4875,7 @@ console.log(buf);
 ```
 
 ### `new Buffer(array)`
+
 <!-- YAML
 deprecated: v6.0.0
 changes:
@@ -4767,11 +4893,12 @@ changes:
 
 > Stability: 0 - Deprecated: Use [`Buffer.from(array)`][] instead.
 
-* `array` {integer[]} An array of bytes to copy from.
+* `array` {integer\[]} An array of bytes to copy from.
 
 See [`Buffer.from(array)`][].
 
 ### `new Buffer(arrayBuffer[, byteOffset[, length]])`
+
 <!-- YAML
 added: v3.0.0
 deprecated: v6.0.0
@@ -4805,6 +4932,7 @@ See
 [`Buffer.from(arrayBuffer[, byteOffset[, length]])`][`Buffer.from(arrayBuf)`].
 
 ### `new Buffer(buffer)`
+
 <!-- YAML
 deprecated: v6.0.0
 changes:
@@ -4828,6 +4956,7 @@ changes:
 See [`Buffer.from(buffer)`][].
 
 ### `new Buffer(size)`
+
 <!-- YAML
 deprecated: v6.0.0
 changes:
@@ -4856,6 +4985,7 @@ See [`Buffer.alloc()`][] and [`Buffer.allocUnsafe()`][]. This variant of the
 constructor is equivalent to [`Buffer.alloc()`][].
 
 ### `new Buffer(string[, encoding])`
+
 <!-- YAML
 deprecated: v6.0.0
 changes:
@@ -4879,15 +5009,18 @@ changes:
 
 See [`Buffer.from(string[, encoding])`][`Buffer.from(string)`].
 
-## `buffer` module APIs
+## `node:buffer` module APIs
 
 While, the `Buffer` object is available as a global, there are additional
-`Buffer`-related APIs that are available only via the `buffer` module
-accessed using `require('buffer')`.
+`Buffer`-related APIs that are available only via the `node:buffer` module
+accessed using `require('node:buffer')`.
 
 ### `buffer.atob(data)`
+
 <!-- YAML
-added: v15.13.0
+added:
+  - v15.13.0
+  - v14.17.0
 -->
 
 > Stability: 3 - Legacy. Use `Buffer.from(data, 'base64')` instead.
@@ -4907,8 +5040,11 @@ and binary data should be performed using `Buffer.from(str, 'base64')` and
 `buf.toString('base64')`.**
 
 ### `buffer.btoa(data)`
+
 <!-- YAML
-added: v15.13.0
+added:
+  - v15.13.0
+  - v14.17.0
 -->
 
 > Stability: 3 - Legacy. Use `buf.toString('base64')` instead.
@@ -4928,6 +5064,7 @@ and binary data should be performed using `Buffer.from(str, 'base64')` and
 `buf.toString('base64')`.**
 
 ### `buffer.INSPECT_MAX_BYTES`
+
 <!-- YAML
 added: v0.5.4
 -->
@@ -4939,6 +5076,7 @@ Returns the maximum number of bytes that will be returned when
 [`util.inspect()`][] for more details on `buf.inspect()` behavior.
 
 ### `buffer.kMaxLength`
+
 <!-- YAML
 added: v3.0.0
 -->
@@ -4948,6 +5086,7 @@ added: v3.0.0
 An alias for [`buffer.constants.MAX_LENGTH`][].
 
 ### `buffer.kStringMaxLength`
+
 <!-- YAML
 added: v3.0.0
 -->
@@ -4957,6 +5096,7 @@ added: v3.0.0
 An alias for [`buffer.constants.MAX_STRING_LENGTH`][].
 
 ### `buffer.resolveObjectURL(id)`
+
 <!-- YAML
 added: v16.7.0
 -->
@@ -4971,6 +5111,7 @@ Resolves a `'blob:nodedata:...'` an associated {Blob} object registered using
 a prior call to `URL.createObjectURL()`.
 
 ### `buffer.transcode(source, fromEnc, toEnc)`
+
 <!-- YAML
 added: v7.1.0
 changes:
@@ -4997,7 +5138,7 @@ The transcoding process will use substitution characters if a given byte
 sequence cannot be adequately represented in the target encoding. For instance:
 
 ```mjs
-import { Buffer, transcode } from 'buffer';
+import { Buffer, transcode } from 'node:buffer';
 
 const newBuf = transcode(Buffer.from('€'), 'utf8', 'ascii');
 console.log(newBuf.toString('ascii'));
@@ -5005,7 +5146,7 @@ console.log(newBuf.toString('ascii'));
 ```
 
 ```cjs
-const { Buffer, transcode } = require('buffer');
+const { Buffer, transcode } = require('node:buffer');
 
 const newBuf = transcode(Buffer.from('€'), 'utf8', 'ascii');
 console.log(newBuf.toString('ascii'));
@@ -5016,6 +5157,7 @@ Because the Euro (`€`) sign is not representable in US-ASCII, it is replaced
 with `?` in the transcoded `Buffer`.
 
 ### Class: `SlowBuffer`
+
 <!-- YAML
 deprecated: v6.0.0
 -->
@@ -5027,6 +5169,7 @@ the constructor always returned a `Buffer` instance, rather than a `SlowBuffer`
 instance.
 
 #### `new SlowBuffer(size)`
+
 <!-- YAML
 deprecated: v6.0.0
 -->
@@ -5038,11 +5181,13 @@ deprecated: v6.0.0
 See [`Buffer.allocUnsafeSlow()`][].
 
 ### Buffer constants
+
 <!-- YAML
 added: v8.2.0
 -->
 
 #### `buffer.constants.MAX_LENGTH`
+
 <!-- YAML
 added: v8.2.0
 changes:
@@ -5059,15 +5204,16 @@ changes:
 * {integer} The largest size allowed for a single `Buffer` instance.
 
 On 32-bit architectures, this value currently is 2<sup>30</sup> - 1 (about 1
-GB).
+GiB).
 
-On 64-bit architectures, this value currently is 2<sup>32</sup> (about 4 GB).
+On 64-bit architectures, this value currently is 2<sup>32</sup> (about 4 GiB).
 
 It reflects [`v8::TypedArray::kMaxLength`][] under the hood.
 
 This value is also available as [`buffer.kMaxLength`][].
 
 #### `buffer.constants.MAX_STRING_LENGTH`
+
 <!-- YAML
 added: v8.2.0
 -->
@@ -5087,11 +5233,11 @@ differently based on what arguments are provided:
 
 * Passing a number as the first argument to `Buffer()` (e.g. `new Buffer(10)`)
   allocates a new `Buffer` object of the specified size. Prior to Node.js 8.0.0,
-  the memory allocated for such `Buffer` instances is *not* initialized and
-  *can contain sensitive data*. Such `Buffer` instances *must* be subsequently
+  the memory allocated for such `Buffer` instances is _not_ initialized and
+  _can contain sensitive data_. Such `Buffer` instances _must_ be subsequently
   initialized by using either [`buf.fill(0)`][`buf.fill()`] or by writing to the
   entire `Buffer` before reading data from the `Buffer`.
-  While this behavior is *intentional* to improve performance,
+  While this behavior is _intentional_ to improve performance,
   development experience has demonstrated that a more explicit distinction is
   required between creating a fast-but-uninitialized `Buffer` versus creating a
   slower-but-safer `Buffer`. Since Node.js 8.0.0, `Buffer(num)` and `new
@@ -5125,18 +5271,18 @@ the various forms of the `new Buffer()` constructor have been **deprecated**
 and replaced by separate `Buffer.from()`, [`Buffer.alloc()`][], and
 [`Buffer.allocUnsafe()`][] methods.
 
-*Developers should migrate all existing uses of the `new Buffer()` constructors
-to one of these new APIs.*
+_Developers should migrate all existing uses of the `new Buffer()` constructors
+to one of these new APIs._
 
-* [`Buffer.from(array)`][] returns a new `Buffer` that *contains a copy* of the
+* [`Buffer.from(array)`][] returns a new `Buffer` that _contains a copy_ of the
   provided octets.
 * [`Buffer.from(arrayBuffer[, byteOffset[, length]])`][`Buffer.from(arrayBuf)`]
-  returns a new `Buffer` that *shares the same allocated memory* as the given
+  returns a new `Buffer` that _shares the same allocated memory_ as the given
   [`ArrayBuffer`][].
-* [`Buffer.from(buffer)`][] returns a new `Buffer` that *contains a copy* of the
+* [`Buffer.from(buffer)`][] returns a new `Buffer` that _contains a copy_ of the
   contents of the given `Buffer`.
 * [`Buffer.from(string[, encoding])`][`Buffer.from(string)`] returns a new
-  `Buffer` that *contains a copy* of the provided string.
+  `Buffer` that _contains a copy_ of the provided string.
 * [`Buffer.alloc(size[, fill[, encoding]])`][`Buffer.alloc()`] returns a new
   initialized `Buffer` of the specified size. This method is slower than
   [`Buffer.allocUnsafe(size)`][`Buffer.allocUnsafe()`] but guarantees that newly
@@ -5149,12 +5295,13 @@ to one of these new APIs.*
   potentially sensitive.
 
 `Buffer` instances returned by [`Buffer.allocUnsafe()`][] and
-[`Buffer.from(array)`][] *may* be allocated off a shared internal memory pool
+[`Buffer.from(array)`][] _may_ be allocated off a shared internal memory pool
 if `size` is less than or equal to half [`Buffer.poolSize`][]. Instances
-returned by [`Buffer.allocUnsafeSlow()`][] *never* use the shared internal
+returned by [`Buffer.allocUnsafeSlow()`][] _never_ use the shared internal
 memory pool.
 
 ### The `--zero-fill-buffers` command-line option
+
 <!-- YAML
 added: v5.10.0
 -->
@@ -5176,14 +5323,14 @@ $ node --zero-fill-buffers
 ### What makes `Buffer.allocUnsafe()` and `Buffer.allocUnsafeSlow()` "unsafe"?
 
 When calling [`Buffer.allocUnsafe()`][] and [`Buffer.allocUnsafeSlow()`][], the
-segment of allocated memory is *uninitialized* (it is not zeroed-out). While
+segment of allocated memory is _uninitialized_ (it is not zeroed-out). While
 this design makes the allocation of memory quite fast, the allocated segment of
 memory might contain old data that is potentially sensitive. Using a `Buffer`
-created by [`Buffer.allocUnsafe()`][] without *completely* overwriting the
+created by [`Buffer.allocUnsafe()`][] without _completely_ overwriting the
 memory can allow this old data to be leaked when the `Buffer` memory is read.
 
 While there are clear performance advantages to using
-[`Buffer.allocUnsafe()`][], extra care *must* be taken in order to avoid
+[`Buffer.allocUnsafe()`][], extra care _must_ be taken in order to avoid
 introducing security vulnerabilities into an application.
 
 [ASCII]: https://en.wikipedia.org/wiki/ASCII
@@ -5227,6 +5374,7 @@ introducing security vulnerabilities into an application.
 [`buf.keys()`]: #bufkeys
 [`buf.length`]: #buflength
 [`buf.slice()`]: #bufslicestart-end
+[`buf.subarray`]: #bufsubarraystart-end
 [`buf.toString()`]: #buftostringencoding-start-end
 [`buf.values()`]: #bufvalues
 [`buffer.constants.MAX_LENGTH`]: #bufferconstantsmax_length
