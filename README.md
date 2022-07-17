@@ -123,7 +123,7 @@ To make the swap, for example in REPL, simple do this:
 global.transpiler.typescript_latest = global.transpiler.typescript;
 
 //override with alternate version:
-global.transpiler.typescript = require('path_to_alternate_src/src_packs/ts/4.2.3/TypeScript.packed.min.js');
+require('path_to_alternate_src/src_packs/ts/4.2.3/TypeScript.packed.min.js');
 ```
 
 `src_packs` folder is not used in Node.JS build. It's purely provided for playing around with.
