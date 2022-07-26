@@ -57,7 +57,7 @@ static std::string GetCodeCacheDefName(const std::string& id) {
   return std::string(buf) + std::string("_cache_data");
 }
 
-static std::string FormatSize(int size) {
+static std::string FormatSize(size_t size) {
   char buf[64] = {0};
   if (size < 1024) {
     snprintf(buf, sizeof(buf), "%.2fB", static_cast<double>(size));
@@ -457,7 +457,7 @@ void SerializeBindingData(Environment* env,
 
 namespace mksnapshot {
 
-static void CompileSnapshotMain(const FunctionCallbackInfo<Value>& args) {
+void CompileSerializeMain(const FunctionCallbackInfo<Value>& args) {
   CHECK(args[0]->IsString());
   Local<String> filename = args[0].As<String>();
   Local<String> source = args[1].As<String>();
@@ -485,23 +485,46 @@ static void CompileSnapshotMain(const FunctionCallbackInfo<Value>& args) {
   }
 }
 
-static void Initialize(Local<Object> target,
-                       Local<Value> unused,
-                       Local<Context> context,
-                       void* priv) {
-  Environment* env = Environment::GetCurrent(context);
-  Isolate* isolate = context->GetIsolate();
-  env->SetMethod(target, "compileSnapshotMain", CompileSnapshotMain);
-  target
-      ->Set(context,
-            FIXED_ONE_BYTE_STRING(isolate, "cleanups"),
-            v8::Array::New(isolate))
-      .Check();
+void SetSerializeCallback(const FunctionCallbackInfo<Value>& args) {
+  Environment* env = Environment::GetCurrent(args);
+  CHECK(env->snapshot_serialize_callback().IsEmpty());
+  CHECK(args[0]->IsFunction());
+  env->set_snapshot_serialize_callback(args[0].As<Function>());
 }
 
-static void RegisterExternalReferences(ExternalReferenceRegistry* registry) {
-  registry->Register(CompileSnapshotMain);
+void SetDeserializeCallback(const FunctionCallbackInfo<Value>& args) {
+  Environment* env = Environment::GetCurrent(args);
+  CHECK(env->snapshot_deserialize_callback().IsEmpty());
+  CHECK(args[0]->IsFunction());
+  env->set_snapshot_deserialize_callback(args[0].As<Function>());
+}
+
+void SetDeserializeMainFunction(const FunctionCallbackInfo<Value>& args) {
+  Environment* env = Environment::GetCurrent(args);
+  CHECK(env->snapshot_deserialize_main().IsEmpty());
+  CHECK(args[0]->IsFunction());
+  env->set_snapshot_deserialize_main(args[0].As<Function>());
+}
+
+void Initialize(Local<Object> target,
+                Local<Value> unused,
+                Local<Context> context,
+                void* priv) {
+  Environment* env = Environment::GetCurrent(context);
+  env->SetMethod(target, "compileSerializeMain", CompileSerializeMain);
+  env->SetMethod(target, "markBootstrapComplete", MarkBootstrapComplete);
+  env->SetMethod(target, "setSerializeCallback", SetSerializeCallback);
+  env->SetMethod(target, "setDeserializeCallback", SetDeserializeCallback);
+  env->SetMethod(
+      target, "setDeserializeMainFunction", SetDeserializeMainFunction);
+}
+
+void RegisterExternalReferences(ExternalReferenceRegistry* registry) {
+  registry->Register(CompileSerializeMain);
   registry->Register(MarkBootstrapComplete);
+  registry->Register(SetSerializeCallback);
+  registry->Register(SetDeserializeCallback);
+  registry->Register(SetDeserializeMainFunction);
 }
 }  // namespace mksnapshot
 }  // namespace node

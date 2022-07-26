@@ -589,7 +589,7 @@
                 ],
                 "changes": []
               },
-              "desc": "<p>This configures Node.js to interpret string input as CommonJS or as an ES\nmodule. String input is input via <code>--eval</code>, <code>--print</code>, or <code>STDIN</code>.</p>\n<p>Valid values are <code>\"commonjs\"</code> and <code>\"module\"</code>. The default is <code>\"commonjs\"</code>.</p>",
+              "desc": "<p>This configures Node.js to interpret string input as CommonJS or as an ES\nmodule. String input is input via <code>--eval</code>, <code>--print</code>, or <code>STDIN</code>.</p>\n<p>Valid values are <code>\"commonjs\"</code> and <code>\"module\"</code>. The default is <code>\"commonjs\"</code>.</p>\n<p>The REPL does not support this option.</p>",
               "type": "module",
               "displayName": "`--input-type=type`"
             },
@@ -1979,6 +1979,13 @@
               "desc": "<p>Sets the max memory size of V8's old memory section. As memory\nconsumption approaches the limit, V8 will spend more time on\ngarbage collection in an effort to free unused memory.</p>\n<p>On a machine with 2 GiB of memory, consider setting this to\n1536 (1.5 GiB) to leave some memory for other uses and avoid swapping.</p>\n<pre><code class=\"language-console\">$ node --max-old-space-size=1536 index.js\n</code></pre>",
               "type": "module",
               "displayName": "`--max-old-space-size=SIZE` (in megabytes)"
+            },
+            {
+              "textRaw": "`--max-semi-space-size=SIZE` (in megabytes)",
+              "name": "`--max-semi-space-size=size`_(in_megabytes)",
+              "desc": "<p>Sets the maximum <a href=\"https://www.memorymanagement.org/glossary/s.html#semi.space\">semi-space</a> size for V8's <a href=\"https://v8.dev/blog/orinoco-parallel-scavenger\">scavenge garbage collector</a> in\nMiB (megabytes).\nIncreasing the max size of a semi-space may improve throughput for Node.js at\nthe cost of more memory consumption.</p>\n<p>Since the young generation size of the V8 heap is three times (see\n<a href=\"https://chromium.googlesource.com/v8/v8.git/+/refs/tags/10.3.129/src/heap/heap.cc#328\"><code>YoungGenerationSizeFromSemiSpaceSize</code></a> in V8) the size of the semi-space,\nan increase of 1 MiB to semi-space applies to each of the three individual\nsemi-spaces and causes the heap size to increase by 3 MiB. The throughput\nimprovement depends on your workload (see <a href=\"https://github.com/nodejs/node/issues/42511\">#42511</a>).</p>\n<p>The default value is 16 MiB for 64-bit systems and 8 MiB for 32-bit systems. To\nget the best configuration for your application, you should try different\nmax-semi-space-size values when running benchmarks for your application.</p>\n<p>For example, benchmark on a 64-bit systems:</p>\n<pre><code class=\"language-bash\">for MiB in 16 32 64 128; do\n    node --max-semi-space-size=$MiB index.js\ndone\n</code></pre>",
+              "type": "module",
+              "displayName": "`--max-semi-space-size=SIZE` (in megabytes)"
             }
           ],
           "type": "misc",

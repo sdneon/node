@@ -1179,6 +1179,13 @@ because the `node:domain` module has been loaded at an earlier point in time.
 The stack trace is extended to include the point in time at which the
 `node:domain` module had been loaded.
 
+<a id="ERR_DUPLICATE_STARTUP_SNAPSHOT_MAIN_FUNCTION"></a>
+
+### `ERR_DUPLICATE_STARTUP_SNAPSHOT_MAIN_FUNCTION`
+
+[`v8.startupSnapshot.setDeserializeMainFunction()`][] could not be called
+because it had already been called before.
+
 <a id="ERR_ENCODING_INVALID_ENCODED_DATA"></a>
 
 ### `ERR_ENCODING_INVALID_ENCODED_DATA`
@@ -2092,6 +2099,17 @@ An attempt was made to open an IPC communication channel with a synchronously
 forked Node.js process. See the documentation for the [`child_process`][] module
 for more information.
 
+<a id="ERR_LOADER_CHAIN_INCOMPLETE"></a>
+
+### `ERR_LOADER_CHAIN_INCOMPLETE`
+
+<!-- YAML
+added: v18.6.0
+-->
+
+An ESM loader hook returned without calling `next()` and without explicitly
+signaling a short circuit.
+
 <a id="ERR_MANIFEST_ASSERT_INTEGRITY"></a>
 
 ### `ERR_MANIFEST_ASSERT_INTEGRITY`
@@ -2303,6 +2321,13 @@ has occurred when attempting to start the loop.
 Once no more items are left in the queue, the idle loop must be suspended. This
 error indicates that the idle loop has failed to stop.
 
+<a id="ERR_NOT_BUILDING_SNAPSHOT"></a>
+
+### `ERR_NOT_BUILDING_SNAPSHOT`
+
+An attempt was made to use operations that can only be used when building
+V8 startup snapshot even though Node.js isn't building one.
+
 <a id="ERR_NO_CRYPTO"></a>
 
 ### `ERR_NO_CRYPTO`
@@ -2364,7 +2389,7 @@ value is provided for an option of type {boolean}.
 added: v18.3.0
 -->
 
-Thrown by [`util.parseArgs()`][], when a postional argument is provided and
+Thrown by [`util.parseArgs()`][], when a positional argument is provided and
 `allowPositionals` is set to `false`.
 
 <a id="ERR_PARSE_ARGS_UNKNOWN_OPTION"></a>
@@ -2665,7 +2690,7 @@ added:
  - v12.17.0
 -->
 
-The TLS socket must be connected and securily established. Ensure the 'secure'
+The TLS socket must be connected and securely established. Ensure the 'secure'
 event is emitted before continuing.
 
 <a id="ERR_TLS_PROTOCOL_VERSION_CONFLICT"></a>
@@ -3424,7 +3449,7 @@ The native call from `process.cpuUsage` could not be processed.
 [Node.js error codes]: #nodejs-error-codes
 [RFC 7230 Section 3]: https://tools.ietf.org/html/rfc7230#section-3
 [Subresource Integrity specification]: https://www.w3.org/TR/SRI/#the-integrity-attribute
-[V8's stack trace API]: https://github.com/v8/v8/wiki/Stack-Trace-API
+[V8's stack trace API]: https://v8.dev/docs/stack-trace-api
 [WHATWG Supported Encodings]: util.md#whatwg-supported-encodings
 [WHATWG URL API]: url.md#the-whatwg-url-api
 [`"exports"`]: packages.md#exports
@@ -3490,6 +3515,7 @@ The native call from `process.cpuUsage` could not be processed.
 [`url.parse()`]: url.md#urlparseurlstring-parsequerystring-slashesdenotehost
 [`util.getSystemErrorName(error.errno)`]: util.md#utilgetsystemerrornameerr
 [`util.parseArgs()`]: util.md#utilparseargsconfig
+[`v8.startupSnapshot.setDeserializeMainFunction()`]: v8.md#v8startupsnapshotsetdeserializemainfunctioncallback-data
 [`zlib`]: zlib.md
 [crypto digest algorithm]: crypto.md#cryptogethashes
 [debugger]: debugger.md

@@ -6,7 +6,7 @@
       "textRaw": "V8",
       "name": "v8",
       "introduced_in": "v4.0.0",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v18.5.0/lib/v8.js\">lib/v8.js</a></p>\n<p>The <code>node:v8</code> module exposes APIs that are specific to the version of <a href=\"https://developers.google.com/v8/\">V8</a>\nbuilt into the Node.js binary. It can be accessed using:</p>\n<pre><code class=\"language-js\">const v8 = require('node:v8');\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v18.6.0/lib/v8.js\">lib/v8.js</a></p>\n<p>The <code>node:v8</code> module exposes APIs that are specific to the version of <a href=\"https://developers.google.com/v8/\">V8</a>\nbuilt into the Node.js binary. It can be accessed using:</p>\n<pre><code class=\"language-js\">const v8 = require('node:v8');\n</code></pre>",
       "methods": [
         {
           "textRaw": "`v8.cachedDataVersionTag()`",
@@ -1000,6 +1000,135 @@
           ],
           "type": "module",
           "displayName": "Promise hooks"
+        },
+        {
+          "textRaw": "Startup Snapshot API",
+          "name": "startup_snapshot_api",
+          "meta": {
+            "added": [
+              "v18.6.0"
+            ],
+            "changes": []
+          },
+          "stability": 1,
+          "stabilityText": "Experimental",
+          "desc": "<p>The <code>v8.startupSnapshot</code> interface can be used to add serialization and\ndeserialization hooks for custom startup snapshots. Currently the startup\nsnapshots can only be built into the Node.js binary from source.</p>\n<pre><code class=\"language-console\">$ cd /path/to/node\n$ ./configure --node-snapshot-main=entry.js\n$ make node\n# This binary contains the result of the execution of entry.js\n$ out/Release/node\n</code></pre>\n<p>In the example above, <code>entry.js</code> can use methods from the <code>v8.startupSnapshot</code>\ninterface to specify how to save information for custom objects in the snapshot\nduring serialization and how the information can be used to synchronize these\nobjects during deserialization of the snapshot. For example, if the <code>entry.js</code>\ncontains the following script:</p>\n<pre><code class=\"language-cjs\">'use strict';\n\nconst fs = require('fs');\nconst zlib = require('zlib');\nconst path = require('path');\nconst assert = require('assert');\n\nconst {\n  isBuildingSnapshot,\n  addSerializeCallback,\n  addDeserializeCallback,\n  setDeserializeMainFunction\n} = require('v8').startupSnapshot;\n\nconst filePath = path.resolve(__dirname, '../x1024.txt');\nconst storage = {};\n\nassert(isBuildingSnapshot());\n\naddSerializeCallback(({ filePath }) => {\n  storage[filePath] = zlib.gzipSync(fs.readFileSync(filePath));\n}, { filePath });\n\naddDeserializeCallback(({ filePath }) => {\n  storage[filePath] = zlib.gunzipSync(storage[filePath]);\n}, { filePath });\n\nsetDeserializeMainFunction(({ filePath }) => {\n  console.log(storage[filePath].toString());\n}, { filePath });\n</code></pre>\n<p>The resulted binary will simply print the data deserialized from the snapshot\nduring start up:</p>\n<pre><code class=\"language-console\">$ out/Release/node\n# Prints content of ./test/fixtures/x1024.txt\n</code></pre>\n<p>Currently the API is only available to a Node.js instance launched from the\ndefault snapshot, that is, the application deserialized from a user-land\nsnapshot cannot use these APIs again.</p>",
+          "methods": [
+            {
+              "textRaw": "`v8.startupSnapshot.addSerializeCallback(callback[, data])`",
+              "type": "method",
+              "name": "addSerializeCallback",
+              "meta": {
+                "added": [
+                  "v18.6.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`callback` {Function} Callback to be invoked before serialization.",
+                      "name": "callback",
+                      "type": "Function",
+                      "desc": "Callback to be invoked before serialization."
+                    },
+                    {
+                      "textRaw": "`data` {any} Optional data that will be passed to the `callback` when it gets called.",
+                      "name": "data",
+                      "type": "any",
+                      "desc": "Optional data that will be passed to the `callback` when it gets called."
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>Add a callback that will be called when the Node.js instance is about to\nget serialized into a snapshot and exit. This can be used to release\nresources that should not or cannot be serialized or to convert user data\ninto a form more suitable for serialization.</p>"
+            },
+            {
+              "textRaw": "`v8.startupSnapshot.addDeserializeCallback(callback[, data])`",
+              "type": "method",
+              "name": "addDeserializeCallback",
+              "meta": {
+                "added": [
+                  "v18.6.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`callback` {Function} Callback to be invoked after the snapshot is deserialized.",
+                      "name": "callback",
+                      "type": "Function",
+                      "desc": "Callback to be invoked after the snapshot is deserialized."
+                    },
+                    {
+                      "textRaw": "`data` {any} Optional data that will be passed to the `callback` when it gets called.",
+                      "name": "data",
+                      "type": "any",
+                      "desc": "Optional data that will be passed to the `callback` when it gets called."
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>Add a callback that will be called when the Node.js instance is deserialized\nfrom a snapshot. The <code>callback</code> and the <code>data</code> (if provided) will be\nserialized into the snapshot, they can be used to re-initialize the state\nof the application or to re-acquire resources that the application needs\nwhen the application is restarted from the snapshot.</p>"
+            },
+            {
+              "textRaw": "`v8.startupSnapshot.setDeserializeMainFunction(callback[, data])`",
+              "type": "method",
+              "name": "setDeserializeMainFunction",
+              "meta": {
+                "added": [
+                  "v18.6.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`callback` {Function} Callback to be invoked as the entry point after the snapshot is deserialized.",
+                      "name": "callback",
+                      "type": "Function",
+                      "desc": "Callback to be invoked as the entry point after the snapshot is deserialized."
+                    },
+                    {
+                      "textRaw": "`data` {any} Optional data that will be passed to the `callback` when it gets called.",
+                      "name": "data",
+                      "type": "any",
+                      "desc": "Optional data that will be passed to the `callback` when it gets called."
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>This sets the entry point of the Node.js application when it is deserialized\nfrom a snapshot. This can be called only once in the snapshot building\nscript. If called, the deserialized application no longer needs an additional\nentry point script to start up and will simply invoke the callback along with\nthe deserialized data (if provided), otherwise an entry point script still\nneeds to be provided to the deserialized application.</p>"
+            },
+            {
+              "textRaw": "`v8.startupSnapshot.isBuildingSnapshot()`",
+              "type": "method",
+              "name": "isBuildingSnapshot",
+              "meta": {
+                "added": [
+                  "v18.6.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "return": {
+                    "textRaw": "Returns: {boolean}",
+                    "name": "return",
+                    "type": "boolean"
+                  },
+                  "params": []
+                }
+              ],
+              "desc": "<p>Returns true if the Node.js instance is run to build a snapshot.</p>"
+            }
+          ],
+          "type": "module",
+          "displayName": "Startup Snapshot API"
         }
       ],
       "type": "module",

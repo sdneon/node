@@ -342,11 +342,6 @@ MaybeLocal<Value> Environment::BootstrapInternalLoaders() {
 MaybeLocal<Value> Environment::BootstrapNode() {
   EscapableHandleScope scope(isolate_);
 
-  Local<Object> global = context()->Global();
-  // TODO(joyeecheung): this can be done in JS land now.
-  global->Set(context(), FIXED_ONE_BYTE_STRING(isolate_, "global"), global)
-      .Check();
-
   // process, require, internalBinding, primordials
   std::vector<Local<String>> node_params = {
       process_string(),
@@ -483,6 +478,14 @@ MaybeLocal<Value> StartExecution(Environment* env, StartExecutionCallback cb) {
     };
 
     return scope.EscapeMaybe(cb(info));
+  }
+
+  // TODO(joyeecheung): move these conditions into JS land and let the
+  // deserialize main function take precedence. For workers, we need to
+  // move the pre-execution part into a different file that can be
+  // reused when dealing with user-defined main functions.
+  if (!env->snapshot_deserialize_main().IsEmpty()) {
+    return env->RunSnapshotDeserializeMain();
   }
 
   if (env->worker_context() != nullptr) {
