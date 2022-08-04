@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v18.6.0">
-  <title>HTTP | Node.js v18.6.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v18.7.0">
+  <title>HTTP | Node.js v18.7.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -95,7 +95,7 @@
     <div id="column1" data-id="http" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v18.6.0 documentation</h1>
+          <h1>Node.js v18.7.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -110,7 +110,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v18.6.0</li>
+            <li class="pinned-header">Node.js v18.7.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -192,6 +192,7 @@
 <li><a href="#event-close_1">Event: <code>'close'</code></a></li>
 <li><a href="#event-connect_1">Event: <code>'connect'</code></a></li>
 <li><a href="#event-connection">Event: <code>'connection'</code></a></li>
+<li><a href="#event-droprequest">Event: <code>'dropRequest'</code></a></li>
 <li><a href="#event-request">Event: <code>'request'</code></a></li>
 <li><a href="#event-upgrade_1">Event: <code>'upgrade'</code></a></li>
 <li><a href="#serverclosecallback"><code>server.close([callback])</code></a></li>
@@ -517,6 +518,7 @@
 <li><a href="#event-close_1">Event: <code>'close'</code></a></li>
 <li><a href="#event-connect_1">Event: <code>'connect'</code></a></li>
 <li><a href="#event-connection">Event: <code>'connection'</code></a></li>
+<li><a href="#event-droprequest">Event: <code>'dropRequest'</code></a></li>
 <li><a href="#event-request">Event: <code>'request'</code></a></li>
 <li><a href="#event-upgrade_1">Event: <code>'upgrade'</code></a></li>
 <li><a href="#serverclosecallback"><code>server.close([callback])</code></a></li>
@@ -639,7 +641,7 @@
         <h2>HTTP<span><a class="mark" href="#http" id="http">#</a></span><a aria-hidden="true" class="legacy" id="http_http"></a></h2>
 
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v18.6.0/lib/http.js">lib/http.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v18.7.0/lib/http.js">lib/http.js</a></p>
 <p>To use the HTTP server and client one must <code>require('node:http')</code>.</p>
 <p>The HTTP interfaces in Node.js are designed to support many features
 of the protocol which have been traditionally difficult to use.
@@ -1357,7 +1359,7 @@ All header names are lowercase.</p>
 request.<span class="hljs-title function_">setHeader</span>(<span class="hljs-string">'Cookie'</span>, [<span class="hljs-string">'foo=bar'</span>, <span class="hljs-string">'bar=baz'</span>]);
 
 <span class="hljs-keyword">const</span> headerNames = request.<span class="hljs-title function_">getHeaderNames</span>();
-<span class="hljs-comment">// headerNames === ['foo', 'Cookie']</span></code></pre>
+<span class="hljs-comment">// headerNames === ['foo', 'cookie']</span></code></pre>
 <h4><code>request.getHeaders()</code><span><a class="mark" href="#requestgetheaders" id="requestgetheaders">#</a></span><a aria-hidden="true" class="legacy" id="http_request_getheaders"></a></h4>
 <div class="api_metadata">
 <span>Added in: v7.7.0</span>
@@ -1771,6 +1773,18 @@ into the HTTP server. In that case, any <a href="stream.html#class-streamduplex"
 <p>This event is guaranteed to be passed an instance of the <a href="net.html#class-netsocket" class="type">&#x3C;net.Socket></a> class,
 a subclass of <a href="stream.html#class-streamduplex" class="type">&#x3C;stream.Duplex></a>, unless the user specifies a socket
 type other than <a href="net.html#class-netsocket" class="type">&#x3C;net.Socket></a>.</p>
+<h4>Event: <code>'dropRequest'</code><span><a class="mark" href="#event-droprequest" id="event-droprequest">#</a></span><a aria-hidden="true" class="legacy" id="http_event_droprequest"></a></h4>
+<div class="api_metadata">
+<span>Added in: v18.7.0</span>
+</div>
+<ul>
+<li><code>request</code> <a href="http.html#class-httpincomingmessage" class="type">&#x3C;http.IncomingMessage></a> Arguments for the HTTP request, as it is in
+the <a href="#event-request"><code>'request'</code></a> event</li>
+<li><code>socket</code> <a href="stream.html#class-streamduplex" class="type">&#x3C;stream.Duplex></a> Network socket between the server and client</li>
+</ul>
+<p>When the number of requests on a socket reaches the threshold of
+<code>server.maxRequestsPerSocket</code>, the server will drop new requests
+and emit <code>'dropRequest'</code> event instead, then send <code>503</code> to client.</p>
 <h4>Event: <code>'request'</code><span><a class="mark" href="#event-request" id="event-request">#</a></span><a aria-hidden="true" class="legacy" id="http_event_request"></a></h4>
 <div class="api_metadata">
 <span>Added in: v0.1.0</span>
@@ -2436,7 +2450,7 @@ may be reused multiple times in case of keep-alive.</p>
 <div class="api_metadata">
 <span>Added in: v10.1.0</span><span>Deprecated since: v17.0.0, v16.12.0</span>
 </div>
-<p></p><div class="api_stability api_stability_0"><a href="documentation.html#stability-index">Stability: 0</a> - Deprecated. Check <code>message.destroyed</code> from <a href="stream.html#class-streamreadable" class="type">&#x3C;stream.Readable></a>..</div><p></p>
+<p></p><div class="api_stability api_stability_0"><a href="documentation.html#stability-index">Stability: 0</a> - Deprecated. Check <code>message.destroyed</code> from <a href="stream.html#class-streamreadable" class="type">&#x3C;stream.Readable></a>.</div><p></p>
 <ul>
 <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
 </ul>

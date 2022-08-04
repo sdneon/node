@@ -8,7 +8,7 @@
       "introduced_in": "v18.0.0",
       "stability": 1,
       "stabilityText": "Experimental",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v18.6.0/lib/test.js\">lib/test.js</a></p>\n<p>The <code>node:test</code> module facilitates the creation of JavaScript tests that\nreport results in <a href=\"https://testanything.org/\">TAP</a> format. To access it:</p>\n<pre><code class=\"language-mjs\">import test from 'node:test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('node:test');\n</code></pre>\n<p>This module is only available under the <code>node:</code> scheme. The following will not\nwork:</p>\n<pre><code class=\"language-mjs\">import test from 'test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('test');\n</code></pre>\n<p>Tests created via the <code>test</code> module consist of a single function that is\nprocessed in one of three ways:</p>\n<ol>\n<li>A synchronous function that is considered failing if it throws an exception,\nand is considered passing otherwise.</li>\n<li>A function that returns a <code>Promise</code> that is considered failing if the\n<code>Promise</code> rejects, and is considered passing if the <code>Promise</code> resolves.</li>\n<li>A function that receives a callback function. If the callback receives any\ntruthy value as its first argument, the test is considered failing. If a\nfalsy value is passed as the first argument to the callback, the test is\nconsidered passing. If the test function receives a callback function and\nalso returns a <code>Promise</code>, the test will fail.</li>\n</ol>\n<p>The following example illustrates how tests are written using the\n<code>test</code> module.</p>\n<pre><code class=\"language-js\">test('synchronous passing test', (t) => {\n  // This test passes because it does not throw an exception.\n  assert.strictEqual(1, 1);\n});\n\ntest('synchronous failing test', (t) => {\n  // This test fails because it throws an exception.\n  assert.strictEqual(1, 2);\n});\n\ntest('asynchronous passing test', async (t) => {\n  // This test passes because the Promise returned by the async\n  // function is not rejected.\n  assert.strictEqual(1, 1);\n});\n\ntest('asynchronous failing test', async (t) => {\n  // This test fails because the Promise returned by the async\n  // function is rejected.\n  assert.strictEqual(1, 2);\n});\n\ntest('failing test using Promises', (t) => {\n  // Promises can be used directly as well.\n  return new Promise((resolve, reject) => {\n    setImmediate(() => {\n      reject(new Error('this will cause the test to fail'));\n    });\n  });\n});\n\ntest('callback passing test', (t, done) => {\n  // done() is the callback function. When the setImmediate() runs, it invokes\n  // done() with no arguments.\n  setImmediate(done);\n});\n\ntest('callback failing test', (t, done) => {\n  // When the setImmediate() runs, done() is invoked with an Error object and\n  // the test fails.\n  setImmediate(() => {\n    done(new Error('callback failure'));\n  });\n});\n</code></pre>\n<p>As a test file executes, TAP is written to the standard output of the Node.js\nprocess. This output can be interpreted by any test harness that understands\nthe TAP format. If any tests fail, the process exit code is set to <code>1</code>.</p>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v18.7.0/lib/test.js\">lib/test.js</a></p>\n<p>The <code>node:test</code> module facilitates the creation of JavaScript tests that\nreport results in <a href=\"https://testanything.org/\">TAP</a> format. To access it:</p>\n<pre><code class=\"language-mjs\">import test from 'node:test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('node:test');\n</code></pre>\n<p>This module is only available under the <code>node:</code> scheme. The following will not\nwork:</p>\n<pre><code class=\"language-mjs\">import test from 'test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('test');\n</code></pre>\n<p>Tests created via the <code>test</code> module consist of a single function that is\nprocessed in one of three ways:</p>\n<ol>\n<li>A synchronous function that is considered failing if it throws an exception,\nand is considered passing otherwise.</li>\n<li>A function that returns a <code>Promise</code> that is considered failing if the\n<code>Promise</code> rejects, and is considered passing if the <code>Promise</code> resolves.</li>\n<li>A function that receives a callback function. If the callback receives any\ntruthy value as its first argument, the test is considered failing. If a\nfalsy value is passed as the first argument to the callback, the test is\nconsidered passing. If the test function receives a callback function and\nalso returns a <code>Promise</code>, the test will fail.</li>\n</ol>\n<p>The following example illustrates how tests are written using the\n<code>test</code> module.</p>\n<pre><code class=\"language-js\">test('synchronous passing test', (t) => {\n  // This test passes because it does not throw an exception.\n  assert.strictEqual(1, 1);\n});\n\ntest('synchronous failing test', (t) => {\n  // This test fails because it throws an exception.\n  assert.strictEqual(1, 2);\n});\n\ntest('asynchronous passing test', async (t) => {\n  // This test passes because the Promise returned by the async\n  // function is not rejected.\n  assert.strictEqual(1, 1);\n});\n\ntest('asynchronous failing test', async (t) => {\n  // This test fails because the Promise returned by the async\n  // function is rejected.\n  assert.strictEqual(1, 2);\n});\n\ntest('failing test using Promises', (t) => {\n  // Promises can be used directly as well.\n  return new Promise((resolve, reject) => {\n    setImmediate(() => {\n      reject(new Error('this will cause the test to fail'));\n    });\n  });\n});\n\ntest('callback passing test', (t, done) => {\n  // done() is the callback function. When the setImmediate() runs, it invokes\n  // done() with no arguments.\n  setImmediate(done);\n});\n\ntest('callback failing test', (t, done) => {\n  // When the setImmediate() runs, done() is invoked with an Error object and\n  // the test fails.\n  setImmediate(() => {\n    done(new Error('callback failure'));\n  });\n});\n</code></pre>\n<p>As a test file executes, TAP is written to the standard output of the Node.js\nprocess. This output can be interpreted by any test harness that understands\nthe TAP format. If any tests fail, the process exit code is set to <code>1</code>.</p>",
       "modules": [
         {
           "textRaw": "Subtests",
@@ -73,7 +73,13 @@
             "added": [
               "v18.0.0"
             ],
-            "changes": []
+            "changes": [
+              {
+                "version": "v18.7.0",
+                "pr-url": "https://github.com/nodejs/node/pull/43505",
+                "description": "Add a `timeout` option."
+              }
+            ]
           },
           "signatures": [
             {
@@ -98,11 +104,11 @@
                   "desc": "Configuration options for the test. The following properties are supported:",
                   "options": [
                     {
-                      "textRaw": "`concurrency` {number} The number of tests that can be run at the same time. If unspecified, subtests inherit this value from their parent. **Default:** `1`.",
+                      "textRaw": "`concurrency` {number|boolean} If a number is provided, then that many tests would run in parallel. If truthy, it would run (number of cpu cores - 1) tests in parallel. For subtests, it will be `Infinity` tests in parallel. If falsy, it would only run one test at a time. If unspecified, subtests inherit this value from their parent. **Default:** `false`.",
                       "name": "concurrency",
-                      "type": "number",
-                      "default": "`1`",
-                      "desc": "The number of tests that can be run at the same time. If unspecified, subtests inherit this value from their parent."
+                      "type": "number|boolean",
+                      "default": "`false`",
+                      "desc": "If a number is provided, then that many tests would run in parallel. If truthy, it would run (number of cpu cores - 1) tests in parallel. For subtests, it will be `Infinity` tests in parallel. If falsy, it would only run one test at a time. If unspecified, subtests inherit this value from their parent."
                     },
                     {
                       "textRaw": "`only` {boolean} If truthy, and the test context is configured to run `only` tests, then this test will be run. Otherwise, the test is skipped. **Default:** `false`.",
@@ -110,6 +116,12 @@
                       "type": "boolean",
                       "default": "`false`",
                       "desc": "If truthy, and the test context is configured to run `only` tests, then this test will be run. Otherwise, the test is skipped."
+                    },
+                    {
+                      "textRaw": "`signal` {AbortSignal} Allows aborting an in-progress test",
+                      "name": "signal",
+                      "type": "AbortSignal",
+                      "desc": "Allows aborting an in-progress test"
                     },
                     {
                       "textRaw": "`skip` {boolean|string} If truthy, the test is skipped. If a string is provided, that string is displayed in the test results as the reason for skipping the test. **Default:** `false`.",
@@ -124,6 +136,13 @@
                       "type": "boolean|string",
                       "default": "`false`",
                       "desc": "If truthy, the test marked as `TODO`. If a string is provided, that string is displayed in the test results as the reason why the test is `TODO`."
+                    },
+                    {
+                      "textRaw": "`timeout` {number} A number of milliseconds the test will fail after. If unspecified, subtests inherit this value from their parent. **Default:** `Infinity`.",
+                      "name": "timeout",
+                      "type": "number",
+                      "default": "`Infinity`",
+                      "desc": "A number of milliseconds the test will fail after. If unspecified, subtests inherit this value from their parent."
                     }
                   ]
                 },
@@ -137,7 +156,7 @@
               ]
             }
           ],
-          "desc": "<p>The <code>test()</code> function is the value imported from the <code>test</code> module. Each\ninvocation of this function results in the creation of a test point in the TAP\noutput.</p>\n<p>The <code>TestContext</code> object passed to the <code>fn</code> argument can be used to perform\nactions related to the current test. Examples include skipping the test, adding\nadditional TAP diagnostic information, or creating subtests.</p>\n<p><code>test()</code> returns a <code>Promise</code> that resolves once the test completes. The return\nvalue can usually be discarded for top level tests. However, the return value\nfrom subtests should be used to prevent the parent test from finishing first\nand cancelling the subtest as shown in the following example.</p>\n<pre><code class=\"language-js\">test('top level test', async (t) => {\n  // The setTimeout() in the following subtest would cause it to outlive its\n  // parent test if 'await' is removed on the next line. Once the parent test\n  // completes, it will cancel any outstanding subtests.\n  await t.test('longer running subtest', async (t) => {\n    return new Promise((resolve, reject) => {\n      setTimeout(resolve, 1000);\n    });\n  });\n});\n</code></pre>"
+          "desc": "<p>The <code>test()</code> function is the value imported from the <code>test</code> module. Each\ninvocation of this function results in the creation of a test point in the TAP\noutput.</p>\n<p>The <code>TestContext</code> object passed to the <code>fn</code> argument can be used to perform\nactions related to the current test. Examples include skipping the test, adding\nadditional TAP diagnostic information, or creating subtests.</p>\n<p><code>test()</code> returns a <code>Promise</code> that resolves once the test completes. The return\nvalue can usually be discarded for top level tests. However, the return value\nfrom subtests should be used to prevent the parent test from finishing first\nand cancelling the subtest as shown in the following example.</p>\n<pre><code class=\"language-js\">test('top level test', async (t) => {\n  // The setTimeout() in the following subtest would cause it to outlive its\n  // parent test if 'await' is removed on the next line. Once the parent test\n  // completes, it will cancel any outstanding subtests.\n  await t.test('longer running subtest', async (t) => {\n    return new Promise((resolve, reject) => {\n      setTimeout(resolve, 1000);\n    });\n  });\n});\n</code></pre>\n<p>The <code>timeout</code> option can be used to fail the test if it takes longer than\n<code>timeout</code> milliseconds to complete. However, it is not a reliable mechanism for\ncanceling tests because a running test might block the application thread and\nthus prevent the scheduled cancellation.</p>"
         },
         {
           "textRaw": "`describe([name][, options][, fn])`",
@@ -165,11 +184,11 @@
                   "desc": "Configuration options for the suite. supports the same options as `test([name][, options][, fn])`"
                 },
                 {
-                  "textRaw": "`fn` {Function} The function under suite. a synchronous function declaring all subtests and subsuites. **Default:** A no-op function.",
+                  "textRaw": "`fn` {Function|AsyncFunction} The function under suite declaring all subtests and subsuites. The first argument to this function is a [`SuiteContext`][] object. **Default:** A no-op function.",
                   "name": "fn",
-                  "type": "Function",
+                  "type": "Function|AsyncFunction",
                   "default": "A no-op function",
-                  "desc": "The function under suite. a synchronous function declaring all subtests and subsuites."
+                  "desc": "The function under suite declaring all subtests and subsuites. The first argument to this function is a [`SuiteContext`][] object."
                 }
               ]
             }
@@ -375,7 +394,13 @@
                 "added": [
                   "v18.0.0"
                 ],
-                "changes": []
+                "changes": [
+                  {
+                    "version": "v18.7.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/43505",
+                    "description": "Add a `timeout` option."
+                  }
+                ]
               },
               "signatures": [
                 {
@@ -426,6 +451,13 @@
                           "type": "boolean|string",
                           "default": "`false`",
                           "desc": "If truthy, the test marked as `TODO`. If a string is provided, that string is displayed in the test results as the reason why the test is `TODO`."
+                        },
+                        {
+                          "textRaw": "`timeout` {number} A number of milliseconds the test will fail after. If unspecified, subtests inherit this value from their parent. **Default:** `Infinity`.",
+                          "name": "timeout",
+                          "type": "number",
+                          "default": "`Infinity`",
+                          "desc": "A number of milliseconds the test will fail after. If unspecified, subtests inherit this value from their parent."
                         }
                       ]
                     },
@@ -440,6 +472,45 @@
                 }
               ],
               "desc": "<p>This function is used to create subtests under the current test. This function\nbehaves in the same fashion as the top level <a href=\"#testname-options-fn\"><code>test()</code></a> function.</p>\n<pre><code class=\"language-js\">test('top level test', async (t) => {\n  await t.test(\n    'This is a subtest',\n    { only: false, skip: false, concurrency: 1, todo: false },\n    (t) => {\n      assert.ok('some relevant assertion here');\n    }\n  );\n});\n</code></pre>"
+            }
+          ],
+          "properties": [
+            {
+              "textRaw": "`signal` <AbortSignal> Can be used to abort test subtasks when the test has been aborted.",
+              "name": "<AbortSignal>",
+              "meta": {
+                "added": [
+                  "v18.7.0"
+                ],
+                "changes": []
+              },
+              "desc": "<pre><code class=\"language-js\">test('top level test', async (t) => {\n  await fetch('some/uri', { signal: t.signal });\n});\n</code></pre>",
+              "shortDesc": "Can be used to abort test subtasks when the test has been aborted."
+            }
+          ]
+        },
+        {
+          "textRaw": "Class: `SuiteContext`",
+          "type": "class",
+          "name": "SuiteContext",
+          "meta": {
+            "added": [
+              "v18.7.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>An instance of <code>SuiteContext</code> is passed to each suite function in order to\ninteract with the test runner. However, the <code>SuiteContext</code> constructor is not\nexposed as part of the API.</p>",
+          "properties": [
+            {
+              "textRaw": "`signal` <AbortSignal> Can be used to abort test subtasks when the test has been aborted.",
+              "name": "<AbortSignal>",
+              "meta": {
+                "added": [
+                  "v18.7.0"
+                ],
+                "changes": []
+              },
+              "shortDesc": "Can be used to abort test subtasks when the test has been aborted."
             }
           ]
         }

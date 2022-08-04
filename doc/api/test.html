@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v18.6.0">
-  <title>Test runner | Node.js v18.6.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v18.7.0">
+  <title>Test runner | Node.js v18.7.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -95,7 +95,7 @@
     <div id="column1" data-id="test" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v18.6.0 documentation</h1>
+          <h1>Node.js v18.7.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -110,7 +110,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v18.6.0</li>
+            <li class="pinned-header">Node.js v18.7.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -145,9 +145,15 @@
 <ul>
 <li><a href="#contextdiagnosticmessage"><code>context.diagnostic(message)</code></a></li>
 <li><a href="#contextrunonlyshouldrunonlytests"><code>context.runOnly(shouldRunOnlyTests)</code></a></li>
+<li><a href="#contextsignal"><code>context.signal</code></a></li>
 <li><a href="#contextskipmessage"><code>context.skip([message])</code></a></li>
 <li><a href="#contexttodomessage"><code>context.todo([message])</code></a></li>
 <li><a href="#contexttestname-options-fn"><code>context.test([name][, options][, fn])</code></a></li>
+</ul>
+</li>
+<li><a href="#class-suitecontext">Class: <code>SuiteContext</code></a>
+<ul>
+<li><a href="#contextsignal_1"><code>context.signal</code></a></li>
 </ul>
 </li>
 </ul>
@@ -298,9 +304,15 @@
 <ul>
 <li><a href="#contextdiagnosticmessage"><code>context.diagnostic(message)</code></a></li>
 <li><a href="#contextrunonlyshouldrunonlytests"><code>context.runOnly(shouldRunOnlyTests)</code></a></li>
+<li><a href="#contextsignal"><code>context.signal</code></a></li>
 <li><a href="#contextskipmessage"><code>context.skip([message])</code></a></li>
 <li><a href="#contexttodomessage"><code>context.todo([message])</code></a></li>
 <li><a href="#contexttestname-options-fn"><code>context.test([name][, options][, fn])</code></a></li>
+</ul>
+</li>
+<li><a href="#class-suitecontext">Class: <code>SuiteContext</code></a>
+<ul>
+<li><a href="#contextsignal_1"><code>context.signal</code></a></li>
 </ul>
 </li>
 </ul>
@@ -311,7 +323,7 @@
         <h2>Test runner<span><a class="mark" href="#test-runner" id="test-runner">#</a></span><a aria-hidden="true" class="legacy" id="test_test_runner"></a></h2>
 
 <p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v18.6.0/lib/test.js">lib/test.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v18.7.0/lib/test.js">lib/test.js</a></p>
 <p>The <code>node:test</code> module facilitates the creation of JavaScript tests that
 report results in <a href="https://testanything.org/">TAP</a> format. To access it:</p>
 
@@ -560,7 +572,15 @@ executable by Node.js, but are not required to use the <code>node:test</code> mo
 internally.</p>
 </section><section><h3><code>test([name][, options][, fn])</code><span><a class="mark" href="#testname-options-fn" id="testname-options-fn">#</a></span><a aria-hidden="true" class="legacy" id="test_test_name_options_fn"></a></h3>
 <div class="api_metadata">
-<span>Added in: v18.0.0</span>
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v18.7.0</td>
+<td><p>Add a <code>timeout</code> option.</p></td></tr>
+<tr><td>v18.0.0</td>
+<td><p><span>Added in: v18.0.0</span></p></td></tr>
+</tbody></table>
+</details>
 </div>
 <ul>
 <li><code>name</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> The name of the test, which is displayed when reporting test
@@ -569,18 +589,27 @@ does not have a name.</li>
 <li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> Configuration options for the test. The following
 properties are supported:
 <ul>
-<li><code>concurrency</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The number of tests that can be run at the same time.
+<li><code>concurrency</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> If a number is provided,
+then that many tests would run in parallel.
+If truthy, it would run (number of cpu cores - 1)
+tests in parallel.
+For subtests, it will be <code>Infinity</code> tests in parallel.
+If falsy, it would only run one test at a time.
 If unspecified, subtests inherit this value from their parent.
-<strong>Default:</strong> <code>1</code>.</li>
+<strong>Default:</strong> <code>false</code>.</li>
 <li><code>only</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> If truthy, and the test context is configured to run
 <code>only</code> tests, then this test will be run. Otherwise, the test is skipped.
 <strong>Default:</strong> <code>false</code>.</li>
+<li><code>signal</code> <a href="globals.html#class-abortsignal" class="type">&#x3C;AbortSignal></a> Allows aborting an in-progress test</li>
 <li><code>skip</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> If truthy, the test is skipped. If a string is
 provided, that string is displayed in the test results as the reason for
 skipping the test. <strong>Default:</strong> <code>false</code>.</li>
 <li><code>todo</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> If truthy, the test marked as <code>TODO</code>. If a string
 is provided, that string is displayed in the test results as the reason why
 the test is <code>TODO</code>. <strong>Default:</strong> <code>false</code>.</li>
+<li><code>timeout</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> A number of milliseconds the test will fail after.
+If unspecified, subtests inherit this value from their parent.
+<strong>Default:</strong> <code>Infinity</code>.</li>
 </ul>
 </li>
 <li><code>fn</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> | <a href="https://tc39.es/ecma262/#sec-async-function-constructor" class="type">&#x3C;AsyncFunction></a> The function under test. The first argument
@@ -609,6 +638,10 @@ and cancelling the subtest as shown in the following example.</p>
     });
   });
 });</code></pre>
+<p>The <code>timeout</code> option can be used to fail the test if it takes longer than
+<code>timeout</code> milliseconds to complete. However, it is not a reliable mechanism for
+canceling tests because a running test might block the application thread and
+thus prevent the scheduled cancellation.</p>
 </section><section><h3><code>describe([name][, options][, fn])</code><span><a class="mark" href="#describename-options-fn" id="describename-options-fn">#</a></span><a aria-hidden="true" class="legacy" id="test_describe_name_options_fn"></a></h3>
 <ul>
 <li><code>name</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> The name of the suite, which is displayed when reporting test
@@ -616,8 +649,9 @@ results. <strong>Default:</strong> The <code>name</code> property of <code>fn</c
 does not have a name.</li>
 <li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> Configuration options for the suite.
 supports the same options as <code>test([name][, options][, fn])</code></li>
-<li><code>fn</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> The function under suite.
-a synchronous function declaring all subtests and subsuites.
+<li><code>fn</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> | <a href="https://tc39.es/ecma262/#sec-async-function-constructor" class="type">&#x3C;AsyncFunction></a> The function under suite
+declaring all subtests and subsuites.
+The first argument to this function is a <a href="#class-suitecontext"><code>SuiteContext</code></a> object.
 <strong>Default:</strong> A no-op function.</li>
 <li>Returns: <code>undefined</code>.</li>
 </ul>
@@ -691,6 +725,16 @@ no-op.</p>
     t.<span class="hljs-title function_">test</span>(<span class="hljs-string">'this subtest is run'</span>, { <span class="hljs-attr">only</span>: <span class="hljs-literal">true</span> }),
   ]);
 });</code></pre>
+<h4><code>context.signal</code><span><a class="mark" href="#contextsignal" id="contextsignal">#</a></span><a aria-hidden="true" class="legacy" id="test_context_signal"></a></h4>
+<div class="api_metadata">
+<span>Added in: v18.7.0</span>
+</div>
+<ul>
+<li><abortsignal> Can be used to abort test subtasks when the test has been aborted.</abortsignal></li>
+</ul>
+<pre><code class="language-js"><span class="hljs-title function_">test</span>(<span class="hljs-string">'top level test'</span>, <span class="hljs-keyword">async</span> (t) => {
+  <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-string">'some/uri'</span>, { <span class="hljs-attr">signal</span>: t.<span class="hljs-property">signal</span> });
+});</code></pre>
 <h4><code>context.skip([message])</code><span><a class="mark" href="#contextskipmessage" id="contextskipmessage">#</a></span><a aria-hidden="true" class="legacy" id="test_context_skip_message"></a></h4>
 <div class="api_metadata">
 <span>Added in: v18.0.0</span>
@@ -722,7 +766,15 @@ execution of the test function. This function does not return a value.</p>
 });</code></pre>
 <h4><code>context.test([name][, options][, fn])</code><span><a class="mark" href="#contexttestname-options-fn" id="contexttestname-options-fn">#</a></span><a aria-hidden="true" class="legacy" id="test_context_test_name_options_fn"></a></h4>
 <div class="api_metadata">
-<span>Added in: v18.0.0</span>
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v18.7.0</td>
+<td><p>Add a <code>timeout</code> option.</p></td></tr>
+<tr><td>v18.0.0</td>
+<td><p><span>Added in: v18.0.0</span></p></td></tr>
+</tbody></table>
+</details>
 </div>
 <ul>
 <li><code>name</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> The name of the subtest, which is displayed when reporting
@@ -743,6 +795,9 @@ skipping the test. <strong>Default:</strong> <code>false</code>.</li>
 <li><code>todo</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> If truthy, the test marked as <code>TODO</code>. If a string
 is provided, that string is displayed in the test results as the reason why
 the test is <code>TODO</code>. <strong>Default:</strong> <code>false</code>.</li>
+<li><code>timeout</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> A number of milliseconds the test will fail after.
+If unspecified, subtests inherit this value from their parent.
+<strong>Default:</strong> <code>Infinity</code>.</li>
 </ul>
 </li>
 <li><code>fn</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> | <a href="https://tc39.es/ecma262/#sec-async-function-constructor" class="type">&#x3C;AsyncFunction></a> The function under test. The first argument
@@ -761,7 +816,21 @@ behaves in the same fashion as the top level <a href="#testname-options-fn"><cod
       assert.<span class="hljs-title function_">ok</span>(<span class="hljs-string">'some relevant assertion here'</span>);
     }
   );
-});</code></pre></section>
+});</code></pre>
+</section><section><h3>Class: <code>SuiteContext</code><span><a class="mark" href="#class-suitecontext" id="class-suitecontext">#</a></span><a aria-hidden="true" class="legacy" id="test_class_suitecontext"></a></h3>
+<div class="api_metadata">
+<span>Added in: v18.7.0</span>
+</div>
+<p>An instance of <code>SuiteContext</code> is passed to each suite function in order to
+interact with the test runner. However, the <code>SuiteContext</code> constructor is not
+exposed as part of the API.</p>
+<h4><code>context.signal</code><span><a class="mark" href="#contextsignal_1" id="contextsignal_1">#</a></span><a aria-hidden="true" class="legacy" id="test_context_signal_1"></a></h4>
+<div class="api_metadata">
+<span>Added in: v18.7.0</span>
+</div>
+<ul>
+<li><abortsignal> Can be used to abort test subtasks when the test has been aborted.</abortsignal></li>
+</ul></section>
         <!-- API END -->
       </div>
     </div>

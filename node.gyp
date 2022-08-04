@@ -461,6 +461,7 @@
         '<(SHARED_INTERMEDIATE_DIR)' # for node_natives.h
       ],
       'dependencies': [
+        'deps/base64/base64.gyp:base64',
         'deps/googletest/googletest.gyp:gtest_prod',
         'deps/histogram/histogram.gyp:histogram',
         'deps/uvwasi/uvwasi.gyp:uvwasi',
@@ -515,7 +516,6 @@
         'src/node_messaging.cc',
         'src/node_metadata.cc',
         'src/node_native_module.cc',
-        'src/node_native_module_env.cc',
         'src/node_options.cc',
         'src/node_os.cc',
         'src/node_perf.cc',
@@ -620,7 +620,6 @@
         'src/node_metadata.h',
         'src/node_mutex.h',
         'src/node_native_module.h',
-        'src/node_native_module_env.h',
         'src/node_object_wrap.h',
         'src/node_options.h',
         'src/node_options-inl.h',
@@ -1189,6 +1188,7 @@
 
       'dependencies': [
         '<(node_lib_target_name)',
+        'deps/base64/base64.gyp:base64',
         'deps/googletest/googletest.gyp:gtest',
         'deps/googletest/googletest.gyp:gtest_main',
         'deps/histogram/histogram.gyp:histogram',

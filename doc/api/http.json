@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v18.6.0/lib/http.js\">lib/http.js</a></p>\n<p>To use the HTTP server and client one must <code>require('node:http')</code>.</p>\n<p>The HTTP interfaces in Node.js are designed to support many features\nof the protocol which have been traditionally difficult to use.\nIn particular, large, possibly chunk-encoded, messages. The interface is\ncareful to never buffer entire requests or responses, so the\nuser is able to stream data.</p>\n<p>HTTP message headers are represented by an object like this:</p>\n<!-- eslint-skip -->\n<pre><code class=\"language-js\">{ 'content-length': '123',\n  'content-type': 'text/plain',\n  'connection': 'keep-alive',\n  'host': 'example.com',\n  'accept': '*/*' }\n</code></pre>\n<p>Keys are lowercased. Values are not modified.</p>\n<p>In order to support the full spectrum of possible HTTP applications, the Node.js\nHTTP API is very low-level. It deals with stream handling and message\nparsing only. It parses a message into headers and body but it does not\nparse the actual headers or the body.</p>\n<p>See <a href=\"#messageheaders\"><code>message.headers</code></a> for details on how duplicate headers are handled.</p>\n<p>The raw headers as they were received are retained in the <code>rawHeaders</code>\nproperty, which is an array of <code>[key, value, key2, value2, ...]</code>. For\nexample, the previous message header object might have a <code>rawHeaders</code>\nlist like the following:</p>\n<!-- eslint-disable semi -->\n<pre><code class=\"language-js\">[ 'ConTent-Length', '123456',\n  'content-LENGTH', '123',\n  'content-type', 'text/plain',\n  'CONNECTION', 'keep-alive',\n  'Host', 'example.com',\n  'accepT', '*/*' ]\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v18.7.0/lib/http.js\">lib/http.js</a></p>\n<p>To use the HTTP server and client one must <code>require('node:http')</code>.</p>\n<p>The HTTP interfaces in Node.js are designed to support many features\nof the protocol which have been traditionally difficult to use.\nIn particular, large, possibly chunk-encoded, messages. The interface is\ncareful to never buffer entire requests or responses, so the\nuser is able to stream data.</p>\n<p>HTTP message headers are represented by an object like this:</p>\n<!-- eslint-skip -->\n<pre><code class=\"language-js\">{ 'content-length': '123',\n  'content-type': 'text/plain',\n  'connection': 'keep-alive',\n  'host': 'example.com',\n  'accept': '*/*' }\n</code></pre>\n<p>Keys are lowercased. Values are not modified.</p>\n<p>In order to support the full spectrum of possible HTTP applications, the Node.js\nHTTP API is very low-level. It deals with stream handling and message\nparsing only. It parses a message into headers and body but it does not\nparse the actual headers or the body.</p>\n<p>See <a href=\"#messageheaders\"><code>message.headers</code></a> for details on how duplicate headers are handled.</p>\n<p>The raw headers as they were received are retained in the <code>rawHeaders</code>\nproperty, which is an array of <code>[key, value, key2, value2, ...]</code>. For\nexample, the previous message header object might have a <code>rawHeaders</code>\nlist like the following:</p>\n<!-- eslint-disable semi -->\n<pre><code class=\"language-js\">[ 'ConTent-Length', '123456',\n  'content-LENGTH', '123',\n  'content-type', 'text/plain',\n  'CONNECTION', 'keep-alive',\n  'Host', 'example.com',\n  'accepT', '*/*' ]\n</code></pre>",
       "classes": [
         {
           "textRaw": "Class: `http.Agent`",
@@ -781,7 +781,7 @@
                   "params": []
                 }
               ],
-              "desc": "<p>Returns an array containing the unique names of the current outgoing headers.\nAll header names are lowercase.</p>\n<pre><code class=\"language-js\">request.setHeader('Foo', 'bar');\nrequest.setHeader('Cookie', ['foo=bar', 'bar=baz']);\n\nconst headerNames = request.getHeaderNames();\n// headerNames === ['foo', 'Cookie']\n</code></pre>"
+              "desc": "<p>Returns an array containing the unique names of the current outgoing headers.\nAll header names are lowercase.</p>\n<pre><code class=\"language-js\">request.setHeader('Foo', 'bar');\nrequest.setHeader('Cookie', ['foo=bar', 'bar=baz']);\n\nconst headerNames = request.getHeaderNames();\n// headerNames === ['foo', 'cookie']\n</code></pre>"
             },
             {
               "textRaw": "`request.getHeaders()`",
@@ -1388,6 +1388,32 @@
                 }
               ],
               "desc": "<p>This event is emitted when a new TCP stream is established. <code>socket</code> is\ntypically an object of type <a href=\"net.html#class-netsocket\"><code>net.Socket</code></a>. Usually users will not want to\naccess this event. In particular, the socket will not emit <code>'readable'</code> events\nbecause of how the protocol parser attaches to the socket. The <code>socket</code> can\nalso be accessed at <code>request.socket</code>.</p>\n<p>This event can also be explicitly emitted by users to inject connections\ninto the HTTP server. In that case, any <a href=\"stream.html#class-streamduplex\"><code>Duplex</code></a> stream can be passed.</p>\n<p>If <code>socket.setTimeout()</code> is called here, the timeout will be replaced with\n<code>server.keepAliveTimeout</code> when the socket has served a request (if\n<code>server.keepAliveTimeout</code> is non-zero).</p>\n<p>This event is guaranteed to be passed an instance of the <a href=\"net.html#class-netsocket\" class=\"type\">&lt;net.Socket&gt;</a> class,\na subclass of <a href=\"stream.html#class-streamduplex\" class=\"type\">&lt;stream.Duplex&gt;</a>, unless the user specifies a socket\ntype other than <a href=\"net.html#class-netsocket\" class=\"type\">&lt;net.Socket&gt;</a>.</p>"
+            },
+            {
+              "textRaw": "Event: `'dropRequest'`",
+              "type": "event",
+              "name": "dropRequest",
+              "meta": {
+                "added": [
+                  "v18.7.0"
+                ],
+                "changes": []
+              },
+              "params": [
+                {
+                  "textRaw": "`request` {http.IncomingMessage} Arguments for the HTTP request, as it is in the [`'request'`][] event",
+                  "name": "request",
+                  "type": "http.IncomingMessage",
+                  "desc": "Arguments for the HTTP request, as it is in the [`'request'`][] event"
+                },
+                {
+                  "textRaw": "`socket` {stream.Duplex} Network socket between the server and client",
+                  "name": "socket",
+                  "type": "stream.Duplex",
+                  "desc": "Network socket between the server and client"
+                }
+              ],
+              "desc": "<p>When the number of requests on a socket reaches the threshold of\n<code>server.maxRequestsPerSocket</code>, the server will drop new requests\nand emit <code>'dropRequest'</code> event instead, then send <code>503</code> to client.</p>"
             },
             {
               "textRaw": "Event: `'request'`",

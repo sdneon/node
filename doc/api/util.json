@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v18.6.0/lib/util.js\">lib/util.js</a></p>\n<p>The <code>node:util</code> module supports the needs of Node.js internal APIs. Many of the\nutilities are useful for application and module developers as well. To access\nit:</p>\n<pre><code class=\"language-js\">const util = require('node:util');\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v18.7.0/lib/util.js\">lib/util.js</a></p>\n<p>The <code>node:util</code> module supports the needs of Node.js internal APIs. Many of the\nutilities are useful for application and module developers as well. To access\nit:</p>\n<pre><code class=\"language-js\">const util = require('node:util');\n</code></pre>",
       "methods": [
         {
           "textRaw": "`util.callbackify(original)`",
@@ -937,7 +937,13 @@
             "added": [
               "v18.3.0"
             ],
-            "changes": []
+            "changes": [
+              {
+                "version": "v18.7.0",
+                "pr-url": "https://github.com/nodejs/node/pull/43459",
+                "description": "add support for returning detailed parse information using `tokens` in input `config` and returned properties."
+              }
+            ]
           },
           "stability": 1,
           "stabilityText": "Experimental",
@@ -960,6 +966,12 @@
                     "name": "positionals",
                     "type": "string\\[]",
                     "desc": "Positional arguments."
+                  },
+                  {
+                    "textRaw": "`tokens` {Object\\[] | undefined} See [parseArgs tokens](#parseargs-tokens) section. Only returned if `config` includes `tokens: true`.",
+                    "name": "tokens",
+                    "type": "Object\\[] | undefined",
+                    "desc": "See [parseArgs tokens](#parseargs-tokens) section. Only returned if `config` includes `tokens: true`."
                   }
                 ]
               },
@@ -1005,25 +1017,41 @@
                       ]
                     },
                     {
-                      "textRaw": "`strict`: {boolean} Should an error be thrown when unknown arguments are encountered, or when arguments are passed that do not match the `type` configured in `options`. **Default:** `true`.",
+                      "textRaw": "`strict` {boolean} Should an error be thrown when unknown arguments are encountered, or when arguments are passed that do not match the `type` configured in `options`. **Default:** `true`.",
                       "name": "strict",
                       "type": "boolean",
                       "default": "`true`",
                       "desc": "Should an error be thrown when unknown arguments are encountered, or when arguments are passed that do not match the `type` configured in `options`."
                     },
                     {
-                      "textRaw": "`allowPositionals`: {boolean} Whether this command accepts positional arguments. **Default:** `false` if `strict` is `true`, otherwise `true`.",
+                      "textRaw": "`allowPositionals` {boolean} Whether this command accepts positional arguments. **Default:** `false` if `strict` is `true`, otherwise `true`.",
                       "name": "allowPositionals",
                       "type": "boolean",
                       "default": "`false` if `strict` is `true`, otherwise `true`",
                       "desc": "Whether this command accepts positional arguments."
+                    },
+                    {
+                      "textRaw": "`tokens` {boolean} Return the parsed tokens. This is useful for extending the built-in behavior, from adding additional checks through to reprocessing the tokens in different ways. **Default:** `false`.",
+                      "name": "tokens",
+                      "type": "boolean",
+                      "default": "`false`",
+                      "desc": "Return the parsed tokens. This is useful for extending the built-in behavior, from adding additional checks through to reprocessing the tokens in different ways."
                     }
                   ]
                 }
               ]
             }
           ],
-          "desc": "<p>Provides a higher level API for command-line argument parsing than interacting\nwith <code>process.argv</code> directly. Takes a specification for the expected arguments\nand returns a structured object with the parsed options and positionals.</p>\n<pre><code class=\"language-mjs\">import { parseArgs } from 'node:util';\nconst args = ['-f', '--bar', 'b'];\nconst options = {\n  foo: {\n    type: 'boolean',\n    short: 'f'\n  },\n  bar: {\n    type: 'string'\n  }\n};\nconst {\n  values,\n  positionals\n} = parseArgs({ args, options });\nconsole.log(values, positionals);\n// Prints: [Object: null prototype] { foo: true, bar: 'b' } []\n</code></pre>\n<pre><code class=\"language-cjs\">const { parseArgs } = require('node:util');\nconst args = ['-f', '--bar', 'b'];\nconst options = {\n  foo: {\n    type: 'boolean',\n    short: 'f'\n  },\n  bar: {\n    type: 'string'\n  }\n};\nconst {\n  values,\n  positionals\n} = parseArgs({ args, options });\nconsole.log(values, positionals);\n// Prints: [Object: null prototype] { foo: true, bar: 'b' } []\n</code></pre>\n<p><code>util.parseArgs</code> is experimental and behavior may change. Join the\nconversation in <a href=\"https://github.com/pkgjs/parseargs\">pkgjs/parseargs</a> to contribute to the design.</p>"
+          "desc": "<p>Provides a higher level API for command-line argument parsing than interacting\nwith <code>process.argv</code> directly. Takes a specification for the expected arguments\nand returns a structured object with the parsed options and positionals.</p>\n<pre><code class=\"language-mjs\">import { parseArgs } from 'node:util';\nconst args = ['-f', '--bar', 'b'];\nconst options = {\n  foo: {\n    type: 'boolean',\n    short: 'f'\n  },\n  bar: {\n    type: 'string'\n  }\n};\nconst {\n  values,\n  positionals\n} = parseArgs({ args, options });\nconsole.log(values, positionals);\n// Prints: [Object: null prototype] { foo: true, bar: 'b' } []\n</code></pre>\n<pre><code class=\"language-cjs\">const { parseArgs } = require('node:util');\nconst args = ['-f', '--bar', 'b'];\nconst options = {\n  foo: {\n    type: 'boolean',\n    short: 'f'\n  },\n  bar: {\n    type: 'string'\n  }\n};\nconst {\n  values,\n  positionals\n} = parseArgs({ args, options });\nconsole.log(values, positionals);\n// Prints: [Object: null prototype] { foo: true, bar: 'b' } []\n</code></pre>\n<p><code>util.parseArgs</code> is experimental and behavior may change. Join the\nconversation in <a href=\"https://github.com/pkgjs/parseargs\">pkgjs/parseargs</a> to contribute to the design.</p>",
+          "modules": [
+            {
+              "textRaw": "`parseArgs` `tokens`",
+              "name": "`parseargs`_`tokens`",
+              "desc": "<p>Detailed parse information is available for adding custom behaviours by\nspecifying <code>tokens: true</code> in the configuration.\nThe returned tokens have properties describing:</p>\n<ul>\n<li>all tokens\n<ul>\n<li><code>kind</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> One of 'option', 'positional', or 'option-terminator'.</li>\n<li><code>index</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> Index of element in <code>args</code> containing token. So the\nsource argument for a token is <code>args[token.index]</code>.</li>\n</ul>\n</li>\n<li>option tokens\n<ul>\n<li><code>name</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> Long name of option.</li>\n<li><code>rawName</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> How option used in args, like <code>-f</code> of <code>--foo</code>.</li>\n<li><code>value</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type\" class=\"type\">&lt;undefined&gt;</a> Option value specified in args.\nUndefined for boolean options.</li>\n<li><code>inlineValue</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type\" class=\"type\">&lt;boolean&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type\" class=\"type\">&lt;undefined&gt;</a> Whether option value specified inline,\nlike <code>--foo=bar</code>.</li>\n</ul>\n</li>\n<li>positional tokens\n<ul>\n<li><code>value</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> The value of the positional argument in args (i.e. <code>args[index]</code>).</li>\n</ul>\n</li>\n<li>option-terminator token</li>\n</ul>\n<p>The returned tokens are in the order encountered in the input args. Options\nthat appear more than once in args produce a token for each use. Short option\ngroups like <code>-xy</code> expand to a token for each option. So <code>-xxx</code> produces\nthree tokens.</p>\n<p>For example to use the returned tokens to add support for a negated option\nlike <code>--no-color</code>, the tokens can be reprocessed to change the value stored\nfor the negated option.</p>\n<pre><code class=\"language-mjs\">import { parseArgs } from 'node:util';\n\nconst options = {\n  'color': { type: 'boolean' },\n  'no-color': { type: 'boolean' },\n  'logfile': { type: 'string' },\n  'no-logfile': { type: 'boolean' },\n};\nconst { values, tokens } = parseArgs({ options, tokens: true });\n\n// Reprocess the option tokens and overwrite the returned values.\ntokens\n  .filter((token) => token.kind === 'option')\n  .forEach((token) => {\n    if (token.name.startsWith('no-')) {\n      // Store foo:false for --no-foo\n      const positiveName = token.name.slice(3);\n      values[positiveName] = false;\n      delete values[token.name];\n    } else {\n      // Resave value so last one wins if both --foo and --no-foo.\n      values[token.name] = token.value ?? true;\n    }\n  });\n\nconst color = values.color;\nconst logfile = values.logfile ?? 'default.log';\n\nconsole.log({ logfile, color });\n</code></pre>\n<pre><code class=\"language-cjs\">const { parseArgs } = require('node:util');\n\nconst options = {\n  'color': { type: 'boolean' },\n  'no-color': { type: 'boolean' },\n  'logfile': { type: 'string' },\n  'no-logfile': { type: 'boolean' },\n};\nconst { values, tokens } = parseArgs({ options, tokens: true });\n\n// Reprocess the option tokens and overwrite the returned values.\ntokens\n  .filter((token) => token.kind === 'option')\n  .forEach((token) => {\n    if (token.name.startsWith('no-')) {\n      // Store foo:false for --no-foo\n      const positiveName = token.name.slice(3);\n      values[positiveName] = false;\n      delete values[token.name];\n    } else {\n      // Resave value so last one wins if both --foo and --no-foo.\n      values[token.name] = token.value ?? true;\n    }\n  });\n\nconst color = values.color;\nconst logfile = values.logfile ?? 'default.log';\n\nconsole.log({ logfile, color });\n</code></pre>\n<p>Example usage showing negated options, and when an option is used\nmultiple ways then last one wins.</p>\n<pre><code class=\"language-console\">$ node negate.js\n{ logfile: 'default.log', color: undefined }\n$ node negate.js --no-logfile --no-color\n{ logfile: false, color: false }\n$ node negate.js --logfile=test.log --color\n{ logfile: 'test.log', color: true }\n$ node negate.js --no-logfile --logfile=test.log --color --no-color\n{ logfile: 'test.log', color: false }\n</code></pre>",
+              "type": "module",
+              "displayName": "`parseArgs` `tokens`"
+            }
+          ]
         },
         {
           "textRaw": "`util.promisify(original)`",
@@ -1386,7 +1414,7 @@
               {
                 "version": "v15.3.0",
                 "pr-url": "https://github.com/nodejs/node/pull/34055",
-                "description": "Exposed as `require('node:util/types')`."
+                "description": "Exposed as `require('util/types')`."
               }
             ]
           },

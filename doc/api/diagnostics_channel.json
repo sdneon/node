@@ -8,7 +8,7 @@
       "introduced_in": "v15.1.0",
       "stability": 1,
       "stabilityText": "Experimental",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v18.6.0/lib/diagnostics_channel.js\">lib/diagnostics_channel.js</a></p>\n<p>The <code>node:diagnostics_channel</code> module provides an API to create named channels\nto report arbitrary message data for diagnostics purposes.</p>\n<p>It can be accessed using:</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\n</code></pre>\n<p>It is intended that a module writer wanting to report diagnostics messages\nwill create one or many top-level channels to report messages through.\nChannels may also be acquired at runtime but it is not encouraged\ndue to the additional overhead of doing so. Channels may be exported for\nconvenience, but as long as the name is known it can be acquired anywhere.</p>\n<p>If you intend for your module to produce diagnostics data for others to\nconsume it is recommended that you include documentation of what named\nchannels are used along with the shape of the message data. Channel names\nshould generally include the module name to avoid collisions with data from\nother modules.</p>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v18.7.0/lib/diagnostics_channel.js\">lib/diagnostics_channel.js</a></p>\n<p>The <code>node:diagnostics_channel</code> module provides an API to create named channels\nto report arbitrary message data for diagnostics purposes.</p>\n<p>It can be accessed using:</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\n</code></pre>\n<p>It is intended that a module writer wanting to report diagnostics messages\nwill create one or many top-level channels to report messages through.\nChannels may also be acquired at runtime but it is not encouraged\ndue to the additional overhead of doing so. Channels may be exported for\nconvenience, but as long as the name is known it can be acquired anywhere.</p>\n<p>If you intend for your module to produce diagnostics data for others to\nconsume it is recommended that you include documentation of what named\nchannels are used along with the shape of the message data. Channel names\nshould generally include the module name to avoid collisions with data from\nother modules.</p>",
       "modules": [
         {
           "textRaw": "Public API",
@@ -17,7 +17,7 @@
             {
               "textRaw": "Overview",
               "name": "overview",
-              "desc": "<p>Following is a simple overview of the public API.</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\n\n// Get a reusable channel object\nconst channel = diagnostics_channel.channel('my-channel');\n\n// Subscribe to the channel\nchannel.subscribe((message, name) => {\n  // Received data\n});\n\n// Check if the channel has an active subscriber\nif (channel.hasSubscribers) {\n  // Publish data to the channel\n  channel.publish({\n    some: 'data'\n  });\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\n\n// Get a reusable channel object\nconst channel = diagnostics_channel.channel('my-channel');\n\n// Subscribe to the channel\nchannel.subscribe((message, name) => {\n  // Received data\n});\n\n// Check if the channel has an active subscriber\nif (channel.hasSubscribers) {\n  // Publish data to the channel\n  channel.publish({\n    some: 'data'\n  });\n}\n</code></pre>",
+              "desc": "<p>Following is a simple overview of the public API.</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\n\n// Get a reusable channel object\nconst channel = diagnostics_channel.channel('my-channel');\n\nfunction onMessage(message, name) {\n  // Received data\n}\n\n// Subscribe to the channel\ndiagnostics_channel.subscribe('my-channel', onMessage);\n\n// Check if the channel has an active subscriber\nif (channel.hasSubscribers) {\n  // Publish data to the channel\n  channel.publish({\n    some: 'data'\n  });\n}\n\n// Unsubscribe from the channel\ndiagnostics_channel.unsubscribe('my-channel', onMessage);\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\n\n// Get a reusable channel object\nconst channel = diagnostics_channel.channel('my-channel');\n\nfunction onMessage(message, name) {\n  // Received data\n}\n\n// Subscribe to the channel\ndiagnostics_channel.subscribe('my-channel', onMessage);\n\n// Check if the channel has an active subscriber\nif (channel.hasSubscribers) {\n  // Publish data to the channel\n  channel.publish({\n    some: 'data'\n  });\n}\n\n// Unsubscribe from the channel\ndiagnostics_channel.unsubscribe('my-channel', onMessage);\n</code></pre>",
               "methods": [
                 {
                   "textRaw": "`diagnostics_channel.hasSubscribers(name)`",
@@ -79,7 +79,87 @@
                       ]
                     }
                   ],
-                  "desc": "<p>This is the primary entry-point for anyone wanting to interact with a named\nchannel. It produces a channel object which is optimized to reduce overhead at\npublish time as much as possible.</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\n\nconst channel = diagnostics_channel.channel('my-channel');\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\n\nconst channel = diagnostics_channel.channel('my-channel');\n</code></pre>"
+                  "desc": "<p>This is the primary entry-point for anyone wanting to publish to a named\nchannel. It produces a channel object which is optimized to reduce overhead at\npublish time as much as possible.</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\n\nconst channel = diagnostics_channel.channel('my-channel');\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\n\nconst channel = diagnostics_channel.channel('my-channel');\n</code></pre>"
+                },
+                {
+                  "textRaw": "`diagnostics_channel.subscribe(name, onMessage)`",
+                  "type": "method",
+                  "name": "subscribe",
+                  "meta": {
+                    "added": [
+                      "v18.7.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`name` {string|symbol} The channel name",
+                          "name": "name",
+                          "type": "string|symbol",
+                          "desc": "The channel name"
+                        },
+                        {
+                          "textRaw": "`onMessage` {Function} The handler to receive channel messages",
+                          "name": "onMessage",
+                          "type": "Function",
+                          "desc": "The handler to receive channel messages",
+                          "options": [
+                            {
+                              "textRaw": "`message` {any} The message data",
+                              "name": "message",
+                              "type": "any",
+                              "desc": "The message data"
+                            },
+                            {
+                              "textRaw": "`name` {string|symbol} The name of the channel",
+                              "name": "name",
+                              "type": "string|symbol",
+                              "desc": "The name of the channel"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>Register a message handler to subscribe to this channel. This message handler\nwill be run synchronously whenever a message is published to the channel. Any\nerrors thrown in the message handler will trigger an <a href=\"process.html#event-uncaughtexception\"><code>'uncaughtException'</code></a>.</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'diagnostics_channel';\n\ndiagnostics_channel.subscribe('my-channel', (message, name) => {\n  // Received data\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('diagnostics_channel');\n\ndiagnostics_channel.subscribe('my-channel', (message, name) => {\n  // Received data\n});\n</code></pre>"
+                },
+                {
+                  "textRaw": "`diagnostics_channel.unsubscribe(name, onMessage)`",
+                  "type": "method",
+                  "name": "unsubscribe",
+                  "meta": {
+                    "added": [
+                      "v18.7.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "return": {
+                        "textRaw": "Returns: {boolean} `true` if the handler was found, `false` otherwise.",
+                        "name": "return",
+                        "type": "boolean",
+                        "desc": "`true` if the handler was found, `false` otherwise."
+                      },
+                      "params": [
+                        {
+                          "textRaw": "`name` {string|symbol} The channel name",
+                          "name": "name",
+                          "type": "string|symbol",
+                          "desc": "The channel name"
+                        },
+                        {
+                          "textRaw": "`onMessage` {Function} The previous subscribed handler to remove",
+                          "name": "onMessage",
+                          "type": "Function",
+                          "desc": "The previous subscribed handler to remove"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>Remove a message handler previously registered to this channel with\n<a href=\"#diagnostics_channelsubscribename-onmessage\"><code>diagnostics_channel.subscribe(name, onMessage)</code></a>.</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'diagnostics_channel';\n\nfunction onMessage(message, name) {\n  // Received data\n}\n\ndiagnostics_channel.subscribe('my-channel', onMessage);\n\ndiagnostics_channel.unsubscribe('my-channel', onMessage);\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('diagnostics_channel');\n\nfunction onMessage(message, name) {\n  // Received data\n}\n\ndiagnostics_channel.subscribe('my-channel', onMessage);\n\ndiagnostics_channel.unsubscribe('my-channel', onMessage);\n</code></pre>"
                 }
               ],
               "type": "module",
@@ -165,8 +245,13 @@
                       "v15.1.0",
                       "v14.17.0"
                     ],
+                    "deprecated": [
+                      "v18.7.0"
+                    ],
                     "changes": []
                   },
+                  "stability": 0,
+                  "stabilityText": "Deprecated: Use [`diagnostics_channel.subscribe(name, onMessage)`][]",
                   "signatures": [
                     {
                       "params": [
@@ -204,6 +289,9 @@
                       "v15.1.0",
                       "v14.17.0"
                     ],
+                    "deprecated": [
+                      "v18.7.0"
+                    ],
                     "changes": [
                       {
                         "version": [
@@ -216,6 +304,8 @@
                       }
                     ]
                   },
+                  "stability": 0,
+                  "stabilityText": "Deprecated: Use [`diagnostics_channel.unsubscribe(name, onMessage)`][]",
                   "signatures": [
                     {
                       "return": {
