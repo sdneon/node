@@ -8,7 +8,7 @@
       "introduced_in": "v18.0.0",
       "stability": 1,
       "stabilityText": "Experimental",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v18.7.0/lib/test.js\">lib/test.js</a></p>\n<p>The <code>node:test</code> module facilitates the creation of JavaScript tests that\nreport results in <a href=\"https://testanything.org/\">TAP</a> format. To access it:</p>\n<pre><code class=\"language-mjs\">import test from 'node:test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('node:test');\n</code></pre>\n<p>This module is only available under the <code>node:</code> scheme. The following will not\nwork:</p>\n<pre><code class=\"language-mjs\">import test from 'test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('test');\n</code></pre>\n<p>Tests created via the <code>test</code> module consist of a single function that is\nprocessed in one of three ways:</p>\n<ol>\n<li>A synchronous function that is considered failing if it throws an exception,\nand is considered passing otherwise.</li>\n<li>A function that returns a <code>Promise</code> that is considered failing if the\n<code>Promise</code> rejects, and is considered passing if the <code>Promise</code> resolves.</li>\n<li>A function that receives a callback function. If the callback receives any\ntruthy value as its first argument, the test is considered failing. If a\nfalsy value is passed as the first argument to the callback, the test is\nconsidered passing. If the test function receives a callback function and\nalso returns a <code>Promise</code>, the test will fail.</li>\n</ol>\n<p>The following example illustrates how tests are written using the\n<code>test</code> module.</p>\n<pre><code class=\"language-js\">test('synchronous passing test', (t) => {\n  // This test passes because it does not throw an exception.\n  assert.strictEqual(1, 1);\n});\n\ntest('synchronous failing test', (t) => {\n  // This test fails because it throws an exception.\n  assert.strictEqual(1, 2);\n});\n\ntest('asynchronous passing test', async (t) => {\n  // This test passes because the Promise returned by the async\n  // function is not rejected.\n  assert.strictEqual(1, 1);\n});\n\ntest('asynchronous failing test', async (t) => {\n  // This test fails because the Promise returned by the async\n  // function is rejected.\n  assert.strictEqual(1, 2);\n});\n\ntest('failing test using Promises', (t) => {\n  // Promises can be used directly as well.\n  return new Promise((resolve, reject) => {\n    setImmediate(() => {\n      reject(new Error('this will cause the test to fail'));\n    });\n  });\n});\n\ntest('callback passing test', (t, done) => {\n  // done() is the callback function. When the setImmediate() runs, it invokes\n  // done() with no arguments.\n  setImmediate(done);\n});\n\ntest('callback failing test', (t, done) => {\n  // When the setImmediate() runs, done() is invoked with an Error object and\n  // the test fails.\n  setImmediate(() => {\n    done(new Error('callback failure'));\n  });\n});\n</code></pre>\n<p>As a test file executes, TAP is written to the standard output of the Node.js\nprocess. This output can be interpreted by any test harness that understands\nthe TAP format. If any tests fail, the process exit code is set to <code>1</code>.</p>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v18.8.0/lib/test.js\">lib/test.js</a></p>\n<p>The <code>node:test</code> module facilitates the creation of JavaScript tests that\nreport results in <a href=\"https://testanything.org/\">TAP</a> format. To access it:</p>\n<pre><code class=\"language-mjs\">import test from 'node:test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('node:test');\n</code></pre>\n<p>This module is only available under the <code>node:</code> scheme. The following will not\nwork:</p>\n<pre><code class=\"language-mjs\">import test from 'test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('test');\n</code></pre>\n<p>Tests created via the <code>test</code> module consist of a single function that is\nprocessed in one of three ways:</p>\n<ol>\n<li>A synchronous function that is considered failing if it throws an exception,\nand is considered passing otherwise.</li>\n<li>A function that returns a <code>Promise</code> that is considered failing if the\n<code>Promise</code> rejects, and is considered passing if the <code>Promise</code> resolves.</li>\n<li>A function that receives a callback function. If the callback receives any\ntruthy value as its first argument, the test is considered failing. If a\nfalsy value is passed as the first argument to the callback, the test is\nconsidered passing. If the test function receives a callback function and\nalso returns a <code>Promise</code>, the test will fail.</li>\n</ol>\n<p>The following example illustrates how tests are written using the\n<code>test</code> module.</p>\n<pre><code class=\"language-js\">test('synchronous passing test', (t) => {\n  // This test passes because it does not throw an exception.\n  assert.strictEqual(1, 1);\n});\n\ntest('synchronous failing test', (t) => {\n  // This test fails because it throws an exception.\n  assert.strictEqual(1, 2);\n});\n\ntest('asynchronous passing test', async (t) => {\n  // This test passes because the Promise returned by the async\n  // function is not rejected.\n  assert.strictEqual(1, 1);\n});\n\ntest('asynchronous failing test', async (t) => {\n  // This test fails because the Promise returned by the async\n  // function is rejected.\n  assert.strictEqual(1, 2);\n});\n\ntest('failing test using Promises', (t) => {\n  // Promises can be used directly as well.\n  return new Promise((resolve, reject) => {\n    setImmediate(() => {\n      reject(new Error('this will cause the test to fail'));\n    });\n  });\n});\n\ntest('callback passing test', (t, done) => {\n  // done() is the callback function. When the setImmediate() runs, it invokes\n  // done() with no arguments.\n  setImmediate(done);\n});\n\ntest('callback failing test', (t, done) => {\n  // When the setImmediate() runs, done() is invoked with an Error object and\n  // the test fails.\n  setImmediate(() => {\n    done(new Error('callback failure'));\n  });\n});\n</code></pre>\n<p>As a test file executes, TAP is written to the standard output of the Node.js\nprocess. This output can be interpreted by any test harness that understands\nthe TAP format. If any tests fail, the process exit code is set to <code>1</code>.</p>",
       "modules": [
         {
           "textRaw": "Subtests",
@@ -27,7 +27,7 @@
         {
           "textRaw": "`describe`/`it` syntax",
           "name": "`describe`/`it`_syntax",
-          "desc": "<p>Running tests can also be done using <code>describe</code> to declare a suite\nand <code>it</code> to declare a test.\nA suite is used to organize and group related tests together.\n<code>it</code> is an alias for <code>test</code>, except there is no test context passed,\nsince nesting is done using suites, as demonstrated in this example</p>\n<pre><code class=\"language-js\">describe('A thing', () => {\n  it('should work', () => {\n    assert.strictEqual(1, 1);\n  });\n\n  it('should be ok', () => {\n    assert.strictEqual(2, 2);\n  });\n\n  describe('a nested thing', () => {\n    it('should work', () => {\n      assert.strictEqual(3, 3);\n    });\n  });\n});\n</code></pre>\n<p><code>describe</code> and <code>it</code> are imported from the <code>node:test</code> module</p>\n<pre><code class=\"language-mjs\">import { describe, it } from 'node:test';\n</code></pre>\n<pre><code class=\"language-cjs\">const { describe, it } = require('node:test');\n</code></pre>",
+          "desc": "<p>Running tests can also be done using <code>describe</code> to declare a suite\nand <code>it</code> to declare a test.\nA suite is used to organize and group related tests together.\n<code>it</code> is an alias for <code>test</code>, except there is no test context passed,\nsince nesting is done using suites.</p>\n<pre><code class=\"language-js\">describe('A thing', () => {\n  it('should work', () => {\n    assert.strictEqual(1, 1);\n  });\n\n  it('should be ok', () => {\n    assert.strictEqual(2, 2);\n  });\n\n  describe('a nested thing', () => {\n    it('should work', () => {\n      assert.strictEqual(3, 3);\n    });\n  });\n});\n</code></pre>\n<p><code>describe</code> and <code>it</code> are imported from the <code>node:test</code> module.</p>\n<pre><code class=\"language-mjs\">import { describe, it } from 'node:test';\n</code></pre>\n<pre><code class=\"language-cjs\">const { describe, it } = require('node:test');\n</code></pre>",
           "modules": [
             {
               "textRaw": "`only` tests",
@@ -75,6 +75,11 @@
             ],
             "changes": [
               {
+                "version": "v18.8.0",
+                "pr-url": "https://github.com/nodejs/node/pull/43554",
+                "description": "Add a `signal` option."
+              },
+              {
                 "version": "v18.7.0",
                 "pr-url": "https://github.com/nodejs/node/pull/43505",
                 "description": "Add a `timeout` option."
@@ -118,10 +123,10 @@
                       "desc": "If truthy, and the test context is configured to run `only` tests, then this test will be run. Otherwise, the test is skipped."
                     },
                     {
-                      "textRaw": "`signal` {AbortSignal} Allows aborting an in-progress test",
+                      "textRaw": "`signal` {AbortSignal} Allows aborting an in-progress test.",
                       "name": "signal",
                       "type": "AbortSignal",
-                      "desc": "Allows aborting an in-progress test"
+                      "desc": "Allows aborting an in-progress test."
                     },
                     {
                       "textRaw": "`skip` {boolean|string} If truthy, the test is skipped. If a string is provided, that string is displayed in the test results as the reason for skipping the test. **Default:** `false`.",
@@ -178,10 +183,10 @@
                   "desc": "The name of the suite, which is displayed when reporting test results."
                 },
                 {
-                  "textRaw": "`options` {Object} Configuration options for the suite. supports the same options as `test([name][, options][, fn])`",
+                  "textRaw": "`options` {Object} Configuration options for the suite. supports the same options as `test([name][, options][, fn])`.",
                   "name": "options",
                   "type": "Object",
-                  "desc": "Configuration options for the suite. supports the same options as `test([name][, options][, fn])`"
+                  "desc": "Configuration options for the suite. supports the same options as `test([name][, options][, fn])`."
                 },
                 {
                   "textRaw": "`fn` {Function|AsyncFunction} The function under suite declaring all subtests and subsuites. The first argument to this function is a [`SuiteContext`][] object. **Default:** A no-op function.",
@@ -193,7 +198,7 @@
               ]
             }
           ],
-          "desc": "<p>The <code>describe()</code> function imported from the <code>node:test</code> module. Each\ninvocation of this function results in the creation of a Subtest\nand a test point in the TAP output.\nAfter invocation of top level <code>describe</code> functions,\nall top level tests and suites will execute</p>"
+          "desc": "<p>The <code>describe()</code> function imported from the <code>node:test</code> module. Each\ninvocation of this function results in the creation of a Subtest\nand a test point in the TAP output.\nAfter invocation of top level <code>describe</code> functions,\nall top level tests and suites will execute.</p>"
         },
         {
           "textRaw": "`describe.skip([name][, options][, fn])`",
@@ -274,7 +279,193 @@
               "params": []
             }
           ],
-          "desc": "<p>Shorthand for marking a test as <code>TODO</code>,\nsame as <a href=\"#testname-options-fn\"><code>it([name], { todo: true }[, fn])</code></a>.</p>"
+          "desc": "<p>Shorthand for marking a test as <code>TODO</code>,\nsame as <a href=\"#testname-options-fn\"><code>it([name], { todo: true }[, fn])</code></a>.</p>",
+          "methods": [
+            {
+              "textRaw": "`before([, fn][, options])`",
+              "type": "method",
+              "name": "before",
+              "meta": {
+                "added": [
+                  "v18.8.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`fn` {Function|AsyncFunction} The hook function. If the hook uses callbacks, the callback function is passed as the second argument. **Default:** A no-op function.",
+                      "name": "fn",
+                      "type": "Function|AsyncFunction",
+                      "default": "A no-op function",
+                      "desc": "The hook function. If the hook uses callbacks, the callback function is passed as the second argument."
+                    },
+                    {
+                      "textRaw": "`options` {Object} Configuration options for the hook. The following properties are supported:",
+                      "name": "options",
+                      "type": "Object",
+                      "desc": "Configuration options for the hook. The following properties are supported:",
+                      "options": [
+                        {
+                          "textRaw": "`signal` {AbortSignal} Allows aborting an in-progress hook.",
+                          "name": "signal",
+                          "type": "AbortSignal",
+                          "desc": "Allows aborting an in-progress hook."
+                        },
+                        {
+                          "textRaw": "`timeout` {number} A number of milliseconds the hook will fail after. If unspecified, subtests inherit this value from their parent. **Default:** `Infinity`.",
+                          "name": "timeout",
+                          "type": "number",
+                          "default": "`Infinity`",
+                          "desc": "A number of milliseconds the hook will fail after. If unspecified, subtests inherit this value from their parent."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>This function is used to create a hook running before running a suite.</p>\n<pre><code class=\"language-js\">describe('tests', async () => {\n  before(() => console.log('about to run some test'));\n  it('is a subtest', () => {\n    assert.ok('some relevant assertion here');\n  });\n});\n</code></pre>"
+            },
+            {
+              "textRaw": "`after([, fn][, options])`",
+              "type": "method",
+              "name": "after",
+              "meta": {
+                "added": [
+                  "v18.8.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`fn` {Function|AsyncFunction} The hook function. If the hook uses callbacks, the callback function is passed as the second argument. **Default:** A no-op function.",
+                      "name": "fn",
+                      "type": "Function|AsyncFunction",
+                      "default": "A no-op function",
+                      "desc": "The hook function. If the hook uses callbacks, the callback function is passed as the second argument."
+                    },
+                    {
+                      "textRaw": "`options` {Object} Configuration options for the hook. The following properties are supported:",
+                      "name": "options",
+                      "type": "Object",
+                      "desc": "Configuration options for the hook. The following properties are supported:",
+                      "options": [
+                        {
+                          "textRaw": "`signal` {AbortSignal} Allows aborting an in-progress hook.",
+                          "name": "signal",
+                          "type": "AbortSignal",
+                          "desc": "Allows aborting an in-progress hook."
+                        },
+                        {
+                          "textRaw": "`timeout` {number} A number of milliseconds the hook will fail after. If unspecified, subtests inherit this value from their parent. **Default:** `Infinity`.",
+                          "name": "timeout",
+                          "type": "number",
+                          "default": "`Infinity`",
+                          "desc": "A number of milliseconds the hook will fail after. If unspecified, subtests inherit this value from their parent."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>This function is used to create a hook running after  running a suite.</p>\n<pre><code class=\"language-js\">describe('tests', async () => {\n  after(() => console.log('finished running tests'));\n  it('is a subtest', () => {\n    assert.ok('some relevant assertion here');\n  });\n});\n</code></pre>"
+            },
+            {
+              "textRaw": "`beforeEach([, fn][, options])`",
+              "type": "method",
+              "name": "beforeEach",
+              "meta": {
+                "added": [
+                  "v18.8.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`fn` {Function|AsyncFunction} The hook function. If the hook uses callbacks, the callback function is passed as the second argument. **Default:** A no-op function.",
+                      "name": "fn",
+                      "type": "Function|AsyncFunction",
+                      "default": "A no-op function",
+                      "desc": "The hook function. If the hook uses callbacks, the callback function is passed as the second argument."
+                    },
+                    {
+                      "textRaw": "`options` {Object} Configuration options for the hook. The following properties are supported:",
+                      "name": "options",
+                      "type": "Object",
+                      "desc": "Configuration options for the hook. The following properties are supported:",
+                      "options": [
+                        {
+                          "textRaw": "`signal` {AbortSignal} Allows aborting an in-progress hook.",
+                          "name": "signal",
+                          "type": "AbortSignal",
+                          "desc": "Allows aborting an in-progress hook."
+                        },
+                        {
+                          "textRaw": "`timeout` {number} A number of milliseconds the hook will fail after. If unspecified, subtests inherit this value from their parent. **Default:** `Infinity`.",
+                          "name": "timeout",
+                          "type": "number",
+                          "default": "`Infinity`",
+                          "desc": "A number of milliseconds the hook will fail after. If unspecified, subtests inherit this value from their parent."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>This function is used to create a hook running\nbefore each subtest of the current suite.</p>\n<pre><code class=\"language-js\">describe('tests', async () => {\n  beforeEach(() => t.diagnostics('about to run a test'));\n  it('is a subtest', () => {\n    assert.ok('some relevant assertion here');\n  });\n});\n</code></pre>"
+            },
+            {
+              "textRaw": "`afterEach([, fn][, options])`",
+              "type": "method",
+              "name": "afterEach",
+              "meta": {
+                "added": [
+                  "v18.8.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`fn` {Function|AsyncFunction} The hook function. If the hook uses callbacks, the callback function is passed as the second argument. **Default:** A no-op function.",
+                      "name": "fn",
+                      "type": "Function|AsyncFunction",
+                      "default": "A no-op function",
+                      "desc": "The hook function. If the hook uses callbacks, the callback function is passed as the second argument."
+                    },
+                    {
+                      "textRaw": "`options` {Object} Configuration options for the hook. The following properties are supported:",
+                      "name": "options",
+                      "type": "Object",
+                      "desc": "Configuration options for the hook. The following properties are supported:",
+                      "options": [
+                        {
+                          "textRaw": "`signal` {AbortSignal} Allows aborting an in-progress hook.",
+                          "name": "signal",
+                          "type": "AbortSignal",
+                          "desc": "Allows aborting an in-progress hook."
+                        },
+                        {
+                          "textRaw": "`timeout` {number} A number of milliseconds the hook will fail after. If unspecified, subtests inherit this value from their parent. **Default:** `Infinity`.",
+                          "name": "timeout",
+                          "type": "number",
+                          "default": "`Infinity`",
+                          "desc": "A number of milliseconds the hook will fail after. If unspecified, subtests inherit this value from their parent."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>This function is used to create a hook running\nafter each subtest of the current test.</p>\n<pre><code class=\"language-js\">describe('tests', async () => {\n  afterEach(() => t.diagnostics('about to run a test'));\n  it('is a subtest', () => {\n    assert.ok('some relevant assertion here');\n  });\n});\n</code></pre>"
+            }
+          ]
         }
       ],
       "classes": [
@@ -290,6 +481,98 @@
           },
           "desc": "<p>An instance of <code>TestContext</code> is passed to each test function in order to\ninteract with the test runner. However, the <code>TestContext</code> constructor is not\nexposed as part of the API.</p>",
           "methods": [
+            {
+              "textRaw": "`context.beforeEach([, fn][, options])`",
+              "type": "method",
+              "name": "beforeEach",
+              "meta": {
+                "added": [
+                  "v18.8.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`fn` {Function|AsyncFunction} The hook function. The first argument to this function is a [`TestContext`][] object. If the hook uses callbacks, the callback function is passed as the second argument. **Default:** A no-op function.",
+                      "name": "fn",
+                      "type": "Function|AsyncFunction",
+                      "default": "A no-op function",
+                      "desc": "The hook function. The first argument to this function is a [`TestContext`][] object. If the hook uses callbacks, the callback function is passed as the second argument."
+                    },
+                    {
+                      "textRaw": "`options` {Object} Configuration options for the hook. The following properties are supported:",
+                      "name": "options",
+                      "type": "Object",
+                      "desc": "Configuration options for the hook. The following properties are supported:",
+                      "options": [
+                        {
+                          "textRaw": "`signal` {AbortSignal} Allows aborting an in-progress hook.",
+                          "name": "signal",
+                          "type": "AbortSignal",
+                          "desc": "Allows aborting an in-progress hook."
+                        },
+                        {
+                          "textRaw": "`timeout` {number} A number of milliseconds the hook will fail after. If unspecified, subtests inherit this value from their parent. **Default:** `Infinity`.",
+                          "name": "timeout",
+                          "type": "number",
+                          "default": "`Infinity`",
+                          "desc": "A number of milliseconds the hook will fail after. If unspecified, subtests inherit this value from their parent."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>This function is used to create a hook running\nbefore each subtest of the current test.</p>\n<pre><code class=\"language-js\">test('top level test', async (t) => {\n  t.beforeEach((t) => t.diagnostics(`about to run ${t.name}`));\n  await t.test(\n    'This is a subtest',\n    (t) => {\n      assert.ok('some relevant assertion here');\n    }\n  );\n});\n</code></pre>"
+            },
+            {
+              "textRaw": "`context.afterEach([, fn][, options])`",
+              "type": "method",
+              "name": "afterEach",
+              "meta": {
+                "added": [
+                  "v18.8.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`fn` {Function|AsyncFunction} The hook function. The first argument to this function is a [`TestContext`][] object. If the hook uses callbacks, the callback function is passed as the second argument. **Default:** A no-op function.",
+                      "name": "fn",
+                      "type": "Function|AsyncFunction",
+                      "default": "A no-op function",
+                      "desc": "The hook function. The first argument to this function is a [`TestContext`][] object. If the hook uses callbacks, the callback function is passed as the second argument."
+                    },
+                    {
+                      "textRaw": "`options` {Object} Configuration options for the hook. The following properties are supported:",
+                      "name": "options",
+                      "type": "Object",
+                      "desc": "Configuration options for the hook. The following properties are supported:",
+                      "options": [
+                        {
+                          "textRaw": "`signal` {AbortSignal} Allows aborting an in-progress hook.",
+                          "name": "signal",
+                          "type": "AbortSignal",
+                          "desc": "Allows aborting an in-progress hook."
+                        },
+                        {
+                          "textRaw": "`timeout` {number} A number of milliseconds the hook will fail after. If unspecified, subtests inherit this value from their parent. **Default:** `Infinity`.",
+                          "name": "timeout",
+                          "type": "number",
+                          "default": "`Infinity`",
+                          "desc": "A number of milliseconds the hook will fail after. If unspecified, subtests inherit this value from their parent."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>This function is used to create a hook running\nafter each subtest of the current test.</p>\n<pre><code class=\"language-js\">test('top level test', async (t) => {\n  t.afterEach((t) => t.diagnostics(`finished running ${t.name}`));\n  await t.test(\n    'This is a subtest',\n    (t) => {\n      assert.ok('some relevant assertion here');\n    }\n  );\n});\n</code></pre>"
+            },
             {
               "textRaw": "`context.diagnostic(message)`",
               "type": "method",
@@ -396,6 +679,11 @@
                 ],
                 "changes": [
                   {
+                    "version": "v18.8.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/43554",
+                    "description": "Add a `signal` option."
+                  },
+                  {
                     "version": "v18.7.0",
                     "pr-url": "https://github.com/nodejs/node/pull/43505",
                     "description": "Add a `timeout` option."
@@ -439,6 +727,12 @@
                           "desc": "If truthy, and the test context is configured to run `only` tests, then this test will be run. Otherwise, the test is skipped."
                         },
                         {
+                          "textRaw": "`signal` {AbortSignal} Allows aborting an in-progress test.",
+                          "name": "signal",
+                          "type": "AbortSignal",
+                          "desc": "Allows aborting an in-progress test."
+                        },
+                        {
                           "textRaw": "`skip` {boolean|string} If truthy, the test is skipped. If a string is provided, that string is displayed in the test results as the reason for skipping the test. **Default:** `false`.",
                           "name": "skip",
                           "type": "boolean|string",
@@ -476,8 +770,20 @@
           ],
           "properties": [
             {
-              "textRaw": "`signal` <AbortSignal> Can be used to abort test subtasks when the test has been aborted.",
-              "name": "<AbortSignal>",
+              "textRaw": "`context.name`",
+              "name": "name",
+              "meta": {
+                "added": [
+                  "v18.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>The name of the test.</p>"
+            },
+            {
+              "textRaw": "`signal` {AbortSignal} Can be used to abort test subtasks when the test has been aborted.",
+              "type": "AbortSignal",
+              "name": "signal",
               "meta": {
                 "added": [
                   "v18.7.0"
@@ -502,8 +808,20 @@
           "desc": "<p>An instance of <code>SuiteContext</code> is passed to each suite function in order to\ninteract with the test runner. However, the <code>SuiteContext</code> constructor is not\nexposed as part of the API.</p>",
           "properties": [
             {
-              "textRaw": "`signal` <AbortSignal> Can be used to abort test subtasks when the test has been aborted.",
-              "name": "<AbortSignal>",
+              "textRaw": "`context.name`",
+              "name": "name",
+              "meta": {
+                "added": [
+                  "v18.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>The name of the suite.</p>"
+            },
+            {
+              "textRaw": "`signal` {AbortSignal} Can be used to abort test subtasks when the test has been aborted.",
+              "type": "AbortSignal",
+              "name": "signal",
               "meta": {
                 "added": [
                   "v18.7.0"

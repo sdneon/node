@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v18.7.0">
-  <title>Performance measurement APIs | Node.js v18.7.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v18.8.0">
+  <title>Performance measurement APIs | Node.js v18.8.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -95,7 +95,7 @@
     <div id="column1" data-id="perf_hooks" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v18.7.0 documentation</h1>
+          <h1>Node.js v18.8.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -110,7 +110,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v18.7.0</li>
+            <li class="pinned-header">Node.js v18.8.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -135,9 +135,14 @@
 <li><a href="#performancemeasurename-startmarkoroptions-endmark"><code>performance.measure(name[, startMarkOrOptions[, endMark]])</code></a></li>
 <li><a href="#performancenodetiming"><code>performance.nodeTiming</code></a></li>
 <li><a href="#performancenow"><code>performance.now()</code></a></li>
+<li><a href="#performancesetresourcetimingbuffersizemaxsize"><code>performance.setResourceTimingBufferSize(maxSize)</code></a></li>
 <li><a href="#performancetimeorigin"><code>performance.timeOrigin</code></a></li>
 <li><a href="#performancetimerifyfn-options"><code>performance.timerify(fn[, options])</code></a></li>
-<li><a href="#performancetojson"><code>performance.toJSON()</code></a></li>
+<li><a href="#performancetojson"><code>performance.toJSON()</code></a>
+<ul>
+<li><a href="#event-resourcetimingbufferfull">Event: <code>'resourcetimingbufferfull'</code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#class-performanceentry">Class: <code>PerformanceEntry</code></a>
@@ -393,9 +398,14 @@
 <li><a href="#performancemeasurename-startmarkoroptions-endmark"><code>performance.measure(name[, startMarkOrOptions[, endMark]])</code></a></li>
 <li><a href="#performancenodetiming"><code>performance.nodeTiming</code></a></li>
 <li><a href="#performancenow"><code>performance.now()</code></a></li>
+<li><a href="#performancesetresourcetimingbuffersizemaxsize"><code>performance.setResourceTimingBufferSize(maxSize)</code></a></li>
 <li><a href="#performancetimeorigin"><code>performance.timeOrigin</code></a></li>
 <li><a href="#performancetimerifyfn-options"><code>performance.timerify(fn[, options])</code></a></li>
-<li><a href="#performancetojson"><code>performance.toJSON()</code></a></li>
+<li><a href="#performancetojson"><code>performance.toJSON()</code></a>
+<ul>
+<li><a href="#event-resourcetimingbufferfull">Event: <code>'resourcetimingbufferfull'</code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#class-performanceentry">Class: <code>PerformanceEntry</code></a>
@@ -511,7 +521,7 @@
         <h2>Performance measurement APIs<span><a class="mark" href="#performance-measurement-apis" id="performance-measurement-apis">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performance_measurement_apis"></a></h2>
 
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v18.7.0/lib/perf_hooks.js">lib/perf_hooks.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v18.8.0/lib/perf_hooks.js">lib/perf_hooks.js</a></p>
 <p>This module provides an implementation of a subset of the W3C
 <a href="https://w3c.github.io/perf-timing-primer/">Web Performance APIs</a> as well as additional APIs for
 Node.js-specific performance measurements.</p>
@@ -778,6 +788,13 @@ metrics for specific Node.js operational milestones.</p>
 </ul>
 <p>Returns the current high resolution millisecond timestamp, where 0 represents
 the start of the current <code>node</code> process.</p>
+<h4><code>performance.setResourceTimingBufferSize(maxSize)</code><span><a class="mark" href="#performancesetresourcetimingbuffersizemaxsize" id="performancesetresourcetimingbuffersizemaxsize">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performance_setresourcetimingbuffersize_maxsize"></a></h4>
+<div class="api_metadata">
+<span>Added in: v18.8.0</span>
+</div>
+<p>Sets the global performance resource timing buffer size to the specified number
+of "resource" type performance entry objects.</p>
+<p>By default the max buffer size is set to 250.</p>
 <h4><code>performance.timeOrigin</code><span><a class="mark" href="#performancetimeorigin" id="performancetimeorigin">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performance_timeorigin"></a></h4>
 <div class="api_metadata">
 <span>Added in: v8.5.0</span>
@@ -846,6 +863,15 @@ invoked.</p>
 </div>
 <p>An object which is JSON representation of the <code>performance</code> object. It
 is similar to <a href="https://developer.mozilla.org/en-US/docs/Web/API/Performance/toJSON"><code>window.performance.toJSON</code></a> in browsers.</p>
+<h5>Event: <code>'resourcetimingbufferfull'</code><span><a class="mark" href="#event-resourcetimingbufferfull" id="event-resourcetimingbufferfull">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_event_resourcetimingbufferfull"></a></h5>
+<div class="api_metadata">
+<span>Added in: v18.8.0</span>
+</div>
+<p>The <code>'resourcetimingbufferfull'</code> event is fired when the global performance
+resource timing buffer is full. Adjust resource timing buffer size with
+<code>performance.setResourceTimingBufferSize()</code> or clear the buffer with
+<code>performance.clearResourceTimings()</code> in the event listener to allow
+more entries to be added to the performance timeline buffer.</p>
 </section><section><h3>Class: <code>PerformanceEntry</code><span><a class="mark" href="#class-performanceentry" id="class-performanceentry">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_class_performanceentry"></a></h3>
 <div class="api_metadata">
 <span>Added in: v8.5.0</span>
@@ -1045,11 +1071,13 @@ will contain the following properties: <code>host</code>, <code>port</code>.</p>
 <code>performanceEntry.detail</code> property will be an <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> containing
 additional information.</p>
 <p>If <code>performanceEntry.name</code> is equal to <code>lookup</code>, the <code>detail</code>
-will contain the following properties: <code>hostname</code>, <code>family</code>, <code>hints</code>, <code>verbatim</code>.</p>
+will contain the following properties: <code>hostname</code>, <code>family</code>, <code>hints</code>, <code>verbatim</code>,
+<code>addresses</code>.</p>
 <p>If <code>performanceEntry.name</code> is equal to <code>lookupService</code>, the <code>detail</code> will
-contain the following properties: <code>host</code>, <code>port</code>.</p>
+contain the following properties: <code>host</code>, <code>port</code>, <code>hostname</code>, <code>service</code>.</p>
 <p>If <code>performanceEntry.name</code> is equal to <code>queryxxx</code> or <code>getHostByAddr</code>, the <code>detail</code> will
-contain the following properties: <code>host</code>, <code>ttl</code>.</p>
+contain the following properties: <code>host</code>, <code>ttl</code>, <code>result</code>. The value of <code>result</code> is
+same as the result of <code>queryxxx</code> or <code>getHostByAddr</code>.</p>
 </section><section><h3>Class: <code>PerformanceNodeTiming</code><span><a class="mark" href="#class-performancenodetiming" id="class-performancenodetiming">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_class_performancenodetiming"></a></h3>
 <div class="api_metadata">
 <span>Added in: v8.5.0</span>
