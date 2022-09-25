@@ -5,13 +5,17 @@ This is a *fun* mod of Node.JS that initially embedded a modified version of dco
 
 Thanks to the inspiration from dcodeIO et al =D
 
-## Version 18.8.0
-Update to Node.JS 18.8.0 baseline.
+## Version 18.9.1
+Update to Node.JS 18.9.1 baseline, along with:
+* a CJS loader _resolveFilename quick fix.
+  * The fix is to detect and amend bad load request of the form 'c:\c:\...' to just 'c:\...'.
+  It is needed for [@squoosh\lib](https://github.com/sdneon/squoosh/tree/dev/libsquoosh)'s encoding to AVIF.
+* Update to TypeScript 4.8.3.
 
 It embeds:
 * DS v1.2.0.
 * CS v2.7.0.
-* TS v4.7.4.
+* TS v4.8.3.
 * Refer to prior readmes for old changes.
 
 ## Usage
@@ -448,6 +452,8 @@ For information about the governance of the Node.js project, see
   **Shelley Vohr** <<shelley.vohr@gmail.com>> (she/her)
 * [cola119](https://github.com/cola119) -
   **Kohei Ueno** <<kohei.ueno119@gmail.com>> (he/him)
+* [daeyeon](https://github.com/daeyeon) -
+  **Daeyeon Jeong** <<daeyeon.dev@gmail.com>> (he/him)
 * [danbev](https://github.com/danbev) -
   **Daniel Bevenius** <<daniel.bevenius@gmail.com>> (he/him)
 * [danielleadams](https://github.com/danielleadams) -

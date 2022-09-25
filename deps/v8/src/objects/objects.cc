@@ -5398,6 +5398,14 @@ Handle<Object> JSPromise::Fulfill(Handle<JSPromise> promise,
                                   Handle<Object> value) {
   Isolate* const isolate = promise->GetIsolate();
 
+#ifdef V8_ENABLE_JAVASCRIPT_PROMISE_HOOKS
+  if (isolate->HasContextPromiseHooks()) {
+    isolate->raw_native_context().RunPromiseHook(
+        PromiseHookType::kResolve, promise,
+        isolate->factory()->undefined_value());
+  }
+#endif
+
   // 1. Assert: The value of promise.[[PromiseState]] is "pending".
   CHECK_EQ(Promise::kPending, promise->status());
 
@@ -5477,8 +5485,8 @@ MaybeHandle<Object> JSPromise::Resolve(Handle<JSPromise> promise,
   DCHECK(
       !reinterpret_cast<v8::Isolate*>(isolate)->GetCurrentContext().IsEmpty());
 
-  isolate->RunAllPromiseHooks(PromiseHookType::kResolve, promise,
-                              isolate->factory()->undefined_value());
+  isolate->RunPromiseHook(PromiseHookType::kResolve, promise,
+                          isolate->factory()->undefined_value());
 
   // 7. If SameValue(resolution, promise) is true, then
   if (promise.is_identical_to(resolution)) {
@@ -6981,7 +6989,7 @@ void JSFinalizationRegistry::RemoveCellFromUnregisterTokenMap(
   }
 
   // weak_cell is now removed from the unregister token map, so clear its
-  // unregister token-related fields for heap verification.
+  // unregister token-related fields.
   weak_cell.set_unregister_token(undefined);
   weak_cell.set_key_list_prev(undefined);
   weak_cell.set_key_list_next(undefined);
