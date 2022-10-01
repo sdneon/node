@@ -228,7 +228,7 @@
             },
           },
           'conditions': [
-            ['OS != "aix" and OS != "mac"', {
+            ['OS != "aix" and OS != "mac" and OS != "ios"', {
               'ldflags': [
                 '-Wl,--whole-archive',
                 '<(obj_dir)/<(STATIC_LIB_PREFIX)<(node_core_target_name)<(STATIC_LIB_SUFFIX)',
@@ -478,6 +478,7 @@
         'src/api/utils.cc',
         'src/async_wrap.cc',
         'src/cares_wrap.cc',
+        'src/cleanup_queue.cc',
         'src/connect_wrap.cc',
         'src/connection_wrap.cc',
         'src/debug_utils.cc',
@@ -577,6 +578,8 @@
         'src/base64-inl.h',
         'src/callback_queue.h',
         'src/callback_queue-inl.h',
+        'src/cleanup_queue.h',
+        'src/cleanup_queue-inl.h',
         'src/connect_wrap.h',
         'src/connection_wrap.h',
         'src/debug_utils.h',
@@ -849,7 +852,6 @@
             'src/crypto/crypto_bio.h',
             'src/crypto/crypto_clienthello-inl.h',
             'src/crypto/crypto_dh.h',
-            'src/crypto/crypto_groups.h',
             'src/crypto/crypto_hmac.h',
             'src/crypto/crypto_rsa.h',
             'src/crypto/crypto_spkac.h',
@@ -1248,6 +1250,7 @@
             'HAVE_OPENSSL=1',
           ],
           'sources': [
+            'test/cctest/test_crypto_clienthello.cc',
             'test/cctest/test_node_crypto.cc',
           ]
         }],

@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v18.9.1">
-  <title>Modules: ECMAScript modules | Node.js v18.9.1 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v18.10.0">
+  <title>Modules: ECMAScript modules | Node.js v18.10.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -61,7 +61,7 @@
 <li><a href="os.html" class="nav-os">OS</a></li>
 <li><a href="path.html" class="nav-path">Path</a></li>
 <li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
-<li><a href="policy.html" class="nav-policy">Policies</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
 <li><a href="process.html" class="nav-process">Process</a></li>
 <li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
 <li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
@@ -95,7 +95,7 @@
     <div id="column1" data-id="esm" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v18.9.1 documentation</h1>
+          <h1>Node.js v18.10.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -110,7 +110,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v18.9.1</li>
+            <li class="pinned-header">Node.js v18.10.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -260,7 +260,7 @@
 <li><a href="os.html" class="nav-os">OS</a></li>
 <li><a href="path.html" class="nav-path">Path</a></li>
 <li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
-<li><a href="policy.html" class="nav-policy">Policies</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
 <li><a href="process.html" class="nav-process">Process</a></li>
 <li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
 <li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
@@ -1618,8 +1618,7 @@ starting with <em>"."</em>, then
 <li>If <em>mainExport</em> is not <strong>undefined</strong>, then
 <ol>
 <li>Let <em>resolved</em> be the result of <strong>PACKAGE_TARGET_RESOLVE</strong>(
-<em>packageURL</em>, <em>mainExport</em>, <em>""</em>, <strong>false</strong>, <strong>false</strong>,
-<em>conditions</em>).</li>
+<em>packageURL</em>, <em>mainExport</em>, <strong>null</strong>, <strong>false</strong>, <em>conditions</em>).</li>
 <li>If <em>resolved</em> is not <strong>null</strong> or <strong>undefined</strong>, return <em>resolved</em>.</li>
 </ol>
 </li>
@@ -1671,7 +1670,7 @@ starting with <em>"."</em>, then
 <ol>
 <li>Let <em>target</em> be the value of <em>matchObj</em>[<em>matchKey</em>].</li>
 <li>Return the result of <strong>PACKAGE_TARGET_RESOLVE</strong>(<em>packageURL</em>,
-<em>target</em>, <em>""</em>, <strong>false</strong>, <em>isImports</em>, <em>conditions</em>).</li>
+<em>target</em>, <strong>null</strong>, <em>isImports</em>, <em>conditions</em>).</li>
 </ol>
 </li>
 <li>Let <em>expansionKeys</em> be the list of keys of <em>matchObj</em> containing only a
@@ -1690,11 +1689,11 @@ index after the first <em>"*"</em> character.</li>
 equal to the length of <em>expansionKey</em>, then
 <ol>
 <li>Let <em>target</em> be the value of <em>matchObj</em>[<em>expansionKey</em>].</li>
-<li>Let <em>subpath</em> be the substring of <em>matchKey</em> starting at the
+<li>Let <em>patternMatch</em> be the substring of <em>matchKey</em> starting at the
 index of the length of <em>patternBase</em> up to the length of
 <em>matchKey</em> minus the length of <em>patternTrailer</em>.</li>
 <li>Return the result of <strong>PACKAGE_TARGET_RESOLVE</strong>(<em>packageURL</em>,
-<em>target</em>, <em>subpath</em>, <strong>true</strong>, <em>isImports</em>, <em>conditions</em>).</li>
+<em>target</em>, <em>patternMatch</em>, <em>isImports</em>, <em>conditions</em>).</li>
 </ol>
 </li>
 </ol>
@@ -1722,54 +1721,46 @@ contains <em>"*"</em>, or the length of <em>keyB</em> otherwise.</li>
 <li>Return 0.</li>
 </ol>
 </blockquote>
-<p><strong>PACKAGE_TARGET_RESOLVE</strong>(<em>packageURL</em>, <em>target</em>, <em>subpath</em>, <em>pattern</em>,
-<em>internal</em>, <em>conditions</em>)</p>
+<p><strong>PACKAGE_TARGET_RESOLVE</strong>(<em>packageURL</em>, <em>target</em>, <em>patternMatch</em>,
+<em>isImports</em>, <em>conditions</em>)</p>
 <blockquote>
 <ol>
 <li>If <em>target</em> is a String, then
 <ol>
-<li>If <em>pattern</em> is <strong>false</strong>, <em>subpath</em> has non-zero length and <em>target</em>
-does not end with <em>"/"</em>, throw an <em>Invalid Module Specifier</em> error.</li>
 <li>If <em>target</em> does not start with <em>"./"</em>, then
 <ol>
-<li>If <em>internal</em> is <strong>true</strong> and <em>target</em> does not start with <em>"../"</em> or
-<em>"/"</em> and is not a valid URL, then
+<li>If <em>isImports</em> is <strong>false</strong>, or if <em>target</em> starts with <em>"../"</em> or
+<em>"/"</em>, or if <em>target</em> is a valid URL, then
 <ol>
-<li>If <em>pattern</em> is <strong>true</strong>, then
+<li>Throw an <em>Invalid Package Target</em> error.</li>
+</ol>
+</li>
+<li>If <em>patternMatch</em> is a String, then
 <ol>
-<li>Return <strong>PACKAGE_RESOLVE</strong>(<em>target</em> with every instance of
-<em>"*"</em> replaced by <em>subpath</em>, <em>packageURL</em> + <em>"/"</em>).</li>
+<li>Return <strong>PACKAGE_RESOLVE</strong>(<em>target</em> with every instance of <em>"*"</em>
+replaced by <em>patternMatch</em>, <em>packageURL</em> + <em>"/"</em>).</li>
 </ol>
 </li>
-<li>Return <strong>PACKAGE_RESOLVE</strong>(<em>target</em> + <em>subpath</em>,
-<em>packageURL</em> + <em>"/"</em>).</li>
+<li>Return <strong>PACKAGE_RESOLVE</strong>(<em>target</em>, <em>packageURL</em> + <em>"/"</em>).</li>
 </ol>
 </li>
-<li>Otherwise, throw an <em>Invalid Package Target</em> error.</li>
-</ol>
-</li>
-<li>If <em>target</em> split on <em>"/"</em> or <em>"\"</em> contains any <em>"."</em>, <em>".."</em>, or
-<em>"node_modules"</em> segments after the first segment, case insensitive and
-including percent encoded variants, throw an <em>Invalid Package Target</em>
-error.</li>
+<li>If <em>target</em> split on <em>"/"</em> or <em>"\"</em> contains any <em>""</em>, <em>"."</em>, <em>".."</em>,
+or <em>"node_modules"</em> segments after the first <em>"."</em> segment, case
+insensitive and including percent encoded variants, throw an <em>Invalid
+Package Target</em> error.</li>
 <li>Let <em>resolvedTarget</em> be the URL resolution of the concatenation of
 <em>packageURL</em> and <em>target</em>.</li>
 <li>Assert: <em>resolvedTarget</em> is contained in <em>packageURL</em>.</li>
-<li>If <em>subpath</em> split on <em>"/"</em> or <em>"\"</em> contains any <em>"."</em>, <em>".."</em>, or
-<em>"node_modules"</em> segments, case insensitive and including percent
-encoded variants, throw an <em>Invalid Module Specifier</em> error.</li>
-<li>If <em>pattern</em> is <strong>true</strong>, then
+<li>If <em>patternMatch</em> is <strong>null</strong>, then
 <ol>
+<li>Return <em>resolvedTarget</em>.</li>
+</ol>
+</li>
+<li>If <em>patternMatch</em> split on <em>"/"</em> or <em>"\"</em> contains any <em>""</em>, <em>"."</em>,
+<em>".."</em>, or <em>"node_modules"</em> segments, case insensitive and including
+percent encoded variants, throw an <em>Invalid Module Specifier</em> error.</li>
 <li>Return the URL resolution of <em>resolvedTarget</em> with every instance of
-<em>"*"</em> replaced with <em>subpath</em>.</li>
-</ol>
-</li>
-<li>Otherwise,
-<ol>
-<li>Return the URL resolution of the concatenation of <em>subpath</em> and
-<em>resolvedTarget</em>.</li>
-</ol>
-</li>
+<em>"*"</em> replaced with <em>patternMatch</em>.</li>
 </ol>
 </li>
 <li>Otherwise, if <em>target</em> is a non-null Object, then
@@ -1783,7 +1774,7 @@ then
 <ol>
 <li>Let <em>targetValue</em> be the value of the <em>p</em> property in <em>target</em>.</li>
 <li>Let <em>resolved</em> be the result of <strong>PACKAGE_TARGET_RESOLVE</strong>(
-<em>packageURL</em>, <em>targetValue</em>, <em>subpath</em>, <em>pattern</em>, <em>internal</em>,
+<em>packageURL</em>, <em>targetValue</em>, <em>patternMatch</em>, <em>isImports</em>,
 <em>conditions</em>).</li>
 <li>If <em>resolved</em> is equal to <strong>undefined</strong>, continue the loop.</li>
 <li>Return <em>resolved</em>.</li>
@@ -1800,7 +1791,7 @@ then
 <li>For each item <em>targetValue</em> in <em>target</em>, do
 <ol>
 <li>Let <em>resolved</em> be the result of <strong>PACKAGE_TARGET_RESOLVE</strong>(
-<em>packageURL</em>, <em>targetValue</em>, <em>subpath</em>, <em>pattern</em>, <em>internal</em>,
+<em>packageURL</em>, <em>targetValue</em>, <em>patternMatch</em>, <em>isImports</em>,
 <em>conditions</em>), continuing the loop on any <em>Invalid Package Target</em>
 error.</li>
 <li>If <em>resolved</em> is <strong>undefined</strong>, continue the loop.</li>

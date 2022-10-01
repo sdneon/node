@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v18.9.1">
-  <title>VM (executing JavaScript) | Node.js v18.9.1 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v18.10.0">
+  <title>VM (executing JavaScript) | Node.js v18.10.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -61,7 +61,7 @@
 <li><a href="os.html" class="nav-os">OS</a></li>
 <li><a href="path.html" class="nav-path">Path</a></li>
 <li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
-<li><a href="policy.html" class="nav-policy">Policies</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
 <li><a href="process.html" class="nav-process">Process</a></li>
 <li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
 <li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
@@ -95,7 +95,7 @@
     <div id="column1" data-id="vm" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v18.9.1 documentation</h1>
+          <h1>Node.js v18.10.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -110,7 +110,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v18.9.1</li>
+            <li class="pinned-header">Node.js v18.10.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -124,6 +124,7 @@
 <li><a href="#class-vmscript">Class: <code>vm.Script</code></a>
 <ul>
 <li><a href="#new-vmscriptcode-options"><code>new vm.Script(code[, options])</code></a></li>
+<li><a href="#scriptcacheddatarejected"><code>script.cachedDataRejected</code></a></li>
 <li><a href="#scriptcreatecacheddata"><code>script.createCachedData()</code></a></li>
 <li><a href="#scriptrunincontextcontextifiedobject-options"><code>script.runInContext(contextifiedObject[, options])</code></a></li>
 <li><a href="#scriptruninnewcontextcontextobject-options"><code>script.runInNewContext([contextObject[, options]])</code></a></li>
@@ -221,7 +222,7 @@
 <li><a href="os.html" class="nav-os">OS</a></li>
 <li><a href="path.html" class="nav-path">Path</a></li>
 <li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
-<li><a href="policy.html" class="nav-policy">Policies</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
 <li><a href="process.html" class="nav-process">Process</a></li>
 <li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
 <li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
@@ -306,6 +307,7 @@
 <li><a href="#class-vmscript">Class: <code>vm.Script</code></a>
 <ul>
 <li><a href="#new-vmscriptcode-options"><code>new vm.Script(code[, options])</code></a></li>
+<li><a href="#scriptcacheddatarejected"><code>script.cachedDataRejected</code></a></li>
 <li><a href="#scriptcreatecacheddata"><code>script.createCachedData()</code></a></li>
 <li><a href="#scriptrunincontextcontextifiedobject-options"><code>script.runInContext(contextifiedObject[, options])</code></a></li>
 <li><a href="#scriptruninnewcontextcontextobject-options"><code>script.runInNewContext([contextObject[, options]])</code></a></li>
@@ -354,7 +356,7 @@
 
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
 
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v18.9.1/lib/vm.js">lib/vm.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v18.10.0/lib/vm.js">lib/vm.js</a></p>
 <p>The <code>node:vm</code> module enables compiling and running code within V8 Virtual
 Machine contexts.</p>
 <p><strong class="critical">The <code>node:vm</code> module is not a security
@@ -450,6 +452,16 @@ issues with namespaces that contain <code>then</code> function exports.</li>
 <p>Creating a new <code>vm.Script</code> object compiles <code>code</code> but does not run it. The
 compiled <code>vm.Script</code> can be run later multiple times. The <code>code</code> is not bound to
 any global object; rather, it is bound before each run, just for that run.</p>
+<h4><code>script.cachedDataRejected</code><span><a class="mark" href="#scriptcacheddatarejected" id="scriptcacheddatarejected">#</a></span><a aria-hidden="true" class="legacy" id="vm_script_cacheddatarejected"></a></h4>
+<div class="api_metadata">
+<span>Added in: v5.7.0</span>
+</div>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a></li>
+</ul>
+<p>When <code>cachedData</code> is supplied to create the <code>vm.Script</code>, this value will be set
+to either <code>true</code> or <code>false</code> depending on acceptance of the data by V8.
+Otherwise the value is <code>undefined</code>.</p>
 <h4><code>script.createCachedData()</code><span><a class="mark" href="#scriptcreatecacheddata" id="scriptcreatecacheddata">#</a></span><a aria-hidden="true" class="legacy" id="vm_script_createcacheddata"></a></h4>
 <div class="api_metadata">
 <span>Added in: v10.6.0</span>
@@ -460,6 +472,14 @@ any global object; rather, it is bound before each run, just for that run.</p>
 <p>Creates a code cache that can be used with the <code>Script</code> constructor's
 <code>cachedData</code> option. Returns a <code>Buffer</code>. This method may be called at any
 time and any number of times.</p>
+<p>The code cache of the <code>Script</code> doesn't contain any JavaScript observable
+states. The code cache is safe to be saved along side the script source and
+used to construct new <code>Script</code> instances multiple times.</p>
+<p>Functions in the <code>Script</code> source can be marked as lazily compiled and they are
+not compiled at construction of the <code>Script</code>. These functions are going to be
+compiled when they are invoked the first time. The code cache serializes the
+metadata that V8 currently knows about the <code>Script</code> that it can use to speed up
+future compilations.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> script = <span class="hljs-keyword">new</span> vm.<span class="hljs-title class_">Script</span>(<span class="hljs-string">`
 function add(a, b) {
   return a + b;
@@ -468,11 +488,14 @@ function add(a, b) {
 const x = add(1, 2);
 `</span>);
 
-<span class="hljs-keyword">const</span> cacheWithoutX = script.<span class="hljs-title function_">createCachedData</span>();
+<span class="hljs-keyword">const</span> cacheWithoutAdd = script.<span class="hljs-title function_">createCachedData</span>();
+<span class="hljs-comment">// In `cacheWithoutAdd` the function `add()` is marked for full compilation</span>
+<span class="hljs-comment">// upon invocation.</span>
 
 script.<span class="hljs-title function_">runInThisContext</span>();
 
-<span class="hljs-keyword">const</span> cacheWithX = script.<span class="hljs-title function_">createCachedData</span>();</code></pre>
+<span class="hljs-keyword">const</span> cacheWithAdd = script.<span class="hljs-title function_">createCachedData</span>();
+<span class="hljs-comment">// `cacheWithAdd` contains fully compiled function `add()`.</span></code></pre>
 <h4><code>script.runInContext(contextifiedObject[, options])</code><span><a class="mark" href="#scriptrunincontextcontextifiedobject-options" id="scriptrunincontextcontextifiedobject-options">#</a></span><a aria-hidden="true" class="legacy" id="vm_script_runincontext_contextifiedobject_options"></a></h4>
 <div class="api_metadata">
 <details class="changelog"><summary>History</summary>
@@ -1088,6 +1111,14 @@ allow the module to access information outside the specified <code>context</code
 <p>Creates a code cache that can be used with the <code>SourceTextModule</code> constructor's
 <code>cachedData</code> option. Returns a <code>Buffer</code>. This method may be called any number
 of times before the module has been evaluated.</p>
+<p>The code cache of the <code>SourceTextModule</code> doesn't contain any JavaScript
+observable states. The code cache is safe to be saved along side the script
+source and used to construct new <code>SourceTextModule</code> instances multiple times.</p>
+<p>Functions in the <code>SourceTextModule</code> source can be marked as lazily compiled
+and they are not compiled at construction of the <code>SourceTextModule</code>. These
+functions are going to be compiled when they are invoked the first time. The
+code cache serializes the metadata that V8 currently knows about the
+<code>SourceTextModule</code> that it can use to speed up future compilations.</p>
 <pre><code class="language-js"><span class="hljs-comment">// Create an initial module</span>
 <span class="hljs-keyword">const</span> <span class="hljs-variable language_">module</span> = <span class="hljs-keyword">new</span> vm.<span class="hljs-title class_">SourceTextModule</span>(<span class="hljs-string">'const a = 1;'</span>);
 
@@ -1430,16 +1461,7 @@ will be thrown. This value must be a strictly positive integer.</li>
 work after that. <strong>Default:</strong> <code>false</code>.</li>
 <li><code>cachedData</code> <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray" class="type">&#x3C;TypedArray></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView" class="type">&#x3C;DataView></a> Provides an optional <code>Buffer</code> or
 <code>TypedArray</code>, or <code>DataView</code> with V8's code cache data for the supplied
-source. When supplied, the <code>cachedDataRejected</code> value will be set to
-either <code>true</code> or <code>false</code> depending on acceptance of the data by V8.</li>
-<li><code>produceCachedData</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> When <code>true</code> and no <code>cachedData</code> is present, V8
-will attempt to produce code cache data for <code>code</code>. Upon success, a
-<code>Buffer</code> with V8's code cache data will be produced and stored in the
-<code>cachedData</code> property of the returned <code>vm.Script</code> instance.
-The <code>cachedDataProduced</code> value will be set to either <code>true</code> or <code>false</code>
-depending on whether code cache data is produced successfully.
-This option is <strong>deprecated</strong> in favor of <code>script.createCachedData()</code>.
-<strong>Default:</strong> <code>false</code>.</li>
+source.</li>
 <li><code>importModuleDynamically</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> Called during evaluation of this module
 when <code>import()</code> is called. If this option is not specified, calls to
 <code>import()</code> will reject with <a href="errors.html#err_vm_dynamic_import_callback_missing"><code>ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING</code></a>.
@@ -1538,16 +1560,7 @@ module will throw a <code>WebAssembly.CompileError</code>. <strong>Default:</str
 </li>
 <li><code>cachedData</code> <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray" class="type">&#x3C;TypedArray></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView" class="type">&#x3C;DataView></a> Provides an optional <code>Buffer</code> or
 <code>TypedArray</code>, or <code>DataView</code> with V8's code cache data for the supplied
-source. When supplied, the <code>cachedDataRejected</code> value will be set to
-either <code>true</code> or <code>false</code> depending on acceptance of the data by V8.</li>
-<li><code>produceCachedData</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> When <code>true</code> and no <code>cachedData</code> is present, V8
-will attempt to produce code cache data for <code>code</code>. Upon success, a
-<code>Buffer</code> with V8's code cache data will be produced and stored in the
-<code>cachedData</code> property of the returned <code>vm.Script</code> instance.
-The <code>cachedDataProduced</code> value will be set to either <code>true</code> or <code>false</code>
-depending on whether code cache data is produced successfully.
-This option is <strong>deprecated</strong> in favor of <code>script.createCachedData()</code>.
-<strong>Default:</strong> <code>false</code>.</li>
+source.</li>
 <li><code>importModuleDynamically</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> Called during evaluation of this module
 when <code>import()</code> is called. If this option is not specified, calls to
 <code>import()</code> will reject with <a href="errors.html#err_vm_dynamic_import_callback_missing"><code>ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING</code></a>.
@@ -1626,16 +1639,7 @@ will be thrown. This value must be a strictly positive integer.</li>
 work after that. <strong>Default:</strong> <code>false</code>.</li>
 <li><code>cachedData</code> <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray" class="type">&#x3C;TypedArray></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView" class="type">&#x3C;DataView></a> Provides an optional <code>Buffer</code> or
 <code>TypedArray</code>, or <code>DataView</code> with V8's code cache data for the supplied
-source. When supplied, the <code>cachedDataRejected</code> value will be set to
-either <code>true</code> or <code>false</code> depending on acceptance of the data by V8.</li>
-<li><code>produceCachedData</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> When <code>true</code> and no <code>cachedData</code> is present, V8
-will attempt to produce code cache data for <code>code</code>. Upon success, a
-<code>Buffer</code> with V8's code cache data will be produced and stored in the
-<code>cachedData</code> property of the returned <code>vm.Script</code> instance.
-The <code>cachedDataProduced</code> value will be set to either <code>true</code> or <code>false</code>
-depending on whether code cache data is produced successfully.
-This option is <strong>deprecated</strong> in favor of <code>script.createCachedData()</code>.
-<strong>Default:</strong> <code>false</code>.</li>
+source.</li>
 <li><code>importModuleDynamically</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> Called during evaluation of this module
 when <code>import()</code> is called. If this option is not specified, calls to
 <code>import()</code> will reject with <a href="errors.html#err_vm_dynamic_import_callback_missing"><code>ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING</code></a>.

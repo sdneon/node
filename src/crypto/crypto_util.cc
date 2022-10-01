@@ -60,26 +60,14 @@ int VerifyCallback(int preverify_ok, X509_STORE_CTX* ctx) {
   return 1;
 }
 
-void CheckEntropy() {
-  for (;;) {
-    int status = RAND_status();
-    CHECK_GE(status, 0);  // Cannot fail.
-    if (status != 0)
-      break;
+MUST_USE_RESULT CSPRNGResult CSPRNG(void* buffer, size_t length) {
+  do {
+    if (1 == RAND_status())
+      if (1 == RAND_bytes(static_cast<unsigned char*>(buffer), length))
+        return {true};
+  } while (1 == RAND_poll());
 
-    // Give up, RAND_poll() not supported.
-    if (RAND_poll() == 0)
-      break;
-  }
-}
-
-bool EntropySource(unsigned char* buffer, size_t length) {
-  // Ensure that OpenSSL's PRNG is properly seeded.
-  CheckEntropy();
-  // RAND_bytes() can return 0 to indicate that the entropy data is not truly
-  // random. That's okay, it's still better than V8's stock source of entropy,
-  // which is /dev/urandom on UNIX platforms and the current time on Windows.
-  return RAND_bytes(buffer, length) != -1;
+  return {false};
 }
 
 int PasswordCallback(char* buf, int size, int rwflag, void* u) {
@@ -674,22 +662,21 @@ CryptoJobMode GetCryptoJobMode(v8::Local<v8::Value> args) {
 }
 
 namespace {
-// SecureBuffer uses openssl to allocate a Uint8Array using
-// OPENSSL_secure_malloc. Because we do not yet actually
-// make use of secure heap, this has the same semantics as
+// SecureBuffer uses OPENSSL_secure_malloc to allocate a Uint8Array.
+// Without --secure-heap, OpenSSL's secure heap is disabled,
+// in which case this has the same semantics as
 // using OPENSSL_malloc. However, if the secure heap is
 // initialized, SecureBuffer will automatically use it.
 void SecureBuffer(const FunctionCallbackInfo<Value>& args) {
   CHECK(args[0]->IsUint32());
   Environment* env = Environment::GetCurrent(args);
   uint32_t len = args[0].As<Uint32>()->Value();
-  char* data = static_cast<char*>(OPENSSL_secure_malloc(len));
+  void* data = OPENSSL_secure_zalloc(len);
   if (data == nullptr) {
     // There's no memory available for the allocation.
     // Return nothing.
     return;
   }
-  memset(data, 0, len);
   std::shared_ptr<BackingStore> store =
       ArrayBuffer::NewBackingStore(
           data,

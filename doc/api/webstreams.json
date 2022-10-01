@@ -270,7 +270,13 @@
                     "added": [
                       "v16.5.0"
                     ],
-                    "changes": []
+                    "changes": [
+                      {
+                        "version": "v18.10.0",
+                        "pr-url": "https://github.com/nodejs/node/pull/44505",
+                        "description": "Support teeing a readable byte stream."
+                      }
+                    ]
                   },
                   "signatures": [
                     {
@@ -694,7 +700,13 @@
                 "added": [
                   "v16.5.0"
                 ],
-                "changes": []
+                "changes": [
+                  {
+                    "version": "v18.10.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44702",
+                    "description": "Support handling a BYOB pull request from a released reader."
+                  }
+                ]
               },
               "desc": "<p>Every <a href=\"webstreams.html#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> has a controller that is responsible for\nthe internal state and management of the stream's queue. The\n<code>ReadableByteStreamController</code> is for byte-oriented <code>ReadableStream</code>s.</p>",
               "properties": [
@@ -1285,20 +1297,6 @@
                 ]
               },
               "desc": "<p>The <code>WritableStreamDefaultController</code> manage's the <a href=\"webstreams.html#class-writablestream\" class=\"type\">&lt;WritableStream&gt;</a>'s\ninternal state.</p>",
-              "properties": [
-                {
-                  "textRaw": "`abortReason` Type: {any} The `reason` value passed to `writableStream.abort()`.",
-                  "type": "any",
-                  "name": "Type",
-                  "desc": "The `reason` value passed to `writableStream.abort()`."
-                },
-                {
-                  "textRaw": "`signal` Type: {AbortSignal} An `AbortSignal` that can be used to cancel pending write or close operations when a {WritableStream} is aborted.",
-                  "type": "AbortSignal",
-                  "name": "Type",
-                  "desc": "An `AbortSignal` that can be used to cancel pending write or close operations when a {WritableStream} is aborted."
-                }
-              ],
               "methods": [
                 {
                   "textRaw": "`writableStreamDefaultController.error(error)`",
@@ -1322,6 +1320,14 @@
                     }
                   ],
                   "desc": "<p>Called by user-code to signal that an error has occurred while processing\nthe <code>WritableStream</code> data. When called, the <a href=\"webstreams.html#class-writablestream\" class=\"type\">&lt;WritableStream&gt;</a> will be aborted,\nwith currently pending writes canceled.</p>"
+                }
+              ],
+              "properties": [
+                {
+                  "textRaw": "`signal` Type: {AbortSignal} An `AbortSignal` that can be used to cancel pending write or close operations when a {WritableStream} is aborted.",
+                  "type": "AbortSignal",
+                  "name": "Type",
+                  "desc": "An `AbortSignal` that can be used to cancel pending write or close operations when a {WritableStream} is aborted."
                 }
               ]
             },
@@ -2076,7 +2082,8 @@
                         }
                       ]
                     }
-                  ]
+                  ],
+                  "desc": "<pre><code class=\"language-mjs\">import { buffer as arrayBuffer } from 'node:stream/consumers';\nimport { Readable } from 'node:stream';\nimport { TextEncoder } from 'node:util';\n\nconst encoder = new TextEncoder();\nconst dataArray = encoder.encode('hello world from consumers!');\n\nconst readable = Readable.from(dataArray);\nconst data = await arrayBuffer(readable);\nconsole.log(`from readable: ${data.byteLength}`);\n</code></pre>\n<pre><code class=\"language-cjs\">const { arrayBuffer } = require('node:stream/consumers');\nconst { Readable } = require('stream');\nconst { TextEncoder } = require('util');\n\nconst encoder = new TextEncoder();\nconst dataArray = encoder.encode(['hello world from consumers!']);\nconst readable = Readable.from(dataArray);\narrayBuffer(readable).then((data) => {\n  console.log(`from readable: ${data.byteLength}`);\n});\n</code></pre>"
                 },
                 {
                   "textRaw": "`streamConsumers.blob(stream)`",
@@ -2104,7 +2111,8 @@
                         }
                       ]
                     }
-                  ]
+                  ],
+                  "desc": "<pre><code class=\"language-mjs\">import { blob } from 'node:stream/consumers';\n\nconst dataBlob = new Blob(['hello world from consumers!']);\n\nconst readable = dataBlob.stream();\nconst data = await blob(readable);\nconsole.log(`from readable: ${data.size}`);\n</code></pre>\n<pre><code class=\"language-cjs\">const { blob } = require('node:stream/consumers');\n\nconst dataBlob = new Blob(['hello world from consumers!']);\n\nconst readable = dataBlob.stream();\nblob(readable).then((data) => {\n  console.log(`from readable: ${data.size}`);\n});\n</code></pre>"
                 },
                 {
                   "textRaw": "`streamConsumers.buffer(stream)`",
@@ -2132,7 +2140,8 @@
                         }
                       ]
                     }
-                  ]
+                  ],
+                  "desc": "<pre><code class=\"language-mjs\">import { buffer } from 'node:stream/consumers';\nimport { Readable } from 'node:stream';\nimport { Buffer } from 'node:buffer';\n\nconst dataBuffer = Buffer.from('hello world from consumers!');\n\nconst readable = Readable.from(dataBuffer);\nconst data = await buffer(readable);\nconsole.log(`from readable: ${data.length}`);\n</code></pre>\n<pre><code class=\"language-cjs\">const { buffer } = require('node:stream/consumers');\nconst { Readable } = require('node:stream');\nconst { Buffer } = require('node:buffer');\n\nconst dataBuffer = Buffer.from('hello world from consumers!');\n\nconst readable = Readable.from(dataBuffer);\nbuffer(readable).then((data) => {\n  console.log(`from readable: ${data.length}`);\n});\n</code></pre>"
                 },
                 {
                   "textRaw": "`streamConsumers.json(stream)`",
@@ -2160,7 +2169,8 @@
                         }
                       ]
                     }
-                  ]
+                  ],
+                  "desc": "<pre><code class=\"language-mjs\">import { json } from 'node:stream/consumers';\nimport { Readable } from 'node:stream';\n\nconst items = Array.from(\n  {\n    length: 100\n  },\n  () => ({\n    message: 'hello world from consumers!'\n  })\n);\n\nconst readable = Readable.from(JSON.stringify(items));\nconst data = await json(readable);\nconsole.log(`from readable: ${data.length}`);\n</code></pre>\n<pre><code class=\"language-cjs\">const { json } = require('node:stream/consumers');\nconst { Readable } = require('node:stream');\n\nconst items = Array.from(\n  {\n    length: 100\n  },\n  () => ({\n    message: 'hello world from consumers!'\n  })\n);\n\nconst readable = Readable.from(JSON.stringify(items));\njson(readable).then((data) => {\n  console.log(`from readable: ${data.length}`);\n});\n</code></pre>"
                 },
                 {
                   "textRaw": "`streamConsumers.text(stream)`",
@@ -2188,7 +2198,8 @@
                         }
                       ]
                     }
-                  ]
+                  ],
+                  "desc": "<pre><code class=\"language-mjs\">import { json, text, blob, buffer } from 'node:stream/consumers';\nimport { Readable } from 'node:stream';\n\nconst readable = Readable.from('Hello world from consumers!');\nconst data = await text(readable);\nconsole.log(`from readable: ${data.length}`);\n</code></pre>\n<pre><code class=\"language-cjs\">const { text } = require('node:stream/consumers');\nconst { Readable } = require('node:stream');\n\nconst readable = Readable.from('Hello world from consumers!');\ntext(readable).then((data) => {\n  console.log(`from readable: ${data.length}`);\n});\n</code></pre>"
                 }
               ],
               "type": "module",

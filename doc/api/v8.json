@@ -6,7 +6,7 @@
       "textRaw": "V8",
       "name": "v8",
       "introduced_in": "v4.0.0",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v18.9.1/lib/v8.js\">lib/v8.js</a></p>\n<p>The <code>node:v8</code> module exposes APIs that are specific to the version of <a href=\"https://developers.google.com/v8/\">V8</a>\nbuilt into the Node.js binary. It can be accessed using:</p>\n<pre><code class=\"language-js\">const v8 = require('node:v8');\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v18.10.0/lib/v8.js\">lib/v8.js</a></p>\n<p>The <code>node:v8</code> module exposes APIs that are specific to the version of <a href=\"https://developers.google.com/v8/\">V8</a>\nbuilt into the Node.js binary. It can be accessed using:</p>\n<pre><code class=\"language-js\">const v8 = require('node:v8');\n</code></pre>",
       "methods": [
         {
           "textRaw": "`v8.cachedDataVersionTag()`",
@@ -237,6 +237,31 @@
             }
           ],
           "desc": "<p>Generates a snapshot of the current V8 heap and writes it to a JSON\nfile. This file is intended to be used with tools such as Chrome\nDevTools. The JSON schema is undocumented and specific to the V8\nengine, and may change from one version of V8 to the next.</p>\n<p>A heap snapshot is specific to a single V8 isolate. When using\n<a href=\"worker_threads.html\">worker threads</a>, a heap snapshot generated from the main thread will\nnot contain any information about the workers, and vice versa.</p>\n<p>Creating a heap snapshot requires memory about twice the size of the heap at\nthe time the snapshot is created. This results in the risk of OOM killers\nterminating the process.</p>\n<p>Generating a snapshot is a synchronous operation which blocks the event loop\nfor a duration depending on the heap size.</p>\n<pre><code class=\"language-js\">const { writeHeapSnapshot } = require('node:v8');\nconst {\n  Worker,\n  isMainThread,\n  parentPort\n} = require('node:worker_threads');\n\nif (isMainThread) {\n  const worker = new Worker(__filename);\n\n  worker.once('message', (filename) => {\n    console.log(`worker heapdump: ${filename}`);\n    // Now get a heapdump for the main thread.\n    console.log(`main thread heapdump: ${writeHeapSnapshot()}`);\n  });\n\n  // Tell the worker to create a heapdump.\n  worker.postMessage('heapdump');\n} else {\n  parentPort.once('message', (message) => {\n    if (message === 'heapdump') {\n      // Generate a heapdump for the worker\n      // and return the filename to the parent.\n      parentPort.postMessage(writeHeapSnapshot());\n    }\n  });\n}\n</code></pre>"
+        },
+        {
+          "textRaw": "`v8.setHeapSnapshotNearHeapLimit(limit)`",
+          "type": "method",
+          "name": "setHeapSnapshotNearHeapLimit",
+          "meta": {
+            "added": [
+              "v18.10.0"
+            ],
+            "changes": []
+          },
+          "stability": 1,
+          "stabilityText": "Experimental",
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`limit` {integer}",
+                  "name": "limit",
+                  "type": "integer"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>The API is a no-op if <code>--heapsnapshot-near-heap-limit</code> is already set from the\ncommand line or the API is called more than once. <code>limit</code> must be a positive\ninteger. See <a href=\"cli.html#--heapsnapshot-near-heap-limitmax_count\"><code>--heapsnapshot-near-heap-limit</code></a> for more information.</p>"
         }
       ],
       "modules": [

@@ -30,6 +30,7 @@
 #include "inspector_profiler.h"
 #endif
 #include "callback_queue.h"
+#include "cleanup_queue-inl.h"
 #include "debug_utils.h"
 #include "handle_wrap.h"
 #include "node.h"
@@ -349,6 +350,7 @@ class NoArrayBufferZeroFillScope {
   V(nistcurve_string, "nistCurve")                                             \
   V(node_string, "node")                                                       \
   V(nsname_string, "nsname")                                                   \
+  V(object_string, "Object")                                                   \
   V(ocsp_request_string, "OCSPRequest")                                        \
   V(oncertcb_string, "oncertcb")                                               \
   V(onchange_string, "onchange")                                               \
@@ -477,6 +479,7 @@ class NoArrayBufferZeroFillScope {
   V(binding_data_ctor_template, v8::FunctionTemplate)                          \
   V(blob_constructor_template, v8::FunctionTemplate)                           \
   V(blocklist_constructor_template, v8::FunctionTemplate)                      \
+  V(contextify_global_template, v8::ObjectTemplate)                            \
   V(compiled_fn_entry_template, v8::ObjectTemplate)                            \
   V(dir_instance_template, v8::ObjectTemplate)                                 \
   V(fd_constructor_template, v8::ObjectTemplate)                               \
@@ -560,7 +563,6 @@ class NoArrayBufferZeroFillScope {
   V(primordials_safe_weak_set_prototype_object, v8::Object)                    \
   V(promise_hook_handler, v8::Function)                                        \
   V(promise_reject_callback, v8::Function)                                     \
-  V(script_data_constructor_function, v8::Function)                            \
   V(snapshot_serialize_callback, v8::Function)                                 \
   V(snapshot_deserialize_callback, v8::Function)                               \
   V(snapshot_deserialize_main, v8::Function)                                   \
@@ -921,38 +923,6 @@ class ShouldNotAbortOnUncaughtScope {
   Environment* env_;
 };
 
-class CleanupHookCallback {
- public:
-  typedef void (*Callback)(void*);
-
-  CleanupHookCallback(Callback fn,
-                      void* arg,
-                      uint64_t insertion_order_counter)
-      : fn_(fn), arg_(arg), insertion_order_counter_(insertion_order_counter) {}
-
-  // Only hashes `arg_`, since that is usually enough to identify the hook.
-  struct Hash {
-    inline size_t operator()(const CleanupHookCallback& cb) const;
-  };
-
-  // Compares by `fn_` and `arg_` being equal.
-  struct Equal {
-    inline bool operator()(const CleanupHookCallback& a,
-                           const CleanupHookCallback& b) const;
-  };
-
-  inline BaseObject* GetBaseObject() const;
-
- private:
-  friend class Environment;
-  Callback fn_;
-  void* arg_;
-
-  // We keep track of the insertion order for these objects, so that we can
-  // call the callbacks in reverse order when we are cleaning up.
-  uint64_t insertion_order_counter_;
-};
-
 typedef void (*DeserializeRequestCallback)(v8::Local<v8::Context> context,
                                            v8::Local<v8::Object> holder,
                                            int index,
@@ -988,7 +958,8 @@ struct SnapshotData {
   enum class DataOwnership { kOwned, kNotOwned };
 
   static const uint32_t kMagic = 0x143da19;
-  static const SnapshotIndex kNodeBaseContextIndex = 0;
+  static const SnapshotIndex kNodeVMContextIndex = 0;
+  static const SnapshotIndex kNodeBaseContextIndex = kNodeVMContextIndex + 1;
   static const SnapshotIndex kNodeMainContextIndex = kNodeBaseContextIndex + 1;
 
   DataOwnership data_ownership = DataOwnership::kOwned;
@@ -1386,9 +1357,8 @@ class Environment : public MemoryRetainer {
   void ScheduleTimer(int64_t duration);
   void ToggleTimerRef(bool ref);
 
-  using CleanupCallback = CleanupHookCallback::Callback;
-  inline void AddCleanupHook(CleanupCallback cb, void* arg);
-  inline void RemoveCleanupHook(CleanupCallback cb, void* arg);
+  inline void AddCleanupHook(CleanupQueue::Callback cb, void* arg);
+  inline void RemoveCleanupHook(CleanupQueue::Callback cb, void* arg);
   void RunCleanup();
 
   static size_t NearHeapLimitCallback(void* data,
@@ -1462,6 +1432,13 @@ class Environment : public MemoryRetainer {
   template <typename T>
   void ForEachBindingData(T&& iterator);
 
+  inline void set_heap_snapshot_near_heap_limit(uint32_t limit);
+  inline bool is_in_heapsnapshot_heap_limit_callback() const;
+
+  inline void AddHeapSnapshotNearHeapLimitCallback();
+
+  inline void RemoveHeapSnapshotNearHeapLimitCallback(size_t heap_limit);
+
  private:
   inline void ThrowError(v8::Local<v8::Value> (*fun)(v8::Local<v8::String>),
                          const char* errmsg);
@@ -1518,8 +1495,10 @@ class Environment : public MemoryRetainer {
   std::vector<std::string> argv_;
   std::string exec_path_;
 
-  bool is_processing_heap_limit_callback_ = false;
-  int64_t heap_limit_snapshot_taken_ = 0;
+  bool is_in_heapsnapshot_heap_limit_callback_ = false;
+  uint32_t heap_limit_snapshot_taken_ = 0;
+  uint32_t heap_snapshot_near_heap_limit_ = 0;
+  bool heapsnapshot_near_heap_limit_callback_added_ = false;
 
   uint32_t module_id_counter_ = 0;
   uint32_t script_id_counter_ = 0;
@@ -1596,11 +1575,7 @@ class Environment : public MemoryRetainer {
 
   BindingDataStore bindings_;
 
-  // Use an unordered_set, so that we have efficient insertion and removal.
-  std::unordered_set<CleanupHookCallback,
-                     CleanupHookCallback::Hash,
-                     CleanupHookCallback::Equal> cleanup_hooks_;
-  uint64_t cleanup_hook_counter_ = 0;
+  CleanupQueue cleanup_queue_;
   bool started_cleanup_ = false;
 
   int64_t base_object_count_ = 0;

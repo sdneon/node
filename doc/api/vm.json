@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v18.9.1/lib/vm.js\">lib/vm.js</a></p>\n<p>The <code>node:vm</code> module enables compiling and running code within V8 Virtual\nMachine contexts.</p>\n<p><strong class=\"critical\">The <code>node:vm</code> module is not a security\nmechanism. Do not use it to run untrusted code.</strong></p>\n<p>JavaScript code can be compiled and run immediately or\ncompiled, saved, and run later.</p>\n<p>A common use case is to run the code in a different V8 Context. This means\ninvoked code has a different global object than the invoking code.</p>\n<p>One can provide the context by <a href=\"#what-does-it-mean-to-contextify-an-object\"><em>contextifying</em></a> an\nobject. The invoked code treats any property in the context like a\nglobal variable. Any changes to global variables caused by the invoked\ncode are reflected in the context object.</p>\n<pre><code class=\"language-js\">const vm = require('node:vm');\n\nconst x = 1;\n\nconst context = { x: 2 };\nvm.createContext(context); // Contextify the object.\n\nconst code = 'x += 40; var y = 17;';\n// `x` and `y` are global variables in the context.\n// Initially, x has the value 2 because that is the value of context.x.\nvm.runInContext(code, context);\n\nconsole.log(context.x); // 42\nconsole.log(context.y); // 17\n\nconsole.log(x); // 1; y is not defined.\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v18.10.0/lib/vm.js\">lib/vm.js</a></p>\n<p>The <code>node:vm</code> module enables compiling and running code within V8 Virtual\nMachine contexts.</p>\n<p><strong class=\"critical\">The <code>node:vm</code> module is not a security\nmechanism. Do not use it to run untrusted code.</strong></p>\n<p>JavaScript code can be compiled and run immediately or\ncompiled, saved, and run later.</p>\n<p>A common use case is to run the code in a different V8 Context. This means\ninvoked code has a different global object than the invoking code.</p>\n<p>One can provide the context by <a href=\"#what-does-it-mean-to-contextify-an-object\"><em>contextifying</em></a> an\nobject. The invoked code treats any property in the context like a\nglobal variable. Any changes to global variables caused by the invoked\ncode are reflected in the context object.</p>\n<pre><code class=\"language-js\">const vm = require('node:vm');\n\nconst x = 1;\n\nconst context = { x: 2 };\nvm.createContext(context); // Contextify the object.\n\nconst code = 'x += 40; var y = 17;';\n// `x` and `y` are global variables in the context.\n// Initially, x has the value 2 because that is the value of context.x.\nvm.runInContext(code, context);\n\nconsole.log(context.x); // 42\nconsole.log(context.y); // 17\n\nconsole.log(x); // 1; y is not defined.\n</code></pre>",
       "classes": [
         {
           "textRaw": "Class: `vm.Script`",
@@ -21,6 +21,20 @@
             "changes": []
           },
           "desc": "<p>Instances of the <code>vm.Script</code> class contain precompiled scripts that can be\nexecuted in specific contexts.</p>",
+          "properties": [
+            {
+              "textRaw": "`cachedDataRejected` {boolean|undefined}",
+              "type": "boolean|undefined",
+              "name": "cachedDataRejected",
+              "meta": {
+                "added": [
+                  "v5.7.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>When <code>cachedData</code> is supplied to create the <code>vm.Script</code>, this value will be set\nto either <code>true</code> or <code>false</code> depending on acceptance of the data by V8.\nOtherwise the value is <code>undefined</code>.</p>"
+            }
+          ],
           "methods": [
             {
               "textRaw": "`script.createCachedData()`",
@@ -42,7 +56,7 @@
                   "params": []
                 }
               ],
-              "desc": "<p>Creates a code cache that can be used with the <code>Script</code> constructor's\n<code>cachedData</code> option. Returns a <code>Buffer</code>. This method may be called at any\ntime and any number of times.</p>\n<pre><code class=\"language-js\">const script = new vm.Script(`\nfunction add(a, b) {\n  return a + b;\n}\n\nconst x = add(1, 2);\n`);\n\nconst cacheWithoutX = script.createCachedData();\n\nscript.runInThisContext();\n\nconst cacheWithX = script.createCachedData();\n</code></pre>"
+              "desc": "<p>Creates a code cache that can be used with the <code>Script</code> constructor's\n<code>cachedData</code> option. Returns a <code>Buffer</code>. This method may be called at any\ntime and any number of times.</p>\n<p>The code cache of the <code>Script</code> doesn't contain any JavaScript observable\nstates. The code cache is safe to be saved along side the script source and\nused to construct new <code>Script</code> instances multiple times.</p>\n<p>Functions in the <code>Script</code> source can be marked as lazily compiled and they are\nnot compiled at construction of the <code>Script</code>. These functions are going to be\ncompiled when they are invoked the first time. The code cache serializes the\nmetadata that V8 currently knows about the <code>Script</code> that it can use to speed up\nfuture compilations.</p>\n<pre><code class=\"language-js\">const script = new vm.Script(`\nfunction add(a, b) {\n  return a + b;\n}\n\nconst x = add(1, 2);\n`);\n\nconst cacheWithoutAdd = script.createCachedData();\n// In `cacheWithoutAdd` the function `add()` is marked for full compilation\n// upon invocation.\n\nscript.runInThisContext();\n\nconst cacheWithAdd = script.createCachedData();\n// `cacheWithAdd` contains fully compiled function `add()`.\n</code></pre>"
             },
             {
               "textRaw": "`script.runInContext(contextifiedObject[, options])`",
@@ -541,7 +555,7 @@
                   "params": []
                 }
               ],
-              "desc": "<p>Creates a code cache that can be used with the <code>SourceTextModule</code> constructor's\n<code>cachedData</code> option. Returns a <code>Buffer</code>. This method may be called any number\nof times before the module has been evaluated.</p>\n<pre><code class=\"language-js\">// Create an initial module\nconst module = new vm.SourceTextModule('const a = 1;');\n\n// Create cached data from this module\nconst cachedData = module.createCachedData();\n\n// Create a new module using the cached data. The code must be the same.\nconst module2 = new vm.SourceTextModule('const a = 1;', { cachedData });\n</code></pre>"
+              "desc": "<p>Creates a code cache that can be used with the <code>SourceTextModule</code> constructor's\n<code>cachedData</code> option. Returns a <code>Buffer</code>. This method may be called any number\nof times before the module has been evaluated.</p>\n<p>The code cache of the <code>SourceTextModule</code> doesn't contain any JavaScript\nobservable states. The code cache is safe to be saved along side the script\nsource and used to construct new <code>SourceTextModule</code> instances multiple times.</p>\n<p>Functions in the <code>SourceTextModule</code> source can be marked as lazily compiled\nand they are not compiled at construction of the <code>SourceTextModule</code>. These\nfunctions are going to be compiled when they are invoked the first time. The\ncode cache serializes the metadata that V8 currently knows about the\n<code>SourceTextModule</code> that it can use to speed up future compilations.</p>\n<pre><code class=\"language-js\">// Create an initial module\nconst module = new vm.SourceTextModule('const a = 1;');\n\n// Create cached data from this module\nconst cachedData = module.createCachedData();\n\n// Create a new module using the cached data. The code must be the same.\nconst module2 = new vm.SourceTextModule('const a = 1;', { cachedData });\n</code></pre>"
             }
           ],
           "signatures": [
@@ -1113,17 +1127,10 @@
                       "desc": "If `true`, receiving `SIGINT` (<kbd>Ctrl</kbd>+<kbd>C</kbd>) will terminate execution and throw an [`Error`][]. Existing handlers for the event that have been attached via `process.on('SIGINT')` are disabled during script execution, but continue to work after that."
                     },
                     {
-                      "textRaw": "`cachedData` {Buffer|TypedArray|DataView} Provides an optional `Buffer` or `TypedArray`, or `DataView` with V8's code cache data for the supplied source. When supplied, the `cachedDataRejected` value will be set to either `true` or `false` depending on acceptance of the data by V8.",
+                      "textRaw": "`cachedData` {Buffer|TypedArray|DataView} Provides an optional `Buffer` or `TypedArray`, or `DataView` with V8's code cache data for the supplied source.",
                       "name": "cachedData",
                       "type": "Buffer|TypedArray|DataView",
-                      "desc": "Provides an optional `Buffer` or `TypedArray`, or `DataView` with V8's code cache data for the supplied source. When supplied, the `cachedDataRejected` value will be set to either `true` or `false` depending on acceptance of the data by V8."
-                    },
-                    {
-                      "textRaw": "`produceCachedData` {boolean} When `true` and no `cachedData` is present, V8 will attempt to produce code cache data for `code`. Upon success, a `Buffer` with V8's code cache data will be produced and stored in the `cachedData` property of the returned `vm.Script` instance. The `cachedDataProduced` value will be set to either `true` or `false` depending on whether code cache data is produced successfully. This option is **deprecated** in favor of `script.createCachedData()`. **Default:** `false`.",
-                      "name": "produceCachedData",
-                      "type": "boolean",
-                      "default": "`false`",
-                      "desc": "When `true` and no `cachedData` is present, V8 will attempt to produce code cache data for `code`. Upon success, a `Buffer` with V8's code cache data will be produced and stored in the `cachedData` property of the returned `vm.Script` instance. The `cachedDataProduced` value will be set to either `true` or `false` depending on whether code cache data is produced successfully. This option is **deprecated** in favor of `script.createCachedData()`."
+                      "desc": "Provides an optional `Buffer` or `TypedArray`, or `DataView` with V8's code cache data for the supplied source."
                     },
                     {
                       "textRaw": "`importModuleDynamically` {Function} Called during evaluation of this module when `import()` is called. If this option is not specified, calls to `import()` will reject with [`ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING`][]. This option is part of the experimental modules API. We do not recommend using it in a production environment.",
@@ -1300,17 +1307,10 @@
                       ]
                     },
                     {
-                      "textRaw": "`cachedData` {Buffer|TypedArray|DataView} Provides an optional `Buffer` or `TypedArray`, or `DataView` with V8's code cache data for the supplied source. When supplied, the `cachedDataRejected` value will be set to either `true` or `false` depending on acceptance of the data by V8.",
+                      "textRaw": "`cachedData` {Buffer|TypedArray|DataView} Provides an optional `Buffer` or `TypedArray`, or `DataView` with V8's code cache data for the supplied source.",
                       "name": "cachedData",
                       "type": "Buffer|TypedArray|DataView",
-                      "desc": "Provides an optional `Buffer` or `TypedArray`, or `DataView` with V8's code cache data for the supplied source. When supplied, the `cachedDataRejected` value will be set to either `true` or `false` depending on acceptance of the data by V8."
-                    },
-                    {
-                      "textRaw": "`produceCachedData` {boolean} When `true` and no `cachedData` is present, V8 will attempt to produce code cache data for `code`. Upon success, a `Buffer` with V8's code cache data will be produced and stored in the `cachedData` property of the returned `vm.Script` instance. The `cachedDataProduced` value will be set to either `true` or `false` depending on whether code cache data is produced successfully. This option is **deprecated** in favor of `script.createCachedData()`. **Default:** `false`.",
-                      "name": "produceCachedData",
-                      "type": "boolean",
-                      "default": "`false`",
-                      "desc": "When `true` and no `cachedData` is present, V8 will attempt to produce code cache data for `code`. Upon success, a `Buffer` with V8's code cache data will be produced and stored in the `cachedData` property of the returned `vm.Script` instance. The `cachedDataProduced` value will be set to either `true` or `false` depending on whether code cache data is produced successfully. This option is **deprecated** in favor of `script.createCachedData()`."
+                      "desc": "Provides an optional `Buffer` or `TypedArray`, or `DataView` with V8's code cache data for the supplied source."
                     },
                     {
                       "textRaw": "`importModuleDynamically` {Function} Called during evaluation of this module when `import()` is called. If this option is not specified, calls to `import()` will reject with [`ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING`][]. This option is part of the experimental modules API. We do not recommend using it in a production environment.",
@@ -1442,17 +1442,10 @@
                       "desc": "If `true`, receiving `SIGINT` (<kbd>Ctrl</kbd>+<kbd>C</kbd>) will terminate execution and throw an [`Error`][]. Existing handlers for the event that have been attached via `process.on('SIGINT')` are disabled during script execution, but continue to work after that."
                     },
                     {
-                      "textRaw": "`cachedData` {Buffer|TypedArray|DataView} Provides an optional `Buffer` or `TypedArray`, or `DataView` with V8's code cache data for the supplied source. When supplied, the `cachedDataRejected` value will be set to either `true` or `false` depending on acceptance of the data by V8.",
+                      "textRaw": "`cachedData` {Buffer|TypedArray|DataView} Provides an optional `Buffer` or `TypedArray`, or `DataView` with V8's code cache data for the supplied source.",
                       "name": "cachedData",
                       "type": "Buffer|TypedArray|DataView",
-                      "desc": "Provides an optional `Buffer` or `TypedArray`, or `DataView` with V8's code cache data for the supplied source. When supplied, the `cachedDataRejected` value will be set to either `true` or `false` depending on acceptance of the data by V8."
-                    },
-                    {
-                      "textRaw": "`produceCachedData` {boolean} When `true` and no `cachedData` is present, V8 will attempt to produce code cache data for `code`. Upon success, a `Buffer` with V8's code cache data will be produced and stored in the `cachedData` property of the returned `vm.Script` instance. The `cachedDataProduced` value will be set to either `true` or `false` depending on whether code cache data is produced successfully. This option is **deprecated** in favor of `script.createCachedData()`. **Default:** `false`.",
-                      "name": "produceCachedData",
-                      "type": "boolean",
-                      "default": "`false`",
-                      "desc": "When `true` and no `cachedData` is present, V8 will attempt to produce code cache data for `code`. Upon success, a `Buffer` with V8's code cache data will be produced and stored in the `cachedData` property of the returned `vm.Script` instance. The `cachedDataProduced` value will be set to either `true` or `false` depending on whether code cache data is produced successfully. This option is **deprecated** in favor of `script.createCachedData()`."
+                      "desc": "Provides an optional `Buffer` or `TypedArray`, or `DataView` with V8's code cache data for the supplied source."
                     },
                     {
                       "textRaw": "`importModuleDynamically` {Function} Called during evaluation of this module when `import()` is called. If this option is not specified, calls to `import()` will reject with [`ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING`][]. This option is part of the experimental modules API. We do not recommend using it in a production environment.",

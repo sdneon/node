@@ -176,6 +176,7 @@
                                          'lib/internal/debugger/inspect.js',
                                          'lib/internal/debugger/inspect_client.js',
                                          'lib/internal/debugger/inspect_repl.js',
+                                         'lib/internal/dns/callback_resolver.js',
                                          'lib/internal/dns/promises.js',
                                          'lib/internal/dns/utils.js',
                                          'lib/internal/fs/dir.js',

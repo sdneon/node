@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v18.9.1">
-  <title>HTTP | Node.js v18.9.1 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v18.10.0">
+  <title>HTTP | Node.js v18.10.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -61,7 +61,7 @@
 <li><a href="os.html" class="nav-os">OS</a></li>
 <li><a href="path.html" class="nav-path">Path</a></li>
 <li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
-<li><a href="policy.html" class="nav-policy">Policies</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
 <li><a href="process.html" class="nav-process">Process</a></li>
 <li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
 <li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
@@ -95,7 +95,7 @@
     <div id="column1" data-id="http" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v18.9.1 documentation</h1>
+          <h1>Node.js v18.10.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -110,7 +110,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v18.9.1</li>
+            <li class="pinned-header">Node.js v18.10.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -366,7 +366,7 @@
 <li><a href="os.html" class="nav-os">OS</a></li>
 <li><a href="path.html" class="nav-path">Path</a></li>
 <li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
-<li><a href="policy.html" class="nav-policy">Policies</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
 <li><a href="process.html" class="nav-process">Process</a></li>
 <li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
 <li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
@@ -643,7 +643,7 @@
         <h2>HTTP<span><a class="mark" href="#http" id="http">#</a></span><a aria-hidden="true" class="legacy" id="http_http"></a></h2>
 
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v18.9.1/lib/http.js">lib/http.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v18.10.0/lib/http.js">lib/http.js</a></p>
 <p>To use the HTTP server and client one must <code>require('node:http')</code>.</p>
 <p>The HTTP interfaces in Node.js are designed to support many features
 of the protocol which have been traditionally difficult to use.
@@ -992,8 +992,11 @@ the data is read it will consume memory that can eventually lead to a
 'process out of memory' error.</p>
 <p>For backward compatibility, <code>res</code> will only emit <code>'error'</code> if there is an
 <code>'error'</code> listener registered.</p>
-<p>Node.js does not check whether Content-Length and the length of the
-body which has been transmitted are equal or not.</p>
+<p>Set <code>Content-Length</code> header to limit the response body size. Mismatching the
+<code>Content-Length</code> header value will result in an [<code>Error</code>][] being thrown,
+identified by <code>code:</code> <a href="errors.html#err_http_content_length_mismatch"><code>'ERR_HTTP_CONTENT_LENGTH_MISMATCH'</code></a>.</p>
+<p><code>Content-Length</code> value should be in bytes, not characters. Use
+<a href="buffer.html#static-method-bufferbytelengthstring-encoding"><code>Buffer.byteLength()</code></a> to determine the length of the body in bytes.</p>
 <h4>Event: <code>'abort'</code><span><a class="mark" href="#event-abort" id="event-abort">#</a></span><a aria-hidden="true" class="legacy" id="http_event_abort"></a></h4>
 <div class="api_metadata">
 <span>Added in: v1.4.1</span><span>Deprecated since: v17.0.0, v16.12.0</span>
@@ -1374,14 +1377,14 @@ is used, array values may be mutated without additional calls to various
 header-related http module methods. The keys of the returned object are the
 header names and the values are the respective header values. All header names
 are lowercase.</p>
-<p>The object returned by the <code>response.getHeaders()</code> method <em>does not</em>
+<p>The object returned by the <code>request.getHeaders()</code> method <em>does not</em>
 prototypically inherit from the JavaScript <code>Object</code>. This means that typical
 <code>Object</code> methods such as <code>obj.toString()</code>, <code>obj.hasOwnProperty()</code>, and others
 are not defined and <em>will not work</em>.</p>
 <pre><code class="language-js">request.<span class="hljs-title function_">setHeader</span>(<span class="hljs-string">'Foo'</span>, <span class="hljs-string">'bar'</span>);
 request.<span class="hljs-title function_">setHeader</span>(<span class="hljs-string">'Cookie'</span>, [<span class="hljs-string">'foo=bar'</span>, <span class="hljs-string">'bar=baz'</span>]);
 
-<span class="hljs-keyword">const</span> headers = response.<span class="hljs-title function_">getHeaders</span>();
+<span class="hljs-keyword">const</span> headers = request.<span class="hljs-title function_">getHeaders</span>();
 <span class="hljs-comment">// headers === { foo: 'bar', 'cookie': ['foo=bar', 'bar=baz'] }</span></code></pre>
 <h4><code>request.getRawHeaderNames()</code><span><a class="mark" href="#requestgetrawheadernames" id="requestgetrawheadernames">#</a></span><a aria-hidden="true" class="legacy" id="http_request_getrawheadernames"></a></h4>
 <div class="api_metadata">
@@ -2392,12 +2395,12 @@ desired with potential future retrieval and modification, use
   res.<span class="hljs-title function_">writeHead</span>(<span class="hljs-number">200</span>, { <span class="hljs-string">'Content-Type'</span>: <span class="hljs-string">'text/plain'</span> });
   res.<span class="hljs-title function_">end</span>(<span class="hljs-string">'ok'</span>);
 });</code></pre>
-<p><code>Content-Length</code> is given in bytes, not characters. Use
+<p><code>Content-Length</code> is read in bytes, not characters. Use
 <a href="buffer.html#static-method-bufferbytelengthstring-encoding"><code>Buffer.byteLength()</code></a> to determine the length of the body in bytes. Node.js
-does not check whether <code>Content-Length</code> and the length of the body which has
+will check whether <code>Content-Length</code> and the length of the body which has
 been transmitted are equal or not.</p>
 <p>Attempting to set a header field name or value that contains invalid characters
-will result in a <a href="errors.html#class-typeerror"><code>TypeError</code></a> being thrown.</p>
+will result in a [<code>Error</code>][] being thrown.</p>
 <h4><code>response.writeProcessing()</code><span><a class="mark" href="#responsewriteprocessing" id="responsewriteprocessing">#</a></span><a aria-hidden="true" class="legacy" id="http_response_writeprocessing"></a></h4>
 <div class="api_metadata">
 <span>Added in: v10.0.0</span>
@@ -2528,7 +2531,7 @@ as an argument to any listeners on the event.</p>
 <span class="hljs-comment">// { 'user-agent': 'curl/7.22.0',</span>
 <span class="hljs-comment">//   host: '127.0.0.1:8000',</span>
 <span class="hljs-comment">//   accept: '*/*' }</span>
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(request.<span class="hljs-title function_">getHeaders</span>());</code></pre>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(request.<span class="hljs-property">headers</span>);</code></pre>
 <p>Duplicates in raw headers are handled in the following ways, depending on the
 header name:</p>
 <ul>
@@ -2680,11 +2683,11 @@ HTTP request. Take the following request:</p>
 <pre><code class="language-http"><span class="hljs-keyword">GET</span> <span class="hljs-string">/status?name=ryan</span> <span class="hljs-meta">HTTP/1.1</span>
 <span class="hljs-attribute">Accept</span><span class="hljs-punctuation">: </span>text/plain</code></pre>
 <p>To parse the URL into its parts:</p>
-<pre><code class="language-js"><span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(request.<span class="hljs-property">url</span>, <span class="hljs-string">`http://<span class="hljs-subst">${request.getHeaders().host}</span>`</span>);</code></pre>
-<p>When <code>request.url</code> is <code>'/status?name=ryan'</code> and
-<code>request.getHeaders().host</code> is <code>'localhost:3000'</code>:</p>
+<pre><code class="language-js"><span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(request.<span class="hljs-property">url</span>, <span class="hljs-string">`http://<span class="hljs-subst">${request.headers.host}</span>`</span>);</code></pre>
+<p>When <code>request.url</code> is <code>'/status?name=ryan'</code> and <code>request.headers.host</code> is
+<code>'localhost:3000'</code>:</p>
 <pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">node</span>
-<span class="hljs-meta prompt_">> </span><span class="language-bash">new URL(request.url, `http://<span class="hljs-variable">${request.getHeaders().host}</span>`)</span>
+<span class="hljs-meta prompt_">> </span><span class="language-bash">new URL(request.url, `http://<span class="hljs-variable">${request.headers.host}</span>`)</span>
 URL {
   href: 'http://localhost:3000/status?name=ryan',
   origin: 'http://localhost:3000',

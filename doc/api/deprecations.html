@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v18.9.1">
-  <title>Deprecated APIs | Node.js v18.9.1 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v18.10.0">
+  <title>Deprecated APIs | Node.js v18.10.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -61,7 +61,7 @@
 <li><a href="os.html" class="nav-os">OS</a></li>
 <li><a href="path.html" class="nav-path">Path</a></li>
 <li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
-<li><a href="policy.html" class="nav-policy">Policies</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
 <li><a href="process.html" class="nav-process">Process</a></li>
 <li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
 <li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
@@ -95,7 +95,7 @@
     <div id="column1" data-id="deprecations" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v18.9.1 documentation</h1>
+          <h1>Node.js v18.10.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -110,7 +110,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v18.9.1</li>
+            <li class="pinned-header">Node.js v18.10.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -285,8 +285,11 @@
 <li><a href="#DEP0161">DEP0161: <code>process._getActiveRequests()</code> and <code>process._getActiveHandles()</code></a></li>
 <li><a href="#DEP0162">DEP0162: <code>fs.write()</code>, <code>fs.writeFileSync()</code> coercion to string</a></li>
 <li><a href="#DEP0163">DEP0163: <code>channel.subscribe(onMessage)</code>, <code>channel.unsubscribe(onMessage)</code></a></li>
-<li><a href="#DEP0164">DEP0164: <code>process.exit([code])</code> coercion to integer</a></li>
+<li><a href="#DEP0164">DEP0164: <code>process.exit(code)</code>, <code>process.exitCode</code> coercion to integer</a></li>
 <li><a href="#DEP0165">DEP0165: <code>--trace-atomics-wait</code></a></li>
+<li><a href="#DEP0166">DEP0166: Double slashes in imports and exports targets</a></li>
+<li><a href="#DEP0167">DEP0167: Weak <code>DiffieHellmanGroup</code> instances (<code>modp1</code>, <code>modp2</code>, <code>modp5</code>)</a></li>
+<li><a href="#DEP0168">DEP0168: Unhandled exception in Node-API callbacks</a></li>
 </ul>
 </li>
 </ul>
@@ -347,7 +350,7 @@
 <li><a href="os.html" class="nav-os">OS</a></li>
 <li><a href="path.html" class="nav-path">Path</a></li>
 <li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
-<li><a href="policy.html" class="nav-policy">Policies</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
 <li><a href="process.html" class="nav-process">Process</a></li>
 <li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
 <li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
@@ -588,8 +591,11 @@
 <li><a href="#DEP0161">DEP0161: <code>process._getActiveRequests()</code> and <code>process._getActiveHandles()</code></a></li>
 <li><a href="#DEP0162">DEP0162: <code>fs.write()</code>, <code>fs.writeFileSync()</code> coercion to string</a></li>
 <li><a href="#DEP0163">DEP0163: <code>channel.subscribe(onMessage)</code>, <code>channel.unsubscribe(onMessage)</code></a></li>
-<li><a href="#DEP0164">DEP0164: <code>process.exit([code])</code> coercion to integer</a></li>
+<li><a href="#DEP0164">DEP0164: <code>process.exit(code)</code>, <code>process.exitCode</code> coercion to integer</a></li>
 <li><a href="#DEP0165">DEP0165: <code>--trace-atomics-wait</code></a></li>
+<li><a href="#DEP0166">DEP0166: Double slashes in imports and exports targets</a></li>
+<li><a href="#DEP0167">DEP0167: Weak <code>DiffieHellmanGroup</code> instances (<code>modp1</code>, <code>modp2</code>, <code>modp5</code>)</a></li>
+<li><a href="#DEP0168">DEP0168: Unhandled exception in Node-API callbacks</a></li>
 </ul>
 </li>
 </ul>
@@ -2329,10 +2335,10 @@ assigning it to <code>process.env</code>.</p>
 </details>
 </div>
 <p>Type: Runtime</p>
-<p>Using <a href="crypto.html#cryptocreatecipheralgorithm-password-options"><code>crypto.createCipher()</code></a> and <a href="crypto.html#cryptocreatedecipheralgorithm-password-options"><code>crypto.createDecipher()</code></a> should be
+<p>Using <a href="crypto.html#cryptocreatecipheralgorithm-password-options"><code>crypto.createCipher()</code></a> and <a href="crypto.html#cryptocreatedecipheralgorithm-password-options"><code>crypto.createDecipher()</code></a> must be
 avoided as they use a weak key derivation function (MD5 with no salt) and static
 initialization vectors. It is recommended to derive a key using
-<a href="crypto.html#cryptopbkdf2password-salt-iterations-keylen-digest-callback"><code>crypto.pbkdf2()</code></a> or <a href="crypto.html#cryptoscryptpassword-salt-keylen-options-callback"><code>crypto.scrypt()</code></a> and to use
+<a href="crypto.html#cryptopbkdf2password-salt-iterations-keylen-digest-callback"><code>crypto.pbkdf2()</code></a> or <a href="crypto.html#cryptoscryptpassword-salt-keylen-options-callback"><code>crypto.scrypt()</code></a> with random salts and to use
 <a href="crypto.html#cryptocreatecipherivalgorithm-key-iv-options"><code>crypto.createCipheriv()</code></a> and <a href="crypto.html#cryptocreatedecipherivalgorithm-key-iv-options"><code>crypto.createDecipheriv()</code></a> to obtain the
 <a href="crypto.html#class-cipher"><code>Cipher</code></a> and <a href="crypto.html#class-decipher"><code>Decipher</code></a> objects respectively.</p>
 <h4 id="DEP0107">DEP0107: <code>tls.convertNPNProtocols()</code><span><a class="mark" href="#dep0107-tlsconvertnpnprotocols" id="dep0107-tlsconvertnpnprotocols">#</a></span><a aria-hidden="true" class="legacy" id="deprecations_dep0107_tls_convertnpnprotocols"></a></h4>
@@ -3010,12 +3016,14 @@ Instead, it is recommended to compare <code>require.main</code> and <code>module
 <details class="changelog"><summary>History</summary>
 <table>
 <tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v18.10.0</td>
+<td><p>End-of-Life.</p></td></tr>
 <tr><td>v16.0.0</td>
 <td><p>Runtime deprecation.</p></td></tr>
 </tbody></table>
 </details>
 </div>
-<p>Type: Runtime</p>
+<p>Type: End-of-Life</p>
 <p>The <code>process.config</code> property provides access to Node.js compile-time settings.
 However, the property is mutable and therefore subject to tampering. The ability
 to change the value will be removed in a future version of Node.js.</p>
@@ -3151,7 +3159,7 @@ would cause an error since mixing promise and callback semantics is not valid.</
 <details class="changelog"><summary>History</summary>
 <table>
 <tbody><tr><th>Version</th><th>Changes</th></tr>
-<tr><td>v17.5.0</td>
+<tr><td>v17.5.0, v16.15.0</td>
 <td><p>Documentation-only deprecation.</p></td></tr>
 </tbody></table>
 </details>
@@ -3180,7 +3188,7 @@ the errors used for value type validation.</p>
 <tbody><tr><th>Version</th><th>Changes</th></tr>
 <tr><td>v18.0.0</td>
 <td><p>Runtime deprecation.</p></td></tr>
-<tr><td>v17.6.0</td>
+<tr><td>v17.6.0, v16.15.0</td>
 <td><p>Documentation-only deprecation.</p></td></tr>
 </tbody></table>
 </details>
@@ -3193,7 +3201,7 @@ which diminished its usefulness.</p>
 <details class="changelog"><summary>History</summary>
 <table>
 <tbody><tr><th>Version</th><th>Changes</th></tr>
-<tr><td>v17.6.0</td>
+<tr><td>v17.6.0, v16.15.0</td>
 <td><p>Documentation-only deprecation.</p></td></tr>
 </tbody></table>
 </details>
@@ -3209,14 +3217,16 @@ resources and not the actual references.</p>
 <details class="changelog"><summary>History</summary>
 <table>
 <tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v18.10.0</td>
+<td><p>End-of-Life.</p></td></tr>
 <tr><td>v18.0.0</td>
 <td><p>Runtime deprecation.</p></td></tr>
-<tr><td>v17.8.0</td>
+<tr><td>v17.8.0, v16.15.0</td>
 <td><p>Documentation-only deprecation.</p></td></tr>
 </tbody></table>
 </details>
 </div>
-<p>Type: Runtime</p>
+<p>Type: End-of-Life</p>
 <p>Implicit coercion of objects with own <code>toString</code> property, passed as second
 parameter in <a href="fs.html#fswritefd-buffer-offset-length-position-callback"><code>fs.write()</code></a>, <a href="fs.html#fswritefilefile-data-options-callback"><code>fs.writeFile()</code></a>, <a href="fs.html#fsappendfilepath-data-options-callback"><code>fs.appendFile()</code></a>,
 <a href="fs.html#fswritefilesyncfile-data-options"><code>fs.writeFileSync()</code></a>, and <a href="fs.html#fsappendfilesyncpath-data-options"><code>fs.appendFileSync()</code></a> is deprecated.
@@ -3226,7 +3236,7 @@ Convert them to primitive strings.</p>
 <details class="changelog"><summary>History</summary>
 <table>
 <tbody><tr><th>Version</th><th>Changes</th></tr>
-<tr><td>v18.7.0</td>
+<tr><td>v18.7.0, v16.17.0</td>
 <td><p>Documentation-only deprecation.</p></td></tr>
 </tbody></table>
 </details>
@@ -3237,19 +3247,22 @@ hold the channel reference alive long enough to receive the events.</p>
 <p>Use <a href="diagnostics_channel.html#diagnostics_channelsubscribename-onmessage"><code>diagnostics_channel.subscribe(name, onMessage)</code></a> or
 <a href="diagnostics_channel.html#diagnostics_channelunsubscribename-onmessage"><code>diagnostics_channel.unsubscribe(name, onMessage)</code></a> which does the same
 thing instead.</p>
-<h4 id="DEP0164">DEP0164: <code>process.exit([code])</code> coercion to integer<span><a class="mark" href="#dep0164-processexitcode-coercion-to-integer" id="dep0164-processexitcode-coercion-to-integer">#</a></span><a aria-hidden="true" class="legacy" id="deprecations_dep0164_process_exit_code_coercion_to_integer"></a></h4>
+<h4 id="DEP0164">DEP0164: <code>process.exit(code)</code>, <code>process.exitCode</code> coercion to integer<span><a class="mark" href="#dep0164-processexitcode-processexitcode-coercion-to-integer" id="dep0164-processexitcode-processexitcode-coercion-to-integer">#</a></span><a aria-hidden="true" class="legacy" id="deprecations_dep0164_process_exit_code_process_exitcode_coercion_to_integer"></a></h4>
 <div class="api_metadata">
 <details class="changelog"><summary>History</summary>
 <table>
 <tbody><tr><th>Version</th><th>Changes</th></tr>
-<tr><td>v18.7.0</td>
-<td><p>Documentation-only deprecation.</p></td></tr>
+<tr><td>v18.10.0</td>
+<td><p>Documentation-only deprecation of <code>process.exitCode</code> integer coercion.</p></td></tr>
+<tr><td>v18.7.0, v16.17.0</td>
+<td><p>Documentation-only deprecation of <code>process.exit(code)</code> integer coercion.</p></td></tr>
 </tbody></table>
 </details>
 </div>
 <p>Type: Documentation-only</p>
-<p><code>code</code> values other than <code>undefined</code>, <code>null</code>, integer numbers and integer
-strings (e.g., '1') are deprecated as parameter in <a href="process.html#processexitcode"><code>process.exit()</code></a>.</p>
+<p>Values other than <code>undefined</code>, <code>null</code>, integer numbers, and integer strings
+(e.g., <code>'1'</code>) are deprecated as value for the <code>code</code> parameter in
+<a href="process.html#processexitcode"><code>process.exit()</code></a> and as value to assign to <a href="process.html#processexitcode_1"><code>process.exitCode</code></a>.</p>
 <h4 id="DEP0165">DEP0165: <code>--trace-atomics-wait</code><span><a class="mark" href="#dep0165---trace-atomics-wait" id="dep0165---trace-atomics-wait">#</a></span><a aria-hidden="true" class="legacy" id="deprecations_dep0165_trace_atomics_wait"></a></h4>
 <div class="api_metadata">
 <details class="changelog"><summary>History</summary>
@@ -3261,7 +3274,56 @@ strings (e.g., '1') are deprecated as parameter in <a href="process.html#process
 </details>
 </div>
 <p>Type: Documentation-only</p>
-<p>The <a href="cli.html#--trace-atomics-wait"><code>--trace-atomics-wait</code></a> flag is deprecated.</p></section>
+<p>The <a href="cli.html#--trace-atomics-wait"><code>--trace-atomics-wait</code></a> flag is deprecated.</p>
+<h4 id="DEP0166">DEP0166: Double slashes in imports and exports targets<span><a class="mark" href="#dep0166-double-slashes-in-imports-and-exports-targets" id="dep0166-double-slashes-in-imports-and-exports-targets">#</a></span><a aria-hidden="true" class="legacy" id="deprecations_dep0166_double_slashes_in_imports_and_exports_targets"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v18.10.0</td>
+<td><p>Runtime deprecation.</p></td></tr>
+<tr><td>v18.10.0</td>
+<td><p>Documentation-only deprecation with <code>--pending-deprecation</code> support.</p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p>Type: Runtime</p>
+<p>Package imports and exports targets mapping into paths including a double slash
+(of <em>"/"</em> or <em>"\"</em>) are deprecated and will fail with a resolution validation
+error in a future release. This same deprecation also applies to pattern matches
+starting or ending in a slash.</p>
+<h4 id="DEP0167">DEP0167: Weak <code>DiffieHellmanGroup</code> instances (<code>modp1</code>, <code>modp2</code>, <code>modp5</code>)<span><a class="mark" href="#dep0167-weak-diffiehellmangroup-instances-modp1-modp2-modp5" id="dep0167-weak-diffiehellmangroup-instances-modp1-modp2-modp5">#</a></span><a aria-hidden="true" class="legacy" id="deprecations_dep0167_weak_diffiehellmangroup_instances_modp1_modp2_modp5"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v18.10.0</td>
+<td><p>Documentation-only deprecation.</p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p>Type: Documentation-only</p>
+<p>The well-known MODP groups <code>modp1</code>, <code>modp2</code>, and <code>modp5</code> are deprecated because
+they are not secure against practical attacks. See <a href="https://www.rfc-editor.org/rfc/rfc8247#section-2.4">RFC 8247 Section 2.4</a> for
+details.</p>
+<p>These groups might be removed in future versions of Node.js. Applications that
+rely on these groups should evaluate using stronger MODP groups instead.</p>
+<h4 id="DEP0168">DEP0168: Unhandled exception in Node-API callbacks<span><a class="mark" href="#dep0168-unhandled-exception-in-node-api-callbacks" id="dep0168-unhandled-exception-in-node-api-callbacks">#</a></span><a aria-hidden="true" class="legacy" id="deprecations_dep0168_unhandled_exception_in_node_api_callbacks"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v18.3.0, v16.17.0</td>
+<td><p>Runtime deprecation.</p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p>Type: Runtime.</p>
+<p>The implicit suppression of uncaught exceptions in Node-API callbacks is now
+deprecated.</p>
+<p>Set the flag <a href="cli.html#--force-node-api-uncaught-exceptions-policy"><code>--force-node-api-uncaught-exceptions-policy</code></a> to force Node.js
+to emit an <a href="process.html#event-uncaughtexception"><code>'uncaughtException'</code></a> event if the exception is not handled in
+Node-API callbacks.</p></section>
         <!-- API END -->
       </div>
     </div>

@@ -5,12 +5,8 @@ This is a *fun* mod of Node.JS that initially embedded a modified version of dco
 
 Thanks to the inspiration from dcodeIO et al =D
 
-## Version 18.9.1
-Update to Node.JS 18.9.1 baseline, along with:
-* a CJS loader _resolveFilename quick fix.
-  * The fix is to detect and amend bad load request of the form 'c:\c:\...' to just 'c:\...'.
-  It is needed for [@squoosh\lib](https://github.com/sdneon/squoosh/tree/dev/libsquoosh)'s encoding to AVIF.
-* Update to TypeScript 4.8.3.
+## Version 18.10.0
+Update to Node.JS 18.10.0 baseline.
 
 It embeds:
 * DS v1.2.0.
@@ -332,6 +328,8 @@ For information about the governance of the Node.js project, see
   **James M Snell** <<jasnell@gmail.com>> (he/him)
 * [joyeecheung](https://github.com/joyeecheung) -
   **Joyee Cheung** <<joyeec9h3@gmail.com>> (she/her)
+* [legendecas](https://github.com/legendecas) -
+  **Chengzhong Wu** <<legendecas@gmail.com>> (he/him)
 * [mcollina](https://github.com/mcollina) -
   **Matteo Collina** <<matteo.collina@gmail.com>> (he/him)
 * [mhdawson](https://github.com/mhdawson) -
@@ -464,8 +462,6 @@ For information about the governance of the Node.js project, see
   **Gus Caplan** <<me@gus.host>> (they/them)
 * [dmabupt](https://github.com/dmabupt) -
   **Xu Meng** <<dmabupt@gmail.com>> (he/him)
-* [dnlup](https://github.com/dnlup)
-  **Daniele Belardi** <<dwon.dnl@gmail.com>> (he/him)
 * [edsadr](https://github.com/edsadr) -
   **Adrian Estrada** <<edsadr@gmail.com>> (he/him)
 * [erickwendel](https://github.com/erickwendel) -
@@ -648,6 +644,8 @@ For information about the governance of the Node.js project, see
   **Jamie Davis** <<davisjam@vt.edu>> (he/him)
 * [digitalinfinity](https://github.com/digitalinfinity) -
   **Hitesh Kanwathirtha** <<digitalinfinity@gmail.com>> (he/him)
+* [dnlup](https://github.com/dnlup)
+  **dnlup** <<dnlup.dev@gmail.com>>
 * [eljefedelrodeodeljefe](https://github.com/eljefedelrodeodeljefe) -
   **Robert Jefe Lindstaedt** <<robert.lindstaedt@gmail.com>>
 * [estliberitas](https://github.com/estliberitas) -
