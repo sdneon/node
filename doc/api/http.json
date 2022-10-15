@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v18.10.0/lib/http.js\">lib/http.js</a></p>\n<p>To use the HTTP server and client one must <code>require('node:http')</code>.</p>\n<p>The HTTP interfaces in Node.js are designed to support many features\nof the protocol which have been traditionally difficult to use.\nIn particular, large, possibly chunk-encoded, messages. The interface is\ncareful to never buffer entire requests or responses, so the\nuser is able to stream data.</p>\n<p>HTTP message headers are represented by an object like this:</p>\n<!-- eslint-skip -->\n<pre><code class=\"language-js\">{ 'content-length': '123',\n  'content-type': 'text/plain',\n  'connection': 'keep-alive',\n  'host': 'example.com',\n  'accept': '*/*' }\n</code></pre>\n<p>Keys are lowercased. Values are not modified.</p>\n<p>In order to support the full spectrum of possible HTTP applications, the Node.js\nHTTP API is very low-level. It deals with stream handling and message\nparsing only. It parses a message into headers and body but it does not\nparse the actual headers or the body.</p>\n<p>See <a href=\"#messageheaders\"><code>message.headers</code></a> for details on how duplicate headers are handled.</p>\n<p>The raw headers as they were received are retained in the <code>rawHeaders</code>\nproperty, which is an array of <code>[key, value, key2, value2, ...]</code>. For\nexample, the previous message header object might have a <code>rawHeaders</code>\nlist like the following:</p>\n<!-- eslint-disable semi -->\n<pre><code class=\"language-js\">[ 'ConTent-Length', '123456',\n  'content-LENGTH', '123',\n  'content-type', 'text/plain',\n  'CONNECTION', 'keep-alive',\n  'Host', 'example.com',\n  'accepT', '*/*' ]\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v18.11.0/lib/http.js\">lib/http.js</a></p>\n<p>To use the HTTP server and client one must <code>require('node:http')</code>.</p>\n<p>The HTTP interfaces in Node.js are designed to support many features\nof the protocol which have been traditionally difficult to use.\nIn particular, large, possibly chunk-encoded, messages. The interface is\ncareful to never buffer entire requests or responses, so the\nuser is able to stream data.</p>\n<p>HTTP message headers are represented by an object like this:</p>\n<!-- eslint-skip -->\n<pre><code class=\"language-js\">{ 'content-length': '123',\n  'content-type': 'text/plain',\n  'connection': 'keep-alive',\n  'host': 'example.com',\n  'accept': '*/*' }\n</code></pre>\n<p>Keys are lowercased. Values are not modified.</p>\n<p>In order to support the full spectrum of possible HTTP applications, the Node.js\nHTTP API is very low-level. It deals with stream handling and message\nparsing only. It parses a message into headers and body but it does not\nparse the actual headers or the body.</p>\n<p>See <a href=\"#messageheaders\"><code>message.headers</code></a> for details on how duplicate headers are handled.</p>\n<p>The raw headers as they were received are retained in the <code>rawHeaders</code>\nproperty, which is an array of <code>[key, value, key2, value2, ...]</code>. For\nexample, the previous message header object might have a <code>rawHeaders</code>\nlist like the following:</p>\n<!-- eslint-disable semi -->\n<pre><code class=\"language-js\">[ 'ConTent-Length', '123456',\n  'content-LENGTH', '123',\n  'content-type', 'text/plain',\n  'CONNECTION', 'keep-alive',\n  'Host', 'example.com',\n  'accepT', '*/*' ]\n</code></pre>",
       "classes": [
         {
           "textRaw": "Class: `http.Agent`",
@@ -1323,7 +1323,7 @@
                   "type": "stream.Duplex"
                 }
               ],
-              "desc": "<p>If a client connection emits an <code>'error'</code> event, it will be forwarded here.\nListener of this event is responsible for closing/destroying the underlying\nsocket. For example, one may wish to more gracefully close the socket with a\ncustom HTTP response instead of abruptly severing the connection.</p>\n<p>This event is guaranteed to be passed an instance of the <a href=\"net.html#class-netsocket\" class=\"type\">&lt;net.Socket&gt;</a> class,\na subclass of <a href=\"stream.html#class-streamduplex\" class=\"type\">&lt;stream.Duplex&gt;</a>, unless the user specifies a socket\ntype other than <a href=\"net.html#class-netsocket\" class=\"type\">&lt;net.Socket&gt;</a>.</p>\n<p>Default behavior is to try close the socket with a HTTP '400 Bad Request',\nor a HTTP '431 Request Header Fields Too Large' in the case of a\n<a href=\"errors.html#hpe_header_overflow\"><code>HPE_HEADER_OVERFLOW</code></a> error. If the socket is not writable or has already\nwritten data it is immediately destroyed.</p>\n<p><code>socket</code> is the <a href=\"net.html#class-netsocket\"><code>net.Socket</code></a> object that the error originated from.</p>\n<pre><code class=\"language-js\">const http = require('node:http');\n\nconst server = http.createServer((req, res) => {\n  res.end();\n});\nserver.on('clientError', (err, socket) => {\n  socket.end('HTTP/1.1 400 Bad Request\\r\\n\\r\\n');\n});\nserver.listen(8000);\n</code></pre>\n<p>When the <code>'clientError'</code> event occurs, there is no <code>request</code> or <code>response</code>\nobject, so any HTTP response sent, including response headers and payload,\n<em>must</em> be written directly to the <code>socket</code> object. Care must be taken to\nensure the response is a properly formatted HTTP response message.</p>\n<p><code>err</code> is an instance of <code>Error</code> with two extra columns:</p>\n<ul>\n<li><code>bytesParsed</code>: the bytes count of request packet that Node.js may have parsed\ncorrectly;</li>\n<li><code>rawPacket</code>: the raw packet of current request.</li>\n</ul>\n<p>In some cases, the client has already received the response and/or the socket\nhas already been destroyed, like in case of <code>ECONNRESET</code> errors. Before\ntrying to send data to the socket, it is better to check that it is still\nwritable.</p>\n<pre><code class=\"language-js\">server.on('clientError', (err, socket) => {\n  if (err.code === 'ECONNRESET' || !socket.writable) {\n    return;\n  }\n\n  socket.end('HTTP/1.1 400 Bad Request\\r\\n\\r\\n');\n});\n</code></pre>"
+              "desc": "<p>If a client connection emits an <code>'error'</code> event, it will be forwarded here.\nListener of this event is responsible for closing/destroying the underlying\nsocket. For example, one may wish to more gracefully close the socket with a\ncustom HTTP response instead of abruptly severing the connection.</p>\n<p>This event is guaranteed to be passed an instance of the <a href=\"net.html#class-netsocket\" class=\"type\">&lt;net.Socket&gt;</a> class,\na subclass of <a href=\"stream.html#class-streamduplex\" class=\"type\">&lt;stream.Duplex&gt;</a>, unless the user specifies a socket\ntype other than <a href=\"net.html#class-netsocket\" class=\"type\">&lt;net.Socket&gt;</a>.</p>\n<p>Default behavior is to try close the socket with a HTTP '400 Bad Request',\nor a HTTP '431 Request Header Fields Too Large' in the case of a\n<a href=\"errors.html#hpe_header_overflow\"><code>HPE_HEADER_OVERFLOW</code></a> error. If the socket is not writable or headers\nof the current attached <a href=\"#class-httpserverresponse\"><code>http.ServerResponse</code></a> has been sent, it is\nimmediately destroyed.</p>\n<p><code>socket</code> is the <a href=\"net.html#class-netsocket\"><code>net.Socket</code></a> object that the error originated from.</p>\n<pre><code class=\"language-js\">const http = require('node:http');\n\nconst server = http.createServer((req, res) => {\n  res.end();\n});\nserver.on('clientError', (err, socket) => {\n  socket.end('HTTP/1.1 400 Bad Request\\r\\n\\r\\n');\n});\nserver.listen(8000);\n</code></pre>\n<p>When the <code>'clientError'</code> event occurs, there is no <code>request</code> or <code>response</code>\nobject, so any HTTP response sent, including response headers and payload,\n<em>must</em> be written directly to the <code>socket</code> object. Care must be taken to\nensure the response is a properly formatted HTTP response message.</p>\n<p><code>err</code> is an instance of <code>Error</code> with two extra columns:</p>\n<ul>\n<li><code>bytesParsed</code>: the bytes count of request packet that Node.js may have parsed\ncorrectly;</li>\n<li><code>rawPacket</code>: the raw packet of current request.</li>\n</ul>\n<p>In some cases, the client has already received the response and/or the socket\nhas already been destroyed, like in case of <code>ECONNRESET</code> errors. Before\ntrying to send data to the socket, it is better to check that it is still\nwritable.</p>\n<pre><code class=\"language-js\">server.on('clientError', (err, socket) => {\n  if (err.code === 'ECONNRESET' || !socket.writable) {\n    return;\n  }\n\n  socket.end('HTTP/1.1 400 Bad Request\\r\\n\\r\\n');\n});\n</code></pre>"
             },
             {
               "textRaw": "Event: `'close'`",
@@ -2100,7 +2100,41 @@
                   "params": []
                 }
               ],
-              "desc": "<p>Sends a HTTP/1.1 100 Continue message to the client, indicating that\nthe request body should be sent. See the <a href=\"#event-checkcontinue\"><code>'checkContinue'</code></a> event on\n<code>Server</code>.</p>"
+              "desc": "<p>Sends an HTTP/1.1 100 Continue message to the client, indicating that\nthe request body should be sent. See the <a href=\"#event-checkcontinue\"><code>'checkContinue'</code></a> event on\n<code>Server</code>.</p>"
+            },
+            {
+              "textRaw": "`response.writeEarlyHints(hints[, callback])`",
+              "type": "method",
+              "name": "writeEarlyHints",
+              "meta": {
+                "added": [
+                  "v18.11.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v18.11.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44820",
+                    "description": "Allow passing hints as an object."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`hints` {Object}",
+                      "name": "hints",
+                      "type": "Object"
+                    },
+                    {
+                      "textRaw": "`callback` {Function}",
+                      "name": "callback",
+                      "type": "Function"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>Sends an HTTP/1.1 103 Early Hints message to the client with a Link header,\nindicating that the user agent can preload/preconnect the linked resources.\nThe <code>hints</code> is an object containing the values of headers to be sent with\nearly hints message. The optional <code>callback</code> argument will be called when\nthe response message has been written.</p>\n<p><strong>Example</strong></p>\n<pre><code class=\"language-js\">const earlyHintsLink = '&#x3C;/styles.css>; rel=preload; as=style';\nresponse.writeEarlyHints({\n  'link': earlyHintsLink,\n});\n\nconst earlyHintsLinks = [\n  '&#x3C;/styles.css>; rel=preload; as=style',\n  '&#x3C;/scripts.js>; rel=preload; as=script',\n];\nresponse.writeEarlyHints({\n  'link': earlyHintsLinks,\n  'x-trace-id': 'id for diagnostics'\n});\n\nconst earlyHintsCallback = () => console.log('early hints message sent');\nresponse.writeEarlyHints(earlyHintsLinks, earlyHintsCallback);\n</code></pre>"
             },
             {
               "textRaw": "`response.writeHead(statusCode[, statusMessage][, headers])`",

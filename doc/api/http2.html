@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v18.10.0">
-  <title>HTTP/2 | Node.js v18.10.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v18.11.0">
+  <title>HTTP/2 | Node.js v18.11.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -95,7 +95,7 @@
     <div id="column1" data-id="http2" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v18.10.0 documentation</h1>
+          <h1>Node.js v18.11.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -110,7 +110,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v18.10.0</li>
+            <li class="pinned-header">Node.js v18.11.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -340,6 +340,10 @@
 <li><a href="#responsewritableended"><code>response.writableEnded</code></a></li>
 <li><a href="#responsewritechunk-encoding-callback"><code>response.write(chunk[, encoding][, callback])</code></a></li>
 <li><a href="#responsewritecontinue"><code>response.writeContinue()</code></a></li>
+</ul>
+</li>
+<li><a href="#responsewriteearlyhintslinks"><code>response.writeEarlyHints(links)</code></a>
+<ul>
 <li><a href="#responsewriteheadstatuscode-statusmessage-headers"><code>response.writeHead(statusCode[, statusMessage][, headers])</code></a></li>
 </ul>
 </li>
@@ -700,6 +704,10 @@
 <li><a href="#responsewritableended"><code>response.writableEnded</code></a></li>
 <li><a href="#responsewritechunk-encoding-callback"><code>response.write(chunk[, encoding][, callback])</code></a></li>
 <li><a href="#responsewritecontinue"><code>response.writeContinue()</code></a></li>
+</ul>
+</li>
+<li><a href="#responsewriteearlyhintslinks"><code>response.writeEarlyHints(links)</code></a>
+<ul>
 <li><a href="#responsewriteheadstatuscode-statusmessage-headers"><code>response.writeHead(statusCode[, statusMessage][, headers])</code></a></li>
 </ul>
 </li>
@@ -730,7 +738,7 @@
 </div>
 
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v18.10.0/lib/http2.js">lib/http2.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v18.11.0/lib/http2.js">lib/http2.js</a></p>
 <p>The <code>node:http2</code> module provides an implementation of the <a href="https://tools.ietf.org/html/rfc7540">HTTP/2</a> protocol.
 It can be accessed using:</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> http2 = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:http2'</span>);</code></pre>
@@ -4055,6 +4063,26 @@ buffer. Returns <code>false</code> if all or part of the data was queued in user
 <p>Sends a status <code>100 Continue</code> to the client, indicating that the request body
 should be sent. See the <a href="#event-checkcontinue"><code>'checkContinue'</code></a> event on <code>Http2Server</code> and
 <code>Http2SecureServer</code>.</p>
+<h4><code>response.writeEarlyHints(links)</code><span><a class="mark" href="#responsewriteearlyhintslinks" id="responsewriteearlyhintslinks">#</a></span><a aria-hidden="true" class="legacy" id="http2_response_writeearlyhints_links"></a></h4>
+<div class="api_metadata">
+<span>Added in: v18.11.0</span>
+</div>
+<ul>
+<li><code>links</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="type">&#x3C;Array></a></li>
+</ul>
+<p>Sends a status <code>103 Early Hints</code> to the client with a Link header,
+indicating that the user agent can preload/preconnect the linked resources.
+The <code>links</code> can be a string or an array of strings containing the values
+of the <code>Link</code> header.</p>
+<p><strong>Example</strong></p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> earlyHintsLink = <span class="hljs-string">'&#x3C;/styles.css>; rel=preload; as=style'</span>;
+response.<span class="hljs-title function_">writeEarlyHints</span>(earlyHintsLink);
+
+<span class="hljs-keyword">const</span> earlyHintsLinks = [
+  <span class="hljs-string">'&#x3C;/styles.css>; rel=preload; as=style'</span>,
+  <span class="hljs-string">'&#x3C;/scripts.js>; rel=preload; as=script'</span>,
+];
+response.<span class="hljs-title function_">writeEarlyHints</span>(earlyHintsLinks);</code></pre>
 <h5><code>response.writeHead(statusCode[, statusMessage][, headers])</code><span><a class="mark" href="#responsewriteheadstatuscode-statusmessage-headers" id="responsewriteheadstatuscode-statusmessage-headers">#</a></span><a aria-hidden="true" class="legacy" id="http2_response_writehead_statuscode_statusmessage_headers"></a></h5>
 <div class="api_metadata">
 <details class="changelog"><summary>History</summary>

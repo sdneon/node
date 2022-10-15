@@ -71,6 +71,7 @@ class DebugOptions : public Options {
   DebugOptions(DebugOptions&&) = default;
   DebugOptions& operator=(DebugOptions&&) = default;
 
+  bool allow_attaching_debugger = true;
   // --inspect
   bool inspector_enabled = false;
   // --debug
@@ -152,6 +153,7 @@ class EnvironmentOptions : public Options {
   std::string redirect_warnings;
   std::string diagnostic_dir;
   bool test_runner = false;
+  std::vector<std::string> test_name_pattern;
   bool test_only = false;
   bool test_udp_no_try_send = false;
   bool throw_deprecation = false;
@@ -171,6 +173,10 @@ class EnvironmentOptions : public Options {
 #else
       false;
 #endif  // DEBUG
+
+  bool watch_mode = false;
+  bool watch_mode_report_to_parent = false;
+  std::vector<std::string> watch_mode_paths;
 
   bool syntax_check_only = false;
   bool has_eval_string = false;

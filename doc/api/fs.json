@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v18.10.0/lib/fs.js\">lib/fs.js</a></p>\n<p>The <code>node:fs</code> module enables interacting with the file system in a\nway modeled on standard POSIX functions.</p>\n<p>To use the promise-based APIs:</p>\n<pre><code class=\"language-mjs\">import * as fs from 'node:fs/promises';\n</code></pre>\n<pre><code class=\"language-cjs\">const fs = require('node:fs/promises');\n</code></pre>\n<p>To use the callback and sync APIs:</p>\n<pre><code class=\"language-mjs\">import * as fs from 'node:fs';\n</code></pre>\n<pre><code class=\"language-cjs\">const fs = require('node:fs');\n</code></pre>\n<p>All file system operations have synchronous, callback, and promise-based\nforms, and are accessible using both CommonJS syntax and ES6 Modules (ESM).</p>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v18.11.0/lib/fs.js\">lib/fs.js</a></p>\n<p>The <code>node:fs</code> module enables interacting with the file system in a\nway modeled on standard POSIX functions.</p>\n<p>To use the promise-based APIs:</p>\n<pre><code class=\"language-mjs\">import * as fs from 'node:fs/promises';\n</code></pre>\n<pre><code class=\"language-cjs\">const fs = require('node:fs/promises');\n</code></pre>\n<p>To use the callback and sync APIs:</p>\n<pre><code class=\"language-mjs\">import * as fs from 'node:fs';\n</code></pre>\n<pre><code class=\"language-cjs\">const fs = require('node:fs');\n</code></pre>\n<p>All file system operations have synchronous, callback, and promise-based\nforms, and are accessible using both CommonJS syntax and ES6 Modules (ESM).</p>",
       "modules": [
         {
           "textRaw": "Promise example",
@@ -648,6 +648,71 @@
                     }
                   ],
                   "desc": "<p>Asynchronously reads the entire contents of a file.</p>\n<p>If <code>options</code> is a string, then it specifies the <code>encoding</code>.</p>\n<p>The <a href=\"fs.html#class-filehandle\" class=\"type\">&lt;FileHandle&gt;</a> has to support reading.</p>\n<p>If one or more <code>filehandle.read()</code> calls are made on a file handle and then a\n<code>filehandle.readFile()</code> call is made, the data will be read from the current\nposition till the end of the file. It doesn't always read from the beginning\nof the file.</p>"
+                },
+                {
+                  "textRaw": "`filehandle.readLines([options])`",
+                  "type": "method",
+                  "name": "readLines",
+                  "meta": {
+                    "added": [
+                      "v18.11.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "return": {
+                        "textRaw": "Returns: {readline.InterfaceConstructor}",
+                        "name": "return",
+                        "type": "readline.InterfaceConstructor"
+                      },
+                      "params": [
+                        {
+                          "textRaw": "`options` {Object}",
+                          "name": "options",
+                          "type": "Object",
+                          "options": [
+                            {
+                              "textRaw": "`encoding` {string} **Default:** `null`",
+                              "name": "encoding",
+                              "type": "string",
+                              "default": "`null`"
+                            },
+                            {
+                              "textRaw": "`autoClose` {boolean} **Default:** `true`",
+                              "name": "autoClose",
+                              "type": "boolean",
+                              "default": "`true`"
+                            },
+                            {
+                              "textRaw": "`emitClose` {boolean} **Default:** `true`",
+                              "name": "emitClose",
+                              "type": "boolean",
+                              "default": "`true`"
+                            },
+                            {
+                              "textRaw": "`start` {integer}",
+                              "name": "start",
+                              "type": "integer"
+                            },
+                            {
+                              "textRaw": "`end` {integer} **Default:** `Infinity`",
+                              "name": "end",
+                              "type": "integer",
+                              "default": "`Infinity`"
+                            },
+                            {
+                              "textRaw": "`highWaterMark` {integer} **Default:** `64 * 1024`",
+                              "name": "highWaterMark",
+                              "type": "integer",
+                              "default": "`64 * 1024`"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>Convenience method to create a <code>readline</code> interface and stream over the file.\nSee <a href=\"#filehandlecreatereadstreamoptions\"><code>filehandle.createReadStream()</code></a> for the options.</p>\n<pre><code class=\"language-mjs\">import { open } from 'node:fs/promises';\n\nconst file = await open('./some/file/to/read');\n\nfor await (const line of file.readLines()) {\n  console.log(line);\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const { open } = require('node:fs/promises');\n\n(async () => {\n  const file = await open('./some/file/to/read');\n\n  for await (const line of file.readLines()) {\n    console.log(line);\n  }\n})();\n</code></pre>"
                 },
                 {
                   "textRaw": "`filehandle.readv(buffers[, position])`",
@@ -1954,7 +2019,7 @@
                   ]
                 }
               ],
-              "desc": "<p>Asynchronously reads the entire contents of a file.</p>\n<p>If no encoding is specified (using <code>options.encoding</code>), the data is returned\nas a <a href=\"buffer.html#class-buffer\" class=\"type\">&lt;Buffer&gt;</a> object. Otherwise, the data will be a string.</p>\n<p>If <code>options</code> is a string, then it specifies the encoding.</p>\n<p>When the <code>path</code> is a directory, the behavior of <code>fsPromises.readFile()</code> is\nplatform-specific. On macOS, Linux, and Windows, the promise will be rejected\nwith an error. On FreeBSD, a representation of the directory's contents will be\nreturned.</p>\n<p>It is possible to abort an ongoing <code>readFile</code> using an <a href=\"globals.html#class-abortsignal\" class=\"type\">&lt;AbortSignal&gt;</a>. If a\nrequest is aborted the promise returned is rejected with an <code>AbortError</code>:</p>\n<pre><code class=\"language-mjs\">import { readFile } from 'node:fs/promises';\n\ntry {\n  const controller = new AbortController();\n  const { signal } = controller;\n  const promise = readFile(fileName, { signal });\n\n  // Abort the request before the promise settles.\n  controller.abort();\n\n  await promise;\n} catch (err) {\n  // When a request is aborted - err is an AbortError\n  console.error(err);\n}\n</code></pre>\n<p>Aborting an ongoing request does not abort individual operating\nsystem requests but rather the internal buffering <code>fs.readFile</code> performs.</p>\n<p>Any specified <a href=\"fs.html#class-filehandle\" class=\"type\">&lt;FileHandle&gt;</a> has to support reading.</p>"
+              "desc": "<p>Asynchronously reads the entire contents of a file.</p>\n<p>If no encoding is specified (using <code>options.encoding</code>), the data is returned\nas a <a href=\"buffer.html#class-buffer\" class=\"type\">&lt;Buffer&gt;</a> object. Otherwise, the data will be a string.</p>\n<p>If <code>options</code> is a string, then it specifies the encoding.</p>\n<p>When the <code>path</code> is a directory, the behavior of <code>fsPromises.readFile()</code> is\nplatform-specific. On macOS, Linux, and Windows, the promise will be rejected\nwith an error. On FreeBSD, a representation of the directory's contents will be\nreturned.</p>\n<p>An example of reading a <code>package.json</code> file located in the same directory of the\nrunning code:</p>\n<pre><code class=\"language-mjs\">import { readFile } from 'node:fs/promises';\ntry {\n  const filePath = new URL('./package.json', import.meta.url);\n  const contents = await readFile(filePath, { encoding: 'utf8' });\n  console.log(contents);\n} catch (err) {\n  console.error(err.message);\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const { readFile } = require('node:fs/promises');\nconst { resolve } = require('node:path');\nasync function logFile() {\n  try {\n    const filePath = resolve('./package.json');\n    const contents = await readFile(filePath, { encoding: 'utf8' });\n    console.log(contents);\n  } catch (err) {\n    console.error(err.message);\n  }\n}\nlogFile();\n</code></pre>\n<p>It is possible to abort an ongoing <code>readFile</code> using an <a href=\"globals.html#class-abortsignal\" class=\"type\">&lt;AbortSignal&gt;</a>. If a\nrequest is aborted the promise returned is rejected with an <code>AbortError</code>:</p>\n<pre><code class=\"language-mjs\">import { readFile } from 'node:fs/promises';\n\ntry {\n  const controller = new AbortController();\n  const { signal } = controller;\n  const promise = readFile(fileName, { signal });\n\n  // Abort the request before the promise settles.\n  controller.abort();\n\n  await promise;\n} catch (err) {\n  // When a request is aborted - err is an AbortError\n  console.error(err);\n}\n</code></pre>\n<p>Aborting an ongoing request does not abort individual operating\nsystem requests but rather the internal buffering <code>fs.readFile</code> performs.</p>\n<p>Any specified <a href=\"fs.html#class-filehandle\" class=\"type\">&lt;FileHandle&gt;</a> has to support reading.</p>"
             },
             {
               "textRaw": "`fsPromises.readlink(path[, options])`",

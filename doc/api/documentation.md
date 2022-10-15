@@ -81,7 +81,7 @@ a command-line flag. Experimental features may also emit a [warning][].
 | [path](path.html) | (2) Stable |
 | [performance_measurement_apis](perf_hooks.html) | (2) Stable |
 | [punycode](punycode.html) | (0) Deprecated |
-| [querystring](querystring.html) | (3) Legacy |
+| [querystring](querystring.html) | (2) Stable |
 | [readline](readline.html) | (2) Stable |
 | [repl](repl.html) | (2) Stable |
 | [stream](stream.html) | (2) Stable |

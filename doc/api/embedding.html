@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v18.10.0">
-  <title>C++ embedder API | Node.js v18.10.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v18.11.0">
+  <title>C++ embedder API | Node.js v18.11.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -95,7 +95,7 @@
     <div id="column1" data-id="embedding" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v18.10.0 documentation</h1>
+          <h1>Node.js v18.11.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -110,7 +110,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v18.10.0</li>
+            <li class="pinned-header">Node.js v18.11.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -296,15 +296,18 @@ the <code>node</code> and <code>v8</code> C++ namespaces, respectively.</p>
 <pre><code class="language-cpp"><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-type">int</span> argc, <span class="hljs-type">char</span>** argv)</span> </span>{
   argv = <span class="hljs-built_in">uv_setup_args</span>(argc, argv);
   <span class="hljs-function">std::vector&#x3C;std::string> <span class="hljs-title">args</span><span class="hljs-params">(argv, argv + argc)</span></span>;
-  std::vector&#x3C;std::string> exec_args;
-  std::vector&#x3C;std::string> errors;
   <span class="hljs-comment">// Parse Node.js CLI options, and print any errors that have occurred while</span>
   <span class="hljs-comment">// trying to parse them.</span>
-  <span class="hljs-type">int</span> exit_code = node::<span class="hljs-built_in">InitializeNodeWithArgs</span>(&#x26;args, &#x26;exec_args, &#x26;errors);
-  <span class="hljs-keyword">for</span> (<span class="hljs-type">const</span> std::string&#x26; error : errors)
+  std::unique_ptr&#x3C;node::InitializationResult> result =
+      node::<span class="hljs-built_in">InitializeOncePerProcess</span>(args, {
+        node::ProcessInitializationFlags::kNoInitializeV8,
+        node::ProcessInitializationFlags::kNoInitializeNodeV8Platform
+      });
+
+  <span class="hljs-keyword">for</span> (<span class="hljs-type">const</span> std::string&#x26; error : result-><span class="hljs-built_in">errors</span>())
     <span class="hljs-built_in">fprintf</span>(stderr, <span class="hljs-string">"%s: %s\n"</span>, args[<span class="hljs-number">0</span>].<span class="hljs-built_in">c_str</span>(), error.<span class="hljs-built_in">c_str</span>());
-  <span class="hljs-keyword">if</span> (exit_code != <span class="hljs-number">0</span>) {
-    <span class="hljs-keyword">return</span> exit_code;
+  <span class="hljs-keyword">if</span> (result-><span class="hljs-built_in">early_return</span>() != <span class="hljs-number">0</span>) {
+    <span class="hljs-keyword">return</span> result-><span class="hljs-built_in">exit_code</span>();
   }
 
   <span class="hljs-comment">// Create a v8::Platform instance. `MultiIsolatePlatform::Create()` is a way</span>
@@ -317,10 +320,13 @@ the <code>node</code> and <code>v8</code> C++ namespaces, respectively.</p>
   V8::<span class="hljs-built_in">Initialize</span>();
 
   <span class="hljs-comment">// See below for the contents of this function.</span>
-  <span class="hljs-type">int</span> ret = <span class="hljs-built_in">RunNodeInstance</span>(platform.<span class="hljs-built_in">get</span>(), args, exec_args);
+  <span class="hljs-type">int</span> ret = <span class="hljs-built_in">RunNodeInstance</span>(
+      platform.<span class="hljs-built_in">get</span>(), result-><span class="hljs-built_in">args</span>(), result-><span class="hljs-built_in">exec_args</span>());
 
   V8::<span class="hljs-built_in">Dispose</span>();
   V8::<span class="hljs-built_in">DisposePlatform</span>();
+
+  node::<span class="hljs-built_in">TearDownOncePerProcess</span>();
   <span class="hljs-keyword">return</span> ret;
 }</code></pre>
 <h4>Per-instance state<span><a class="mark" href="#per-instance-state" id="per-instance-state">#</a></span><a aria-hidden="true" class="legacy" id="embedding_per_instance_state"></a></h4>

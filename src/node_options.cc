@@ -156,9 +156,33 @@ void EnvironmentOptions::CheckOptions(std::vector<std::string>* errors) {
       errors->push_back("either --test or --interactive can be used, not both");
     }
 
-    if (debug_options_.inspector_enabled) {
-      errors->push_back("the inspector cannot be used with --test");
+    if (watch_mode) {
+      // TODO(MoLow): Support (incremental?) watch mode within test runner
+      errors->push_back("either --test or --watch can be used, not both");
     }
+
+#ifndef ALLOW_ATTACHING_DEBUGGER_IN_TEST_RUNNER
+    debug_options_.allow_attaching_debugger = false;
+#endif
+  }
+
+  if (watch_mode) {
+    if (syntax_check_only) {
+      errors->push_back("either --watch or --check can be used, not both");
+    }
+
+    if (has_eval_string) {
+      errors->push_back("either --watch or --eval can be used, not both");
+    }
+
+    if (force_repl) {
+      errors->push_back("either --watch or --interactive "
+                        "can be used, not both");
+    }
+
+#ifndef ALLOW_ATTACHING_DEBUGGER_IN_WATCH_MODE
+    debug_options_.allow_attaching_debugger = false;
+#endif
   }
 
 #if HAVE_INSPECTOR
@@ -529,6 +553,9 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
   AddOption("--test",
             "launch test runner on startup",
             &EnvironmentOptions::test_runner);
+  AddOption("--test-name-pattern",
+            "run tests whose name matches this regular expression",
+            &EnvironmentOptions::test_name_pattern);
   AddOption("--test-only",
             "run tests with 'only' option set",
             &EnvironmentOptions::test_only,
@@ -586,7 +613,15 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
             "", /* undocumented, only for debugging */
             &EnvironmentOptions::verify_base_objects,
             kAllowedInEnvironment);
-
+  AddOption("--watch",
+            "run in watch mode",
+            &EnvironmentOptions::watch_mode,
+            kAllowedInEnvironment);
+  AddOption("--watch-path",
+            "path to watch",
+            &EnvironmentOptions::watch_mode_paths,
+            kAllowedInEnvironment);
+  Implies("--watch-path", "--watch");
   AddOption("--check",
             "syntax check script without executing",
             &EnvironmentOptions::syntax_check_only);
