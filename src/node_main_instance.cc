@@ -8,6 +8,7 @@
 #include "node_external_reference.h"
 #include "node_internals.h"
 #include "node_options-inl.h"
+#include "node_realm.h"
 #include "node_snapshot_builder.h"
 #include "node_snapshotable.h"
 #include "node_v8_platform-inl.h"
@@ -117,12 +118,12 @@ NodeMainInstance::~NodeMainInstance() {
   isolate_->Dispose();
 }
 
-int NodeMainInstance::Run() {
+ExitCode NodeMainInstance::Run() {
   Locker locker(isolate_);
   Isolate::Scope isolate_scope(isolate_);
   HandleScope handle_scope(isolate_);
 
-  int exit_code = 0;
+  ExitCode exit_code = ExitCode::kNoFailure;
   DeleteFnPtr<Environment, FreeEnvironment> env =
       CreateMainEnvironment(&exit_code);
   CHECK_NOT_NULL(env);
@@ -132,11 +133,12 @@ int NodeMainInstance::Run() {
   return exit_code;
 }
 
-void NodeMainInstance::Run(int* exit_code, Environment* env) {
-  if (*exit_code == 0) {
+void NodeMainInstance::Run(ExitCode* exit_code, Environment* env) {
+  if (*exit_code == ExitCode::kNoFailure) {
     LoadEnvironment(env, StartExecutionCallback{});
 
-    *exit_code = SpinEventLoop(env).FromMaybe(1);
+    *exit_code =
+        SpinEventLoopInternal(env).FromMaybe(ExitCode::kGenericUserError);
   }
 
 #if defined(LEAK_SANITIZER)
@@ -145,8 +147,8 @@ void NodeMainInstance::Run(int* exit_code, Environment* env) {
 }
 
 DeleteFnPtr<Environment, FreeEnvironment>
-NodeMainInstance::CreateMainEnvironment(int* exit_code) {
-  *exit_code = 0;  // Reset the exit code to 0
+NodeMainInstance::CreateMainEnvironment(ExitCode* exit_code) {
+  *exit_code = ExitCode::kNoFailure;  // Reset the exit code to 0
 
   HandleScope handle_scope(isolate_);
 
@@ -179,9 +181,10 @@ NodeMainInstance::CreateMainEnvironment(int* exit_code) {
     SetIsolateErrorHandlers(isolate_, {});
     env->InitializeMainContext(context, &(snapshot_data_->env_info));
 #if HAVE_INSPECTOR
+    // TODO(joyeecheung): handle the exit code returned by
+    // InitializeInspector().
     env->InitializeInspector({});
 #endif
-    env->DoneBootstrapping();
 
 #if HAVE_OPENSSL
     crypto::InitCryptoOnce(isolate_);
@@ -198,9 +201,11 @@ NodeMainInstance::CreateMainEnvironment(int* exit_code) {
                               EnvironmentFlags::kDefaultFlags,
                               {}));
 #if HAVE_INSPECTOR
+    // TODO(joyeecheung): handle the exit code returned by
+    // InitializeInspector().
     env->InitializeInspector({});
 #endif
-    if (env->RunBootstrapping().IsEmpty()) {
+    if (env->principal_realm()->RunBootstrapping().IsEmpty()) {
       return nullptr;
     }
   }

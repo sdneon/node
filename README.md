@@ -5,8 +5,8 @@ This is a *fun* mod of Node.JS that initially embedded a modified version of dco
 
 Thanks to the inspiration from dcodeIO et al =D
 
-## Version 18.11.0
-Update to Node.JS 18.11.0 baseline, TypeScript 4.8.4.
+## Version 19.0.0
+Update to Node.JS 19.0.0 baseline, TypeScript 4.8.4.
 
 It embeds:
 * DS v1.2.0.
@@ -150,7 +150,7 @@ If building for Windows 7, you'll need the `deps\uv\src\win\util.c` patch to rev
 If building for newer versions (>= 8.1), you may omit this patch.
 
 # Original README
-Node.js is an open-source, cross-platform, JavaScript runtime environment.
+Node.js is an open-source, cross-platform JavaScript runtime environment.
 
 For information on using Node.js, see the [Node.js website][].
 

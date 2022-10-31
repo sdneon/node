@@ -8,36 +8,56 @@
       "meta": {
         "changes": [
           {
-            "version": "v18.4.0",
+            "version": "v19.0.0",
+            "pr-url": "https://github.com/nodejs/node/pull/44897",
+            "description": "No longer experimental except for the `Ed25519`, `Ed448`, `X25519`, and `X448` algorithms."
+          },
+          {
+            "version": [
+              "v18.4.0",
+              "v16.17.0"
+            ],
             "pr-url": "https://github.com/nodejs/node/pull/43310",
             "description": "Removed proprietary `'node.keyObject'` import/export format."
           },
           {
-            "version": "v18.4.0",
+            "version": [
+              "v18.4.0",
+              "v16.17.0"
+            ],
             "pr-url": "https://github.com/nodejs/node/pull/43310",
             "description": "Removed proprietary `'NODE-DSA'`, `'NODE-DH'`, and `'NODE-SCRYPT'` algorithms."
           },
           {
-            "version": "v18.4.0",
+            "version": [
+              "v18.4.0",
+              "v16.17.0"
+            ],
             "pr-url": "https://github.com/nodejs/node/pull/42507",
             "description": "Added `'Ed25519'`, `'Ed448'`, `'X25519'`, and `'X448'` algorithms."
           },
           {
-            "version": "v18.4.0",
+            "version": [
+              "v18.4.0",
+              "v16.17.0"
+            ],
             "pr-url": "https://github.com/nodejs/node/pull/42507",
             "description": "Removed proprietary `'NODE-ED25519'` and `'NODE-ED448'` algorithms."
           },
           {
-            "version": "v18.4.0",
+            "version": [
+              "v18.4.0",
+              "v16.17.0"
+            ],
             "pr-url": "https://github.com/nodejs/node/pull/42507",
             "description": "Removed proprietary `'NODE-X25519'` and `'NODE-X448'` named curves from the `'ECDH'` algorithm."
           }
         ]
       },
       "introduced_in": "v15.0.0",
-      "stability": 1,
-      "stabilityText": "Experimental",
-      "desc": "<p>Node.js provides an implementation of the standard <a href=\"https://www.w3.org/TR/WebCryptoAPI/\">Web Crypto API</a>.</p>\n<p>Use <code>require('node:crypto').webcrypto</code> to access this module.</p>\n<pre><code class=\"language-js\">const { subtle } = require('node:crypto').webcrypto;\n\n(async function() {\n\n  const key = await subtle.generateKey({\n    name: 'HMAC',\n    hash: 'SHA-256',\n    length: 256\n  }, true, ['sign', 'verify']);\n\n  const enc = new TextEncoder();\n  const message = enc.encode('I love cupcakes');\n\n  const digest = await subtle.sign({\n    name: 'HMAC'\n  }, key, message);\n\n})();\n</code></pre>\n<h2>Examples</h2>",
+      "stability": 2,
+      "stabilityText": "Stable",
+      "desc": "<p>Node.js provides an implementation of the standard <a href=\"https://www.w3.org/TR/WebCryptoAPI/\">Web Crypto API</a>.</p>\n<p>Use <code>globalThis.crypto</code> or <code>require('node:crypto').webcrypto</code> to access this\nmodule.</p>\n<pre><code class=\"language-js\">const { subtle } = globalThis.crypto;\n\n(async function() {\n\n  const key = await subtle.generateKey({\n    name: 'HMAC',\n    hash: 'SHA-256',\n    length: 256\n  }, true, ['sign', 'verify']);\n\n  const enc = new TextEncoder();\n  const message = enc.encode('I love cupcakes');\n\n  const digest = await subtle.sign({\n    name: 'HMAC'\n  }, key, message);\n\n})();\n</code></pre>\n<h2>Examples</h2>",
       "modules": [
         {
           "textRaw": "Generating keys",
@@ -47,14 +67,14 @@
             {
               "textRaw": "AES keys",
               "name": "aes_keys",
-              "desc": "<pre><code class=\"language-js\">const { subtle } = require('node:crypto').webcrypto;\n\nasync function generateAesKey(length = 256) {\n  const key = await subtle.generateKey({\n    name: 'AES-CBC',\n    length\n  }, true, ['encrypt', 'decrypt']);\n\n  return key;\n}\n</code></pre>",
+              "desc": "<pre><code class=\"language-js\">const { subtle } = globalThis.crypto;\n\nasync function generateAesKey(length = 256) {\n  const key = await subtle.generateKey({\n    name: 'AES-CBC',\n    length\n  }, true, ['encrypt', 'decrypt']);\n\n  return key;\n}\n</code></pre>",
               "type": "module",
               "displayName": "AES keys"
             },
             {
               "textRaw": "ECDSA key pairs",
               "name": "ecdsa_key_pairs",
-              "desc": "<pre><code class=\"language-js\">const { subtle } = require('node:crypto').webcrypto;\n\nasync function generateEcKey(namedCurve = 'P-521') {\n  const {\n    publicKey,\n    privateKey\n  } = await subtle.generateKey({\n    name: 'ECDSA',\n    namedCurve,\n  }, true, ['sign', 'verify']);\n\n  return { publicKey, privateKey };\n}\n</code></pre>",
+              "desc": "<pre><code class=\"language-js\">const { subtle } = globalThis.crypto;\n\nasync function generateEcKey(namedCurve = 'P-521') {\n  const {\n    publicKey,\n    privateKey\n  } = await subtle.generateKey({\n    name: 'ECDSA',\n    namedCurve,\n  }, true, ['sign', 'verify']);\n\n  return { publicKey, privateKey };\n}\n</code></pre>",
               "type": "module",
               "displayName": "ECDSA key pairs"
             },
@@ -63,21 +83,21 @@
               "name": "ed25519/ed448/x25519/x448_key_pairs",
               "stability": 1,
               "stabilityText": "Experimental",
-              "desc": "<pre><code class=\"language-js\">const { subtle } = require('node:crypto').webcrypto;\n\nasync function generateEd25519Key() {\n  return subtle.generateKey({\n    name: 'Ed25519',\n  }, true, ['sign', 'verify']);\n}\n\nasync function generateX25519Key() {\n  return subtle.generateKey({\n    name: 'X25519',\n  }, true, ['deriveKey']);\n}\n</code></pre>",
+              "desc": "<pre><code class=\"language-js\">const { subtle } = globalThis.crypto;\n\nasync function generateEd25519Key() {\n  return subtle.generateKey({\n    name: 'Ed25519',\n  }, true, ['sign', 'verify']);\n}\n\nasync function generateX25519Key() {\n  return subtle.generateKey({\n    name: 'X25519',\n  }, true, ['deriveKey']);\n}\n</code></pre>",
               "type": "module",
               "displayName": "Ed25519/Ed448/X25519/X448 key pairs"
             },
             {
               "textRaw": "HMAC keys",
               "name": "hmac_keys",
-              "desc": "<pre><code class=\"language-js\">const { subtle } = require('node:crypto').webcrypto;\n\nasync function generateHmacKey(hash = 'SHA-256') {\n  const key = await subtle.generateKey({\n    name: 'HMAC',\n    hash\n  }, true, ['sign', 'verify']);\n\n  return key;\n}\n</code></pre>",
+              "desc": "<pre><code class=\"language-js\">const { subtle } = globalThis.crypto;\n\nasync function generateHmacKey(hash = 'SHA-256') {\n  const key = await subtle.generateKey({\n    name: 'HMAC',\n    hash\n  }, true, ['sign', 'verify']);\n\n  return key;\n}\n</code></pre>",
               "type": "module",
               "displayName": "HMAC keys"
             },
             {
               "textRaw": "RSA key pairs",
               "name": "rsa_key_pairs",
-              "desc": "<pre><code class=\"language-js\">const { subtle } = require('node:crypto').webcrypto;\nconst publicExponent = new Uint8Array([1, 0, 1]);\n\nasync function generateRsaKey(modulusLength = 2048, hash = 'SHA-256') {\n  const {\n    publicKey,\n    privateKey\n  } = await subtle.generateKey({\n    name: 'RSASSA-PKCS1-v1_5',\n    modulusLength,\n    publicExponent,\n    hash,\n  }, true, ['sign', 'verify']);\n\n  return { publicKey, privateKey };\n}\n</code></pre>",
+              "desc": "<pre><code class=\"language-js\">const { subtle } = globalThis.crypto;\nconst publicExponent = new Uint8Array([1, 0, 1]);\n\nasync function generateRsaKey(modulusLength = 2048, hash = 'SHA-256') {\n  const {\n    publicKey,\n    privateKey\n  } = await subtle.generateKey({\n    name: 'RSASSA-PKCS1-v1_5',\n    modulusLength,\n    publicExponent,\n    hash,\n  }, true, ['sign', 'verify']);\n\n  return { publicKey, privateKey };\n}\n</code></pre>",
               "type": "module",
               "displayName": "RSA key pairs"
             }
@@ -88,42 +108,42 @@
         {
           "textRaw": "Encryption and decryption",
           "name": "encryption_and_decryption",
-          "desc": "<pre><code class=\"language-js\">const crypto = require('node:crypto').webcrypto;\n\nasync function aesEncrypt(plaintext) {\n  const ec = new TextEncoder();\n  const key = await generateAesKey();\n  const iv = crypto.getRandomValues(new Uint8Array(16));\n\n  const ciphertext = await crypto.subtle.encrypt({\n    name: 'AES-CBC',\n    iv,\n  }, key, ec.encode(plaintext));\n\n  return {\n    key,\n    iv,\n    ciphertext\n  };\n}\n\nasync function aesDecrypt(ciphertext, key, iv) {\n  const dec = new TextDecoder();\n  const plaintext = await crypto.subtle.decrypt({\n    name: 'AES-CBC',\n    iv,\n  }, key, ciphertext);\n\n  return dec.decode(plaintext);\n}\n</code></pre>",
+          "desc": "<pre><code class=\"language-js\">const crypto = globalThis.crypto;\n\nasync function aesEncrypt(plaintext) {\n  const ec = new TextEncoder();\n  const key = await generateAesKey();\n  const iv = crypto.getRandomValues(new Uint8Array(16));\n\n  const ciphertext = await crypto.subtle.encrypt({\n    name: 'AES-CBC',\n    iv,\n  }, key, ec.encode(plaintext));\n\n  return {\n    key,\n    iv,\n    ciphertext\n  };\n}\n\nasync function aesDecrypt(ciphertext, key, iv) {\n  const dec = new TextDecoder();\n  const plaintext = await crypto.subtle.decrypt({\n    name: 'AES-CBC',\n    iv,\n  }, key, ciphertext);\n\n  return dec.decode(plaintext);\n}\n</code></pre>",
           "type": "module",
           "displayName": "Encryption and decryption"
         },
         {
           "textRaw": "Exporting and importing keys",
           "name": "exporting_and_importing_keys",
-          "desc": "<pre><code class=\"language-js\">const { subtle } = require('node:crypto').webcrypto;\n\nasync function generateAndExportHmacKey(format = 'jwk', hash = 'SHA-512') {\n  const key = await subtle.generateKey({\n    name: 'HMAC',\n    hash\n  }, true, ['sign', 'verify']);\n\n  return subtle.exportKey(format, key);\n}\n\nasync function importHmacKey(keyData, format = 'jwk', hash = 'SHA-512') {\n  const key = await subtle.importKey(format, keyData, {\n    name: 'HMAC',\n    hash\n  }, true, ['sign', 'verify']);\n\n  return key;\n}\n</code></pre>",
+          "desc": "<pre><code class=\"language-js\">const { subtle } = globalThis.crypto;\n\nasync function generateAndExportHmacKey(format = 'jwk', hash = 'SHA-512') {\n  const key = await subtle.generateKey({\n    name: 'HMAC',\n    hash\n  }, true, ['sign', 'verify']);\n\n  return subtle.exportKey(format, key);\n}\n\nasync function importHmacKey(keyData, format = 'jwk', hash = 'SHA-512') {\n  const key = await subtle.importKey(format, keyData, {\n    name: 'HMAC',\n    hash\n  }, true, ['sign', 'verify']);\n\n  return key;\n}\n</code></pre>",
           "type": "module",
           "displayName": "Exporting and importing keys"
         },
         {
           "textRaw": "Wrapping and unwrapping keys",
           "name": "wrapping_and_unwrapping_keys",
-          "desc": "<pre><code class=\"language-js\">const { subtle } = require('node:crypto').webcrypto;\n\nasync function generateAndWrapHmacKey(format = 'jwk', hash = 'SHA-512') {\n  const [\n    key,\n    wrappingKey,\n  ] = await Promise.all([\n    subtle.generateKey({\n      name: 'HMAC', hash\n    }, true, ['sign', 'verify']),\n    subtle.generateKey({\n      name: 'AES-KW',\n      length: 256\n    }, true, ['wrapKey', 'unwrapKey']),\n  ]);\n\n  const wrappedKey = await subtle.wrapKey(format, key, wrappingKey, 'AES-KW');\n\n  return { wrappedKey, wrappingKey };\n}\n\nasync function unwrapHmacKey(\n  wrappedKey,\n  wrappingKey,\n  format = 'jwk',\n  hash = 'SHA-512') {\n\n  const key = await subtle.unwrapKey(\n    format,\n    wrappedKey,\n    wrappingKey,\n    'AES-KW',\n    { name: 'HMAC', hash },\n    true,\n    ['sign', 'verify']);\n\n  return key;\n}\n</code></pre>",
+          "desc": "<pre><code class=\"language-js\">const { subtle } = globalThis.crypto;\n\nasync function generateAndWrapHmacKey(format = 'jwk', hash = 'SHA-512') {\n  const [\n    key,\n    wrappingKey,\n  ] = await Promise.all([\n    subtle.generateKey({\n      name: 'HMAC', hash\n    }, true, ['sign', 'verify']),\n    subtle.generateKey({\n      name: 'AES-KW',\n      length: 256\n    }, true, ['wrapKey', 'unwrapKey']),\n  ]);\n\n  const wrappedKey = await subtle.wrapKey(format, key, wrappingKey, 'AES-KW');\n\n  return { wrappedKey, wrappingKey };\n}\n\nasync function unwrapHmacKey(\n  wrappedKey,\n  wrappingKey,\n  format = 'jwk',\n  hash = 'SHA-512') {\n\n  const key = await subtle.unwrapKey(\n    format,\n    wrappedKey,\n    wrappingKey,\n    'AES-KW',\n    { name: 'HMAC', hash },\n    true,\n    ['sign', 'verify']);\n\n  return key;\n}\n</code></pre>",
           "type": "module",
           "displayName": "Wrapping and unwrapping keys"
         },
         {
           "textRaw": "Sign and verify",
           "name": "sign_and_verify",
-          "desc": "<pre><code class=\"language-js\">const { subtle } = require('node:crypto').webcrypto;\n\nasync function sign(key, data) {\n  const ec = new TextEncoder();\n  const signature =\n    await subtle.sign('RSASSA-PKCS1-v1_5', key, ec.encode(data));\n  return signature;\n}\n\nasync function verify(key, signature, data) {\n  const ec = new TextEncoder();\n  const verified =\n    await subtle.verify(\n      'RSASSA-PKCS1-v1_5',\n      key,\n      signature,\n      ec.encode(data));\n  return verified;\n}\n</code></pre>",
+          "desc": "<pre><code class=\"language-js\">const { subtle } = globalThis.crypto;\n\nasync function sign(key, data) {\n  const ec = new TextEncoder();\n  const signature =\n    await subtle.sign('RSASSA-PKCS1-v1_5', key, ec.encode(data));\n  return signature;\n}\n\nasync function verify(key, signature, data) {\n  const ec = new TextEncoder();\n  const verified =\n    await subtle.verify(\n      'RSASSA-PKCS1-v1_5',\n      key,\n      signature,\n      ec.encode(data));\n  return verified;\n}\n</code></pre>",
           "type": "module",
           "displayName": "Sign and verify"
         },
         {
           "textRaw": "Deriving bits and keys",
           "name": "deriving_bits_and_keys",
-          "desc": "<pre><code class=\"language-js\">const { subtle } = require('node:crypto').webcrypto;\n\nasync function pbkdf2(pass, salt, iterations = 1000, length = 256) {\n  const ec = new TextEncoder();\n  const key = await subtle.importKey(\n    'raw',\n    ec.encode(pass),\n    'PBKDF2',\n    false,\n    ['deriveBits']);\n  const bits = await subtle.deriveBits({\n    name: 'PBKDF2',\n    hash: 'SHA-512',\n    salt: ec.encode(salt),\n    iterations\n  }, key, length);\n  return bits;\n}\n\nasync function pbkdf2Key(pass, salt, iterations = 1000, length = 256) {\n  const ec = new TextEncoder();\n  const keyMaterial = await subtle.importKey(\n    'raw',\n    ec.encode(pass),\n    'PBKDF2',\n    false,\n    ['deriveKey']);\n  const key = await subtle.deriveKey({\n    name: 'PBKDF2',\n    hash: 'SHA-512',\n    salt: ec.encode(salt),\n    iterations\n  }, keyMaterial, {\n    name: 'AES-GCM',\n    length: 256\n  }, true, ['encrypt', 'decrypt']);\n  return key;\n}\n</code></pre>",
+          "desc": "<pre><code class=\"language-js\">const { subtle } = globalThis.crypto;\n\nasync function pbkdf2(pass, salt, iterations = 1000, length = 256) {\n  const ec = new TextEncoder();\n  const key = await subtle.importKey(\n    'raw',\n    ec.encode(pass),\n    'PBKDF2',\n    false,\n    ['deriveBits']);\n  const bits = await subtle.deriveBits({\n    name: 'PBKDF2',\n    hash: 'SHA-512',\n    salt: ec.encode(salt),\n    iterations\n  }, key, length);\n  return bits;\n}\n\nasync function pbkdf2Key(pass, salt, iterations = 1000, length = 256) {\n  const ec = new TextEncoder();\n  const keyMaterial = await subtle.importKey(\n    'raw',\n    ec.encode(pass),\n    'PBKDF2',\n    false,\n    ['deriveKey']);\n  const key = await subtle.deriveKey({\n    name: 'PBKDF2',\n    hash: 'SHA-512',\n    salt: ec.encode(salt),\n    iterations\n  }, keyMaterial, {\n    name: 'AES-GCM',\n    length: 256\n  }, true, ['encrypt', 'decrypt']);\n  return key;\n}\n</code></pre>",
           "type": "module",
           "displayName": "Deriving bits and keys"
         },
         {
           "textRaw": "Digest",
           "name": "digest",
-          "desc": "<pre><code class=\"language-js\">const { subtle } = require('node:crypto').webcrypto;\n\nasync function digest(data, algorithm = 'SHA-512') {\n  const ec = new TextEncoder();\n  const digest = await subtle.digest(algorithm, ec.encode(data));\n  return digest;\n}\n</code></pre>",
+          "desc": "<pre><code class=\"language-js\">const { subtle } = globalThis.crypto;\n\nasync function digest(data, algorithm = 'SHA-512') {\n  const ec = new TextEncoder();\n  const digest = await subtle.digest(algorithm, ec.encode(data));\n  return digest;\n}\n</code></pre>",
           "type": "module",
           "displayName": "Digest"
         },
@@ -145,7 +165,8 @@
               "name": "AlgorithmIdentifier",
               "meta": {
                 "added": [
-                  "v18.4.0"
+                  "v18.4.0",
+                  "v16.17.0"
                 ],
                 "changes": []
               },
@@ -156,7 +177,8 @@
                   "name": "Type",
                   "meta": {
                     "added": [
-                      "v18.4.0"
+                      "v18.4.0",
+                      "v16.17.0"
                     ],
                     "changes": []
                   }
@@ -513,7 +535,8 @@
                   "name": "Type",
                   "meta": {
                     "added": [
-                      "v18.4.0"
+                      "v18.4.0",
+                      "v16.17.0"
                     ],
                     "changes": []
                   },
@@ -525,7 +548,8 @@
                   "name": "Type",
                   "meta": {
                     "added": [
-                      "v18.4.0"
+                      "v18.4.0",
+                      "v16.17.0"
                     ],
                     "changes": []
                   },
@@ -941,7 +965,7 @@
             ],
             "changes": []
           },
-          "desc": "<p>Calling <code>require('node:crypto').webcrypto</code> returns an instance of the <code>Crypto</code>\nclass. <code>Crypto</code> is a singleton that provides access to the remainder of the\ncrypto API.</p>",
+          "desc": "<p><code>globalThis.crypto</code> is an instance of the <code>Crypto</code>\nclass. <code>Crypto</code> is a singleton that provides access to the remainder of the\ncrypto API.</p>",
           "properties": [
             {
               "textRaw": "`subtle` Type: {SubtleCrypto}",
@@ -1168,7 +1192,10 @@
                 ],
                 "changes": [
                   {
-                    "version": "v18.4.0",
+                    "version": [
+                      "v18.4.0",
+                      "v16.17.0"
+                    ],
                     "pr-url": "https://github.com/nodejs/node/pull/42507",
                     "description": "Added `'X25519'`, and `'X448'` algorithms."
                   }
@@ -1191,7 +1218,10 @@
                 ],
                 "changes": [
                   {
-                    "version": "v18.4.0",
+                    "version": [
+                      "v18.4.0",
+                      "v16.17.0"
+                    ],
                     "pr-url": "https://github.com/nodejs/node/pull/42507",
                     "description": "Added `'X25519'`, and `'X448'` algorithms."
                   }
@@ -1282,7 +1312,10 @@
                 ],
                 "changes": [
                   {
-                    "version": "v18.4.0",
+                    "version": [
+                      "v18.4.0",
+                      "v16.17.0"
+                    ],
                     "pr-url": "https://github.com/nodejs/node/pull/42507",
                     "description": "Added `'Ed25519'`, `'Ed448'`, `'X25519'`, and `'X448'` algorithms."
                   },
@@ -1345,7 +1378,10 @@
                 ],
                 "changes": [
                   {
-                    "version": "v18.4.0",
+                    "version": [
+                      "v18.4.0",
+                      "v16.17.0"
+                    ],
                     "pr-url": "https://github.com/nodejs/node/pull/42507",
                     "description": "Added `'Ed25519'`, `'Ed448'`, `'X25519'`, and `'X448'` algorithms."
                   },
@@ -1385,7 +1421,10 @@
                 ],
                 "changes": [
                   {
-                    "version": "v18.4.0",
+                    "version": [
+                      "v18.4.0",
+                      "v16.17.0"
+                    ],
                     "pr-url": "https://github.com/nodejs/node/pull/42507",
                     "description": "Added `'Ed25519'`, and `'Ed448'` algorithms."
                   }
@@ -1442,7 +1481,10 @@
                 ],
                 "changes": [
                   {
-                    "version": "v18.4.0",
+                    "version": [
+                      "v18.4.0",
+                      "v16.17.0"
+                    ],
                     "pr-url": "https://github.com/nodejs/node/pull/42507",
                     "description": "Added `'Ed25519'`, and `'Ed448'` algorithms."
                   }

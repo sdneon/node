@@ -8,7 +8,7 @@
       "introduced_in": "v18.0.0",
       "stability": 1,
       "stabilityText": "Experimental",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v18.11.0/lib/test.js\">lib/test.js</a></p>\n<p>The <code>node:test</code> module facilitates the creation of JavaScript tests that\nreport results in <a href=\"https://testanything.org/\">TAP</a> format. To access it:</p>\n<pre><code class=\"language-mjs\">import test from 'node:test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('node:test');\n</code></pre>\n<p>This module is only available under the <code>node:</code> scheme. The following will not\nwork:</p>\n<pre><code class=\"language-mjs\">import test from 'test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('test');\n</code></pre>\n<p>Tests created via the <code>test</code> module consist of a single function that is\nprocessed in one of three ways:</p>\n<ol>\n<li>A synchronous function that is considered failing if it throws an exception,\nand is considered passing otherwise.</li>\n<li>A function that returns a <code>Promise</code> that is considered failing if the\n<code>Promise</code> rejects, and is considered passing if the <code>Promise</code> resolves.</li>\n<li>A function that receives a callback function. If the callback receives any\ntruthy value as its first argument, the test is considered failing. If a\nfalsy value is passed as the first argument to the callback, the test is\nconsidered passing. If the test function receives a callback function and\nalso returns a <code>Promise</code>, the test will fail.</li>\n</ol>\n<p>The following example illustrates how tests are written using the\n<code>test</code> module.</p>\n<pre><code class=\"language-js\">test('synchronous passing test', (t) => {\n  // This test passes because it does not throw an exception.\n  assert.strictEqual(1, 1);\n});\n\ntest('synchronous failing test', (t) => {\n  // This test fails because it throws an exception.\n  assert.strictEqual(1, 2);\n});\n\ntest('asynchronous passing test', async (t) => {\n  // This test passes because the Promise returned by the async\n  // function is not rejected.\n  assert.strictEqual(1, 1);\n});\n\ntest('asynchronous failing test', async (t) => {\n  // This test fails because the Promise returned by the async\n  // function is rejected.\n  assert.strictEqual(1, 2);\n});\n\ntest('failing test using Promises', (t) => {\n  // Promises can be used directly as well.\n  return new Promise((resolve, reject) => {\n    setImmediate(() => {\n      reject(new Error('this will cause the test to fail'));\n    });\n  });\n});\n\ntest('callback passing test', (t, done) => {\n  // done() is the callback function. When the setImmediate() runs, it invokes\n  // done() with no arguments.\n  setImmediate(done);\n});\n\ntest('callback failing test', (t, done) => {\n  // When the setImmediate() runs, done() is invoked with an Error object and\n  // the test fails.\n  setImmediate(() => {\n    done(new Error('callback failure'));\n  });\n});\n</code></pre>\n<p>As a test file executes, TAP is written to the standard output of the Node.js\nprocess. This output can be interpreted by any test harness that understands\nthe TAP format. If any tests fail, the process exit code is set to <code>1</code>.</p>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v19.0.0/lib/test.js\">lib/test.js</a></p>\n<p>The <code>node:test</code> module facilitates the creation of JavaScript tests that\nreport results in <a href=\"https://testanything.org/\">TAP</a> format. To access it:</p>\n<pre><code class=\"language-mjs\">import test from 'node:test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('node:test');\n</code></pre>\n<p>This module is only available under the <code>node:</code> scheme. The following will not\nwork:</p>\n<pre><code class=\"language-mjs\">import test from 'test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('test');\n</code></pre>\n<p>Tests created via the <code>test</code> module consist of a single function that is\nprocessed in one of three ways:</p>\n<ol>\n<li>A synchronous function that is considered failing if it throws an exception,\nand is considered passing otherwise.</li>\n<li>A function that returns a <code>Promise</code> that is considered failing if the\n<code>Promise</code> rejects, and is considered passing if the <code>Promise</code> resolves.</li>\n<li>A function that receives a callback function. If the callback receives any\ntruthy value as its first argument, the test is considered failing. If a\nfalsy value is passed as the first argument to the callback, the test is\nconsidered passing. If the test function receives a callback function and\nalso returns a <code>Promise</code>, the test will fail.</li>\n</ol>\n<p>The following example illustrates how tests are written using the\n<code>test</code> module.</p>\n<pre><code class=\"language-js\">test('synchronous passing test', (t) => {\n  // This test passes because it does not throw an exception.\n  assert.strictEqual(1, 1);\n});\n\ntest('synchronous failing test', (t) => {\n  // This test fails because it throws an exception.\n  assert.strictEqual(1, 2);\n});\n\ntest('asynchronous passing test', async (t) => {\n  // This test passes because the Promise returned by the async\n  // function is not rejected.\n  assert.strictEqual(1, 1);\n});\n\ntest('asynchronous failing test', async (t) => {\n  // This test fails because the Promise returned by the async\n  // function is rejected.\n  assert.strictEqual(1, 2);\n});\n\ntest('failing test using Promises', (t) => {\n  // Promises can be used directly as well.\n  return new Promise((resolve, reject) => {\n    setImmediate(() => {\n      reject(new Error('this will cause the test to fail'));\n    });\n  });\n});\n\ntest('callback passing test', (t, done) => {\n  // done() is the callback function. When the setImmediate() runs, it invokes\n  // done() with no arguments.\n  setImmediate(done);\n});\n\ntest('callback failing test', (t, done) => {\n  // When the setImmediate() runs, done() is invoked with an Error object and\n  // the test fails.\n  setImmediate(() => {\n    done(new Error('callback failure'));\n  });\n});\n</code></pre>\n<p>As a test file executes, TAP is written to the standard output of the Node.js\nprocess. This output can be interpreted by any test harness that understands\nthe TAP format. If any tests fail, the process exit code is set to <code>1</code>.</p>",
       "modules": [
         {
           "textRaw": "Subtests",
@@ -142,16 +142,23 @@
           "name": "test",
           "meta": {
             "added": [
-              "v18.0.0"
+              "v18.0.0",
+              "v16.17.0"
             ],
             "changes": [
               {
-                "version": "v18.8.0",
+                "version": [
+                  "v18.8.0",
+                  "v16.18.0"
+                ],
                 "pr-url": "https://github.com/nodejs/node/pull/43554",
                 "description": "Add a `signal` option."
               },
               {
-                "version": "v18.7.0",
+                "version": [
+                  "v18.7.0",
+                  "v16.17.0"
+                ],
                 "pr-url": "https://github.com/nodejs/node/pull/43505",
                 "description": "Add a `timeout` option."
               }
@@ -358,7 +365,8 @@
           "name": "before",
           "meta": {
             "added": [
-              "v18.8.0"
+              "v18.8.0",
+              "v16.18.0"
             ],
             "changes": []
           },
@@ -404,7 +412,8 @@
           "name": "after",
           "meta": {
             "added": [
-              "v18.8.0"
+              "v18.8.0",
+              "v16.18.0"
             ],
             "changes": []
           },
@@ -450,7 +459,8 @@
           "name": "beforeEach",
           "meta": {
             "added": [
-              "v18.8.0"
+              "v18.8.0",
+              "v16.18.0"
             ],
             "changes": []
           },
@@ -496,7 +506,8 @@
           "name": "afterEach",
           "meta": {
             "added": [
-              "v18.8.0"
+              "v18.8.0",
+              "v16.18.0"
             ],
             "changes": []
           },
@@ -668,7 +679,8 @@
           "name": "TestContext",
           "meta": {
             "added": [
-              "v18.0.0"
+              "v18.0.0",
+              "v16.17.0"
             ],
             "changes": []
           },
@@ -680,7 +692,8 @@
               "name": "beforeEach",
               "meta": {
                 "added": [
-                  "v18.8.0"
+                  "v18.8.0",
+                  "v16.18.0"
                 ],
                 "changes": []
               },
@@ -726,7 +739,8 @@
               "name": "afterEach",
               "meta": {
                 "added": [
-                  "v18.8.0"
+                  "v18.8.0",
+                  "v16.18.0"
                 ],
                 "changes": []
               },
@@ -772,7 +786,8 @@
               "name": "diagnostic",
               "meta": {
                 "added": [
-                  "v18.0.0"
+                  "v18.0.0",
+                  "v16.17.0"
                 ],
                 "changes": []
               },
@@ -796,7 +811,8 @@
               "name": "runOnly",
               "meta": {
                 "added": [
-                  "v18.0.0"
+                  "v18.0.0",
+                  "v16.17.0"
                 ],
                 "changes": []
               },
@@ -820,7 +836,8 @@
               "name": "skip",
               "meta": {
                 "added": [
-                  "v18.0.0"
+                  "v18.0.0",
+                  "v16.17.0"
                 ],
                 "changes": []
               },
@@ -844,7 +861,8 @@
               "name": "todo",
               "meta": {
                 "added": [
-                  "v18.0.0"
+                  "v18.0.0",
+                  "v16.17.0"
                 ],
                 "changes": []
               },
@@ -868,16 +886,23 @@
               "name": "test",
               "meta": {
                 "added": [
-                  "v18.0.0"
+                  "v18.0.0",
+                  "v16.17.0"
                 ],
                 "changes": [
                   {
-                    "version": "v18.8.0",
+                    "version": [
+                      "v18.8.0",
+                      "v16.18.0"
+                    ],
                     "pr-url": "https://github.com/nodejs/node/pull/43554",
                     "description": "Add a `signal` option."
                   },
                   {
-                    "version": "v18.7.0",
+                    "version": [
+                      "v18.7.0",
+                      "v16.17.0"
+                    ],
                     "pr-url": "https://github.com/nodejs/node/pull/43505",
                     "description": "Add a `timeout` option."
                   }
@@ -967,7 +992,8 @@
               "name": "name",
               "meta": {
                 "added": [
-                  "v18.8.0"
+                  "v18.8.0",
+                  "v16.18.0"
                 ],
                 "changes": []
               },
@@ -979,7 +1005,8 @@
               "name": "signal",
               "meta": {
                 "added": [
-                  "v18.7.0"
+                  "v18.7.0",
+                  "v16.17.0"
                 ],
                 "changes": []
               },
@@ -994,7 +1021,8 @@
           "name": "SuiteContext",
           "meta": {
             "added": [
-              "v18.7.0"
+              "v18.7.0",
+              "v16.17.0"
             ],
             "changes": []
           },
@@ -1005,7 +1033,8 @@
               "name": "name",
               "meta": {
                 "added": [
-                  "v18.8.0"
+                  "v18.8.0",
+                  "v16.18.0"
                 ],
                 "changes": []
               },
@@ -1017,7 +1046,8 @@
               "name": "signal",
               "meta": {
                 "added": [
-                  "v18.7.0"
+                  "v18.7.0",
+                  "v16.17.0"
                 ],
                 "changes": []
               },

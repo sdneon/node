@@ -2,22 +2,36 @@
 
 <!-- YAML
 changes:
-  - version: v18.4.0
+  - version: v19.0.0
+    pr-url: https://github.com/nodejs/node/pull/44897
+    description: No longer experimental except for the `Ed25519`, `Ed448`,
+      `X25519`, and `X448` algorithms.
+  - version:
+    - v18.4.0
+    - v16.17.0
     pr-url: https://github.com/nodejs/node/pull/43310
     description: Removed proprietary `'node.keyObject'` import/export format.
-  - version: v18.4.0
+  - version:
+    - v18.4.0
+    - v16.17.0
     pr-url: https://github.com/nodejs/node/pull/43310
     description: Removed proprietary `'NODE-DSA'`, `'NODE-DH'`,
       and `'NODE-SCRYPT'` algorithms.
-  - version: v18.4.0
+  - version:
+    - v18.4.0
+    - v16.17.0
     pr-url: https://github.com/nodejs/node/pull/42507
     description: Added `'Ed25519'`, `'Ed448'`, `'X25519'`, and `'X448'`
       algorithms.
-  - version: v18.4.0
+  - version:
+    - v18.4.0
+    - v16.17.0
     pr-url: https://github.com/nodejs/node/pull/42507
     description: Removed proprietary `'NODE-ED25519'` and `'NODE-ED448'`
       algorithms.
-  - version: v18.4.0
+  - version:
+    - v18.4.0
+    - v16.17.0
     pr-url: https://github.com/nodejs/node/pull/42507
     description: Removed proprietary `'NODE-X25519'` and `'NODE-X448'` named
       curves from the `'ECDH'` algorithm.
@@ -25,14 +39,15 @@ changes:
 
 <!-- introduced_in=v15.0.0 -->
 
-> Stability: 1 - Experimental
+> Stability: 2 - Stable
 
 Node.js provides an implementation of the standard [Web Crypto API][].
 
-Use `require('node:crypto').webcrypto` to access this module.
+Use `globalThis.crypto` or `require('node:crypto').webcrypto` to access this
+module.
 
 ```js
-const { subtle } = require('node:crypto').webcrypto;
+const { subtle } = globalThis.crypto;
 
 (async function() {
 
@@ -62,7 +77,7 @@ or asymmetric key pairs (public key and private key).
 #### AES keys
 
 ```js
-const { subtle } = require('node:crypto').webcrypto;
+const { subtle } = globalThis.crypto;
 
 async function generateAesKey(length = 256) {
   const key = await subtle.generateKey({
@@ -77,7 +92,7 @@ async function generateAesKey(length = 256) {
 #### ECDSA key pairs
 
 ```js
-const { subtle } = require('node:crypto').webcrypto;
+const { subtle } = globalThis.crypto;
 
 async function generateEcKey(namedCurve = 'P-521') {
   const {
@@ -97,7 +112,7 @@ async function generateEcKey(namedCurve = 'P-521') {
 > Stability: 1 - Experimental
 
 ```js
-const { subtle } = require('node:crypto').webcrypto;
+const { subtle } = globalThis.crypto;
 
 async function generateEd25519Key() {
   return subtle.generateKey({
@@ -115,7 +130,7 @@ async function generateX25519Key() {
 #### HMAC keys
 
 ```js
-const { subtle } = require('node:crypto').webcrypto;
+const { subtle } = globalThis.crypto;
 
 async function generateHmacKey(hash = 'SHA-256') {
   const key = await subtle.generateKey({
@@ -130,7 +145,7 @@ async function generateHmacKey(hash = 'SHA-256') {
 #### RSA key pairs
 
 ```js
-const { subtle } = require('node:crypto').webcrypto;
+const { subtle } = globalThis.crypto;
 const publicExponent = new Uint8Array([1, 0, 1]);
 
 async function generateRsaKey(modulusLength = 2048, hash = 'SHA-256') {
@@ -151,7 +166,7 @@ async function generateRsaKey(modulusLength = 2048, hash = 'SHA-256') {
 ### Encryption and decryption
 
 ```js
-const crypto = require('node:crypto').webcrypto;
+const crypto = globalThis.crypto;
 
 async function aesEncrypt(plaintext) {
   const ec = new TextEncoder();
@@ -184,7 +199,7 @@ async function aesDecrypt(ciphertext, key, iv) {
 ### Exporting and importing keys
 
 ```js
-const { subtle } = require('node:crypto').webcrypto;
+const { subtle } = globalThis.crypto;
 
 async function generateAndExportHmacKey(format = 'jwk', hash = 'SHA-512') {
   const key = await subtle.generateKey({
@@ -208,7 +223,7 @@ async function importHmacKey(keyData, format = 'jwk', hash = 'SHA-512') {
 ### Wrapping and unwrapping keys
 
 ```js
-const { subtle } = require('node:crypto').webcrypto;
+const { subtle } = globalThis.crypto;
 
 async function generateAndWrapHmacKey(format = 'jwk', hash = 'SHA-512') {
   const [
@@ -251,7 +266,7 @@ async function unwrapHmacKey(
 ### Sign and verify
 
 ```js
-const { subtle } = require('node:crypto').webcrypto;
+const { subtle } = globalThis.crypto;
 
 async function sign(key, data) {
   const ec = new TextEncoder();
@@ -275,7 +290,7 @@ async function verify(key, signature, data) {
 ### Deriving bits and keys
 
 ```js
-const { subtle } = require('node:crypto').webcrypto;
+const { subtle } = globalThis.crypto;
 
 async function pbkdf2(pass, salt, iterations = 1000, length = 256) {
   const ec = new TextEncoder();
@@ -318,7 +333,7 @@ async function pbkdf2Key(pass, salt, iterations = 1000, length = 256) {
 ### Digest
 
 ```js
-const { subtle } = require('node:crypto').webcrypto;
+const { subtle } = globalThis.crypto;
 
 async function digest(data, algorithm = 'SHA-512') {
   const ec = new TextEncoder();
@@ -361,7 +376,7 @@ implementation and the APIs supported for each:
 added: v15.0.0
 -->
 
-Calling `require('node:crypto').webcrypto` returns an instance of the `Crypto`
+`globalThis.crypto` is an instance of the `Crypto`
 class. `Crypto` is a singleton that provides access to the remainder of the
 crypto API.
 
@@ -553,7 +568,9 @@ The algorithms currently supported include:
 <!-- YAML
 added: v15.0.0
 changes:
-  - version: v18.4.0
+  - version:
+    - v18.4.0
+    - v16.17.0
     pr-url: https://github.com/nodejs/node/pull/42507
     description: Added `'X25519'`, and `'X448'` algorithms.
 -->
@@ -594,7 +611,9 @@ The algorithms currently supported include:
 <!-- YAML
 added: v15.0.0
 changes:
-  - version: v18.4.0
+  - version:
+    - v18.4.0
+    - v16.17.0
     pr-url: https://github.com/nodejs/node/pull/42507
     description: Added `'X25519'`, and `'X448'` algorithms.
 -->
@@ -678,7 +697,9 @@ The algorithms currently supported include:
 <!-- YAML
 added: v15.0.0
 changes:
-  - version: v18.4.0
+  - version:
+    - v18.4.0
+    - v16.17.0
     pr-url: https://github.com/nodejs/node/pull/42507
     description: Added `'Ed25519'`, `'Ed448'`, `'X25519'`, and `'X448'`
       algorithms.
@@ -766,7 +787,9 @@ The {CryptoKey} (secret key) generating algorithms supported include:
 <!-- YAML
 added: v15.0.0
 changes:
-  - version: v18.4.0
+  - version:
+    - v18.4.0
+    - v16.17.0
     pr-url: https://github.com/nodejs/node/pull/42507
     description: Added `'Ed25519'`, `'Ed448'`, `'X25519'`, and `'X448'`
       algorithms.
@@ -821,7 +844,9 @@ The algorithms currently supported include:
 <!-- YAML
 added: v15.0.0
 changes:
-  - version: v18.4.0
+  - version:
+    - v18.4.0
+    - v16.17.0
     pr-url: https://github.com/nodejs/node/pull/42507
     description: Added `'Ed25519'`, and `'Ed448'` algorithms.
 -->
@@ -909,7 +934,9 @@ The unwrapped key algorithms supported include:
 <!-- YAML
 added: v15.0.0
 changes:
-  - version: v18.4.0
+  - version:
+    - v18.4.0
+    - v16.17.0
     pr-url: https://github.com/nodejs/node/pull/42507
     description: Added `'Ed25519'`, and `'Ed448'` algorithms.
 -->
@@ -981,13 +1008,17 @@ are simple JavaScript dictionary objects.
 ### Class: `AlgorithmIdentifier`
 
 <!-- YAML
-added: v18.4.0
+added:
+  - v18.4.0
+  - v16.17.0
 -->
 
 #### `algorithmIdentifier.name`
 
 <!-- YAML
-added: v18.4.0
+added:
+  - v18.4.0
+  - v16.17.0
 -->
 
 * Type: {string}
@@ -1244,7 +1275,9 @@ added: v15.0.0
 #### `ed448Params.name`
 
 <!-- YAML
-added: v18.4.0
+added:
+  - v18.4.0
+  - v16.17.0
 -->
 
 * Type: {string} Must be `'Ed448'`.
@@ -1252,7 +1285,9 @@ added: v18.4.0
 #### `ed448Params.context`
 
 <!-- YAML
-added: v18.4.0
+added:
+  - v18.4.0
+  - v16.17.0
 -->
 
 * Type: {ArrayBuffer|TypedArray|DataView|Buffer|undefined}

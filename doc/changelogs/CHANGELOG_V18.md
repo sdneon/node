@@ -26,6 +26,7 @@
 </table>
 
 * Other Versions
+  * [19.x](CHANGELOG_V19.md)
   * [17.x](CHANGELOG_V17.md)
   * [16.x](CHANGELOG_V16.md)
   * [15.x](CHANGELOG_V15.md)
@@ -49,13 +50,15 @@
 
 ## 2022-10-13, Version 18.11.0 (Current), @danielleadams
 
-### watch mode (experimental)
+### Notable changes
+
+#### watch mode (experimental)
 
 Running in 'watch' mode using `node --watch` restarts the process when an imported file is changed.
 
 Contributed by Moshe Atlow in [#44366](https://github.com/nodejs/node/pull/44366)
 
-### Other notable changes
+#### Other notable changes
 
 * **fs**:
   * (SEMVER-MINOR) add `FileHandle.prototype.readLines` (Antoine du Hamel) [#42590](https://github.com/nodejs/node/pull/42590)

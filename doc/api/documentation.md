@@ -94,7 +94,7 @@ a command-line flag. Experimental features may also emit a [warning][].
 | [url](url.html) | (2) Stable |
 | [util](util.html) | (2) Stable |
 | [vm](vm.html) | (2) Stable |
-| [web_crypto_api](webcrypto.html) | (1) Experimental |
+| [web_crypto_api](webcrypto.html) | (2) Stable |
 | [web_streams_api](webstreams.html) | (1) Experimental. |
 | [webassembly_system_interface_(wasi)](wasi.html) | (1) Experimental |
 | [worker_threads](worker_threads.html) | (2) Stable |

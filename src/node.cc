@@ -36,6 +36,7 @@
 #include "node_options-inl.h"
 #include "node_perf.h"
 #include "node_process-inl.h"
+#include "node_realm-inl.h"
 #include "node_report.h"
 #include "node_revert.h"
 #include "node_snapshot_builder.h"
@@ -53,10 +54,6 @@
 #if HAVE_INSPECTOR
 #include "inspector_agent.h"
 #include "inspector_io.h"
-#endif
-
-#if defined HAVE_DTRACE || defined HAVE_ETW
-#include "node_dtrace.h"
 #endif
 
 #if NODE_USE_V8_PLATFORM
@@ -128,13 +125,10 @@ namespace node {
 using builtins::BuiltinLoader;
 
 using v8::EscapableHandleScope;
-using v8::Function;
 using v8::Isolate;
 using v8::Local;
 using v8::MaybeLocal;
 using v8::Object;
-using v8::String;
-using v8::Undefined;
 using v8::V8;
 using v8::Value;
 
@@ -171,38 +165,8 @@ void SignalExit(int signo, siginfo_t* info, void* ucontext) {
 }
 #endif  // __POSIX__
 
-MaybeLocal<Value> ExecuteBootstrapper(Environment* env,
-                                      const char* id,
-                                      std::vector<Local<Value>>* arguments) {
-  EscapableHandleScope scope(env->isolate());
-  MaybeLocal<Function> maybe_fn =
-      BuiltinLoader::LookupAndCompile(env->context(), id, env);
-
-  Local<Function> fn;
-  if (!maybe_fn.ToLocal(&fn)) {
-    return MaybeLocal<Value>();
-  }
-
-  MaybeLocal<Value> result = fn->Call(env->context(),
-                                      Undefined(env->isolate()),
-                                      arguments->size(),
-                                      arguments->data());
-
-  // If there was an error during bootstrap, it must be unrecoverable
-  // (e.g. max call stack exceeded). Clear the stack so that the
-  // AsyncCallbackScope destructor doesn't fail on the id check.
-  // There are only two ways to have a stack size > 1: 1) the user manually
-  // called MakeCallback or 2) user awaited during bootstrap, which triggered
-  // _tickCallback().
-  if (result.IsEmpty()) {
-    env->async_hooks()->clear_async_id_stack();
-  }
-
-  return scope.EscapeMaybe(result);
-}
-
 #if HAVE_INSPECTOR
-int Environment::InitializeInspector(
+ExitCode Environment::InitializeInspector(
     std::unique_ptr<inspector::ParentInspectorHandle> parent_handle) {
   std::string inspector_path;
   bool is_main = !parent_handle;
@@ -223,7 +187,7 @@ int Environment::InitializeInspector(
                           is_main);
   if (options_->debug_options().inspector_enabled &&
       !inspector_agent_->IsListening()) {
-    return 12;  // Signal internal error
+    return ExitCode::kInvalidCommandLineArgument2;  // Signal internal error
   }
 
   profiler::StartProfilers(this);
@@ -232,7 +196,7 @@ int Environment::InitializeInspector(
     inspector_agent_->PauseOnNextJavascriptStatement("Break at bootstrap");
   }
 
-  return 0;
+  return ExitCode::kNoFailure;
 }
 #endif  // HAVE_INSPECTOR
 
@@ -289,145 +253,15 @@ void Environment::InitializeDiagnostics() {
       env->isolate()->SetAtomicsWaitCallback(nullptr, nullptr);
     }, this);
   }
-
-#if defined HAVE_DTRACE || defined HAVE_ETW
-  InitDTrace(this);
-#endif
-}
-
-MaybeLocal<Value> Environment::BootstrapInternalLoaders() {
-  EscapableHandleScope scope(isolate_);
-
-  // Arguments must match the parameters specified in
-  // BuiltinLoader::LookupAndCompile().
-  std::vector<Local<Value>> loaders_args = {
-      process_object(),
-      NewFunctionTemplate(isolate_, binding::GetLinkedBinding)
-          ->GetFunction(context())
-          .ToLocalChecked(),
-      NewFunctionTemplate(isolate_, binding::GetInternalBinding)
-          ->GetFunction(context())
-          .ToLocalChecked(),
-      primordials()};
-
-  // Bootstrap internal loaders
-  Local<Value> loader_exports;
-  if (!ExecuteBootstrapper(this, "internal/bootstrap/loaders", &loaders_args)
-           .ToLocal(&loader_exports)) {
-    return MaybeLocal<Value>();
-  }
-  CHECK(loader_exports->IsObject());
-  Local<Object> loader_exports_obj = loader_exports.As<Object>();
-  Local<Value> internal_binding_loader =
-      loader_exports_obj->Get(context(), internal_binding_string())
-          .ToLocalChecked();
-  CHECK(internal_binding_loader->IsFunction());
-  set_internal_binding_loader(internal_binding_loader.As<Function>());
-  Local<Value> require =
-      loader_exports_obj->Get(context(), require_string()).ToLocalChecked();
-  CHECK(require->IsFunction());
-  set_builtin_module_require(require.As<Function>());
-
-  return scope.Escape(loader_exports);
-}
-
-MaybeLocal<Value> Environment::BootstrapNode() {
-  EscapableHandleScope scope(isolate_);
-
-  // Arguments must match the parameters specified in
-  // BuiltinLoader::LookupAndCompile().
-  // process, require, internalBinding, primordials
-  std::vector<Local<Value>> node_args = {process_object(),
-                                         builtin_module_require(),
-                                         internal_binding_loader(),
-                                         primordials()};
-
-  MaybeLocal<Value> result =
-      ExecuteBootstrapper(this, "internal/bootstrap/node", &node_args);
-
-  if (result.IsEmpty()) {
-    return MaybeLocal<Value>();
-  }
-
-  if (!no_browser_globals()) {
-    result =
-        ExecuteBootstrapper(this, "internal/bootstrap/browser", &node_args);
-
-    if (result.IsEmpty()) {
-      return MaybeLocal<Value>();
-    }
-  }
-
-  // TODO(joyeecheung): skip these in the snapshot building for workers.
-  auto thread_switch_id =
-      is_main_thread() ? "internal/bootstrap/switches/is_main_thread"
-                       : "internal/bootstrap/switches/is_not_main_thread";
-  result = ExecuteBootstrapper(this, thread_switch_id, &node_args);
-
-  if (result.IsEmpty()) {
-    return MaybeLocal<Value>();
-  }
-
-  auto process_state_switch_id =
-      owns_process_state()
-          ? "internal/bootstrap/switches/does_own_process_state"
-          : "internal/bootstrap/switches/does_not_own_process_state";
-  result = ExecuteBootstrapper(this, process_state_switch_id, &node_args);
-
-  if (result.IsEmpty()) {
-    return MaybeLocal<Value>();
-  }
-
-  Local<String> env_string = FIXED_ONE_BYTE_STRING(isolate_, "env");
-  Local<Object> env_var_proxy;
-  if (!CreateEnvVarProxy(context(), isolate_).ToLocal(&env_var_proxy) ||
-      process_object()->Set(context(), env_string, env_var_proxy).IsNothing()) {
-    return MaybeLocal<Value>();
-  }
-
-  return scope.EscapeMaybe(result);
-}
-
-MaybeLocal<Value> Environment::RunBootstrapping() {
-  EscapableHandleScope scope(isolate_);
-
-  CHECK(!has_run_bootstrapping_code());
-
-  if (BootstrapInternalLoaders().IsEmpty()) {
-    return MaybeLocal<Value>();
-  }
-
-  Local<Value> result;
-  if (!BootstrapNode().ToLocal(&result)) {
-    return MaybeLocal<Value>();
-  }
-
-  // Make sure that no request or handle is created during bootstrap -
-  // if necessary those should be done in pre-execution.
-  // Usually, doing so would trigger the checks present in the ReqWrap and
-  // HandleWrap classes, so this is only a consistency check.
-  CHECK(req_wrap_queue()->IsEmpty());
-  CHECK(handle_wrap_queue()->IsEmpty());
-
-  DoneBootstrapping();
-
-  return scope.Escape(result);
 }
 
 static
 MaybeLocal<Value> StartExecution(Environment* env, const char* main_script_id) {
   EscapableHandleScope scope(env->isolate());
   CHECK_NOT_NULL(main_script_id);
+  Realm* realm = env->principal_realm();
 
-  // Arguments must match the parameters specified in
-  // BuiltinLoader::LookupAndCompile().
-  std::vector<Local<Value>> arguments = {env->process_object(),
-                                         env->builtin_module_require(),
-                                         env->internal_binding_loader(),
-                                         env->primordials()};
-
-  return scope.EscapeMaybe(
-      ExecuteBootstrapper(env, main_script_id, &arguments));
+  return scope.EscapeMaybe(realm->ExecuteBootstrapper(main_script_id));
 }
 
 MaybeLocal<Value> StartExecution(Environment* env, StartExecutionCallback cb) {
@@ -792,11 +626,10 @@ void ResetStdio() {
 #endif  // __POSIX__
 }
 
-
-int ProcessGlobalArgs(std::vector<std::string>* args,
-                      std::vector<std::string>* exec_args,
-                      std::vector<std::string>* errors,
-                      OptionEnvvarSettings settings) {
+static ExitCode ProcessGlobalArgsInternal(std::vector<std::string>* args,
+                                          std::vector<std::string>* exec_args,
+                                          std::vector<std::string>* errors,
+                                          OptionEnvvarSettings settings) {
   // Parse a few arguments which are specific to Node.
   std::vector<std::string> v8_args;
 
@@ -809,14 +642,15 @@ int ProcessGlobalArgs(std::vector<std::string>* args,
       settings,
       errors);
 
-  if (!errors->empty()) return 9;
+  if (!errors->empty()) return ExitCode::kInvalidCommandLineArgument;
 
   std::string revert_error;
   for (const std::string& cve : per_process::cli_options->security_reverts) {
     Revert(cve.c_str(), &revert_error);
     if (!revert_error.empty()) {
       errors->emplace_back(std::move(revert_error));
-      return 12;
+      // TODO(joyeecheung): merge into kInvalidCommandLineArgument.
+      return ExitCode::kInvalidCommandLineArgument2;
     }
   }
 
@@ -824,7 +658,8 @@ int ProcessGlobalArgs(std::vector<std::string>* args,
       per_process::cli_options->disable_proto != "throw" &&
       per_process::cli_options->disable_proto != "") {
     errors->emplace_back("invalid mode passed to --disable-proto");
-    return 12;
+    // TODO(joyeecheung): merge into kInvalidCommandLineArgument.
+    return ExitCode::kInvalidCommandLineArgument2;
   }
 
   // TODO(aduh95): remove this when the harmony-import-assertions flag
@@ -864,26 +699,29 @@ int ProcessGlobalArgs(std::vector<std::string>* args,
   for (size_t i = 1; i < v8_args_as_char_ptr.size(); i++)
     errors->push_back("bad option: " + std::string(v8_args_as_char_ptr[i]));
 
-  if (v8_args_as_char_ptr.size() > 1) return 9;
+  if (v8_args_as_char_ptr.size() > 1)
+    return ExitCode::kInvalidCommandLineArgument;
 
-  return 0;
+  return ExitCode::kNoFailure;
+}
+
+int ProcessGlobalArgs(std::vector<std::string>* args,
+                      std::vector<std::string>* exec_args,
+                      std::vector<std::string>* errors,
+                      OptionEnvvarSettings settings) {
+  return static_cast<int>(
+      ProcessGlobalArgsInternal(args, exec_args, errors, settings));
 }
 
 static std::atomic_bool init_called{false};
 
 // TODO(addaleax): Turn this into a wrapper around InitializeOncePerProcess()
 // (with the corresponding additional flags set), then eventually remove this.
-int InitializeNodeWithArgs(std::vector<std::string>* argv,
-                           std::vector<std::string>* exec_argv,
-                           std::vector<std::string>* errors) {
-  return InitializeNodeWithArgs(argv, exec_argv, errors,
-                                ProcessFlags::kNoFlags);
-}
-
-int InitializeNodeWithArgs(std::vector<std::string>* argv,
-                           std::vector<std::string>* exec_argv,
-                           std::vector<std::string>* errors,
-                           ProcessInitializationFlags::Flags flags) {
+static ExitCode InitializeNodeWithArgsInternal(
+    std::vector<std::string>* argv,
+    std::vector<std::string>* exec_argv,
+    std::vector<std::string>* errors,
+    ProcessInitializationFlags::Flags flags) {
   // Make sure InitializeNodeWithArgs() is called only once.
   CHECK(!init_called.exchange(true));
 
@@ -903,6 +741,11 @@ int InitializeNodeWithArgs(std::vector<std::string>* argv,
   // used in diagnostic reports.
   per_process::cli_options->cmdline = *argv;
 
+  // Node provides a "v8.setFlagsFromString" method to dynamically change flags.
+  // Hence do not freeze flags when initializing V8. In a browser setting, this
+  // is security relevant, for Node it's less important.
+  V8::SetFlagsFromString("--no-freeze-flags-after-init");
+
 #if defined(NODE_V8_OPTIONS)
   // Should come before the call to V8::SetFlagsFromCommandLine()
   // so the user can disable a flag --foo at run-time by passing
@@ -920,26 +763,22 @@ int InitializeNodeWithArgs(std::vector<std::string>* argv,
       std::vector<std::string> env_argv =
           ParseNodeOptionsEnvVar(node_options, errors);
 
-      if (!errors->empty()) return 9;
+      if (!errors->empty()) return ExitCode::kInvalidCommandLineArgument;
 
       // [0] is expected to be the program name, fill it in from the real argv.
       env_argv.insert(env_argv.begin(), argv->at(0));
 
-      const int exit_code = ProcessGlobalArgs(&env_argv,
-                                              nullptr,
-                                              errors,
-                                              kAllowedInEnvironment);
-      if (exit_code != 0) return exit_code;
+      const ExitCode exit_code = ProcessGlobalArgsInternal(
+          &env_argv, nullptr, errors, kAllowedInEnvironment);
+      if (exit_code != ExitCode::kNoFailure) return exit_code;
     }
   }
 #endif
 
   if (!(flags & ProcessInitializationFlags::kDisableCLIOptions)) {
-    const int exit_code = ProcessGlobalArgs(argv,
-                                            exec_argv,
-                                            errors,
-                                            kDisallowedInEnvironment);
-    if (exit_code != 0) return exit_code;
+    const ExitCode exit_code = ProcessGlobalArgsInternal(
+        argv, exec_argv, errors, kDisallowedInEnvironment);
+    if (exit_code != ExitCode::kNoFailure) return exit_code;
   }
 
   // Set the process.title immediately after processing argv if --title is set.
@@ -976,7 +815,7 @@ int InitializeNodeWithArgs(std::vector<std::string>* argv,
     if (!i18n::InitializeICUDirectory(per_process::cli_options->icu_data_dir)) {
       errors->push_back("could not initialize ICU "
                         "(check NODE_ICU_DATA or --icu-data-dir parameters)\n");
-      return 9;
+      return ExitCode::kInvalidCommandLineArgument;
     }
     per_process::metadata.versions.InitializeIntlVersions();
   }
@@ -994,12 +833,21 @@ int InitializeNodeWithArgs(std::vector<std::string>* argv,
   // otherwise embedders using node::Init to initialize everything will not be
   // able to set it and native addons will not load for them.
   node_is_initialized = true;
-  return 0;
+  return ExitCode::kNoFailure;
 }
 
-std::unique_ptr<InitializationResult> InitializeOncePerProcess(
-    const std::vector<std::string>& args,
-    ProcessInitializationFlags::Flags flags) {
+int InitializeNodeWithArgs(std::vector<std::string>* argv,
+                           std::vector<std::string>* exec_argv,
+                           std::vector<std::string>* errors,
+                           ProcessInitializationFlags::Flags flags) {
+  return static_cast<int>(
+      InitializeNodeWithArgsInternal(argv, exec_argv, errors, flags));
+}
+
+static std::unique_ptr<InitializationResultImpl>
+InitializeOncePerProcessInternal(const std::vector<std::string>& args,
+                                 ProcessInitializationFlags::Flags flags =
+                                     ProcessInitializationFlags::kNoFlags) {
   auto result = std::make_unique<InitializationResultImpl>();
   result->args_ = args;
 
@@ -1013,9 +861,9 @@ std::unique_ptr<InitializationResult> InitializeOncePerProcess(
 
   // This needs to run *before* V8::Initialize().
   {
-    result->exit_code_ = InitializeNodeWithArgs(
+    result->exit_code_ = InitializeNodeWithArgsInternal(
         &result->args_, &result->exec_args_, &result->errors_, flags);
-    if (result->exit_code() != 0) {
+    if (result->exit_code_enum() != ExitCode::kNoFailure) {
       result->early_return_ = true;
       return result;
     }
@@ -1033,7 +881,7 @@ std::unique_ptr<InitializationResult> InitializeOncePerProcess(
   if (!(flags & ProcessInitializationFlags::kNoPrintHelpOrVersionOutput)) {
     if (per_process::cli_options->print_version) {
       printf("%s\n", NODE_VERSION);
-      result->exit_code_ = 0;
+      result->exit_code_ = ExitCode::kNoFailure;
       result->early_return_ = true;
       return result;
     }
@@ -1041,14 +889,14 @@ std::unique_ptr<InitializationResult> InitializeOncePerProcess(
     if (per_process::cli_options->print_bash_completion) {
       std::string completion = options_parser::GetBashCompletion();
       printf("%s\n", completion.c_str());
-      result->exit_code_ = 0;
+      result->exit_code_ = ExitCode::kNoFailure;
       result->early_return_ = true;
       return result;
     }
 
     if (per_process::cli_options->print_v8_help) {
       V8::SetFlagsFromString("--help", static_cast<size_t>(6));
-      result->exit_code_ = 0;
+      result->exit_code_ = ExitCode::kNoFailure;
       result->early_return_ = true;
       return result;
     }
@@ -1125,7 +973,8 @@ std::unique_ptr<InitializationResult> InitializeOncePerProcess(
     if (ERR_peek_error() != 0) {
       // XXX: ERR_GET_REASON does not return something that is
       // useful as an exit code at all.
-      result->exit_code_ = ERR_GET_REASON(ERR_peek_error());
+      result->exit_code_ =
+          static_cast<ExitCode>(ERR_GET_REASON(ERR_peek_error()));
       result->early_return_ = true;
       result->errors_.emplace_back("OpenSSL configuration error:\n" +
                                    GetOpenSSLErrorString());
@@ -1139,7 +988,8 @@ std::unique_ptr<InitializationResult> InitializeOncePerProcess(
     if (!crypto::ProcessFipsOptions()) {
       // XXX: ERR_GET_REASON does not return something that is
       // useful as an exit code at all.
-      result->exit_code_ = ERR_GET_REASON(ERR_peek_error());
+      result->exit_code_ =
+          static_cast<ExitCode>(ERR_GET_REASON(ERR_peek_error()));
       result->early_return_ = true;
       result->errors_.emplace_back(
           "OpenSSL error when trying to enable FIPS:\n" +
@@ -1177,6 +1027,12 @@ std::unique_ptr<InitializationResult> InitializeOncePerProcess(
   return result;
 }
 
+std::unique_ptr<InitializationResult> InitializeOncePerProcess(
+    const std::vector<std::string>& args,
+    ProcessInitializationFlags::Flags flags) {
+  return InitializeOncePerProcessInternal(args, flags);
+}
+
 void TearDownOncePerProcess() {
   const uint64_t flags = init_process_flags.load();
   ResetStdio();
@@ -1210,9 +1066,9 @@ void TearDownOncePerProcess() {
 InitializationResult::~InitializationResult() {}
 InitializationResultImpl::~InitializationResultImpl() {}
 
-int GenerateAndWriteSnapshotData(const SnapshotData** snapshot_data_ptr,
-                                 const InitializationResult* result) {
-  int exit_code = result->exit_code();
+ExitCode GenerateAndWriteSnapshotData(const SnapshotData** snapshot_data_ptr,
+                                      const InitializationResultImpl* result) {
+  ExitCode exit_code = result->exit_code_enum();
   // nullptr indicates there's no snapshot data.
   DCHECK_NULL(*snapshot_data_ptr);
 
@@ -1226,7 +1082,8 @@ int GenerateAndWriteSnapshotData(const SnapshotData** snapshot_data_ptr,
               "node:embedded_snapshot_main was specified as snapshot "
               "entry point but Node.js was built without embedded "
               "snapshot.\n");
-      exit_code = 1;
+      // TODO(joyeecheung): should be kInvalidCommandLineArgument instead.
+      exit_code = ExitCode::kGenericUserError;
       return exit_code;
     }
   } else {
@@ -1235,7 +1092,7 @@ int GenerateAndWriteSnapshotData(const SnapshotData** snapshot_data_ptr,
         std::make_unique<SnapshotData>();
     exit_code = node::SnapshotBuilder::Generate(
         generated_data.get(), result->args(), result->exec_args());
-    if (exit_code == 0) {
+    if (exit_code == ExitCode::kNoFailure) {
       *snapshot_data_ptr = generated_data.release();
     } else {
       return exit_code;
@@ -1259,14 +1116,15 @@ int GenerateAndWriteSnapshotData(const SnapshotData** snapshot_data_ptr,
     fprintf(stderr,
             "Cannot open %s for writing a snapshot.\n",
             snapshot_blob_path.c_str());
-    exit_code = 1;
+    // TODO(joyeecheung): should be kStartupSnapshotFailure.
+    exit_code = ExitCode::kGenericUserError;
   }
   return exit_code;
 }
 
-int LoadSnapshotDataAndRun(const SnapshotData** snapshot_data_ptr,
-                           const InitializationResult* result) {
-  int exit_code = result->exit_code();
+ExitCode LoadSnapshotDataAndRun(const SnapshotData** snapshot_data_ptr,
+                                const InitializationResultImpl* result) {
+  ExitCode exit_code = result->exit_code_enum();
   // nullptr indicates there's no snapshot data.
   DCHECK_NULL(*snapshot_data_ptr);
   // --snapshot-blob indicates that we are reading a customized snapshot.
@@ -1275,17 +1133,29 @@ int LoadSnapshotDataAndRun(const SnapshotData** snapshot_data_ptr,
     FILE* fp = fopen(filename.c_str(), "rb");
     if (fp == nullptr) {
       fprintf(stderr, "Cannot open %s", filename.c_str());
-      exit_code = 1;
+      // TODO(joyeecheung): should be kStartupSnapshotFailure.
+      exit_code = ExitCode::kGenericUserError;
       return exit_code;
     }
     std::unique_ptr<SnapshotData> read_data = std::make_unique<SnapshotData>();
-    SnapshotData::FromBlob(read_data.get(), fp);
+    if (!SnapshotData::FromBlob(read_data.get(), fp)) {
+      // If we fail to read the customized snapshot, simply exit with 1.
+      // TODO(joyeecheung): should be kStartupSnapshotFailure.
+      exit_code = ExitCode::kGenericUserError;
+      return exit_code;
+    }
     *snapshot_data_ptr = read_data.release();
     fclose(fp);
   } else if (per_process::cli_options->node_snapshot) {
     // If --snapshot-blob is not specified, we are reading the embedded
     // snapshot, but we will skip it if --no-node-snapshot is specified.
-    *snapshot_data_ptr = SnapshotBuilder::GetEmbeddedSnapshotData();
+    const node::SnapshotData* read_data =
+        SnapshotBuilder::GetEmbeddedSnapshotData();
+    if (read_data != nullptr && read_data->Check()) {
+      // If we fail to read the embedded snapshot, treat it as if Node.js
+      // was built without one.
+      *snapshot_data_ptr = read_data;
+    }
   }
 
   if ((*snapshot_data_ptr) != nullptr) {
@@ -1300,22 +1170,23 @@ int LoadSnapshotDataAndRun(const SnapshotData** snapshot_data_ptr,
   return exit_code;
 }
 
-int Start(int argc, char** argv) {
+static ExitCode StartInternal(int argc, char** argv) {
   CHECK_GT(argc, 0);
 
   // Hack around with the argv pointer. Used for process.title = "blah".
   argv = uv_setup_args(argc, argv);
 
-  std::unique_ptr<InitializationResult> result =
-      InitializeOncePerProcess(std::vector<std::string>(argv, argv + argc));
+  std::unique_ptr<InitializationResultImpl> result =
+      InitializeOncePerProcessInternal(
+          std::vector<std::string>(argv, argv + argc));
   for (const std::string& error : result->errors()) {
     FPrintF(stderr, "%s: %s\n", result->args().at(0), error);
   }
   if (result->early_return()) {
-    return result->exit_code();
+    return result->exit_code_enum();
   }
 
-  DCHECK_EQ(result->exit_code(), 0);
+  DCHECK_EQ(result->exit_code_enum(), ExitCode::kNoFailure);
   const SnapshotData* snapshot_data = nullptr;
 
   auto cleanup_process = OnScopeLeave([&]() {
@@ -1335,13 +1206,17 @@ int Start(int argc, char** argv) {
       fprintf(stderr,
               "--build-snapshot must be used with an entry point script.\n"
               "Usage: node --build-snapshot /path/to/entry.js\n");
-      return 9;
+      return ExitCode::kInvalidCommandLineArgument;
     }
     return GenerateAndWriteSnapshotData(&snapshot_data, result.get());
   }
 
   // Without --build-snapshot, we are in snapshot loading mode.
   return LoadSnapshotDataAndRun(&snapshot_data, result.get());
+}
+
+int Start(int argc, char** argv) {
+  return static_cast<int>(StartInternal(argc, argv));
 }
 
 int Stop(Environment* env) {

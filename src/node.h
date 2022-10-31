@@ -309,6 +309,10 @@ NODE_EXTERN int Start(int argc, char* argv[]);
 // in the loop and / or actively executing JavaScript code).
 NODE_EXTERN int Stop(Environment* env);
 
+// Set up per-process state needed to run Node.js. This will consume arguments
+// from argv, fill exec_argv, and possibly add errors resulting from parsing
+// the arguments to `errors`. The return value is a suggested exit code for the
+// program; If it is 0, then initializing Node.js succeeded.
 // This runs a subset of the initialization performed by
 // InitializeOncePerProcess(), which supersedes this function.
 // The subset is roughly equivalent to the one given by
@@ -318,12 +322,8 @@ NODE_DEPRECATED("Use InitializeOncePerProcess() instead",
                     std::vector<std::string>* argv,
                     std::vector<std::string>* exec_argv,
                     std::vector<std::string>* errors,
-                    ProcessInitializationFlags::Flags flags));
-NODE_DEPRECATED("Use InitializeOncePerProcess() instead",
-                NODE_EXTERN int InitializeNodeWithArgs(
-                    std::vector<std::string>* argv,
-                    std::vector<std::string>* exec_argv,
-                    std::vector<std::string>* errors));
+                    ProcessInitializationFlags::Flags flags =
+                        ProcessInitializationFlags::kNoFlags));
 
 // Set up per-process state needed to run Node.js. This will consume arguments
 // from args, and return information about the initialization success,

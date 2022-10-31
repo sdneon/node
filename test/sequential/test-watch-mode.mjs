@@ -208,9 +208,7 @@ describe('watch mode', { concurrency: true, timeout: 60_0000 }, () => {
     });
   });
 
-  it('should not load --import modules in main process', {
-    skip: 'enable once --import is backported',
-  }, async () => {
+  it('should not load --import modules in main process', async () => {
     const file = createTmpFile('');
     const imported = fixtures.fileURL('watch-mode/process_exit.js');
     const args = ['--import', imported, file];

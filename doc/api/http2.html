@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v18.11.0">
-  <title>HTTP/2 | Node.js v18.11.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v19.0.0">
+  <title>HTTP/2 | Node.js v19.0.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -95,7 +95,7 @@
     <div id="column1" data-id="http2" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v18.11.0 documentation</h1>
+          <h1>Node.js v19.0.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -110,7 +110,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v18.11.0</li>
+            <li class="pinned-header">Node.js v19.0.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -738,7 +738,7 @@
 </div>
 
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v18.11.0/lib/http2.js">lib/http2.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v19.0.0/lib/http2.js">lib/http2.js</a></p>
 <p>The <code>node:http2</code> module provides an implementation of the <a href="https://tools.ietf.org/html/rfc7540">HTTP/2</a> protocol.
 It can be accessed using:</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> http2 = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:http2'</span>);</code></pre>
@@ -2614,7 +2614,15 @@ a given number of milliseconds set using <code>http2secureServer.setTimeout()</c
 <strong>Default:</strong> 2 minutes.</p>
 <h5>Event: <code>'unknownProtocol'</code><span><a class="mark" href="#event-unknownprotocol" id="event-unknownprotocol">#</a></span><a aria-hidden="true" class="legacy" id="http2_event_unknownprotocol"></a></h5>
 <div class="api_metadata">
-<span>Added in: v8.4.0</span>
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.0.0</td>
+<td><p>This event will only be emitted if the client did not transmit an ALPN extension during the TLS handshake.</p></td></tr>
+<tr><td>v8.4.0</td>
+<td><p><span>Added in: v8.4.0</span></p></td></tr>
+</tbody></table>
+</details>
 </div>
 <ul>
 <li><code>socket</code> <a href="stream.html#class-streamduplex" class="type">&#x3C;stream.Duplex></a></li>
@@ -2623,8 +2631,15 @@ a given number of milliseconds set using <code>http2secureServer.setTimeout()</c
 negotiate an allowed protocol (i.e. HTTP/2 or HTTP/1.1). The event handler
 receives the socket for handling. If no listener is registered for this event,
 the connection is terminated. A timeout may be specified using the
-<code>'unknownProtocolTimeout'</code> option passed to <a href="#http2createsecureserveroptions-onrequesthandler"><code>http2.createSecureServer()</code></a>.
-See the <a href="#compatibility-api">Compatibility API</a>.</p>
+<code>'unknownProtocolTimeout'</code> option passed to <a href="#http2createsecureserveroptions-onrequesthandler"><code>http2.createSecureServer()</code></a>.</p>
+<p>In earlier versions of Node.js, this event would be emitted if <code>allowHTTP1</code> is
+<code>false</code> and, during the TLS handshake, the client either does not send an ALPN
+extension or sends an ALPN extension that does not include HTTP/2 (<code>h2</code>). Newer
+versions of Node.js only emit this event if <code>allowHTTP1</code> is <code>false</code> and the
+client does not send an ALPN extension. If the client sends an ALPN extension
+that does not include HTTP/2 (or HTTP/1.1 if <code>allowHTTP1</code> is <code>true</code>), the TLS
+handshake will fail and no secure connection will be established.</p>
+<p>See the <a href="#compatibility-api">Compatibility API</a>.</p>
 <h5><code>server.close([callback])</code><span><a class="mark" href="#serverclosecallback_1" id="serverclosecallback_1">#</a></span><a aria-hidden="true" class="legacy" id="http2_server_close_callback_1"></a></h5>
 <div class="api_metadata">
 <span>Added in: v8.4.0</span>
