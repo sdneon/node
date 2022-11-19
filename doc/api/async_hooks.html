@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v19.0.1">
-  <title>Async hooks | Node.js v19.0.1 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v19.1.0">
+  <title>Async hooks | Node.js v19.1.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -95,7 +95,7 @@
     <div id="column1" data-id="async_hooks" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v19.0.1 documentation</h1>
+          <h1>Node.js v19.1.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -110,7 +110,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v19.0.1</li>
+            <li class="pinned-header">Node.js v19.1.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -346,7 +346,13 @@
         <h2>Async hooks<span><a class="mark" href="#async-hooks" id="async-hooks">#</a></span><a aria-hidden="true" class="legacy" id="async_hooks_async_hooks"></a></h2>
 
 <p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v19.0.1/lib/async_hooks.js">lib/async_hooks.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v19.1.0/lib/async_hooks.js">lib/async_hooks.js</a></p>
+<p>We strongly discourage the use of the <code>async_hooks</code> API.
+Other APIs that can cover most of its use cases include:</p>
+<ul>
+<li><a href="async_context.html#class-asynclocalstorage"><code>AsyncLocalStorage</code></a> tracks async context</li>
+<li><a href="process.html#processgetactiveresourcesinfo"><code>process.getActiveResourcesInfo()</code></a> tracks active resources</li>
+</ul>
 <p>The <code>node:async_hooks</code> module provides an API to track asynchronous resources.
 It can be accessed using:</p>
 
@@ -603,14 +609,13 @@ current Node.js instance.</p>
 <p>The <code>type</code> is a string identifying the type of resource that caused
 <code>init</code> to be called. Generally, it will correspond to the name of the
 resource's constructor.</p>
-<p>Valid values are:</p>
-<pre><code class="language-text">FSEVENTWRAP, FSREQCALLBACK, GETADDRINFOREQWRAP, GETNAMEINFOREQWRAP, HTTPINCOMINGMESSAGE,
-HTTPCLIENTREQUEST, JSSTREAM, PIPECONNECTWRAP, PIPEWRAP, PROCESSWRAP, QUERYWRAP,
-SHUTDOWNWRAP, SIGNALWRAP, STATWATCHER, TCPCONNECTWRAP, TCPSERVERWRAP, TCPWRAP,
-TTYWRAP, UDPSENDWRAP, UDPWRAP, WRITEWRAP, ZLIB, SSLCONNECTION, PBKDF2REQUEST,
-RANDOMBYTESREQUEST, TLSWRAP, Microtask, Timeout, Immediate, TickObject</code></pre>
-<p>These values can change in any Node.js release. Furthermore users of <a href="async_context.html#class-asyncresource"><code>AsyncResource</code></a>
-likely provide other values.</p>
+<p>The <code>type</code> of resources created by Node.js itself can change in any Node.js
+release. Valid values include <code>TLSWRAP</code>,
+<code>TCPWRAP</code>, <code>TCPSERVERWRAP</code>, <code>GETADDRINFOREQWRAP</code>, <code>FSREQCALLBACK</code>,
+<code>Microtask</code>, and <code>Timeout</code>. Inspect the source code of the Node.js version used
+to get the full list.</p>
+<p>Furthermore users of <a href="async_context.html#class-asyncresource"><code>AsyncResource</code></a> create async resources independent
+of Node.js itself.</p>
 <p>There is also the <code>PROMISE</code> resource type, which is used to track <code>Promise</code>
 instances and asynchronous work scheduled by them.</p>
 <p>Users are able to define their own <code>type</code> when using the public embedder API.</p>
@@ -664,16 +669,15 @@ terms of what caused them to be created, so <code>triggerAsyncId</code> is given
 of propagating what resource is responsible for the new resource's existence.</p>
 <h6><code>resource</code><span><a class="mark" href="#resource" id="resource">#</a></span><a aria-hidden="true" class="legacy" id="async_hooks_resource"></a></h6>
 <p><code>resource</code> is an object that represents the actual async resource that has
-been initialized. This can contain useful information that can vary based on
-the value of <code>type</code>. For instance, for the <code>GETADDRINFOREQWRAP</code> resource type,
-<code>resource</code> provides the host name used when looking up the IP address for the
-host in <code>net.Server.listen()</code>. The API for accessing this information is
-not supported, but using the Embedder API, users can provide
-and document their own resource objects. For example, such a resource object
-could contain the SQL query being executed.</p>
+been initialized. The API to access the object may be specified by the
+creator of the resource. Resources created by Node.js itself are internal
+and may change at any time. Therefore no API is specified for these.</p>
 <p>In some cases the resource object is reused for performance reasons, it is
 thus not safe to use it as a key in a <code>WeakMap</code> or add properties to it.</p>
 <h6>Asynchronous context example<span><a class="mark" href="#asynchronous-context-example" id="asynchronous-context-example">#</a></span><a aria-hidden="true" class="legacy" id="async_hooks_asynchronous_context_example"></a></h6>
+<p>The context tracking use case is covered by the stable API <a href="async_context.html#class-asynclocalstorage"><code>AsyncLocalStorage</code></a>.
+This example only illustrates async hooks operation but <a href="async_context.html#class-asynclocalstorage"><code>AsyncLocalStorage</code></a>
+fits better to this use case.</p>
 <p>The following is an example with additional information about the calls to
 <code>init</code> between the <code>before</code> and <code>after</code> calls, specifically what the
 callback to <code>listen()</code> will look like. The output formatting is slightly more
@@ -791,6 +795,8 @@ called asynchronously from the embedder API <code>emitDestroy()</code>.</p>
 made to the <code>resource</code> object passed to <code>init</code> it is possible that <code>destroy</code>
 will never be called, causing a memory leak in the application. If the resource
 does not depend on garbage collection, then this will not be an issue.</p>
+<p>Using the destroy hook results in additional overhead because it enables
+tracking of <code>Promise</code> instances via the garbage collector.</p>
 <h5><code>promiseResolve(asyncId)</code><span><a class="mark" href="#promiseresolveasyncid" id="promiseresolveasyncid">#</a></span><a aria-hidden="true" class="legacy" id="async_hooks_promiseresolve_asyncid"></a></h5>
 <div class="api_metadata">
 <span>Added in: v8.6.0</span>

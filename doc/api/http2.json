@@ -33,7 +33,7 @@
       "introduced_in": "v8.4.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v19.0.1/lib/http2.js\">lib/http2.js</a></p>\n<p>The <code>node:http2</code> module provides an implementation of the <a href=\"https://tools.ietf.org/html/rfc7540\">HTTP/2</a> protocol.\nIt can be accessed using:</p>\n<pre><code class=\"language-js\">const http2 = require('node:http2');\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v19.1.0/lib/http2.js\">lib/http2.js</a></p>\n<p>The <code>node:http2</code> module provides an implementation of the <a href=\"https://tools.ietf.org/html/rfc7540\">HTTP/2</a> protocol.\nIt can be accessed using:</p>\n<pre><code class=\"language-js\">const http2 = require('node:http2');\n</code></pre>",
       "modules": [
         {
           "textRaw": "Determining if crypto support is unavailable",
@@ -3873,146 +3873,7 @@
                     }
                   ],
                   "desc": "<p>Removes a header that has been queued for implicit sending.</p>\n<pre><code class=\"language-js\">response.removeHeader('Content-Encoding');\n</code></pre>"
-                }
-              ],
-              "properties": [
-                {
-                  "textRaw": "`connection` {net.Socket|tls.TLSSocket}",
-                  "type": "net.Socket|tls.TLSSocket",
-                  "name": "connection",
-                  "meta": {
-                    "added": [
-                      "v8.4.0"
-                    ],
-                    "deprecated": [
-                      "v13.0.0"
-                    ],
-                    "changes": []
-                  },
-                  "stability": 0,
-                  "stabilityText": "Deprecated. Use [`response.socket`][].",
-                  "desc": "<p>See <a href=\"#responsesocket\"><code>response.socket</code></a>.</p>"
                 },
-                {
-                  "textRaw": "`finished` {boolean}",
-                  "type": "boolean",
-                  "name": "finished",
-                  "meta": {
-                    "added": [
-                      "v8.4.0"
-                    ],
-                    "deprecated": [
-                      "v13.4.0",
-                      "v12.16.0"
-                    ],
-                    "changes": []
-                  },
-                  "stability": 0,
-                  "stabilityText": "Deprecated. Use [`response.writableEnded`][].",
-                  "desc": "<p>Boolean value that indicates whether the response has completed. Starts\nas <code>false</code>. After <a href=\"#responseenddata-encoding-callback\"><code>response.end()</code></a> executes, the value will be <code>true</code>.</p>"
-                },
-                {
-                  "textRaw": "`headersSent` {boolean}",
-                  "type": "boolean",
-                  "name": "headersSent",
-                  "meta": {
-                    "added": [
-                      "v8.4.0"
-                    ],
-                    "changes": []
-                  },
-                  "desc": "<p>True if headers were sent, false otherwise (read-only).</p>"
-                }
-              ]
-            }
-          ],
-          "properties": [
-            {
-              "textRaw": "`req` {http2.Http2ServerRequest}",
-              "type": "http2.Http2ServerRequest",
-              "name": "req",
-              "meta": {
-                "added": [
-                  "v15.7.0"
-                ],
-                "changes": []
-              },
-              "desc": "<p>A reference to the original HTTP2 <code>request</code> object.</p>",
-              "properties": [
-                {
-                  "textRaw": "`sendDate` {boolean}",
-                  "type": "boolean",
-                  "name": "sendDate",
-                  "meta": {
-                    "added": [
-                      "v8.4.0"
-                    ],
-                    "changes": []
-                  },
-                  "desc": "<p>When true, the Date header will be automatically generated and sent in\nthe response if it is not already present in the headers. Defaults to true.</p>\n<p>This should only be disabled for testing; HTTP requires the Date header\nin responses.</p>"
-                },
-                {
-                  "textRaw": "`socket` {net.Socket|tls.TLSSocket}",
-                  "type": "net.Socket|tls.TLSSocket",
-                  "name": "socket",
-                  "meta": {
-                    "added": [
-                      "v8.4.0"
-                    ],
-                    "changes": []
-                  },
-                  "desc": "<p>Returns a <code>Proxy</code> object that acts as a <code>net.Socket</code> (or <code>tls.TLSSocket</code>) but\napplies getters, setters, and methods based on HTTP/2 logic.</p>\n<p><code>destroyed</code>, <code>readable</code>, and <code>writable</code> properties will be retrieved from and\nset on <code>response.stream</code>.</p>\n<p><code>destroy</code>, <code>emit</code>, <code>end</code>, <code>on</code> and <code>once</code> methods will be called on\n<code>response.stream</code>.</p>\n<p><code>setTimeout</code> method will be called on <code>response.stream.session</code>.</p>\n<p><code>pause</code>, <code>read</code>, <code>resume</code>, and <code>write</code> will throw an error with code\n<code>ERR_HTTP2_NO_SOCKET_MANIPULATION</code>. See <a href=\"#http2session-and-sockets\"><code>Http2Session</code> and Sockets</a> for\nmore information.</p>\n<p>All other interactions will be routed directly to the socket.</p>\n<pre><code class=\"language-js\">const http2 = require('node:http2');\nconst server = http2.createServer((req, res) => {\n  const ip = req.socket.remoteAddress;\n  const port = req.socket.remotePort;\n  res.end(`Your IP address is ${ip} and your source port is ${port}.`);\n}).listen(3000);\n</code></pre>"
-                },
-                {
-                  "textRaw": "`statusCode` {number}",
-                  "type": "number",
-                  "name": "statusCode",
-                  "meta": {
-                    "added": [
-                      "v8.4.0"
-                    ],
-                    "changes": []
-                  },
-                  "desc": "<p>When using implicit headers (not calling <a href=\"#responsewriteheadstatuscode-statusmessage-headers\"><code>response.writeHead()</code></a> explicitly),\nthis property controls the status code that will be sent to the client when\nthe headers get flushed.</p>\n<pre><code class=\"language-js\">response.statusCode = 404;\n</code></pre>\n<p>After response header was sent to the client, this property indicates the\nstatus code which was sent out.</p>"
-                },
-                {
-                  "textRaw": "`statusMessage` {string}",
-                  "type": "string",
-                  "name": "statusMessage",
-                  "meta": {
-                    "added": [
-                      "v8.4.0"
-                    ],
-                    "changes": []
-                  },
-                  "desc": "<p>Status message is not supported by HTTP/2 (RFC 7540 8.1.2.4). It returns\nan empty string.</p>"
-                },
-                {
-                  "textRaw": "`stream` {Http2Stream}",
-                  "type": "Http2Stream",
-                  "name": "stream",
-                  "meta": {
-                    "added": [
-                      "v8.4.0"
-                    ],
-                    "changes": []
-                  },
-                  "desc": "<p>The <a href=\"#class-http2stream\"><code>Http2Stream</code></a> object backing the response.</p>"
-                },
-                {
-                  "textRaw": "`writableEnded` {boolean}",
-                  "type": "boolean",
-                  "name": "writableEnded",
-                  "meta": {
-                    "added": [
-                      "v12.9.0"
-                    ],
-                    "changes": []
-                  },
-                  "desc": "<p>Is <code>true</code> after <a href=\"#responseenddata-encoding-callback\"><code>response.end()</code></a> has been called. This property\ndoes not indicate whether the data has been flushed, for this use\n<a href=\"stream.html#writablewritablefinished\"><code>writable.writableFinished</code></a> instead.</p>"
-                }
-              ],
-              "methods": [
                 {
                   "textRaw": "`response.setHeader(name, value)`",
                   "type": "method",
@@ -4128,34 +3989,30 @@
                     }
                   ],
                   "desc": "<p>Sends a status <code>100 Continue</code> to the client, indicating that the request body\nshould be sent. See the <a href=\"#event-checkcontinue\"><code>'checkContinue'</code></a> event on <code>Http2Server</code> and\n<code>Http2SecureServer</code>.</p>"
-                }
-              ]
-            }
-          ],
-          "methods": [
-            {
-              "textRaw": "`response.writeEarlyHints(links)`",
-              "type": "method",
-              "name": "writeEarlyHints",
-              "meta": {
-                "added": [
-                  "v18.11.0"
-                ],
-                "changes": []
-              },
-              "signatures": [
+                },
                 {
-                  "params": [
+                  "textRaw": "`response.writeEarlyHints(hints)`",
+                  "type": "method",
+                  "name": "writeEarlyHints",
+                  "meta": {
+                    "added": [
+                      "v18.11.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
                     {
-                      "textRaw": "`links` {string|Array}",
-                      "name": "links",
-                      "type": "string|Array"
+                      "params": [
+                        {
+                          "textRaw": "`hints` {Object}",
+                          "name": "hints",
+                          "type": "Object"
+                        }
+                      ]
                     }
-                  ]
-                }
-              ],
-              "desc": "<p>Sends a status <code>103 Early Hints</code> to the client with a Link header,\nindicating that the user agent can preload/preconnect the linked resources.\nThe <code>links</code> can be a string or an array of strings containing the values\nof the <code>Link</code> header.</p>\n<p><strong>Example</strong></p>\n<pre><code class=\"language-js\">const earlyHintsLink = '&#x3C;/styles.css>; rel=preload; as=style';\nresponse.writeEarlyHints(earlyHintsLink);\n\nconst earlyHintsLinks = [\n  '&#x3C;/styles.css>; rel=preload; as=style',\n  '&#x3C;/scripts.js>; rel=preload; as=script',\n];\nresponse.writeEarlyHints(earlyHintsLinks);\n</code></pre>",
-              "methods": [
+                  ],
+                  "desc": "<p>Sends a status <code>103 Early Hints</code> to the client with a Link header,\nindicating that the user agent can preload/preconnect the linked resources.\nThe <code>hints</code> is an object containing the values of headers to be sent with\nearly hints message.</p>\n<p><strong>Example</strong></p>\n<pre><code class=\"language-js\">const earlyHintsLink = '&#x3C;/styles.css>; rel=preload; as=style';\nresponse.writeEarlyHints({\n  'link': earlyHintsLink,\n});\n\nconst earlyHintsLinks = [\n  '&#x3C;/styles.css>; rel=preload; as=style',\n  '&#x3C;/scripts.js>; rel=preload; as=script',\n];\nresponse.writeEarlyHints({\n  'link': earlyHintsLinks,\n});\n</code></pre>"
+                },
                 {
                   "textRaw": "`response.writeHead(statusCode[, statusMessage][, headers])`",
                   "type": "method",
@@ -4202,6 +4059,139 @@
                     }
                   ],
                   "desc": "<p>Sends a response header to the request. The status code is a 3-digit HTTP\nstatus code, like <code>404</code>. The last argument, <code>headers</code>, are the response headers.</p>\n<p>Returns a reference to the <code>Http2ServerResponse</code>, so that calls can be chained.</p>\n<p>For compatibility with <a href=\"http.html\">HTTP/1</a>, a human-readable <code>statusMessage</code> may be\npassed as the second argument. However, because the <code>statusMessage</code> has no\nmeaning within HTTP/2, the argument will have no effect and a process warning\nwill be emitted.</p>\n<pre><code class=\"language-js\">const body = 'hello world';\nresponse.writeHead(200, {\n  'Content-Length': Buffer.byteLength(body),\n  'Content-Type': 'text/plain; charset=utf-8',\n});\n</code></pre>\n<p><code>Content-Length</code> is given in bytes not characters. The\n<code>Buffer.byteLength()</code> API may be used to determine the number of bytes in a\ngiven encoding. On outbound messages, Node.js does not check if Content-Length\nand the length of the body being transmitted are equal or not. However, when\nreceiving messages, Node.js will automatically reject messages when the\n<code>Content-Length</code> does not match the actual payload size.</p>\n<p>This method may be called at most one time on a message before\n<a href=\"#responseenddata-encoding-callback\"><code>response.end()</code></a> is called.</p>\n<p>If <a href=\"#responsewritechunk-encoding-callback\"><code>response.write()</code></a> or <a href=\"#responseenddata-encoding-callback\"><code>response.end()</code></a> are called before calling\nthis, the implicit/mutable headers will be calculated and call this function.</p>\n<p>When headers have been set with <a href=\"#responsesetheadername-value\"><code>response.setHeader()</code></a>, they will be merged\nwith any headers passed to <a href=\"#responsewriteheadstatuscode-statusmessage-headers\"><code>response.writeHead()</code></a>, with the headers passed\nto <a href=\"#responsewriteheadstatuscode-statusmessage-headers\"><code>response.writeHead()</code></a> given precedence.</p>\n<pre><code class=\"language-js\">// Returns content-type = text/plain\nconst server = http2.createServer((req, res) => {\n  res.setHeader('Content-Type', 'text/html; charset=utf-8');\n  res.setHeader('X-Foo', 'bar');\n  res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });\n  res.end('ok');\n});\n</code></pre>\n<p>Attempting to set a header field name or value that contains invalid characters\nwill result in a <a href=\"errors.html#class-typeerror\"><code>TypeError</code></a> being thrown.</p>"
+                }
+              ],
+              "properties": [
+                {
+                  "textRaw": "`connection` {net.Socket|tls.TLSSocket}",
+                  "type": "net.Socket|tls.TLSSocket",
+                  "name": "connection",
+                  "meta": {
+                    "added": [
+                      "v8.4.0"
+                    ],
+                    "deprecated": [
+                      "v13.0.0"
+                    ],
+                    "changes": []
+                  },
+                  "stability": 0,
+                  "stabilityText": "Deprecated. Use [`response.socket`][].",
+                  "desc": "<p>See <a href=\"#responsesocket\"><code>response.socket</code></a>.</p>"
+                },
+                {
+                  "textRaw": "`finished` {boolean}",
+                  "type": "boolean",
+                  "name": "finished",
+                  "meta": {
+                    "added": [
+                      "v8.4.0"
+                    ],
+                    "deprecated": [
+                      "v13.4.0",
+                      "v12.16.0"
+                    ],
+                    "changes": []
+                  },
+                  "stability": 0,
+                  "stabilityText": "Deprecated. Use [`response.writableEnded`][].",
+                  "desc": "<p>Boolean value that indicates whether the response has completed. Starts\nas <code>false</code>. After <a href=\"#responseenddata-encoding-callback\"><code>response.end()</code></a> executes, the value will be <code>true</code>.</p>"
+                },
+                {
+                  "textRaw": "`headersSent` {boolean}",
+                  "type": "boolean",
+                  "name": "headersSent",
+                  "meta": {
+                    "added": [
+                      "v8.4.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>True if headers were sent, false otherwise (read-only).</p>"
+                },
+                {
+                  "textRaw": "`req` {http2.Http2ServerRequest}",
+                  "type": "http2.Http2ServerRequest",
+                  "name": "req",
+                  "meta": {
+                    "added": [
+                      "v15.7.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>A reference to the original HTTP2 <code>request</code> object.</p>"
+                },
+                {
+                  "textRaw": "`sendDate` {boolean}",
+                  "type": "boolean",
+                  "name": "sendDate",
+                  "meta": {
+                    "added": [
+                      "v8.4.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>When true, the Date header will be automatically generated and sent in\nthe response if it is not already present in the headers. Defaults to true.</p>\n<p>This should only be disabled for testing; HTTP requires the Date header\nin responses.</p>"
+                },
+                {
+                  "textRaw": "`socket` {net.Socket|tls.TLSSocket}",
+                  "type": "net.Socket|tls.TLSSocket",
+                  "name": "socket",
+                  "meta": {
+                    "added": [
+                      "v8.4.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>Returns a <code>Proxy</code> object that acts as a <code>net.Socket</code> (or <code>tls.TLSSocket</code>) but\napplies getters, setters, and methods based on HTTP/2 logic.</p>\n<p><code>destroyed</code>, <code>readable</code>, and <code>writable</code> properties will be retrieved from and\nset on <code>response.stream</code>.</p>\n<p><code>destroy</code>, <code>emit</code>, <code>end</code>, <code>on</code> and <code>once</code> methods will be called on\n<code>response.stream</code>.</p>\n<p><code>setTimeout</code> method will be called on <code>response.stream.session</code>.</p>\n<p><code>pause</code>, <code>read</code>, <code>resume</code>, and <code>write</code> will throw an error with code\n<code>ERR_HTTP2_NO_SOCKET_MANIPULATION</code>. See <a href=\"#http2session-and-sockets\"><code>Http2Session</code> and Sockets</a> for\nmore information.</p>\n<p>All other interactions will be routed directly to the socket.</p>\n<pre><code class=\"language-js\">const http2 = require('node:http2');\nconst server = http2.createServer((req, res) => {\n  const ip = req.socket.remoteAddress;\n  const port = req.socket.remotePort;\n  res.end(`Your IP address is ${ip} and your source port is ${port}.`);\n}).listen(3000);\n</code></pre>"
+                },
+                {
+                  "textRaw": "`statusCode` {number}",
+                  "type": "number",
+                  "name": "statusCode",
+                  "meta": {
+                    "added": [
+                      "v8.4.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>When using implicit headers (not calling <a href=\"#responsewriteheadstatuscode-statusmessage-headers\"><code>response.writeHead()</code></a> explicitly),\nthis property controls the status code that will be sent to the client when\nthe headers get flushed.</p>\n<pre><code class=\"language-js\">response.statusCode = 404;\n</code></pre>\n<p>After response header was sent to the client, this property indicates the\nstatus code which was sent out.</p>"
+                },
+                {
+                  "textRaw": "`statusMessage` {string}",
+                  "type": "string",
+                  "name": "statusMessage",
+                  "meta": {
+                    "added": [
+                      "v8.4.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>Status message is not supported by HTTP/2 (RFC 7540 8.1.2.4). It returns\nan empty string.</p>"
+                },
+                {
+                  "textRaw": "`stream` {Http2Stream}",
+                  "type": "Http2Stream",
+                  "name": "stream",
+                  "meta": {
+                    "added": [
+                      "v8.4.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>The <a href=\"#class-http2stream\"><code>Http2Stream</code></a> object backing the response.</p>"
+                },
+                {
+                  "textRaw": "`writableEnded` {boolean}",
+                  "type": "boolean",
+                  "name": "writableEnded",
+                  "meta": {
+                    "added": [
+                      "v12.9.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>Is <code>true</code> after <a href=\"#responseenddata-encoding-callback\"><code>response.end()</code></a> has been called. This property\ndoes not indicate whether the data has been flushed, for this use\n<a href=\"stream.html#writablewritablefinished\"><code>writable.writableFinished</code></a> instead.</p>"
                 }
               ]
             }

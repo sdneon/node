@@ -12,7 +12,7 @@ Last update:
 
 - common: https://github.com/web-platform-tests/wpt/tree/03c5072aff/common
 - console: https://github.com/web-platform-tests/wpt/tree/767ae35464/console
-- dom/abort: https://github.com/web-platform-tests/wpt/tree/c49cafb491/dom/abort
+- dom/abort: https://github.com/web-platform-tests/wpt/tree/8fadb38120/dom/abort
 - dom/events: https://github.com/web-platform-tests/wpt/tree/f8821adb28/dom/events
 - encoding: https://github.com/web-platform-tests/wpt/tree/c1b24fce6e/encoding
 - fetch/data-urls/resources: https://github.com/web-platform-tests/wpt/tree/7c79d998ff/fetch/data-urls/resources
@@ -25,13 +25,13 @@ Last update:
 - interfaces: https://github.com/web-platform-tests/wpt/tree/df731dab88/interfaces
 - performance-timeline: https://github.com/web-platform-tests/wpt/tree/17ebc3aea0/performance-timeline
 - resource-timing: https://github.com/web-platform-tests/wpt/tree/22d38586d0/resource-timing
-- resources: https://github.com/web-platform-tests/wpt/tree/c5b428f15a/resources
+- resources: https://github.com/web-platform-tests/wpt/tree/fbf1e7d247/resources
 - streams: https://github.com/web-platform-tests/wpt/tree/9e5ef42bd3/streams
 - url: https://github.com/web-platform-tests/wpt/tree/0e5b126cd0/url
 - user-timing: https://github.com/web-platform-tests/wpt/tree/df24fb604e/user-timing
 - wasm/jsapi: https://github.com/web-platform-tests/wpt/tree/d8dbe6990b/wasm/jsapi
 - wasm/webapi: https://github.com/web-platform-tests/wpt/tree/fd1b23eeaa/wasm/webapi
-- WebCryptoAPI: https://github.com/web-platform-tests/wpt/tree/edca84af42/WebCryptoAPI
+- WebCryptoAPI: https://github.com/web-platform-tests/wpt/tree/0042d42ee6/WebCryptoAPI
 - webidl/ecmascript-binding/es-exceptions: https://github.com/web-platform-tests/wpt/tree/a370aad338/webidl/ecmascript-binding/es-exceptions
 
 [Web Platform Tests]: https://github.com/web-platform-tests/wpt

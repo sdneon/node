@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v19.0.1">
-  <title>Node-API | Node.js v19.0.1 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v19.1.0">
+  <title>Node-API | Node.js v19.1.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -95,7 +95,7 @@
     <div id="column1" data-id="n-api" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v19.0.1 documentation</h1>
+          <h1>Node.js v19.1.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -110,7 +110,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v19.0.1</li>
+            <li class="pinned-header">Node.js v19.1.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -1386,6 +1386,7 @@ Currently, the following status codes are supported.</p>
   napi_arraybuffer_expected,
   napi_detachable_arraybuffer_expected,
   napi_would_deadlock,  <span class="hljs-comment">/* unused */</span>
+  napi_no_external_buffers_allowed
 } napi_status;</code></pre>
 <p>If additional information is required upon an API returning a failed status,
 it can be obtained by calling <code>napi_get_last_error_info</code>.</p>
@@ -2725,6 +2726,17 @@ collection.</li>
 <li><code>[out] result</code>: A <code>napi_value</code> representing a JavaScript <code>ArrayBuffer</code>.</li>
 </ul>
 <p>Returns <code>napi_ok</code> if the API succeeded.</p>
+<p><strong>Some runtimes other than Node.js have dropped support for external buffers</strong>.
+On runtimes other than Node.js this method may return
+<code>napi_no_external_buffers_allowed</code> to indicate that external
+buffers are not supported. One such runtime is Electron as
+described in this issue
+<a href="https://github.com/electron/electron/issues/35801">electron/issues/35801</a>.</p>
+<p>In order to maintain broadest compatibility with all runtimes
+you may define <code>NODE_API_NO_EXTERNAL_BUFFERS_ALLOWED</code> in your addon before
+includes for the node-api headers. Doing so will hide the 2 functions
+that create external buffers. This will ensure a compilation error
+occurs if you accidentally use one of these methods.</p>
 <p>This API returns a Node-API value corresponding to a JavaScript <code>ArrayBuffer</code>.
 The underlying byte buffer of the <code>ArrayBuffer</code> is externally allocated and
 managed. The caller must ensure that the byte buffer remains valid until the
@@ -2762,6 +2774,17 @@ collection.</li>
 <li><code>[out] result</code>: A <code>napi_value</code> representing a <code>node::Buffer</code>.</li>
 </ul>
 <p>Returns <code>napi_ok</code> if the API succeeded.</p>
+<p><strong>Some runtimes other than Node.js have dropped support for external buffers</strong>.
+On runtimes other than Node.js this method may return
+<code>napi_no_external_buffers_allowed</code> to indicate that external
+buffers are not supported. One such runtime is Electron as
+described in this issue
+<a href="https://github.com/electron/electron/issues/35801">electron/issues/35801</a>.</p>
+<p>In order to maintain broadest compatibility with all runtimes
+you may define <code>NODE_API_NO_EXTERNAL_BUFFERS_ALLOWED</code> in your addon before
+includes for the node-api headers. Doing so will hide the 2 functions
+that create external buffers. This will ensure a compilation error
+occurs if you accidentally use one of these methods.</p>
 <p>This API allocates a <code>node::Buffer</code> object and initializes it with data
 backed by the passed in buffer. While this is still a fully-supported data
 structure, in most cases using a <code>TypedArray</code> will suffice.</p>

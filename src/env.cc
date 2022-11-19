@@ -39,6 +39,7 @@ using v8::EscapableHandleScope;
 using v8::Function;
 using v8::FunctionTemplate;
 using v8::HandleScope;
+using v8::HeapProfiler;
 using v8::HeapSpaceStatistics;
 using v8::Integer;
 using v8::Isolate;
@@ -63,7 +64,7 @@ int const ContextEmbedderTag::kNodeContextTag = 0x6e6f64;
 void* const ContextEmbedderTag::kNodeContextTagPtr = const_cast<void*>(
     static_cast<const void*>(&ContextEmbedderTag::kNodeContextTag));
 
-void AsyncHooks::SetJSPromiseHooks(Local<Function> init,
+void AsyncHooks::ResetPromiseHooks(Local<Function> init,
                                    Local<Function> before,
                                    Local<Function> after,
                                    Local<Function> resolve) {
@@ -71,12 +72,20 @@ void AsyncHooks::SetJSPromiseHooks(Local<Function> init,
   js_promise_hooks_[1].Reset(env()->isolate(), before);
   js_promise_hooks_[2].Reset(env()->isolate(), after);
   js_promise_hooks_[3].Reset(env()->isolate(), resolve);
+}
+
+void Environment::ResetPromiseHooks(Local<Function> init,
+                                    Local<Function> before,
+                                    Local<Function> after,
+                                    Local<Function> resolve) {
+  async_hooks()->ResetPromiseHooks(init, before, after, resolve);
+
   for (auto it = contexts_.begin(); it != contexts_.end(); it++) {
     if (it->IsEmpty()) {
       contexts_.erase(it--);
       continue;
     }
-    PersistentToLocal::Weak(env()->isolate(), *it)
+    PersistentToLocal::Weak(isolate_, *it)
         ->SetPromiseHooks(init, before, after, resolve);
   }
 }
@@ -179,7 +188,7 @@ void AsyncHooks::clear_async_id_stack() {
   fields_[kStackLength] = 0;
 }
 
-void AsyncHooks::AddContext(Local<Context> ctx) {
+void AsyncHooks::InstallPromiseHooks(Local<Context> ctx) {
   ctx->SetPromiseHooks(js_promise_hooks_[0].IsEmpty()
                            ? Local<Function>()
                            : PersistentToLocal::Strong(js_promise_hooks_[0]),
@@ -192,23 +201,24 @@ void AsyncHooks::AddContext(Local<Context> ctx) {
                        js_promise_hooks_[3].IsEmpty()
                            ? Local<Function>()
                            : PersistentToLocal::Strong(js_promise_hooks_[3]));
+}
 
+void Environment::TrackContext(Local<Context> context) {
   size_t id = contexts_.size();
   contexts_.resize(id + 1);
-  contexts_[id].Reset(env()->isolate(), ctx);
+  contexts_[id].Reset(isolate_, context);
   contexts_[id].SetWeak();
 }
 
-void AsyncHooks::RemoveContext(Local<Context> ctx) {
-  Isolate* isolate = env()->isolate();
-  HandleScope handle_scope(isolate);
+void Environment::UntrackContext(Local<Context> context) {
+  HandleScope handle_scope(isolate_);
   contexts_.erase(std::remove_if(contexts_.begin(),
                                  contexts_.end(),
                                  [&](auto&& el) { return el.IsEmpty(); }),
                   contexts_.end());
   for (auto it = contexts_.begin(); it != contexts_.end(); it++) {
-    Local<Context> saved_context = PersistentToLocal::Weak(isolate, *it);
-    if (saved_context == ctx) {
+    Local<Context> saved_context = PersistentToLocal::Weak(isolate_, *it);
+    if (saved_context == context) {
       it->Reset();
       contexts_.erase(it);
       break;
@@ -543,7 +553,8 @@ void Environment::AssignToContext(Local<v8::Context> context,
   inspector_agent()->ContextCreated(context, info);
 #endif  // HAVE_INSPECTOR
 
-  this->async_hooks()->AddContext(context);
+  this->async_hooks()->InstallPromiseHooks(context);
+  TrackContext(context);
 }
 
 void Environment::TryLoadAddon(
@@ -1466,8 +1477,9 @@ AsyncHooks::SerializeInfo AsyncHooks::Serialize(Local<Context> context,
                 context,
                 native_execution_async_resources_[i]);
   }
-  CHECK_EQ(contexts_.size(), 1);
-  CHECK_EQ(contexts_[0], env()->context());
+
+  // At the moment, promise hooks are not supported in the startup snapshot.
+  // TODO(joyeecheung): support promise hooks in the startup snapshot.
   CHECK(js_promise_hooks_[0].IsEmpty());
   CHECK(js_promise_hooks_[1].IsEmpty());
   CHECK(js_promise_hooks_[2].IsEmpty());
@@ -1602,6 +1614,10 @@ EnvSerializeInfo Environment::Serialize(SnapshotCreator* creator) {
       should_abort_on_uncaught_toggle_.Serialize(ctx, creator);
 
   info.principal_realm = principal_realm_->Serialize(creator);
+  // For now we only support serialization of the main context.
+  // TODO(joyeecheung): support de/serialization of vm contexts.
+  CHECK_EQ(contexts_.size(), 1);
+  CHECK_EQ(contexts_[0], context());
   return info;
 }
 
@@ -1775,7 +1791,10 @@ size_t Environment::NearHeapLimitCallback(void* data,
 
   Debug(env, DebugCategory::DIAGNOSTICS, "Start generating %s...\n", *name);
 
-  heap::WriteSnapshot(env, filename.c_str());
+  HeapProfiler::HeapSnapshotOptions options;
+  options.numerics_mode = HeapProfiler::NumericsMode::kExposeNumericValues;
+  options.snapshot_mode = HeapProfiler::HeapSnapshotMode::kExposeInternals;
+  heap::WriteSnapshot(env, filename.c_str(), options);
   env->heap_limit_snapshot_taken_ += 1;
 
   Debug(env,

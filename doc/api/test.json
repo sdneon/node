@@ -8,7 +8,7 @@
       "introduced_in": "v18.0.0",
       "stability": 1,
       "stabilityText": "Experimental",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v19.0.1/lib/test.js\">lib/test.js</a></p>\n<p>The <code>node:test</code> module facilitates the creation of JavaScript tests that\nreport results in <a href=\"https://testanything.org/\">TAP</a> format. To access it:</p>\n<pre><code class=\"language-mjs\">import test from 'node:test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('node:test');\n</code></pre>\n<p>This module is only available under the <code>node:</code> scheme. The following will not\nwork:</p>\n<pre><code class=\"language-mjs\">import test from 'test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('test');\n</code></pre>\n<p>Tests created via the <code>test</code> module consist of a single function that is\nprocessed in one of three ways:</p>\n<ol>\n<li>A synchronous function that is considered failing if it throws an exception,\nand is considered passing otherwise.</li>\n<li>A function that returns a <code>Promise</code> that is considered failing if the\n<code>Promise</code> rejects, and is considered passing if the <code>Promise</code> resolves.</li>\n<li>A function that receives a callback function. If the callback receives any\ntruthy value as its first argument, the test is considered failing. If a\nfalsy value is passed as the first argument to the callback, the test is\nconsidered passing. If the test function receives a callback function and\nalso returns a <code>Promise</code>, the test will fail.</li>\n</ol>\n<p>The following example illustrates how tests are written using the\n<code>test</code> module.</p>\n<pre><code class=\"language-js\">test('synchronous passing test', (t) => {\n  // This test passes because it does not throw an exception.\n  assert.strictEqual(1, 1);\n});\n\ntest('synchronous failing test', (t) => {\n  // This test fails because it throws an exception.\n  assert.strictEqual(1, 2);\n});\n\ntest('asynchronous passing test', async (t) => {\n  // This test passes because the Promise returned by the async\n  // function is not rejected.\n  assert.strictEqual(1, 1);\n});\n\ntest('asynchronous failing test', async (t) => {\n  // This test fails because the Promise returned by the async\n  // function is rejected.\n  assert.strictEqual(1, 2);\n});\n\ntest('failing test using Promises', (t) => {\n  // Promises can be used directly as well.\n  return new Promise((resolve, reject) => {\n    setImmediate(() => {\n      reject(new Error('this will cause the test to fail'));\n    });\n  });\n});\n\ntest('callback passing test', (t, done) => {\n  // done() is the callback function. When the setImmediate() runs, it invokes\n  // done() with no arguments.\n  setImmediate(done);\n});\n\ntest('callback failing test', (t, done) => {\n  // When the setImmediate() runs, done() is invoked with an Error object and\n  // the test fails.\n  setImmediate(() => {\n    done(new Error('callback failure'));\n  });\n});\n</code></pre>\n<p>As a test file executes, TAP is written to the standard output of the Node.js\nprocess. This output can be interpreted by any test harness that understands\nthe TAP format. If any tests fail, the process exit code is set to <code>1</code>.</p>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v19.1.0/lib/test.js\">lib/test.js</a></p>\n<p>The <code>node:test</code> module facilitates the creation of JavaScript tests that\nreport results in <a href=\"https://testanything.org/\">TAP</a> format. To access it:</p>\n<pre><code class=\"language-mjs\">import test from 'node:test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('node:test');\n</code></pre>\n<p>This module is only available under the <code>node:</code> scheme. The following will not\nwork:</p>\n<pre><code class=\"language-mjs\">import test from 'test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('test');\n</code></pre>\n<p>Tests created via the <code>test</code> module consist of a single function that is\nprocessed in one of three ways:</p>\n<ol>\n<li>A synchronous function that is considered failing if it throws an exception,\nand is considered passing otherwise.</li>\n<li>A function that returns a <code>Promise</code> that is considered failing if the\n<code>Promise</code> rejects, and is considered passing if the <code>Promise</code> resolves.</li>\n<li>A function that receives a callback function. If the callback receives any\ntruthy value as its first argument, the test is considered failing. If a\nfalsy value is passed as the first argument to the callback, the test is\nconsidered passing. If the test function receives a callback function and\nalso returns a <code>Promise</code>, the test will fail.</li>\n</ol>\n<p>The following example illustrates how tests are written using the\n<code>test</code> module.</p>\n<pre><code class=\"language-js\">test('synchronous passing test', (t) => {\n  // This test passes because it does not throw an exception.\n  assert.strictEqual(1, 1);\n});\n\ntest('synchronous failing test', (t) => {\n  // This test fails because it throws an exception.\n  assert.strictEqual(1, 2);\n});\n\ntest('asynchronous passing test', async (t) => {\n  // This test passes because the Promise returned by the async\n  // function is not rejected.\n  assert.strictEqual(1, 1);\n});\n\ntest('asynchronous failing test', async (t) => {\n  // This test fails because the Promise returned by the async\n  // function is rejected.\n  assert.strictEqual(1, 2);\n});\n\ntest('failing test using Promises', (t) => {\n  // Promises can be used directly as well.\n  return new Promise((resolve, reject) => {\n    setImmediate(() => {\n      reject(new Error('this will cause the test to fail'));\n    });\n  });\n});\n\ntest('callback passing test', (t, done) => {\n  // done() is the callback function. When the setImmediate() runs, it invokes\n  // done() with no arguments.\n  setImmediate(done);\n});\n\ntest('callback failing test', (t, done) => {\n  // When the setImmediate() runs, done() is invoked with an Error object and\n  // the test fails.\n  setImmediate(() => {\n    done(new Error('callback failure'));\n  });\n});\n</code></pre>\n<p>As a test file executes, TAP is written to the standard output of the Node.js\nprocess. This output can be interpreted by any test harness that understands\nthe TAP format. If any tests fail, the process exit code is set to <code>1</code>.</p>",
       "modules": [
         {
           "textRaw": "Subtests",
@@ -28,17 +28,15 @@
           "textRaw": "`describe`/`it` syntax",
           "name": "`describe`/`it`_syntax",
           "desc": "<p>Running tests can also be done using <code>describe</code> to declare a suite\nand <code>it</code> to declare a test.\nA suite is used to organize and group related tests together.\n<code>it</code> is an alias for <code>test</code>, except there is no test context passed,\nsince nesting is done using suites.</p>\n<pre><code class=\"language-js\">describe('A thing', () => {\n  it('should work', () => {\n    assert.strictEqual(1, 1);\n  });\n\n  it('should be ok', () => {\n    assert.strictEqual(2, 2);\n  });\n\n  describe('a nested thing', () => {\n    it('should work', () => {\n      assert.strictEqual(3, 3);\n    });\n  });\n});\n</code></pre>\n<p><code>describe</code> and <code>it</code> are imported from the <code>node:test</code> module.</p>\n<pre><code class=\"language-mjs\">import { describe, it } from 'node:test';\n</code></pre>\n<pre><code class=\"language-cjs\">const { describe, it } = require('node:test');\n</code></pre>",
-          "modules": [
-            {
-              "textRaw": "`only` tests",
-              "name": "`only`_tests",
-              "desc": "<p>If Node.js is started with the <a href=\"cli.html#--test-only\"><code>--test-only</code></a> command-line option, it is\npossible to skip all top level tests except for a selected subset by passing\nthe <code>only</code> option to the tests that should be run. When a test with the <code>only</code>\noption set is run, all subtests are also run. The test context's <code>runOnly()</code>\nmethod can be used to implement the same behavior at the subtest level.</p>\n<pre><code class=\"language-js\">// Assume Node.js is run with the --test-only command-line option.\n// The 'only' option is set, so this test is run.\ntest('this test is run', { only: true }, async (t) => {\n  // Within this test, all subtests are run by default.\n  await t.test('running subtest');\n\n  // The test context can be updated to run subtests with the 'only' option.\n  t.runOnly(true);\n  await t.test('this subtest is now skipped');\n  await t.test('this subtest is run', { only: true });\n\n  // Switch the context back to execute all tests.\n  t.runOnly(false);\n  await t.test('this subtest is now run');\n\n  // Explicitly do not run these tests.\n  await t.test('skipped subtest 3', { only: false });\n  await t.test('skipped subtest 4', { skip: true });\n});\n\n// The 'only' option is not set, so this test is skipped.\ntest('this test is not run', () => {\n  // This code is not run.\n  throw new Error('fail');\n});\n</code></pre>",
-              "type": "module",
-              "displayName": "`only` tests"
-            }
-          ],
           "type": "module",
           "displayName": "`describe`/`it` syntax"
+        },
+        {
+          "textRaw": "`only` tests",
+          "name": "`only`_tests",
+          "desc": "<p>If Node.js is started with the <a href=\"cli.html#--test-only\"><code>--test-only</code></a> command-line option, it is\npossible to skip all top level tests except for a selected subset by passing\nthe <code>only</code> option to the tests that should be run. When a test with the <code>only</code>\noption set is run, all subtests are also run. The test context's <code>runOnly()</code>\nmethod can be used to implement the same behavior at the subtest level.</p>\n<pre><code class=\"language-js\">// Assume Node.js is run with the --test-only command-line option.\n// The 'only' option is set, so this test is run.\ntest('this test is run', { only: true }, async (t) => {\n  // Within this test, all subtests are run by default.\n  await t.test('running subtest');\n\n  // The test context can be updated to run subtests with the 'only' option.\n  t.runOnly(true);\n  await t.test('this subtest is now skipped');\n  await t.test('this subtest is run', { only: true });\n\n  // Switch the context back to execute all tests.\n  t.runOnly(false);\n  await t.test('this subtest is now run');\n\n  // Explicitly do not run these tests.\n  await t.test('skipped subtest 3', { only: false });\n  await t.test('skipped subtest 4', { skip: true });\n});\n\n// The 'only' option is not set, so this test is skipped.\ntest('this test is not run', () => {\n  // This code is not run.\n  throw new Error('fail');\n});\n</code></pre>",
+          "type": "module",
+          "displayName": "`only` tests"
         },
         {
           "textRaw": "Filtering tests by name",
@@ -50,7 +48,7 @@
         {
           "textRaw": "Extraneous asynchronous activity",
           "name": "extraneous_asynchronous_activity",
-          "desc": "<p>Once a test function finishes executing, the TAP results are output as quickly\nas possible while maintaining the order of the tests. However, it is possible\nfor the test function to generate asynchronous activity that outlives the test\nitself. The test runner handles this type of activity, but does not delay the\nreporting of test results in order to accommodate it.</p>\n<p>In the following example, a test completes with two <code>setImmediate()</code>\noperations still outstanding. The first <code>setImmediate()</code> attempts to create a\nnew subtest. Because the parent test has already finished and output its\nresults, the new subtest is immediately marked as failed, and reported in the\ntop level of the file's TAP output.</p>\n<p>The second <code>setImmediate()</code> creates an <code>uncaughtException</code> event.\n<code>uncaughtException</code> and <code>unhandledRejection</code> events originating from a completed\ntest are handled by the <code>test</code> module and reported as diagnostic warnings in\nthe top level of the file's TAP output.</p>\n<pre><code class=\"language-js\">test('a test that creates asynchronous activity', (t) => {\n  setImmediate(() => {\n    t.test('subtest that is created too late', (t) => {\n      throw new Error('error1');\n    });\n  });\n\n  setImmediate(() => {\n    throw new Error('error2');\n  });\n\n  // The test finishes after this line.\n});\n</code></pre>",
+          "desc": "<p>Once a test function finishes executing, the TAP results are output as quickly\nas possible while maintaining the order of the tests. However, it is possible\nfor the test function to generate asynchronous activity that outlives the test\nitself. The test runner handles this type of activity, but does not delay the\nreporting of test results in order to accommodate it.</p>\n<p>In the following example, a test completes with two <code>setImmediate()</code>\noperations still outstanding. The first <code>setImmediate()</code> attempts to create a\nnew subtest. Because the parent test has already finished and output its\nresults, the new subtest is immediately marked as failed, and reported in the\ntop level of the file's TAP output.</p>\n<p>The second <code>setImmediate()</code> creates an <code>uncaughtException</code> event.\n<code>uncaughtException</code> and <code>unhandledRejection</code> events originating from a completed\ntest are marked as failed by the <code>test</code> module and reported as diagnostic\nwarnings in the top level of the file's TAP output.</p>\n<pre><code class=\"language-js\">test('a test that creates asynchronous activity', (t) => {\n  setImmediate(() => {\n    t.test('subtest that is created too late', (t) => {\n      throw new Error('error1');\n    });\n  });\n\n  setImmediate(() => {\n    throw new Error('error2');\n  });\n\n  // The test finishes after this line.\n});\n</code></pre>",
           "type": "module",
           "displayName": "Extraneous asynchronous activity"
         },
@@ -69,6 +67,13 @@
           ],
           "type": "module",
           "displayName": "Running tests from the command line"
+        },
+        {
+          "textRaw": "Mocking",
+          "name": "mocking",
+          "desc": "<p>The <code>node:test</code> module supports mocking during testing via a top-level <code>mock</code>\nobject. The following example creates a spy on a function that adds two numbers\ntogether. The spy is then used to assert that the function was called as\nexpected.</p>\n<pre><code class=\"language-mjs\">import assert from 'node:assert';\nimport { mock, test } from 'node:test';\n\ntest('spies on a function', () => {\n  const sum = mock.fn((a, b) => {\n    return a + b;\n  });\n\n  assert.strictEqual(sum.mock.calls.length, 0);\n  assert.strictEqual(sum(3, 4), 7);\n  assert.strictEqual(sum.mock.calls.length, 1);\n\n  const call = sum.mock.calls[0];\n  assert.deepStrictEqual(call.arguments, [3, 4]);\n  assert.strictEqual(call.result, 7);\n  assert.strictEqual(call.error, undefined);\n\n  // Reset the globally tracked mocks.\n  mock.reset();\n});\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\nconst assert = require('node:assert');\nconst { mock, test } = require('node:test');\n\ntest('spies on a function', () => {\n  const sum = mock.fn((a, b) => {\n    return a + b;\n  });\n\n  assert.strictEqual(sum.mock.calls.length, 0);\n  assert.strictEqual(sum(3, 4), 7);\n  assert.strictEqual(sum.mock.calls.length, 1);\n\n  const call = sum.mock.calls[0];\n  assert.deepStrictEqual(call.arguments, [3, 4]);\n  assert.strictEqual(call.result, 7);\n  assert.strictEqual(call.error, undefined);\n\n  // Reset the globally tracked mocks.\n  mock.reset();\n});\n</code></pre>\n<p>The same mocking functionality is also exposed on the <a href=\"#class-testcontext\"><code>TestContext</code></a> object\nof each test. The following example creates a spy on an object method using the\nAPI exposed on the <code>TestContext</code>. The benefit of mocking via the test context is\nthat the test runner will automatically restore all mocked functionality once\nthe test finishes.</p>\n<pre><code class=\"language-js\">test('spies on an object method', (t) => {\n  const number = {\n    value: 5,\n    add(a) {\n      return this.value + a;\n    },\n  };\n\n  t.mock.method(number, 'add');\n  assert.strictEqual(number.add.mock.calls.length, 0);\n  assert.strictEqual(number.add(3), 8);\n  assert.strictEqual(number.add.mock.calls.length, 1);\n\n  const call = number.add.mock.calls[0];\n\n  assert.deepStrictEqual(call.arguments, [3]);\n  assert.strictEqual(call.result, 8);\n  assert.strictEqual(call.target, undefined);\n  assert.strictEqual(call.this, number);\n});\n</code></pre>",
+          "type": "module",
+          "displayName": "Mocking"
         }
       ],
       "methods": [
@@ -549,6 +554,302 @@
         }
       ],
       "classes": [
+        {
+          "textRaw": "Class: `MockFunctionContext`",
+          "type": "class",
+          "name": "MockFunctionContext",
+          "meta": {
+            "added": [
+              "v19.1.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>The <code>MockFunctionContext</code> class is used to inspect or manipulate the behavior of\nmocks created via the <a href=\"#class-mocktracker\"><code>MockTracker</code></a> APIs.</p>",
+          "properties": [
+            {
+              "textRaw": "`calls` {Array}",
+              "type": "Array",
+              "name": "calls",
+              "meta": {
+                "added": [
+                  "v19.1.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>A getter that returns a copy of the internal array used to track calls to the\nmock. Each entry in the array is an object with the following properties.</p>\n<ul>\n<li><code>arguments</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array\" class=\"type\">&lt;Array&gt;</a> An array of the arguments passed to the mock function.</li>\n<li><code>error</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types\" class=\"type\">&lt;any&gt;</a> If the mocked function threw then this property contains the\nthrown value. <strong>Default:</strong> <code>undefined</code>.</li>\n<li><code>result</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types\" class=\"type\">&lt;any&gt;</a> The value returned by the mocked function.</li>\n<li><code>stack</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error\" class=\"type\">&lt;Error&gt;</a> An <code>Error</code> object whose stack can be used to determine the\ncallsite of the mocked function invocation.</li>\n<li><code>target</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function\" class=\"type\">&lt;Function&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type\" class=\"type\">&lt;undefined&gt;</a> If the mocked function is a constructor, this\nfield contains the class being constructed. Otherwise this will be\n<code>undefined</code>.</li>\n<li><code>this</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types\" class=\"type\">&lt;any&gt;</a> The mocked function's <code>this</code> value.</li>\n</ul>"
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`ctx.callCount()`",
+              "type": "method",
+              "name": "callCount",
+              "meta": {
+                "added": [
+                  "v19.1.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "return": {
+                    "textRaw": "Returns: {integer} The number of times that this mock has been invoked.",
+                    "name": "return",
+                    "type": "integer",
+                    "desc": "The number of times that this mock has been invoked."
+                  },
+                  "params": []
+                }
+              ],
+              "desc": "<p>This function returns the number of times that this mock has been invoked. This\nfunction is more efficient than checking <code>ctx.calls.length</code> because <code>ctx.calls</code>\nis a getter that creates a copy of the internal call tracking array.</p>"
+            },
+            {
+              "textRaw": "`ctx.mockImplementation(implementation)`",
+              "type": "method",
+              "name": "mockImplementation",
+              "meta": {
+                "added": [
+                  "v19.1.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`implementation` {Function|AsyncFunction} The function to be used as the mock's new implementation.",
+                      "name": "implementation",
+                      "type": "Function|AsyncFunction",
+                      "desc": "The function to be used as the mock's new implementation."
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>This function is used to change the behavior of an existing mock.</p>\n<p>The following example creates a mock function using <code>t.mock.fn()</code>, calls the\nmock function, and then changes the mock implementation to a different function.</p>\n<pre><code class=\"language-js\">test('changes a mock behavior', (t) => {\n  let cnt = 0;\n\n  function addOne() {\n    cnt++;\n    return cnt;\n  }\n\n  function addTwo() {\n    cnt += 2;\n    return cnt;\n  }\n\n  const fn = t.mock.fn(addOne);\n\n  assert.strictEqual(fn(), 1);\n  fn.mock.mockImplementation(addTwo);\n  assert.strictEqual(fn(), 3);\n  assert.strictEqual(fn(), 5);\n});\n</code></pre>"
+            },
+            {
+              "textRaw": "`ctx.mockImplementationOnce(implementation[, onCall])`",
+              "type": "method",
+              "name": "mockImplementationOnce",
+              "meta": {
+                "added": [
+                  "v19.1.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`implementation` {Function|AsyncFunction} The function to be used as the mock's implementation for the invocation number specified by `onCall`.",
+                      "name": "implementation",
+                      "type": "Function|AsyncFunction",
+                      "desc": "The function to be used as the mock's implementation for the invocation number specified by `onCall`."
+                    },
+                    {
+                      "textRaw": "`onCall` {integer} The invocation number that will use `implementation`. If the specified invocation has already occurred then an exception is thrown. **Default:** The number of the next invocation.",
+                      "name": "onCall",
+                      "type": "integer",
+                      "default": "The number of the next invocation",
+                      "desc": "The invocation number that will use `implementation`. If the specified invocation has already occurred then an exception is thrown."
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>This function is used to change the behavior of an existing mock for a single\ninvocation. Once invocation <code>onCall</code> has occurred, the mock will revert to\nwhatever behavior it would have used had <code>mockImplementationOnce()</code> not been\ncalled.</p>\n<p>The following example creates a mock function using <code>t.mock.fn()</code>, calls the\nmock function, changes the mock implementation to a different function for the\nnext invocation, and then resumes its previous behavior.</p>\n<pre><code class=\"language-js\">test('changes a mock behavior once', (t) => {\n  let cnt = 0;\n\n  function addOne() {\n    cnt++;\n    return cnt;\n  }\n\n  function addTwo() {\n    cnt += 2;\n    return cnt;\n  }\n\n  const fn = t.mock.fn(addOne);\n\n  assert.strictEqual(fn(), 1);\n  fn.mock.mockImplementationOnce(addTwo);\n  assert.strictEqual(fn(), 3);\n  assert.strictEqual(fn(), 4);\n});\n</code></pre>"
+            },
+            {
+              "textRaw": "`ctx.restore()`",
+              "type": "method",
+              "name": "restore",
+              "meta": {
+                "added": [
+                  "v19.1.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>Resets the implementation of the mock function to its original behavior. The\nmock can still be used after calling this function.</p>"
+            }
+          ]
+        },
+        {
+          "textRaw": "Class: `MockTracker`",
+          "type": "class",
+          "name": "MockTracker",
+          "meta": {
+            "added": [
+              "v19.1.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>The <code>MockTracker</code> class is used to manage mocking functionality. The test runner\nmodule provides a top level <code>mock</code> export which is a <code>MockTracker</code> instance.\nEach test also provides its own <code>MockTracker</code> instance via the test context's\n<code>mock</code> property.</p>",
+          "methods": [
+            {
+              "textRaw": "`mock.fn([original[, implementation]][, options])`",
+              "type": "method",
+              "name": "fn",
+              "meta": {
+                "added": [
+                  "v19.1.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "return": {
+                    "textRaw": "Returns: {Proxy} The mocked function. The mocked function contains a special `mock` property, which is an instance of [`MockFunctionContext`][], and can be used for inspecting and changing the behavior of the mocked function.",
+                    "name": "return",
+                    "type": "Proxy",
+                    "desc": "The mocked function. The mocked function contains a special `mock` property, which is an instance of [`MockFunctionContext`][], and can be used for inspecting and changing the behavior of the mocked function."
+                  },
+                  "params": [
+                    {
+                      "textRaw": "`original` {Function|AsyncFunction} An optional function to create a mock on. **Default:** A no-op function.",
+                      "name": "original",
+                      "type": "Function|AsyncFunction",
+                      "default": "A no-op function",
+                      "desc": "An optional function to create a mock on."
+                    },
+                    {
+                      "textRaw": "`implementation` {Function|AsyncFunction} An optional function used as the mock implementation for `original`. This is useful for creating mocks that exhibit one behavior for a specified number of calls and then restore the behavior of `original`. **Default:** The function specified by `original`.",
+                      "name": "implementation",
+                      "type": "Function|AsyncFunction",
+                      "default": "The function specified by `original`",
+                      "desc": "An optional function used as the mock implementation for `original`. This is useful for creating mocks that exhibit one behavior for a specified number of calls and then restore the behavior of `original`."
+                    },
+                    {
+                      "textRaw": "`options` {Object} Optional configuration options for the mock function. The following properties are supported:",
+                      "name": "options",
+                      "type": "Object",
+                      "desc": "Optional configuration options for the mock function. The following properties are supported:",
+                      "options": [
+                        {
+                          "textRaw": "`times` {integer} The number of times that the mock will use the behavior of `implementation`. Once the mock function has been called `times` times, it will automatically restore the behavior of `original`. This value must be an integer greater than zero. **Default:** `Infinity`.",
+                          "name": "times",
+                          "type": "integer",
+                          "default": "`Infinity`",
+                          "desc": "The number of times that the mock will use the behavior of `implementation`. Once the mock function has been called `times` times, it will automatically restore the behavior of `original`. This value must be an integer greater than zero."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>This function is used to create a mock function.</p>\n<p>The following example creates a mock function that increments a counter by one\non each invocation. The <code>times</code> option is used to modify the mock behavior such\nthat the first two invocations add two to the counter instead of one.</p>\n<pre><code class=\"language-js\">test('mocks a counting function', (t) => {\n  let cnt = 0;\n\n  function addOne() {\n    cnt++;\n    return cnt;\n  }\n\n  function addTwo() {\n    cnt += 2;\n    return cnt;\n  }\n\n  const fn = t.mock.fn(addOne, addTwo, { times: 2 });\n\n  assert.strictEqual(fn(), 2);\n  assert.strictEqual(fn(), 4);\n  assert.strictEqual(fn(), 5);\n  assert.strictEqual(fn(), 6);\n});\n</code></pre>"
+            },
+            {
+              "textRaw": "`mock.method(object, methodName[, implementation][, options])`",
+              "type": "method",
+              "name": "method",
+              "meta": {
+                "added": [
+                  "v19.1.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "return": {
+                    "textRaw": "Returns: {Proxy} The mocked method. The mocked method contains a special `mock` property, which is an instance of [`MockFunctionContext`][], and can be used for inspecting and changing the behavior of the mocked method.",
+                    "name": "return",
+                    "type": "Proxy",
+                    "desc": "The mocked method. The mocked method contains a special `mock` property, which is an instance of [`MockFunctionContext`][], and can be used for inspecting and changing the behavior of the mocked method."
+                  },
+                  "params": [
+                    {
+                      "textRaw": "`object` {Object} The object whose method is being mocked.",
+                      "name": "object",
+                      "type": "Object",
+                      "desc": "The object whose method is being mocked."
+                    },
+                    {
+                      "textRaw": "`methodName` {string|symbol} The identifier of the method on `object` to mock. If `object[methodName]` is not a function, an error is thrown.",
+                      "name": "methodName",
+                      "type": "string|symbol",
+                      "desc": "The identifier of the method on `object` to mock. If `object[methodName]` is not a function, an error is thrown."
+                    },
+                    {
+                      "textRaw": "`implementation` {Function|AsyncFunction} An optional function used as the mock implementation for `object[methodName]`. **Default:** The original method specified by `object[methodName]`.",
+                      "name": "implementation",
+                      "type": "Function|AsyncFunction",
+                      "default": "The original method specified by `object[methodName]`",
+                      "desc": "An optional function used as the mock implementation for `object[methodName]`."
+                    },
+                    {
+                      "textRaw": "`options` {Object} Optional configuration options for the mock method. The following properties are supported:",
+                      "name": "options",
+                      "type": "Object",
+                      "desc": "Optional configuration options for the mock method. The following properties are supported:",
+                      "options": [
+                        {
+                          "textRaw": "`getter` {boolean} If `true`, `object[methodName]` is treated as a getter. This option cannot be used with the `setter` option. **Default:** false.",
+                          "name": "getter",
+                          "type": "boolean",
+                          "default": "false",
+                          "desc": "If `true`, `object[methodName]` is treated as a getter. This option cannot be used with the `setter` option."
+                        },
+                        {
+                          "textRaw": "`setter` {boolean} If `true`, `object[methodName]` is treated as a setter. This option cannot be used with the `getter` option. **Default:** false.",
+                          "name": "setter",
+                          "type": "boolean",
+                          "default": "false",
+                          "desc": "If `true`, `object[methodName]` is treated as a setter. This option cannot be used with the `getter` option."
+                        },
+                        {
+                          "textRaw": "`times` {integer} The number of times that the mock will use the behavior of `implementation`. Once the mocked method has been called `times` times, it will automatically restore the original behavior. This value must be an integer greater than zero. **Default:** `Infinity`.",
+                          "name": "times",
+                          "type": "integer",
+                          "default": "`Infinity`",
+                          "desc": "The number of times that the mock will use the behavior of `implementation`. Once the mocked method has been called `times` times, it will automatically restore the original behavior. This value must be an integer greater than zero."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>This function is used to create a mock on an existing object method. The\nfollowing example demonstrates how a mock is created on an existing object\nmethod.</p>\n<pre><code class=\"language-js\">test('spies on an object method', (t) => {\n  const number = {\n    value: 5,\n    subtract(a) {\n      return this.value - a;\n    },\n  };\n\n  t.mock.method(number, 'subtract');\n  assert.strictEqual(number.subtract.mock.calls.length, 0);\n  assert.strictEqual(number.subtract(3), 2);\n  assert.strictEqual(number.subtract.mock.calls.length, 1);\n\n  const call = number.subtract.mock.calls[0];\n\n  assert.deepStrictEqual(call.arguments, [3]);\n  assert.strictEqual(call.result, 2);\n  assert.strictEqual(call.error, undefined);\n  assert.strictEqual(call.target, undefined);\n  assert.strictEqual(call.this, number);\n});\n</code></pre>"
+            },
+            {
+              "textRaw": "`mock.reset()`",
+              "type": "method",
+              "name": "reset",
+              "meta": {
+                "added": [
+                  "v19.1.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>This function restores the default behavior of all mocks that were previously\ncreated by this <code>MockTracker</code> and disassociates the mocks from the\n<code>MockTracker</code> instance. Once disassociated, the mocks can still be used, but the\n<code>MockTracker</code> instance can no longer be used to reset their behavior or\notherwise interact with them.</p>\n<p>After each test completes, this function is called on the test context's\n<code>MockTracker</code>. If the global <code>MockTracker</code> is used extensively, calling this\nfunction manually is recommended.</p>"
+            },
+            {
+              "textRaw": "`mock.restoreAll()`",
+              "type": "method",
+              "name": "restoreAll",
+              "meta": {
+                "added": [
+                  "v19.1.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>This function restores the default behavior of all mocks that were previously\ncreated by this <code>MockTracker</code>. Unlike <code>mock.reset()</code>, <code>mock.restoreAll()</code> does\nnot disassociate the mocks from the <code>MockTracker</code> instance.</p>"
+            }
+          ]
+        },
         {
           "textRaw": "Class: `TapStream`",
           "type": "class",

@@ -6,7 +6,7 @@
       "textRaw": "V8",
       "name": "v8",
       "introduced_in": "v4.0.0",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v19.0.1/lib/v8.js\">lib/v8.js</a></p>\n<p>The <code>node:v8</code> module exposes APIs that are specific to the version of <a href=\"https://developers.google.com/v8/\">V8</a>\nbuilt into the Node.js binary. It can be accessed using:</p>\n<pre><code class=\"language-js\">const v8 = require('node:v8');\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v19.1.0/lib/v8.js\">lib/v8.js</a></p>\n<p>The <code>node:v8</code> module exposes APIs that are specific to the version of <a href=\"https://developers.google.com/v8/\">V8</a>\nbuilt into the Node.js binary. It can be accessed using:</p>\n<pre><code class=\"language-js\">const v8 = require('node:v8');\n</code></pre>",
       "methods": [
         {
           "textRaw": "`v8.cachedDataVersionTag()`",
@@ -53,24 +53,52 @@
           "desc": "<p>Get statistics about code and its metadata in the heap, see V8\n<a href=\"https://v8docs.nodesource.com/node-13.2/d5/dda/classv8_1_1_isolate.html#a6079122af17612ef54ef3348ce170866\"><code>GetHeapCodeAndMetadataStatistics</code></a> API. Returns an object with the\nfollowing properties:</p>\n<ul>\n<li><code>code_and_metadata_size</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a></li>\n<li><code>bytecode_and_metadata_size</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a></li>\n<li><code>external_script_source_size</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a></li>\n<li><code>cpu_profiler_metadata_size</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a></li>\n</ul>\n<!-- eslint-skip -->\n<pre><code class=\"language-js\">{\n  code_and_metadata_size: 212208,\n  bytecode_and_metadata_size: 161368,\n  external_script_source_size: 1410794,\n  cpu_profiler_metadata_size: 0,\n}\n</code></pre>"
         },
         {
-          "textRaw": "`v8.getHeapSnapshot()`",
+          "textRaw": "`v8.getHeapSnapshot([options])`",
           "type": "method",
           "name": "getHeapSnapshot",
           "meta": {
             "added": [
               "v11.13.0"
             ],
-            "changes": []
+            "changes": [
+              {
+                "version": "v19.1.0",
+                "pr-url": "https://github.com/nodejs/node/pull/44989",
+                "description": "Support options to configure the heap snapshot."
+              }
+            ]
           },
           "signatures": [
             {
               "return": {
-                "textRaw": "Returns: {stream.Readable} A Readable Stream containing the V8 heap snapshot",
+                "textRaw": "Returns: {stream.Readable} A Readable containing the V8 heap snapshot.",
                 "name": "return",
                 "type": "stream.Readable",
-                "desc": "A Readable Stream containing the V8 heap snapshot"
+                "desc": "A Readable containing the V8 heap snapshot."
               },
-              "params": []
+              "params": [
+                {
+                  "textRaw": "`options` {Object}",
+                  "name": "options",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`exposeInternals` {boolean} If true, expose internals in the heap snapshot. **Default:** `false`.",
+                      "name": "exposeInternals",
+                      "type": "boolean",
+                      "default": "`false`",
+                      "desc": "If true, expose internals in the heap snapshot."
+                    },
+                    {
+                      "textRaw": "`exposeNumericValues` {boolean} If true, expose numeric values in artificial fields. **Default:** `false`.",
+                      "name": "exposeNumericValues",
+                      "type": "boolean",
+                      "default": "`false`",
+                      "desc": "If true, expose numeric values in artificial fields."
+                    }
+                  ]
+                }
+              ]
             }
           ],
           "desc": "<p>Generates a snapshot of the current V8 heap and returns a Readable\nStream that may be used to read the JSON serialized representation.\nThis JSON stream format is intended to be used with tools such as\nChrome DevTools. The JSON schema is undocumented and specific to the\nV8 engine. Therefore, the schema may change from one version of V8 to the next.</p>\n<p>Creating a heap snapshot requires memory about twice the size of the heap at\nthe time the snapshot is created. This results in the risk of OOM killers\nterminating the process.</p>\n<p>Generating a snapshot is a synchronous operation which blocks the event loop\nfor a duration depending on the heap size.</p>\n<pre><code class=\"language-js\">// Print heap snapshot to the console\nconst v8 = require('node:v8');\nconst stream = v8.getHeapSnapshot();\nstream.pipe(process.stdout);\n</code></pre>"
@@ -198,7 +226,7 @@
           "desc": "<p>The <code>v8.takeCoverage()</code> method allows the user to write the coverage started by\n<a href=\"cli.html#node_v8_coveragedir\"><code>NODE_V8_COVERAGE</code></a> to disk on demand. This method can be invoked multiple\ntimes during the lifetime of the process. Each time the execution counter will\nbe reset and a new coverage report will be written to the directory specified\nby <a href=\"cli.html#node_v8_coveragedir\"><code>NODE_V8_COVERAGE</code></a>.</p>\n<p>When the process is about to exit, one last coverage will still be written to\ndisk unless <a href=\"#v8stopcoverage\"><code>v8.stopCoverage()</code></a> is invoked before the process exits.</p>"
         },
         {
-          "textRaw": "`v8.writeHeapSnapshot([filename])`",
+          "textRaw": "`v8.writeHeapSnapshot([filename[,options]])`",
           "type": "method",
           "name": "writeHeapSnapshot",
           "meta": {
@@ -206,6 +234,11 @@
               "v11.13.0"
             ],
             "changes": [
+              {
+                "version": "v19.1.0",
+                "pr-url": "https://github.com/nodejs/node/pull/44989",
+                "description": "Support options to configure the heap snapshot."
+              },
               {
                 "version": "v18.0.0",
                 "pr-url": "https://github.com/nodejs/node/pull/41373",
@@ -232,6 +265,27 @@
                   "name": "filename",
                   "type": "string",
                   "desc": "The file path where the V8 heap snapshot is to be saved. If not specified, a file name with the pattern `'Heap-${yyyymmdd}-${hhmmss}-${pid}-${thread_id}.heapsnapshot'` will be generated, where `{pid}` will be the PID of the Node.js process, `{thread_id}` will be `0` when `writeHeapSnapshot()` is called from the main Node.js thread or the id of a worker thread."
+                },
+                {
+                  "textRaw": "`options` {Object}",
+                  "name": "options",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`exposeInternals` {boolean} If true, expose internals in the heap snapshot. **Default:** `false`.",
+                      "name": "exposeInternals",
+                      "type": "boolean",
+                      "default": "`false`",
+                      "desc": "If true, expose internals in the heap snapshot."
+                    },
+                    {
+                      "textRaw": "`exposeNumericValues` {boolean} If true, expose numeric values in artificial fields. **Default:** `false`.",
+                      "name": "exposeNumericValues",
+                      "type": "boolean",
+                      "default": "`false`",
+                      "desc": "If true, expose numeric values in artificial fields."
+                    }
+                  ]
                 }
               ]
             }
@@ -1039,7 +1093,7 @@
           },
           "stability": 1,
           "stabilityText": "Experimental",
-          "desc": "<p>The <code>v8.startupSnapshot</code> interface can be used to add serialization and\ndeserialization hooks for custom startup snapshots. Currently the startup\nsnapshots can only be built into the Node.js binary from source.</p>\n<pre><code class=\"language-console\">$ cd /path/to/node\n$ ./configure --node-snapshot-main=entry.js\n$ make node\n# This binary contains the result of the execution of entry.js\n$ out/Release/node\n</code></pre>\n<p>In the example above, <code>entry.js</code> can use methods from the <code>v8.startupSnapshot</code>\ninterface to specify how to save information for custom objects in the snapshot\nduring serialization and how the information can be used to synchronize these\nobjects during deserialization of the snapshot. For example, if the <code>entry.js</code>\ncontains the following script:</p>\n<pre><code class=\"language-cjs\">'use strict';\n\nconst fs = require('fs');\nconst zlib = require('zlib');\nconst path = require('path');\nconst assert = require('assert');\n\nconst {\n  isBuildingSnapshot,\n  addSerializeCallback,\n  addDeserializeCallback,\n  setDeserializeMainFunction\n} = require('v8').startupSnapshot;\n\nconst filePath = path.resolve(__dirname, '../x1024.txt');\nconst storage = {};\n\nassert(isBuildingSnapshot());\n\naddSerializeCallback(({ filePath }) => {\n  storage[filePath] = zlib.gzipSync(fs.readFileSync(filePath));\n}, { filePath });\n\naddDeserializeCallback(({ filePath }) => {\n  storage[filePath] = zlib.gunzipSync(storage[filePath]);\n}, { filePath });\n\nsetDeserializeMainFunction(({ filePath }) => {\n  console.log(storage[filePath].toString());\n}, { filePath });\n</code></pre>\n<p>The resulted binary will simply print the data deserialized from the snapshot\nduring start up:</p>\n<pre><code class=\"language-console\">$ out/Release/node\n# Prints content of ./test/fixtures/x1024.txt\n</code></pre>\n<p>Currently the API is only available to a Node.js instance launched from the\ndefault snapshot, that is, the application deserialized from a user-land\nsnapshot cannot use these APIs again.</p>",
+          "desc": "<p>The <code>v8.startupSnapshot</code> interface can be used to add serialization and\ndeserialization hooks for custom startup snapshots. Currently the startup\nsnapshots can only be built into the Node.js binary from source.</p>\n<pre><code class=\"language-console\">$ cd /path/to/node\n$ ./configure --node-snapshot-main=entry.js\n$ make node\n# This binary contains the result of the execution of entry.js\n$ out/Release/node\n</code></pre>\n<p>In the example above, <code>entry.js</code> can use methods from the <code>v8.startupSnapshot</code>\ninterface to specify how to save information for custom objects in the snapshot\nduring serialization and how the information can be used to synchronize these\nobjects during deserialization of the snapshot. For example, if the <code>entry.js</code>\ncontains the following script:</p>\n<pre><code class=\"language-cjs\">'use strict';\n\nconst fs = require('node:fs');\nconst zlib = require('node:zlib');\nconst path = require('node:path');\nconst assert = require('node:assert');\n\nconst {\n  isBuildingSnapshot,\n  addSerializeCallback,\n  addDeserializeCallback,\n  setDeserializeMainFunction\n} = require('node:v8').startupSnapshot;\n\nconst filePath = path.resolve(__dirname, '../x1024.txt');\nconst storage = {};\n\nassert(isBuildingSnapshot());\n\naddSerializeCallback(({ filePath }) => {\n  storage[filePath] = zlib.gzipSync(fs.readFileSync(filePath));\n}, { filePath });\n\naddDeserializeCallback(({ filePath }) => {\n  storage[filePath] = zlib.gunzipSync(storage[filePath]);\n}, { filePath });\n\nsetDeserializeMainFunction(({ filePath }) => {\n  console.log(storage[filePath].toString());\n}, { filePath });\n</code></pre>\n<p>The resulted binary will simply print the data deserialized from the snapshot\nduring start up:</p>\n<pre><code class=\"language-console\">$ out/Release/node\n# Prints content of ./test/fixtures/x1024.txt\n</code></pre>\n<p>Currently the API is only available to a Node.js instance launched from the\ndefault snapshot, that is, the application deserialized from a user-land\nsnapshot cannot use these APIs again.</p>",
           "methods": [
             {
               "textRaw": "`v8.startupSnapshot.addSerializeCallback(callback[, data])`",

@@ -950,6 +950,10 @@ napi_status NAPI_CDECL napi_create_external_buffer(napi_env env,
   NAPI_PREAMBLE(env);
   CHECK_ARG(env, result);
 
+#if defined(V8_ENABLE_SANDBOX)
+  return napi_set_last_error(env, napi_no_external_buffers_allowed);
+#endif
+
   v8::Isolate* isolate = env->isolate;
 
   // The finalizer object will delete itself after invoking the callback.
@@ -1069,7 +1073,7 @@ class Work : public node::AsyncResource, public node::ThreadPoolWork {
             env->isolate,
             async_resource,
             *v8::String::Utf8Value(env->isolate, async_resource_name)),
-        ThreadPoolWork(env->node_env()),
+        ThreadPoolWork(env->node_env(), "node_api"),
         _env(env),
         _data(data),
         _execute(execute),

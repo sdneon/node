@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v19.0.1/lib/stream.js\">lib/stream.js</a></p>\n<p>A stream is an abstract interface for working with streaming data in Node.js.\nThe <code>node:stream</code> module provides an API for implementing the stream interface.</p>\n<p>There are many stream objects provided by Node.js. For instance, a\n<a href=\"http.html#class-httpincomingmessage\">request to an HTTP server</a> and <a href=\"process.html#processstdout\"><code>process.stdout</code></a>\nare both stream instances.</p>\n<p>Streams can be readable, writable, or both. All streams are instances of\n<a href=\"events.html#class-eventemitter\"><code>EventEmitter</code></a>.</p>\n<p>To access the <code>node:stream</code> module:</p>\n<pre><code class=\"language-js\">const stream = require('node:stream');\n</code></pre>\n<p>The <code>node:stream</code> module is useful for creating new types of stream instances.\nIt is usually not necessary to use the <code>node:stream</code> module to consume streams.</p>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v19.1.0/lib/stream.js\">lib/stream.js</a></p>\n<p>A stream is an abstract interface for working with streaming data in Node.js.\nThe <code>node:stream</code> module provides an API for implementing the stream interface.</p>\n<p>There are many stream objects provided by Node.js. For instance, a\n<a href=\"http.html#class-httpincomingmessage\">request to an HTTP server</a> and <a href=\"process.html#processstdout\"><code>process.stdout</code></a>\nare both stream instances.</p>\n<p>Streams can be readable, writable, or both. All streams are instances of\n<a href=\"events.html#class-eventemitter\"><code>EventEmitter</code></a>.</p>\n<p>To access the <code>node:stream</code> module:</p>\n<pre><code class=\"language-js\">const stream = require('node:stream');\n</code></pre>\n<p>The <code>node:stream</code> module is useful for creating new types of stream instances.\nIt is usually not necessary to use the <code>node:stream</code> module to consume streams.</p>",
       "modules": [
         {
           "textRaw": "Organization of this document",
@@ -133,6 +133,13 @@
                       "name": "signal",
                       "type": "AbortSignal",
                       "desc": "allows aborting the wait for the stream finish. The underlying stream will _not_ be aborted if the signal is aborted. The callback will get called with an `AbortError`. All registered listeners added by this function will also be removed."
+                    },
+                    {
+                      "textRaw": "`cleanup` {boolean} remove all registered stream listeners. **Default:** `false`.",
+                      "name": "cleanup",
+                      "type": "boolean",
+                      "default": "`false`",
+                      "desc": "remove all registered stream listeners."
                     }
                   ]
                 },
@@ -391,7 +398,7 @@
               ]
             }
           ],
-          "desc": "<p>Combines two or more streams into a <code>Duplex</code> stream that writes to the\nfirst stream and reads from the last. Each provided stream is piped into\nthe next, using <code>stream.pipeline</code>. If any of the streams error then all\nare destroyed, including the outer <code>Duplex</code> stream.</p>\n<p>Because <code>stream.compose</code> returns a new stream that in turn can (and\nshould) be piped into other streams, it enables composition. In contrast,\nwhen passing streams to <code>stream.pipeline</code>, typically the first stream is\na readable stream and the last a writable stream, forming a closed\ncircuit.</p>\n<p>If passed a <code>Function</code> it must be a factory method taking a <code>source</code>\n<code>Iterable</code>.</p>\n<pre><code class=\"language-mjs\">import { compose, Transform } from 'node:stream';\n\nconst removeSpaces = new Transform({\n  transform(chunk, encoding, callback) {\n    callback(null, String(chunk).replace(' ', ''));\n  }\n});\n\nasync function* toUpper(source) {\n  for await (const chunk of source) {\n    yield String(chunk).toUpperCase();\n  }\n}\n\nlet res = '';\nfor await (const buf of compose(removeSpaces, toUpper).end('hello world')) {\n  res += buf;\n}\n\nconsole.log(res); // prints 'HELLOWORLD'\n</code></pre>\n<p><code>stream.compose</code> can be used to convert async iterables, generators and\nfunctions into streams.</p>\n<ul>\n<li><code>AsyncIterable</code> converts into a readable <code>Duplex</code>. Cannot yield\n<code>null</code>.</li>\n<li><code>AsyncGeneratorFunction</code> converts into a readable/writable transform <code>Duplex</code>.\nMust take a source <code>AsyncIterable</code> as first parameter. Cannot yield\n<code>null</code>.</li>\n<li><code>AsyncFunction</code> converts into a writable <code>Duplex</code>. Must return\neither <code>null</code> or <code>undefined</code>.</li>\n</ul>\n<pre><code class=\"language-mjs\">import { compose } from 'node:stream';\nimport { finished } from 'node:stream/promises';\n\n// Convert AsyncIterable into readable Duplex.\nconst s1 = compose(async function*() {\n  yield 'Hello';\n  yield 'World';\n}());\n\n// Convert AsyncGenerator into transform Duplex.\nconst s2 = compose(async function*(source) {\n  for await (const chunk of source) {\n    yield String(chunk).toUpperCase();\n  }\n});\n\nlet res = '';\n\n// Convert AsyncFunction into writable Duplex.\nconst s3 = compose(async function(source) {\n  for await (const chunk of source) {\n    res += chunk;\n  }\n});\n\nawait finished(compose(s1, s2, s3));\n\nconsole.log(res); // prints 'HELLOWORLD'\n</code></pre>"
+          "desc": "<p>Combines two or more streams into a <code>Duplex</code> stream that writes to the\nfirst stream and reads from the last. Each provided stream is piped into\nthe next, using <code>stream.pipeline</code>. If any of the streams error then all\nare destroyed, including the outer <code>Duplex</code> stream.</p>\n<p>Because <code>stream.compose</code> returns a new stream that in turn can (and\nshould) be piped into other streams, it enables composition. In contrast,\nwhen passing streams to <code>stream.pipeline</code>, typically the first stream is\na readable stream and the last a writable stream, forming a closed\ncircuit.</p>\n<p>If passed a <code>Function</code> it must be a factory method taking a <code>source</code>\n<code>Iterable</code>.</p>\n<pre><code class=\"language-mjs\">import { compose, Transform } from 'node:stream';\n\nconst removeSpaces = new Transform({\n  transform(chunk, encoding, callback) {\n    callback(null, String(chunk).replace(' ', ''));\n  }\n});\n\nasync function* toUpper(source) {\n  for await (const chunk of source) {\n    yield String(chunk).toUpperCase();\n  }\n}\n\nlet res = '';\nfor await (const buf of compose(removeSpaces, toUpper).end('hello world')) {\n  res += buf;\n}\n\nconsole.log(res); // prints 'HELLOWORLD'\n</code></pre>\n<p><code>stream.compose</code> can be used to convert async iterables, generators and\nfunctions into streams.</p>\n<ul>\n<li><code>AsyncIterable</code> converts into a readable <code>Duplex</code>. Cannot yield\n<code>null</code>.</li>\n<li><code>AsyncGeneratorFunction</code> converts into a readable/writable transform <code>Duplex</code>.\nMust take a source <code>AsyncIterable</code> as first parameter. Cannot yield\n<code>null</code>.</li>\n<li><code>AsyncFunction</code> converts into a writable <code>Duplex</code>. Must return\neither <code>null</code> or <code>undefined</code>.</li>\n</ul>\n<pre><code class=\"language-mjs\">import { compose } from 'node:stream';\nimport { finished } from 'node:stream/promises';\n\n// Convert AsyncIterable into readable Duplex.\nconst s1 = compose(async function*() {\n  yield 'Hello';\n  yield 'World';\n}());\n\n// Convert AsyncGenerator into transform Duplex.\nconst s2 = compose(async function*(source) {\n  for await (const chunk of source) {\n    yield String(chunk).toUpperCase();\n  }\n});\n\nlet res = '';\n\n// Convert AsyncFunction into writable Duplex.\nconst s3 = compose(async function(source) {\n  for await (const chunk of source) {\n    res += chunk;\n  }\n});\n\nawait finished(compose(s1, s2, s3));\n\nconsole.log(res); // prints 'HELLOWORLD'\n</code></pre>\n<p>See <a href=\"#readablecomposestream-options\"><code>readable.compose(stream)</code></a> for <code>stream.compose</code> as operator.</p>"
         },
         {
           "textRaw": "`stream.Readable.from(iterable[, options])`",
@@ -1912,6 +1919,50 @@
                       "desc": "<pre><code class=\"language-js\">const fs = require('node:fs');\n\nasync function print(readable) {\n  readable.setEncoding('utf8');\n  let data = '';\n  for await (const chunk of readable) {\n    data += chunk;\n  }\n  console.log(data);\n}\n\nprint(fs.createReadStream('file')).catch(console.error);\n</code></pre>\n<p>If the loop terminates with a <code>break</code>, <code>return</code>, or a <code>throw</code>, the stream will\nbe destroyed. In other terms, iterating over a stream will consume the stream\nfully. The stream will be read in chunks of size equal to the <code>highWaterMark</code>\noption. In the code example above, data will be in a single chunk if the file\nhas less then 64 KiB of data because no <code>highWaterMark</code> option is provided to\n<a href=\"fs.html#fscreatereadstreampath-options\"><code>fs.createReadStream()</code></a>.</p>"
                     },
                     {
+                      "textRaw": "`readable.compose(stream[, options])`",
+                      "type": "method",
+                      "name": "compose",
+                      "meta": {
+                        "added": [
+                          "v19.1.0"
+                        ],
+                        "changes": []
+                      },
+                      "stability": 1,
+                      "stabilityText": "Experimental",
+                      "signatures": [
+                        {
+                          "return": {
+                            "textRaw": "Returns: {Duplex} a stream composed with the stream `stream`.",
+                            "name": "return",
+                            "type": "Duplex",
+                            "desc": "a stream composed with the stream `stream`."
+                          },
+                          "params": [
+                            {
+                              "textRaw": "`stream` {Stream|Iterable|AsyncIterable|Function}",
+                              "name": "stream",
+                              "type": "Stream|Iterable|AsyncIterable|Function"
+                            },
+                            {
+                              "textRaw": "`options` {Object}",
+                              "name": "options",
+                              "type": "Object",
+                              "options": [
+                                {
+                                  "textRaw": "`signal` {AbortSignal} allows destroying the stream if the signal is aborted.",
+                                  "name": "signal",
+                                  "type": "AbortSignal",
+                                  "desc": "allows destroying the stream if the signal is aborted."
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "desc": "<pre><code class=\"language-mjs\">import { Readable } from 'node:stream';\n\nasync function* splitToWords(source) {\n  for await (const chunk of source) {\n    const words = String(chunk).split(' ');\n\n    for (const word of words) {\n      yield word;\n    }\n  }\n}\n\nconst wordsStream = Readable.from(['this is', 'compose as operator']).compose(splitToWords);\nconst words = await wordsStream.toArray();\n\nconsole.log(words); // prints ['this', 'is', 'compose', 'as', 'operator']\n</code></pre>\n<p>See <a href=\"#streamcomposestreams\"><code>stream.compose</code></a> for more information.</p>"
+                    },
+                    {
                       "textRaw": "`readable.iterator([options])`",
                       "type": "method",
                       "name": "iterator",
@@ -3044,6 +3095,13 @@
                           "name": "signal",
                           "type": "AbortSignal",
                           "desc": "allows aborting the wait for the stream finish. The underlying stream will _not_ be aborted if the signal is aborted. The callback will get called with an `AbortError`. All registered listeners added by this function will also be removed."
+                        },
+                        {
+                          "textRaw": "`cleanup` {boolean} remove all registered stream listeners. **Default:** `false`.",
+                          "name": "cleanup",
+                          "type": "boolean",
+                          "default": "`false`",
+                          "desc": "remove all registered stream listeners."
                         }
                       ]
                     },
@@ -3302,7 +3360,7 @@
                   ]
                 }
               ],
-              "desc": "<p>Combines two or more streams into a <code>Duplex</code> stream that writes to the\nfirst stream and reads from the last. Each provided stream is piped into\nthe next, using <code>stream.pipeline</code>. If any of the streams error then all\nare destroyed, including the outer <code>Duplex</code> stream.</p>\n<p>Because <code>stream.compose</code> returns a new stream that in turn can (and\nshould) be piped into other streams, it enables composition. In contrast,\nwhen passing streams to <code>stream.pipeline</code>, typically the first stream is\na readable stream and the last a writable stream, forming a closed\ncircuit.</p>\n<p>If passed a <code>Function</code> it must be a factory method taking a <code>source</code>\n<code>Iterable</code>.</p>\n<pre><code class=\"language-mjs\">import { compose, Transform } from 'node:stream';\n\nconst removeSpaces = new Transform({\n  transform(chunk, encoding, callback) {\n    callback(null, String(chunk).replace(' ', ''));\n  }\n});\n\nasync function* toUpper(source) {\n  for await (const chunk of source) {\n    yield String(chunk).toUpperCase();\n  }\n}\n\nlet res = '';\nfor await (const buf of compose(removeSpaces, toUpper).end('hello world')) {\n  res += buf;\n}\n\nconsole.log(res); // prints 'HELLOWORLD'\n</code></pre>\n<p><code>stream.compose</code> can be used to convert async iterables, generators and\nfunctions into streams.</p>\n<ul>\n<li><code>AsyncIterable</code> converts into a readable <code>Duplex</code>. Cannot yield\n<code>null</code>.</li>\n<li><code>AsyncGeneratorFunction</code> converts into a readable/writable transform <code>Duplex</code>.\nMust take a source <code>AsyncIterable</code> as first parameter. Cannot yield\n<code>null</code>.</li>\n<li><code>AsyncFunction</code> converts into a writable <code>Duplex</code>. Must return\neither <code>null</code> or <code>undefined</code>.</li>\n</ul>\n<pre><code class=\"language-mjs\">import { compose } from 'node:stream';\nimport { finished } from 'node:stream/promises';\n\n// Convert AsyncIterable into readable Duplex.\nconst s1 = compose(async function*() {\n  yield 'Hello';\n  yield 'World';\n}());\n\n// Convert AsyncGenerator into transform Duplex.\nconst s2 = compose(async function*(source) {\n  for await (const chunk of source) {\n    yield String(chunk).toUpperCase();\n  }\n});\n\nlet res = '';\n\n// Convert AsyncFunction into writable Duplex.\nconst s3 = compose(async function(source) {\n  for await (const chunk of source) {\n    res += chunk;\n  }\n});\n\nawait finished(compose(s1, s2, s3));\n\nconsole.log(res); // prints 'HELLOWORLD'\n</code></pre>"
+              "desc": "<p>Combines two or more streams into a <code>Duplex</code> stream that writes to the\nfirst stream and reads from the last. Each provided stream is piped into\nthe next, using <code>stream.pipeline</code>. If any of the streams error then all\nare destroyed, including the outer <code>Duplex</code> stream.</p>\n<p>Because <code>stream.compose</code> returns a new stream that in turn can (and\nshould) be piped into other streams, it enables composition. In contrast,\nwhen passing streams to <code>stream.pipeline</code>, typically the first stream is\na readable stream and the last a writable stream, forming a closed\ncircuit.</p>\n<p>If passed a <code>Function</code> it must be a factory method taking a <code>source</code>\n<code>Iterable</code>.</p>\n<pre><code class=\"language-mjs\">import { compose, Transform } from 'node:stream';\n\nconst removeSpaces = new Transform({\n  transform(chunk, encoding, callback) {\n    callback(null, String(chunk).replace(' ', ''));\n  }\n});\n\nasync function* toUpper(source) {\n  for await (const chunk of source) {\n    yield String(chunk).toUpperCase();\n  }\n}\n\nlet res = '';\nfor await (const buf of compose(removeSpaces, toUpper).end('hello world')) {\n  res += buf;\n}\n\nconsole.log(res); // prints 'HELLOWORLD'\n</code></pre>\n<p><code>stream.compose</code> can be used to convert async iterables, generators and\nfunctions into streams.</p>\n<ul>\n<li><code>AsyncIterable</code> converts into a readable <code>Duplex</code>. Cannot yield\n<code>null</code>.</li>\n<li><code>AsyncGeneratorFunction</code> converts into a readable/writable transform <code>Duplex</code>.\nMust take a source <code>AsyncIterable</code> as first parameter. Cannot yield\n<code>null</code>.</li>\n<li><code>AsyncFunction</code> converts into a writable <code>Duplex</code>. Must return\neither <code>null</code> or <code>undefined</code>.</li>\n</ul>\n<pre><code class=\"language-mjs\">import { compose } from 'node:stream';\nimport { finished } from 'node:stream/promises';\n\n// Convert AsyncIterable into readable Duplex.\nconst s1 = compose(async function*() {\n  yield 'Hello';\n  yield 'World';\n}());\n\n// Convert AsyncGenerator into transform Duplex.\nconst s2 = compose(async function*(source) {\n  for await (const chunk of source) {\n    yield String(chunk).toUpperCase();\n  }\n});\n\nlet res = '';\n\n// Convert AsyncFunction into writable Duplex.\nconst s3 = compose(async function(source) {\n  for await (const chunk of source) {\n    res += chunk;\n  }\n});\n\nawait finished(compose(s1, s2, s3));\n\nconsole.log(res); // prints 'HELLOWORLD'\n</code></pre>\n<p>See <a href=\"#readablecomposestream-options\"><code>readable.compose(stream)</code></a> for <code>stream.compose</code> as operator.</p>"
             },
             {
               "textRaw": "`stream.Readable.from(iterable[, options])`",
