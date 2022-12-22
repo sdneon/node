@@ -291,6 +291,25 @@ test('a test that creates asynchronous activity', (t) => {
 });
 ```
 
+## Watch mode
+
+<!-- YAML
+added: v19.2.0
+-->
+
+> Stability: 1 - Experimental
+
+The Node.js test runner supports running in watch mode by passing the `--watch` flag:
+
+```bash
+node --test --watch
+```
+
+In watch mode, the test runner will watch for changes to test files and
+their dependencies. When a change is detected, the test runner will
+rerun the tests affected by the change.
+The test runner will continue to run until the process is terminated.
+
 ## Running tests from the command line
 
 The Node.js test runner can be invoked from the command line by passing the
@@ -1023,8 +1042,7 @@ Emitted when [`context.diagnostic`][] is called.
 ### Event: `'test:fail'`
 
 * `data` {Object}
-  * `duration` {number} The test duration.
-  * `error` {Error} The failure casing test to fail.
+  * `details` {Object} Additional execution metadata.
   * `name` {string} The test name.
   * `testNumber` {number} The ordinal number of the test.
   * `todo` {string|undefined} Present if [`context.todo`][] is called
@@ -1035,7 +1053,7 @@ Emitted when a test fails.
 ### Event: `'test:pass'`
 
 * `data` {Object}
-  * `duration` {number} The test duration.
+  * `details` {Object} Additional execution metadata.
   * `name` {string} The test name.
   * `testNumber` {number} The ordinal number of the test.
   * `todo` {string|undefined} Present if [`context.todo`][] is called
@@ -1084,7 +1102,7 @@ test('top level test', async (t) => {
     'This is a subtest',
     (t) => {
       assert.ok('some relevant assertion here');
-    }
+    },
   );
 });
 ```
@@ -1118,7 +1136,7 @@ test('top level test', async (t) => {
     'This is a subtest',
     (t) => {
       assert.ok('some relevant assertion here');
-    }
+    },
   );
 });
 ```
@@ -1295,7 +1313,7 @@ test('top level test', async (t) => {
     { only: false, skip: false, concurrency: 1, todo: false },
     (t) => {
       assert.ok('some relevant assertion here');
-    }
+    },
   );
 });
 ```

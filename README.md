@@ -5,13 +5,13 @@ This is a *fun* mod of Node.JS that initially embedded a modified version of dco
 
 Thanks to the inspiration from dcodeIO et al =D
 
-## Version 19.1.0
-Update to Node.JS 19.1.0 baseline.
+## Version 19.2.0
+Update to Node.JS 19.2.0 baseline, and TypeSCript 4.9.4.
 
 It embeds:
 * DS v1.2.0.
 * CS v2.7.0.
-* TS v4.8.4.
+* TS v4.9.4.
 * Refer to prior readmes for old changes.
 
 ## Usage
@@ -594,7 +594,7 @@ For information about the governance of the Node.js project, see
   **Rich Trott** <<rtrott@gmail.com>> (he/him)
 * [vdeturckheim](https://github.com/vdeturckheim) -
   **Vladimir de Turckheim** <<vlad2t@hotmail.com>> (he/him)
-* [VoltrexMaster](https://github.com/VoltrexMaster) -
+* [VoltrexKeyva](https://github.com/VoltrexKeyva) -
   **Mohammed Keyvanzadeh** <<mohammadkeyvanzade94@gmail.com>> (he/him)
 * [watilde](https://github.com/watilde) -
   **Daijiro Wachi** <<daijiro.wachi@gmail.com>> (he/him)
@@ -840,7 +840,7 @@ maintaining the Node.js project.
   **Pooja Durgad** <<Pooja.D.P@ibm.com>>
 * [RaisinTen](https://github.com/RaisinTen) -
   **Darshan Sen** <<raisinten@gmail.com>>
-* [VoltrexMaster](https://github.com/VoltrexMaster) -
+* [VoltrexKeyva](https://github.com/VoltrexKeyva) -
   **Mohammed Keyvanzadeh** <<mohammadkeyvanzade94@gmail.com>> (he/him)
 
 Triagers follow the [Triage Guide](./doc/contributing/issues.md#triaging-a-bug-report) when

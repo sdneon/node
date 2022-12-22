@@ -8,7 +8,7 @@
       "introduced_in": "v16.4.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v19.1.0/lib/async_hooks.js\">lib/async_hooks.js</a></p>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v19.2.0/lib/async_hooks.js\">lib/async_hooks.js</a></p>",
       "modules": [
         {
           "textRaw": "Introduction",
@@ -191,8 +191,22 @@
           ],
           "signatures": [
             {
-              "params": [],
-              "desc": "<p>Creates a new instance of <code>AsyncLocalStorage</code>. Store is only provided within a\n<code>run()</code> call or after an <code>enterWith()</code> call.</p>"
+              "params": [
+                {
+                  "textRaw": "`options` {Object}",
+                  "name": "options",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`onPropagate` {Function} Optional callback invoked before a store is propagated to a new async resource. Returning `true` allows propagation, returning `false` avoids it. Default is to propagate always.",
+                      "name": "onPropagate",
+                      "type": "Function",
+                      "desc": "Optional callback invoked before a store is propagated to a new async resource. Returning `true` allows propagation, returning `false` avoids it. Default is to propagate always."
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>Creates a new instance of <code>AsyncLocalStorage</code>. Store is only provided within a\n<code>run()</code> call or after an <code>enterWith()</code> call.</p>\n<p>The <code>onPropagate</code> is called during creation of an async resource. Throwing at\nthis time will print the stack trace and exit. See\n<a href=\"async_hooks.html#error-handling\"><code>async_hooks</code> Error handling</a> for details.</p>\n<p>Creating an async resource within the <code>onPropagate</code> callback will result in\na recursive call to <code>onPropagate</code>.</p>"
             }
           ]
         },
@@ -209,7 +223,7 @@
               }
             ]
           },
-          "desc": "<p>The class <code>AsyncResource</code> is designed to be extended by the embedder's async\nresources. Using this, users can easily trigger the lifetime events of their\nown resources.</p>\n<p>The <code>init</code> hook will trigger when an <code>AsyncResource</code> is instantiated.</p>\n<p>The following is an overview of the <code>AsyncResource</code> API.</p>\n<pre><code class=\"language-mjs\">import { AsyncResource, executionAsyncId } from 'node:async_hooks';\n\n// AsyncResource() is meant to be extended. Instantiating a\n// new AsyncResource() also triggers init. If triggerAsyncId is omitted then\n// async_hook.executionAsyncId() is used.\nconst asyncResource = new AsyncResource(\n  type, { triggerAsyncId: executionAsyncId(), requireManualDestroy: false }\n);\n\n// Run a function in the execution context of the resource. This will\n// * establish the context of the resource\n// * trigger the AsyncHooks before callbacks\n// * call the provided function `fn` with the supplied arguments\n// * trigger the AsyncHooks after callbacks\n// * restore the original execution context\nasyncResource.runInAsyncScope(fn, thisArg, ...args);\n\n// Call AsyncHooks destroy callbacks.\nasyncResource.emitDestroy();\n\n// Return the unique ID assigned to the AsyncResource instance.\nasyncResource.asyncId();\n\n// Return the trigger ID for the AsyncResource instance.\nasyncResource.triggerAsyncId();\n</code></pre>\n<pre><code class=\"language-cjs\">const { AsyncResource, executionAsyncId } = require('node:async_hooks');\n\n// AsyncResource() is meant to be extended. Instantiating a\n// new AsyncResource() also triggers init. If triggerAsyncId is omitted then\n// async_hook.executionAsyncId() is used.\nconst asyncResource = new AsyncResource(\n  type, { triggerAsyncId: executionAsyncId(), requireManualDestroy: false }\n);\n\n// Run a function in the execution context of the resource. This will\n// * establish the context of the resource\n// * trigger the AsyncHooks before callbacks\n// * call the provided function `fn` with the supplied arguments\n// * trigger the AsyncHooks after callbacks\n// * restore the original execution context\nasyncResource.runInAsyncScope(fn, thisArg, ...args);\n\n// Call AsyncHooks destroy callbacks.\nasyncResource.emitDestroy();\n\n// Return the unique ID assigned to the AsyncResource instance.\nasyncResource.asyncId();\n\n// Return the trigger ID for the AsyncResource instance.\nasyncResource.triggerAsyncId();\n</code></pre>",
+          "desc": "<p>The class <code>AsyncResource</code> is designed to be extended by the embedder's async\nresources. Using this, users can easily trigger the lifetime events of their\nown resources.</p>\n<p>The <code>init</code> hook will trigger when an <code>AsyncResource</code> is instantiated.</p>\n<p>The following is an overview of the <code>AsyncResource</code> API.</p>\n<pre><code class=\"language-mjs\">import { AsyncResource, executionAsyncId } from 'node:async_hooks';\n\n// AsyncResource() is meant to be extended. Instantiating a\n// new AsyncResource() also triggers init. If triggerAsyncId is omitted then\n// async_hook.executionAsyncId() is used.\nconst asyncResource = new AsyncResource(\n  type, { triggerAsyncId: executionAsyncId(), requireManualDestroy: false },\n);\n\n// Run a function in the execution context of the resource. This will\n// * establish the context of the resource\n// * trigger the AsyncHooks before callbacks\n// * call the provided function `fn` with the supplied arguments\n// * trigger the AsyncHooks after callbacks\n// * restore the original execution context\nasyncResource.runInAsyncScope(fn, thisArg, ...args);\n\n// Call AsyncHooks destroy callbacks.\nasyncResource.emitDestroy();\n\n// Return the unique ID assigned to the AsyncResource instance.\nasyncResource.asyncId();\n\n// Return the trigger ID for the AsyncResource instance.\nasyncResource.triggerAsyncId();\n</code></pre>\n<pre><code class=\"language-cjs\">const { AsyncResource, executionAsyncId } = require('node:async_hooks');\n\n// AsyncResource() is meant to be extended. Instantiating a\n// new AsyncResource() also triggers init. If triggerAsyncId is omitted then\n// async_hook.executionAsyncId() is used.\nconst asyncResource = new AsyncResource(\n  type, { triggerAsyncId: executionAsyncId(), requireManualDestroy: false },\n);\n\n// Run a function in the execution context of the resource. This will\n// * establish the context of the resource\n// * trigger the AsyncHooks before callbacks\n// * call the provided function `fn` with the supplied arguments\n// * trigger the AsyncHooks after callbacks\n// * restore the original execution context\nasyncResource.runInAsyncScope(fn, thisArg, ...args);\n\n// Call AsyncHooks destroy callbacks.\nasyncResource.emitDestroy();\n\n// Return the unique ID assigned to the AsyncResource instance.\nasyncResource.asyncId();\n\n// Return the trigger ID for the AsyncResource instance.\nasyncResource.triggerAsyncId();\n</code></pre>",
           "classMethods": [
             {
               "textRaw": "Static method: `AsyncResource.bind(fn[, type[, thisArg]])`",

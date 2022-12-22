@@ -8,7 +8,7 @@
       "introduced_in": "v18.0.0",
       "stability": 1,
       "stabilityText": "Experimental",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v19.1.0/lib/test.js\">lib/test.js</a></p>\n<p>The <code>node:test</code> module facilitates the creation of JavaScript tests that\nreport results in <a href=\"https://testanything.org/\">TAP</a> format. To access it:</p>\n<pre><code class=\"language-mjs\">import test from 'node:test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('node:test');\n</code></pre>\n<p>This module is only available under the <code>node:</code> scheme. The following will not\nwork:</p>\n<pre><code class=\"language-mjs\">import test from 'test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('test');\n</code></pre>\n<p>Tests created via the <code>test</code> module consist of a single function that is\nprocessed in one of three ways:</p>\n<ol>\n<li>A synchronous function that is considered failing if it throws an exception,\nand is considered passing otherwise.</li>\n<li>A function that returns a <code>Promise</code> that is considered failing if the\n<code>Promise</code> rejects, and is considered passing if the <code>Promise</code> resolves.</li>\n<li>A function that receives a callback function. If the callback receives any\ntruthy value as its first argument, the test is considered failing. If a\nfalsy value is passed as the first argument to the callback, the test is\nconsidered passing. If the test function receives a callback function and\nalso returns a <code>Promise</code>, the test will fail.</li>\n</ol>\n<p>The following example illustrates how tests are written using the\n<code>test</code> module.</p>\n<pre><code class=\"language-js\">test('synchronous passing test', (t) => {\n  // This test passes because it does not throw an exception.\n  assert.strictEqual(1, 1);\n});\n\ntest('synchronous failing test', (t) => {\n  // This test fails because it throws an exception.\n  assert.strictEqual(1, 2);\n});\n\ntest('asynchronous passing test', async (t) => {\n  // This test passes because the Promise returned by the async\n  // function is not rejected.\n  assert.strictEqual(1, 1);\n});\n\ntest('asynchronous failing test', async (t) => {\n  // This test fails because the Promise returned by the async\n  // function is rejected.\n  assert.strictEqual(1, 2);\n});\n\ntest('failing test using Promises', (t) => {\n  // Promises can be used directly as well.\n  return new Promise((resolve, reject) => {\n    setImmediate(() => {\n      reject(new Error('this will cause the test to fail'));\n    });\n  });\n});\n\ntest('callback passing test', (t, done) => {\n  // done() is the callback function. When the setImmediate() runs, it invokes\n  // done() with no arguments.\n  setImmediate(done);\n});\n\ntest('callback failing test', (t, done) => {\n  // When the setImmediate() runs, done() is invoked with an Error object and\n  // the test fails.\n  setImmediate(() => {\n    done(new Error('callback failure'));\n  });\n});\n</code></pre>\n<p>As a test file executes, TAP is written to the standard output of the Node.js\nprocess. This output can be interpreted by any test harness that understands\nthe TAP format. If any tests fail, the process exit code is set to <code>1</code>.</p>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v19.2.0/lib/test.js\">lib/test.js</a></p>\n<p>The <code>node:test</code> module facilitates the creation of JavaScript tests that\nreport results in <a href=\"https://testanything.org/\">TAP</a> format. To access it:</p>\n<pre><code class=\"language-mjs\">import test from 'node:test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('node:test');\n</code></pre>\n<p>This module is only available under the <code>node:</code> scheme. The following will not\nwork:</p>\n<pre><code class=\"language-mjs\">import test from 'test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('test');\n</code></pre>\n<p>Tests created via the <code>test</code> module consist of a single function that is\nprocessed in one of three ways:</p>\n<ol>\n<li>A synchronous function that is considered failing if it throws an exception,\nand is considered passing otherwise.</li>\n<li>A function that returns a <code>Promise</code> that is considered failing if the\n<code>Promise</code> rejects, and is considered passing if the <code>Promise</code> resolves.</li>\n<li>A function that receives a callback function. If the callback receives any\ntruthy value as its first argument, the test is considered failing. If a\nfalsy value is passed as the first argument to the callback, the test is\nconsidered passing. If the test function receives a callback function and\nalso returns a <code>Promise</code>, the test will fail.</li>\n</ol>\n<p>The following example illustrates how tests are written using the\n<code>test</code> module.</p>\n<pre><code class=\"language-js\">test('synchronous passing test', (t) => {\n  // This test passes because it does not throw an exception.\n  assert.strictEqual(1, 1);\n});\n\ntest('synchronous failing test', (t) => {\n  // This test fails because it throws an exception.\n  assert.strictEqual(1, 2);\n});\n\ntest('asynchronous passing test', async (t) => {\n  // This test passes because the Promise returned by the async\n  // function is not rejected.\n  assert.strictEqual(1, 1);\n});\n\ntest('asynchronous failing test', async (t) => {\n  // This test fails because the Promise returned by the async\n  // function is rejected.\n  assert.strictEqual(1, 2);\n});\n\ntest('failing test using Promises', (t) => {\n  // Promises can be used directly as well.\n  return new Promise((resolve, reject) => {\n    setImmediate(() => {\n      reject(new Error('this will cause the test to fail'));\n    });\n  });\n});\n\ntest('callback passing test', (t, done) => {\n  // done() is the callback function. When the setImmediate() runs, it invokes\n  // done() with no arguments.\n  setImmediate(done);\n});\n\ntest('callback failing test', (t, done) => {\n  // When the setImmediate() runs, done() is invoked with an Error object and\n  // the test fails.\n  setImmediate(() => {\n    done(new Error('callback failure'));\n  });\n});\n</code></pre>\n<p>As a test file executes, TAP is written to the standard output of the Node.js\nprocess. This output can be interpreted by any test harness that understands\nthe TAP format. If any tests fail, the process exit code is set to <code>1</code>.</p>",
       "modules": [
         {
           "textRaw": "Subtests",
@@ -51,6 +51,21 @@
           "desc": "<p>Once a test function finishes executing, the TAP results are output as quickly\nas possible while maintaining the order of the tests. However, it is possible\nfor the test function to generate asynchronous activity that outlives the test\nitself. The test runner handles this type of activity, but does not delay the\nreporting of test results in order to accommodate it.</p>\n<p>In the following example, a test completes with two <code>setImmediate()</code>\noperations still outstanding. The first <code>setImmediate()</code> attempts to create a\nnew subtest. Because the parent test has already finished and output its\nresults, the new subtest is immediately marked as failed, and reported in the\ntop level of the file's TAP output.</p>\n<p>The second <code>setImmediate()</code> creates an <code>uncaughtException</code> event.\n<code>uncaughtException</code> and <code>unhandledRejection</code> events originating from a completed\ntest are marked as failed by the <code>test</code> module and reported as diagnostic\nwarnings in the top level of the file's TAP output.</p>\n<pre><code class=\"language-js\">test('a test that creates asynchronous activity', (t) => {\n  setImmediate(() => {\n    t.test('subtest that is created too late', (t) => {\n      throw new Error('error1');\n    });\n  });\n\n  setImmediate(() => {\n    throw new Error('error2');\n  });\n\n  // The test finishes after this line.\n});\n</code></pre>",
           "type": "module",
           "displayName": "Extraneous asynchronous activity"
+        },
+        {
+          "textRaw": "Watch mode",
+          "name": "watch_mode",
+          "meta": {
+            "added": [
+              "v19.2.0"
+            ],
+            "changes": []
+          },
+          "stability": 1,
+          "stabilityText": "Experimental",
+          "desc": "<p>The Node.js test runner supports running in watch mode by passing the <code>--watch</code> flag:</p>\n<pre><code class=\"language-bash\">node --test --watch\n</code></pre>\n<p>In watch mode, the test runner will watch for changes to test files and\ntheir dependencies. When a change is detected, the test runner will\nrerun the tests affected by the change.\nThe test runner will continue to run until the process is terminated.</p>",
+          "type": "module",
+          "displayName": "Watch mode"
         },
         {
           "textRaw": "Running tests from the command line",
@@ -887,16 +902,10 @@
                   "type": "Object",
                   "options": [
                     {
-                      "textRaw": "`duration` {number} The test duration.",
-                      "name": "duration",
-                      "type": "number",
-                      "desc": "The test duration."
-                    },
-                    {
-                      "textRaw": "`error` {Error} The failure casing test to fail.",
-                      "name": "error",
-                      "type": "Error",
-                      "desc": "The failure casing test to fail."
+                      "textRaw": "`details` {Object} Additional execution metadata.",
+                      "name": "details",
+                      "type": "Object",
+                      "desc": "Additional execution metadata."
                     },
                     {
                       "textRaw": "`name` {string} The test name.",
@@ -938,10 +947,10 @@
                   "type": "Object",
                   "options": [
                     {
-                      "textRaw": "`duration` {number} The test duration.",
-                      "name": "duration",
-                      "type": "number",
-                      "desc": "The test duration."
+                      "textRaw": "`details` {Object} Additional execution metadata.",
+                      "name": "details",
+                      "type": "Object",
+                      "desc": "Additional execution metadata."
                     },
                     {
                       "textRaw": "`name` {string} The test name.",
@@ -1032,7 +1041,7 @@
                   ]
                 }
               ],
-              "desc": "<p>This function is used to create a hook running\nbefore each subtest of the current test.</p>\n<pre><code class=\"language-js\">test('top level test', async (t) => {\n  t.beforeEach((t) => t.diagnostic(`about to run ${t.name}`));\n  await t.test(\n    'This is a subtest',\n    (t) => {\n      assert.ok('some relevant assertion here');\n    }\n  );\n});\n</code></pre>"
+              "desc": "<p>This function is used to create a hook running\nbefore each subtest of the current test.</p>\n<pre><code class=\"language-js\">test('top level test', async (t) => {\n  t.beforeEach((t) => t.diagnostic(`about to run ${t.name}`));\n  await t.test(\n    'This is a subtest',\n    (t) => {\n      assert.ok('some relevant assertion here');\n    },\n  );\n});\n</code></pre>"
             },
             {
               "textRaw": "`context.afterEach([fn][, options])`",
@@ -1079,7 +1088,7 @@
                   ]
                 }
               ],
-              "desc": "<p>This function is used to create a hook running\nafter each subtest of the current test.</p>\n<pre><code class=\"language-js\">test('top level test', async (t) => {\n  t.afterEach((t) => t.diagnostic(`finished running ${t.name}`));\n  await t.test(\n    'This is a subtest',\n    (t) => {\n      assert.ok('some relevant assertion here');\n    }\n  );\n});\n</code></pre>"
+              "desc": "<p>This function is used to create a hook running\nafter each subtest of the current test.</p>\n<pre><code class=\"language-js\">test('top level test', async (t) => {\n  t.afterEach((t) => t.diagnostic(`finished running ${t.name}`));\n  await t.test(\n    'This is a subtest',\n    (t) => {\n      assert.ok('some relevant assertion here');\n    },\n  );\n});\n</code></pre>"
             },
             {
               "textRaw": "`context.diagnostic(message)`",
@@ -1284,7 +1293,7 @@
                   ]
                 }
               ],
-              "desc": "<p>This function is used to create subtests under the current test. This function\nbehaves in the same fashion as the top level <a href=\"#testname-options-fn\"><code>test()</code></a> function.</p>\n<pre><code class=\"language-js\">test('top level test', async (t) => {\n  await t.test(\n    'This is a subtest',\n    { only: false, skip: false, concurrency: 1, todo: false },\n    (t) => {\n      assert.ok('some relevant assertion here');\n    }\n  );\n});\n</code></pre>"
+              "desc": "<p>This function is used to create subtests under the current test. This function\nbehaves in the same fashion as the top level <a href=\"#testname-options-fn\"><code>test()</code></a> function.</p>\n<pre><code class=\"language-js\">test('top level test', async (t) => {\n  await t.test(\n    'This is a subtest',\n    { only: false, skip: false, concurrency: 1, todo: false },\n    (t) => {\n      assert.ok('some relevant assertion here');\n    },\n  );\n});\n</code></pre>"
             }
           ],
           "properties": [

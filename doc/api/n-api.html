@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v19.1.0">
-  <title>Node-API | Node.js v19.1.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v19.2.0">
+  <title>Node-API | Node.js v19.2.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -95,7 +95,7 @@
     <div id="column1" data-id="n-api" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v19.1.0 documentation</h1>
+          <h1>Node.js v19.2.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -110,7 +110,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v19.1.0</li>
+            <li class="pinned-header">Node.js v19.2.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -173,6 +173,7 @@
 <li><a href="#napi_async_execute_callback"><code>napi_async_execute_callback</code></a></li>
 <li><a href="#napi_async_complete_callback"><code>napi_async_complete_callback</code></a></li>
 <li><a href="#napi_threadsafe_function_call_js"><code>napi_threadsafe_function_call_js</code></a></li>
+<li><a href="#napi_cleanup_hook"><code>napi_cleanup_hook</code></a></li>
 <li><a href="#napi_async_cleanup_hook"><code>napi_async_cleanup_hook</code></a></li>
 </ul>
 </li>
@@ -639,6 +640,7 @@
 <li><a href="#napi_async_execute_callback"><code>napi_async_execute_callback</code></a></li>
 <li><a href="#napi_async_complete_callback"><code>napi_async_complete_callback</code></a></li>
 <li><a href="#napi_threadsafe_function_call_js"><code>napi_threadsafe_function_call_js</code></a></li>
+<li><a href="#napi_cleanup_hook"><code>napi_cleanup_hook</code></a></li>
 <li><a href="#napi_async_cleanup_hook"><code>napi_async_cleanup_hook</code></a></li>
 </ul>
 </li>
@@ -1612,6 +1614,18 @@ callback should free the data.</li>
 </ul>
 <p>Unless for reasons discussed in <a href="#object-lifetime-management">Object Lifetime Management</a>, creating a
 handle and/or callback scope inside the function body is not necessary.</p>
+<h5><code>napi_cleanup_hook</code><span><a class="mark" href="#napi_cleanup_hook" id="napi_cleanup_hook">#</a></span><a aria-hidden="true" class="legacy" id="n_api_napi_cleanup_hook"></a></h5>
+<div class="api_metadata">
+<span>Added in: v19.2.0</span>
+<span>N-API version: 3</span>
+</div>
+<p>Function pointer used with <a href="#napi_add_env_cleanup_hook"><code>napi_add_env_cleanup_hook</code></a>. It will be called
+when the environment is being torn down.</p>
+<p>Callback functions must satisfy the following signature:</p>
+<pre><code class="language-c"><span class="hljs-keyword">typedef</span> <span class="hljs-title function_">void</span> <span class="hljs-params">(*napi_cleanup_hook)</span><span class="hljs-params">(<span class="hljs-type">void</span>* data)</span>;</code></pre>
+<ul>
+<li><code>[in] data</code>: The data that was passed to <a href="#napi_add_env_cleanup_hook"><code>napi_add_env_cleanup_hook</code></a>.</li>
+</ul>
 <h5><code>napi_async_cleanup_hook</code><span><a class="mark" href="#napi_async_cleanup_hook" id="napi_async_cleanup_hook">#</a></span><a aria-hidden="true" class="legacy" id="n_api_napi_async_cleanup_hook"></a></h5>
 <div class="api_metadata">
 <span>Added in: v14.10.0, v12.19.0</span>
@@ -2277,7 +2291,7 @@ should be freed up.</p>
 <span>N-API version: 3</span>
 </div>
 <pre><code class="language-c">NODE_EXTERN napi_status <span class="hljs-title function_">napi_add_env_cleanup_hook</span><span class="hljs-params">(napi_env env,
-                                                  <span class="hljs-type">void</span> (*fun)(<span class="hljs-type">void</span>* arg),
+                                                  napi_cleanup_hook fun,
                                                   <span class="hljs-type">void</span>* arg)</span>;</code></pre>
 <p>Registers <code>fun</code> as a function to be run with the <code>arg</code> parameter once the
 current Node.js environment exits.</p>
@@ -3911,7 +3925,7 @@ reasons. Consider the following JavaScript:</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> obj = {};
 <span class="hljs-title class_">Object</span>.<span class="hljs-title function_">defineProperties</span>(obj, {
   <span class="hljs-string">'foo'</span>: { <span class="hljs-attr">value</span>: <span class="hljs-number">123</span>, <span class="hljs-attr">writable</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">configurable</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">enumerable</span>: <span class="hljs-literal">true</span> },
-  <span class="hljs-string">'bar'</span>: { <span class="hljs-attr">value</span>: <span class="hljs-number">456</span>, <span class="hljs-attr">writable</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">configurable</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">enumerable</span>: <span class="hljs-literal">true</span> }
+  <span class="hljs-string">'bar'</span>: { <span class="hljs-attr">value</span>: <span class="hljs-number">456</span>, <span class="hljs-attr">writable</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">configurable</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">enumerable</span>: <span class="hljs-literal">true</span> },
 });</code></pre>
 <p>The following is the approximate equivalent of the Node-API counterpart:</p>
 <pre><code class="language-c">napi_status status = napi_status_generic_failure;

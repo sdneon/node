@@ -67,7 +67,7 @@ a command-line flag. Experimental features may also emit a [warning][].
 | [Cluster](cluster.html) | (2) Stable |
 | [Console](console.html) | (2) Stable |
 | [Crypto](crypto.html) | (2) Stable |
-| [Diagnostics Channel](diagnostics_channel.html) | (1) Experimental |
+| [Diagnostics Channel](diagnostics_channel.html) | (2) Stable |
 | [DNS](dns.html) | (2) Stable |
 | [Domain](domain.html) | (0) Deprecated |
 | [File system](fs.html) | (2) Stable |
