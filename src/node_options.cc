@@ -613,6 +613,10 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
             "path to watch",
             &EnvironmentOptions::watch_mode_paths,
             kAllowedInEnvvar);
+  AddOption("--watch-preserve-output",
+            "preserve outputs on watch mode restart",
+            &EnvironmentOptions::watch_mode_preserve_output,
+            kAllowedInEnvvar);
   Implies("--watch-path", "--watch");
   AddOption("--check",
             "syntax check script without executing",
@@ -1296,6 +1300,6 @@ std::vector<std::string> ParseNodeOptionsEnvVar(
 }
 }  // namespace node
 
-NODE_MODULE_CONTEXT_AWARE_INTERNAL(options, node::options_parser::Initialize)
-NODE_MODULE_EXTERNAL_REFERENCE(options,
-                               node::options_parser::RegisterExternalReferences)
+NODE_BINDING_CONTEXT_AWARE_INTERNAL(options, node::options_parser::Initialize)
+NODE_BINDING_EXTERNAL_REFERENCE(
+    options, node::options_parser::RegisterExternalReferences)

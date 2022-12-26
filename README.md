@@ -5,8 +5,8 @@ This is a *fun* mod of Node.JS that initially embedded a modified version of dco
 
 Thanks to the inspiration from dcodeIO et al =D
 
-## Version 19.2.0
-Update to Node.JS 19.2.0 baseline, and TypeSCript 4.9.4.
+## Version 19.3.0
+Update to Node.JS 19.3.0 baseline.
 
 It embeds:
 * DS v1.2.0.
@@ -334,6 +334,8 @@ For information about the governance of the Node.js project, see
   **Matteo Collina** <<matteo.collina@gmail.com>> (he/him)
 * [mhdawson](https://github.com/mhdawson) -
   **Michael Dawson** <<midawson@redhat.com>> (he/him)
+* [RafaelGSS](https://github.com/RafaelGSS) -
+  **Rafael Gonzaga** <<rafael.nunu@hotmail.com>> (he/him)
 * [RaisinTen](https://github.com/RaisinTen) -
   **Darshan Sen** <<raisinten@gmail.com>> (he/him)
 * [richardlau](https://github.com/richardlau) -

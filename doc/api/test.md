@@ -870,6 +870,14 @@ test('changes a mock behavior once', (t) => {
 });
 ```
 
+### `ctx.resetCalls()`
+
+<!-- YAML
+added: v19.3.0
+-->
+
+Resets the call history of the mock function.
+
 ### `ctx.restore()`
 
 <!-- YAML
@@ -940,6 +948,15 @@ test('mocks a counting function', (t) => {
   assert.strictEqual(fn(), 6);
 });
 ```
+
+### `mock.getter(object, methodName[, implementation][, options])`
+
+<!-- YAML
+added: v19.3.0
+-->
+
+This function is syntax sugar for [`MockTracker.method`][] with `options.getter`
+set to `true`.
 
 ### `mock.method(object, methodName[, implementation][, options])`
 
@@ -1020,6 +1037,15 @@ added: v19.1.0
 This function restores the default behavior of all mocks that were previously
 created by this `MockTracker`. Unlike `mock.reset()`, `mock.restoreAll()` does
 not disassociate the mocks from the `MockTracker` instance.
+
+### `mock.setter(object, methodName[, implementation][, options])`
+
+<!-- YAML
+added: v19.3.0
+-->
+
+This function is syntax sugar for [`MockTracker.method`][] with `options.setter`
+set to `true`.
 
 ## Class: `TapStream`
 
@@ -1104,6 +1130,33 @@ test('top level test', async (t) => {
       assert.ok('some relevant assertion here');
     },
   );
+});
+```
+
+### `context.after([fn][, options])`
+
+<!-- YAML
+added: v19.3.0
+-->
+
+* `fn` {Function|AsyncFunction} The hook function. The first argument
+  to this function is a [`TestContext`][] object. If the hook uses callbacks,
+  the callback function is passed as the second argument. **Default:** A no-op
+  function.
+* `options` {Object} Configuration options for the hook. The following
+  properties are supported:
+  * `signal` {AbortSignal} Allows aborting an in-progress hook.
+  * `timeout` {number} A number of milliseconds the hook will fail after.
+    If unspecified, subtests inherit this value from their parent.
+    **Default:** `Infinity`.
+
+This function is used to create a hook that runs after the current test
+finishes.
+
+```js
+test('top level test', async (t) => {
+  t.after((t) => t.diagnostic(`finished running ${t.name}`));
+  assert.ok('some relevant assertion here');
 });
 ```
 
@@ -1356,6 +1409,7 @@ added:
 [`--test-only`]: cli.md#--test-only
 [`--test`]: cli.md#--test
 [`MockFunctionContext`]: #class-mockfunctioncontext
+[`MockTracker.method`]: #mockmethodobject-methodname-implementation-options
 [`MockTracker`]: #class-mocktracker
 [`SuiteContext`]: #class-suitecontext
 [`TestContext`]: #class-testcontext

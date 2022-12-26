@@ -570,6 +570,8 @@ void StringSlice(const FunctionCallbackInfo<Value>& args) {
 void DecodeUTF8(const FunctionCallbackInfo<Value>& args) {
   Environment* env = Environment::GetCurrent(args);  // list, flags
 
+  CHECK_GE(args.Length(), 1);
+
   if (!(args[0]->IsArrayBuffer() || args[0]->IsSharedArrayBuffer() ||
         args[0]->IsArrayBufferView())) {
     return node::THROW_ERR_INVALID_ARG_TYPE(
@@ -580,7 +582,6 @@ void DecodeUTF8(const FunctionCallbackInfo<Value>& args) {
 
   ArrayBufferViewContents<char> buffer(args[0]);
 
-  CHECK(args[1]->IsBoolean());
   bool ignore_bom = args[1]->IsTrue();
 
   const char* data = buffer.data();
@@ -1425,5 +1426,6 @@ void RegisterExternalReferences(ExternalReferenceRegistry* registry) {
 }  // namespace Buffer
 }  // namespace node
 
-NODE_MODULE_CONTEXT_AWARE_INTERNAL(buffer, node::Buffer::Initialize)
-NODE_MODULE_EXTERNAL_REFERENCE(buffer, node::Buffer::RegisterExternalReferences)
+NODE_BINDING_CONTEXT_AWARE_INTERNAL(buffer, node::Buffer::Initialize)
+NODE_BINDING_EXTERNAL_REFERENCE(buffer,
+                                node::Buffer::RegisterExternalReferences)

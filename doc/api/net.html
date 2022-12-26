@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v19.2.0">
-  <title>Net | Node.js v19.2.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v19.3.0">
+  <title>Net | Node.js v19.3.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -95,7 +95,7 @@
     <div id="column1" data-id="net" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v19.2.0 documentation</h1>
+          <h1>Node.js v19.3.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -110,7 +110,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v19.2.0</li>
+            <li class="pinned-header">Node.js v19.3.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -499,7 +499,7 @@
 
 <!--lint disable maximum-line-length-->
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v19.2.0/lib/net.js">lib/net.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v19.3.0/lib/net.js">lib/net.js</a></p>
 <p>The <code>node:net</code> module provides an asynchronous network API for creating stream-based
 TCP or <a href="#ipc-support">IPC</a> servers (<a href="#netcreateserveroptions-connectionlistener"><code>net.createServer()</code></a>) and clients
 (<a href="#netcreateconnection"><code>net.createConnection()</code></a>).</p>
@@ -811,7 +811,7 @@ This happens when another server is already listening on the requested
 after a certain amount of time:</p>
 <pre><code class="language-js">server.<span class="hljs-title function_">on</span>(<span class="hljs-string">'error'</span>, <span class="hljs-function">(<span class="hljs-params">e</span>) =></span> {
   <span class="hljs-keyword">if</span> (e.<span class="hljs-property">code</span> === <span class="hljs-string">'EADDRINUSE'</span>) {
-    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'Address in use, retrying...'</span>);
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">'Address in use, retrying...'</span>);
     <span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =></span> {
       server.<span class="hljs-title function_">close</span>();
       server.<span class="hljs-title function_">listen</span>(<span class="hljs-variable constant_">PORT</span>, <span class="hljs-variable constant_">HOST</span>);
@@ -1193,6 +1193,8 @@ behavior.</p>
 <details class="changelog"><summary>History</summary>
 <table>
 <tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.3.0</td>
+<td><p>Added the <code>autoSelectFamily</code> option.</p></td></tr>
 <tr><td>v17.7.0, v16.15.0</td>
 <td><p>The <code>noDelay</code>, <code>keepAlive</code>, and <code>keepAliveInitialDelay</code> options are supported now.</p></td></tr>
 <tr><td>v12.10.0</td>
@@ -1233,6 +1235,20 @@ immediately after the connection is established, similarly on what is done in
 <strong>Default:</strong> <code>false</code>.</li>
 <li><code>keepAliveInitialDelay</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> If set to a positive number, it sets the initial delay before
 the first keepalive probe is sent on an idle socket.<strong>Default:</strong> <code>0</code>.</li>
+<li><code>autoSelectFamily</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a>: If set to <code>true</code>, it enables a family autodetection algorithm
+that loosely implements section 5 of <a href="https://www.rfc-editor.org/rfc/rfc8305.txt">RFC 8305</a>.
+The <code>all</code> option passed to lookup is set to <code>true</code> and the sockets attempts to connect to all
+obtained IPv6 and IPv4 addresses, in sequence, until a connection is established.
+The first returned AAAA address is tried first, then the first returned A address and so on.
+Each connection attempt is given the amount of time specified by the <code>autoSelectFamilyAttemptTimeout</code>
+option before timing out and trying the next address.
+Ignored if the <code>family</code> option is not <code>0</code> or if <code>localAddress</code> is set.
+Connection errors are not emitted if at least one connection succeeds.
+<strong>Default:</strong> <code>false</code>.</li>
+<li><code>autoSelectFamilyAttemptTimeout</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a>: The amount of time in milliseconds to wait
+for a connection attempt to finish before trying the next address when using the <code>autoSelectFamily</code> option.
+If set to a positive integer less than <code>10</code>, then the value <code>10</code> will be used instead.
+<strong>Default:</strong> <code>250</code>.</li>
 </ul>
 <p>For <a href="#ipc-support">IPC</a> connections, available <code>options</code> are:</p>
 <ul>
