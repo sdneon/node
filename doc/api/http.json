@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v19.3.0/lib/http.js\">lib/http.js</a></p>\n<p>To use the HTTP server and client one must <code>require('node:http')</code>.</p>\n<p>The HTTP interfaces in Node.js are designed to support many features\nof the protocol which have been traditionally difficult to use.\nIn particular, large, possibly chunk-encoded, messages. The interface is\ncareful to never buffer entire requests or responses, so the\nuser is able to stream data.</p>\n<p>HTTP message headers are represented by an object like this:</p>\n<!-- eslint-skip -->\n<pre><code class=\"language-js\">{ 'content-length': '123',\n  'content-type': 'text/plain',\n  'connection': 'keep-alive',\n  'host': 'example.com',\n  'accept': '*/*' }\n</code></pre>\n<p>Keys are lowercased. Values are not modified.</p>\n<p>In order to support the full spectrum of possible HTTP applications, the Node.js\nHTTP API is very low-level. It deals with stream handling and message\nparsing only. It parses a message into headers and body but it does not\nparse the actual headers or the body.</p>\n<p>See <a href=\"#messageheaders\"><code>message.headers</code></a> for details on how duplicate headers are handled.</p>\n<p>The raw headers as they were received are retained in the <code>rawHeaders</code>\nproperty, which is an array of <code>[key, value, key2, value2, ...]</code>. For\nexample, the previous message header object might have a <code>rawHeaders</code>\nlist like the following:</p>\n<!-- eslint-disable semi -->\n<pre><code class=\"language-js\">[ 'ConTent-Length', '123456',\n  'content-LENGTH', '123',\n  'content-type', 'text/plain',\n  'CONNECTION', 'keep-alive',\n  'Host', 'example.com',\n  'accepT', '*/*' ]\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v19.6.1/lib/http.js\">lib/http.js</a></p>\n<p>To use the HTTP server and client one must <code>require('node:http')</code>.</p>\n<p>The HTTP interfaces in Node.js are designed to support many features\nof the protocol which have been traditionally difficult to use.\nIn particular, large, possibly chunk-encoded, messages. The interface is\ncareful to never buffer entire requests or responses, so the\nuser is able to stream data.</p>\n<p>HTTP message headers are represented by an object like this:</p>\n<!-- eslint-skip -->\n<pre><code class=\"language-js\">{ 'content-length': '123',\n  'content-type': 'text/plain',\n  'connection': 'keep-alive',\n  'host': 'example.com',\n  'accept': '*/*' }\n</code></pre>\n<p>Keys are lowercased. Values are not modified.</p>\n<p>In order to support the full spectrum of possible HTTP applications, the Node.js\nHTTP API is very low-level. It deals with stream handling and message\nparsing only. It parses a message into headers and body but it does not\nparse the actual headers or the body.</p>\n<p>See <a href=\"#messageheaders\"><code>message.headers</code></a> for details on how duplicate headers are handled.</p>\n<p>The raw headers as they were received are retained in the <code>rawHeaders</code>\nproperty, which is an array of <code>[key, value, key2, value2, ...]</code>. For\nexample, the previous message header object might have a <code>rawHeaders</code>\nlist like the following:</p>\n<!-- eslint-disable semi -->\n<pre><code class=\"language-js\">[ 'ConTent-Length', '123456',\n  'content-LENGTH', '123',\n  'content-type', 'text/plain',\n  'CONNECTION', 'keep-alive',\n  'Host', 'example.com',\n  'accepT', '*/*' ]\n</code></pre>",
       "classes": [
         {
           "textRaw": "Class: `http.Agent`",
@@ -1613,7 +1613,7 @@
           ],
           "properties": [
             {
-              "textRaw": "`headersTimeout` {number} **Default:** `60000`",
+              "textRaw": "`headersTimeout` {number} **Default:** The minimum between [`server.requestTimeout`][] or `60000`.",
               "type": "number",
               "name": "headersTimeout",
               "meta": {
@@ -1621,9 +1621,15 @@
                   "v11.3.0",
                   "v10.14.0"
                 ],
-                "changes": []
+                "changes": [
+                  {
+                    "version": "v19.4.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/45778",
+                    "description": "The default is now set to the minimum between 60000 (60 seconds) or `requestTimeout`."
+                  }
+                ]
               },
-              "default": "`60000`",
+              "default": "The minimum between [`server.requestTimeout`][] or `60000`",
               "desc": "<p>Limit the amount of time the parser will wait to receive the complete HTTP\nheaders.</p>\n<p>If the timeout expires, the server responds with status 408 without\nforwarding the request to the request listener and then closes the connection.</p>\n<p>It must be set to a non-zero value (e.g. 120 seconds) to protect against\npotential Denial-of-Service attacks in case the server is deployed without a\nreverse proxy in front.</p>"
             },
             {
@@ -2505,13 +2511,18 @@
                 ],
                 "changes": [
                   {
+                    "version": "v19.5.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/45982",
+                    "description": "The `joinDuplicateHeaders` option in the `http.request()` and `http.createServer()` functions ensures that duplicate headers are not discarded, but rather combined using a comma separator, in accordance with RFC 9110 Section 5.3."
+                  },
+                  {
                     "version": "v15.1.0",
                     "pr-url": "https://github.com/nodejs/node/pull/35281",
                     "description": "`message.headers` is now lazily computed using an accessor property on the prototype and is no longer enumerable."
                   }
                 ]
               },
-              "desc": "<p>The request/response headers object.</p>\n<p>Key-value pairs of header names and values. Header names are lower-cased.</p>\n<pre><code class=\"language-js\">// Prints something like:\n//\n// { 'user-agent': 'curl/7.22.0',\n//   host: '127.0.0.1:8000',\n//   accept: '*/*' }\nconsole.log(request.headers);\n</code></pre>\n<p>Duplicates in raw headers are handled in the following ways, depending on the\nheader name:</p>\n<ul>\n<li>Duplicates of <code>age</code>, <code>authorization</code>, <code>content-length</code>, <code>content-type</code>,\n<code>etag</code>, <code>expires</code>, <code>from</code>, <code>host</code>, <code>if-modified-since</code>, <code>if-unmodified-since</code>,\n<code>last-modified</code>, <code>location</code>, <code>max-forwards</code>, <code>proxy-authorization</code>, <code>referer</code>,\n<code>retry-after</code>, <code>server</code>, or <code>user-agent</code> are discarded.</li>\n<li><code>set-cookie</code> is always an array. Duplicates are added to the array.</li>\n<li>For duplicate <code>cookie</code> headers, the values are joined together with <code>; </code>.</li>\n<li>For all other headers, the values are joined together with <code>, </code>.</li>\n</ul>"
+              "desc": "<p>The request/response headers object.</p>\n<p>Key-value pairs of header names and values. Header names are lower-cased.</p>\n<pre><code class=\"language-js\">// Prints something like:\n//\n// { 'user-agent': 'curl/7.22.0',\n//   host: '127.0.0.1:8000',\n//   accept: '*/*' }\nconsole.log(request.headers);\n</code></pre>\n<p>Duplicates in raw headers are handled in the following ways, depending on the\nheader name:</p>\n<ul>\n<li>Duplicates of <code>age</code>, <code>authorization</code>, <code>content-length</code>, <code>content-type</code>,\n<code>etag</code>, <code>expires</code>, <code>from</code>, <code>host</code>, <code>if-modified-since</code>, <code>if-unmodified-since</code>,\n<code>last-modified</code>, <code>location</code>, <code>max-forwards</code>, <code>proxy-authorization</code>, <code>referer</code>,\n<code>retry-after</code>, <code>server</code>, or <code>user-agent</code> are discarded.\nTo allow duplicate values of the headers listed above to be joined,\nuse the option <code>joinDuplicateHeaders</code> in <a href=\"#httprequestoptions-callback\"><code>http.request()</code></a>\nand <a href=\"#httpcreateserveroptions-requestlistener\"><code>http.createServer()</code></a>. See RFC 9110 Section 5.3 for more\ninformation.</li>\n<li><code>set-cookie</code> is always an array. Duplicates are added to the array.</li>\n<li>For duplicate <code>cookie</code> headers, the values are joined together with <code>; </code>.</li>\n<li>For all other headers, the values are joined together with <code>, </code>.</li>\n</ul>"
             },
             {
               "textRaw": "`headersDistinct` {Object}",
@@ -3125,6 +3136,34 @@
               "desc": "<p>Sets a single header value. If the header already exists in the to-be-sent\nheaders, its value will be replaced. Use an array of strings to send multiple\nheaders with the same name.</p>"
             },
             {
+              "textRaw": "`outgoingMessage.setHeaders(headers)`",
+              "type": "method",
+              "name": "setHeaders",
+              "meta": {
+                "added": [
+                  "v19.6.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "return": {
+                    "textRaw": "Returns: {http.ServerResponse}",
+                    "name": "return",
+                    "type": "http.ServerResponse"
+                  },
+                  "params": [
+                    {
+                      "textRaw": "`headers` {Headers|Map}",
+                      "name": "headers",
+                      "type": "Headers|Map"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>Returns the response object.</p>\n<p>Sets multiple header values for implicit headers.\n<code>headers</code> must be an instance of <a href=\"globals.html#class-headers\"><code>Headers</code></a> or <code>Map</code>,\nif a header already exists in the to-be-sent headers,\nits value will be replaced.</p>\n<pre><code class=\"language-js\">const headers = new Headers({ foo: 'bar' });\nresponse.setHeaders(headers);\n</code></pre>\n<p>or</p>\n<pre><code class=\"language-js\">const headers = new Map([['foo', 'bar']]);\nres.setHeaders(headers);\n</code></pre>\n<p>When headers have been set with <a href=\"#outgoingmessagesetheadersheaders\"><code>outgoingMessage.setHeaders()</code></a>,\nthey will be merged with any headers passed to <a href=\"#responsewriteheadstatuscode-statusmessage-headers\"><code>response.writeHead()</code></a>,\nwith the headers passed to <a href=\"#responsewriteheadstatuscode-statusmessage-headers\"><code>response.writeHead()</code></a> given precedence.</p>\n<pre><code class=\"language-js\">// Returns content-type = text/plain\nconst server = http.createServer((req, res) => {\n  const headers = new Headers({ 'Content-Type': 'text/html' });\n  res.setHeaders(headers);\n  res.writeHead(200, { 'Content-Type': 'text/plain' });\n  res.end('ok');\n});\n</code></pre>"
+            },
+            {
               "textRaw": "`outgoingMessage.setTimeout(msesc[, callback])`",
               "type": "method",
               "name": "setTimeout",
@@ -3401,19 +3440,6 @@
             "changes": []
           },
           "desc": "<p>Read-only property specifying the maximum allowed size of HTTP headers in bytes.\nDefaults to 16 KiB. Configurable using the <a href=\"cli.html#--max-http-header-sizesize\"><code>--max-http-header-size</code></a> CLI\noption.</p>\n<p>This can be overridden for servers and client requests by passing the\n<code>maxHeaderSize</code> option.</p>"
-        },
-        {
-          "textRaw": "`setMaxIdleHTTPParsers` {number}",
-          "type": "number",
-          "name": "setMaxIdleHTTPParsers",
-          "meta": {
-            "added": [
-              "v18.8.0",
-              "v16.18.0"
-            ],
-            "changes": []
-          },
-          "desc": "<p>Set the maximum number of idle HTTP parsers. <strong>Default:</strong> <code>1000</code>.</p>"
         }
       ],
       "methods": [
@@ -3482,24 +3508,10 @@
                   "type": "Object",
                   "options": [
                     {
-                      "textRaw": "`IncomingMessage` {http.IncomingMessage} Specifies the `IncomingMessage` class to be used. Useful for extending the original `IncomingMessage`. **Default:** `IncomingMessage`.",
-                      "name": "IncomingMessage",
-                      "type": "http.IncomingMessage",
-                      "default": "`IncomingMessage`",
-                      "desc": "Specifies the `IncomingMessage` class to be used. Useful for extending the original `IncomingMessage`."
-                    },
-                    {
-                      "textRaw": "`ServerResponse` {http.ServerResponse} Specifies the `ServerResponse` class to be used. Useful for extending the original `ServerResponse`. **Default:** `ServerResponse`.",
-                      "name": "ServerResponse",
-                      "type": "http.ServerResponse",
-                      "default": "`ServerResponse`",
-                      "desc": "Specifies the `ServerResponse` class to be used. Useful for extending the original `ServerResponse`."
-                    },
-                    {
-                      "textRaw": "`requestTimeout`: Sets the timeout value in milliseconds for receiving the entire request from the client. See [`server.requestTimeout`][] for more information. **Default:** `300000`.",
-                      "name": "requestTimeout",
-                      "default": "`300000`",
-                      "desc": "Sets the timeout value in milliseconds for receiving the entire request from the client. See [`server.requestTimeout`][] for more information."
+                      "textRaw": "`connectionsCheckingInterval`: Sets the interval value in milliseconds to check for request and headers timeout in incomplete requests. **Default:** `30000`.",
+                      "name": "connectionsCheckingInterval",
+                      "default": "`30000`",
+                      "desc": "Sets the interval value in milliseconds to check for request and headers timeout in incomplete requests."
                     },
                     {
                       "textRaw": "`headersTimeout`: Sets the timeout value in milliseconds for receiving the complete HTTP headers from the client. See [`server.headersTimeout`][] for more information. **Default:** `60000`.",
@@ -3508,23 +3520,38 @@
                       "desc": "Sets the timeout value in milliseconds for receiving the complete HTTP headers from the client. See [`server.headersTimeout`][] for more information."
                     },
                     {
-                      "textRaw": "`keepAliveTimeout`: The number of milliseconds of inactivity a server needs to wait for additional incoming data, after it has finished writing the last response, before a socket will be destroyed. See [`server.keepAliveTimeout`][] for more information. **Default:** `5000`.",
-                      "name": "keepAliveTimeout",
-                      "default": "`5000`",
-                      "desc": "The number of milliseconds of inactivity a server needs to wait for additional incoming data, after it has finished writing the last response, before a socket will be destroyed. See [`server.keepAliveTimeout`][] for more information."
-                    },
-                    {
-                      "textRaw": "`connectionsCheckingInterval`: Sets the interval value in milliseconds to check for request and headers timeout in incomplete requests. **Default:** `30000`.",
-                      "name": "connectionsCheckingInterval",
-                      "default": "`30000`",
-                      "desc": "Sets the interval value in milliseconds to check for request and headers timeout in incomplete requests."
-                    },
-                    {
-                      "textRaw": "`insecureHTTPParser` {boolean} Use an insecure HTTP parser that accepts invalid HTTP headers when `true`. Using the insecure parser should be avoided. See [`--insecure-http-parser`][] for more information. **Default:** `false`",
+                      "textRaw": "`insecureHTTPParser` {boolean} Use an insecure HTTP parser that accepts invalid HTTP headers when `true`. Using the insecure parser should be avoided. See [`--insecure-http-parser`][] for more information. **Default:** `false`.",
                       "name": "insecureHTTPParser",
                       "type": "boolean",
                       "default": "`false`",
                       "desc": "Use an insecure HTTP parser that accepts invalid HTTP headers when `true`. Using the insecure parser should be avoided. See [`--insecure-http-parser`][] for more information."
+                    },
+                    {
+                      "textRaw": "`IncomingMessage` {http.IncomingMessage} Specifies the `IncomingMessage` class to be used. Useful for extending the original `IncomingMessage`. **Default:** `IncomingMessage`.",
+                      "name": "IncomingMessage",
+                      "type": "http.IncomingMessage",
+                      "default": "`IncomingMessage`",
+                      "desc": "Specifies the `IncomingMessage` class to be used. Useful for extending the original `IncomingMessage`."
+                    },
+                    {
+                      "textRaw": "`keepAlive` {boolean} If set to `true`, it enables keep-alive functionality on the socket immediately after a new incoming connection is received, similarly on what is done in \\[`socket.setKeepAlive([enable][, initialDelay])`]\\[`socket.setKeepAlive(enable, initialDelay)`]. **Default:** `false`.",
+                      "name": "keepAlive",
+                      "type": "boolean",
+                      "default": "`false`",
+                      "desc": "If set to `true`, it enables keep-alive functionality on the socket immediately after a new incoming connection is received, similarly on what is done in \\[`socket.setKeepAlive([enable][, initialDelay])`]\\[`socket.setKeepAlive(enable, initialDelay)`]."
+                    },
+                    {
+                      "textRaw": "`keepAliveInitialDelay` {number} If set to a positive number, it sets the initial delay before the first keepalive probe is sent on an idle socket. **Default:** `0`.",
+                      "name": "keepAliveInitialDelay",
+                      "type": "number",
+                      "default": "`0`",
+                      "desc": "If set to a positive number, it sets the initial delay before the first keepalive probe is sent on an idle socket."
+                    },
+                    {
+                      "textRaw": "`keepAliveTimeout`: The number of milliseconds of inactivity a server needs to wait for additional incoming data, after it has finished writing the last response, before a socket will be destroyed. See [`server.keepAliveTimeout`][] for more information. **Default:** `5000`.",
+                      "name": "keepAliveTimeout",
+                      "default": "`5000`",
+                      "desc": "The number of milliseconds of inactivity a server needs to wait for additional incoming data, after it has finished writing the last response, before a socket will be destroyed. See [`server.keepAliveTimeout`][] for more information."
                     },
                     {
                       "textRaw": "`maxHeaderSize` {number} Optionally overrides the value of [`--max-http-header-size`][] for requests received by this server, i.e. the maximum length of request headers in bytes. **Default:** 16384 (16 KiB).",
@@ -3541,18 +3568,23 @@
                       "desc": "If set to `true`, it disables the use of Nagle's algorithm immediately after a new incoming connection is received."
                     },
                     {
-                      "textRaw": "`keepAlive` {boolean} If set to `true`, it enables keep-alive functionality on the socket immediately after a new incoming connection is received, similarly on what is done in \\[`socket.setKeepAlive([enable][, initialDelay])`]\\[`socket.setKeepAlive(enable, initialDelay)`]. **Default:** `false`.",
-                      "name": "keepAlive",
-                      "type": "boolean",
-                      "default": "`false`",
-                      "desc": "If set to `true`, it enables keep-alive functionality on the socket immediately after a new incoming connection is received, similarly on what is done in \\[`socket.setKeepAlive([enable][, initialDelay])`]\\[`socket.setKeepAlive(enable, initialDelay)`]."
+                      "textRaw": "`requestTimeout`: Sets the timeout value in milliseconds for receiving the entire request from the client. See [`server.requestTimeout`][] for more information.",
+                      "name": "requestTimeout",
+                      "desc": "Sets the timeout value in milliseconds for receiving the entire request from the client. See [`server.requestTimeout`][] for more information."
                     },
                     {
-                      "textRaw": "`keepAliveInitialDelay` {number} If set to a positive number, it sets the initial delay before the first keepalive probe is sent on an idle socket. **Default:** `0`.",
-                      "name": "keepAliveInitialDelay",
-                      "type": "number",
-                      "default": "`0`",
-                      "desc": "If set to a positive number, it sets the initial delay before the first keepalive probe is sent on an idle socket."
+                      "textRaw": "`joinDuplicateHeaders` {boolean} It joins the field line values of multiple headers in a request with `, ` instead of discarding the duplicates. See [`message.headers`][] for more information. **Default:** `false`.",
+                      "name": "joinDuplicateHeaders",
+                      "type": "boolean",
+                      "default": "`false`",
+                      "desc": "It joins the field line values of multiple headers in a request with `, ` instead of discarding the duplicates. See [`message.headers`][] for more information."
+                    },
+                    {
+                      "textRaw": "`ServerResponse` {http.ServerResponse} Specifies the `ServerResponse` class to be used. Useful for extending the original `ServerResponse`. **Default:** `ServerResponse`. **Default:** `300000`.",
+                      "name": "ServerResponse",
+                      "type": "http.ServerResponse",
+                      "default": "`ServerResponse`. **Default:** `300000`",
+                      "desc": "Specifies the `ServerResponse` class to be used. Useful for extending the original `ServerResponse`."
                     },
                     {
                       "textRaw": "`uniqueHeaders` {Array} A list of response headers that should be sent only once. If the header's value is an array, the items will be joined using `; `.",
@@ -3904,6 +3936,13 @@
                       "name": "uniqueHeaders",
                       "type": "Array",
                       "desc": "A list of request headers that should be sent only once. If the header's value is an array, the items will be joined using `; `."
+                    },
+                    {
+                      "textRaw": "`joinDuplicateHeaders` {boolean} It joins the field line values of multiple headers in a request with `, ` instead of discarding the duplicates. See [`message.headers`][] for more information. **Default:** `false`.",
+                      "name": "joinDuplicateHeaders",
+                      "type": "boolean",
+                      "default": "`false`",
+                      "desc": "It joins the field line values of multiple headers in a request with `, ` instead of discarding the duplicates. See [`message.headers`][] for more information."
                     }
                   ]
                 },
@@ -4149,6 +4188,13 @@
                       "name": "uniqueHeaders",
                       "type": "Array",
                       "desc": "A list of request headers that should be sent only once. If the header's value is an array, the items will be joined using `; `."
+                    },
+                    {
+                      "textRaw": "`joinDuplicateHeaders` {boolean} It joins the field line values of multiple headers in a request with `, ` instead of discarding the duplicates. See [`message.headers`][] for more information. **Default:** `false`.",
+                      "name": "joinDuplicateHeaders",
+                      "type": "boolean",
+                      "default": "`false`",
+                      "desc": "It joins the field line values of multiple headers in a request with `, ` instead of discarding the duplicates. See [`message.headers`][] for more information."
                     }
                   ]
                 },
@@ -4163,14 +4209,20 @@
           "desc": "<p><code>options</code> in <a href=\"net.html#socketconnectoptions-connectlistener\"><code>socket.connect()</code></a> are also supported.</p>\n<p>Node.js maintains several connections per server to make HTTP requests.\nThis function allows one to transparently issue requests.</p>\n<p><code>url</code> can be a string or a <a href=\"url.html#the-whatwg-url-api\"><code>URL</code></a> object. If <code>url</code> is a\nstring, it is automatically parsed with <a href=\"url.html#new-urlinput-base\"><code>new URL()</code></a>. If it is a <a href=\"url.html#the-whatwg-url-api\"><code>URL</code></a>\nobject, it will be automatically converted to an ordinary <code>options</code> object.</p>\n<p>If both <code>url</code> and <code>options</code> are specified, the objects are merged, with the\n<code>options</code> properties taking precedence.</p>\n<p>The optional <code>callback</code> parameter will be added as a one-time listener for\nthe <a href=\"#event-response\"><code>'response'</code></a> event.</p>\n<p><code>http.request()</code> returns an instance of the <a href=\"#class-httpclientrequest\"><code>http.ClientRequest</code></a>\nclass. The <code>ClientRequest</code> instance is a writable stream. If one needs to\nupload a file with a POST request, then write to the <code>ClientRequest</code> object.</p>\n<pre><code class=\"language-js\">const http = require('node:http');\n\nconst postData = JSON.stringify({\n  'msg': 'Hello World!',\n});\n\nconst options = {\n  hostname: 'www.google.com',\n  port: 80,\n  path: '/upload',\n  method: 'POST',\n  headers: {\n    'Content-Type': 'application/json',\n    'Content-Length': Buffer.byteLength(postData),\n  },\n};\n\nconst req = http.request(options, (res) => {\n  console.log(`STATUS: ${res.statusCode}`);\n  console.log(`HEADERS: ${JSON.stringify(res.headers)}`);\n  res.setEncoding('utf8');\n  res.on('data', (chunk) => {\n    console.log(`BODY: ${chunk}`);\n  });\n  res.on('end', () => {\n    console.log('No more data in response.');\n  });\n});\n\nreq.on('error', (e) => {\n  console.error(`problem with request: ${e.message}`);\n});\n\n// Write data to request body\nreq.write(postData);\nreq.end();\n</code></pre>\n<p>In the example <code>req.end()</code> was called. With <code>http.request()</code> one\nmust always call <code>req.end()</code> to signify the end of the request -\neven if there is no data being written to the request body.</p>\n<p>If any error is encountered during the request (be that with DNS resolution,\nTCP level errors, or actual HTTP parse errors) an <code>'error'</code> event is emitted\non the returned request object. As with all <code>'error'</code> events, if no listeners\nare registered the error will be thrown.</p>\n<p>There are a few special headers that should be noted.</p>\n<ul>\n<li>\n<p>Sending a 'Connection: keep-alive' will notify Node.js that the connection to\nthe server should be persisted until the next request.</p>\n</li>\n<li>\n<p>Sending a 'Content-Length' header will disable the default chunked encoding.</p>\n</li>\n<li>\n<p>Sending an 'Expect' header will immediately send the request headers.\nUsually, when sending 'Expect: 100-continue', both a timeout and a listener\nfor the <code>'continue'</code> event should be set. See RFC 2616 Section 8.2.3 for more\ninformation.</p>\n</li>\n<li>\n<p>Sending an Authorization header will override using the <code>auth</code> option\nto compute basic authentication.</p>\n</li>\n</ul>\n<p>Example using a <a href=\"url.html#the-whatwg-url-api\"><code>URL</code></a> as <code>options</code>:</p>\n<pre><code class=\"language-js\">const options = new URL('http://abc:xyz@example.com');\n\nconst req = http.request(options, (res) => {\n  // ...\n});\n</code></pre>\n<p>In a successful request, the following events will be emitted in the following\norder:</p>\n<ul>\n<li><code>'socket'</code></li>\n<li><code>'response'</code>\n<ul>\n<li><code>'data'</code> any number of times, on the <code>res</code> object\n(<code>'data'</code> will not be emitted at all if the response body is empty, for\ninstance, in most redirects)</li>\n<li><code>'end'</code> on the <code>res</code> object</li>\n</ul>\n</li>\n<li><code>'close'</code></li>\n</ul>\n<p>In the case of a connection error, the following events will be emitted:</p>\n<ul>\n<li><code>'socket'</code></li>\n<li><code>'error'</code></li>\n<li><code>'close'</code></li>\n</ul>\n<p>In the case of a premature connection close before the response is received,\nthe following events will be emitted in the following order:</p>\n<ul>\n<li><code>'socket'</code></li>\n<li><code>'error'</code> with an error with message <code>'Error: socket hang up'</code> and code\n<code>'ECONNRESET'</code></li>\n<li><code>'close'</code></li>\n</ul>\n<p>In the case of a premature connection close after the response is received,\nthe following events will be emitted in the following order:</p>\n<ul>\n<li><code>'socket'</code></li>\n<li><code>'response'</code>\n<ul>\n<li><code>'data'</code> any number of times, on the <code>res</code> object</li>\n</ul>\n</li>\n<li>(connection closed here)</li>\n<li><code>'aborted'</code> on the <code>res</code> object</li>\n<li><code>'error'</code> on the <code>res</code> object with an error with message\n<code>'Error: aborted'</code> and code <code>'ECONNRESET'</code>.</li>\n<li><code>'close'</code></li>\n<li><code>'close'</code> on the <code>res</code> object</li>\n</ul>\n<p>If <code>req.destroy()</code> is called before a socket is assigned, the following\nevents will be emitted in the following order:</p>\n<ul>\n<li>(<code>req.destroy()</code> called here)</li>\n<li><code>'error'</code> with an error with message <code>'Error: socket hang up'</code> and code\n<code>'ECONNRESET'</code></li>\n<li><code>'close'</code></li>\n</ul>\n<p>If <code>req.destroy()</code> is called before the connection succeeds, the following\nevents will be emitted in the following order:</p>\n<ul>\n<li><code>'socket'</code></li>\n<li>(<code>req.destroy()</code> called here)</li>\n<li><code>'error'</code> with an error with message <code>'Error: socket hang up'</code> and code\n<code>'ECONNRESET'</code></li>\n<li><code>'close'</code></li>\n</ul>\n<p>If <code>req.destroy()</code> is called after the response is received, the following\nevents will be emitted in the following order:</p>\n<ul>\n<li><code>'socket'</code></li>\n<li><code>'response'</code>\n<ul>\n<li><code>'data'</code> any number of times, on the <code>res</code> object</li>\n</ul>\n</li>\n<li>(<code>req.destroy()</code> called here)</li>\n<li><code>'aborted'</code> on the <code>res</code> object</li>\n<li><code>'error'</code> on the <code>res</code> object with an error with message\n<code>'Error: aborted'</code> and code <code>'ECONNRESET'</code>.</li>\n<li><code>'close'</code></li>\n<li><code>'close'</code> on the <code>res</code> object</li>\n</ul>\n<p>If <code>req.abort()</code> is called before a socket is assigned, the following\nevents will be emitted in the following order:</p>\n<ul>\n<li>(<code>req.abort()</code> called here)</li>\n<li><code>'abort'</code></li>\n<li><code>'close'</code></li>\n</ul>\n<p>If <code>req.abort()</code> is called before the connection succeeds, the following\nevents will be emitted in the following order:</p>\n<ul>\n<li><code>'socket'</code></li>\n<li>(<code>req.abort()</code> called here)</li>\n<li><code>'abort'</code></li>\n<li><code>'error'</code> with an error with message <code>'Error: socket hang up'</code> and code\n<code>'ECONNRESET'</code></li>\n<li><code>'close'</code></li>\n</ul>\n<p>If <code>req.abort()</code> is called after the response is received, the following\nevents will be emitted in the following order:</p>\n<ul>\n<li><code>'socket'</code></li>\n<li><code>'response'</code>\n<ul>\n<li><code>'data'</code> any number of times, on the <code>res</code> object</li>\n</ul>\n</li>\n<li>(<code>req.abort()</code> called here)</li>\n<li><code>'abort'</code></li>\n<li><code>'aborted'</code> on the <code>res</code> object</li>\n<li><code>'error'</code> on the <code>res</code> object with an error with message\n<code>'Error: aborted'</code> and code <code>'ECONNRESET'</code>.</li>\n<li><code>'close'</code></li>\n<li><code>'close'</code> on the <code>res</code> object</li>\n</ul>\n<p>Setting the <code>timeout</code> option or using the <code>setTimeout()</code> function will\nnot abort the request or do anything besides add a <code>'timeout'</code> event.</p>\n<p>Passing an <code>AbortSignal</code> and then calling <code>abort</code> on the corresponding\n<code>AbortController</code> will behave the same way as calling <code>.destroy()</code> on the\nrequest itself.</p>"
         },
         {
-          "textRaw": "`http.validateHeaderName(name)`",
+          "textRaw": "`http.validateHeaderName(name[, label])`",
           "type": "method",
           "name": "validateHeaderName",
           "meta": {
             "added": [
               "v14.3.0"
             ],
-            "changes": []
+            "changes": [
+              {
+                "version": "v19.5.0",
+                "pr-url": "https://github.com/nodejs/node/pull/46143",
+                "description": "The `label` parameter is added."
+              }
+            ]
           },
           "signatures": [
             {
@@ -4179,11 +4231,18 @@
                   "textRaw": "`name` {string}",
                   "name": "name",
                   "type": "string"
+                },
+                {
+                  "textRaw": "`label` {string} Label for error message. **Default:** `'Header name'`.",
+                  "name": "label",
+                  "type": "string",
+                  "default": "`'Header name'`",
+                  "desc": "Label for error message."
                 }
               ]
             }
           ],
-          "desc": "<p>Performs the low-level validations on the provided <code>name</code> that are done when\n<code>res.setHeader(name, value)</code> is called.</p>\n<p>Passing illegal value as <code>name</code> will result in a <a href=\"errors.html#class-typeerror\"><code>TypeError</code></a> being thrown,\nidentified by <code>code: 'ERR_INVALID_HTTP_TOKEN'</code>.</p>\n<p>It is not necessary to use this method before passing headers to an HTTP request\nor response. The HTTP module will automatically validate such headers.\nExamples:</p>\n<p>Example:</p>\n<pre><code class=\"language-js\">const { validateHeaderName } = require('node:http');\n\ntry {\n  validateHeaderName('');\n} catch (err) {\n  err instanceof TypeError; // --> true\n  err.code; // --> 'ERR_INVALID_HTTP_TOKEN'\n  err.message; // --> 'Header name must be a valid HTTP token [\"\"]'\n}\n</code></pre>"
+          "desc": "<p>Performs the low-level validations on the provided <code>name</code> that are done when\n<code>res.setHeader(name, value)</code> is called.</p>\n<p>Passing illegal value as <code>name</code> will result in a <a href=\"errors.html#class-typeerror\"><code>TypeError</code></a> being thrown,\nidentified by <code>code: 'ERR_INVALID_HTTP_TOKEN'</code>.</p>\n<p>It is not necessary to use this method before passing headers to an HTTP request\nor response. The HTTP module will automatically validate such headers.\nExamples:</p>\n<p>Example:</p>\n<pre><code class=\"language-js\">const { validateHeaderName } = require('node:http');\n\ntry {\n  validateHeaderName('');\n} catch (err) {\n  console.error(err instanceof TypeError); // --> true\n  console.error(err.code); // --> 'ERR_INVALID_HTTP_TOKEN'\n  console.error(err.message); // --> 'Header name must be a valid HTTP token [\"\"]'\n}\n</code></pre>"
         },
         {
           "textRaw": "`http.validateHeaderValue(name, value)`",
@@ -4211,7 +4270,32 @@
               ]
             }
           ],
-          "desc": "<p>Performs the low-level validations on the provided <code>value</code> that are done when\n<code>res.setHeader(name, value)</code> is called.</p>\n<p>Passing illegal value as <code>value</code> will result in a <a href=\"errors.html#class-typeerror\"><code>TypeError</code></a> being thrown.</p>\n<ul>\n<li>Undefined value error is identified by <code>code: 'ERR_HTTP_INVALID_HEADER_VALUE'</code>.</li>\n<li>Invalid value character error is identified by <code>code: 'ERR_INVALID_CHAR'</code>.</li>\n</ul>\n<p>It is not necessary to use this method before passing headers to an HTTP request\nor response. The HTTP module will automatically validate such headers.</p>\n<p>Examples:</p>\n<pre><code class=\"language-js\">const { validateHeaderValue } = require('node:http');\n\ntry {\n  validateHeaderValue('x-my-header', undefined);\n} catch (err) {\n  err instanceof TypeError; // --> true\n  err.code === 'ERR_HTTP_INVALID_HEADER_VALUE'; // --> true\n  err.message; // --> 'Invalid value \"undefined\" for header \"x-my-header\"'\n}\n\ntry {\n  validateHeaderValue('x-my-header', 'oʊmɪɡə');\n} catch (err) {\n  err instanceof TypeError; // --> true\n  err.code === 'ERR_INVALID_CHAR'; // --> true\n  err.message; // --> 'Invalid character in header content [\"x-my-header\"]'\n}\n</code></pre>"
+          "desc": "<p>Performs the low-level validations on the provided <code>value</code> that are done when\n<code>res.setHeader(name, value)</code> is called.</p>\n<p>Passing illegal value as <code>value</code> will result in a <a href=\"errors.html#class-typeerror\"><code>TypeError</code></a> being thrown.</p>\n<ul>\n<li>Undefined value error is identified by <code>code: 'ERR_HTTP_INVALID_HEADER_VALUE'</code>.</li>\n<li>Invalid value character error is identified by <code>code: 'ERR_INVALID_CHAR'</code>.</li>\n</ul>\n<p>It is not necessary to use this method before passing headers to an HTTP request\nor response. The HTTP module will automatically validate such headers.</p>\n<p>Examples:</p>\n<pre><code class=\"language-js\">const { validateHeaderValue } = require('node:http');\n\ntry {\n  validateHeaderValue('x-my-header', undefined);\n} catch (err) {\n  console.error(err instanceof TypeError); // --> true\n  console.error(err.code === 'ERR_HTTP_INVALID_HEADER_VALUE'); // --> true\n  console.error(err.message); // --> 'Invalid value \"undefined\" for header \"x-my-header\"'\n}\n\ntry {\n  validateHeaderValue('x-my-header', 'oʊmɪɡə');\n} catch (err) {\n  console.error(err instanceof TypeError); // --> true\n  console.error(err.code === 'ERR_INVALID_CHAR'); // --> true\n  console.error(err.message); // --> 'Invalid character in header content [\"x-my-header\"]'\n}\n</code></pre>"
+        },
+        {
+          "textRaw": "`http.setMaxIdleHTTPParsers(max)`",
+          "type": "method",
+          "name": "setMaxIdleHTTPParsers",
+          "meta": {
+            "added": [
+              "v18.8.0",
+              "v16.18.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`max` {number} **Default:** `1000`.",
+                  "name": "max",
+                  "type": "number",
+                  "default": "`1000`"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>Set the maximum number of idle HTTP parsers.</p>"
         }
       ],
       "type": "module",

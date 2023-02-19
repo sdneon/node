@@ -96,6 +96,7 @@
         '-W',
         '-Wno-unused-parameter',
         '-Werror=undefined-inline',
+        '-Werror=extra-semi',
       ],
     },
 
@@ -455,6 +456,7 @@
         'deps/googletest/googletest.gyp:gtest_prod',
         'deps/histogram/histogram.gyp:histogram',
         'deps/uvwasi/uvwasi.gyp:uvwasi',
+        'deps/simdutf/simdutf.gyp:simdutf',
       ],
 
       'sources': [
@@ -824,7 +826,8 @@
               '-CAES,BF,BIO,DES,DH,DSA,EC,ECDH,ECDSA,ENGINE,EVP,HMAC,MD4,MD5,'
               'PSK,RC2,RC4,RSA,SHA,SHA0,SHA1,SHA256,SHA512,SOCK,STDIO,TLSEXT,'
               'UI,FP_API,TLS1_METHOD,TLS1_1_METHOD,TLS1_2_METHOD,SCRYPT,OCSP,'
-              'NEXTPROTONEG,RMD160,CAST,DEPRECATEDIN_1_1_0,DEPRECATEDIN_1_2_0',
+              'NEXTPROTONEG,RMD160,CAST,DEPRECATEDIN_1_1_0,DEPRECATEDIN_1_2_0,'
+              'DEPRECATEDIN_3_0',
               # Defines.
               '-DWIN32',
               # Symbols to filter from the export list.
@@ -972,6 +975,7 @@
         'deps/googletest/googletest.gyp:gtest_main',
         'deps/histogram/histogram.gyp:histogram',
         'deps/uvwasi/uvwasi.gyp:uvwasi',
+        'deps/simdutf/simdutf.gyp:simdutf',
       ],
 
       'includes': [
@@ -1003,7 +1007,6 @@
         'test/cctest/test_base_object_ptr.cc',
         'test/cctest/test_node_postmortem_metadata.cc',
         'test/cctest/test_environment.cc',
-        'test/cctest/test_js_native_api_v8.cc',
         'test/cctest/test_linked_binding.cc',
         'test/cctest/test_node_api.cc',
         'test/cctest/test_per_process.cc',

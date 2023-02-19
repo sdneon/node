@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v19.3.0/lib/fs.js\">lib/fs.js</a></p>\n<p>The <code>node:fs</code> module enables interacting with the file system in a\nway modeled on standard POSIX functions.</p>\n<p>To use the promise-based APIs:</p>\n<pre><code class=\"language-mjs\">import * as fs from 'node:fs/promises';\n</code></pre>\n<pre><code class=\"language-cjs\">const fs = require('node:fs/promises');\n</code></pre>\n<p>To use the callback and sync APIs:</p>\n<pre><code class=\"language-mjs\">import * as fs from 'node:fs';\n</code></pre>\n<pre><code class=\"language-cjs\">const fs = require('node:fs');\n</code></pre>\n<p>All file system operations have synchronous, callback, and promise-based\nforms, and are accessible using both CommonJS syntax and ES6 Modules (ESM).</p>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v19.6.1/lib/fs.js\">lib/fs.js</a></p>\n<p>The <code>node:fs</code> module enables interacting with the file system in a\nway modeled on standard POSIX functions.</p>\n<p>To use the promise-based APIs:</p>\n<pre><code class=\"language-mjs\">import * as fs from 'node:fs/promises';\n</code></pre>\n<pre><code class=\"language-cjs\">const fs = require('node:fs/promises');\n</code></pre>\n<p>To use the callback and sync APIs:</p>\n<pre><code class=\"language-mjs\">import * as fs from 'node:fs';\n</code></pre>\n<pre><code class=\"language-cjs\">const fs = require('node:fs');\n</code></pre>\n<p>All file system operations have synchronous, callback, and promise-based\nforms, and are accessible using both CommonJS syntax and ES6 Modules (ESM).</p>",
       "modules": [
         {
           "textRaw": "Promise example",
@@ -1790,10 +1790,10 @@
               "signatures": [
                 {
                   "return": {
-                    "textRaw": "Returns: {Promise} Fulfills with a string containing the filesystem path of the newly created temporary directory.",
+                    "textRaw": "Returns: {Promise} Fulfills with a string containing the file system path of the newly created temporary directory.",
                     "name": "return",
                     "type": "Promise",
-                    "desc": "Fulfills with a string containing the filesystem path of the newly created temporary directory."
+                    "desc": "Fulfills with a string containing the file system path of the newly created temporary directory."
                   },
                   "params": [
                     {
@@ -2359,6 +2359,48 @@
                           "type": "boolean",
                           "default": "`false`",
                           "desc": "Whether the numeric values in the returned {fs.Stats} object should be `bigint`."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "textRaw": "`fsPromises.statfs(path[, options])`",
+              "type": "method",
+              "name": "statfs",
+              "meta": {
+                "added": [
+                  "v19.6.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "return": {
+                    "textRaw": "Returns: {Promise} Fulfills with the {fs.StatFs} object for the given `path`.",
+                    "name": "return",
+                    "type": "Promise",
+                    "desc": "Fulfills with the {fs.StatFs} object for the given `path`."
+                  },
+                  "params": [
+                    {
+                      "textRaw": "`path` {string|Buffer|URL}",
+                      "name": "path",
+                      "type": "string|Buffer|URL"
+                    },
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`bigint` {boolean} Whether the numeric values in the returned {fs.StatFs} object should be `bigint`. **Default:** `false`.",
+                          "name": "bigint",
+                          "type": "boolean",
+                          "default": "`false`",
+                          "desc": "Whether the numeric values in the returned {fs.StatFs} object should be `bigint`."
                         }
                       ]
                     }
@@ -5727,6 +5769,60 @@
               "desc": "<p>Asynchronous <a href=\"http://man7.org/linux/man-pages/man2/stat.2.html\"><code>stat(2)</code></a>. The callback gets two arguments <code>(err, stats)</code> where\n<code>stats</code> is an <a href=\"fs.html#class-fsstats\" class=\"type\">&lt;fs.Stats&gt;</a> object.</p>\n<p>In case of an error, the <code>err.code</code> will be one of <a href=\"errors.html#common-system-errors\">Common System Errors</a>.</p>\n<p>Using <code>fs.stat()</code> to check for the existence of a file before calling\n<code>fs.open()</code>, <code>fs.readFile()</code>, or <code>fs.writeFile()</code> is not recommended.\nInstead, user code should open/read/write the file directly and handle the\nerror raised if the file is not available.</p>\n<p>To check if a file exists without manipulating it afterwards, <a href=\"#fsaccesspath-mode-callback\"><code>fs.access()</code></a>\nis recommended.</p>\n<p>For example, given the following directory structure:</p>\n<pre><code class=\"language-text\">- txtDir\n-- file.txt\n- app.js\n</code></pre>\n<p>The next program will check for the stats of the given paths:</p>\n<pre><code class=\"language-mjs\">import { stat } from 'node:fs';\n\nconst pathsToCheck = ['./txtDir', './txtDir/file.txt'];\n\nfor (let i = 0; i &#x3C; pathsToCheck.length; i++) {\n  stat(pathsToCheck[i], (err, stats) => {\n    console.log(stats.isDirectory());\n    console.log(stats);\n  });\n}\n</code></pre>\n<p>The resulting output will resemble:</p>\n<pre><code class=\"language-console\">true\nStats {\n  dev: 16777220,\n  mode: 16877,\n  nlink: 3,\n  uid: 501,\n  gid: 20,\n  rdev: 0,\n  blksize: 4096,\n  ino: 14214262,\n  size: 96,\n  blocks: 0,\n  atimeMs: 1561174653071.963,\n  mtimeMs: 1561174614583.3518,\n  ctimeMs: 1561174626623.5366,\n  birthtimeMs: 1561174126937.2893,\n  atime: 2019-06-22T03:37:33.072Z,\n  mtime: 2019-06-22T03:36:54.583Z,\n  ctime: 2019-06-22T03:37:06.624Z,\n  birthtime: 2019-06-22T03:28:46.937Z\n}\nfalse\nStats {\n  dev: 16777220,\n  mode: 33188,\n  nlink: 1,\n  uid: 501,\n  gid: 20,\n  rdev: 0,\n  blksize: 4096,\n  ino: 14214074,\n  size: 8,\n  blocks: 8,\n  atimeMs: 1561174616618.8555,\n  mtimeMs: 1561174614584,\n  ctimeMs: 1561174614583.8145,\n  birthtimeMs: 1561174007710.7478,\n  atime: 2019-06-22T03:36:56.619Z,\n  mtime: 2019-06-22T03:36:54.584Z,\n  ctime: 2019-06-22T03:36:54.584Z,\n  birthtime: 2019-06-22T03:26:47.711Z\n}\n</code></pre>"
             },
             {
+              "textRaw": "`fs.statfs(path[, options], callback)`",
+              "type": "method",
+              "name": "statfs",
+              "meta": {
+                "added": [
+                  "v19.6.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`path` {string|Buffer|URL}",
+                      "name": "path",
+                      "type": "string|Buffer|URL"
+                    },
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`bigint` {boolean} Whether the numeric values in the returned {fs.StatFs} object should be `bigint`. **Default:** `false`.",
+                          "name": "bigint",
+                          "type": "boolean",
+                          "default": "`false`",
+                          "desc": "Whether the numeric values in the returned {fs.StatFs} object should be `bigint`."
+                        }
+                      ]
+                    },
+                    {
+                      "textRaw": "`callback` {Function}",
+                      "name": "callback",
+                      "type": "Function",
+                      "options": [
+                        {
+                          "textRaw": "`err` {Error}",
+                          "name": "err",
+                          "type": "Error"
+                        },
+                        {
+                          "textRaw": "`stats` {fs.StatFs}",
+                          "name": "stats",
+                          "type": "fs.StatFs"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>Asynchronous <a href=\"http://man7.org/linux/man-pages/man2/statfs.2.html\"><code>statfs(2)</code></a>. Returns information about the mounted file system which\ncontains <code>path</code>. The callback gets two arguments <code>(err, stats)</code> where <code>stats</code>\nis an <a href=\"fs.html#class-fsstatfs\" class=\"type\">&lt;fs.StatFs&gt;</a> object.</p>\n<p>In case of an error, the <code>err.code</code> will be one of <a href=\"errors.html#common-system-errors\">Common System Errors</a>.</p>"
+            },
+            {
               "textRaw": "`fs.symlink(target, path[, type], callback)`",
               "type": "method",
               "name": "symlink",
@@ -6125,7 +6221,7 @@
                       "textRaw": "Availability",
                       "name": "Availability",
                       "type": "misc",
-                      "desc": "<p>This feature depends on the underlying operating system providing a way\nto be notified of filesystem changes.</p>\n<ul>\n<li>On Linux systems, this uses <a href=\"https://man7.org/linux/man-pages/man7/inotify.7.html\"><code>inotify(7)</code></a>.</li>\n<li>On BSD systems, this uses <a href=\"https://www.freebsd.org/cgi/man.cgi?query=kqueue&#x26;sektion=2\"><code>kqueue(2)</code></a>.</li>\n<li>On macOS, this uses <a href=\"https://www.freebsd.org/cgi/man.cgi?query=kqueue&#x26;sektion=2\"><code>kqueue(2)</code></a> for files and <a href=\"https://developer.apple.com/documentation/coreservices/file_system_events\"><code>FSEvents</code></a> for\ndirectories.</li>\n<li>On SunOS systems (including Solaris and SmartOS), this uses <a href=\"https://illumos.org/man/port_create\"><code>event ports</code></a>.</li>\n<li>On Windows systems, this feature depends on <a href=\"https://docs.microsoft.com/en-us/windows/desktop/api/winbase/nf-winbase-readdirectorychangesw\"><code>ReadDirectoryChangesW</code></a>.</li>\n<li>On AIX systems, this feature depends on <a href=\"https://developer.ibm.com/articles/au-aix_event_infrastructure/\"><code>AHAFS</code></a>, which must be enabled.</li>\n<li>On IBM i systems, this feature is not supported.</li>\n</ul>\n<p>If the underlying functionality is not available for some reason, then\n<code>fs.watch()</code> will not be able to function and may throw an exception.\nFor example, watching files or directories can be unreliable, and in some\ncases impossible, on network file systems (NFS, SMB, etc) or host file systems\nwhen using virtualization software such as Vagrant or Docker.</p>\n<p>It is still possible to use <code>fs.watchFile()</code>, which uses stat polling, but\nthis method is slower and less reliable.</p>"
+                      "desc": "<p>This feature depends on the underlying operating system providing a way\nto be notified of file system changes.</p>\n<ul>\n<li>On Linux systems, this uses <a href=\"https://man7.org/linux/man-pages/man7/inotify.7.html\"><code>inotify(7)</code></a>.</li>\n<li>On BSD systems, this uses <a href=\"https://www.freebsd.org/cgi/man.cgi?query=kqueue&#x26;sektion=2\"><code>kqueue(2)</code></a>.</li>\n<li>On macOS, this uses <a href=\"https://www.freebsd.org/cgi/man.cgi?query=kqueue&#x26;sektion=2\"><code>kqueue(2)</code></a> for files and <a href=\"https://developer.apple.com/documentation/coreservices/file_system_events\"><code>FSEvents</code></a> for\ndirectories.</li>\n<li>On SunOS systems (including Solaris and SmartOS), this uses <a href=\"https://illumos.org/man/port_create\"><code>event ports</code></a>.</li>\n<li>On Windows systems, this feature depends on <a href=\"https://docs.microsoft.com/en-us/windows/desktop/api/winbase/nf-winbase-readdirectorychangesw\"><code>ReadDirectoryChangesW</code></a>.</li>\n<li>On AIX systems, this feature depends on <a href=\"https://developer.ibm.com/articles/au-aix_event_infrastructure/\"><code>AHAFS</code></a>, which must be enabled.</li>\n<li>On IBM i systems, this feature is not supported.</li>\n</ul>\n<p>If the underlying functionality is not available for some reason, then\n<code>fs.watch()</code> will not be able to function and may throw an exception.\nFor example, watching files or directories can be unreliable, and in some\ncases impossible, on network file systems (NFS, SMB, etc) or host file systems\nwhen using virtualization software such as Vagrant or Docker.</p>\n<p>It is still possible to use <code>fs.watchFile()</code>, which uses stat polling, but\nthis method is slower and less reliable.</p>"
                     },
                     {
                       "textRaw": "Inodes",
@@ -8467,6 +8563,48 @@
               "desc": "<p>Retrieves the <a href=\"fs.html#class-fsstats\" class=\"type\">&lt;fs.Stats&gt;</a> for the path.</p>"
             },
             {
+              "textRaw": "`fs.statfsSync(path[, options])`",
+              "type": "method",
+              "name": "statfsSync",
+              "meta": {
+                "added": [
+                  "v19.6.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "return": {
+                    "textRaw": "Returns: {fs.StatFs}",
+                    "name": "return",
+                    "type": "fs.StatFs"
+                  },
+                  "params": [
+                    {
+                      "textRaw": "`path` {string|Buffer|URL}",
+                      "name": "path",
+                      "type": "string|Buffer|URL"
+                    },
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`bigint` {boolean} Whether the numeric values in the returned {fs.StatFs} object should be `bigint`. **Default:** `false`.",
+                          "name": "bigint",
+                          "type": "boolean",
+                          "default": "`false`",
+                          "desc": "Whether the numeric values in the returned {fs.StatFs} object should be `bigint`."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>Synchronous <a href=\"http://man7.org/linux/man-pages/man2/statfs.2.html\"><code>statfs(2)</code></a>. Returns information about the mounted file system which\ncontains <code>path</code>.</p>\n<p>In case of an error, the <code>err.code</code> will be one of <a href=\"errors.html#common-system-errors\">Common System Errors</a>.</p>"
+            },
+            {
               "textRaw": "`fs.symlinkSync(target, path[, type])`",
               "type": "method",
               "name": "symlinkSync",
@@ -10016,9 +10154,107 @@
                 {
                   "textRaw": "Stat time values",
                   "name": "stat_time_values",
-                  "desc": "<p>The <code>atimeMs</code>, <code>mtimeMs</code>, <code>ctimeMs</code>, <code>birthtimeMs</code> properties are\nnumeric values that hold the corresponding times in milliseconds. Their\nprecision is platform specific. When <code>bigint: true</code> is passed into the\nmethod that generates the object, the properties will be <a href=\"https://tc39.github.io/proposal-bigint\">bigints</a>,\notherwise they will be <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\">numbers</a>.</p>\n<p>The <code>atimeNs</code>, <code>mtimeNs</code>, <code>ctimeNs</code>, <code>birthtimeNs</code> properties are\n<a href=\"https://tc39.github.io/proposal-bigint\">bigints</a> that hold the corresponding times in nanoseconds. They are\nonly present when <code>bigint: true</code> is passed into the method that generates\nthe object. Their precision is platform specific.</p>\n<p><code>atime</code>, <code>mtime</code>, <code>ctime</code>, and <code>birthtime</code> are\n<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date\"><code>Date</code></a> object alternate representations of the various times. The\n<code>Date</code> and number values are not connected. Assigning a new number value, or\nmutating the <code>Date</code> value, will not be reflected in the corresponding alternate\nrepresentation.</p>\n<p>The times in the stat object have the following semantics:</p>\n<ul>\n<li><code>atime</code> \"Access Time\": Time when file data last accessed. Changed\nby the <a href=\"http://man7.org/linux/man-pages/man2/mknod.2.html\"><code>mknod(2)</code></a>, <a href=\"http://man7.org/linux/man-pages/man2/utimes.2.html\"><code>utimes(2)</code></a>, and <a href=\"http://man7.org/linux/man-pages/man2/read.2.html\"><code>read(2)</code></a> system calls.</li>\n<li><code>mtime</code> \"Modified Time\": Time when file data last modified.\nChanged by the <a href=\"http://man7.org/linux/man-pages/man2/mknod.2.html\"><code>mknod(2)</code></a>, <a href=\"http://man7.org/linux/man-pages/man2/utimes.2.html\"><code>utimes(2)</code></a>, and <a href=\"http://man7.org/linux/man-pages/man2/write.2.html\"><code>write(2)</code></a> system calls.</li>\n<li><code>ctime</code> \"Change Time\": Time when file status was last changed\n(inode data modification). Changed by the <a href=\"http://man7.org/linux/man-pages/man2/chmod.2.html\"><code>chmod(2)</code></a>, <a href=\"http://man7.org/linux/man-pages/man2/chown.2.html\"><code>chown(2)</code></a>,\n<a href=\"http://man7.org/linux/man-pages/man2/link.2.html\"><code>link(2)</code></a>, <a href=\"http://man7.org/linux/man-pages/man2/mknod.2.html\"><code>mknod(2)</code></a>, <a href=\"http://man7.org/linux/man-pages/man2/rename.2.html\"><code>rename(2)</code></a>, <a href=\"http://man7.org/linux/man-pages/man2/unlink.2.html\"><code>unlink(2)</code></a>, <a href=\"http://man7.org/linux/man-pages/man2/utimes.2.html\"><code>utimes(2)</code></a>,\n<a href=\"http://man7.org/linux/man-pages/man2/read.2.html\"><code>read(2)</code></a>, and <a href=\"http://man7.org/linux/man-pages/man2/write.2.html\"><code>write(2)</code></a> system calls.</li>\n<li><code>birthtime</code> \"Birth Time\": Time of file creation. Set once when the\nfile is created. On filesystems where birthtime is not available,\nthis field may instead hold either the <code>ctime</code> or\n<code>1970-01-01T00:00Z</code> (ie, Unix epoch timestamp <code>0</code>). This value may be greater\nthan <code>atime</code> or <code>mtime</code> in this case. On Darwin and other FreeBSD variants,\nalso set if the <code>atime</code> is explicitly set to an earlier value than the current\n<code>birthtime</code> using the <a href=\"http://man7.org/linux/man-pages/man2/utimes.2.html\"><code>utimes(2)</code></a> system call.</li>\n</ul>\n<p>Prior to Node.js 0.12, the <code>ctime</code> held the <code>birthtime</code> on Windows systems. As\nof 0.12, <code>ctime</code> is not \"creation time\", and on Unix systems, it never was.</p>",
+                  "desc": "<p>The <code>atimeMs</code>, <code>mtimeMs</code>, <code>ctimeMs</code>, <code>birthtimeMs</code> properties are\nnumeric values that hold the corresponding times in milliseconds. Their\nprecision is platform specific. When <code>bigint: true</code> is passed into the\nmethod that generates the object, the properties will be <a href=\"https://tc39.github.io/proposal-bigint\">bigints</a>,\notherwise they will be <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\">numbers</a>.</p>\n<p>The <code>atimeNs</code>, <code>mtimeNs</code>, <code>ctimeNs</code>, <code>birthtimeNs</code> properties are\n<a href=\"https://tc39.github.io/proposal-bigint\">bigints</a> that hold the corresponding times in nanoseconds. They are\nonly present when <code>bigint: true</code> is passed into the method that generates\nthe object. Their precision is platform specific.</p>\n<p><code>atime</code>, <code>mtime</code>, <code>ctime</code>, and <code>birthtime</code> are\n<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date\"><code>Date</code></a> object alternate representations of the various times. The\n<code>Date</code> and number values are not connected. Assigning a new number value, or\nmutating the <code>Date</code> value, will not be reflected in the corresponding alternate\nrepresentation.</p>\n<p>The times in the stat object have the following semantics:</p>\n<ul>\n<li><code>atime</code> \"Access Time\": Time when file data last accessed. Changed\nby the <a href=\"http://man7.org/linux/man-pages/man2/mknod.2.html\"><code>mknod(2)</code></a>, <a href=\"http://man7.org/linux/man-pages/man2/utimes.2.html\"><code>utimes(2)</code></a>, and <a href=\"http://man7.org/linux/man-pages/man2/read.2.html\"><code>read(2)</code></a> system calls.</li>\n<li><code>mtime</code> \"Modified Time\": Time when file data last modified.\nChanged by the <a href=\"http://man7.org/linux/man-pages/man2/mknod.2.html\"><code>mknod(2)</code></a>, <a href=\"http://man7.org/linux/man-pages/man2/utimes.2.html\"><code>utimes(2)</code></a>, and <a href=\"http://man7.org/linux/man-pages/man2/write.2.html\"><code>write(2)</code></a> system calls.</li>\n<li><code>ctime</code> \"Change Time\": Time when file status was last changed\n(inode data modification). Changed by the <a href=\"http://man7.org/linux/man-pages/man2/chmod.2.html\"><code>chmod(2)</code></a>, <a href=\"http://man7.org/linux/man-pages/man2/chown.2.html\"><code>chown(2)</code></a>,\n<a href=\"http://man7.org/linux/man-pages/man2/link.2.html\"><code>link(2)</code></a>, <a href=\"http://man7.org/linux/man-pages/man2/mknod.2.html\"><code>mknod(2)</code></a>, <a href=\"http://man7.org/linux/man-pages/man2/rename.2.html\"><code>rename(2)</code></a>, <a href=\"http://man7.org/linux/man-pages/man2/unlink.2.html\"><code>unlink(2)</code></a>, <a href=\"http://man7.org/linux/man-pages/man2/utimes.2.html\"><code>utimes(2)</code></a>,\n<a href=\"http://man7.org/linux/man-pages/man2/read.2.html\"><code>read(2)</code></a>, and <a href=\"http://man7.org/linux/man-pages/man2/write.2.html\"><code>write(2)</code></a> system calls.</li>\n<li><code>birthtime</code> \"Birth Time\": Time of file creation. Set once when the\nfile is created. On file systems where birthtime is not available,\nthis field may instead hold either the <code>ctime</code> or\n<code>1970-01-01T00:00Z</code> (ie, Unix epoch timestamp <code>0</code>). This value may be greater\nthan <code>atime</code> or <code>mtime</code> in this case. On Darwin and other FreeBSD variants,\nalso set if the <code>atime</code> is explicitly set to an earlier value than the current\n<code>birthtime</code> using the <a href=\"http://man7.org/linux/man-pages/man2/utimes.2.html\"><code>utimes(2)</code></a> system call.</li>\n</ul>\n<p>Prior to Node.js 0.12, the <code>ctime</code> held the <code>birthtime</code> on Windows systems. As\nof 0.12, <code>ctime</code> is not \"creation time\", and on Unix systems, it never was.</p>",
                   "type": "module",
                   "displayName": "Stat time values"
+                }
+              ]
+            },
+            {
+              "textRaw": "Class: `fs.StatFs`",
+              "type": "class",
+              "name": "fs.StatFs",
+              "meta": {
+                "added": [
+                  "v19.6.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>Provides information about a mounted file system.</p>\n<p>Objects returned from <a href=\"#fsstatfspath-options-callback\"><code>fs.statfs()</code></a> and its synchronous counterpart are of\nthis type. If <code>bigint</code> in the <code>options</code> passed to those methods is <code>true</code>, the\nnumeric values will be <code>bigint</code> instead of <code>number</code>.</p>\n<pre><code class=\"language-console\">StatFs {\n  type: 1397114950,\n  bsize: 4096,\n  blocks: 121938943,\n  bfree: 61058895,\n  bavail: 61058895,\n  files: 999,\n  ffree: 1000000\n}\n</code></pre>\n<p><code>bigint</code> version:</p>\n<pre><code class=\"language-console\">StatFs {\n  type: 1397114950n,\n  bsize: 4096n,\n  blocks: 121938943n,\n  bfree: 61058895n,\n  bavail: 61058895n,\n  files: 999n,\n  ffree: 1000000n\n}\n</code></pre>",
+              "properties": [
+                {
+                  "textRaw": "`bavail` {number|bigint}",
+                  "type": "number|bigint",
+                  "name": "bavail",
+                  "meta": {
+                    "added": [
+                      "v19.6.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>Free blocks available to unprivileged users.</p>"
+                },
+                {
+                  "textRaw": "`bfree` {number|bigint}",
+                  "type": "number|bigint",
+                  "name": "bfree",
+                  "meta": {
+                    "added": [
+                      "v19.6.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>Free blocks in file system.</p>"
+                },
+                {
+                  "textRaw": "`blocks` {number|bigint}",
+                  "type": "number|bigint",
+                  "name": "blocks",
+                  "meta": {
+                    "added": [
+                      "v19.6.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>Total data blocks in file system.</p>"
+                },
+                {
+                  "textRaw": "`bsize` {number|bigint}",
+                  "type": "number|bigint",
+                  "name": "bsize",
+                  "meta": {
+                    "added": [
+                      "v19.6.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>Optimal transfer block size.</p>"
+                },
+                {
+                  "textRaw": "`ffree` {number|bigint}",
+                  "type": "number|bigint",
+                  "name": "ffree",
+                  "meta": {
+                    "added": [
+                      "v19.6.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>Free file nodes in file system.</p>"
+                },
+                {
+                  "textRaw": "`files` {number|bigint}",
+                  "type": "number|bigint",
+                  "name": "files",
+                  "meta": {
+                    "added": [
+                      "v19.6.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>Total file nodes in file system.</p>"
+                },
+                {
+                  "textRaw": "`type` {number|bigint}",
+                  "type": "number|bigint",
+                  "name": "type",
+                  "meta": {
+                    "added": [
+                      "v19.6.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>Type of file system.</p>"
                 }
               ]
             },

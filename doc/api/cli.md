@@ -314,6 +314,15 @@ added: v6.0.0
 Enable FIPS-compliant crypto at startup. (Requires Node.js to be built
 against FIPS-compatible OpenSSL.)
 
+### `--enable-network-family-autoselection`
+
+<!-- YAML
+added: v19.4.0
+-->
+
+Enables the family autoselection algorithm unless connection options explicitly
+disables it.
+
 ### `--enable-source-maps`
 
 <!-- YAML
@@ -1229,6 +1238,24 @@ A regular expression that configures the test runner to only execute tests
 whose name matches the provided pattern. See the documentation on
 [filtering tests by name][] for more details.
 
+### `--test-reporter`
+
+<!-- YAML
+added: v19.6.0
+-->
+
+A test reporter to use when running tests. See the documentation on
+[test reporters][] for more details.
+
+### `--test-reporter-destination`
+
+<!-- YAML
+added: v19.6.0
+-->
+
+The destination for the corresponding test reporter. See the documentation on
+[test reporters][] for more details.
+
 ### `--test-only`
 
 <!-- YAML
@@ -1503,14 +1530,6 @@ occurs. One of the following modes can be chosen:
 
 If a rejection happens during the command line entry point's ES module static
 loading phase, it will always raise it as an uncaught exception.
-
-### `--update-assert-snapshot`
-
-<!-- YAML
-added: v18.8.0
--->
-
-Updates snapshot files used by [`assert.snapshot()`][].
 
 ### `--use-bundled-ca`, `--use-openssl-ca`
 
@@ -1847,6 +1866,7 @@ Node.js options that are allowed are:
 * `--disable-proto`
 * `--dns-result-order`
 * `--enable-fips`
+* `--enable-network-family-autoselection`
 * `--enable-source-maps`
 * `--experimental-abortcontroller`
 * `--experimental-import-meta-resolve`
@@ -1933,7 +1953,6 @@ Node.js options that are allowed are:
 * `--trace-warnings`
 * `--track-heap-objects`
 * `--unhandled-rejections`
-* `--update-assert-snapshot`
 * `--use-bundled-ca`
 * `--use-largepages`
 * `--use-openssl-ca`
@@ -1951,6 +1970,7 @@ V8 options that are allowed are:
 
 * `--abort-on-uncaught-exception`
 * `--disallow-code-generation-from-strings`
+* `--enable-etw-stack-walking`
 * `--huge-max-old-generation-size`
 * `--interpreted-frames-native-stack`
 * `--jitless`
@@ -1966,6 +1986,8 @@ V8 options that are allowed are:
 
 `--perf-basic-prof-only-functions`, `--perf-basic-prof`,
 `--perf-prof-unwinding-info`, and `--perf-prof` are only available on Linux.
+
+`--enable-etw-stack-walking` is only available on Windows.
 
 ### `NODE_PATH=path[:…]`
 
@@ -2314,7 +2336,6 @@ done
 [`NO_COLOR`]: https://no-color.org
 [`SlowBuffer`]: buffer.md#class-slowbuffer
 [`YoungGenerationSizeFromSemiSpaceSize`]: https://chromium.googlesource.com/v8/v8.git/+/refs/tags/10.3.129/src/heap/heap.cc#328
-[`assert.snapshot()`]: assert.md#assertsnapshotvalue-name
 [`dns.lookup()`]: dns.md#dnslookuphostname-options-callback
 [`dns.setDefaultResultOrder()`]: dns.md#dnssetdefaultresultorderorder
 [`dnsPromises.lookup()`]: dns.md#dnspromiseslookuphostname-options
@@ -2338,6 +2359,7 @@ done
 [scavenge garbage collector]: https://v8.dev/blog/orinoco-parallel-scavenger
 [security warning]: #warning-binding-inspector-to-a-public-ipport-combination-is-insecure
 [semi-space]: https://www.memorymanagement.org/glossary/s.html#semi.space
+[test reporters]: test.md#test-reporters
 [timezone IDs]: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 [tracking issue for user-land snapshots]: https://github.com/nodejs/node/issues/44014
 [ways that `TZ` is handled in other environments]: https://www.gnu.org/software/libc/manual/html_node/TZ-Variable.html

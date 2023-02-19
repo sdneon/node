@@ -24,7 +24,8 @@
   V(napi_type_tag, "node:napi:type_tag")                                       \
   V(napi_wrapper, "node:napi:wrapper")                                         \
   V(untransferable_object_private_symbol, "node:untransferableObject")         \
-  V(exiting_aliased_Uint32Array, "node:exiting_aliased_Uint32Array")
+  V(exiting_aliased_Uint32Array, "node:exiting_aliased_Uint32Array")           \
+  V(require_private_symbol, "node:require_private_symbol")
 
 // Symbols are per-isolate primitives but Environment proxies them
 // for the sake of convenience.
@@ -321,8 +322,7 @@
   V(writable_string, "writable")                                               \
   V(write_host_object_string, "_writeHostObject")                              \
   V(write_queue_size_string, "writeQueueSize")                                 \
-  V(x_forwarded_string, "x-forwarded-for")                                     \
-  V(zero_return_string, "ZERO_RETURN")
+  V(x_forwarded_string, "x-forwarded-for")
 
 #define PER_ISOLATE_TEMPLATE_PROPERTIES(V)                                     \
   V(async_wrap_ctor_template, v8::FunctionTemplate)                            \

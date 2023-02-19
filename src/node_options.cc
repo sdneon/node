@@ -346,6 +346,10 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
             "returned)",
             &EnvironmentOptions::dns_result_order,
             kAllowedInEnvvar);
+  AddOption("--enable-network-family-autoselection",
+            "Enable network address family autodetection algorithm",
+            &EnvironmentOptions::enable_network_family_autoselection,
+            kAllowedInEnvvar);
   AddOption("--enable-source-maps",
             "Source Map V3 support for stack traces",
             &EnvironmentOptions::enable_source_maps,
@@ -548,6 +552,12 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
   AddOption("--test-name-pattern",
             "run tests whose name matches this regular expression",
             &EnvironmentOptions::test_name_pattern);
+  AddOption("--test-reporter",
+            "report test output using the given reporter",
+            &EnvironmentOptions::test_reporter);
+  AddOption("--test-reporter-destination",
+            "report given reporter to the given destination",
+            &EnvironmentOptions::test_reporter_destination);
   AddOption("--test-only",
             "run tests with 'only' option set",
             &EnvironmentOptions::test_only,
@@ -658,11 +668,6 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
             "use D Script, CoffeeScript or TypeScript in REPL (default: JS; options: ds, cs, ts)",
            &EnvironmentOptions::repl_lang);
 
-  AddOption("--update-assert-snapshot",
-            "update assert snapshot files",
-            &EnvironmentOptions::update_assert_snapshot,
-            kAllowedInEnvvar);
-
   AddOption("--napi-modules", "", NoOp{}, kAllowedInEnvvar);
 
   AddOption("--tls-keylog",
@@ -752,6 +757,10 @@ PerIsolateOptionsParser::PerIsolateOptionsParser(
             &PerIsolateOptions::report_signal,
             kAllowedInEnvvar);
   Implies("--report-signal", "--report-on-signal");
+  AddOption("--enable-etw-stack-walking",
+            "provides heap data to ETW Windows native tracing",
+            V8Option{},
+            kAllowedInEnvvar);
 
   AddOption("--experimental-top-level-await", "", NoOp{}, kAllowedInEnvvar);
 

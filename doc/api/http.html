@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v19.3.0">
-  <title>HTTP | Node.js v19.3.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v19.6.1">
+  <title>HTTP | Node.js v19.6.1 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -95,7 +95,7 @@
     <div id="column1" data-id="http" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v19.3.0 documentation</h1>
+          <h1>Node.js v19.6.1 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -110,7 +110,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v19.3.0</li>
+            <li class="pinned-header">Node.js v19.6.1</li>
             
     <li class="picker-header">
       <a href="#">
@@ -285,6 +285,7 @@
 <li><a href="#outgoingmessagepipe"><code>outgoingMessage.pipe()</code></a></li>
 <li><a href="#outgoingmessageremoveheadername"><code>outgoingMessage.removeHeader(name)</code></a></li>
 <li><a href="#outgoingmessagesetheadername-value"><code>outgoingMessage.setHeader(name, value)</code></a></li>
+<li><a href="#outgoingmessagesetheadersheaders"><code>outgoingMessage.setHeaders(headers)</code></a></li>
 <li><a href="#outgoingmessagesettimeoutmsesc-callback"><code>outgoingMessage.setTimeout(msesc[, callback])</code></a></li>
 <li><a href="#outgoingmessagesocket"><code>outgoingMessage.socket</code></a></li>
 <li><a href="#outgoingmessageuncork"><code>outgoingMessage.uncork()</code></a></li>
@@ -306,9 +307,9 @@
 <li><a href="#httpmaxheadersize"><code>http.maxHeaderSize</code></a></li>
 <li><a href="#httprequestoptions-callback"><code>http.request(options[, callback])</code></a></li>
 <li><a href="#httprequesturl-options-callback"><code>http.request(url[, options][, callback])</code></a></li>
-<li><a href="#httpvalidateheadernamename"><code>http.validateHeaderName(name)</code></a></li>
+<li><a href="#httpvalidateheadernamename-label"><code>http.validateHeaderName(name[, label])</code></a></li>
 <li><a href="#httpvalidateheadervaluename-value"><code>http.validateHeaderValue(name, value)</code></a></li>
-<li><a href="#httpsetmaxidlehttpparsers"><code>http.setMaxIdleHTTPParsers</code></a></li>
+<li><a href="#httpsetmaxidlehttpparsersmax"><code>http.setMaxIdleHTTPParsers(max)</code></a></li>
 </ul>
 </li>
 </ul></div></div>
@@ -614,6 +615,7 @@
 <li><a href="#outgoingmessagepipe"><code>outgoingMessage.pipe()</code></a></li>
 <li><a href="#outgoingmessageremoveheadername"><code>outgoingMessage.removeHeader(name)</code></a></li>
 <li><a href="#outgoingmessagesetheadername-value"><code>outgoingMessage.setHeader(name, value)</code></a></li>
+<li><a href="#outgoingmessagesetheadersheaders"><code>outgoingMessage.setHeaders(headers)</code></a></li>
 <li><a href="#outgoingmessagesettimeoutmsesc-callback"><code>outgoingMessage.setTimeout(msesc[, callback])</code></a></li>
 <li><a href="#outgoingmessagesocket"><code>outgoingMessage.socket</code></a></li>
 <li><a href="#outgoingmessageuncork"><code>outgoingMessage.uncork()</code></a></li>
@@ -635,9 +637,9 @@
 <li><a href="#httpmaxheadersize"><code>http.maxHeaderSize</code></a></li>
 <li><a href="#httprequestoptions-callback"><code>http.request(options[, callback])</code></a></li>
 <li><a href="#httprequesturl-options-callback"><code>http.request(url[, options][, callback])</code></a></li>
-<li><a href="#httpvalidateheadernamename"><code>http.validateHeaderName(name)</code></a></li>
+<li><a href="#httpvalidateheadernamename-label"><code>http.validateHeaderName(name[, label])</code></a></li>
 <li><a href="#httpvalidateheadervaluename-value"><code>http.validateHeaderValue(name, value)</code></a></li>
-<li><a href="#httpsetmaxidlehttpparsers"><code>http.setMaxIdleHTTPParsers</code></a></li>
+<li><a href="#httpsetmaxidlehttpparsersmax"><code>http.setMaxIdleHTTPParsers(max)</code></a></li>
 </ul>
 </li>
 </ul></details>
@@ -646,7 +648,7 @@
         <h2>HTTP<span><a class="mark" href="#http" id="http">#</a></span><a aria-hidden="true" class="legacy" id="http_http"></a></h2>
 
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v19.3.0/lib/http.js">lib/http.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v19.6.1/lib/http.js">lib/http.js</a></p>
 <p>To use the HTTP server and client one must <code>require('node:http')</code>.</p>
 <p>The HTTP interfaces in Node.js are designed to support many features
 of the protocol which have been traditionally difficult to use.
@@ -1872,10 +1874,18 @@ See <a href="net.html#serverclosecallback"><code>net.Server.close()</code></a>.<
 or waiting for a response.</p>
 <h4><code>server.headersTimeout</code><span><a class="mark" href="#serverheaderstimeout" id="serverheaderstimeout">#</a></span><a aria-hidden="true" class="legacy" id="http_server_headerstimeout"></a></h4>
 <div class="api_metadata">
-<span>Added in: v11.3.0, v10.14.0</span>
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.4.0</td>
+<td><p>The default is now set to the minimum between 60000 (60 seconds) or <code>requestTimeout</code>.</p></td></tr>
+<tr><td>v11.3.0, v10.14.0</td>
+<td><p><span>Added in: v11.3.0, v10.14.0</span></p></td></tr>
+</tbody></table>
+</details>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> <strong>Default:</strong> <code>60000</code></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> <strong>Default:</strong> The minimum between <a href="#serverrequesttimeout"><code>server.requestTimeout</code></a> or <code>60000</code>.</li>
 </ul>
 <p>Limit the amount of time the parser will wait to receive the complete HTTP
 headers.</p>
@@ -2589,6 +2599,8 @@ as an argument to any listeners on the event.</p>
 <details class="changelog"><summary>History</summary>
 <table>
 <tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.5.0</td>
+<td><p>The <code>joinDuplicateHeaders</code> option in the <code>http.request()</code> and <code>http.createServer()</code> functions ensures that duplicate headers are not discarded, but rather combined using a comma separator, in accordance with RFC 9110 Section 5.3.</p></td></tr>
 <tr><td>v15.1.0</td>
 <td><p><code>message.headers</code> is now lazily computed using an accessor property on the prototype and is no longer enumerable.</p></td></tr>
 <tr><td>v0.1.5</td>
@@ -2613,7 +2625,11 @@ header name:</p>
 <li>Duplicates of <code>age</code>, <code>authorization</code>, <code>content-length</code>, <code>content-type</code>,
 <code>etag</code>, <code>expires</code>, <code>from</code>, <code>host</code>, <code>if-modified-since</code>, <code>if-unmodified-since</code>,
 <code>last-modified</code>, <code>location</code>, <code>max-forwards</code>, <code>proxy-authorization</code>, <code>referer</code>,
-<code>retry-after</code>, <code>server</code>, or <code>user-agent</code> are discarded.</li>
+<code>retry-after</code>, <code>server</code>, or <code>user-agent</code> are discarded.
+To allow duplicate values of the headers listed above to be joined,
+use the option <code>joinDuplicateHeaders</code> in <a href="#httprequestoptions-callback"><code>http.request()</code></a>
+and <a href="#httpcreateserveroptions-requestlistener"><code>http.createServer()</code></a>. See RFC 9110 Section 5.3 for more
+information.</li>
 <li><code>set-cookie</code> is always an array. Duplicates are added to the array.</li>
 <li>For duplicate <code>cookie</code> headers, the values are joined together with <code>; </code>.</li>
 <li>For all other headers, the values are joined together with <code>, </code>.</li>
@@ -2989,6 +3005,34 @@ write-only stream.</p>
 <p>Sets a single header value. If the header already exists in the to-be-sent
 headers, its value will be replaced. Use an array of strings to send multiple
 headers with the same name.</p>
+<h4><code>outgoingMessage.setHeaders(headers)</code><span><a class="mark" href="#outgoingmessagesetheadersheaders" id="outgoingmessagesetheadersheaders">#</a></span><a aria-hidden="true" class="legacy" id="http_outgoingmessage_setheaders_headers"></a></h4>
+<div class="api_metadata">
+<span>Added in: v19.6.0</span>
+</div>
+<ul>
+<li><code>headers</code> <a href="https://developer.mozilla.org/en-US/docs/Web/API/Headers" class="type">&#x3C;Headers></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map" class="type">&#x3C;Map></a></li>
+<li>Returns: <a href="http.html#class-httpserverresponse" class="type">&#x3C;http.ServerResponse></a></li>
+</ul>
+<p>Returns the response object.</p>
+<p>Sets multiple header values for implicit headers.
+<code>headers</code> must be an instance of <a href="globals.html#class-headers"><code>Headers</code></a> or <code>Map</code>,
+if a header already exists in the to-be-sent headers,
+its value will be replaced.</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> headers = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Headers</span>({ <span class="hljs-attr">foo</span>: <span class="hljs-string">'bar'</span> });
+response.<span class="hljs-title function_">setHeaders</span>(headers);</code></pre>
+<p>or</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> headers = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Map</span>([[<span class="hljs-string">'foo'</span>, <span class="hljs-string">'bar'</span>]]);
+res.<span class="hljs-title function_">setHeaders</span>(headers);</code></pre>
+<p>When headers have been set with <a href="#outgoingmessagesetheadersheaders"><code>outgoingMessage.setHeaders()</code></a>,
+they will be merged with any headers passed to <a href="#responsewriteheadstatuscode-statusmessage-headers"><code>response.writeHead()</code></a>,
+with the headers passed to <a href="#responsewriteheadstatuscode-statusmessage-headers"><code>response.writeHead()</code></a> given precedence.</p>
+<pre><code class="language-js"><span class="hljs-comment">// Returns content-type = text/plain</span>
+<span class="hljs-keyword">const</span> server = http.<span class="hljs-title function_">createServer</span>(<span class="hljs-function">(<span class="hljs-params">req, res</span>) =></span> {
+  <span class="hljs-keyword">const</span> headers = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Headers</span>({ <span class="hljs-string">'Content-Type'</span>: <span class="hljs-string">'text/html'</span> });
+  res.<span class="hljs-title function_">setHeaders</span>(headers);
+  res.<span class="hljs-title function_">writeHead</span>(<span class="hljs-number">200</span>, { <span class="hljs-string">'Content-Type'</span>: <span class="hljs-string">'text/plain'</span> });
+  res.<span class="hljs-title function_">end</span>(<span class="hljs-string">'ok'</span>);
+});</code></pre>
 <h4><code>outgoingMessage.setTimeout(msesc[, callback])</code><span><a class="mark" href="#outgoingmessagesettimeoutmsesc-callback" id="outgoingmessagesettimeoutmsesc-callback">#</a></span><a aria-hidden="true" class="legacy" id="http_outgoingmessage_settimeout_msesc_callback"></a></h4>
 <div class="api_metadata">
 <span>Added in: v0.9.12</span>
@@ -3138,39 +3182,20 @@ short description of each. For example, <code>http.STATUS_CODES[404] === 'Not Fo
 <li>
 <p><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></p>
 <ul>
-<li><code>IncomingMessage</code> <a href="http.html#class-httpincomingmessage" class="type">&#x3C;http.IncomingMessage></a> Specifies the <code>IncomingMessage</code>
-class to be used. Useful for extending the original <code>IncomingMessage</code>.
-<strong>Default:</strong> <code>IncomingMessage</code>.</li>
-<li><code>ServerResponse</code> <a href="http.html#class-httpserverresponse" class="type">&#x3C;http.ServerResponse></a> Specifies the <code>ServerResponse</code> class
-to be used. Useful for extending the original <code>ServerResponse</code>. <strong>Default:</strong>
-<code>ServerResponse</code>.</li>
-<li><code>requestTimeout</code>: Sets the timeout value in milliseconds for receiving
-the entire request from the client.
-See <a href="#serverrequesttimeout"><code>server.requestTimeout</code></a> for more information.
-<strong>Default:</strong> <code>300000</code>.</li>
+<li><code>connectionsCheckingInterval</code>: Sets the interval value in milliseconds to
+check for request and headers timeout in incomplete requests.
+<strong>Default:</strong> <code>30000</code>.</li>
 <li><code>headersTimeout</code>: Sets the timeout value in milliseconds for receiving
 the complete HTTP headers from the client.
 See <a href="#serverheaderstimeout"><code>server.headersTimeout</code></a> for more information.
 <strong>Default:</strong> <code>60000</code>.</li>
-<li><code>keepAliveTimeout</code>: The number of milliseconds of inactivity a server
-needs to wait for additional incoming data, after it has finished writing
-the last response, before a socket will be destroyed.
-See <a href="#serverkeepalivetimeout"><code>server.keepAliveTimeout</code></a> for more information.
-<strong>Default:</strong> <code>5000</code>.</li>
-<li><code>connectionsCheckingInterval</code>: Sets the interval value in milliseconds to
-check for request and headers timeout in incomplete requests.
-<strong>Default:</strong> <code>30000</code>.</li>
 <li><code>insecureHTTPParser</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> Use an insecure HTTP parser that accepts
 invalid HTTP headers when <code>true</code>. Using the insecure parser should be
 avoided. See <a href="cli.html#--insecure-http-parser"><code>--insecure-http-parser</code></a> for more information.
-<strong>Default:</strong> <code>false</code></li>
-<li><code>maxHeaderSize</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> Optionally overrides the value of
-<a href="cli.html#--max-http-header-sizesize"><code>--max-http-header-size</code></a> for requests received by this server, i.e.
-the maximum length of request headers in bytes.
-<strong>Default:</strong> 16384 (16 KiB).</li>
-<li><code>noDelay</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> If set to <code>true</code>, it disables the use of Nagle's
-algorithm immediately after a new incoming connection is received.
-<strong>Default:</strong> <code>true</code>.</li>
+<strong>Default:</strong> <code>false</code>.</li>
+<li><code>IncomingMessage</code> <a href="http.html#class-httpincomingmessage" class="type">&#x3C;http.IncomingMessage></a> Specifies the <code>IncomingMessage</code>
+class to be used. Useful for extending the original <code>IncomingMessage</code>.
+<strong>Default:</strong> <code>IncomingMessage</code>.</li>
 <li><code>keepAlive</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> If set to <code>true</code>, it enables keep-alive functionality
 on the socket immediately after a new incoming connection is received,
 similarly on what is done in [<code>socket.setKeepAlive([enable][, initialDelay])</code>][<code>socket.setKeepAlive(enable, initialDelay)</code>].
@@ -3178,6 +3203,29 @@ similarly on what is done in [<code>socket.setKeepAlive([enable][, initialDelay]
 <li><code>keepAliveInitialDelay</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> If set to a positive number, it sets the
 initial delay before the first keepalive probe is sent on an idle socket.
 <strong>Default:</strong> <code>0</code>.</li>
+<li><code>keepAliveTimeout</code>: The number of milliseconds of inactivity a server
+needs to wait for additional incoming data, after it has finished writing
+the last response, before a socket will be destroyed.
+See <a href="#serverkeepalivetimeout"><code>server.keepAliveTimeout</code></a> for more information.
+<strong>Default:</strong> <code>5000</code>.</li>
+<li><code>maxHeaderSize</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> Optionally overrides the value of
+<a href="cli.html#--max-http-header-sizesize"><code>--max-http-header-size</code></a> for requests received by this server, i.e.
+the maximum length of request headers in bytes.
+<strong>Default:</strong> 16384 (16 KiB).</li>
+<li><code>noDelay</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> If set to <code>true</code>, it disables the use of Nagle's
+algorithm immediately after a new incoming connection is received.
+<strong>Default:</strong> <code>true</code>.</li>
+<li><code>requestTimeout</code>: Sets the timeout value in milliseconds for receiving
+the entire request from the client.
+See <a href="#serverrequesttimeout"><code>server.requestTimeout</code></a> for more information.</li>
+<li><code>joinDuplicateHeaders</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> It joins the field line values of multiple
+headers in a request with <code>, </code> instead of discarding the duplicates.
+See <a href="#messageheaders"><code>message.headers</code></a> for more information.
+<strong>Default:</strong> <code>false</code>.</li>
+<li><code>ServerResponse</code> <a href="http.html#class-httpserverresponse" class="type">&#x3C;http.ServerResponse></a> Specifies the <code>ServerResponse</code> class
+to be used. Useful for extending the original <code>ServerResponse</code>. <strong>Default:</strong>
+<code>ServerResponse</code>.
+<strong>Default:</strong> <code>300000</code>.</li>
 <li><code>uniqueHeaders</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="type">&#x3C;Array></a> A list of response headers that should be sent only
 once. If the header's value is an array, the items will be joined
 using <code>; </code>.</li>
@@ -3407,6 +3455,10 @@ This will set the timeout before the socket is connected.</li>
 <li><code>uniqueHeaders</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="type">&#x3C;Array></a> A list of request headers that should be sent
 only once. If the header's value is an array, the items will be joined
 using <code>; </code>.</li>
+<li><code>joinDuplicateHeaders</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> It joins the field line values of
+multiple headers in a request with <code>, </code> instead of discarding
+the duplicates. See <a href="#messageheaders"><code>message.headers</code></a> for more information.
+<strong>Default:</strong> <code>false</code>.</li>
 </ul>
 </li>
 <li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a></li>
@@ -3610,12 +3662,21 @@ not abort the request or do anything besides add a <code>'timeout'</code> event.
 <p>Passing an <code>AbortSignal</code> and then calling <code>abort</code> on the corresponding
 <code>AbortController</code> will behave the same way as calling <code>.destroy()</code> on the
 request itself.</p>
-</section><section><h3><code>http.validateHeaderName(name)</code><span><a class="mark" href="#httpvalidateheadernamename" id="httpvalidateheadernamename">#</a></span><a aria-hidden="true" class="legacy" id="http_http_validateheadername_name"></a></h3>
+</section><section><h3><code>http.validateHeaderName(name[, label])</code><span><a class="mark" href="#httpvalidateheadernamename-label" id="httpvalidateheadernamename-label">#</a></span><a aria-hidden="true" class="legacy" id="http_http_validateheadername_name_label"></a></h3>
 <div class="api_metadata">
-<span>Added in: v14.3.0</span>
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.5.0</td>
+<td><p>The <code>label</code> parameter is added.</p></td></tr>
+<tr><td>v14.3.0</td>
+<td><p><span>Added in: v14.3.0</span></p></td></tr>
+</tbody></table>
+</details>
 </div>
 <ul>
 <li><code>name</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li><code>label</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> Label for error message. <strong>Default:</strong> <code>'Header name'</code>.</li>
 </ul>
 <p>Performs the low-level validations on the provided <code>name</code> that are done when
 <code>res.setHeader(name, value)</code> is called.</p>
@@ -3630,9 +3691,9 @@ Examples:</p>
 <span class="hljs-keyword">try</span> {
   <span class="hljs-title function_">validateHeaderName</span>(<span class="hljs-string">''</span>);
 } <span class="hljs-keyword">catch</span> (err) {
-  err <span class="hljs-keyword">instanceof</span> <span class="hljs-title class_">TypeError</span>; <span class="hljs-comment">// --> true</span>
-  err.<span class="hljs-property">code</span>; <span class="hljs-comment">// --> 'ERR_INVALID_HTTP_TOKEN'</span>
-  err.<span class="hljs-property">message</span>; <span class="hljs-comment">// --> 'Header name must be a valid HTTP token [""]'</span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(err <span class="hljs-keyword">instanceof</span> <span class="hljs-title class_">TypeError</span>); <span class="hljs-comment">// --> true</span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(err.<span class="hljs-property">code</span>); <span class="hljs-comment">// --> 'ERR_INVALID_HTTP_TOKEN'</span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(err.<span class="hljs-property">message</span>); <span class="hljs-comment">// --> 'Header name must be a valid HTTP token [""]'</span>
 }</code></pre>
 </section><section><h3><code>http.validateHeaderValue(name, value)</code><span><a class="mark" href="#httpvalidateheadervaluename-value" id="httpvalidateheadervaluename-value">#</a></span><a aria-hidden="true" class="legacy" id="http_http_validateheadervalue_name_value"></a></h3>
 <div class="api_metadata">
@@ -3657,26 +3718,26 @@ or response. The HTTP module will automatically validate such headers.</p>
 <span class="hljs-keyword">try</span> {
   <span class="hljs-title function_">validateHeaderValue</span>(<span class="hljs-string">'x-my-header'</span>, <span class="hljs-literal">undefined</span>);
 } <span class="hljs-keyword">catch</span> (err) {
-  err <span class="hljs-keyword">instanceof</span> <span class="hljs-title class_">TypeError</span>; <span class="hljs-comment">// --> true</span>
-  err.<span class="hljs-property">code</span> === <span class="hljs-string">'ERR_HTTP_INVALID_HEADER_VALUE'</span>; <span class="hljs-comment">// --> true</span>
-  err.<span class="hljs-property">message</span>; <span class="hljs-comment">// --> 'Invalid value "undefined" for header "x-my-header"'</span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(err <span class="hljs-keyword">instanceof</span> <span class="hljs-title class_">TypeError</span>); <span class="hljs-comment">// --> true</span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(err.<span class="hljs-property">code</span> === <span class="hljs-string">'ERR_HTTP_INVALID_HEADER_VALUE'</span>); <span class="hljs-comment">// --> true</span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(err.<span class="hljs-property">message</span>); <span class="hljs-comment">// --> 'Invalid value "undefined" for header "x-my-header"'</span>
 }
 
 <span class="hljs-keyword">try</span> {
   <span class="hljs-title function_">validateHeaderValue</span>(<span class="hljs-string">'x-my-header'</span>, <span class="hljs-string">'oʊmɪɡə'</span>);
 } <span class="hljs-keyword">catch</span> (err) {
-  err <span class="hljs-keyword">instanceof</span> <span class="hljs-title class_">TypeError</span>; <span class="hljs-comment">// --> true</span>
-  err.<span class="hljs-property">code</span> === <span class="hljs-string">'ERR_INVALID_CHAR'</span>; <span class="hljs-comment">// --> true</span>
-  err.<span class="hljs-property">message</span>; <span class="hljs-comment">// --> 'Invalid character in header content ["x-my-header"]'</span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(err <span class="hljs-keyword">instanceof</span> <span class="hljs-title class_">TypeError</span>); <span class="hljs-comment">// --> true</span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(err.<span class="hljs-property">code</span> === <span class="hljs-string">'ERR_INVALID_CHAR'</span>); <span class="hljs-comment">// --> true</span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(err.<span class="hljs-property">message</span>); <span class="hljs-comment">// --> 'Invalid character in header content ["x-my-header"]'</span>
 }</code></pre>
-</section><section><h3><code>http.setMaxIdleHTTPParsers</code><span><a class="mark" href="#httpsetmaxidlehttpparsers" id="httpsetmaxidlehttpparsers">#</a></span><a aria-hidden="true" class="legacy" id="http_http_setmaxidlehttpparsers"></a></h3>
+</section><section><h3><code>http.setMaxIdleHTTPParsers(max)</code><span><a class="mark" href="#httpsetmaxidlehttpparsersmax" id="httpsetmaxidlehttpparsersmax">#</a></span><a aria-hidden="true" class="legacy" id="http_http_setmaxidlehttpparsers_max"></a></h3>
 <div class="api_metadata">
 <span>Added in: v18.8.0, v16.18.0</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+<li><code>max</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> <strong>Default:</strong> <code>1000</code>.</li>
 </ul>
-<p>Set the maximum number of idle HTTP parsers. <strong>Default:</strong> <code>1000</code>.</p></section>
+<p>Set the maximum number of idle HTTP parsers.</p></section>
         <!-- API END -->
       </div>
     </div>

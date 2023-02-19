@@ -5,13 +5,13 @@ This is a *fun* mod of Node.JS that initially embedded a modified version of dco
 
 Thanks to the inspiration from dcodeIO et al =D
 
-## Version 19.3.0
-Update to Node.JS 19.3.0 baseline.
+## Version 19.6.1
+Update to Node.JS 19.6.1 baseline, and TypeSCript 4.9.5.
 
 It embeds:
 * DS v1.2.0.
 * CS v2.7.0.
-* TS v4.9.4.
+* TS v4.9.5.
 * Refer to prior readmes for old changes.
 
 ## Usage
@@ -156,6 +156,12 @@ For information on using Node.js, see the [Node.js website][].
 
 The Node.js project uses an [open governance model](./GOVERNANCE.md). The
 [OpenJS Foundation][] provides support for the project.
+
+Contributors are expected to act in a collaborative manner to move
+the project forward. We encourage the constructive exchange of contrary
+opinions and compromise. The [TSC](./GOVERNANCE.md#technical-steering-committee)
+reserves the right to limit or block contributors who repeatedly act in ways
+that discourage, exhaust, or otherwise negatively affect other participants.
 
 **This project has a [Code of Conduct][].**
 
@@ -468,8 +474,6 @@ For information about the governance of the Node.js project, see
   **Adrian Estrada** <<edsadr@gmail.com>> (he/him)
 * [erickwendel](https://github.com/erickwendel) -
   **Erick Wendel** <<erick.workspace@gmail.com>> (he/him)
-* [evanlucas](https://github.com/evanlucas) -
-  **Evan Lucas** <<evanlucas@me.com>> (he/him)
 * [fhinkel](https://github.com/fhinkel) -
   **Franziska Hinkelmann** <<franziska.hinkelmann@gmail.com>> (she/her)
 * [F3n67u](https://github.com/F3n67u) -
@@ -549,7 +553,7 @@ For information about the governance of the Node.js project, see
 * [oyyd](https://github.com/oyyd) -
   **Ouyang Yadong** <<oyydoibh@gmail.com>> (he/him)
 * [panva](https://github.com/panva) -
-  **Filip Skokan** <<panva.ip@gmail.com>>
+  **Filip Skokan** <<panva.ip@gmail.com>> (he/him)
 * [puzpuzpuz](https://github.com/puzpuzpuz) -
   **Andrey Pechkurov** <<apechkurov@gmail.com>> (he/him)
 * [Qard](https://github.com/Qard) -
@@ -656,6 +660,8 @@ For information about the governance of the Node.js project, see
   **Alexander Makarenko** <<estliberitas@gmail.com>>
 * [eugeneo](https://github.com/eugeneo) -
   **Eugene Ostroukhov** <<eostroukhov@google.com>>
+* [evanlucas](https://github.com/evanlucas) -
+  **Evan Lucas** <<evanlucas@me.com>> (he/him)
 * [firedfox](https://github.com/firedfox) -
   **Daniel Wang** <<wangyang0123@gmail.com>>
 * [Fishrock123](https://github.com/Fishrock123) -
@@ -858,8 +864,6 @@ Primary GPG keys for Node.js Releasers (some Releasers sign with subkeys):
   `141F07595B7B3FFE74309A937405533BE57C7D57`
 * **Danielle Adams** <<adamzdanielle@gmail.com>>
   `74F12602B6F1C4E913FAA37AD3A89613643B6201`
-* **Juan José Arboleda** <<soyjuanarbol@gmail.com>>
-  `61FC681DFB92A079F1685E77973F295594EC4689`
 * **Michaël Zasso** <<targos@protonmail.com>>
   `8FCCA13FEF1D0C2E91008E09770F7A9A5AE15600`
 * **Myles Borins** <<myles.borins@gmail.com>>
@@ -878,7 +882,6 @@ to sign releases):
 gpg --keyserver hkps://keys.openpgp.org --recv-keys 4ED778F539E3634C779C87C6D7062848A1AB005C
 gpg --keyserver hkps://keys.openpgp.org --recv-keys 141F07595B7B3FFE74309A937405533BE57C7D57
 gpg --keyserver hkps://keys.openpgp.org --recv-keys 74F12602B6F1C4E913FAA37AD3A89613643B6201
-gpg --keyserver hkps://keys.openpgp.org --recv-keys 61FC681DFB92A079F1685E77973F295594EC4689
 gpg --keyserver hkps://keys.openpgp.org --recv-keys 8FCCA13FEF1D0C2E91008E09770F7A9A5AE15600
 gpg --keyserver hkps://keys.openpgp.org --recv-keys C4F0DFFF4E8C1A8236409D08E73BC641CC11F4C8
 gpg --keyserver hkps://keys.openpgp.org --recv-keys 890C08DB8579162FEE0DF9DB8BEAB4DFCF555EF4
@@ -911,6 +914,8 @@ verify a downloaded file.
   `71DCFD284A79C3B38668286BC97EC7A07EDE3FC1`
 * **Jeremiah Senkpiel** <<fishrock@keybase.io>>
   `FD3A5288F042B6850C66B31F09FE44734EB7990E`
+* **Juan José Arboleda** <<soyjuanarbol@gmail.com>>
+  `61FC681DFB92A079F1685E77973F295594EC4689`
 * **Julien Gilli** <<jgilli@fastmail.fm>>
   `114F43EE0176B71C7BC219DD50A3051F888C628D`
 * **Rod Vagg** <<rod@vagg.org>>

@@ -1,9 +1,12 @@
 #include "node_metadata.h"
+#include "acorn_version.h"
 #include "ares.h"
 #include "brotli/encode.h"
 #include "llhttp.h"
 #include "nghttp2/nghttp2ver.h"
 #include "node.h"
+#include "simdutf.h"
+#include "undici_version.h"
 #include "util.h"
 #include "uv.h"
 #include "uvwasi.h"
@@ -90,6 +93,10 @@ Metadata::Versions::Versions() {
     std::to_string((BrotliEncoderVersion() & 0xFFF000) >> 12) +
     "." +
     std::to_string(BrotliEncoderVersion() & 0xFFF);
+#ifndef NODE_SHARED_BUILTIN_UNDICI_UNDICI_PATH
+  undici = UNDICI_VERSION;
+#endif
+  acorn = ACORN_VERSION;
 
   uvwasi = UVWASI_VERSION_STRING;
 
@@ -106,6 +113,8 @@ Metadata::Versions::Versions() {
   ngtcp2 = NGTCP2_VERSION;
   nghttp3 = NGHTTP3_VERSION;
 #endif
+
+  simdutf = SIMDUTF_VERSION;
 }
 
 Metadata::Release::Release() : name(NODE_RELEASE) {
