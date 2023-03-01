@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v19.6.1">
-  <title>Test runner | Node.js v19.6.1 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v19.7.0">
+  <title>Test runner | Node.js v19.7.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -68,6 +68,7 @@
 <li><a href="readline.html" class="nav-readline">Readline</a></li>
 <li><a href="repl.html" class="nav-repl">REPL</a></li>
 <li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
 <li><a href="stream.html" class="nav-stream">Stream</a></li>
 <li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
 <li><a href="test.html" class="nav-test active">Test runner</a></li>
@@ -95,7 +96,7 @@
     <div id="column1" data-id="test" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v19.6.1 documentation</h1>
+          <h1>Node.js v19.7.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -110,7 +111,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v19.6.1</li>
+            <li class="pinned-header">Node.js v19.7.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -133,6 +134,7 @@
 <li><a href="#test-runner-execution-model">Test runner execution model</a></li>
 </ul>
 </li>
+<li><a href="#collecting-code-coverage">Collecting code coverage</a></li>
 <li><a href="#mocking">Mocking</a></li>
 <li><a href="#test-reporters">Test reporters</a>
 <ul>
@@ -174,6 +176,7 @@
 </li>
 <li><a href="#class-testsstream">Class: <code>TestsStream</code></a>
 <ul>
+<li><a href="#event-testcoverage">Event: <code>'test:coverage'</code></a></li>
 <li><a href="#event-testdiagnostic">Event: <code>'test:diagnostic'</code></a></li>
 <li><a href="#event-testfail">Event: <code>'test:fail'</code></a></li>
 <li><a href="#event-testpass">Event: <code>'test:pass'</code></a></li>
@@ -266,6 +269,7 @@
 <li><a href="readline.html" class="nav-readline">Readline</a></li>
 <li><a href="repl.html" class="nav-repl">REPL</a></li>
 <li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
 <li><a href="stream.html" class="nav-stream">Stream</a></li>
 <li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
 <li><a href="test.html" class="nav-test active">Test runner</a></li>
@@ -338,6 +342,7 @@
 <li><a href="#test-runner-execution-model">Test runner execution model</a></li>
 </ul>
 </li>
+<li><a href="#collecting-code-coverage">Collecting code coverage</a></li>
 <li><a href="#mocking">Mocking</a></li>
 <li><a href="#test-reporters">Test reporters</a>
 <ul>
@@ -379,6 +384,7 @@
 </li>
 <li><a href="#class-testsstream">Class: <code>TestsStream</code></a>
 <ul>
+<li><a href="#event-testcoverage">Event: <code>'test:coverage'</code></a></li>
 <li><a href="#event-testdiagnostic">Event: <code>'test:diagnostic'</code></a></li>
 <li><a href="#event-testfail">Event: <code>'test:fail'</code></a></li>
 <li><a href="#event-testpass">Event: <code>'test:pass'</code></a></li>
@@ -414,7 +420,7 @@
         <h2>Test runner<span><a class="mark" href="#test-runner" id="test-runner">#</a></span><a aria-hidden="true" class="legacy" id="test_test_runner"></a></h2>
 
 <p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v19.6.1/lib/test.js">lib/test.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v19.7.0/lib/test.js">lib/test.js</a></p>
 <p>The <code>node:test</code> module facilitates the creation of JavaScript tests.
 To access it:</p>
 
@@ -697,6 +703,46 @@ process finishes with an exit code of 0, the test is considered passing.
 Otherwise, the test is considered to be a failure. Test files must be
 executable by Node.js, but are not required to use the <code>node:test</code> module
 internally.</p>
+</section><section><h3>Collecting code coverage<span><a class="mark" href="#collecting-code-coverage" id="collecting-code-coverage">#</a></span><a aria-hidden="true" class="legacy" id="test_collecting_code_coverage"></a></h3>
+<p>When Node.js is started with the <a href="cli.html#--experimental-test-coverage"><code>--experimental-test-coverage</code></a>
+command-line flag, code coverage is collected and statistics are reported once
+all tests have completed. If the <a href="cli.html#node_v8_coveragedir"><code>NODE_V8_COVERAGE</code></a> environment variable is
+used to specify a code coverage directory, the generated V8 coverage files are
+written to that directory. Node.js core modules and files within
+<code>node_modules/</code> directories are not included in the coverage report. If
+coverage is enabled, the coverage report is sent to any <a href="#test-reporters">test reporters</a> via
+the <code>'test:coverage'</code> event.</p>
+<p>Coverage can be disabled on a series of lines using the following
+comment syntax:</p>
+<pre><code class="language-js"><span class="hljs-comment">/* node:coverage disable */</span>
+<span class="hljs-keyword">if</span> (anAlwaysFalseCondition) {
+  <span class="hljs-comment">// Code in this branch will never be executed, but the lines are ignored for</span>
+  <span class="hljs-comment">// coverage purposes. All lines following the 'disable' comment are ignored</span>
+  <span class="hljs-comment">// until a corresponding 'enable' comment is encountered.</span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'this is never executed'</span>);
+}
+<span class="hljs-comment">/* node:coverage enable */</span></code></pre>
+<p>Coverage can also be disabled for a specified number of lines. After the
+specified number of lines, coverage will be automatically reenabled. If the
+number of lines is not explicitly provided, a single line is ignored.</p>
+<pre><code class="language-js"><span class="hljs-comment">/* node:coverage ignore next */</span>
+<span class="hljs-keyword">if</span> (anAlwaysFalseCondition) { <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'this is never executed'</span>); }
+
+<span class="hljs-comment">/* node:coverage ignore next 3 */</span>
+<span class="hljs-keyword">if</span> (anAlwaysFalseCondition) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'this is never executed'</span>);
+}</code></pre>
+<p>The test runner's code coverage functionality has the following limitations,
+which will be addressed in a future Node.js release:</p>
+<ul>
+<li>Although coverage data is collected for child processes, this information is
+not included in the coverage report. Because the command line test runner uses
+child processes to execute test files, it cannot be used with
+<code>--experimental-test-coverage</code>.</li>
+<li>Source maps are not supported.</li>
+<li>Excluding specific files or directories from the coverage report is not
+supported.</li>
+</ul>
 </section><section><h3>Mocking<span><a class="mark" href="#mocking" id="mocking">#</a></span><a aria-hidden="true" class="legacy" id="test_mocking"></a></h3>
 <p>The <code>node:test</code> module supports mocking during testing via a top-level <code>mock</code>
 object. The following example creates a spy on a function that adds two numbers
@@ -918,11 +964,10 @@ properties are supported:
 <ul>
 <li><code>concurrency</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> If a number is provided,
 then that many files would run in parallel.
-If truthy, it would run (number of cpu cores - 1)
-files in parallel.
-If falsy, it would only run one file at a time.
-If unspecified, subtests inherit this value from their parent.
-<strong>Default:</strong> <code>true</code>.</li>
+If <code>true</code>, it would run <code>os.availableParallelism() - 1</code> test files in
+parallel.
+If <code>false</code>, it would only run one test file at a time.
+<strong>Default:</strong> <code>false</code>.</li>
 <li><code>files</code>: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="type">&#x3C;Array></a> An array containing the list of files to run.
 <strong>Default</strong> matching files from <a href="#test-runner-execution-model">test runner execution model</a>.</li>
 <li><code>signal</code> <a href="globals.html#class-abortsignal" class="type">&#x3C;AbortSignal></a> Allows aborting an in-progress test execution.</li>
@@ -964,10 +1009,9 @@ properties are supported:
 <ul>
 <li><code>concurrency</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> If a number is provided,
 then that many tests would run in parallel.
-If truthy, it would run (number of cpu cores - 1)
-tests in parallel.
+If <code>true</code>, it would run <code>os.availableParallelism() - 1</code> tests in parallel.
 For subtests, it will be <code>Infinity</code> tests in parallel.
-If falsy, it would only run one test at a time.
+If <code>false</code>, it would only run one test at a time.
 If unspecified, subtests inherit this value from their parent.
 <strong>Default:</strong> <code>false</code>.</li>
 <li><code>only</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> If truthy, and the test context is configured to run
@@ -1129,7 +1173,7 @@ If unspecified, subtests inherit this value from their parent.
 <p>This function is used to create a hook running
 before each subtest of the current suite.</p>
 <pre><code class="language-js"><span class="hljs-title function_">describe</span>(<span class="hljs-string">'tests'</span>, <span class="hljs-keyword">async</span> () => {
-  <span class="hljs-title function_">beforeEach</span>(<span class="hljs-function">() =></span> t.<span class="hljs-title function_">diagnostic</span>(<span class="hljs-string">'about to run a test'</span>));
+  <span class="hljs-title function_">beforeEach</span>(<span class="hljs-function">() =></span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'about to run a test'</span>));
   <span class="hljs-title function_">it</span>(<span class="hljs-string">'is a subtest'</span>, <span class="hljs-function">() =></span> {
     assert.<span class="hljs-title function_">ok</span>(<span class="hljs-string">'some relevant assertion here'</span>);
   });
@@ -1156,7 +1200,7 @@ If unspecified, subtests inherit this value from their parent.
 <p>This function is used to create a hook running
 after each subtest of the current test.</p>
 <pre><code class="language-js"><span class="hljs-title function_">describe</span>(<span class="hljs-string">'tests'</span>, <span class="hljs-keyword">async</span> () => {
-  <span class="hljs-title function_">afterEach</span>(<span class="hljs-function">() =></span> t.<span class="hljs-title function_">diagnostic</span>(<span class="hljs-string">'about to run a test'</span>));
+  <span class="hljs-title function_">afterEach</span>(<span class="hljs-function">() =></span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'finished running a test'</span>));
   <span class="hljs-title function_">it</span>(<span class="hljs-string">'is a subtest'</span>, <span class="hljs-function">() =></span> {
     assert.<span class="hljs-title function_">ok</span>(<span class="hljs-string">'some relevant assertion here'</span>);
   });
@@ -1427,6 +1471,53 @@ set to <code>true</code>.</p>
 <p>A successful call to <a href="#runoptions"><code>run()</code></a> method will return a new <a href="test.html#class-testsstream" class="type">&#x3C;TestsStream></a>
 object, streaming a series of events representing the execution of the tests.
 <code>TestsStream</code> will emit events, in the order of the tests definition</p>
+<h4>Event: <code>'test:coverage'</code><span><a class="mark" href="#event-testcoverage" id="event-testcoverage">#</a></span><a aria-hidden="true" class="legacy" id="test_event_test_coverage"></a></h4>
+<ul>
+<li><code>data</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>summary</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> An object containing the coverage report.
+<ul>
+<li><code>files</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="type">&#x3C;Array></a> An array of coverage reports for individual files. Each
+report is an object with the following schema:
+<ul>
+<li><code>path</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> The absolute path of the file.</li>
+<li><code>totalLineCount</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The total number of lines.</li>
+<li><code>totalBranchCount</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The total number of branches.</li>
+<li><code>totalFunctionCount</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The total number of functions.</li>
+<li><code>coveredLineCount</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The number of covered lines.</li>
+<li><code>coveredBranchCount</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The number of covered branches.</li>
+<li><code>coveredFunctionCount</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The number of covered functions.</li>
+<li><code>coveredLinePercent</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The percentage of lines covered.</li>
+<li><code>coveredBranchPercent</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The percentage of branches covered.</li>
+<li><code>coveredFunctionPercent</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The percentage of functions covered.</li>
+<li><code>uncoveredLineNumbers</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="type">&#x3C;Array></a> An array of integers representing line
+numbers that are uncovered.</li>
+</ul>
+</li>
+<li><code>totals</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> An object containing a summary of coverage for all
+files.
+<ul>
+<li><code>totalLineCount</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The total number of lines.</li>
+<li><code>totalBranchCount</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The total number of branches.</li>
+<li><code>totalFunctionCount</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The total number of functions.</li>
+<li><code>coveredLineCount</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The number of covered lines.</li>
+<li><code>coveredBranchCount</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The number of covered branches.</li>
+<li><code>coveredFunctionCount</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The number of covered functions.</li>
+<li><code>coveredLinePercent</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The percentage of lines covered.</li>
+<li><code>coveredBranchPercent</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The percentage of branches covered.</li>
+<li><code>coveredFunctionPercent</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The percentage of functions covered.</li>
+</ul>
+</li>
+<li><code>workingDirectory</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> The working directory when code coverage
+began. This is useful for displaying relative path names in case the tests
+changed the working directory of the Node.js process.</li>
+</ul>
+</li>
+<li><code>nesting</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The nesting level of the test.</li>
+</ul>
+</li>
+</ul>
+<p>Emitted when code coverage is enabled and all tests have completed.</p>
 <h4>Event: <code>'test:diagnostic'</code><span><a class="mark" href="#event-testdiagnostic" id="event-testdiagnostic">#</a></span><a aria-hidden="true" class="legacy" id="test_event_test_diagnostic"></a></h4>
 <ul>
 <li><code>data</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
@@ -1694,9 +1785,12 @@ test results. <strong>Default:</strong> The <code>name</code> property of <code>
 <li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> Configuration options for the subtest. The following
 properties are supported:
 <ul>
-<li><code>concurrency</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The number of tests that can be run at the same time.
+<li><code>concurrency</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a> If a number is provided,
+then that many tests would run in parallel.
+If <code>true</code>, it would run all subtests in parallel.
+If <code>false</code>, it would only run one test at a time.
 If unspecified, subtests inherit this value from their parent.
-<strong>Default:</strong> <code>1</code>.</li>
+<strong>Default:</strong> <code>null</code>.</li>
 <li><code>only</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> If truthy, and the test context is configured to run
 <code>only</code> tests, then this test will be run. Otherwise, the test is skipped.
 <strong>Default:</strong> <code>false</code>.</li>

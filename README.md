@@ -5,11 +5,11 @@ This is a *fun* mod of Node.JS that initially embedded a modified version of dco
 
 Thanks to the inspiration from dcodeIO et al =D
 
-## Version 19.6.1
-Update to Node.JS 19.6.1 baseline, and TypeSCript 4.9.5.
+## Version 19.7.0
+Update to Node.JS 19.7.0 baseline, and D Script 1.2.1.
 
 It embeds:
-* DS v1.2.0.
+* DS v1.2.1.
 * CS v2.7.0.
 * TS v4.9.5.
 * Refer to prior readmes for old changes.
@@ -40,6 +40,17 @@ The mod thus allows Node.JS+ to run .ds, .cs and .ts scripts directly for D Scri
       error: 'red'
   });
   ```
+  * `#ds seapp`: [from v19.7.0] for embedding as single executable app, `seapp` 'restores' the normal 'require()'. Code inject:
+  ```javascript
+  require = require('module').createRequire(__filename);
+  ```
+  which is the shortened form of the doc suggested:
+  ```javascript
+  const { createRequire } = require('module');
+  require = createRequire(__filename);
+  ```
+    * Note: original doc suggests `require('node:module')` but that throw an error as 'node:' is unrecognized!
+    Simply use `require('module')` instead.
 * `#cs`, `#ts`, `#end`: CS & TS code fragments/blocks can be embedded in D using `#cs` & `#ts` respectively, and terminated by `#end`.
   ```
   #ds colors This is a D example 
@@ -434,8 +445,6 @@ For information about the governance of the Node.js project, see
   **Ash Cripps** <<email@ashleycripps.co.uk>>
 * [Ayase-252](https://github.com/Ayase-252) -
   **Qingyu Deng** <<i@ayase-lab.com>>
-* [bcoe](https://github.com/bcoe) -
-  **Ben Coe** <<bencoe@gmail.com>> (he/him)
 * [bengl](https://github.com/bengl) -
   **Bryan English** <<bryan@bryanenglish.com>> (he/him)
 * [benjamingr](https://github.com/benjamingr) -
@@ -466,6 +475,10 @@ For information about the governance of the Node.js project, see
   **Daniel Bevenius** <<daniel.bevenius@gmail.com>> (he/him)
 * [danielleadams](https://github.com/danielleadams) -
   **Danielle Adams** <<adamzdanielle@gmail.com>> (she/her)
+* [debadree25](https://github.com/debadree25) -
+  **Debadree Chatterjee** <<debadree333@gmail.com>> (he/him)
+* [deokjinkim](https://github.com/deokjinkim) -
+  **Deokjin Kim** <<deokjin81.kim@gmail.com>> (he/him)
 * [devnexen](https://github.com/devnexen) -
   **David Carlier** <<devnexen@gmail.com>>
 * [devsnek](https://github.com/devsnek) -
@@ -496,8 +509,6 @@ For information about the governance of the Node.js project, see
   **Zeyu "Alex" Yang** <<himself65@outlook.com>> (he/him)
 * [iansu](https://github.com/iansu) -
   **Ian Sutherland** <<ian@iansutherland.ca>>
-* [indutny](https://github.com/indutny) -
-  **Fedor Indutny** <<fedor@indutny.com>>
 * [JacksonTian](https://github.com/JacksonTian) -
   **Jackson Tian** <<shyvo1987@gmail.com>>
 * [JakobJingleheimer](https://github.com/JakobJingleheimer) -
@@ -582,8 +593,6 @@ For information about the governance of the Node.js project, see
   **Paolo Insogna** <<paolo@cowtech.it>> (he/him)
 * [srl295](https://github.com/srl295) -
   **Steven R Loomis** <<srl295@gmail.com>>
-* [starkwang](https://github.com/starkwang) -
-  **Weijia Wang** <<starkwang@126.com>>
 * [sxa](https://github.com/sxa) -
   **Stewart X Addison** <<sxa@redhat.com>> (he/him)
 * [targos](https://github.com/targos) -
@@ -630,6 +639,8 @@ For information about the governance of the Node.js project, see
   **Andreas Madsen** <<amwebdk@gmail.com>> (he/him)
 * [aqrln](https://github.com/aqrln) -
   **Alexey Orlenko** <<eaglexrlnk@gmail.com>> (he/him)
+* [bcoe](https://github.com/bcoe) -
+  **Ben Coe** <<bencoe@gmail.com>> (he/him)
 * [bmeurer](https://github.com/bmeurer) -
   **Benedikt Meurer** <<benedikt.meurer@gmail.com>>
 * [boneskull](https://github.com/boneskull) -
@@ -684,6 +695,8 @@ For information about the governance of the Node.js project, see
   **Imran Iqbal** <<imran@imraniqbal.org>>
 * [imyller](https://github.com/imyller) -
   **Ilkka Myller** <<ilkka.myller@nodefield.com>>
+* [indutny](https://github.com/indutny) -
+  **Fedor Indutny** <<fedor@indutny.com>>
 * [isaacs](https://github.com/isaacs) -
   **Isaac Z. Schlueter** <<i@izs.me>>
 * [italoacasas](https://github.com/italoacasas) -
@@ -786,6 +799,8 @@ For information about the governance of the Node.js project, see
   **Shigeki Ohtsu** <<ohtsu@ohtsu.org>> (he/him)
 * [silverwind](https://github.com/silverwind) -
   **Roman Reiss** <<me@silverwind.io>>
+* [starkwang](https://github.com/starkwang) -
+  **Weijia Wang** <<starkwang@126.com>>
 * [stefanmb](https://github.com/stefanmb) -
   **Stefan Budeanu** <<stefan@budeanu.com>>
 * [tellnes](https://github.com/tellnes) -

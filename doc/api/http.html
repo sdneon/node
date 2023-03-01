@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v19.6.1">
-  <title>HTTP | Node.js v19.6.1 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v19.7.0">
+  <title>HTTP | Node.js v19.7.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -68,6 +68,7 @@
 <li><a href="readline.html" class="nav-readline">Readline</a></li>
 <li><a href="repl.html" class="nav-repl">REPL</a></li>
 <li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
 <li><a href="stream.html" class="nav-stream">Stream</a></li>
 <li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
 <li><a href="test.html" class="nav-test">Test runner</a></li>
@@ -95,7 +96,7 @@
     <div id="column1" data-id="http" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v19.6.1 documentation</h1>
+          <h1>Node.js v19.7.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -110,7 +111,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v19.6.1</li>
+            <li class="pinned-header">Node.js v19.7.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -232,6 +233,7 @@
 <li><a href="#responsesocket"><code>response.socket</code></a></li>
 <li><a href="#responsestatuscode"><code>response.statusCode</code></a></li>
 <li><a href="#responsestatusmessage"><code>response.statusMessage</code></a></li>
+<li><a href="#responsestrictcontentlength"><code>response.strictContentLength</code></a></li>
 <li><a href="#responseuncork"><code>response.uncork()</code></a></li>
 <li><a href="#responsewritableended"><code>response.writableEnded</code></a></li>
 <li><a href="#responsewritablefinished"><code>response.writableFinished</code></a></li>
@@ -375,6 +377,7 @@
 <li><a href="readline.html" class="nav-readline">Readline</a></li>
 <li><a href="repl.html" class="nav-repl">REPL</a></li>
 <li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
 <li><a href="stream.html" class="nav-stream">Stream</a></li>
 <li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
 <li><a href="test.html" class="nav-test">Test runner</a></li>
@@ -562,6 +565,7 @@
 <li><a href="#responsesocket"><code>response.socket</code></a></li>
 <li><a href="#responsestatuscode"><code>response.statusCode</code></a></li>
 <li><a href="#responsestatusmessage"><code>response.statusMessage</code></a></li>
+<li><a href="#responsestrictcontentlength"><code>response.strictContentLength</code></a></li>
 <li><a href="#responseuncork"><code>response.uncork()</code></a></li>
 <li><a href="#responsewritableended"><code>response.writableEnded</code></a></li>
 <li><a href="#responsewritablefinished"><code>response.writableFinished</code></a></li>
@@ -648,7 +652,7 @@
         <h2>HTTP<span><a class="mark" href="#http" id="http">#</a></span><a aria-hidden="true" class="legacy" id="http_http"></a></h2>
 
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v19.6.1/lib/http.js">lib/http.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v19.7.0/lib/http.js">lib/http.js</a></p>
 <p>To use the HTTP server and client one must <code>require('node:http')</code>.</p>
 <p>The HTTP interfaces in Node.js are designed to support many features
 of the protocol which have been traditionally difficult to use.
@@ -997,8 +1001,9 @@ the data is read it will consume memory that can eventually lead to a
 'process out of memory' error.</p>
 <p>For backward compatibility, <code>res</code> will only emit <code>'error'</code> if there is an
 <code>'error'</code> listener registered.</p>
-<p>Set <code>Content-Length</code> header to limit the response body size. Mismatching the
-<code>Content-Length</code> header value will result in an [<code>Error</code>][] being thrown,
+<p>Set <code>Content-Length</code> header to limit the response body size.
+If <a href="#responsestrictcontentlength"><code>response.strictContentLength</code></a> is set to <code>true</code>, mismatching the
+<code>Content-Length</code> header value will result in an <code>Error</code> being thrown,
 identified by <code>code:</code> <a href="errors.html#err_http_content_length_mismatch"><code>'ERR_HTTP_CONTENT_LENGTH_MISMATCH'</code></a>.</p>
 <p><code>Content-Length</code> value should be in bytes, not characters. Use
 <a href="buffer.html#static-method-bufferbytelengthstring-encoding"><code>Buffer.byteLength()</code></a> to determine the length of the body in bytes.</p>
@@ -1710,7 +1715,8 @@ not be emitted.</p>
 <p>If a client connection emits an <code>'error'</code> event, it will be forwarded here.
 Listener of this event is responsible for closing/destroying the underlying
 socket. For example, one may wish to more gracefully close the socket with a
-custom HTTP response instead of abruptly severing the connection.</p>
+custom HTTP response instead of abruptly severing the connection. The socket
+<strong>must be closed or destroyed</strong> before the listener ends.</p>
 <p>This event is guaranteed to be passed an instance of the <a href="net.html#class-netsocket" class="type">&#x3C;net.Socket></a> class,
 a subclass of <a href="stream.html#class-streamduplex" class="type">&#x3C;stream.Duplex></a>, unless the user specifies a socket
 type other than <a href="net.html#class-netsocket" class="type">&#x3C;net.Socket></a>.</p>
@@ -2313,6 +2319,17 @@ message for the status code will be used.</p>
 <pre><code class="language-js">response.<span class="hljs-property">statusMessage</span> = <span class="hljs-string">'Not found'</span>;</code></pre>
 <p>After response header was sent to the client, this property indicates the
 status message which was sent out.</p>
+<h4><code>response.strictContentLength</code><span><a class="mark" href="#responsestrictcontentlength" id="responsestrictcontentlength">#</a></span><a aria-hidden="true" class="legacy" id="http_response_strictcontentlength"></a></h4>
+<div class="api_metadata">
+<span>Added in: v18.10.0, v16.18.0</span>
+</div>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> <strong>Default:</strong> <code>false</code></li>
+</ul>
+<p>If set to <code>true</code>, Node.js will check whether the <code>Content-Length</code>
+header value and the size of the body, in bytes, are equal.
+Mismatching the <code>Content-Length</code> header value will result
+in an <code>Error</code> being thrown, identified by <code>code:</code> <a href="errors.html#err_http_content_length_mismatch"><code>'ERR_HTTP_CONTENT_LENGTH_MISMATCH'</code></a>.</p>
 <h4><code>response.uncork()</code><span><a class="mark" href="#responseuncork" id="responseuncork">#</a></span><a aria-hidden="true" class="legacy" id="http_response_uncork"></a></h4>
 <div class="api_metadata">
 <span>Added in: v13.2.0, v12.16.0</span>
@@ -3217,15 +3234,15 @@ algorithm immediately after a new incoming connection is received.
 <strong>Default:</strong> <code>true</code>.</li>
 <li><code>requestTimeout</code>: Sets the timeout value in milliseconds for receiving
 the entire request from the client.
-See <a href="#serverrequesttimeout"><code>server.requestTimeout</code></a> for more information.</li>
+See <a href="#serverrequesttimeout"><code>server.requestTimeout</code></a> for more information.
+<strong>Default:</strong> <code>300000</code>.</li>
 <li><code>joinDuplicateHeaders</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> It joins the field line values of multiple
 headers in a request with <code>, </code> instead of discarding the duplicates.
 See <a href="#messageheaders"><code>message.headers</code></a> for more information.
 <strong>Default:</strong> <code>false</code>.</li>
 <li><code>ServerResponse</code> <a href="http.html#class-httpserverresponse" class="type">&#x3C;http.ServerResponse></a> Specifies the <code>ServerResponse</code> class
 to be used. Useful for extending the original <code>ServerResponse</code>. <strong>Default:</strong>
-<code>ServerResponse</code>.
-<strong>Default:</strong> <code>300000</code>.</li>
+<code>ServerResponse</code>.</li>
 <li><code>uniqueHeaders</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="type">&#x3C;Array></a> A list of response headers that should be sent only
 once. If the header's value is an array, the items will be joined
 using <code>; </code>.</li>

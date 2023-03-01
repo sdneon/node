@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v19.6.1/lib/util.js\">lib/util.js</a></p>\n<p>The <code>node:util</code> module supports the needs of Node.js internal APIs. Many of the\nutilities are useful for application and module developers as well. To access\nit:</p>\n<pre><code class=\"language-js\">const util = require('node:util');\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v19.7.0/lib/util.js\">lib/util.js</a></p>\n<p>The <code>node:util</code> module supports the needs of Node.js internal APIs. Many of the\nutilities are useful for application and module developers as well. To access\nit:</p>\n<pre><code class=\"language-js\">const util = require('node:util');\n</code></pre>",
       "methods": [
         {
           "textRaw": "`util.callbackify(original)`",
@@ -1239,6 +1239,42 @@
             }
           ],
           "desc": "<p>Marks the given <a href=\"globals.html#class-abortsignal\" class=\"type\">&lt;AbortSignal&gt;</a> as transferable so that it can be used with\n<code>structuredClone()</code> and <code>postMessage()</code>.</p>\n<pre><code class=\"language-js\">const signal = transferableAbortSignal(AbortSignal.timeout(100));\nconst channel = new MessageChannel();\nchannel.port2.postMessage(signal, [signal]);\n</code></pre>"
+        },
+        {
+          "textRaw": "`util.aborted(signal, resource)`",
+          "type": "method",
+          "name": "aborted",
+          "meta": {
+            "added": [
+              "v19.7.0"
+            ],
+            "changes": []
+          },
+          "stability": 1,
+          "stabilityText": "Experimental",
+          "signatures": [
+            {
+              "return": {
+                "textRaw": "Returns: {Promise}",
+                "name": "return",
+                "type": "Promise"
+              },
+              "params": [
+                {
+                  "textRaw": "`signal` {AbortSignal}",
+                  "name": "signal",
+                  "type": "AbortSignal"
+                },
+                {
+                  "textRaw": "`resource` {Object} Any non-null entity, reference to which is held weakly.",
+                  "name": "resource",
+                  "type": "Object",
+                  "desc": "Any non-null entity, reference to which is held weakly."
+                }
+              ]
+            }
+          ],
+          "desc": "<p>Listens to abort event on the provided <code>signal</code> and\nreturns a promise that is fulfilled when the <code>signal</code> is\naborted. If the passed <code>resource</code> is garbage collected before the <code>signal</code> is\naborted, the returned promise shall remain pending indefinitely.</p>\n<pre><code class=\"language-cjs\">const { aborted } = require('node:util');\n\nconst dependent = obtainSomethingAbortable();\n\naborted(dependent.signal, dependent).then(() => {\n  // Do something when dependent is aborted.\n});\n\ndependent.on('event', () => {\n  dependent.abort();\n});\n</code></pre>\n<pre><code class=\"language-mjs\">import { aborted } from 'node:util';\n\nconst dependent = obtainSomethingAbortable();\n\naborted(dependent.signal, dependent).then(() => {\n  // Do something when dependent is aborted.\n});\n\ndependent.on('event', () => {\n  dependent.abort();\n});\n</code></pre>"
         }
       ],
       "classes": [

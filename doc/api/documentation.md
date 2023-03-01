@@ -83,6 +83,7 @@ a command-line flag. Experimental features may also emit a [warning][].
 | [Query string](querystring.html) | (2) Stable |
 | [Readline](readline.html) | (2) Stable |
 | [REPL](repl.html) | (2) Stable |
+| [Single executable applications](single-executable-applications.html) | (1) Experimental: This feature is being designed and will change. |
 | [Stream](stream.html) | (2) Stable |
 | [String decoder](string_decoder.html) | (2) Stable |
 | [Test runner](test.html) | (1) Experimental |
