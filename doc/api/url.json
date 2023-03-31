@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v19.7.0/lib/url.js\">lib/url.js</a></p>\n<p>The <code>node:url</code> module provides utilities for URL resolution and parsing. It can\nbe accessed using:</p>\n<pre><code class=\"language-mjs\">import url from 'node:url';\n</code></pre>\n<pre><code class=\"language-cjs\">const url = require('node:url');\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v19.8.1/lib/url.js\">lib/url.js</a></p>\n<p>The <code>node:url</code> module provides utilities for URL resolution and parsing. It can\nbe accessed using:</p>\n<pre><code class=\"language-mjs\">import url from 'node:url';\n</code></pre>\n<pre><code class=\"language-cjs\">const url = require('node:url');\n</code></pre>",
       "modules": [
         {
           "textRaw": "URL strings and URL objects",
@@ -149,7 +149,7 @@
                   "textRaw": "`searchParams` {URLSearchParams}",
                   "type": "URLSearchParams",
                   "name": "searchParams",
-                  "desc": "<p>Gets the <a href=\"#class-urlsearchparams\"><code>URLSearchParams</code></a> object representing the query parameters of the\nURL. This property is read-only but the <code>URLSearchParams</code> object it provides\ncan be used to mutate the URL instance; to replace the entirety of query\nparameters of the URL, use the <a href=\"#urlsearch\"><code>url.search</code></a> setter. See\n<a href=\"#class-urlsearchparams\"><code>URLSearchParams</code></a> documentation for details.</p>\n<p>Use care when using <code>.searchParams</code> to modify the <code>URL</code> because,\nper the WHATWG specification, the <code>URLSearchParams</code> object uses\ndifferent rules to determine which characters to percent-encode. For\ninstance, the <code>URL</code> object will not percent encode the ASCII tilde (<code>~</code>)\ncharacter, while <code>URLSearchParams</code> will always encode it:</p>\n<pre><code class=\"language-js\">const myUrl = new URL('https://example.org/abc?foo=~bar');\n\nconsole.log(myUrl.search);  // prints ?foo=~bar\n\n// Modify the URL via searchParams...\nmyUrl.searchParams.sort();\n\nconsole.log(myUrl.search);  // prints ?foo=%7Ebar\n</code></pre>"
+                  "desc": "<p>Gets the <a href=\"#class-urlsearchparams\"><code>URLSearchParams</code></a> object representing the query parameters of the\nURL. This property is read-only but the <code>URLSearchParams</code> object it provides\ncan be used to mutate the URL instance; to replace the entirety of query\nparameters of the URL, use the <a href=\"#urlsearch\"><code>url.search</code></a> setter. See\n<a href=\"#class-urlsearchparams\"><code>URLSearchParams</code></a> documentation for details.</p>\n<p>Use care when using <code>.searchParams</code> to modify the <code>URL</code> because,\nper the WHATWG specification, the <code>URLSearchParams</code> object uses\ndifferent rules to determine which characters to percent-encode. For\ninstance, the <code>URL</code> object will not percent encode the ASCII tilde (<code>~</code>)\ncharacter, while <code>URLSearchParams</code> will always encode it:</p>\n<pre><code class=\"language-js\">const myURL = new URL('https://example.org/abc?foo=~bar');\n\nconsole.log(myURL.search);  // prints ?foo=~bar\n\n// Modify the URL via searchParams...\nmyURL.searchParams.sort();\n\nconsole.log(myURL.search);  // prints ?foo=%7Ebar\n</code></pre>"
                 },
                 {
                   "textRaw": "`username` {string}",
@@ -547,6 +547,19 @@
                   "desc": "<p>Returns an ES6 <code>Iterator</code> over each of the name-value pairs in the query string.\nEach item of the iterator is a JavaScript <code>Array</code>. The first item of the <code>Array</code>\nis the <code>name</code>, the second item of the <code>Array</code> is the <code>value</code>.</p>\n<p>Alias for <a href=\"#urlsearchparamsentries\"><code>urlSearchParams.entries()</code></a>.</p>\n<pre><code class=\"language-js\">const params = new URLSearchParams('foo=bar&#x26;xyz=baz');\nfor (const [name, value] of params) {\n  console.log(name, value);\n}\n// Prints:\n//   foo bar\n//   xyz baz\n</code></pre>"
                 }
               ],
+              "properties": [
+                {
+                  "textRaw": "`urlSearchParams.size`",
+                  "name": "size",
+                  "meta": {
+                    "added": [
+                      "v19.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>The total number of parameter entries.</p>"
+                }
+              ],
               "signatures": [
                 {
                   "params": [],
@@ -856,7 +869,7 @@
                   ]
                 }
               ],
-              "desc": "<p>This utility function converts a URL object into an ordinary options object as\nexpected by the <a href=\"http.html#httprequestoptions-callback\"><code>http.request()</code></a> and <a href=\"https.html#httpsrequestoptions-callback\"><code>https.request()</code></a> APIs.</p>\n<pre><code class=\"language-mjs\">import { urlToHttpOptions } from 'node:url';\nconst myURL = new URL('https://a:b@測試?abc#foo');\n\nconsole.log(urlToHttpOptions(myURL));\n/*\n{\n  protocol: 'https:',\n  hostname: 'xn--g6w251d',\n  hash: '#foo',\n  search: '?abc',\n  pathname: '/',\n  path: '/?abc',\n  href: 'https://a:b@xn--g6w251d/?abc#foo',\n  auth: 'a:b'\n}\n*/\n</code></pre>\n<pre><code class=\"language-cjs\">const { urlToHttpOptions } = require('node:url');\nconst myURL = new URL('https://a:b@測試?abc#foo');\n\nconsole.log(urlToHttpOptions(myUrl));\n/*\n{\n  protocol: 'https:',\n  hostname: 'xn--g6w251d',\n  hash: '#foo',\n  search: '?abc',\n  pathname: '/',\n  path: '/?abc',\n  href: 'https://a:b@xn--g6w251d/?abc#foo',\n  auth: 'a:b'\n}\n*/\n</code></pre>"
+              "desc": "<p>This utility function converts a URL object into an ordinary options object as\nexpected by the <a href=\"http.html#httprequestoptions-callback\"><code>http.request()</code></a> and <a href=\"https.html#httpsrequestoptions-callback\"><code>https.request()</code></a> APIs.</p>\n<pre><code class=\"language-mjs\">import { urlToHttpOptions } from 'node:url';\nconst myURL = new URL('https://a:b@測試?abc#foo');\n\nconsole.log(urlToHttpOptions(myURL));\n/*\n{\n  protocol: 'https:',\n  hostname: 'xn--g6w251d',\n  hash: '#foo',\n  search: '?abc',\n  pathname: '/',\n  path: '/?abc',\n  href: 'https://a:b@xn--g6w251d/?abc#foo',\n  auth: 'a:b'\n}\n*/\n</code></pre>\n<pre><code class=\"language-cjs\">const { urlToHttpOptions } = require('node:url');\nconst myURL = new URL('https://a:b@測試?abc#foo');\n\nconsole.log(urlToHttpOptions(myURL));\n/*\n{\n  protocol: 'https:',\n  hostname: 'xn--g6w251d',\n  hash: '#foo',\n  search: '?abc',\n  pathname: '/',\n  path: '/?abc',\n  href: 'https://a:b@xn--g6w251d/?abc#foo',\n  auth: 'a:b'\n}\n*/\n</code></pre>"
             }
           ],
           "type": "module",

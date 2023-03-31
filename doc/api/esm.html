@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v19.7.0">
-  <title>Modules: ECMAScript modules | Node.js v19.7.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v19.8.1">
+  <title>Modules: ECMAScript modules | Node.js v19.8.1 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -96,7 +96,7 @@
     <div id="column1" data-id="esm" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v19.7.0 documentation</h1>
+          <h1>Node.js v19.8.1 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -111,7 +111,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v19.7.0</li>
+            <li class="pinned-header">Node.js v19.8.1</li>
             
     <li class="picker-header">
       <a href="#">
@@ -935,7 +935,8 @@ signature may change. Do not rely on the API described below.</p>
 <li><code>context</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
 <ul>
 <li><code>conditions</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a> Export conditions of the relevant <code>package.json</code></li>
-<li><code>importAssertions</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+<li><code>importAssertions</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> An object whose key-value pairs represent the
+assertions for the module to import</li>
 <li><code>parentURL</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> The module importing this one, or undefined
 if this is the Node.js entry point</li>
 </ul>
@@ -952,23 +953,25 @@ Node.js default <code>resolve</code> hook after the last user-supplied <code>res
 <li><code>format</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> A hint to the load hook (it might be
 ignored)
 <code>'builtin' | 'commonjs' | 'json' | 'module' | 'wasm'</code></li>
+<li><code>importAssertions</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> The import assertions to use when
+caching the module (optional; if excluded the input will be used)</li>
 <li><code>shortCircuit</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> A signal that this hook intends to
 terminate the chain of <code>resolve</code> hooks. <strong>Default:</strong> <code>false</code></li>
 <li><code>url</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> The absolute URL to which this input resolves</li>
 </ul>
 </li>
 </ul>
-<p>The <code>resolve</code> hook chain is responsible for resolving file URL for a given
-module specifier and parent URL, and optionally its format (such as <code>'module'</code>)
-as a hint to the <code>load</code> hook. If a format is specified, the <code>load</code> hook is
-ultimately responsible for providing the final <code>format</code> value (and it is free to
-ignore the hint provided by <code>resolve</code>); if <code>resolve</code> provides a <code>format</code>, a
-custom <code>load</code> hook is required even if only to pass the value to the Node.js
-default <code>load</code> hook.</p>
-<p>The module specifier is the string in an <code>import</code> statement or
-<code>import()</code> expression.</p>
-<p>The parent URL is the URL of the module that imported this one, or <code>undefined</code>
-if this is the main entry point for the application.</p>
+<p>The <code>resolve</code> hook chain is responsible for telling Node.js where to find and
+how to cache a given <code>import</code> statement or expression. It can optionally return
+its format (such as <code>'module'</code>) as a hint to the <code>load</code> hook. If a format is
+specified, the <code>load</code> hook is ultimately responsible for providing the final
+<code>format</code> value (and it is free to ignore the hint provided by <code>resolve</code>); if
+<code>resolve</code> provides a <code>format</code>, a custom <code>load</code> hook is required even if only to
+pass the value to the Node.js default <code>load</code> hook.</p>
+<p>Import type assertions are part of the cache key for saving loaded modules into
+the internal module cache. The <code>resolve</code> hook is responsible for
+returning an <code>importAssertions</code> object if the module should be cached with
+different assertions than were present in the source code.</p>
 <p>The <code>conditions</code> property in <code>context</code> is an array of conditions for
 <a href="packages.html#conditional-exports">package exports conditions</a> that apply to this resolution
 request. They can be used for looking up conditional mappings elsewhere or to
@@ -1318,7 +1321,7 @@ purposes.</p>
     <span class="hljs-comment">// file, search up the file system for the nearest parent package.json file</span>
     <span class="hljs-comment">// and read its "type" field.</span>
     <span class="hljs-keyword">const</span> format = <span class="hljs-keyword">await</span> <span class="hljs-title function_">getPackageType</span>(url);
-    <span class="hljs-comment">// When a hook returns a format of 'commonjs', `source` is be ignored.</span>
+    <span class="hljs-comment">// When a hook returns a format of 'commonjs', `source` is ignored.</span>
     <span class="hljs-comment">// To handle CommonJS files, a handler needs to be registered with</span>
     <span class="hljs-comment">// `require.extensions` in order to process the files with the CommonJS</span>
     <span class="hljs-comment">// loader. Avoiding the need for a separate CommonJS handler is a future</span>

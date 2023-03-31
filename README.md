@@ -5,13 +5,13 @@ This is a *fun* mod of Node.JS that initially embedded a modified version of dco
 
 Thanks to the inspiration from dcodeIO et al =D
 
-## Version 19.7.0
-Update to Node.JS 19.7.0 baseline, and D Script 1.2.1.
+## Version 19.8.1
+Update to Node.JS 19.8.1 baseline, and TypeScript 5.0.2.
 
 It embeds:
 * DS v1.2.1.
 * CS v2.7.0.
-* TS v4.9.5.
+* TS v5.0.2.
 * Refer to prior readmes for old changes.
 
 ## Usage
@@ -541,6 +541,8 @@ For information about the governance of the Node.js project, see
   **Luke Karrys** <<luke@lukekarrys.com>> (he/him)
 * [Lxxyx](https://github.com/Lxxyx) -
   **Zijian Liu** <<lxxyxzj@gmail.com>> (he/him)
+* [marco-ippolito](https://github.com/marco-ippolito) -
+  **Marco Ippolito** <<marcoippolito54@gmail.com>> (he/him)
 * [marsonya](https://github.com/marsonya) -
   **Akhil Marsonya** <<akhil.marsonya27@gmail.com>> (he/him)
 * [mcollina](https://github.com/mcollina) -
@@ -879,6 +881,8 @@ Primary GPG keys for Node.js Releasers (some Releasers sign with subkeys):
   `141F07595B7B3FFE74309A937405533BE57C7D57`
 * **Danielle Adams** <<adamzdanielle@gmail.com>>
   `74F12602B6F1C4E913FAA37AD3A89613643B6201`
+* **Juan José Arboleda** <<soyjuanarbol@gmail.com>>
+  `DD792F5973C6DE52C432CBDAC77ABFA00DDBF2B7`
 * **Michaël Zasso** <<targos@protonmail.com>>
   `8FCCA13FEF1D0C2E91008E09770F7A9A5AE15600`
 * **Myles Borins** <<myles.borins@gmail.com>>
@@ -897,6 +901,7 @@ to sign releases):
 gpg --keyserver hkps://keys.openpgp.org --recv-keys 4ED778F539E3634C779C87C6D7062848A1AB005C
 gpg --keyserver hkps://keys.openpgp.org --recv-keys 141F07595B7B3FFE74309A937405533BE57C7D57
 gpg --keyserver hkps://keys.openpgp.org --recv-keys 74F12602B6F1C4E913FAA37AD3A89613643B6201
+gpg --keyserver hkps://keys.openpgp.org --recv-keys DD792F5973C6DE52C432CBDAC77ABFA00DDBF2B7
 gpg --keyserver hkps://keys.openpgp.org --recv-keys 8FCCA13FEF1D0C2E91008E09770F7A9A5AE15600
 gpg --keyserver hkps://keys.openpgp.org --recv-keys C4F0DFFF4E8C1A8236409D08E73BC641CC11F4C8
 gpg --keyserver hkps://keys.openpgp.org --recv-keys 890C08DB8579162FEE0DF9DB8BEAB4DFCF555EF4

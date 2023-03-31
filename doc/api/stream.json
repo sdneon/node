@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v19.7.0/lib/stream.js\">lib/stream.js</a></p>\n<p>A stream is an abstract interface for working with streaming data in Node.js.\nThe <code>node:stream</code> module provides an API for implementing the stream interface.</p>\n<p>There are many stream objects provided by Node.js. For instance, a\n<a href=\"http.html#class-httpincomingmessage\">request to an HTTP server</a> and <a href=\"process.html#processstdout\"><code>process.stdout</code></a>\nare both stream instances.</p>\n<p>Streams can be readable, writable, or both. All streams are instances of\n<a href=\"events.html#class-eventemitter\"><code>EventEmitter</code></a>.</p>\n<p>To access the <code>node:stream</code> module:</p>\n<pre><code class=\"language-js\">const stream = require('node:stream');\n</code></pre>\n<p>The <code>node:stream</code> module is useful for creating new types of stream instances.\nIt is usually not necessary to use the <code>node:stream</code> module to consume streams.</p>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v19.8.1/lib/stream.js\">lib/stream.js</a></p>\n<p>A stream is an abstract interface for working with streaming data in Node.js.\nThe <code>node:stream</code> module provides an API for implementing the stream interface.</p>\n<p>There are many stream objects provided by Node.js. For instance, a\n<a href=\"http.html#class-httpincomingmessage\">request to an HTTP server</a> and <a href=\"process.html#processstdout\"><code>process.stdout</code></a>\nare both stream instances.</p>\n<p>Streams can be readable, writable, or both. All streams are instances of\n<a href=\"events.html#class-eventemitter\"><code>EventEmitter</code></a>.</p>\n<p>To access the <code>node:stream</code> module:</p>\n<pre><code class=\"language-js\">const stream = require('node:stream');\n</code></pre>\n<p>The <code>node:stream</code> module is useful for creating new types of stream instances.\nIt is usually not necessary to use the <code>node:stream</code> module to consume streams.</p>",
       "modules": [
         {
           "textRaw": "Organization of this document",
@@ -581,7 +581,13 @@
             "added": [
               "v16.9.0"
             ],
-            "changes": []
+            "changes": [
+              {
+                "version": "v19.8.0",
+                "pr-url": "https://github.com/nodejs/node/pull/46675",
+                "description": "Added support for webstreams."
+              }
+            ]
           },
           "stability": 1,
           "stabilityText": "`stream.compose` is experimental.",
@@ -594,9 +600,9 @@
               },
               "params": [
                 {
-                  "textRaw": "`streams` {Stream\\[]|Iterable\\[]|AsyncIterable\\[]|Function\\[]}",
+                  "textRaw": "`streams` {Stream\\[]|Iterable\\[]|AsyncIterable\\[]|Function\\[]| ReadableStream\\[]|WritableStream\\[]|TransformStream\\[]}",
                   "name": "streams",
-                  "type": "Stream\\[]|Iterable\\[]|AsyncIterable\\[]|Function\\[]"
+                  "type": "Stream\\[]|Iterable\\[]|AsyncIterable\\[]|Function\\[]| ReadableStream\\[]|WritableStream\\[]|TransformStream\\[]"
                 }
               ]
             }
@@ -823,14 +829,28 @@
                       "type": "Object",
                       "options": [
                         {
-                          "textRaw": "`highWaterMark` {number}",
+                          "textRaw": "`highWaterMark` {number} The maximum internal queue size (of the created `ReadableStream`) before backpressure is applied in reading from the given `stream.Readable`. If no value is provided, it will be taken from the given `stream.Readable`.",
                           "name": "highWaterMark",
-                          "type": "number"
+                          "type": "number",
+                          "desc": "The maximum internal queue size (of the created `ReadableStream`) before backpressure is applied in reading from the given `stream.Readable`. If no value is provided, it will be taken from the given `stream.Readable`."
                         },
                         {
-                          "textRaw": "`size` {Function}",
+                          "textRaw": "`size` {Function} A function that size of the given chunk of data. If no value is provided, the size will be `1` for all the chunks.",
                           "name": "size",
-                          "type": "Function"
+                          "type": "Function",
+                          "desc": "A function that size of the given chunk of data. If no value is provided, the size will be `1` for all the chunks.",
+                          "options": [
+                            {
+                              "textRaw": "`chunk` {any}",
+                              "name": "chunk",
+                              "type": "any"
+                            },
+                            {
+                              "textRaw": "Returns: {number}",
+                              "name": "return",
+                              "type": "number"
+                            }
+                          ]
                         }
                       ]
                     }
@@ -2550,7 +2570,7 @@
                           ]
                         }
                       ],
-                      "desc": "<p>This method is similar to <code>Array.prototype.some</code> and calls <code>fn</code> on each chunk\nin the stream until the awaited return value is <code>true</code> (or any truthy value).\nOnce an <code>fn</code> call on a chunk awaited return value is truthy, the stream is\ndestroyed and the promise is fulfilled with <code>true</code>. If none of the <code>fn</code>\ncalls on the chunks return a truthy value, the promise is fulfilled with\n<code>false</code>.</p>\n<pre><code class=\"language-mjs\">import { Readable } from 'node:stream';\nimport { stat } from 'node:fs/promises';\n\n// With a synchronous predicate.\nawait Readable.from([1, 2, 3, 4]).some((x) => x > 2); // true\nawait Readable.from([1, 2, 3, 4]).some((x) => x &#x3C; 0); // false\n\n// With an asynchronous predicate, making at most 2 file checks at a time.\nconst anyBigFile = await Readable.from([\n  'file1',\n  'file2',\n  'file3',\n]).some(async (fileName) => {\n  const stats = await stat(fileName);\n  return stat.size > 1024 * 1024;\n}, { concurrency: 2 });\nconsole.log(anyBigFile); // `true` if any file in the list is bigger than 1MB\nconsole.log('done'); // Stream has finished\n</code></pre>"
+                      "desc": "<p>This method is similar to <code>Array.prototype.some</code> and calls <code>fn</code> on each chunk\nin the stream until the awaited return value is <code>true</code> (or any truthy value).\nOnce an <code>fn</code> call on a chunk awaited return value is truthy, the stream is\ndestroyed and the promise is fulfilled with <code>true</code>. If none of the <code>fn</code>\ncalls on the chunks return a truthy value, the promise is fulfilled with\n<code>false</code>.</p>\n<pre><code class=\"language-mjs\">import { Readable } from 'node:stream';\nimport { stat } from 'node:fs/promises';\n\n// With a synchronous predicate.\nawait Readable.from([1, 2, 3, 4]).some((x) => x > 2); // true\nawait Readable.from([1, 2, 3, 4]).some((x) => x &#x3C; 0); // false\n\n// With an asynchronous predicate, making at most 2 file checks at a time.\nconst anyBigFile = await Readable.from([\n  'file1',\n  'file2',\n  'file3',\n]).some(async (fileName) => {\n  const stats = await stat(fileName);\n  return stats.size > 1024 * 1024;\n}, { concurrency: 2 });\nconsole.log(anyBigFile); // `true` if any file in the list is bigger than 1MB\nconsole.log('done'); // Stream has finished\n</code></pre>"
                     },
                     {
                       "textRaw": "`readable.find(fn[, options])`",
@@ -2624,7 +2644,7 @@
                           ]
                         }
                       ],
-                      "desc": "<p>This method is similar to <code>Array.prototype.find</code> and calls <code>fn</code> on each chunk\nin the stream to find a chunk with a truthy value for <code>fn</code>. Once an <code>fn</code> call's\nawaited return value is truthy, the stream is destroyed and the promise is\nfulfilled with value for which <code>fn</code> returned a truthy value. If all of the\n<code>fn</code> calls on the chunks return a falsy value, the promise is fulfilled with\n<code>undefined</code>.</p>\n<pre><code class=\"language-mjs\">import { Readable } from 'node:stream';\nimport { stat } from 'node:fs/promises';\n\n// With a synchronous predicate.\nawait Readable.from([1, 2, 3, 4]).find((x) => x > 2); // 3\nawait Readable.from([1, 2, 3, 4]).find((x) => x > 0); // 1\nawait Readable.from([1, 2, 3, 4]).find((x) => x > 10); // undefined\n\n// With an asynchronous predicate, making at most 2 file checks at a time.\nconst foundBigFile = await Readable.from([\n  'file1',\n  'file2',\n  'file3',\n]).find(async (fileName) => {\n  const stats = await stat(fileName);\n  return stat.size > 1024 * 1024;\n}, { concurrency: 2 });\nconsole.log(foundBigFile); // File name of large file, if any file in the list is bigger than 1MB\nconsole.log('done'); // Stream has finished\n</code></pre>"
+                      "desc": "<p>This method is similar to <code>Array.prototype.find</code> and calls <code>fn</code> on each chunk\nin the stream to find a chunk with a truthy value for <code>fn</code>. Once an <code>fn</code> call's\nawaited return value is truthy, the stream is destroyed and the promise is\nfulfilled with value for which <code>fn</code> returned a truthy value. If all of the\n<code>fn</code> calls on the chunks return a falsy value, the promise is fulfilled with\n<code>undefined</code>.</p>\n<pre><code class=\"language-mjs\">import { Readable } from 'node:stream';\nimport { stat } from 'node:fs/promises';\n\n// With a synchronous predicate.\nawait Readable.from([1, 2, 3, 4]).find((x) => x > 2); // 3\nawait Readable.from([1, 2, 3, 4]).find((x) => x > 0); // 1\nawait Readable.from([1, 2, 3, 4]).find((x) => x > 10); // undefined\n\n// With an asynchronous predicate, making at most 2 file checks at a time.\nconst foundBigFile = await Readable.from([\n  'file1',\n  'file2',\n  'file3',\n]).find(async (fileName) => {\n  const stats = await stat(fileName);\n  return stats.size > 1024 * 1024;\n}, { concurrency: 2 });\nconsole.log(foundBigFile); // File name of large file, if any file in the list is bigger than 1MB\nconsole.log('done'); // Stream has finished\n</code></pre>"
                     },
                     {
                       "textRaw": "`readable.every(fn[, options])`",
@@ -2698,7 +2718,7 @@
                           ]
                         }
                       ],
-                      "desc": "<p>This method is similar to <code>Array.prototype.every</code> and calls <code>fn</code> on each chunk\nin the stream to check if all awaited return values are truthy value for <code>fn</code>.\nOnce an <code>fn</code> call on a chunk awaited return value is falsy, the stream is\ndestroyed and the promise is fulfilled with <code>false</code>. If all of the <code>fn</code> calls\non the chunks return a truthy value, the promise is fulfilled with <code>true</code>.</p>\n<pre><code class=\"language-mjs\">import { Readable } from 'node:stream';\nimport { stat } from 'node:fs/promises';\n\n// With a synchronous predicate.\nawait Readable.from([1, 2, 3, 4]).every((x) => x > 2); // false\nawait Readable.from([1, 2, 3, 4]).every((x) => x > 0); // true\n\n// With an asynchronous predicate, making at most 2 file checks at a time.\nconst allBigFiles = await Readable.from([\n  'file1',\n  'file2',\n  'file3',\n]).every(async (fileName) => {\n  const stats = await stat(fileName);\n  return stat.size > 1024 * 1024;\n}, { concurrency: 2 });\n// `true` if all files in the list are bigger than 1MiB\nconsole.log(allBigFiles);\nconsole.log('done'); // Stream has finished\n</code></pre>"
+                      "desc": "<p>This method is similar to <code>Array.prototype.every</code> and calls <code>fn</code> on each chunk\nin the stream to check if all awaited return values are truthy value for <code>fn</code>.\nOnce an <code>fn</code> call on a chunk awaited return value is falsy, the stream is\ndestroyed and the promise is fulfilled with <code>false</code>. If all of the <code>fn</code> calls\non the chunks return a truthy value, the promise is fulfilled with <code>true</code>.</p>\n<pre><code class=\"language-mjs\">import { Readable } from 'node:stream';\nimport { stat } from 'node:fs/promises';\n\n// With a synchronous predicate.\nawait Readable.from([1, 2, 3, 4]).every((x) => x > 2); // false\nawait Readable.from([1, 2, 3, 4]).every((x) => x > 0); // true\n\n// With an asynchronous predicate, making at most 2 file checks at a time.\nconst allBigFiles = await Readable.from([\n  'file1',\n  'file2',\n  'file3',\n]).every(async (fileName) => {\n  const stats = await stat(fileName);\n  return stats.size > 1024 * 1024;\n}, { concurrency: 2 });\n// `true` if all files in the list are bigger than 1MiB\nconsole.log(allBigFiles);\nconsole.log('done'); // Stream has finished\n</code></pre>"
                     },
                     {
                       "textRaw": "`readable.flatMap(fn[, options])`",
@@ -3515,7 +3535,13 @@
                 "added": [
                   "v16.9.0"
                 ],
-                "changes": []
+                "changes": [
+                  {
+                    "version": "v19.8.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/46675",
+                    "description": "Added support for webstreams."
+                  }
+                ]
               },
               "stability": 1,
               "stabilityText": "`stream.compose` is experimental.",
@@ -3528,9 +3554,9 @@
                   },
                   "params": [
                     {
-                      "textRaw": "`streams` {Stream\\[]|Iterable\\[]|AsyncIterable\\[]|Function\\[]}",
+                      "textRaw": "`streams` {Stream\\[]|Iterable\\[]|AsyncIterable\\[]|Function\\[]| ReadableStream\\[]|WritableStream\\[]|TransformStream\\[]}",
                       "name": "streams",
-                      "type": "Stream\\[]|Iterable\\[]|AsyncIterable\\[]|Function\\[]"
+                      "type": "Stream\\[]|Iterable\\[]|AsyncIterable\\[]|Function\\[]| ReadableStream\\[]|WritableStream\\[]|TransformStream\\[]"
                     }
                   ]
                 }
@@ -3757,14 +3783,28 @@
                           "type": "Object",
                           "options": [
                             {
-                              "textRaw": "`highWaterMark` {number}",
+                              "textRaw": "`highWaterMark` {number} The maximum internal queue size (of the created `ReadableStream`) before backpressure is applied in reading from the given `stream.Readable`. If no value is provided, it will be taken from the given `stream.Readable`.",
                               "name": "highWaterMark",
-                              "type": "number"
+                              "type": "number",
+                              "desc": "The maximum internal queue size (of the created `ReadableStream`) before backpressure is applied in reading from the given `stream.Readable`. If no value is provided, it will be taken from the given `stream.Readable`."
                             },
                             {
-                              "textRaw": "`size` {Function}",
+                              "textRaw": "`size` {Function} A function that size of the given chunk of data. If no value is provided, the size will be `1` for all the chunks.",
                               "name": "size",
-                              "type": "Function"
+                              "type": "Function",
+                              "desc": "A function that size of the given chunk of data. If no value is provided, the size will be `1` for all the chunks.",
+                              "options": [
+                                {
+                                  "textRaw": "`chunk` {any}",
+                                  "name": "chunk",
+                                  "type": "any"
+                                },
+                                {
+                                  "textRaw": "Returns: {number}",
+                                  "name": "return",
+                                  "type": "number"
+                                }
+                              ]
                             }
                           ]
                         }

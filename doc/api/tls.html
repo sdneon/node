@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v19.7.0">
-  <title>TLS (SSL) | Node.js v19.7.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v19.8.1">
+  <title>TLS (SSL) | Node.js v19.8.1 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -96,7 +96,7 @@
     <div id="column1" data-id="tls" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v19.7.0 documentation</h1>
+          <h1>Node.js v19.8.1 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -111,7 +111,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v19.7.0</li>
+            <li class="pinned-header">Node.js v19.8.1</li>
             
     <li class="picker-header">
       <a href="#">
@@ -219,6 +219,7 @@
 <li><a href="#tlsdefault_ecdh_curve"><code>tls.DEFAULT_ECDH_CURVE</code></a></li>
 <li><a href="#tlsdefault_max_version"><code>tls.DEFAULT_MAX_VERSION</code></a></li>
 <li><a href="#tlsdefault_min_version"><code>tls.DEFAULT_MIN_VERSION</code></a></li>
+<li><a href="#tlsdefault_ciphers"><code>tls.DEFAULT_CIPHERS</code></a></li>
 </ul>
 </li>
 </ul></div></div>
@@ -458,6 +459,7 @@
 <li><a href="#tlsdefault_ecdh_curve"><code>tls.DEFAULT_ECDH_CURVE</code></a></li>
 <li><a href="#tlsdefault_max_version"><code>tls.DEFAULT_MAX_VERSION</code></a></li>
 <li><a href="#tlsdefault_min_version"><code>tls.DEFAULT_MIN_VERSION</code></a></li>
+<li><a href="#tlsdefault_ciphers"><code>tls.DEFAULT_CIPHERS</code></a></li>
 </ul>
 </li>
 </ul></details>
@@ -466,7 +468,7 @@
         <h2>TLS (SSL)<span><a class="mark" href="#tls-ssl" id="tls-ssl">#</a></span><a aria-hidden="true" class="legacy" id="tls_tls_ssl"></a></h2>
 
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v19.7.0/lib/tls.js">lib/tls.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v19.8.1/lib/tls.js">lib/tls.js</a></p>
 <p>The <code>node:tls</code> module provides an implementation of the Transport Layer Security
 (TLS) and Secure Socket Layer (SSL) protocols that is built on top of OpenSSL.
 The module can be accessed using:</p>
@@ -544,19 +546,16 @@ all sessions). Methods implementing this technique are called "ephemeral".</p>
 <p>Currently two methods are commonly used to achieve perfect forward secrecy (note
 the character "E" appended to the traditional abbreviations):</p>
 <ul>
-<li><a href="https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange">DHE</a>: An ephemeral version of the Diffie-Hellman key-agreement protocol.</li>
 <li><a href="https://en.wikipedia.org/wiki/Elliptic_curve_Diffie%E2%80%93Hellman">ECDHE</a>: An ephemeral version of the Elliptic Curve Diffie-Hellman
 key-agreement protocol.</li>
+<li><a href="https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange">DHE</a>: An ephemeral version of the Diffie-Hellman key-agreement protocol.</li>
 </ul>
-<p>To use perfect forward secrecy using <code>DHE</code> with the <code>node:tls</code> module, it is
-required to generate Diffie-Hellman parameters and specify them with the
-<code>dhparam</code> option to <a href="#tlscreatesecurecontextoptions"><code>tls.createSecureContext()</code></a>. The following illustrates
-the use of the OpenSSL command-line interface to generate such parameters:</p>
-<pre><code class="language-bash">openssl dhparam -outform PEM -out dhparam.pem 2048</code></pre>
-<p>If using perfect forward secrecy using <code>ECDHE</code>, Diffie-Hellman parameters are
-not required and a default ECDHE curve will be used. The <code>ecdhCurve</code> property
-can be used when creating a TLS Server to specify the list of names of supported
-curves to use, see <a href="#tlscreateserveroptions-secureconnectionlistener"><code>tls.createServer()</code></a> for more info.</p>
+<p>Perfect forward secrecy using ECDHE is enabled by default. The <code>ecdhCurve</code>
+option can be used when creating a TLS server to customize the list of supported
+ECDH curves to use. See <a href="#tlscreateserveroptions-secureconnectionlistener"><code>tls.createServer()</code></a> for more info.</p>
+<p>DHE is disabled by default but can be enabled alongside ECDHE by setting the
+<code>dhparam</code> option to <code>'auto'</code>. Custom DHE parameters are also supported but
+discouraged in favor of automatically selected, well-known parameters.</p>
 <p>Perfect forward secrecy was optional up to TLSv1.2. As of TLSv1.3, (EC)DHE is
 always used (with the exception of PSK-only connections).</p>
 <h4>ALPN and SNI<span><a class="mark" href="#alpn-and-sni" id="alpn-and-sni">#</a></span><a aria-hidden="true" class="legacy" id="tls_alpn_and_sni"></a></h4>
@@ -719,6 +718,21 @@ the default TLS cipher suite:</p>
 
 <span class="hljs-built_in">export</span> NODE_OPTIONS=--tls-cipher-list=<span class="hljs-string">'ECDHE-RSA-AES128-GCM-SHA256:!RC4'</span>
 node server.js</code></pre>
+<p>To verify, use the following command to show the set cipher list, note the
+difference between <code>defaultCoreCipherList</code> and <code>defaultCipherList</code>:</p>
+<pre><code class="language-bash">node --tls-cipher-list=<span class="hljs-string">'ECDHE-RSA-AES128-GCM-SHA256:!RC4'</span> -p crypto.constants.defaultCipherList | <span class="hljs-built_in">tr</span> <span class="hljs-string">':'</span> <span class="hljs-string">'\n'</span>
+ECDHE-RSA-AES128-GCM-SHA256
+!RC4</code></pre>
+<p>i.e. the <code>defaultCoreCipherList</code> list is set at compilation time and the
+<code>defaultCipherList</code> is set at runtime.</p>
+<p>To modify the default cipher suites from within the runtime, modify the
+<code>tls.DEFAULT_CIPHERS</code> variable, this must be performed before listening on any
+sockets, it will not affect sockets already opened. For example:</p>
+<pre><code class="language-js"><span class="hljs-comment">// Remove Obsolete CBC Ciphers and RSA Key Exchange based Ciphers as they don't provide Forward Secrecy</span>
+tls.<span class="hljs-property">DEFAULT_CIPHERS</span> +=
+  <span class="hljs-string">':!ECDHE-RSA-AES128-SHA:!ECDHE-RSA-AES128-SHA256:!ECDHE-RSA-AES256-SHA:!ECDHE-RSA-AES256-SHA384'</span> +
+  <span class="hljs-string">':!ECDHE-ECDSA-AES128-SHA:!ECDHE-ECDSA-AES128-SHA256:!ECDHE-ECDSA-AES256-SHA:!ECDHE-ECDSA-AES256-SHA384'</span> +
+  <span class="hljs-string">':!kRSA'</span>;</code></pre>
 <p>The default can also be replaced on a per client or server basis using the
 <code>ciphers</code> option from <a href="#tlscreatesecurecontextoptions"><code>tls.createSecureContext()</code></a>, which is also available
 in <a href="#tlscreateserveroptions-secureconnectionlistener"><code>tls.createServer()</code></a>, <a href="#tlsconnectoptions-callback"><code>tls.connect()</code></a>, and when creating new
@@ -1953,6 +1967,8 @@ argument.</p>
 <details class="changelog"><summary>History</summary>
 <table>
 <tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.8.0</td>
+<td><p>The <code>dhparam</code> option can now be set to <code>'auto'</code> to enable DHE with appropriate well-known parameters.</p></td></tr>
 <tr><td>v12.12.0</td>
 <td><p>Added <code>privateKeyIdentifier</code> and <code>privateKeyEngine</code> options to get private key from an OpenSSL engine.</p></td></tr>
 <tr><td>v12.11.0</td>
@@ -2022,12 +2038,10 @@ uppercased in order for OpenSSL to accept them.</li>
 client certificate.</li>
 <li><code>crl</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer[]></a> PEM formatted CRLs (Certificate
 Revocation Lists).</li>
-<li><code>dhparam</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> Diffie-Hellman parameters, required for
-<a href="#perfect-forward-secrecy">perfect forward secrecy</a>. Use <code>openssl dhparam</code> to create the parameters.
-The key length must be greater than or equal to 1024 bits or else an error
-will be thrown. Although 1024 bits is permissible, use 2048 bits or larger
-for stronger security. If omitted or invalid, the parameters are silently
-discarded and DHE ciphers will not be available.</li>
+<li><code>dhparam</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> <code>'auto'</code> or custom Diffie-Hellman parameters,
+required for non-ECDHE <a href="#perfect-forward-secrecy">perfect forward secrecy</a>. If omitted or invalid,
+the parameters are silently discarded and DHE ciphers will not be available.
+<a href="https://en.wikipedia.org/wiki/Elliptic_curve_Diffie%E2%80%93Hellman">ECDHE</a>-based <a href="#perfect-forward-secrecy">perfect forward secrecy</a> will still be available.</li>
 <li><code>ecdhCurve</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> A string describing a named curve or a colon separated
 list of curve NIDs or names, for example <code>P-521:P-384:P-256</code>, to use for
 ECDH key agreement. Set to <code>auto</code> to select the
@@ -2111,6 +2125,12 @@ but has no public methods. The <a href="#class-tlsserver"><code>tls.Server</code
 <code>pfx</code> can be used to provide it.</p>
 <p>If the <code>ca</code> option is not given, then Node.js will default to using
 <a href="https://hg.mozilla.org/mozilla-central/raw-file/tip/security/nss/lib/ckfw/builtins/certdata.txt">Mozilla's publicly trusted list of CAs</a>.</p>
+<p>Custom DHE parameters are discouraged in favor of the new <code>dhparam: 'auto'</code>
+option. When set to <code>'auto'</code>, well-known DHE parameters of sufficient strength
+will be selected automatically. Otherwise, if necessary, <code>openssl dhparam</code> can
+be used to create custom parameters. The key length must be greater than or
+equal to 1024 bits or else an error will be thrown. Although 1024 bits is
+permissible, use 2048 bits or larger for stronger security.</p>
 </section><section><h3><code>tls.createSecurePair([context][, isServer][, requestCert][, rejectUnauthorized][, options])</code><span><a class="mark" href="#tlscreatesecurepaircontext-isserver-requestcert-rejectunauthorized-options" id="tlscreatesecurepaircontext-isserver-requestcert-rejectunauthorized-options">#</a></span><a aria-hidden="true" class="legacy" id="tls_tls_createsecurepair_context_isserver_requestcert_rejectunauthorized_options"></a></h3>
 <div class="api_metadata">
 <details class="changelog"><summary>History</summary>
@@ -2385,6 +2405,17 @@ protocol versions, <code>'TLSv1.3'</code>, <code>'TLSv1.2'</code>, <code>'TLSv1.
 the default to <code>'TLSv1.1'</code>. Using <code>--tls-min-v1.3</code> sets the default to
 <code>'TLSv1.3'</code>. If multiple of the options are provided, the lowest minimum is
 used.</li>
+</ul>
+</section><section><h3><code>tls.DEFAULT_CIPHERS</code><span><a class="mark" href="#tlsdefault_ciphers" id="tlsdefault_ciphers">#</a></span><a aria-hidden="true" class="legacy" id="tls_tls_default_ciphers"></a></h3>
+<div class="api_metadata">
+<span>Added in: v19.8.0</span>
+</div>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> The default value of the <code>ciphers</code> option of
+<a href="#tlscreatesecurecontextoptions"><code>tls.createSecureContext()</code></a>. It can be assigned any of the supported
+OpenSSL ciphers.  Defaults to the content of
+<code>crypto.constants.defaultCoreCipherList</code>, unless changed using CLI options
+using <code>--tls-default-ciphers</code>.</li>
 </ul></section>
         <!-- API END -->
       </div>

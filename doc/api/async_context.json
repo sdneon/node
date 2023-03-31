@@ -8,7 +8,7 @@
       "introduced_in": "v16.4.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v19.7.0/lib/async_hooks.js\">lib/async_hooks.js</a></p>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v19.8.1/lib/async_hooks.js\">lib/async_hooks.js</a></p>",
       "modules": [
         {
           "textRaw": "Introduction",
@@ -37,6 +37,65 @@
             ]
           },
           "desc": "<p>This class creates stores that stay coherent through asynchronous operations.</p>\n<p>While you can create your own implementation on top of the <code>node:async_hooks</code>\nmodule, <code>AsyncLocalStorage</code> should be preferred as it is a performant and memory\nsafe implementation that involves significant optimizations that are non-obvious\nto implement.</p>\n<p>The following example uses <code>AsyncLocalStorage</code> to build a simple logger\nthat assigns IDs to incoming HTTP requests and includes them in messages\nlogged within each request.</p>\n<pre><code class=\"language-mjs\">import http from 'node:http';\nimport { AsyncLocalStorage } from 'node:async_hooks';\n\nconst asyncLocalStorage = new AsyncLocalStorage();\n\nfunction logWithId(msg) {\n  const id = asyncLocalStorage.getStore();\n  console.log(`${id !== undefined ? id : '-'}:`, msg);\n}\n\nlet idSeq = 0;\nhttp.createServer((req, res) => {\n  asyncLocalStorage.run(idSeq++, () => {\n    logWithId('start');\n    // Imagine any chain of async operations here\n    setImmediate(() => {\n      logWithId('finish');\n      res.end();\n    });\n  });\n}).listen(8080);\n\nhttp.get('http://localhost:8080');\nhttp.get('http://localhost:8080');\n// Prints:\n//   0: start\n//   1: start\n//   0: finish\n//   1: finish\n</code></pre>\n<pre><code class=\"language-cjs\">const http = require('node:http');\nconst { AsyncLocalStorage } = require('node:async_hooks');\n\nconst asyncLocalStorage = new AsyncLocalStorage();\n\nfunction logWithId(msg) {\n  const id = asyncLocalStorage.getStore();\n  console.log(`${id !== undefined ? id : '-'}:`, msg);\n}\n\nlet idSeq = 0;\nhttp.createServer((req, res) => {\n  asyncLocalStorage.run(idSeq++, () => {\n    logWithId('start');\n    // Imagine any chain of async operations here\n    setImmediate(() => {\n      logWithId('finish');\n      res.end();\n    });\n  });\n}).listen(8080);\n\nhttp.get('http://localhost:8080');\nhttp.get('http://localhost:8080');\n// Prints:\n//   0: start\n//   1: start\n//   0: finish\n//   1: finish\n</code></pre>\n<p>Each instance of <code>AsyncLocalStorage</code> maintains an independent storage context.\nMultiple instances can safely exist simultaneously without risk of interfering\nwith each other's data.</p>",
+          "classMethods": [
+            {
+              "textRaw": "Static method: `AsyncLocalStorage.bind(fn)`",
+              "type": "classMethod",
+              "name": "bind",
+              "meta": {
+                "added": [
+                  "v19.8.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "signatures": [
+                {
+                  "return": {
+                    "textRaw": "Returns: {Function} A new function that calls `fn` within the captured execution context.",
+                    "name": "return",
+                    "type": "Function",
+                    "desc": "A new function that calls `fn` within the captured execution context."
+                  },
+                  "params": [
+                    {
+                      "textRaw": "`fn` {Function} The function to bind to the current execution context.",
+                      "name": "fn",
+                      "type": "Function",
+                      "desc": "The function to bind to the current execution context."
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>Binds the given function to the current execution context.</p>"
+            },
+            {
+              "textRaw": "Static method: `AsyncLocalStorage.snapshot()`",
+              "type": "classMethod",
+              "name": "snapshot",
+              "meta": {
+                "added": [
+                  "v19.8.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "signatures": [
+                {
+                  "return": {
+                    "textRaw": "Returns: {Function} A new function with the signature `(fn: (...args) : R, ...args) : R`.",
+                    "name": "return",
+                    "type": "Function",
+                    "desc": "A new function with the signature `(fn: (...args) : R, ...args) : R`."
+                  },
+                  "params": []
+                }
+              ],
+              "desc": "<p>Captures the current execution context and returns a function that accepts a\nfunction as an argument. Whenever the returned function is called, it\ncalls the function passed to it within the captured context.</p>\n<pre><code class=\"language-js\">const asyncLocalStorage = new AsyncLocalStorage();\nconst runInAsyncScope = asyncLocalStorage.run(123, () => asyncLocalStorage.snapshot());\nconst result = asyncLocalStorage.run(321, () => runInAsyncScope(() => asyncLocalStorage.getStore()));\nconsole.log(result);  // returns 123\n</code></pre>\n<p>AsyncLocalStorage.snapshot() can replace the use of AsyncResource for simple\nasync context tracking purposes, for example:</p>\n<pre><code class=\"language-js\">class Foo {\n  #runInAsyncScope = AsyncLocalStorage.snapshot();\n\n  get() { return this.#runInAsyncScope(() => asyncLocalStorage.getStore()); }\n}\n\nconst foo = asyncLocalStorage.run(123, () => new Foo());\nconsole.log(asyncLocalStorage.run(321, () => foo.get())); // returns 123\n</code></pre>"
+            }
+          ],
           "methods": [
             {
               "textRaw": "`asyncLocalStorage.disable()`",

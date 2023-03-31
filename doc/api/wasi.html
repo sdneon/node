@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v19.7.0">
-  <title>WebAssembly System Interface (WASI) | Node.js v19.7.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v19.8.1">
+  <title>WebAssembly System Interface (WASI) | Node.js v19.8.1 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -96,7 +96,7 @@
     <div id="column1" data-id="wasi" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v19.7.0 documentation</h1>
+          <h1>Node.js v19.8.1 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -111,7 +111,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v19.7.0</li>
+            <li class="pinned-header">Node.js v19.8.1</li>
             
     <li class="picker-header">
       <a href="#">
@@ -125,6 +125,7 @@
 <li><a href="#class-wasi">Class: <code>WASI</code></a>
 <ul>
 <li><a href="#new-wasioptions"><code>new WASI([options])</code></a></li>
+<li><a href="#wasigetimportobject"><code>wasi.getImportObject()</code></a></li>
 <li><a href="#wasistartinstance"><code>wasi.start(instance)</code></a></li>
 <li><a href="#wasiinitializeinstance"><code>wasi.initialize(instance)</code></a></li>
 <li><a href="#wasiwasiimport"><code>wasi.wasiImport</code></a></li>
@@ -265,6 +266,7 @@
 <li><a href="#class-wasi">Class: <code>WASI</code></a>
 <ul>
 <li><a href="#new-wasioptions"><code>new WASI([options])</code></a></li>
+<li><a href="#wasigetimportobject"><code>wasi.getImportObject()</code></a></li>
 <li><a href="#wasistartinstance"><code>wasi.start(instance)</code></a></li>
 <li><a href="#wasiinitializeinstance"><code>wasi.initialize(instance)</code></a></li>
 <li><a href="#wasiwasiimport"><code>wasi.wasiImport</code></a></li>
@@ -278,7 +280,7 @@
         <h2>WebAssembly System Interface (WASI)<span><a class="mark" href="#webassembly-system-interface-wasi" id="webassembly-system-interface-wasi">#</a></span><a aria-hidden="true" class="legacy" id="wasi_webassembly_system_interface_wasi"></a></h2>
 
 <p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v19.7.0/lib/wasi.js">lib/wasi.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v19.8.1/lib/wasi.js">lib/wasi.js</a></p>
 <p>The WASI API provides an implementation of the <a href="https://wasi.dev/">WebAssembly System Interface</a>
 specification. WASI gives sandboxed WebAssembly applications access to the
 underlying operating system via a collection of POSIX-like functions.</p>
@@ -288,6 +290,7 @@ underlying operating system via a collection of POSIX-like functions.</p>
 <span class="hljs-keyword">import</span> { argv, env } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:process'</span>;
 
 <span class="hljs-keyword">const</span> wasi = <span class="hljs-keyword">new</span> <span class="hljs-title function_">WASI</span>({
+  <span class="hljs-attr">version</span>: <span class="hljs-string">'preview1'</span>,
   <span class="hljs-attr">args</span>: argv,
   env,
   <span class="hljs-attr">preopens</span>: {
@@ -295,14 +298,10 @@ underlying operating system via a collection of POSIX-like functions.</p>
   },
 });
 
-<span class="hljs-comment">// Some WASI binaries require:</span>
-<span class="hljs-comment">//   const importObject = { wasi_unstable: wasi.wasiImport };</span>
-<span class="hljs-keyword">const</span> importObject = { <span class="hljs-attr">wasi_snapshot_preview1</span>: wasi.<span class="hljs-property">wasiImport</span> };
-
 <span class="hljs-keyword">const</span> wasm = <span class="hljs-keyword">await</span> <span class="hljs-title class_">WebAssembly</span>.<span class="hljs-title function_">compile</span>(
   <span class="hljs-keyword">await</span> <span class="hljs-title function_">readFile</span>(<span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'./demo.wasm'</span>, <span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">url</span>)),
 );
-<span class="hljs-keyword">const</span> instance = <span class="hljs-keyword">await</span> <span class="hljs-title class_">WebAssembly</span>.<span class="hljs-title function_">instantiate</span>(wasm, importObject);
+<span class="hljs-keyword">const</span> instance = <span class="hljs-keyword">await</span> <span class="hljs-title class_">WebAssembly</span>.<span class="hljs-title function_">instantiate</span>(wasm, wasi.<span class="hljs-title function_">getImportObject</span>());
 
 wasi.<span class="hljs-title function_">start</span>(instance);</code><code class="language-js cjs"><span class="hljs-meta">'use strict'</span>;
 <span class="hljs-keyword">const</span> { readFile } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:fs/promises'</span>);
@@ -311,6 +310,7 @@ wasi.<span class="hljs-title function_">start</span>(instance);</code><code clas
 <span class="hljs-keyword">const</span> { join } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:path'</span>);
 
 <span class="hljs-keyword">const</span> wasi = <span class="hljs-keyword">new</span> <span class="hljs-title function_">WASI</span>({
+  <span class="hljs-attr">version</span>: <span class="hljs-string">'preview1'</span>,
   <span class="hljs-attr">args</span>: argv,
   env,
   <span class="hljs-attr">preopens</span>: {
@@ -318,15 +318,11 @@ wasi.<span class="hljs-title function_">start</span>(instance);</code><code clas
   },
 });
 
-<span class="hljs-comment">// Some WASI binaries require:</span>
-<span class="hljs-comment">//   const importObject = { wasi_unstable: wasi.wasiImport };</span>
-<span class="hljs-keyword">const</span> importObject = { <span class="hljs-attr">wasi_snapshot_preview1</span>: wasi.<span class="hljs-property">wasiImport</span> };
-
 (<span class="hljs-keyword">async</span> () => {
   <span class="hljs-keyword">const</span> wasm = <span class="hljs-keyword">await</span> <span class="hljs-title class_">WebAssembly</span>.<span class="hljs-title function_">compile</span>(
     <span class="hljs-keyword">await</span> <span class="hljs-title function_">readFile</span>(<span class="hljs-title function_">join</span>(__dirname, <span class="hljs-string">'demo.wasm'</span>)),
   );
-  <span class="hljs-keyword">const</span> instance = <span class="hljs-keyword">await</span> <span class="hljs-title class_">WebAssembly</span>.<span class="hljs-title function_">instantiate</span>(wasm, importObject);
+  <span class="hljs-keyword">const</span> instance = <span class="hljs-keyword">await</span> <span class="hljs-title class_">WebAssembly</span>.<span class="hljs-title function_">instantiate</span>(wasm, wasi.<span class="hljs-title function_">getImportObject</span>());
 
   wasi.<span class="hljs-title function_">start</span>(instance);
 })();</code></pre>
@@ -374,7 +370,15 @@ instance must have its command-line arguments, environment variables, and
 sandbox directory structure configured explicitly.</p>
 <h4><code>new WASI([options])</code><span><a class="mark" href="#new-wasioptions" id="new-wasioptions">#</a></span><a aria-hidden="true" class="legacy" id="wasi_new_wasi_options"></a></h4>
 <div class="api_metadata">
-<span>Added in: v13.3.0, v12.16.0</span>
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.8.0</td>
+<td><p>version field added to options.</p></td></tr>
+<tr><td>v13.3.0, v12.16.0</td>
+<td><p><span>Added in: v13.3.0, v12.16.0</span></p></td></tr>
+</tbody></table>
+</details>
 </div>
 <ul>
 <li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
@@ -398,9 +402,22 @@ WebAssembly application. <strong>Default:</strong> <code>0</code>.</li>
 WebAssembly application. <strong>Default:</strong> <code>1</code>.</li>
 <li><code>stderr</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a> The file descriptor used as standard error in the
 WebAssembly application. <strong>Default:</strong> <code>2</code>.</li>
+<li><code>version</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> The version of WASI requested. Currently the only
+supported versions are <code>unstable</code> and <code>preview1</code>. <strong>Default:</strong> <code>preview1</code>.</li>
 </ul>
 </li>
 </ul>
+<h4><code>wasi.getImportObject()</code><span><a class="mark" href="#wasigetimportobject" id="wasigetimportobject">#</a></span><a aria-hidden="true" class="legacy" id="wasi_wasi_getimportobject"></a></h4>
+<div class="api_metadata">
+<span>Added in: v19.8.0</span>
+</div>
+<p>Return an import object that can be passed to <code>WebAssembly.instantiate()</code> if
+no other WASM imports are needed beyond those provided by WASI.</p>
+<p>If version <code>unstable</code> was passed into the constructor it will return:</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span> wasi_unstable<span class="hljs-punctuation">:</span> wasi.wasiImport <span class="hljs-punctuation">}</span></code></pre>
+<p>If version <code>preview1</code> was passed into the constructor or no version was
+specified it will return:</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span> wasi_snapshot_preview1<span class="hljs-punctuation">:</span> wasi.wasiImport <span class="hljs-punctuation">}</span></code></pre>
 <h4><code>wasi.start(instance)</code><span><a class="mark" href="#wasistartinstance" id="wasistartinstance">#</a></span><a aria-hidden="true" class="legacy" id="wasi_wasi_start_instance"></a></h4>
 <div class="api_metadata">
 <span>Added in: v13.3.0, v12.16.0</span>

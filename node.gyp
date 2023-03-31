@@ -61,7 +61,7 @@
       [ 'node_shared=="true"', {
         'node_target_type%': 'shared_library',
         'conditions': [
-          ['OS=="aix"', {
+          ['OS in "aix os400"', {
             # For AIX, always generate static library first,
             # It needs an extra step to generate exp and
             # then use both static lib and exp to create
@@ -110,7 +110,7 @@
     },
 
     'conditions': [
-      ['OS=="aix"', {
+      ['OS in "aix os400"', {
         'ldflags': [
           '-Wl,-bnoerrmsg',
         ],
@@ -192,7 +192,7 @@
           },
         }],
         [ 'node_intermediate_lib_type=="static_library" and '
-            'node_shared=="true" and OS=="aix"', {
+            'node_shared=="true" and OS in "aix os400"', {
           # For AIX, shared lib is linked by static lib and .exp. In the
           # case here, the executable needs to link to shared lib.
           # Therefore, use 'node_aix_shared' target to generate the
@@ -227,7 +227,7 @@
             },
           },
           'conditions': [
-            ['OS != "aix" and OS != "mac" and OS != "ios"', {
+            ['OS != "aix" and OS != "os400" and OS != "mac" and OS != "ios"', {
               'ldflags': [
                 '-Wl,--whole-archive',
                 '<(obj_dir)/<(STATIC_LIB_PREFIX)<(node_core_target_name)<(STATIC_LIB_SUFFIX)',
@@ -477,7 +477,9 @@
         'src/cleanup_queue.cc',
         'src/connect_wrap.cc',
         'src/connection_wrap.cc',
+        'src/dataqueue/queue.cc',
         'src/debug_utils.cc',
+        'src/encoding_binding.cc',
         'src/env.cc',
         'src/fs_event_wrap.cc',
         'src/handle_wrap.cc',
@@ -572,6 +574,7 @@
         'src/async_wrap-inl.h',
         'src/base_object.h',
         'src/base_object-inl.h',
+        'src/base_object_types.h',
         'src/base64.h',
         'src/base64-inl.h',
         'src/callback_queue.h',
@@ -580,8 +583,10 @@
         'src/cleanup_queue-inl.h',
         'src/connect_wrap.h',
         'src/connection_wrap.h',
+        'src/dataqueue/queue.h',
         'src/debug_utils.h',
         'src/debug_utils-inl.h',
+        'src/encoding_binding.h',
         'src/env_properties.h',
         'src/env.h',
         'src/env-inl.h',
@@ -665,6 +670,7 @@
         'src/string_decoder-inl.h',
         'src/string_search.h',
         'src/tcp_wrap.h',
+        'src/timers.h',
         'src/tracing/agent.h',
         'src/tracing/node_trace_buffer.h',
         'src/tracing/node_trace_writer.h',
@@ -679,7 +685,7 @@
         'src/util-inl.h',
         # Dependency headers
         'deps/v8/include/v8.h',
-        'deps/postject/postject-api.h'
+        'deps/postject/postject-api.h',
         # javascript files to make for an even more pleasant IDE experience
         '<@(library_files)',
         '<@(deps_files)',
@@ -739,7 +745,7 @@
             'NODE_USE_NODE_CODE_CACHE=1',
           ],
         }],
-        ['node_shared=="true" and OS=="aix"', {
+        ['node_shared=="true" and OS in "aix os400"', {
           'product_name': 'node_base',
         }],
         [ 'v8_enable_inspector==1', {
@@ -991,6 +997,7 @@
         'test/cctest/test_sockaddr.cc',
         'test/cctest/test_traced_value.cc',
         'test/cctest/test_util.cc',
+        'test/cctest/test_dataqueue.cc',
       ],
 
       'conditions': [
@@ -1167,7 +1174,7 @@
   ], # end targets
 
   'conditions': [
-    ['OS=="aix" and node_shared=="true"', {
+    ['OS in "aix os400" and node_shared=="true"', {
       'targets': [
         {
           'target_name': 'node_aix_shared',

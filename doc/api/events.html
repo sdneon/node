@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v19.7.0">
-  <title>Events | Node.js v19.7.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v19.8.1">
+  <title>Events | Node.js v19.8.1 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -96,7 +96,7 @@
     <div id="column1" data-id="events" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v19.7.0 documentation</h1>
+          <h1>Node.js v19.8.1 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -111,7 +111,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v19.7.0</li>
+            <li class="pinned-header">Node.js v19.8.1</li>
             
     <li class="picker-header">
       <a href="#">
@@ -135,7 +135,7 @@
 <li><a href="#emitteremiteventname-args"><code>emitter.emit(eventName[, ...args])</code></a></li>
 <li><a href="#emittereventnames"><code>emitter.eventNames()</code></a></li>
 <li><a href="#emittergetmaxlisteners"><code>emitter.getMaxListeners()</code></a></li>
-<li><a href="#emitterlistenercounteventname"><code>emitter.listenerCount(eventName)</code></a></li>
+<li><a href="#emitterlistenercounteventname-listener"><code>emitter.listenerCount(eventName[, listener])</code></a></li>
 <li><a href="#emitterlistenerseventname"><code>emitter.listeners(eventName)</code></a></li>
 <li><a href="#emitteroffeventname-listener"><code>emitter.off(eventName, listener)</code></a></li>
 <li><a href="#emitteroneventname-listener"><code>emitter.on(eventName, listener)</code></a></li>
@@ -214,6 +214,7 @@
 <li><a href="#class-nodeeventtarget">Class: <code>NodeEventTarget</code></a>
 <ul>
 <li><a href="#nodeeventtargetaddlistenertype-listener"><code>nodeEventTarget.addListener(type, listener)</code></a></li>
+<li><a href="#nodeeventtargetemittype-arg"><code>nodeEventTarget.emit(type, arg)</code></a></li>
 <li><a href="#nodeeventtargeteventnames"><code>nodeEventTarget.eventNames()</code></a></li>
 <li><a href="#nodeeventtargetlistenercounttype"><code>nodeEventTarget.listenerCount(type)</code></a></li>
 <li><a href="#nodeeventtargetsetmaxlistenersn"><code>nodeEventTarget.setMaxListeners(n)</code></a></li>
@@ -382,7 +383,7 @@
 <li><a href="#emitteremiteventname-args"><code>emitter.emit(eventName[, ...args])</code></a></li>
 <li><a href="#emittereventnames"><code>emitter.eventNames()</code></a></li>
 <li><a href="#emittergetmaxlisteners"><code>emitter.getMaxListeners()</code></a></li>
-<li><a href="#emitterlistenercounteventname"><code>emitter.listenerCount(eventName)</code></a></li>
+<li><a href="#emitterlistenercounteventname-listener"><code>emitter.listenerCount(eventName[, listener])</code></a></li>
 <li><a href="#emitterlistenerseventname"><code>emitter.listeners(eventName)</code></a></li>
 <li><a href="#emitteroffeventname-listener"><code>emitter.off(eventName, listener)</code></a></li>
 <li><a href="#emitteroneventname-listener"><code>emitter.on(eventName, listener)</code></a></li>
@@ -461,6 +462,7 @@
 <li><a href="#class-nodeeventtarget">Class: <code>NodeEventTarget</code></a>
 <ul>
 <li><a href="#nodeeventtargetaddlistenertype-listener"><code>nodeEventTarget.addListener(type, listener)</code></a></li>
+<li><a href="#nodeeventtargetemittype-arg"><code>nodeEventTarget.emit(type, arg)</code></a></li>
 <li><a href="#nodeeventtargeteventnames"><code>nodeEventTarget.eventNames()</code></a></li>
 <li><a href="#nodeeventtargetlistenercounttype"><code>nodeEventTarget.listenerCount(type)</code></a></li>
 <li><a href="#nodeeventtargetsetmaxlistenersn"><code>nodeEventTarget.setMaxListeners(n)</code></a></li>
@@ -483,7 +485,7 @@
 
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
 
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v19.7.0/lib/events.js">lib/events.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v19.8.1/lib/events.js">lib/events.js</a></p>
 <p>Much of the Node.js core API is built around an idiomatic asynchronous
 event-driven architecture in which certain kinds of objects (called "emitters")
 emit named events that cause <code>Function</code> objects ("listeners") to be called.</p>
@@ -986,15 +988,26 @@ myEE.<span class="hljs-title function_">on</span>(sym, <span class="hljs-functio
 <p>Returns the current max listener value for the <code>EventEmitter</code> which is either
 set by <a href="#emittersetmaxlistenersn"><code>emitter.setMaxListeners(n)</code></a> or defaults to
 <a href="#eventsdefaultmaxlisteners"><code>events.defaultMaxListeners</code></a>.</p>
-<h4><code>emitter.listenerCount(eventName)</code><span><a class="mark" href="#emitterlistenercounteventname" id="emitterlistenercounteventname">#</a></span><a aria-hidden="true" class="legacy" id="events_emitter_listenercount_eventname"></a></h4>
+<h4><code>emitter.listenerCount(eventName[, listener])</code><span><a class="mark" href="#emitterlistenercounteventname-listener" id="emitterlistenercounteventname-listener">#</a></span><a aria-hidden="true" class="legacy" id="events_emitter_listenercount_eventname_listener"></a></h4>
 <div class="api_metadata">
-<span>Added in: v3.2.0</span>
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.8.0</td>
+<td><p>Added the <code>listener</code> argument.</p></td></tr>
+<tr><td>v3.2.0</td>
+<td><p><span>Added in: v3.2.0</span></p></td></tr>
+</tbody></table>
+</details>
 </div>
 <ul>
 <li><code>eventName</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Symbol_type" class="type">&#x3C;symbol></a> The name of the event being listened for</li>
+<li><code>listener</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> The event handler function</li>
 <li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a></li>
 </ul>
-<p>Returns the number of listeners listening to the event named <code>eventName</code>.</p>
+<p>Returns the number of listeners listening for the event named <code>eventName</code>.
+If <code>listener</code> is provided, it will return how many times the listener is found
+in the list of the listeners of the event.</p>
 <h4><code>emitter.listeners(eventName)</code><span><a class="mark" href="#emitterlistenerseventname" id="emitterlistenerseventname">#</a></span><a aria-hidden="true" class="legacy" id="events_emitter_listeners_eventname"></a></h4>
 <div class="api_metadata">
 <details class="changelog"><summary>History</summary>
@@ -1738,7 +1751,7 @@ process.<span class="hljs-title function_">nextTick</span>(<span class="hljs-fun
 <div class="api_metadata">
 <span>Added in: v0.9.12</span><span>Deprecated since: v3.2.0</span>
 </div>
-<p></p><div class="api_stability api_stability_0"><a href="documentation.html#stability-index">Stability: 0</a> - Deprecated: Use <a href="#emitterlistenercounteventname"><code>emitter.listenerCount()</code></a> instead.</div><p></p>
+<p></p><div class="api_stability api_stability_0"><a href="documentation.html#stability-index">Stability: 0</a> - Deprecated: Use <a href="#emitterlistenercounteventname-listener"><code>emitter.listenerCount()</code></a> instead.</div><p></p>
 <ul>
 <li><code>emitter</code> <a href="events.html#class-eventemitter" class="type">&#x3C;EventEmitter></a> The emitter to query</li>
 <li><code>eventName</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Symbol_type" class="type">&#x3C;symbol></a> The event name</li>
@@ -2394,6 +2407,18 @@ that emulates a subset of the <code>EventEmitter</code> API.</p>
 equivalent <code>EventEmitter</code> API. The only difference between <code>addListener()</code> and
 <code>addEventListener()</code> is that <code>addListener()</code> will return a reference to the
 <code>EventTarget</code>.</p>
+<h5><code>nodeEventTarget.emit(type, arg)</code><span><a class="mark" href="#nodeeventtargetemittype-arg" id="nodeeventtargetemittype-arg">#</a></span><a aria-hidden="true" class="legacy" id="events_nodeeventtarget_emit_type_arg"></a></h5>
+<div class="api_metadata">
+<span>Added in: v15.2.0</span>
+</div>
+<ul>
+<li><code>type</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li><code>arg</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a></li>
+<li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> <code>true</code> if event listeners registered for the <code>type</code> exist,
+otherwise <code>false</code>.</li>
+</ul>
+<p>Node.js-specific extension to the <code>EventTarget</code> class that dispatches the
+<code>arg</code> to the list of handlers for <code>type</code>.</p>
 <h5><code>nodeEventTarget.eventNames()</code><span><a class="mark" href="#nodeeventtargeteventnames" id="nodeeventtargeteventnames">#</a></span><a aria-hidden="true" class="legacy" id="events_nodeeventtarget_eventnames"></a></h5>
 <div class="api_metadata">
 <span>Added in: v14.5.0</span>
@@ -2456,7 +2481,7 @@ of max event listeners.</p>
 <p>Returns: <a href="events.html#class-eventtarget" class="type">&#x3C;EventTarget></a> this</p>
 </li>
 </ul>
-<p>Node.js-specific alias for <code>eventTarget.removeListener()</code>.</p>
+<p>Node.js-specific alias for <code>eventTarget.removeEventListener()</code>.</p>
 <h5><code>nodeEventTarget.on(type, listener)</code><span><a class="mark" href="#nodeeventtargetontype-listener" id="nodeeventtargetontype-listener">#</a></span><a aria-hidden="true" class="legacy" id="events_nodeeventtarget_on_type_listener"></a></h5>
 <div class="api_metadata">
 <span>Added in: v14.5.0</span>
@@ -2472,7 +2497,7 @@ of max event listeners.</p>
 <p>Returns: <a href="events.html#class-eventtarget" class="type">&#x3C;EventTarget></a> this</p>
 </li>
 </ul>
-<p>Node.js-specific alias for <code>eventTarget.addListener()</code>.</p>
+<p>Node.js-specific alias for <code>eventTarget.addEventListener()</code>.</p>
 <h5><code>nodeEventTarget.once(type, listener)</code><span><a class="mark" href="#nodeeventtargetoncetype-listener" id="nodeeventtargetoncetype-listener">#</a></span><a aria-hidden="true" class="legacy" id="events_nodeeventtarget_once_type_listener"></a></h5>
 <div class="api_metadata">
 <span>Added in: v14.5.0</span>

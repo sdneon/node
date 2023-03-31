@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v19.7.0">
-  <title>Single executable applications | Node.js v19.7.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v19.8.1">
+  <title>Single executable applications | Node.js v19.8.1 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -96,7 +96,7 @@
     <div id="column1" data-id="single-executable-applications" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v19.7.0 documentation</h1>
+          <h1>Node.js v19.8.1 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -111,7 +111,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v19.7.0</li>
+            <li class="pinned-header">Node.js v19.8.1</li>
             
     <li class="picker-header">
       <a href="#">
@@ -273,7 +273,7 @@
         <h2>Single executable applications<span><a class="mark" href="#single-executable-applications" id="single-executable-applications">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_single_executable_applications"></a></h2>
 
 <p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental: This feature is being designed and will change.</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v19.7.0/lib/internal/main/single_executable_application.js">lib/internal/main/single_executable_application.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v19.8.1/lib/internal/main/single_executable_application.js">lib/internal/main/single_executable_application.js</a></p>
 <p>This feature allows the distribution of a Node.js application conveniently to a
 system that does not have Node.js installed.</p>
 <p>Node.js supports the creation of <a href="https://github.com/nodejs/single-executable">single executable applications</a> by allowing
@@ -294,6 +294,19 @@ tool, <a href="https://github.com/nodejs/postject">postject</a>:</p>
 <li>
 <p>Create a copy of the <code>node</code> executable and name it according to your needs:</p>
 <pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash"><span class="hljs-built_in">cp</span> $(<span class="hljs-built_in">command</span> -v node) hello</span></code></pre>
+</li>
+<li>
+<p>Remove the signature of the binary:</p>
+<ul>
+<li>On macOS:</li>
+</ul>
+<pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">codesign --remove-signature hello</span></code></pre>
+<ul>
+<li>On Windows (optional):</li>
+</ul>
+<p><a href="https://learn.microsoft.com/en-us/windows/win32/seccrypto/signtool">signtool</a> can be used from the installed <a href="https://developer.microsoft.com/en-us/windows/downloads/windows-sdk/">Windows SDK</a>. If this step is
+skipped, ignore any signature-related warning from postject.</p>
+<pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">signtool remove /s hello</span></code></pre>
 </li>
 <li>
 <p>Inject the JavaScript file into the copied binary by running <code>postject</code> with
@@ -323,6 +336,19 @@ stored.</li>
     --macho-segment-name NODE_JS</span></code></pre>
 </li>
 </ul>
+</li>
+<li>
+<p>Sign the binary:</p>
+<ul>
+<li>On macOS:</li>
+</ul>
+<pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">codesign --sign - hello</span></code></pre>
+<ul>
+<li>On Windows (optional):</li>
+</ul>
+<p>A certificate needs to be present for this to work. However, the unsigned
+binary would still be runnable.</p>
+<pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">signtool sign /fd SHA256 hello</span></code></pre>
 </li>
 <li>
 <p>Run the binary:</p>
@@ -367,7 +393,8 @@ platforms:</p>
 <ul>
 <li>Windows</li>
 <li>macOS</li>
-<li>Linux (AMD64 only)</li>
+<li>Linux (all distributions <a href="https://github.com/nodejs/node/blob/main/BUILDING.md#platform-list">supported by Node.js</a> except Alpine and all
+architectures <a href="https://github.com/nodejs/node/blob/main/BUILDING.md#platform-list">supported by Node.js</a> except s390x and ppc64)</li>
 </ul>
 <p>This is due to a lack of better tools to generate single-executables that can be
 used to test this feature on other platforms.</p>

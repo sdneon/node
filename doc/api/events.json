@@ -9,7 +9,7 @@
       "stability": 2,
       "stabilityText": "Stable",
       "type": "module",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v19.7.0/lib/events.js\">lib/events.js</a></p>\n<p>Much of the Node.js core API is built around an idiomatic asynchronous\nevent-driven architecture in which certain kinds of objects (called \"emitters\")\nemit named events that cause <code>Function</code> objects (\"listeners\") to be called.</p>\n<p>For instance: a <a href=\"net.html#class-netserver\"><code>net.Server</code></a> object emits an event each time a peer\nconnects to it; a <a href=\"fs.html#class-fsreadstream\"><code>fs.ReadStream</code></a> emits an event when the file is opened;\na <a href=\"stream.html\">stream</a> emits an event whenever data is available to be read.</p>\n<p>All objects that emit events are instances of the <code>EventEmitter</code> class. These\nobjects expose an <code>eventEmitter.on()</code> function that allows one or more\nfunctions to be attached to named events emitted by the object. Typically,\nevent names are camel-cased strings but any valid JavaScript property key\ncan be used.</p>\n<p>When the <code>EventEmitter</code> object emits an event, all of the functions attached\nto that specific event are called <em>synchronously</em>. Any values returned by the\ncalled listeners are <em>ignored</em> and discarded.</p>\n<p>The following example shows a simple <code>EventEmitter</code> instance with a single\nlistener. The <code>eventEmitter.on()</code> method is used to register listeners, while\nthe <code>eventEmitter.emit()</code> method is used to trigger the event.</p>\n<pre><code class=\"language-mjs\">import { EventEmitter } from 'node:events';\n\nclass MyEmitter extends EventEmitter {}\n\nconst myEmitter = new MyEmitter();\nmyEmitter.on('event', () => {\n  console.log('an event occurred!');\n});\nmyEmitter.emit('event');\n</code></pre>\n<pre><code class=\"language-cjs\">const EventEmitter = require('node:events');\n\nclass MyEmitter extends EventEmitter {}\n\nconst myEmitter = new MyEmitter();\nmyEmitter.on('event', () => {\n  console.log('an event occurred!');\n});\nmyEmitter.emit('event');\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v19.8.1/lib/events.js\">lib/events.js</a></p>\n<p>Much of the Node.js core API is built around an idiomatic asynchronous\nevent-driven architecture in which certain kinds of objects (called \"emitters\")\nemit named events that cause <code>Function</code> objects (\"listeners\") to be called.</p>\n<p>For instance: a <a href=\"net.html#class-netserver\"><code>net.Server</code></a> object emits an event each time a peer\nconnects to it; a <a href=\"fs.html#class-fsreadstream\"><code>fs.ReadStream</code></a> emits an event when the file is opened;\na <a href=\"stream.html\">stream</a> emits an event whenever data is available to be read.</p>\n<p>All objects that emit events are instances of the <code>EventEmitter</code> class. These\nobjects expose an <code>eventEmitter.on()</code> function that allows one or more\nfunctions to be attached to named events emitted by the object. Typically,\nevent names are camel-cased strings but any valid JavaScript property key\ncan be used.</p>\n<p>When the <code>EventEmitter</code> object emits an event, all of the functions attached\nto that specific event are called <em>synchronously</em>. Any values returned by the\ncalled listeners are <em>ignored</em> and discarded.</p>\n<p>The following example shows a simple <code>EventEmitter</code> instance with a single\nlistener. The <code>eventEmitter.on()</code> method is used to register listeners, while\nthe <code>eventEmitter.emit()</code> method is used to trigger the event.</p>\n<pre><code class=\"language-mjs\">import { EventEmitter } from 'node:events';\n\nclass MyEmitter extends EventEmitter {}\n\nconst myEmitter = new MyEmitter();\nmyEmitter.on('event', () => {\n  console.log('an event occurred!');\n});\nmyEmitter.emit('event');\n</code></pre>\n<pre><code class=\"language-cjs\">const EventEmitter = require('node:events');\n\nclass MyEmitter extends EventEmitter {}\n\nconst myEmitter = new MyEmitter();\nmyEmitter.on('event', () => {\n  console.log('an event occurred!');\n});\nmyEmitter.emit('event');\n</code></pre>",
       "modules": [
         {
           "textRaw": "Passing arguments and `this` to listeners",
@@ -632,6 +632,40 @@
                   "desc": "<p>Node.js-specific extension to the <code>EventTarget</code> class that emulates the\nequivalent <code>EventEmitter</code> API. The only difference between <code>addListener()</code> and\n<code>addEventListener()</code> is that <code>addListener()</code> will return a reference to the\n<code>EventTarget</code>.</p>"
                 },
                 {
+                  "textRaw": "`nodeEventTarget.emit(type, arg)`",
+                  "type": "method",
+                  "name": "emit",
+                  "meta": {
+                    "added": [
+                      "v15.2.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "return": {
+                        "textRaw": "Returns: {boolean} `true` if event listeners registered for the `type` exist, otherwise `false`.",
+                        "name": "return",
+                        "type": "boolean",
+                        "desc": "`true` if event listeners registered for the `type` exist, otherwise `false`."
+                      },
+                      "params": [
+                        {
+                          "textRaw": "`type` {string}",
+                          "name": "type",
+                          "type": "string"
+                        },
+                        {
+                          "textRaw": "`arg` {any}",
+                          "name": "arg",
+                          "type": "any"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>Node.js-specific extension to the <code>EventTarget</code> class that dispatches the\n<code>arg</code> to the list of handlers for <code>type</code>.</p>"
+                },
+                {
                   "textRaw": "`nodeEventTarget.eventNames()`",
                   "type": "method",
                   "name": "eventNames",
@@ -770,7 +804,7 @@
                       ]
                     }
                   ],
-                  "desc": "<p>Node.js-specific alias for <code>eventTarget.removeListener()</code>.</p>"
+                  "desc": "<p>Node.js-specific alias for <code>eventTarget.removeEventListener()</code>.</p>"
                 },
                 {
                   "textRaw": "`nodeEventTarget.on(type, listener)`",
@@ -804,7 +838,7 @@
                       ]
                     }
                   ],
-                  "desc": "<p>Node.js-specific alias for <code>eventTarget.addListener()</code>.</p>"
+                  "desc": "<p>Node.js-specific alias for <code>eventTarget.addEventListener()</code>.</p>"
                 },
                 {
                   "textRaw": "`nodeEventTarget.once(type, listener)`",
@@ -1113,14 +1147,20 @@
               "desc": "<p>Returns the current max listener value for the <code>EventEmitter</code> which is either\nset by <a href=\"#emittersetmaxlistenersn\"><code>emitter.setMaxListeners(n)</code></a> or defaults to\n<a href=\"#eventsdefaultmaxlisteners\"><code>events.defaultMaxListeners</code></a>.</p>"
             },
             {
-              "textRaw": "`emitter.listenerCount(eventName)`",
+              "textRaw": "`emitter.listenerCount(eventName[, listener])`",
               "type": "method",
               "name": "listenerCount",
               "meta": {
                 "added": [
                   "v3.2.0"
                 ],
-                "changes": []
+                "changes": [
+                  {
+                    "version": "v19.8.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/46523",
+                    "description": "Added the `listener` argument."
+                  }
+                ]
               },
               "signatures": [
                 {
@@ -1135,11 +1175,17 @@
                       "name": "eventName",
                       "type": "string|symbol",
                       "desc": "The name of the event being listened for"
+                    },
+                    {
+                      "textRaw": "`listener` {Function} The event handler function",
+                      "name": "listener",
+                      "type": "Function",
+                      "desc": "The event handler function"
                     }
                   ]
                 }
               ],
-              "desc": "<p>Returns the number of listeners listening to the event named <code>eventName</code>.</p>"
+              "desc": "<p>Returns the number of listeners listening for the event named <code>eventName</code>.\nIf <code>listener</code> is provided, it will return how many times the listener is found\nin the list of the listeners of the event.</p>"
             },
             {
               "textRaw": "`emitter.listeners(eventName)`",

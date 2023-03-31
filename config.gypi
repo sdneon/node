@@ -172,6 +172,7 @@
                                          'lib/internal/modules/esm/formats.js',
                                          'lib/internal/modules/esm/get_format.js',
                                          'lib/internal/modules/esm/handle_process_exit.js',
+                                         'lib/internal/modules/esm/hooks.js',
                                          'lib/internal/modules/esm/initialize_import_meta.js',
                                          'lib/internal/modules/esm/load.js',
                                          'lib/internal/modules/esm/loader.js',
