@@ -113,7 +113,7 @@ platforms. This is true regardless of entries in the table below.
 | Windows          | x64, x86 (WoW64) | >= Windows 10/Server 2016         | Tier 1                                          | [^2],[^3]                            |
 | Windows          | x86 (native)     | >= Windows 10/Server 2016         | Tier 1 (running) / Experimental (compiling)[^4] |                                      |
 | Windows          | x64, x86         | Windows 8.1/Server 2012           | Experimental                                    |                                      |
-| Windows          | arm64            | >= Windows 10                     | Tier 2 (compiling) / Experimental (running)     |                                      |
+| Windows          | arm64            | >= Windows 10                     | Tier 2                                          |                                      |
 | macOS            | x64              | >= 10.15                          | Tier 1                                          | For notes about compilation see [^5] |
 | macOS            | arm64            | >= 11                             | Tier 1                                          |                                      |
 | SmartOS          | x64              | >= 18                             | Tier 2                                          |                                      |
@@ -586,10 +586,7 @@ to run it again before invoking `make -j4`.
 
 Optional requirements to build the MSI installer package:
 
-* The [WiX Toolset v3.11](https://wixtoolset.org/releases/) and the
-  [Wix Toolset Visual Studio 2019 Extension](https://marketplace.visualstudio.com/items?itemName=WixToolset.WixToolsetVisualStudio2019Extension)
-* The [WiX Toolset v3.14](https://wixtoolset.org/releases/) if
-  building for Windows 10 on ARM (ARM64)
+* The .NET SDK component from [Visual Studio 2019](https://visualstudio.microsoft.com/vs/older-downloads/#visual-studio-2019-and-other-products)
 
 Optional requirements for compiling for Windows 10 on ARM (ARM64):
 

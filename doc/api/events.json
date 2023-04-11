@@ -9,7 +9,7 @@
       "stability": 2,
       "stabilityText": "Stable",
       "type": "module",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v19.8.1/lib/events.js\">lib/events.js</a></p>\n<p>Much of the Node.js core API is built around an idiomatic asynchronous\nevent-driven architecture in which certain kinds of objects (called \"emitters\")\nemit named events that cause <code>Function</code> objects (\"listeners\") to be called.</p>\n<p>For instance: a <a href=\"net.html#class-netserver\"><code>net.Server</code></a> object emits an event each time a peer\nconnects to it; a <a href=\"fs.html#class-fsreadstream\"><code>fs.ReadStream</code></a> emits an event when the file is opened;\na <a href=\"stream.html\">stream</a> emits an event whenever data is available to be read.</p>\n<p>All objects that emit events are instances of the <code>EventEmitter</code> class. These\nobjects expose an <code>eventEmitter.on()</code> function that allows one or more\nfunctions to be attached to named events emitted by the object. Typically,\nevent names are camel-cased strings but any valid JavaScript property key\ncan be used.</p>\n<p>When the <code>EventEmitter</code> object emits an event, all of the functions attached\nto that specific event are called <em>synchronously</em>. Any values returned by the\ncalled listeners are <em>ignored</em> and discarded.</p>\n<p>The following example shows a simple <code>EventEmitter</code> instance with a single\nlistener. The <code>eventEmitter.on()</code> method is used to register listeners, while\nthe <code>eventEmitter.emit()</code> method is used to trigger the event.</p>\n<pre><code class=\"language-mjs\">import { EventEmitter } from 'node:events';\n\nclass MyEmitter extends EventEmitter {}\n\nconst myEmitter = new MyEmitter();\nmyEmitter.on('event', () => {\n  console.log('an event occurred!');\n});\nmyEmitter.emit('event');\n</code></pre>\n<pre><code class=\"language-cjs\">const EventEmitter = require('node:events');\n\nclass MyEmitter extends EventEmitter {}\n\nconst myEmitter = new MyEmitter();\nmyEmitter.on('event', () => {\n  console.log('an event occurred!');\n});\nmyEmitter.emit('event');\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v19.9.0/lib/events.js\">lib/events.js</a></p>\n<p>Much of the Node.js core API is built around an idiomatic asynchronous\nevent-driven architecture in which certain kinds of objects (called \"emitters\")\nemit named events that cause <code>Function</code> objects (\"listeners\") to be called.</p>\n<p>For instance: a <a href=\"net.html#class-netserver\"><code>net.Server</code></a> object emits an event each time a peer\nconnects to it; a <a href=\"fs.html#class-fsreadstream\"><code>fs.ReadStream</code></a> emits an event when the file is opened;\na <a href=\"stream.html\">stream</a> emits an event whenever data is available to be read.</p>\n<p>All objects that emit events are instances of the <code>EventEmitter</code> class. These\nobjects expose an <code>eventEmitter.on()</code> function that allows one or more\nfunctions to be attached to named events emitted by the object. Typically,\nevent names are camel-cased strings but any valid JavaScript property key\ncan be used.</p>\n<p>When the <code>EventEmitter</code> object emits an event, all of the functions attached\nto that specific event are called <em>synchronously</em>. Any values returned by the\ncalled listeners are <em>ignored</em> and discarded.</p>\n<p>The following example shows a simple <code>EventEmitter</code> instance with a single\nlistener. The <code>eventEmitter.on()</code> method is used to register listeners, while\nthe <code>eventEmitter.emit()</code> method is used to trigger the event.</p>\n<pre><code class=\"language-mjs\">import { EventEmitter } from 'node:events';\n\nclass MyEmitter extends EventEmitter {}\n\nconst myEmitter = new MyEmitter();\nmyEmitter.on('event', () => {\n  console.log('an event occurred!');\n});\nmyEmitter.emit('event');\n</code></pre>\n<pre><code class=\"language-cjs\">const EventEmitter = require('node:events');\n\nclass MyEmitter extends EventEmitter {}\n\nconst myEmitter = new MyEmitter();\nmyEmitter.on('event', () => {\n  console.log('an event occurred!');\n});\nmyEmitter.emit('event');\n</code></pre>",
       "modules": [
         {
           "textRaw": "Passing arguments and `this` to listeners",
@@ -1727,6 +1727,34 @@
             }
           ],
           "desc": "<p>Returns a copy of the array of listeners for the event named <code>eventName</code>.</p>\n<p>For <code>EventEmitter</code>s this behaves exactly the same as calling <code>.listeners</code> on\nthe emitter.</p>\n<p>For <code>EventTarget</code>s this is the only way to get the event listeners for the\nevent target. This is useful for debugging and diagnostic purposes.</p>\n<pre><code class=\"language-mjs\">import { getEventListeners, EventEmitter } from 'node:events';\n\n{\n  const ee = new EventEmitter();\n  const listener = () => console.log('Events are fun');\n  ee.on('foo', listener);\n  console.log(getEventListeners(ee, 'foo')); // [ [Function: listener] ]\n}\n{\n  const et = new EventTarget();\n  const listener = () => console.log('Events are fun');\n  et.addEventListener('foo', listener);\n  console.log(getEventListeners(et, 'foo')); // [ [Function: listener] ]\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const { getEventListeners, EventEmitter } = require('node:events');\n\n{\n  const ee = new EventEmitter();\n  const listener = () => console.log('Events are fun');\n  ee.on('foo', listener);\n  console.log(getEventListeners(ee, 'foo')); // [ [Function: listener] ]\n}\n{\n  const et = new EventTarget();\n  const listener = () => console.log('Events are fun');\n  et.addEventListener('foo', listener);\n  console.log(getEventListeners(et, 'foo')); // [ [Function: listener] ]\n}\n</code></pre>"
+        },
+        {
+          "textRaw": "`events.getMaxListeners(emitterOrTarget)`",
+          "type": "method",
+          "name": "getMaxListeners",
+          "meta": {
+            "added": [
+              "v19.9.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "return": {
+                "textRaw": "Returns: {number}",
+                "name": "return",
+                "type": "number"
+              },
+              "params": [
+                {
+                  "textRaw": "`emitterOrTarget` {EventEmitter|EventTarget}",
+                  "name": "emitterOrTarget",
+                  "type": "EventEmitter|EventTarget"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>Returns the currently set max amount of listeners.</p>\n<p>For <code>EventEmitter</code>s this behaves exactly the same as calling <code>.getMaxListeners</code> on\nthe emitter.</p>\n<p>For <code>EventTarget</code>s this is the only way to get the max event listeners for the\nevent target. If the number of event handlers on a single EventTarget exceeds\nthe max set, the EventTarget will print a warning.</p>\n<pre><code class=\"language-mjs\">import { getMaxListeners, setMaxListeners, EventEmitter } from 'node:events';\n\n{\n  const ee = new EventEmitter();\n  console.log(getMaxListeners(ee)); // 10\n  setMaxListeners(11, ee);\n  console.log(getMaxListeners(ee)); // 11\n}\n{\n  const et = new EventTarget();\n  console.log(getMaxListeners(et)); // 10\n  setMaxListeners(11, et);\n  console.log(getMaxListeners(et)); // 11\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const { getMaxListeners, setMaxListeners, EventEmitter } = require('node:events');\n\n{\n  const ee = new EventEmitter();\n  console.log(getMaxListeners(ee)); // 10\n  setMaxListeners(11, ee);\n  console.log(getMaxListeners(ee)); // 11\n}\n{\n  const et = new EventTarget();\n  console.log(getMaxListeners(et)); // 10\n  setMaxListeners(11, et);\n  console.log(getMaxListeners(et)); // 11\n}\n</code></pre>"
         },
         {
           "textRaw": "`events.once(emitter, name[, options])`",

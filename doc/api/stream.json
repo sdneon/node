@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v19.8.1/lib/stream.js\">lib/stream.js</a></p>\n<p>A stream is an abstract interface for working with streaming data in Node.js.\nThe <code>node:stream</code> module provides an API for implementing the stream interface.</p>\n<p>There are many stream objects provided by Node.js. For instance, a\n<a href=\"http.html#class-httpincomingmessage\">request to an HTTP server</a> and <a href=\"process.html#processstdout\"><code>process.stdout</code></a>\nare both stream instances.</p>\n<p>Streams can be readable, writable, or both. All streams are instances of\n<a href=\"events.html#class-eventemitter\"><code>EventEmitter</code></a>.</p>\n<p>To access the <code>node:stream</code> module:</p>\n<pre><code class=\"language-js\">const stream = require('node:stream');\n</code></pre>\n<p>The <code>node:stream</code> module is useful for creating new types of stream instances.\nIt is usually not necessary to use the <code>node:stream</code> module to consume streams.</p>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v19.9.0/lib/stream.js\">lib/stream.js</a></p>\n<p>A stream is an abstract interface for working with streaming data in Node.js.\nThe <code>node:stream</code> module provides an API for implementing the stream interface.</p>\n<p>There are many stream objects provided by Node.js. For instance, a\n<a href=\"http.html#class-httpincomingmessage\">request to an HTTP server</a> and <a href=\"process.html#processstdout\"><code>process.stdout</code></a>\nare both stream instances.</p>\n<p>Streams can be readable, writable, or both. All streams are instances of\n<a href=\"events.html#class-eventemitter\"><code>EventEmitter</code></a>.</p>\n<p>To access the <code>node:stream</code> module:</p>\n<pre><code class=\"language-js\">const stream = require('node:stream');\n</code></pre>\n<p>The <code>node:stream</code> module is useful for creating new types of stream instances.\nIt is usually not necessary to use the <code>node:stream</code> module to consume streams.</p>",
       "modules": [
         {
           "textRaw": "Organization of this document",
@@ -1129,6 +1129,62 @@
             }
           ],
           "desc": "<p>A stream to attach a signal to.</p>\n<p>Attaches an AbortSignal to a readable or writeable stream. This lets code\ncontrol stream destruction using an <code>AbortController</code>.</p>\n<p>Calling <code>abort</code> on the <code>AbortController</code> corresponding to the passed\n<code>AbortSignal</code> will behave the same way as calling <code>.destroy(new AbortError())</code>\non the stream, and <code>controller.error(new AbortError())</code> for webstreams.</p>\n<pre><code class=\"language-js\">const fs = require('node:fs');\n\nconst controller = new AbortController();\nconst read = addAbortSignal(\n  controller.signal,\n  fs.createReadStream(('object.json')),\n);\n// Later, abort the operation closing the stream\ncontroller.abort();\n</code></pre>\n<p>Or using an <code>AbortSignal</code> with a readable stream as an async iterable:</p>\n<pre><code class=\"language-js\">const controller = new AbortController();\nsetTimeout(() => controller.abort(), 10_000); // set a timeout\nconst stream = addAbortSignal(\n  controller.signal,\n  fs.createReadStream(('object.json')),\n);\n(async () => {\n  try {\n    for await (const chunk of stream) {\n      await process(chunk);\n    }\n  } catch (e) {\n    if (e.name === 'AbortError') {\n      // The operation was cancelled\n    } else {\n      throw e;\n    }\n  }\n})();\n</code></pre>\n<p>Or using an <code>AbortSignal</code> with a ReadableStream:</p>\n<pre><code class=\"language-js\">const controller = new AbortController();\nconst rs = new ReadableStream({\n  start(controller) {\n    controller.enqueue('hello');\n    controller.enqueue('world');\n    controller.close();\n  },\n});\n\naddAbortSignal(controller.signal, rs);\n\nfinished(rs, (err) => {\n  if (err) {\n    if (err.name === 'AbortError') {\n      // The operation was cancelled\n    }\n  }\n});\n\nconst reader = rs.getReader();\n\nreader.read().then(({ value, done }) => {\n  console.log(value); // hello\n  console.log(done); // false\n  controller.abort();\n});\n</code></pre>"
+        },
+        {
+          "textRaw": "`stream.getDefaultHighWaterMark(objectMode)`",
+          "type": "method",
+          "name": "getDefaultHighWaterMark",
+          "meta": {
+            "added": [
+              "v19.9.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "return": {
+                "textRaw": "Returns: {integer}",
+                "name": "return",
+                "type": "integer"
+              },
+              "params": [
+                {
+                  "textRaw": "{boolean} objectMode",
+                  "type": "boolean",
+                  "desc": "objectMode"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>Returns the default highWaterMark used by streams.\nDefaults to <code>16384</code> (16 KiB), or <code>16</code> for <code>objectMode</code>.</p>"
+        },
+        {
+          "textRaw": "`stream.setDefaultHighWaterMark(objectMode, value)`",
+          "type": "method",
+          "name": "setDefaultHighWaterMark",
+          "meta": {
+            "added": [
+              "v19.9.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "{boolean} objectMode",
+                  "type": "boolean",
+                  "desc": "objectMode"
+                },
+                {
+                  "textRaw": "{integer} highWaterMark value",
+                  "type": "integer",
+                  "desc": "highWaterMark value"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>Sets the default highWaterMark used by streams.</p>"
         },
         {
           "textRaw": "`readable.read(0)`",
@@ -3003,7 +3059,7 @@
                           ]
                         }
                       ],
-                      "desc": "<p>This method calls <code>fn</code> on each chunk of the stream in order, passing it the\nresult from the calculation on the previous element. It returns a promise for\nthe final value of the reduction.</p>\n<p>The reducer function iterates the stream element-by-element which means that\nthere is no <code>concurrency</code> parameter or parallelism. To perform a <code>reduce</code>\nconcurrently, it can be chained to the <a href=\"#readablemapfn-options\"><code>readable.map</code></a> method.</p>\n<p>If no <code>initial</code> value is supplied the first chunk of the stream is used as the\ninitial value. If the stream is empty, the promise is rejected with a\n<code>TypeError</code> with the <code>ERR_INVALID_ARGS</code> code property.</p>\n<pre><code class=\"language-mjs\">import { Readable } from 'node:stream';\n\nconst ten = await Readable.from([1, 2, 3, 4]).reduce((previous, data) => {\n  return previous + data;\n});\nconsole.log(ten); // 10\n</code></pre>"
+                      "desc": "<p>This method calls <code>fn</code> on each chunk of the stream in order, passing it the\nresult from the calculation on the previous element. It returns a promise for\nthe final value of the reduction.</p>\n<p>If no <code>initial</code> value is supplied the first chunk of the stream is used as the\ninitial value. If the stream is empty, the promise is rejected with a\n<code>TypeError</code> with the <code>ERR_INVALID_ARGS</code> code property.</p>\n<pre><code class=\"language-mjs\">import { Readable } from 'node:stream';\nimport { readdir, stat } from 'node:fs/promises';\nimport { join } from 'node:path';\n\nconst directoryPath = './src';\nconst filesInDir = await readdir(directoryPath);\n\nconst folderSize = await Readable.from(filesInDir)\n  .reduce(async (totalSize, file) => {\n    const { size } = await stat(join(directoryPath, file));\n    return totalSize + size;\n  }, 0);\n\nconsole.log(folderSize);\n</code></pre>\n<p>The reducer function iterates the stream element-by-element which means that\nthere is no <code>concurrency</code> parameter or parallelism. To perform a <code>reduce</code>\nconcurrently, you can extract the async function to <a href=\"#readablemapfn-options\"><code>readable.map</code></a> method.</p>\n<pre><code class=\"language-mjs\">import { Readable } from 'node:stream';\nimport { readdir, stat } from 'node:fs/promises';\nimport { join } from 'node:path';\n\nconst directoryPath = './src';\nconst filesInDir = await readdir(directoryPath);\n\nconst folderSize = await Readable.from(filesInDir)\n  .map((file) => stat(join(directoryPath, file)), { concurrency: 2 })\n  .reduce((totalSize, { size }) => totalSize + size, 0);\n\nconsole.log(folderSize);\n</code></pre>"
                     }
                   ],
                   "properties": [
@@ -4083,6 +4139,62 @@
                 }
               ],
               "desc": "<p>A stream to attach a signal to.</p>\n<p>Attaches an AbortSignal to a readable or writeable stream. This lets code\ncontrol stream destruction using an <code>AbortController</code>.</p>\n<p>Calling <code>abort</code> on the <code>AbortController</code> corresponding to the passed\n<code>AbortSignal</code> will behave the same way as calling <code>.destroy(new AbortError())</code>\non the stream, and <code>controller.error(new AbortError())</code> for webstreams.</p>\n<pre><code class=\"language-js\">const fs = require('node:fs');\n\nconst controller = new AbortController();\nconst read = addAbortSignal(\n  controller.signal,\n  fs.createReadStream(('object.json')),\n);\n// Later, abort the operation closing the stream\ncontroller.abort();\n</code></pre>\n<p>Or using an <code>AbortSignal</code> with a readable stream as an async iterable:</p>\n<pre><code class=\"language-js\">const controller = new AbortController();\nsetTimeout(() => controller.abort(), 10_000); // set a timeout\nconst stream = addAbortSignal(\n  controller.signal,\n  fs.createReadStream(('object.json')),\n);\n(async () => {\n  try {\n    for await (const chunk of stream) {\n      await process(chunk);\n    }\n  } catch (e) {\n    if (e.name === 'AbortError') {\n      // The operation was cancelled\n    } else {\n      throw e;\n    }\n  }\n})();\n</code></pre>\n<p>Or using an <code>AbortSignal</code> with a ReadableStream:</p>\n<pre><code class=\"language-js\">const controller = new AbortController();\nconst rs = new ReadableStream({\n  start(controller) {\n    controller.enqueue('hello');\n    controller.enqueue('world');\n    controller.close();\n  },\n});\n\naddAbortSignal(controller.signal, rs);\n\nfinished(rs, (err) => {\n  if (err) {\n    if (err.name === 'AbortError') {\n      // The operation was cancelled\n    }\n  }\n});\n\nconst reader = rs.getReader();\n\nreader.read().then(({ value, done }) => {\n  console.log(value); // hello\n  console.log(done); // false\n  controller.abort();\n});\n</code></pre>"
+            },
+            {
+              "textRaw": "`stream.getDefaultHighWaterMark(objectMode)`",
+              "type": "method",
+              "name": "getDefaultHighWaterMark",
+              "meta": {
+                "added": [
+                  "v19.9.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "return": {
+                    "textRaw": "Returns: {integer}",
+                    "name": "return",
+                    "type": "integer"
+                  },
+                  "params": [
+                    {
+                      "textRaw": "{boolean} objectMode",
+                      "type": "boolean",
+                      "desc": "objectMode"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>Returns the default highWaterMark used by streams.\nDefaults to <code>16384</code> (16 KiB), or <code>16</code> for <code>objectMode</code>.</p>"
+            },
+            {
+              "textRaw": "`stream.setDefaultHighWaterMark(objectMode, value)`",
+              "type": "method",
+              "name": "setDefaultHighWaterMark",
+              "meta": {
+                "added": [
+                  "v19.9.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "{boolean} objectMode",
+                      "type": "boolean",
+                      "desc": "objectMode"
+                    },
+                    {
+                      "textRaw": "{integer} highWaterMark value",
+                      "type": "integer",
+                      "desc": "highWaterMark value"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>Sets the default highWaterMark used by streams.</p>"
             }
           ]
         },

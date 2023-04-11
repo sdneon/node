@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v19.8.1">
-  <title>Node-API | Node.js v19.8.1 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v19.9.0">
+  <title>Node-API | Node.js v19.9.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -96,7 +96,7 @@
     <div id="column1" data-id="n-api" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v19.8.1 documentation</h1>
+          <h1>Node.js v19.9.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -111,7 +111,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v19.8.1</li>
+            <li class="pinned-header">Node.js v19.9.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -231,7 +231,7 @@
 <li><a href="#napi_get_reference_value"><code>napi_get_reference_value</code></a></li>
 </ul>
 </li>
-<li><a href="#cleanup-on-exit-of-the-current-nodejs-instance">Cleanup on exit of the current Node.js instance</a>
+<li><a href="#cleanup-on-exit-of-the-current-nodejs-environment">Cleanup on exit of the current Node.js environment</a>
 <ul>
 <li><a href="#napi_add_env_cleanup_hook"><code>napi_add_env_cleanup_hook</code></a></li>
 <li><a href="#napi_remove_env_cleanup_hook"><code>napi_remove_env_cleanup_hook</code></a></li>
@@ -239,6 +239,7 @@
 <li><a href="#napi_remove_async_cleanup_hook"><code>napi_remove_async_cleanup_hook</code></a></li>
 </ul>
 </li>
+<li><a href="#finalization-on-the-exit-of-the-nodejs-environment">Finalization on the exit of the Node.js environment</a></li>
 </ul>
 </li>
 <li><a href="#module-registration">Module registration</a></li>
@@ -699,7 +700,7 @@
 <li><a href="#napi_get_reference_value"><code>napi_get_reference_value</code></a></li>
 </ul>
 </li>
-<li><a href="#cleanup-on-exit-of-the-current-nodejs-instance">Cleanup on exit of the current Node.js instance</a>
+<li><a href="#cleanup-on-exit-of-the-current-nodejs-environment">Cleanup on exit of the current Node.js environment</a>
 <ul>
 <li><a href="#napi_add_env_cleanup_hook"><code>napi_add_env_cleanup_hook</code></a></li>
 <li><a href="#napi_remove_env_cleanup_hook"><code>napi_remove_env_cleanup_hook</code></a></li>
@@ -707,6 +708,7 @@
 <li><a href="#napi_remove_async_cleanup_hook"><code>napi_remove_async_cleanup_hook</code></a></li>
 </ul>
 </li>
+<li><a href="#finalization-on-the-exit-of-the-nodejs-environment">Finalization on the exit of the Node.js environment</a></li>
 </ul>
 </li>
 <li><a href="#module-registration">Module registration</a></li>
@@ -968,7 +970,7 @@ following <code>node-addon-api</code> code. The first section shows the
 <code>node-addon-api</code> code and the second section shows what actually gets
 used in the addon.</p>
 <pre><code class="language-cpp">Object obj = Object::<span class="hljs-built_in">New</span>(env);
-obj[<span class="hljs-string">"foo"</span>] = String::<span class="hljs-built_in">New</span>(env, <span class="hljs-string">"bar"</span>);</code></pre>
+obj[<span class="hljs-string">"foo"</span>] = String::<span class="hljs-built_in">New</span>(env, <span class="hljs-string">"bar"</span>);</code> <button class="copy-button">copy</button></pre>
 <pre><code class="language-cpp">napi_status status;
 napi_value object, string;
 status = <span class="hljs-built_in">napi_create_object</span>(env, &#x26;object);
@@ -987,7 +989,7 @@ status = <span class="hljs-built_in">napi_set_named_property</span>(env, object,
 <span class="hljs-keyword">if</span> (status != napi_ok) {
   <span class="hljs-built_in">napi_throw_error</span>(env, ...);
   <span class="hljs-keyword">return</span>;
-}</code></pre>
+}</code> <button class="copy-button">copy</button></pre>
 <p>The end result is that the addon only uses the exported C APIs. As a result,
 it still gets the benefits of the ABI stability provided by the C API.</p>
 <p>When using <code>node-addon-api</code> instead of the C APIs, start with the API <a href="https://github.com/nodejs/node-addon-api#api-documentation">docs</a>
@@ -1007,20 +1009,20 @@ versions:</p>
 <pre><code class="language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&#x3C;node.h></span></span>
 <span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&#x3C;node_buffer.h></span></span>
 <span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&#x3C;node_version.h></span></span>
-<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&#x3C;node_object_wrap.h></span></span></code></pre>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&#x3C;node_object_wrap.h></span></span></code> <button class="copy-button">copy</button></pre>
 </li>
 <li>
 <p>the libuv APIs which are also included with Node.js and available via</p>
-<pre><code class="language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&#x3C;uv.h></span></span></code></pre>
+<pre><code class="language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&#x3C;uv.h></span></span></code> <button class="copy-button">copy</button></pre>
 </li>
 <li>
 <p>the V8 API available via</p>
-<pre><code class="language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&#x3C;v8.h></span></span></code></pre>
+<pre><code class="language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&#x3C;v8.h></span></span></code> <button class="copy-button">copy</button></pre>
 </li>
 </ul>
 <p>Thus, for an addon to remain ABI-compatible across Node.js major versions, it
 must use Node-API exclusively by restricting itself to using</p>
-<pre><code class="language-c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&#x3C;node_api.h></span></span></code></pre>
+<pre><code class="language-c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&#x3C;node_api.h></span></span></code> <button class="copy-button">copy</button></pre>
 <p>and by checking, for all external libraries that it uses, that the external
 library makes ABI stability guarantees similar to Node-API.</p>
 </section><section><h3>Building<span><a class="mark" href="#building" id="building">#</a></span><a aria-hidden="true" class="legacy" id="n_api_building"></a></h3>
@@ -1037,11 +1039,11 @@ compiler infrastructure is also a good choice.</p>
 <p>For Mac developers, <a href="https://developer.apple.com/xcode/">Xcode</a> offers all the required compiler tools.
 However, it is not necessary to install the entire Xcode IDE. The following
 command installs the necessary toolchain:</p>
-<pre><code class="language-bash">xcode-select --install</code></pre>
+<pre><code class="language-bash">xcode-select --install</code> <button class="copy-button">copy</button></pre>
 <p>For Windows developers, <a href="https://visualstudio.microsoft.com">Visual Studio</a> offers all the required compiler
 tools. However, it is not necessary to install the entire Visual Studio
 IDE. The following command installs the necessary toolchain:</p>
-<pre><code class="language-bash">npm install --global windows-build-tools</code></pre>
+<pre><code class="language-bash">npm install --global windows-build-tools</code> <button class="copy-button">copy</button></pre>
 <p>The sections below describe the additional tools available for developing
 and deploying Node.js native addons.</p>
 <h4>Build tools<span><a class="mark" href="#build-tools" id="build-tools">#</a></span><a aria-hidden="true" class="legacy" id="n_api_build_tools"></a></h4>
@@ -1083,17 +1085,17 @@ available to the module user when the native addon is installed.</p>
 </section><section><h3>Usage<span><a class="mark" href="#usage" id="usage">#</a></span><a aria-hidden="true" class="legacy" id="n_api_usage"></a></h3>
 <p>In order to use the Node-API functions, include the file <a href="https://github.com/nodejs/node/blob/HEAD/src/node_api.h"><code>node_api.h</code></a> which
 is located in the src directory in the node development tree:</p>
-<pre><code class="language-c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&#x3C;node_api.h></span></span></code></pre>
+<pre><code class="language-c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&#x3C;node_api.h></span></span></code> <button class="copy-button">copy</button></pre>
 <p>This will opt into the default <code>NAPI_VERSION</code> for the given release of Node.js.
 In order to ensure compatibility with specific versions of Node-API, the version
 can be specified explicitly when including the header:</p>
 <pre><code class="language-c"><span class="hljs-meta">#<span class="hljs-keyword">define</span> NAPI_VERSION 3</span>
-<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&#x3C;node_api.h></span></span></code></pre>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&#x3C;node_api.h></span></span></code> <button class="copy-button">copy</button></pre>
 <p>This restricts the Node-API surface to just the functionality that was available
 in the specified (and earlier) versions.</p>
 <p>Some of the Node-API surface is experimental and requires explicit opt-in:</p>
 <pre><code class="language-c"><span class="hljs-meta">#<span class="hljs-keyword">define</span> NAPI_EXPERIMENTAL</span>
-<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&#x3C;node_api.h></span></span></code></pre>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&#x3C;node_api.h></span></span></code> <button class="copy-button">copy</button></pre>
 <p>In this case the entire API surface, including any experimental APIs, will be
 available to the module code.</p>
 </section><section><h3>Node-API version matrix<span><a class="mark" href="#node-api-version-matrix" id="node-api-version-matrix">#</a></span><a aria-hidden="true" class="legacy" id="n_api_node_api_version_matrix"></a></h3>
@@ -1238,7 +1240,7 @@ addon is loaded into a Node.js environment.</p>
 <span class="hljs-meta">#<span class="hljs-keyword">define</span> _ADDON_H_</span>
 <span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&#x3C;js_native_api.h></span></span>
 napi_value <span class="hljs-title function_">create_addon</span><span class="hljs-params">(napi_env env)</span>;
-<span class="hljs-meta">#<span class="hljs-keyword">endif</span>  <span class="hljs-comment">// _ADDON_H_</span></span></code></pre>
+<span class="hljs-meta">#<span class="hljs-keyword">endif</span>  <span class="hljs-comment">// _ADDON_H_</span></span></code> <button class="copy-button">copy</button></pre>
 <pre><code class="language-c"><span class="hljs-comment">// addon.c</span>
 <span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">"addon.h"</span></span>
 
@@ -1285,7 +1287,7 @@ napi_value <span class="hljs-title function_">create_addon</span><span class="hl
                                          exported_function));
 
   <span class="hljs-keyword">return</span> result;
-}</code></pre>
+}</code> <button class="copy-button">copy</button></pre>
 <pre><code class="language-c"><span class="hljs-comment">// addon_node.c</span>
 <span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&#x3C;node_api.h></span></span>
 <span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">"addon.h"</span></span>
@@ -1295,7 +1297,7 @@ NAPI_MODULE_INIT() {
   <span class="hljs-comment">// The variables `napi_env env` and `napi_value exports` may be used within</span>
   <span class="hljs-comment">// the body, as they are provided by the definition of `NAPI_MODULE_INIT()`.</span>
   <span class="hljs-keyword">return</span> create_addon(env);
-}</code></pre>
+}</code> <button class="copy-button">copy</button></pre>
 </section><section><h3>Environment life cycle APIs<span><a class="mark" href="#environment-life-cycle-apis" id="environment-life-cycle-apis">#</a></span><a aria-hidden="true" class="legacy" id="n_api_environment_life_cycle_apis"></a></h3>
 <p><a href="https://tc39.es/ecma262/#sec-agents">Section 8.7</a> of the <a href="https://tc39.github.io/ecma262/">ECMAScript Language Specification</a> defines the concept
 of an "Agent" as a self-contained environment in which JavaScript code runs.
@@ -1313,10 +1315,10 @@ environments as worker threads.</p>
 may be called multiple times, from multiple contexts, and even concurrently from
 multiple threads.</p>
 <p>Native addons may need to allocate global state which they use during
-their entire life cycle such that the state must be unique to each instance of
-the addon.</p>
-<p>To this end, Node-API provides a way to allocate data such that its life cycle
-is tied to the life cycle of the Agent.</p>
+their life cycle of an Node.js environment such that the state can be
+unique to each instance of the addon.</p>
+<p>To this end, Node-API provides a way to associate data such that its life cycle
+is tied to the life cycle of a Node.js environment.</p>
 <h4><code>napi_set_instance_data</code><span><a class="mark" href="#napi_set_instance_data" id="napi_set_instance_data">#</a></span><a aria-hidden="true" class="legacy" id="n_api_napi_set_instance_data"></a></h4>
 <div class="api_metadata">
 <span>Added in: v12.8.0, v10.20.0</span>
@@ -1325,7 +1327,7 @@ is tied to the life cycle of the Agent.</p>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_set_instance_data</span><span class="hljs-params">(napi_env env,
                                    <span class="hljs-type">void</span>* data,
                                    napi_finalize finalize_cb,
-                                   <span class="hljs-type">void</span>* finalize_hint)</span>;</code></pre>
+                                   <span class="hljs-type">void</span>* finalize_hint)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the Node-API call is invoked under.</li>
 <li><code>[in] data</code>: The data item to make available to bindings of this instance.</li>
@@ -1336,27 +1338,27 @@ down. The function receives <code>data</code> so that it might free it.
 collection.</li>
 </ul>
 <p>Returns <code>napi_ok</code> if the API succeeded.</p>
-<p>This API associates <code>data</code> with the currently running Agent. <code>data</code> can later
-be retrieved using <code>napi_get_instance_data()</code>. Any existing data associated with
-the currently running Agent which was set by means of a previous call to
-<code>napi_set_instance_data()</code> will be overwritten. If a <code>finalize_cb</code> was provided
-by the previous call, it will not be called.</p>
+<p>This API associates <code>data</code> with the currently running Node.js environment. <code>data</code>
+can later be retrieved using <code>napi_get_instance_data()</code>. Any existing data
+associated with the currently running Node.js environment which was set by means
+of a previous call to <code>napi_set_instance_data()</code> will be overwritten. If a
+<code>finalize_cb</code> was provided by the previous call, it will not be called.</p>
 <h4><code>napi_get_instance_data</code><span><a class="mark" href="#napi_get_instance_data" id="napi_get_instance_data">#</a></span><a aria-hidden="true" class="legacy" id="n_api_napi_get_instance_data"></a></h4>
 <div class="api_metadata">
 <span>Added in: v12.8.0, v10.20.0</span>
 <span>N-API version: 6</span>
 </div>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_get_instance_data</span><span class="hljs-params">(napi_env env,
-                                   <span class="hljs-type">void</span>** data)</span>;</code></pre>
+                                   <span class="hljs-type">void</span>** data)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the Node-API call is invoked under.</li>
 <li><code>[out] data</code>: The data item that was previously associated with the currently
-running Agent by a call to <code>napi_set_instance_data()</code>.</li>
+running Node.js environment by a call to <code>napi_set_instance_data()</code>.</li>
 </ul>
 <p>Returns <code>napi_ok</code> if the API succeeded.</p>
 <p>This API retrieves data that was previously associated with the currently
-running Agent via <code>napi_set_instance_data()</code>. If no data is set, the call will
-succeed and <code>data</code> will be set to <code>NULL</code>.</p>
+running Node.js environment via <code>napi_set_instance_data()</code>. If no data is set,
+the call will succeed and <code>data</code> will be set to <code>NULL</code>.</p>
 </section><section><h3>Basic Node-API data types<span><a class="mark" href="#basic-node-api-data-types" id="basic-node-api-data-types">#</a></span><a aria-hidden="true" class="legacy" id="n_api_basic_node_api_data_types"></a></h3>
 <p>Node-API exposes the following fundamental datatypes as abstractions that are
 consumed by the various APIs. These APIs should be treated as opaque,
@@ -1392,7 +1394,7 @@ Currently, the following status codes are supported.</p>
   napi_detachable_arraybuffer_expected,
   napi_would_deadlock,  <span class="hljs-comment">/* unused */</span>
   napi_no_external_buffers_allowed
-} napi_status;</code></pre>
+} napi_status;</code> <button class="copy-button">copy</button></pre>
 <p>If additional information is required upon an API returning a failed status,
 it can be obtained by calling <code>napi_get_last_error_info</code>.</p>
 <h4><code>napi_extended_error_info</code><span><a class="mark" href="#napi_extended_error_info" id="napi_extended_error_info">#</a></span><a aria-hidden="true" class="legacy" id="n_api_napi_extended_error_info"></a></h4>
@@ -1405,7 +1407,7 @@ it can be obtained by calling <code>napi_get_last_error_info</code>.</p>
   <span class="hljs-type">void</span>* engine_reserved;
   <span class="hljs-type">uint32_t</span> engine_error_code;
   napi_status error_code;
-} napi_extended_error_info;</code></pre>
+} napi_extended_error_info;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>error_message</code>: UTF8-encoded string containing a VM-neutral description of
 the error.</li>
@@ -1450,7 +1452,7 @@ merely released (<code>napi_tsfn_release</code>) and thus available for subseque
 <pre><code class="language-c"><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">enum</span> {</span>
   napi_tsfn_release,
   napi_tsfn_abort
-} napi_threadsafe_function_release_mode;</code></pre>
+} napi_threadsafe_function_release_mode;</code> <button class="copy-button">copy</button></pre>
 <h4><code>napi_threadsafe_function_call_mode</code><span><a class="mark" href="#napi_threadsafe_function_call_mode" id="napi_threadsafe_function_call_mode">#</a></span><a aria-hidden="true" class="legacy" id="n_api_napi_threadsafe_function_call_mode"></a></h4>
 <div class="api_metadata">
 <span>Added in: v10.6.0</span>
@@ -1462,7 +1464,7 @@ function is full.</p>
 <pre><code class="language-c"><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">enum</span> {</span>
   napi_tsfn_nonblocking,
   napi_tsfn_blocking
-} napi_threadsafe_function_call_mode;</code></pre>
+} napi_threadsafe_function_call_mode;</code> <button class="copy-button">copy</button></pre>
 <h4>Node-API memory management types<span><a class="mark" href="#node-api-memory-management-types" id="node-api-memory-management-types">#</a></span><a aria-hidden="true" class="legacy" id="n_api_node_api_memory_management_types"></a></h4>
 <h5><code>napi_handle_scope</code><span><a class="mark" href="#napi_handle_scope" id="napi_handle_scope">#</a></span><a aria-hidden="true" class="legacy" id="n_api_napi_handle_scope"></a></h5>
 <p>This is an abstraction used to control and modify the lifetime of objects
@@ -1501,17 +1503,17 @@ minimum lifetimes explicitly.</p>
 <span>N-API version: 8</span>
 </div>
 <p>A 128-bit value stored as two unsigned 64-bit integers. It serves as a UUID
-with which JavaScript objects can be "tagged" in order to ensure that they are
-of a certain type. This is a stronger check than <a href="#napi_instanceof"><code>napi_instanceof</code></a>, because
-the latter can report a false positive if the object's prototype has been
-manipulated. Type-tagging is most useful in conjunction with <a href="#napi_wrap"><code>napi_wrap</code></a>
-because it ensures that the pointer retrieved from a wrapped object can be
-safely cast to the native type corresponding to the type tag that had been
-previously applied to the JavaScript object.</p>
+with which JavaScript objects or <a href="#napi_create_external">externals</a> can be "tagged" in order to
+ensure that they are of a certain type. This is a stronger check than
+<a href="#napi_instanceof"><code>napi_instanceof</code></a>, because the latter can report a false positive if the
+object's prototype has been manipulated. Type-tagging is most useful in
+conjunction with <a href="#napi_wrap"><code>napi_wrap</code></a> because it ensures that the pointer retrieved
+from a wrapped object can be safely cast to the native type corresponding to the
+type tag that had been previously applied to the JavaScript object.</p>
 <pre><code class="language-c"><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> {</span>
   <span class="hljs-type">uint64_t</span> lower;
   <span class="hljs-type">uint64_t</span> upper;
-} napi_type_tag;</code></pre>
+} napi_type_tag;</code> <button class="copy-button">copy</button></pre>
 <h5><code>napi_async_cleanup_hook_handle</code><span><a class="mark" href="#napi_async_cleanup_hook_handle" id="napi_async_cleanup_hook_handle">#</a></span><a aria-hidden="true" class="legacy" id="n_api_napi_async_cleanup_hook_handle"></a></h5>
 <div class="api_metadata">
 <span>Added in: v14.10.0, v12.19.0</span>
@@ -1536,7 +1538,7 @@ invoked.</p>
 <p>Function pointer type for user-provided native functions which are to be
 exposed to JavaScript via Node-API. Callback functions should satisfy the
 following signature:</p>
-<pre><code class="language-c"><span class="hljs-keyword">typedef</span> <span class="hljs-title function_">napi_value</span> <span class="hljs-params">(*napi_callback)</span><span class="hljs-params">(napi_env, napi_callback_info)</span>;</code></pre>
+<pre><code class="language-c"><span class="hljs-keyword">typedef</span> <span class="hljs-title function_">napi_value</span> <span class="hljs-params">(*napi_callback)</span><span class="hljs-params">(napi_env, napi_callback_info)</span>;</code> <button class="copy-button">copy</button></pre>
 <p>Unless for reasons discussed in <a href="#object-lifetime-management">Object Lifetime Management</a>, creating a
 handle and/or callback scope inside a <code>napi_callback</code> is not necessary.</p>
 <h5><code>napi_finalize</code><span><a class="mark" href="#napi_finalize" id="napi_finalize">#</a></span><a aria-hidden="true" class="legacy" id="n_api_napi_finalize"></a></h5>
@@ -1552,7 +1554,7 @@ called upon the object's collection. Currently, <code>napi_finalize</code> can b
 finding out when objects that have external data are collected.</p>
 <pre><code class="language-c"><span class="hljs-keyword">typedef</span> <span class="hljs-title function_">void</span> <span class="hljs-params">(*napi_finalize)</span><span class="hljs-params">(napi_env env,
                               <span class="hljs-type">void</span>* finalize_data,
-                              <span class="hljs-type">void</span>* finalize_hint)</span>;</code></pre>
+                              <span class="hljs-type">void</span>* finalize_hint)</span>;</code> <button class="copy-button">copy</button></pre>
 <p>Unless for reasons discussed in <a href="#object-lifetime-management">Object Lifetime Management</a>, creating a
 handle and/or callback scope inside the function body is not necessary.</p>
 <h5><code>napi_async_execute_callback</code><span><a class="mark" href="#napi_async_execute_callback" id="napi_async_execute_callback">#</a></span><a aria-hidden="true" class="legacy" id="n_api_napi_async_execute_callback"></a></h5>
@@ -1562,7 +1564,7 @@ handle and/or callback scope inside the function body is not necessary.</p>
 </div>
 <p>Function pointer used with functions that support asynchronous
 operations. Callback functions must satisfy the following signature:</p>
-<pre><code class="language-c"><span class="hljs-keyword">typedef</span> <span class="hljs-title function_">void</span> <span class="hljs-params">(*napi_async_execute_callback)</span><span class="hljs-params">(napi_env env, <span class="hljs-type">void</span>* data)</span>;</code></pre>
+<pre><code class="language-c"><span class="hljs-keyword">typedef</span> <span class="hljs-title function_">void</span> <span class="hljs-params">(*napi_async_execute_callback)</span><span class="hljs-params">(napi_env env, <span class="hljs-type">void</span>* data)</span>;</code> <button class="copy-button">copy</button></pre>
 <p>Implementations of this function must avoid making Node-API calls that execute
 JavaScript or interact with JavaScript objects. Node-API calls should be in the
 <code>napi_async_complete_callback</code> instead. Do not use the <code>napi_env</code> parameter as
@@ -1576,7 +1578,7 @@ it will likely result in execution of JavaScript.</p>
 operations. Callback functions must satisfy the following signature:</p>
 <pre><code class="language-c"><span class="hljs-keyword">typedef</span> <span class="hljs-title function_">void</span> <span class="hljs-params">(*napi_async_complete_callback)</span><span class="hljs-params">(napi_env env,
                                              napi_status status,
-                                             <span class="hljs-type">void</span>* data)</span>;</code></pre>
+                                             <span class="hljs-type">void</span>* data)</span>;</code> <button class="copy-button">copy</button></pre>
 <p>Unless for reasons discussed in <a href="#object-lifetime-management">Object Lifetime Management</a>, creating a
 handle and/or callback scope inside the function body is not necessary.</p>
 <h5><code>napi_threadsafe_function_call_js</code><span><a class="mark" href="#napi_threadsafe_function_call_js" id="napi_threadsafe_function_call_js">#</a></span><a aria-hidden="true" class="legacy" id="n_api_napi_threadsafe_function_call_js"></a></h5>
@@ -1599,7 +1601,7 @@ via <code>napi_make_callback</code>.</p>
 <pre><code class="language-c"><span class="hljs-keyword">typedef</span> <span class="hljs-title function_">void</span> <span class="hljs-params">(*napi_threadsafe_function_call_js)</span><span class="hljs-params">(napi_env env,
                                                  napi_value js_callback,
                                                  <span class="hljs-type">void</span>* context,
-                                                 <span class="hljs-type">void</span>* data)</span>;</code></pre>
+                                                 <span class="hljs-type">void</span>* data)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment to use for API calls, or <code>NULL</code> if the thread-safe
 function is being torn down and <code>data</code> may need to be freed.</li>
@@ -1625,7 +1627,7 @@ handle and/or callback scope inside the function body is not necessary.</p>
 <p>Function pointer used with <a href="#napi_add_env_cleanup_hook"><code>napi_add_env_cleanup_hook</code></a>. It will be called
 when the environment is being torn down.</p>
 <p>Callback functions must satisfy the following signature:</p>
-<pre><code class="language-c"><span class="hljs-keyword">typedef</span> <span class="hljs-title function_">void</span> <span class="hljs-params">(*napi_cleanup_hook)</span><span class="hljs-params">(<span class="hljs-type">void</span>* data)</span>;</code></pre>
+<pre><code class="language-c"><span class="hljs-keyword">typedef</span> <span class="hljs-title function_">void</span> <span class="hljs-params">(*napi_cleanup_hook)</span><span class="hljs-params">(<span class="hljs-type">void</span>* data)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] data</code>: The data that was passed to <a href="#napi_add_env_cleanup_hook"><code>napi_add_env_cleanup_hook</code></a>.</li>
 </ul>
@@ -1637,7 +1639,7 @@ when the environment is being torn down.</p>
 when the environment is being torn down.</p>
 <p>Callback functions must satisfy the following signature:</p>
 <pre><code class="language-c"><span class="hljs-keyword">typedef</span> <span class="hljs-title function_">void</span> <span class="hljs-params">(*napi_async_cleanup_hook)</span><span class="hljs-params">(napi_async_cleanup_hook_handle handle,
-                                        <span class="hljs-type">void</span>* data)</span>;</code></pre>
+                                        <span class="hljs-type">void</span>* data)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] handle</code>: The handle that must be passed to
 <a href="#napi_remove_async_cleanup_hook"><code>napi_remove_async_cleanup_hook</code></a> after completion of the asynchronous
@@ -1680,7 +1682,7 @@ The format of the <code>napi_extended_error_info</code> structure is as follows:
   <span class="hljs-type">void</span>* engine_reserved;
   <span class="hljs-type">uint32_t</span> engine_error_code;
   napi_status error_code;
-};</code></pre>
+};</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>error_message</code>: Textual representation of the error that occurred.</li>
 <li><code>engine_reserved</code>: Opaque handle reserved for engine use only.</li>
@@ -1699,7 +1701,7 @@ logging purposes.</p>
 </div>
 <pre><code class="language-c">napi_status
 <span class="hljs-title function_">napi_get_last_error_info</span><span class="hljs-params">(napi_env env,
-                         <span class="hljs-type">const</span> napi_extended_error_info** result)</span>;</code></pre>
+                         <span class="hljs-type">const</span> napi_extended_error_info** result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[out] result</code>: The <code>napi_extended_error_info</code> structure with more
@@ -1776,17 +1778,17 @@ take an optional code parameter which is the string for the code
 to be added to the error object. If the optional parameter is <code>NULL</code>
 then no code will be associated with the error. If a code is provided,
 the name associated with the error is also updated to be:</p>
-<pre><code class="language-text">originalName [code]</code></pre>
+<pre><code class="language-text">originalName [code]</code> <button class="copy-button">copy</button></pre>
 <p>where <code>originalName</code> is the original name associated with the error
 and <code>code</code> is the code that was provided. For example, if the code
 is <code>'ERR_ERROR_1'</code> and a <code>TypeError</code> is being created the name will be:</p>
-<pre><code class="language-text">TypeError [ERR_ERROR_1]</code></pre>
+<pre><code class="language-text">TypeError [ERR_ERROR_1]</code> <button class="copy-button">copy</button></pre>
 <h5><code>napi_throw</code><span><a class="mark" href="#napi_throw" id="napi_throw">#</a></span><a aria-hidden="true" class="legacy" id="n_api_napi_throw"></a></h5>
 <div class="api_metadata">
 <span>Added in: v8.0.0</span>
 <span>N-API version: 1</span>
 </div>
-<pre><code class="language-c">NAPI_EXTERN napi_status <span class="hljs-title function_">napi_throw</span><span class="hljs-params">(napi_env env, napi_value error)</span>;</code></pre>
+<pre><code class="language-c">NAPI_EXTERN napi_status <span class="hljs-title function_">napi_throw</span><span class="hljs-params">(napi_env env, napi_value error)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] error</code>: The JavaScript value to be thrown.</li>
@@ -1800,7 +1802,7 @@ is <code>'ERR_ERROR_1'</code> and a <code>TypeError</code> is being created the 
 </div>
 <pre><code class="language-c">NAPI_EXTERN napi_status <span class="hljs-title function_">napi_throw_error</span><span class="hljs-params">(napi_env env,
                                          <span class="hljs-type">const</span> <span class="hljs-type">char</span>* code,
-                                         <span class="hljs-type">const</span> <span class="hljs-type">char</span>* msg)</span>;</code></pre>
+                                         <span class="hljs-type">const</span> <span class="hljs-type">char</span>* msg)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] code</code>: Optional error code to be set on the error.</li>
@@ -1815,7 +1817,7 @@ is <code>'ERR_ERROR_1'</code> and a <code>TypeError</code> is being created the 
 </div>
 <pre><code class="language-c">NAPI_EXTERN napi_status <span class="hljs-title function_">napi_throw_type_error</span><span class="hljs-params">(napi_env env,
                                               <span class="hljs-type">const</span> <span class="hljs-type">char</span>* code,
-                                              <span class="hljs-type">const</span> <span class="hljs-type">char</span>* msg)</span>;</code></pre>
+                                              <span class="hljs-type">const</span> <span class="hljs-type">char</span>* msg)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] code</code>: Optional error code to be set on the error.</li>
@@ -1830,7 +1832,7 @@ is <code>'ERR_ERROR_1'</code> and a <code>TypeError</code> is being created the 
 </div>
 <pre><code class="language-c">NAPI_EXTERN napi_status <span class="hljs-title function_">napi_throw_range_error</span><span class="hljs-params">(napi_env env,
                                                <span class="hljs-type">const</span> <span class="hljs-type">char</span>* code,
-                                               <span class="hljs-type">const</span> <span class="hljs-type">char</span>* msg)</span>;</code></pre>
+                                               <span class="hljs-type">const</span> <span class="hljs-type">char</span>* msg)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] code</code>: Optional error code to be set on the error.</li>
@@ -1845,7 +1847,7 @@ is <code>'ERR_ERROR_1'</code> and a <code>TypeError</code> is being created the 
 <p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
 <pre><code class="language-c">NAPI_EXTERN napi_status <span class="hljs-title function_">node_api_throw_syntax_error</span><span class="hljs-params">(napi_env env,
                                                     <span class="hljs-type">const</span> <span class="hljs-type">char</span>* code,
-                                                    <span class="hljs-type">const</span> <span class="hljs-type">char</span>* msg)</span>;</code></pre>
+                                                    <span class="hljs-type">const</span> <span class="hljs-type">char</span>* msg)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] code</code>: Optional error code to be set on the error.</li>
@@ -1860,7 +1862,7 @@ is <code>'ERR_ERROR_1'</code> and a <code>TypeError</code> is being created the 
 </div>
 <pre><code class="language-c">NAPI_EXTERN napi_status <span class="hljs-title function_">napi_is_error</span><span class="hljs-params">(napi_env env,
                                       napi_value value,
-                                      <span class="hljs-type">bool</span>* result)</span>;</code></pre>
+                                      <span class="hljs-type">bool</span>* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] value</code>: The <code>napi_value</code> to be checked.</li>
@@ -1877,7 +1879,7 @@ an error, false otherwise.</li>
 <pre><code class="language-c">NAPI_EXTERN napi_status <span class="hljs-title function_">napi_create_error</span><span class="hljs-params">(napi_env env,
                                           napi_value code,
                                           napi_value msg,
-                                          napi_value* result)</span>;</code></pre>
+                                          napi_value* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] code</code>: Optional <code>napi_value</code> with the string for the error code to be
@@ -1896,7 +1898,7 @@ the message for the <code>Error</code>.</li>
 <pre><code class="language-c">NAPI_EXTERN napi_status <span class="hljs-title function_">napi_create_type_error</span><span class="hljs-params">(napi_env env,
                                                napi_value code,
                                                napi_value msg,
-                                               napi_value* result)</span>;</code></pre>
+                                               napi_value* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] code</code>: Optional <code>napi_value</code> with the string for the error code to be
@@ -1915,7 +1917,7 @@ the message for the <code>Error</code>.</li>
 <pre><code class="language-c">NAPI_EXTERN napi_status <span class="hljs-title function_">napi_create_range_error</span><span class="hljs-params">(napi_env env,
                                                 napi_value code,
                                                 napi_value msg,
-                                                napi_value* result)</span>;</code></pre>
+                                                napi_value* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] code</code>: Optional <code>napi_value</code> with the string for the error code to be
@@ -1934,7 +1936,7 @@ the message for the <code>Error</code>.</li>
 <pre><code class="language-c">NAPI_EXTERN napi_status <span class="hljs-title function_">node_api_create_syntax_error</span><span class="hljs-params">(napi_env env,
                                                      napi_value code,
                                                      napi_value msg,
-                                                     napi_value* result)</span>;</code></pre>
+                                                     napi_value* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] code</code>: Optional <code>napi_value</code> with the string for the error code to be
@@ -1951,7 +1953,7 @@ the message for the <code>Error</code>.</li>
 <span>N-API version: 1</span>
 </div>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_get_and_clear_last_exception</span><span class="hljs-params">(napi_env env,
-                                              napi_value* result)</span>;</code></pre>
+                                              napi_value* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[out] result</code>: The exception if one is pending, <code>NULL</code> otherwise.</li>
@@ -1963,7 +1965,7 @@ the message for the <code>Error</code>.</li>
 <span>Added in: v8.0.0</span>
 <span>N-API version: 1</span>
 </div>
-<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_is_exception_pending</span><span class="hljs-params">(napi_env env, <span class="hljs-type">bool</span>* result)</span>;</code></pre>
+<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_is_exception_pending</span><span class="hljs-params">(napi_env env, <span class="hljs-type">bool</span>* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[out] result</code>: Boolean value that is set to true if an exception is pending.</li>
@@ -1975,7 +1977,7 @@ the message for the <code>Error</code>.</li>
 <span>Added in: v9.10.0</span>
 <span>N-API version: 3</span>
 </div>
-<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_fatal_exception</span><span class="hljs-params">(napi_env env, napi_value err)</span>;</code></pre>
+<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_fatal_exception</span><span class="hljs-params">(napi_env env, napi_value err)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] err</code>: The error that is passed to <code>'uncaughtException'</code>.</li>
@@ -1993,7 +1995,7 @@ thrown to immediately terminate the process.</p>
 <pre><code class="language-c">NAPI_NO_RETURN <span class="hljs-type">void</span> <span class="hljs-title function_">napi_fatal_error</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span>* location,
                                      <span class="hljs-type">size_t</span> location_len,
                                      <span class="hljs-type">const</span> <span class="hljs-type">char</span>* message,
-                                     <span class="hljs-type">size_t</span> message_len)</span>;</code></pre>
+                                     <span class="hljs-type">size_t</span> message_len)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] location</code>: Optional location at which the error occurred.</li>
 <li><code>[in] location_len</code>: The length of the location in bytes, or
@@ -2030,7 +2032,7 @@ that has a loop which iterates through the elements in a large array:</p>
     <span class="hljs-keyword">break</span>;
   }
   <span class="hljs-comment">// do something with element</span>
-}</code></pre>
+}</code> <button class="copy-button">copy</button></pre>
 <p>This would result in a large number of handles being created, consuming
 substantial resources. In addition, even though the native code could only
 use the most recent handle, all of the associated objects would also be
@@ -2064,7 +2066,7 @@ is valid throughout the execution of the loop:</p>
   <span class="hljs-keyword">if</span> (status != napi_ok) {
     <span class="hljs-keyword">break</span>;
   }
-}</code></pre>
+}</code> <button class="copy-button">copy</button></pre>
 <p>When nesting scopes, there are cases where a handle from an
 inner scope needs to live beyond the lifespan of that scope. Node-API supports
 an 'escapable scope' in order to support this case. An escapable scope
@@ -2082,7 +2084,7 @@ can only be called once.</p>
 <span>N-API version: 1</span>
 </div>
 <pre><code class="language-c">NAPI_EXTERN napi_status <span class="hljs-title function_">napi_open_handle_scope</span><span class="hljs-params">(napi_env env,
-                                               napi_handle_scope* result)</span>;</code></pre>
+                                               napi_handle_scope* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[out] result</code>: <code>napi_value</code> representing the new scope.</li>
@@ -2095,7 +2097,7 @@ can only be called once.</p>
 <span>N-API version: 1</span>
 </div>
 <pre><code class="language-c">NAPI_EXTERN napi_status <span class="hljs-title function_">napi_close_handle_scope</span><span class="hljs-params">(napi_env env,
-                                                napi_handle_scope scope)</span>;</code></pre>
+                                                napi_handle_scope scope)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] scope</code>: <code>napi_value</code> representing the scope to be closed.</li>
@@ -2111,7 +2113,7 @@ reverse order from which they were created.</p>
 </div>
 <pre><code class="language-c">NAPI_EXTERN napi_status
     <span class="hljs-title function_">napi_open_escapable_handle_scope</span><span class="hljs-params">(napi_env env,
-                                     napi_handle_scope* result)</span>;</code></pre>
+                                     napi_handle_scope* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[out] result</code>: <code>napi_value</code> representing the new scope.</li>
@@ -2126,7 +2128,7 @@ to the outer scope.</p>
 </div>
 <pre><code class="language-c">NAPI_EXTERN napi_status
     <span class="hljs-title function_">napi_close_escapable_handle_scope</span><span class="hljs-params">(napi_env env,
-                                      napi_handle_scope scope)</span>;</code></pre>
+                                      napi_handle_scope scope)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] scope</code>: <code>napi_value</code> representing the scope to be closed.</li>
@@ -2143,7 +2145,7 @@ reverse order from which they were created.</p>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_escape_handle</span><span class="hljs-params">(napi_env env,
                                napi_escapable_handle_scope scope,
                                napi_value escapee,
-                               napi_value* result)</span>;</code></pre>
+                               napi_value* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] scope</code>: <code>napi_value</code> representing the current scope.</li>
@@ -2205,7 +2207,7 @@ will not be freed. This can be avoided by calling
 <pre><code class="language-c">NAPI_EXTERN napi_status <span class="hljs-title function_">napi_create_reference</span><span class="hljs-params">(napi_env env,
                                               napi_value value,
                                               <span class="hljs-type">uint32_t</span> initial_refcount,
-                                              napi_ref* result)</span>;</code></pre>
+                                              napi_ref* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] value</code>: <code>napi_value</code> representing the <code>Object</code> to which we want a
@@ -2221,7 +2223,7 @@ to the <code>Object</code> passed in.</p>
 <span>Added in: v8.0.0</span>
 <span>N-API version: 1</span>
 </div>
-<pre><code class="language-c">NAPI_EXTERN napi_status <span class="hljs-title function_">napi_delete_reference</span><span class="hljs-params">(napi_env env, napi_ref ref)</span>;</code></pre>
+<pre><code class="language-c">NAPI_EXTERN napi_status <span class="hljs-title function_">napi_delete_reference</span><span class="hljs-params">(napi_env env, napi_ref ref)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] ref</code>: <code>napi_ref</code> to be deleted.</li>
@@ -2236,7 +2238,7 @@ to the <code>Object</code> passed in.</p>
 </div>
 <pre><code class="language-c">NAPI_EXTERN napi_status <span class="hljs-title function_">napi_reference_ref</span><span class="hljs-params">(napi_env env,
                                            napi_ref ref,
-                                           <span class="hljs-type">uint32_t</span>* result)</span>;</code></pre>
+                                           <span class="hljs-type">uint32_t</span>* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] ref</code>: <code>napi_ref</code> for which the reference count will be incremented.</li>
@@ -2252,7 +2254,7 @@ passed in and returns the resulting reference count.</p>
 </div>
 <pre><code class="language-c">NAPI_EXTERN napi_status <span class="hljs-title function_">napi_reference_unref</span><span class="hljs-params">(napi_env env,
                                              napi_ref ref,
-                                             <span class="hljs-type">uint32_t</span>* result)</span>;</code></pre>
+                                             <span class="hljs-type">uint32_t</span>* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] ref</code>: <code>napi_ref</code> for which the reference count will be decremented.</li>
@@ -2268,7 +2270,7 @@ passed in and returns the resulting reference count.</p>
 </div>
 <pre><code class="language-c">NAPI_EXTERN napi_status <span class="hljs-title function_">napi_get_reference_value</span><span class="hljs-params">(napi_env env,
                                                  napi_ref ref,
-                                                 napi_value* result)</span>;</code></pre>
+                                                 napi_value* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <p>the <code>napi_value passed</code> in or out of these methods is a handle to the
 object to which the reference is related.</p>
 <ul>
@@ -2281,10 +2283,10 @@ object to which the reference is related.</p>
 <p>If still valid, this API returns the <code>napi_value</code> representing the
 JavaScript <code>Object</code> associated with the <code>napi_ref</code>. Otherwise, result
 will be <code>NULL</code>.</p>
-<h4>Cleanup on exit of the current Node.js instance<span><a class="mark" href="#cleanup-on-exit-of-the-current-nodejs-instance" id="cleanup-on-exit-of-the-current-nodejs-instance">#</a></span><a aria-hidden="true" class="legacy" id="n_api_cleanup_on_exit_of_the_current_node_js_instance"></a></h4>
+<h4>Cleanup on exit of the current Node.js environment<span><a class="mark" href="#cleanup-on-exit-of-the-current-nodejs-environment" id="cleanup-on-exit-of-the-current-nodejs-environment">#</a></span><a aria-hidden="true" class="legacy" id="n_api_cleanup_on_exit_of_the_current_node_js_environment"></a></h4>
 <p>While a Node.js process typically releases all its resources when exiting,
 embedders of Node.js, or future Worker support, may require addons to register
-clean-up hooks that will be run once the current Node.js instance exits.</p>
+clean-up hooks that will be run once the current Node.js environment exits.</p>
 <p>Node-API provides functions for registering and un-registering such callbacks.
 When those callbacks are run, all resources that are being held by the addon
 should be freed up.</p>
@@ -2295,7 +2297,7 @@ should be freed up.</p>
 </div>
 <pre><code class="language-c">NODE_EXTERN napi_status <span class="hljs-title function_">napi_add_env_cleanup_hook</span><span class="hljs-params">(napi_env env,
                                                   napi_cleanup_hook fun,
-                                                  <span class="hljs-type">void</span>* arg)</span>;</code></pre>
+                                                  <span class="hljs-type">void</span>* arg)</span>;</code> <button class="copy-button">copy</button></pre>
 <p>Registers <code>fun</code> as a function to be run with the <code>arg</code> parameter once the
 current Node.js environment exits.</p>
 <p>A function can safely be specified multiple times with different
@@ -2315,7 +2317,7 @@ is being torn down anyway.</p>
 </div>
 <pre><code class="language-c">NAPI_EXTERN napi_status <span class="hljs-title function_">napi_remove_env_cleanup_hook</span><span class="hljs-params">(napi_env env,
                                                      <span class="hljs-type">void</span> (*fun)(<span class="hljs-type">void</span>* arg),
-                                                     <span class="hljs-type">void</span>* arg)</span>;</code></pre>
+                                                     <span class="hljs-type">void</span>* arg)</span>;</code> <button class="copy-button">copy</button></pre>
 <p>Unregisters <code>fun</code> as a function to be run with the <code>arg</code> parameter once the
 current Node.js environment exits. Both the argument and the function value
 need to be exact matches.</p>
@@ -2338,7 +2340,7 @@ with <code>napi_add_env_cleanup_hook</code>, otherwise the process will abort.</
     napi_env env,
     napi_async_cleanup_hook hook,
     <span class="hljs-type">void</span>* arg,
-    napi_async_cleanup_hook_handle* remove_handle)</span>;</code></pre>
+    napi_async_cleanup_hook_handle* remove_handle)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] hook</code>: The function pointer to call at environment teardown.</li>
@@ -2369,7 +2371,7 @@ is being torn down anyway.</p>
 </details>
 </div>
 <pre><code class="language-c">NAPI_EXTERN napi_status <span class="hljs-title function_">napi_remove_async_cleanup_hook</span><span class="hljs-params">(
-    napi_async_cleanup_hook_handle remove_handle)</span>;</code></pre>
+    napi_async_cleanup_hook_handle remove_handle)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] remove_handle</code>: The handle to an asynchronous cleanup hook that was
 created with <a href="#napi_add_async_cleanup_hook"><code>napi_add_async_cleanup_hook</code></a>.</li>
@@ -2378,14 +2380,27 @@ created with <a href="#napi_add_async_cleanup_hook"><code>napi_add_async_cleanup
 the hook from being executed, unless it has already started executing.
 This must be called on any <code>napi_async_cleanup_hook_handle</code> value obtained
 from <a href="#napi_add_async_cleanup_hook"><code>napi_add_async_cleanup_hook</code></a>.</p>
+<h4>Finalization on the exit of the Node.js environment<span><a class="mark" href="#finalization-on-the-exit-of-the-nodejs-environment" id="finalization-on-the-exit-of-the-nodejs-environment">#</a></span><a aria-hidden="true" class="legacy" id="n_api_finalization_on_the_exit_of_the_node_js_environment"></a></h4>
+<p>The Node.js environment may be torn down at an arbitrary time as soon as
+possible with JavaScript execution disallowed, like on the request of
+<a href="worker_threads.html#workerterminate"><code>worker.terminate()</code></a>. When the environment is being torn down, the
+registered <code>napi_finalize</code> callbacks of JavaScript objects, Thread-safe
+functions and environment instance data are invoked immediately and
+independently.</p>
+<p>The invocation of <code>napi_finalize</code> callbacks are scheduled after the manually
+registered cleanup hooks. In order to ensure a proper order of addon
+finalization during environment shutdown to avoid use-after-free in the
+<code>napi_finalize</code> callback, addons should register a cleanup hook with
+<code>napi_add_env_cleanup_hook</code> and <code>napi_add_async_cleanup_hook</code> to manually
+release the allocated resource in a proper order.</p>
 </section><section><h3>Module registration<span><a class="mark" href="#module-registration" id="module-registration">#</a></span><a aria-hidden="true" class="legacy" id="n_api_module_registration"></a></h3>
 <p>Node-API modules are registered in a manner similar to other modules
 except that instead of using the <code>NODE_MODULE</code> macro the following
 is used:</p>
-<pre><code class="language-c">NAPI_MODULE(NODE_GYP_MODULE_NAME, Init)</code></pre>
+<pre><code class="language-c">NAPI_MODULE(NODE_GYP_MODULE_NAME, Init)</code> <button class="copy-button">copy</button></pre>
 <p>The next difference is the signature for the <code>Init</code> method. For a Node-API
 module it is as follows:</p>
-<pre><code class="language-c">napi_value <span class="hljs-title function_">Init</span><span class="hljs-params">(napi_env env, napi_value exports)</span>;</code></pre>
+<pre><code class="language-c">napi_value <span class="hljs-title function_">Init</span><span class="hljs-params">(napi_env env, napi_value exports)</span>;</code> <button class="copy-button">copy</button></pre>
 <p>The return value from <code>Init</code> is treated as the <code>exports</code> object for the module.
 The <code>Init</code> method is passed an empty object via the <code>exports</code> parameter as a
 convenience. If <code>Init</code> returns <code>NULL</code>, the parameter passed as <code>exports</code> is
@@ -2408,7 +2423,7 @@ provided by the addon:</p>
   status = napi_define_properties(env, exports, <span class="hljs-number">1</span>, &#x26;desc);
   <span class="hljs-keyword">if</span> (status != napi_ok) <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;
   <span class="hljs-keyword">return</span> exports;
-}</code></pre>
+}</code> <button class="copy-button">copy</button></pre>
 <p>To set a function to be returned by the <code>require()</code> for the addon:</p>
 <pre><code class="language-c">napi_value <span class="hljs-title function_">Init</span><span class="hljs-params">(napi_env env, napi_value exports)</span> {
   napi_value method;
@@ -2416,7 +2431,7 @@ provided by the addon:</p>
   status = napi_create_function(env, <span class="hljs-string">"exports"</span>, NAPI_AUTO_LENGTH, Method, <span class="hljs-literal">NULL</span>, &#x26;method);
   <span class="hljs-keyword">if</span> (status != napi_ok) <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;
   <span class="hljs-keyword">return</span> method;
-}</code></pre>
+}</code> <button class="copy-button">copy</button></pre>
 <p>To define a class so that new instances can be created (often used with
 <a href="#object-wrap">Object wrap</a>):</p>
 <pre><code class="language-c"><span class="hljs-comment">// <span class="hljs-doctag">NOTE:</span> partial example, not all referenced code is included</span>
@@ -2440,7 +2455,7 @@ napi_value <span class="hljs-title function_">Init</span><span class="hljs-param
   <span class="hljs-keyword">if</span> (status != napi_ok) <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;
 
   <span class="hljs-keyword">return</span> exports;
-}</code></pre>
+}</code> <button class="copy-button">copy</button></pre>
 <p>You can also use the <code>NAPI_MODULE_INIT</code> macro, which acts as a shorthand
 for <code>NAPI_MODULE</code> and defining an <code>Init</code> function:</p>
 <pre><code class="language-c">NAPI_MODULE_INIT() {
@@ -2454,7 +2469,7 @@ for <code>NAPI_MODULE</code> and defining an <code>Init</code> function:</p>
   <span class="hljs-keyword">if</span> (status != napi_ok) <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;
 
   <span class="hljs-keyword">return</span> exports;
-}</code></pre>
+}</code> <button class="copy-button">copy</button></pre>
 <p>All Node-API addons are context-aware, meaning they may be loaded multiple
 times. There are a few design considerations when declaring such a module.
 The documentation on <a href="addons.html#context-aware-addons">context-aware addons</a> provides more details.</p>
@@ -2489,7 +2504,7 @@ the <code>napi_value</code> in question is of the JavaScript type expected by th
 <pre><code class="language-c"><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">enum</span> {</span>
   napi_key_include_prototypes,
   napi_key_own_only
-} napi_key_collection_mode;</code></pre>
+} napi_key_collection_mode;</code> <button class="copy-button">copy</button></pre>
 <p>Describes the <code>Keys/Properties</code> filter enums:</p>
 <p><code>napi_key_collection_mode</code> limits the range of collected properties.</p>
 <p><code>napi_key_own_only</code> limits the collected properties to the given
@@ -2507,7 +2522,7 @@ of the objects's prototype chain as well.</p>
   napi_key_configurable = <span class="hljs-number">1</span> &#x3C;&#x3C; <span class="hljs-number">2</span>,
   napi_key_skip_strings = <span class="hljs-number">1</span> &#x3C;&#x3C; <span class="hljs-number">3</span>,
   napi_key_skip_symbols = <span class="hljs-number">1</span> &#x3C;&#x3C; <span class="hljs-number">4</span>
-} napi_key_filter;</code></pre>
+} napi_key_filter;</code> <button class="copy-button">copy</button></pre>
 <p>Property filter bits. They can be or'ed to build a composite filter.</p>
 <h5><code>napi_key_conversion</code><span><a class="mark" href="#napi_key_conversion" id="napi_key_conversion">#</a></span><a aria-hidden="true" class="legacy" id="n_api_napi_key_conversion"></a></h5>
 <div class="api_metadata">
@@ -2517,7 +2532,7 @@ of the objects's prototype chain as well.</p>
 <pre><code class="language-c"><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">enum</span> {</span>
   napi_key_keep_numbers,
   napi_key_numbers_to_strings
-} napi_key_conversion;</code></pre>
+} napi_key_conversion;</code> <button class="copy-button">copy</button></pre>
 <p><code>napi_key_numbers_to_strings</code> will convert integer indices to
 strings. <code>napi_key_keep_numbers</code> will return numbers for integer
 indices.</p>
@@ -2534,7 +2549,7 @@ indices.</p>
   napi_function,
   napi_external,
   napi_bigint,
-} napi_valuetype;</code></pre>
+} napi_valuetype;</code> <button class="copy-button">copy</button></pre>
 <p>Describes the type of a <code>napi_value</code>. This generally corresponds to the types
 described in <a href="https://tc39.github.io/ecma262/#sec-ecmascript-language-types">Section 6.1</a> of the ECMAScript Language Specification.
 In addition to types in that section, <code>napi_valuetype</code> can also represent
@@ -2554,7 +2569,7 @@ object such that no properties can be set on it, and no prototype.</p>
   napi_float64_array,
   napi_bigint64_array,
   napi_biguint64_array,
-} napi_typedarray_type;</code></pre>
+} napi_typedarray_type;</code> <button class="copy-button">copy</button></pre>
 <p>This represents the underlying binary scalar datatype of the <code>TypedArray</code>.
 Elements of this enum correspond to
 <a href="https://tc39.github.io/ecma262/#sec-typedarray-objects">Section 22.2</a> of the <a href="https://tc39.github.io/ecma262/">ECMAScript Language Specification</a>.</p>
@@ -2564,7 +2579,7 @@ Elements of this enum correspond to
 <span>Added in: v8.0.0</span>
 <span>N-API version: 1</span>
 </div>
-<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_create_array</span><span class="hljs-params">(napi_env env, napi_value* result)</span></code></pre>
+<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_create_array</span><span class="hljs-params">(napi_env env, napi_value* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the Node-API call is invoked under.</li>
 <li><code>[out] result</code>: A <code>napi_value</code> representing a JavaScript <code>Array</code>.</li>
@@ -2580,7 +2595,7 @@ JavaScript arrays are described in
 </div>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_create_array_with_length</span><span class="hljs-params">(napi_env env,
                                           <span class="hljs-type">size_t</span> length,
-                                          napi_value* result)</span></code></pre>
+                                          napi_value* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] length</code>: The initial length of the <code>Array</code>.</li>
@@ -2604,7 +2619,7 @@ directly read and/or written via C, consider using
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_create_arraybuffer</span><span class="hljs-params">(napi_env env,
                                     <span class="hljs-type">size_t</span> byte_length,
                                     <span class="hljs-type">void</span>** data,
-                                    napi_value* result)</span></code></pre>
+                                    napi_value* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] length</code>: The length in bytes of the array buffer to create.</li>
@@ -2632,7 +2647,7 @@ a typed array or <code>DataView</code> object would need to be created.</p>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_create_buffer</span><span class="hljs-params">(napi_env env,
                                <span class="hljs-type">size_t</span> size,
                                <span class="hljs-type">void</span>** data,
-                               napi_value* result)</span></code></pre>
+                               napi_value* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] size</code>: Size in bytes of the underlying buffer.</li>
@@ -2652,7 +2667,7 @@ fully-supported data structure, in most cases using a <code>TypedArray</code> wi
                                     <span class="hljs-type">size_t</span> length,
                                     <span class="hljs-type">const</span> <span class="hljs-type">void</span>* data,
                                     <span class="hljs-type">void</span>** result_data,
-                                    napi_value* result)</span></code></pre>
+                                    napi_value* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] size</code>: Size in bytes of the input buffer (should be the same as the size
@@ -2673,7 +2688,7 @@ structure, in most cases using a <code>TypedArray</code> will suffice.</p>
 </div>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_create_date</span><span class="hljs-params">(napi_env env,
                              <span class="hljs-type">double</span> time,
-                             napi_value* result)</span>;</code></pre>
+                             napi_value* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] time</code>: ECMAScript time value in milliseconds since 01 January, 1970 UTC.</li>
@@ -2694,7 +2709,7 @@ ECMAScript aligns with POSIX time specification.</p>
                                  <span class="hljs-type">void</span>* data,
                                  napi_finalize finalize_cb,
                                  <span class="hljs-type">void</span>* finalize_hint,
-                                 napi_value* result)</span></code></pre>
+                                 napi_value* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] data</code>: Raw pointer to the external data.</li>
@@ -2724,7 +2739,7 @@ an external value yields <code>napi_external</code>.</p>
                                  <span class="hljs-type">size_t</span> byte_length,
                                  napi_finalize finalize_cb,
                                  <span class="hljs-type">void</span>* finalize_hint,
-                                 napi_value* result)</span></code></pre>
+                                 napi_value* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] external_data</code>: Pointer to the underlying byte buffer of the
@@ -2766,7 +2781,7 @@ object just created has been garbage collected.</p>
                                         <span class="hljs-type">void</span>* data,
                                         napi_finalize finalize_cb,
                                         <span class="hljs-type">void</span>* finalize_hint,
-                                        napi_value* result)</span></code></pre>
+                                        napi_value* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] length</code>: Size in bytes of the input buffer (should be the same as the
@@ -2801,7 +2816,7 @@ object just created has been garbage collected.</p>
 <span>Added in: v8.0.0</span>
 <span>N-API version: 1</span>
 </div>
-<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_create_object</span><span class="hljs-params">(napi_env env, napi_value* result)</span></code></pre>
+<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_create_object</span><span class="hljs-params">(napi_env env, napi_value* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[out] result</code>: A <code>napi_value</code> representing a JavaScript <code>Object</code>.</li>
@@ -2818,7 +2833,7 @@ ECMAScript Language Specification.</p>
 </div>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_create_symbol</span><span class="hljs-params">(napi_env env,
                                napi_value description,
-                               napi_value* result)</span></code></pre>
+                               napi_value* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] description</code>: Optional <code>napi_value</code> which refers to a JavaScript
@@ -2837,7 +2852,7 @@ of the ECMAScript Language Specification.</p>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">node_api_symbol_for</span><span class="hljs-params">(napi_env env,
                                 <span class="hljs-type">const</span> <span class="hljs-type">char</span>* utf8description,
                                 <span class="hljs-type">size_t</span> length,
-                                napi_value* result)</span></code></pre>
+                                napi_value* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] utf8description</code>: UTF-8 C string representing the text to be used as the
@@ -2862,7 +2877,7 @@ Language Specification.</p>
                                    <span class="hljs-type">size_t</span> length,
                                    napi_value arraybuffer,
                                    <span class="hljs-type">size_t</span> byte_offset,
-                                   napi_value* result)</span></code></pre>
+                                   napi_value* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] type</code>: Scalar datatype of the elements within the <code>TypedArray</code>.</li>
@@ -2891,7 +2906,7 @@ is raised.</p>
                                  <span class="hljs-type">size_t</span> byte_length,
                                  napi_value arraybuffer,
                                  <span class="hljs-type">size_t</span> byte_offset,
-                                 napi_value* result)</span></code></pre>
+                                 napi_value* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] length</code>: Number of elements in the <code>DataView</code>.</li>
@@ -2915,7 +2930,7 @@ raised.</p>
 <span>Added in: v8.4.0</span>
 <span>N-API version: 1</span>
 </div>
-<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_create_int32</span><span class="hljs-params">(napi_env env, <span class="hljs-type">int32_t</span> value, napi_value* result)</span></code></pre>
+<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_create_int32</span><span class="hljs-params">(napi_env env, <span class="hljs-type">int32_t</span> value, napi_value* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] value</code>: Integer value to be represented in JavaScript.</li>
@@ -2931,7 +2946,7 @@ raised.</p>
 <span>Added in: v8.4.0</span>
 <span>N-API version: 1</span>
 </div>
-<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_create_uint32</span><span class="hljs-params">(napi_env env, <span class="hljs-type">uint32_t</span> value, napi_value* result)</span></code></pre>
+<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_create_uint32</span><span class="hljs-params">(napi_env env, <span class="hljs-type">uint32_t</span> value, napi_value* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] value</code>: Unsigned integer value to be represented in JavaScript.</li>
@@ -2947,7 +2962,7 @@ raised.</p>
 <span>Added in: v8.4.0</span>
 <span>N-API version: 1</span>
 </div>
-<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_create_int64</span><span class="hljs-params">(napi_env env, <span class="hljs-type">int64_t</span> value, napi_value* result)</span></code></pre>
+<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_create_int64</span><span class="hljs-params">(napi_env env, <span class="hljs-type">int64_t</span> value, napi_value* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] value</code>: Integer value to be represented in JavaScript.</li>
@@ -2966,7 +2981,7 @@ outside the range of <a href="https://tc39.github.io/ecma262/#sec-number.min_saf
 <span>Added in: v8.4.0</span>
 <span>N-API version: 1</span>
 </div>
-<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_create_double</span><span class="hljs-params">(napi_env env, <span class="hljs-type">double</span> value, napi_value* result)</span></code></pre>
+<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_create_double</span><span class="hljs-params">(napi_env env, <span class="hljs-type">double</span> value, napi_value* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] value</code>: Double-precision value to be represented in JavaScript.</li>
@@ -2984,7 +2999,7 @@ outside the range of <a href="https://tc39.github.io/ecma262/#sec-number.min_saf
 </div>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_create_bigint_int64</span><span class="hljs-params">(napi_env env,
                                      <span class="hljs-type">int64_t</span> value,
-                                     napi_value* result)</span>;</code></pre>
+                                     napi_value* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] value</code>: Integer value to be represented in JavaScript.</li>
@@ -2999,7 +3014,7 @@ outside the range of <a href="https://tc39.github.io/ecma262/#sec-number.min_saf
 </div>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_create_bigint_uint64</span><span class="hljs-params">(napi_env env,
                                       <span class="hljs-type">uint64_t</span> value,
-                                      napi_value* result)</span>;</code></pre>
+                                      napi_value* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] value</code>: Unsigned integer value to be represented in JavaScript.</li>
@@ -3016,7 +3031,7 @@ outside the range of <a href="https://tc39.github.io/ecma262/#sec-number.min_saf
                                      <span class="hljs-type">int</span> sign_bit,
                                      <span class="hljs-type">size_t</span> word_count,
                                      <span class="hljs-type">const</span> <span class="hljs-type">uint64_t</span>* words,
-                                     napi_value* result)</span>;</code></pre>
+                                     napi_value* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] sign_bit</code>: Determines if the resulting <code>BigInt</code> will be positive or
@@ -3038,7 +3053,7 @@ value.</p>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_create_string_latin1</span><span class="hljs-params">(napi_env env,
                                       <span class="hljs-type">const</span> <span class="hljs-type">char</span>* str,
                                       <span class="hljs-type">size_t</span> length,
-                                      napi_value* result)</span>;</code></pre>
+                                      napi_value* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] str</code>: Character buffer representing an ISO-8859-1-encoded string.</li>
@@ -3059,7 +3074,7 @@ string. The native string is copied.</p>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_create_string_utf16</span><span class="hljs-params">(napi_env env,
                                      <span class="hljs-type">const</span> <span class="hljs-type">char16_t</span>* str,
                                      <span class="hljs-type">size_t</span> length,
-                                     napi_value* result)</span></code></pre>
+                                     napi_value* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] str</code>: Character buffer representing a UTF16-LE-encoded string.</li>
@@ -3080,7 +3095,7 @@ The native string is copied.</p>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_create_string_utf8</span><span class="hljs-params">(napi_env env,
                                     <span class="hljs-type">const</span> <span class="hljs-type">char</span>* str,
                                     <span class="hljs-type">size_t</span> length,
-                                    napi_value* result)</span></code></pre>
+                                    napi_value* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] str</code>: Character buffer representing a UTF8-encoded string.</li>
@@ -3101,7 +3116,7 @@ The native string is copied.</p>
 </div>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_get_array_length</span><span class="hljs-params">(napi_env env,
                                   napi_value value,
-                                  <span class="hljs-type">uint32_t</span>* result)</span></code></pre>
+                                  <span class="hljs-type">uint32_t</span>* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] value</code>: <code>napi_value</code> representing the JavaScript <code>Array</code> whose length is
@@ -3120,7 +3135,7 @@ Specification.</p>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_get_arraybuffer_info</span><span class="hljs-params">(napi_env env,
                                       napi_value arraybuffer,
                                       <span class="hljs-type">void</span>** data,
-                                      <span class="hljs-type">size_t</span>* byte_length)</span></code></pre>
+                                      <span class="hljs-type">size_t</span>* byte_length)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] arraybuffer</code>: <code>napi_value</code> representing the <code>ArrayBuffer</code> being queried.</li>
@@ -3146,7 +3161,7 @@ trigger a GC.</p>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_get_buffer_info</span><span class="hljs-params">(napi_env env,
                                  napi_value value,
                                  <span class="hljs-type">void</span>** data,
-                                 <span class="hljs-type">size_t</span>* length)</span></code></pre>
+                                 <span class="hljs-type">size_t</span>* length)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] value</code>: <code>napi_value</code> representing the <code>node::Buffer</code> being queried.</li>
@@ -3166,7 +3181,7 @@ lifetime is not guaranteed if it's managed by the VM.</p>
 </div>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_get_prototype</span><span class="hljs-params">(napi_env env,
                                napi_value object,
-                               napi_value* result)</span></code></pre>
+                               napi_value* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] object</code>: <code>napi_value</code> representing JavaScript <code>Object</code> whose prototype
@@ -3186,7 +3201,7 @@ not the same as the function's <code>prototype</code> property).</li>
                                      <span class="hljs-type">size_t</span>* length,
                                      <span class="hljs-type">void</span>** data,
                                      napi_value* arraybuffer,
-                                     <span class="hljs-type">size_t</span>* byte_offset)</span></code></pre>
+                                     <span class="hljs-type">size_t</span>* byte_offset)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] typedarray</code>: <code>napi_value</code> representing the <code>TypedArray</code> whose
@@ -3219,7 +3234,7 @@ is managed by the VM.</p>
                                    <span class="hljs-type">size_t</span>* byte_length,
                                    <span class="hljs-type">void</span>** data,
                                    napi_value* arraybuffer,
-                                   <span class="hljs-type">size_t</span>* byte_offset)</span></code></pre>
+                                   <span class="hljs-type">size_t</span>* byte_offset)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] dataview</code>: <code>napi_value</code> representing the <code>DataView</code> whose
@@ -3241,7 +3256,7 @@ to start projecting the <code>DataView</code>.</li>
 </div>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_get_date_value</span><span class="hljs-params">(napi_env env,
                                 napi_value value,
-                                <span class="hljs-type">double</span>* result)</span></code></pre>
+                                <span class="hljs-type">double</span>* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] value</code>: <code>napi_value</code> representing a JavaScript <code>Date</code>.</li>
@@ -3259,7 +3274,7 @@ in it returns <code>napi_date_expected</code>.</p>
 <span>Added in: v8.0.0</span>
 <span>N-API version: 1</span>
 </div>
-<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_get_value_bool</span><span class="hljs-params">(napi_env env, napi_value value, <span class="hljs-type">bool</span>* result)</span></code></pre>
+<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_get_value_bool</span><span class="hljs-params">(napi_env env, napi_value value, <span class="hljs-type">bool</span>* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] value</code>: <code>napi_value</code> representing JavaScript <code>Boolean</code>.</li>
@@ -3277,7 +3292,7 @@ passed in it returns <code>napi_boolean_expected</code>.</p>
 </div>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_get_value_double</span><span class="hljs-params">(napi_env env,
                                   napi_value value,
-                                  <span class="hljs-type">double</span>* result)</span></code></pre>
+                                  <span class="hljs-type">double</span>* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] value</code>: <code>napi_value</code> representing JavaScript <code>number</code>.</li>
@@ -3296,7 +3311,7 @@ in it returns <code>napi_number_expected</code>.</p>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_get_value_bigint_int64</span><span class="hljs-params">(napi_env env,
                                         napi_value value,
                                         <span class="hljs-type">int64_t</span>* result,
-                                        <span class="hljs-type">bool</span>* lossless)</span>;</code></pre>
+                                        <span class="hljs-type">bool</span>* lossless)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under</li>
 <li><code>[in] value</code>: <code>napi_value</code> representing JavaScript <code>BigInt</code>.</li>
@@ -3317,7 +3332,7 @@ returns <code>napi_bigint_expected</code>.</p>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_get_value_bigint_uint64</span><span class="hljs-params">(napi_env env,
                                         napi_value value,
                                         <span class="hljs-type">uint64_t</span>* result,
-                                        <span class="hljs-type">bool</span>* lossless)</span>;</code></pre>
+                                        <span class="hljs-type">bool</span>* lossless)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] value</code>: <code>napi_value</code> representing JavaScript <code>BigInt</code>.</li>
@@ -3339,7 +3354,7 @@ returns <code>napi_bigint_expected</code>.</p>
                                         napi_value value,
                                         <span class="hljs-type">int</span>* sign_bit,
                                         <span class="hljs-type">size_t</span>* word_count,
-                                        <span class="hljs-type">uint64_t</span>* words)</span>;</code></pre>
+                                        <span class="hljs-type">uint64_t</span>* words)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] value</code>: <code>napi_value</code> representing JavaScript <code>BigInt</code>.</li>
@@ -3361,7 +3376,7 @@ both set to <code>NULL</code>, in order to get only <code>word_count</code>.</p>
 </div>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_get_value_external</span><span class="hljs-params">(napi_env env,
                                     napi_value value,
-                                    <span class="hljs-type">void</span>** result)</span></code></pre>
+                                    <span class="hljs-type">void</span>** result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] value</code>: <code>napi_value</code> representing JavaScript external value.</li>
@@ -3378,7 +3393,7 @@ passed in it returns <code>napi_invalid_arg</code>.</p>
 </div>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_get_value_int32</span><span class="hljs-params">(napi_env env,
                                  napi_value value,
-                                 <span class="hljs-type">int32_t</span>* result)</span></code></pre>
+                                 <span class="hljs-type">int32_t</span>* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] value</code>: <code>napi_value</code> representing JavaScript <code>number</code>.</li>
@@ -3401,7 +3416,7 @@ result to zero.</p>
 </div>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_get_value_int64</span><span class="hljs-params">(napi_env env,
                                  napi_value value,
-                                 <span class="hljs-type">int64_t</span>* result)</span></code></pre>
+                                 <span class="hljs-type">int64_t</span>* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] value</code>: <code>napi_value</code> representing JavaScript <code>number</code>.</li>
@@ -3426,7 +3441,7 @@ result to zero.</p>
                                          napi_value value,
                                          <span class="hljs-type">char</span>* buf,
                                          <span class="hljs-type">size_t</span> bufsize,
-                                         <span class="hljs-type">size_t</span>* result)</span></code></pre>
+                                         <span class="hljs-type">size_t</span>* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] value</code>: <code>napi_value</code> representing JavaScript string.</li>
@@ -3451,7 +3466,7 @@ in.</p>
                                        napi_value value,
                                        <span class="hljs-type">char</span>* buf,
                                        <span class="hljs-type">size_t</span> bufsize,
-                                       <span class="hljs-type">size_t</span>* result)</span></code></pre>
+                                       <span class="hljs-type">size_t</span>* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] value</code>: <code>napi_value</code> representing JavaScript string.</li>
@@ -3475,7 +3490,7 @@ is passed in it returns <code>napi_string_expected</code>.</p>
                                         napi_value value,
                                         <span class="hljs-type">char16_t</span>* buf,
                                         <span class="hljs-type">size_t</span> bufsize,
-                                        <span class="hljs-type">size_t</span>* result)</span></code></pre>
+                                        <span class="hljs-type">size_t</span>* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] value</code>: <code>napi_value</code> representing JavaScript string.</li>
@@ -3497,7 +3512,7 @@ is passed in it returns <code>napi_string_expected</code>.</p>
 </div>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_get_value_uint32</span><span class="hljs-params">(napi_env env,
                                   napi_value value,
-                                  <span class="hljs-type">uint32_t</span>* result)</span></code></pre>
+                                  <span class="hljs-type">uint32_t</span>* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] value</code>: <code>napi_value</code> representing JavaScript <code>number</code>.</li>
@@ -3514,7 +3529,7 @@ is passed in it returns <code>napi_number_expected</code>.</p>
 <span>Added in: v8.0.0</span>
 <span>N-API version: 1</span>
 </div>
-<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_get_boolean</span><span class="hljs-params">(napi_env env, <span class="hljs-type">bool</span> value, napi_value* result)</span></code></pre>
+<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_get_boolean</span><span class="hljs-params">(napi_env env, <span class="hljs-type">bool</span> value, napi_value* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] value</code>: The value of the boolean to retrieve.</li>
@@ -3529,7 +3544,7 @@ represent the given boolean value.</p>
 <span>Added in: v8.0.0</span>
 <span>N-API version: 1</span>
 </div>
-<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_get_global</span><span class="hljs-params">(napi_env env, napi_value* result)</span></code></pre>
+<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_get_global</span><span class="hljs-params">(napi_env env, napi_value* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[out] result</code>: <code>napi_value</code> representing JavaScript <code>global</code> object.</li>
@@ -3541,7 +3556,7 @@ represent the given boolean value.</p>
 <span>Added in: v8.0.0</span>
 <span>N-API version: 1</span>
 </div>
-<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_get_null</span><span class="hljs-params">(napi_env env, napi_value* result)</span></code></pre>
+<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_get_null</span><span class="hljs-params">(napi_env env, napi_value* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[out] result</code>: <code>napi_value</code> representing JavaScript <code>null</code> object.</li>
@@ -3553,7 +3568,7 @@ represent the given boolean value.</p>
 <span>Added in: v8.0.0</span>
 <span>N-API version: 1</span>
 </div>
-<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_get_undefined</span><span class="hljs-params">(napi_env env, napi_value* result)</span></code></pre>
+<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_get_undefined</span><span class="hljs-params">(napi_env env, napi_value* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[out] result</code>: <code>napi_value</code> representing JavaScript Undefined value.</li>
@@ -3578,7 +3593,7 @@ of the <a href="https://tc39.github.io/ecma262/">ECMAScript Language Specificati
 </div>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_coerce_to_bool</span><span class="hljs-params">(napi_env env,
                                 napi_value value,
-                                napi_value* result)</span></code></pre>
+                                napi_value* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] value</code>: The JavaScript value to coerce.</li>
@@ -3594,7 +3609,7 @@ of the <a href="https://tc39.github.io/ecma262/">ECMAScript Language Specificati
 </div>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_coerce_to_number</span><span class="hljs-params">(napi_env env,
                                   napi_value value,
-                                  napi_value* result)</span></code></pre>
+                                  napi_value* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] value</code>: The JavaScript value to coerce.</li>
@@ -3612,7 +3627,7 @@ object.</p>
 </div>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_coerce_to_object</span><span class="hljs-params">(napi_env env,
                                   napi_value value,
-                                  napi_value* result)</span></code></pre>
+                                  napi_value* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] value</code>: The JavaScript value to coerce.</li>
@@ -3628,7 +3643,7 @@ object.</p>
 </div>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_coerce_to_string</span><span class="hljs-params">(napi_env env,
                                   napi_value value,
-                                  napi_value* result)</span></code></pre>
+                                  napi_value* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] value</code>: The JavaScript value to coerce.</li>
@@ -3644,7 +3659,7 @@ object.</p>
 <span>Added in: v8.0.0</span>
 <span>N-API version: 1</span>
 </div>
-<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_typeof</span><span class="hljs-params">(napi_env env, napi_value value, napi_valuetype* result)</span></code></pre>
+<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_typeof</span><span class="hljs-params">(napi_env env, napi_value value, napi_valuetype* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] value</code>: The JavaScript value whose type to query.</li>
@@ -3672,7 +3687,7 @@ Specification. However, there are some differences:</p>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_instanceof</span><span class="hljs-params">(napi_env env,
                             napi_value object,
                             napi_value constructor,
-                            <span class="hljs-type">bool</span>* result)</span></code></pre>
+                            <span class="hljs-type">bool</span>* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] object</code>: The JavaScript value to check.</li>
@@ -3689,7 +3704,7 @@ defined in <a href="https://tc39.github.io/ecma262/#sec-instanceofoperator">Sect
 <span>Added in: v8.0.0</span>
 <span>N-API version: 1</span>
 </div>
-<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_is_array</span><span class="hljs-params">(napi_env env, napi_value value, <span class="hljs-type">bool</span>* result)</span></code></pre>
+<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_is_array</span><span class="hljs-params">(napi_env env, napi_value value, <span class="hljs-type">bool</span>* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] value</code>: The JavaScript value to check.</li>
@@ -3703,7 +3718,7 @@ as defined in <a href="https://tc39.github.io/ecma262/#sec-isarray">Section 7.2.
 <span>Added in: v8.0.0</span>
 <span>N-API version: 1</span>
 </div>
-<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_is_arraybuffer</span><span class="hljs-params">(napi_env env, napi_value value, <span class="hljs-type">bool</span>* result)</span></code></pre>
+<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_is_arraybuffer</span><span class="hljs-params">(napi_env env, napi_value value, <span class="hljs-type">bool</span>* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] value</code>: The JavaScript value to check.</li>
@@ -3716,7 +3731,7 @@ as defined in <a href="https://tc39.github.io/ecma262/#sec-isarray">Section 7.2.
 <span>Added in: v8.0.0</span>
 <span>N-API version: 1</span>
 </div>
-<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_is_buffer</span><span class="hljs-params">(napi_env env, napi_value value, <span class="hljs-type">bool</span>* result)</span></code></pre>
+<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_is_buffer</span><span class="hljs-params">(napi_env env, napi_value value, <span class="hljs-type">bool</span>* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] value</code>: The JavaScript value to check.</li>
@@ -3730,7 +3745,7 @@ object.</li>
 <span>Added in: v11.11.0, v10.17.0</span>
 <span>N-API version: 5</span>
 </div>
-<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_is_date</span><span class="hljs-params">(napi_env env, napi_value value, <span class="hljs-type">bool</span>* result)</span></code></pre>
+<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_is_date</span><span class="hljs-params">(napi_env env, napi_value value, <span class="hljs-type">bool</span>* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] value</code>: The JavaScript value to check.</li>
@@ -3744,7 +3759,7 @@ object.</li>
 <span>Added in: v8.0.0</span>
 <span>N-API version: 1</span>
 </div>
-<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_is_error</span><span class="hljs-params">(napi_env env, napi_value value, <span class="hljs-type">bool</span>* result)</span></code></pre>
+<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_is_error</span><span class="hljs-params">(napi_env env, napi_value value, <span class="hljs-type">bool</span>* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] value</code>: The JavaScript value to check.</li>
@@ -3757,7 +3772,7 @@ object.</li>
 <span>Added in: v8.0.0</span>
 <span>N-API version: 1</span>
 </div>
-<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_is_typedarray</span><span class="hljs-params">(napi_env env, napi_value value, <span class="hljs-type">bool</span>* result)</span></code></pre>
+<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_is_typedarray</span><span class="hljs-params">(napi_env env, napi_value value, <span class="hljs-type">bool</span>* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] value</code>: The JavaScript value to check.</li>
@@ -3770,7 +3785,7 @@ object.</li>
 <span>Added in: v8.3.0</span>
 <span>N-API version: 1</span>
 </div>
-<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_is_dataview</span><span class="hljs-params">(napi_env env, napi_value value, <span class="hljs-type">bool</span>* result)</span></code></pre>
+<pre><code class="language-c">napi_status <span class="hljs-title function_">napi_is_dataview</span><span class="hljs-params">(napi_env env, napi_value value, <span class="hljs-type">bool</span>* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] value</code>: The JavaScript value to check.</li>
@@ -3786,7 +3801,7 @@ object.</li>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_strict_equals</span><span class="hljs-params">(napi_env env,
                                napi_value lhs,
                                napi_value rhs,
-                               <span class="hljs-type">bool</span>* result)</span></code></pre>
+                               <span class="hljs-type">bool</span>* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] lhs</code>: The JavaScript value to check.</li>
@@ -3802,7 +3817,7 @@ defined in <a href="https://tc39.github.io/ecma262/#sec-strict-equality-comparis
 <span>N-API version: 7</span>
 </div>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_detach_arraybuffer</span><span class="hljs-params">(napi_env env,
-                                    napi_value arraybuffer)</span></code></pre>
+                                    napi_value arraybuffer)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] arraybuffer</code>: The JavaScript <code>ArrayBuffer</code> to be detached.</li>
@@ -3822,7 +3837,7 @@ defined in <a href="https://tc39.es/ecma262/#sec-detacharraybuffer">Section 24.1
 </div>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_is_detached_arraybuffer</span><span class="hljs-params">(napi_env env,
                                          napi_value arraybuffer,
-                                         <span class="hljs-type">bool</span>* result)</span></code></pre>
+                                         <span class="hljs-type">bool</span>* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] arraybuffer</code>: The JavaScript <code>ArrayBuffer</code> to be checked.</li>
@@ -3855,7 +3870,7 @@ get and set properties on arbitrary JavaScript objects represented by
 <code>napi_value</code>.</p>
 <p>For instance, consider the following JavaScript code snippet:</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> obj = {};
-obj.<span class="hljs-property">myProp</span> = <span class="hljs-number">123</span>;</code></pre>
+obj.<span class="hljs-property">myProp</span> = <span class="hljs-number">123</span>;</code> <button class="copy-button">copy</button></pre>
 <p>The equivalent can be done using Node-API values with the following snippet:</p>
 <pre><code class="language-c">napi_status status = napi_generic_failure;
 
@@ -3870,11 +3885,11 @@ status = napi_create_int32(env, <span class="hljs-number">123</span>, &#x26;valu
 
 <span class="hljs-comment">// obj.myProp = 123</span>
 status = napi_set_named_property(env, obj, <span class="hljs-string">"myProp"</span>, value);
-<span class="hljs-keyword">if</span> (status != napi_ok) <span class="hljs-keyword">return</span> status;</code></pre>
+<span class="hljs-keyword">if</span> (status != napi_ok) <span class="hljs-keyword">return</span> status;</code> <button class="copy-button">copy</button></pre>
 <p>Indexed properties can be set in a similar manner. Consider the following
 JavaScript snippet:</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> arr = [];
-arr[<span class="hljs-number">123</span>] = <span class="hljs-string">'hello'</span>;</code></pre>
+arr[<span class="hljs-number">123</span>] = <span class="hljs-string">'hello'</span>;</code> <button class="copy-button">copy</button></pre>
 <p>The equivalent can be done using Node-API values with the following snippet:</p>
 <pre><code class="language-c">napi_status status = napi_generic_failure;
 
@@ -3889,11 +3904,11 @@ status = napi_create_string_utf8(env, <span class="hljs-string">"hello"</span>, 
 
 <span class="hljs-comment">// arr[123] = 'hello';</span>
 status = napi_set_element(env, arr, <span class="hljs-number">123</span>, value);
-<span class="hljs-keyword">if</span> (status != napi_ok) <span class="hljs-keyword">return</span> status;</code></pre>
+<span class="hljs-keyword">if</span> (status != napi_ok) <span class="hljs-keyword">return</span> status;</code> <button class="copy-button">copy</button></pre>
 <p>Properties can be retrieved using the APIs described in this section.
 Consider the following JavaScript snippet:</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> arr = [];
-<span class="hljs-keyword">const</span> value = arr[<span class="hljs-number">123</span>];</code></pre>
+<span class="hljs-keyword">const</span> value = arr[<span class="hljs-number">123</span>];</code> <button class="copy-button">copy</button></pre>
 <p>The following is the approximate equivalent of the Node-API counterpart:</p>
 <pre><code class="language-c">napi_status status = napi_generic_failure;
 
@@ -3904,14 +3919,14 @@ status = napi_create_array(env, &#x26;arr);
 
 <span class="hljs-comment">// const value = arr[123]</span>
 status = napi_get_element(env, arr, <span class="hljs-number">123</span>, &#x26;value);
-<span class="hljs-keyword">if</span> (status != napi_ok) <span class="hljs-keyword">return</span> status;</code></pre>
+<span class="hljs-keyword">if</span> (status != napi_ok) <span class="hljs-keyword">return</span> status;</code> <button class="copy-button">copy</button></pre>
 <p>Finally, multiple properties can also be defined on an object for performance
 reasons. Consider the following JavaScript:</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> obj = {};
 <span class="hljs-title class_">Object</span>.<span class="hljs-title function_">defineProperties</span>(obj, {
   <span class="hljs-string">'foo'</span>: { <span class="hljs-attr">value</span>: <span class="hljs-number">123</span>, <span class="hljs-attr">writable</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">configurable</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">enumerable</span>: <span class="hljs-literal">true</span> },
   <span class="hljs-string">'bar'</span>: { <span class="hljs-attr">value</span>: <span class="hljs-number">456</span>, <span class="hljs-attr">writable</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">configurable</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">enumerable</span>: <span class="hljs-literal">true</span> },
-});</code></pre>
+});</code> <button class="copy-button">copy</button></pre>
 <p>The following is the approximate equivalent of the Node-API counterpart:</p>
 <pre><code class="language-c">napi_status status = napi_status_generic_failure;
 
@@ -3936,7 +3951,7 @@ status = napi_define_properties(env,
                                 obj,
                                 <span class="hljs-keyword">sizeof</span>(descriptors) / <span class="hljs-keyword">sizeof</span>(descriptors[<span class="hljs-number">0</span>]),
                                 descriptors);
-<span class="hljs-keyword">if</span> (status != napi_ok) <span class="hljs-keyword">return</span> status;</code></pre>
+<span class="hljs-keyword">if</span> (status != napi_ok) <span class="hljs-keyword">return</span> status;</code> <button class="copy-button">copy</button></pre>
 <h4>Structures<span><a class="mark" href="#structures" id="structures">#</a></span><a aria-hidden="true" class="legacy" id="n_api_structures"></a></h4>
 <h5><code>napi_property_attributes</code><span><a class="mark" href="#napi_property_attributes" id="napi_property_attributes">#</a></span><a aria-hidden="true" class="legacy" id="n_api_napi_property_attributes"></a></h5>
 <div class="api_metadata">
@@ -3965,7 +3980,7 @@ status = napi_define_properties(env,
   napi_default_jsproperty = napi_writable |
                           napi_enumerable |
                           napi_configurable,
-} napi_property_attributes;</code></pre>
+} napi_property_attributes;</code> <button class="copy-button">copy</button></pre>
 <p><code>napi_property_attributes</code> are flags used to control the behavior of properties
 set on a JavaScript object. Other than <code>napi_static</code> they correspond to the
 attributes listed in <a href="https://tc39.github.io/ecma262/#table-2">Section 6.1.7.1</a>
@@ -3999,7 +4014,7 @@ the property is writable, enumerable, and configurable.</li>
 
   napi_property_attributes attributes;
   <span class="hljs-type">void</span>* data;
-} napi_property_descriptor;</code></pre>
+} napi_property_descriptor;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>utf8name</code>: Optional string describing the key for the property,
 encoded as UTF8. One of <code>utf8name</code> or <code>name</code> must be provided for the
@@ -4037,7 +4052,7 @@ function is invoked.</li>
 </div>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_get_property_names</span><span class="hljs-params">(napi_env env,
                                     napi_value object,
-                                    napi_value* result)</span>;</code></pre>
+                                    napi_value* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the Node-API call is invoked under.</li>
 <li><code>[in] object</code>: The object from which to retrieve the properties.</li>
@@ -4060,7 +4075,7 @@ included.</p>
                             napi_key_collection_mode key_mode,
                             napi_key_filter key_filter,
                             napi_key_conversion key_conversion,
-                            napi_value* result);</code></pre>
+                            napi_value* result);</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the Node-API call is invoked under.</li>
 <li><code>[in] object</code>: The object from which to retrieve the properties.</li>
@@ -4083,7 +4098,7 @@ of this object.</p>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_set_property</span><span class="hljs-params">(napi_env env,
                               napi_value object,
                               napi_value key,
-                              napi_value value)</span>;</code></pre>
+                              napi_value value)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the Node-API call is invoked under.</li>
 <li><code>[in] object</code>: The object on which to set the property.</li>
@@ -4100,7 +4115,7 @@ of this object.</p>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_get_property</span><span class="hljs-params">(napi_env env,
                               napi_value object,
                               napi_value key,
-                              napi_value* result)</span>;</code></pre>
+                              napi_value* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the Node-API call is invoked under.</li>
 <li><code>[in] object</code>: The object from which to retrieve the property.</li>
@@ -4117,7 +4132,7 @@ of this object.</p>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_has_property</span><span class="hljs-params">(napi_env env,
                               napi_value object,
                               napi_value key,
-                              <span class="hljs-type">bool</span>* result)</span>;</code></pre>
+                              <span class="hljs-type">bool</span>* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the Node-API call is invoked under.</li>
 <li><code>[in] object</code>: The object to query.</li>
@@ -4134,7 +4149,7 @@ of this object.</p>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_delete_property</span><span class="hljs-params">(napi_env env,
                                  napi_value object,
                                  napi_value key,
-                                 <span class="hljs-type">bool</span>* result)</span>;</code></pre>
+                                 <span class="hljs-type">bool</span>* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the Node-API call is invoked under.</li>
 <li><code>[in] object</code>: The object to query.</li>
@@ -4152,7 +4167,7 @@ optionally be ignored by passing <code>NULL</code>.</li>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_has_own_property</span><span class="hljs-params">(napi_env env,
                                   napi_value object,
                                   napi_value key,
-                                  <span class="hljs-type">bool</span>* result)</span>;</code></pre>
+                                  <span class="hljs-type">bool</span>* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the Node-API call is invoked under.</li>
 <li><code>[in] object</code>: The object to query.</li>
@@ -4171,7 +4186,7 @@ perform any conversion between data types.</p>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_set_named_property</span><span class="hljs-params">(napi_env env,
                                     napi_value object,
                                     <span class="hljs-type">const</span> <span class="hljs-type">char</span>* utf8Name,
-                                    napi_value value)</span>;</code></pre>
+                                    napi_value value)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the Node-API call is invoked under.</li>
 <li><code>[in] object</code>: The object on which to set the property.</li>
@@ -4189,7 +4204,7 @@ created from the string passed in as <code>utf8Name</code>.</p>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_get_named_property</span><span class="hljs-params">(napi_env env,
                                     napi_value object,
                                     <span class="hljs-type">const</span> <span class="hljs-type">char</span>* utf8Name,
-                                    napi_value* result)</span>;</code></pre>
+                                    napi_value* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the Node-API call is invoked under.</li>
 <li><code>[in] object</code>: The object from which to retrieve the property.</li>
@@ -4207,7 +4222,7 @@ created from the string passed in as <code>utf8Name</code>.</p>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_has_named_property</span><span class="hljs-params">(napi_env env,
                                     napi_value object,
                                     <span class="hljs-type">const</span> <span class="hljs-type">char</span>* utf8Name,
-                                    <span class="hljs-type">bool</span>* result)</span>;</code></pre>
+                                    <span class="hljs-type">bool</span>* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the Node-API call is invoked under.</li>
 <li><code>[in] object</code>: The object to query.</li>
@@ -4225,7 +4240,7 @@ created from the string passed in as <code>utf8Name</code>.</p>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_set_element</span><span class="hljs-params">(napi_env env,
                              napi_value object,
                              <span class="hljs-type">uint32_t</span> index,
-                             napi_value value)</span>;</code></pre>
+                             napi_value value)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the Node-API call is invoked under.</li>
 <li><code>[in] object</code>: The object from which to set the properties.</li>
@@ -4242,7 +4257,7 @@ created from the string passed in as <code>utf8Name</code>.</p>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_get_element</span><span class="hljs-params">(napi_env env,
                              napi_value object,
                              <span class="hljs-type">uint32_t</span> index,
-                             napi_value* result)</span>;</code></pre>
+                             napi_value* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the Node-API call is invoked under.</li>
 <li><code>[in] object</code>: The object from which to retrieve the property.</li>
@@ -4259,7 +4274,7 @@ created from the string passed in as <code>utf8Name</code>.</p>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_has_element</span><span class="hljs-params">(napi_env env,
                              napi_value object,
                              <span class="hljs-type">uint32_t</span> index,
-                             <span class="hljs-type">bool</span>* result)</span>;</code></pre>
+                             <span class="hljs-type">bool</span>* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the Node-API call is invoked under.</li>
 <li><code>[in] object</code>: The object to query.</li>
@@ -4277,7 +4292,7 @@ requested index.</p>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_delete_element</span><span class="hljs-params">(napi_env env,
                                 napi_value object,
                                 <span class="hljs-type">uint32_t</span> index,
-                                <span class="hljs-type">bool</span>* result)</span>;</code></pre>
+                                <span class="hljs-type">bool</span>* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the Node-API call is invoked under.</li>
 <li><code>[in] object</code>: The object to query.</li>
@@ -4295,7 +4310,7 @@ optionally be ignored by passing <code>NULL</code>.</li>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_define_properties</span><span class="hljs-params">(napi_env env,
                                    napi_value object,
                                    <span class="hljs-type">size_t</span> property_count,
-                                   <span class="hljs-type">const</span> napi_property_descriptor* properties)</span>;</code></pre>
+                                   <span class="hljs-type">const</span> napi_property_descriptor* properties)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the Node-API call is invoked under.</li>
 <li><code>[in] object</code>: The object from which to retrieve the properties.</li>
@@ -4315,7 +4330,7 @@ specification).</p>
 <span>N-API version: 8</span>
 </div>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_object_freeze</span><span class="hljs-params">(napi_env env,
-                               napi_value object)</span>;</code></pre>
+                               napi_value object)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the Node-API call is invoked under.</li>
 <li><code>[in] object</code>: The object to freeze.</li>
@@ -4334,7 +4349,7 @@ ECMA-262 specification.</p>
 <span>N-API version: 8</span>
 </div>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_object_seal</span><span class="hljs-params">(napi_env env,
-                             napi_value object)</span>;</code></pre>
+                             napi_value object)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the Node-API call is invoked under.</li>
 <li><code>[in] object</code>: The object to seal.</li>
@@ -4375,7 +4390,7 @@ whenever <code>object</code> is garbage-collected by passing both <code>object</
                                            napi_value func,
                                            <span class="hljs-type">size_t</span> argc,
                                            <span class="hljs-type">const</span> napi_value* argv,
-                                           napi_value* result)</span>;</code></pre>
+                                           napi_value* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] recv</code>: The <code>this</code> value passed to the called function.</li>
@@ -4395,7 +4410,7 @@ snippet:</p>
 <pre><code class="language-js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">AddTwo</span>(<span class="hljs-params">num</span>) {
   <span class="hljs-keyword">return</span> num + <span class="hljs-number">2</span>;
 }
-<span class="hljs-variable language_">global</span>.<span class="hljs-property">AddTwo</span> = <span class="hljs-title class_">AddTwo</span>;</code></pre>
+<span class="hljs-variable language_">global</span>.<span class="hljs-property">AddTwo</span> = <span class="hljs-title class_">AddTwo</span>;</code> <button class="copy-button">copy</button></pre>
 <p>Then, the above function can be invoked from a native add-on using the
 following code:</p>
 <pre><code class="language-c"><span class="hljs-comment">// Get the function named "AddTwo" on the global object</span>
@@ -4421,7 +4436,7 @@ status = napi_call_function(env, global, add_two, argc, argv, &#x26;return_val);
 <span class="hljs-comment">// Convert the result back to a native type</span>
 <span class="hljs-type">int32_t</span> result;
 status = napi_get_value_int32(env, return_val, &#x26;result);
-<span class="hljs-keyword">if</span> (status != napi_ok) <span class="hljs-keyword">return</span>;</code></pre>
+<span class="hljs-keyword">if</span> (status != napi_ok) <span class="hljs-keyword">return</span>;</code> <button class="copy-button">copy</button></pre>
 <h4><code>napi_create_function</code><span><a class="mark" href="#napi_create_function" id="napi_create_function">#</a></span><a aria-hidden="true" class="legacy" id="n_api_napi_create_function"></a></h4>
 <div class="api_metadata">
 <span>Added in: v8.0.0</span>
@@ -4432,7 +4447,7 @@ status = napi_get_value_int32(env, return_val, &#x26;result);
                                  <span class="hljs-type">size_t</span> length,
                                  napi_callback cb,
                                  <span class="hljs-type">void</span>* data,
-                                 napi_value* result)</span>;</code></pre>
+                                 napi_value* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] utf8Name</code>: Optional name of the function encoded as UTF8. This is
@@ -4474,10 +4489,10 @@ napi_value <span class="hljs-title function_">Init</span><span class="hljs-param
   <span class="hljs-keyword">return</span> exports;
 }
 
-NAPI_MODULE(NODE_GYP_MODULE_NAME, Init)</code></pre>
+NAPI_MODULE(NODE_GYP_MODULE_NAME, Init)</code> <button class="copy-button">copy</button></pre>
 <p>Given the above code, the add-on can be used from JavaScript as follows:</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> myaddon = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./addon'</span>);
-myaddon.<span class="hljs-title function_">sayHello</span>();</code></pre>
+myaddon.<span class="hljs-title function_">sayHello</span>();</code> <button class="copy-button">copy</button></pre>
 <p>The string passed to <code>require()</code> is the name of the target in <code>binding.gyp</code>
 responsible for creating the <code>.node</code> file.</p>
 <p>Any non-<code>NULL</code> data which is passed to this API via the <code>data</code> parameter can
@@ -4496,7 +4511,7 @@ Language Specification.</p>
                              <span class="hljs-type">size_t</span>* argc,
                              napi_value* argv,
                              napi_value* thisArg,
-                             <span class="hljs-type">void</span>** data)</span></code></pre>
+                             <span class="hljs-type">void</span>** data)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] cbinfo</code>: The callback info passed into the callback function.</li>
@@ -4524,7 +4539,7 @@ call like the arguments and the <code>this</code> pointer from a given callback 
 </div>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_get_new_target</span><span class="hljs-params">(napi_env env,
                                 napi_callback_info cbinfo,
-                                napi_value* result)</span></code></pre>
+                                napi_value* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] cbinfo</code>: The callback info passed into the callback function.</li>
@@ -4542,7 +4557,7 @@ callback is not a constructor call, the result is <code>NULL</code>.</p>
                               napi_value cons,
                               <span class="hljs-type">size_t</span> argc,
                               napi_value* argv,
-                              napi_value* result)</span></code></pre>
+                              napi_value* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] cons</code>: <code>napi_value</code> representing the JavaScript function to be invoked
@@ -4562,7 +4577,7 @@ consider the following snippet:</p>
 }
 
 <span class="hljs-keyword">const</span> arg = <span class="hljs-string">'hello'</span>;
-<span class="hljs-keyword">const</span> value = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MyObject</span>(arg);</code></pre>
+<span class="hljs-keyword">const</span> value = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MyObject</span>(arg);</code> <button class="copy-button">copy</button></pre>
 <p>The following can be approximated in Node-API using the following snippet:</p>
 <pre><code class="language-c"><span class="hljs-comment">// Get the constructor function MyObject</span>
 napi_value global, constructor, arg, value;
@@ -4580,7 +4595,7 @@ napi_value* argv = &#x26;arg;
 <span class="hljs-type">size_t</span> argc = <span class="hljs-number">1</span>;
 
 <span class="hljs-comment">// const value = new MyObject(arg)</span>
-status = napi_new_instance(env, constructor, argc, argv, &#x26;value);</code></pre>
+status = napi_new_instance(env, constructor, argc, argv, &#x26;value);</code> <button class="copy-button">copy</button></pre>
 <p>Returns <code>napi_ok</code> if the API succeeded.</p>
 </section><section><h3>Object wrap<span><a class="mark" href="#object-wrap" id="object-wrap">#</a></span><a aria-hidden="true" class="legacy" id="n_api_object_wrap"></a></h3>
 <p>Node-API offers a way to "wrap" C++ classes and instances so that the class
@@ -4611,7 +4626,7 @@ assert(napi_ok == status);
   <span class="hljs-comment">// napi_unwrap() ...</span>
 } <span class="hljs-keyword">else</span> {
   <span class="hljs-comment">// otherwise...</span>
-}</code></pre>
+}</code> <button class="copy-button">copy</button></pre>
 <p>The reference must be freed once it is no longer needed.</p>
 <p>There are occasions where <code>napi_instanceof()</code> is insufficient for ensuring that
 a JavaScript object is a wrapper for a certain native type. This is the case
@@ -4636,7 +4651,7 @@ cases there is a chance that they may be unwrapped incorrectly.</p>
 <span class="hljs-comment">//</span>
 <span class="hljs-keyword">while</span> (myAddon.<span class="hljs-title function_">queryHasRecords</span>(queryHandle, dbHandle)) {
   <span class="hljs-comment">// retrieve records</span>
-}</code></pre>
+}</code> <button class="copy-button">copy</button></pre>
 <p>In the above example <code>myAddon.queryHasRecords()</code> is a method that accepts two
 arguments. The first is a database handle and the second is a query handle.
 Internally, it unwraps the first argument and casts the resulting pointer to a
@@ -4661,7 +4676,7 @@ containing a pointer to a database handle.</p>
 <p>To this end, Node-API provides type-tagging capabilities.</p>
 <p>A type tag is a 128-bit integer unique to the addon. Node-API provides the
 <code>napi_type_tag</code> structure for storing a type tag. When such a value is passed
-along with a JavaScript object stored in a <code>napi_value</code> to
+along with a JavaScript object or <a href="#napi_create_external">external</a> stored in a <code>napi_value</code> to
 <code>napi_type_tag_object()</code>, the JavaScript object will be "marked" with the
 type tag. The "mark" is invisible on the JavaScript side. When a JavaScript
 object arrives into a native binding, <code>napi_check_object_type_tag()</code> can be used
@@ -4736,7 +4751,7 @@ illustrates the use of <code>napi_type_tag_object()</code> and
     <span class="hljs-comment">// Throw a TypeError.</span>
     <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;
   }
-}</code></pre>
+}</code> <button class="copy-button">copy</button></pre>
 <h4><code>napi_define_class</code><span><a class="mark" href="#napi_define_class" id="napi_define_class">#</a></span><a aria-hidden="true" class="legacy" id="n_api_napi_define_class"></a></h4>
 <div class="api_metadata">
 <span>Added in: v8.0.0</span>
@@ -4749,7 +4764,7 @@ illustrates the use of <code>napi_type_tag_object()</code> and
                               <span class="hljs-type">void</span>* data,
                               <span class="hljs-type">size_t</span> property_count,
                               <span class="hljs-type">const</span> napi_property_descriptor* properties,
-                              napi_value* result)</span>;</code></pre>
+                              napi_value* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] utf8name</code>: Name of the JavaScript constructor function; When wrapping a
@@ -4812,7 +4827,7 @@ the JavaScript function and the data to <a href="#napi_add_finalizer"><code>napi
                       <span class="hljs-type">void</span>* native_object,
                       napi_finalize finalize_cb,
                       <span class="hljs-type">void</span>* finalize_hint,
-                      napi_ref* result)</span>;</code></pre>
+                      napi_ref* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] js_object</code>: The JavaScript object that will be the wrapper for the
@@ -4861,7 +4876,7 @@ first.</p>
 </div>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_unwrap</span><span class="hljs-params">(napi_env env,
                         napi_value js_object,
-                        <span class="hljs-type">void</span>** result)</span>;</code></pre>
+                        <span class="hljs-type">void</span>** result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] js_object</code>: The object associated with the native instance.</li>
@@ -4882,7 +4897,7 @@ then by calling <code>napi_unwrap()</code> on the wrapper object.</p>
 </div>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_remove_wrap</span><span class="hljs-params">(napi_env env,
                              napi_value js_object,
-                             <span class="hljs-type">void</span>** result)</span>;</code></pre>
+                             <span class="hljs-type">void</span>** result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] js_object</code>: The object associated with the native instance.</li>
@@ -4900,17 +4915,17 @@ JavaScript object becomes garbage-collected.</p>
 </div>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_type_tag_object</span><span class="hljs-params">(napi_env env,
                                  napi_value js_object,
-                                 <span class="hljs-type">const</span> napi_type_tag* type_tag)</span>;</code></pre>
+                                 <span class="hljs-type">const</span> napi_type_tag* type_tag)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
-<li><code>[in] js_object</code>: The JavaScript object to be marked.</li>
+<li><code>[in] js_object</code>: The JavaScript object or <a href="#napi_create_external">external</a> to be marked.</li>
 <li><code>[in] type_tag</code>: The tag with which the object is to be marked.</li>
 </ul>
 <p>Returns <code>napi_ok</code> if the API succeeded.</p>
-<p>Associates the value of the <code>type_tag</code> pointer with the JavaScript object.
-<code>napi_check_object_type_tag()</code> can then be used to compare the tag that was
-attached to the object with one owned by the addon to ensure that the object
-has the right type.</p>
+<p>Associates the value of the <code>type_tag</code> pointer with the JavaScript object or
+<a href="#napi_create_external">external</a>. <code>napi_check_object_type_tag()</code> can then be used to compare the tag
+that was attached to the object with one owned by the addon to ensure that the
+object has the right type.</p>
 <p>If the object already has an associated type tag, this API will return
 <code>napi_invalid_arg</code>.</p>
 <h4><code>napi_check_object_type_tag</code><span><a class="mark" href="#napi_check_object_type_tag" id="napi_check_object_type_tag">#</a></span><a aria-hidden="true" class="legacy" id="n_api_napi_check_object_type_tag"></a></h4>
@@ -4921,10 +4936,11 @@ has the right type.</p>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_check_object_type_tag</span><span class="hljs-params">(napi_env env,
                                        napi_value js_object,
                                        <span class="hljs-type">const</span> napi_type_tag* type_tag,
-                                       <span class="hljs-type">bool</span>* result)</span>;</code></pre>
+                                       <span class="hljs-type">bool</span>* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
-<li><code>[in] js_object</code>: The JavaScript object whose type tag to examine.</li>
+<li><code>[in] js_object</code>: The JavaScript object or <a href="#napi_create_external">external</a> whose type tag to
+examine.</li>
 <li><code>[in] type_tag</code>: The tag with which to compare any tag found on the object.</li>
 <li><code>[out] result</code>: Whether the type tag given matched the type tag on the
 object. <code>false</code> is also returned if no type tag was found on the object.</li>
@@ -4944,7 +4960,7 @@ matches <code>type_tag</code>, then <code>result</code> is set to <code>true</co
                                <span class="hljs-type">void</span>* finalize_data,
                                napi_finalize finalize_cb,
                                <span class="hljs-type">void</span>* finalize_hint,
-                               napi_ref* result)</span>;</code></pre>
+                               napi_ref* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] js_object</code>: The JavaScript object to which the native data will be
@@ -4990,14 +5006,14 @@ it will likely execute JavaScript.</p>
                                             <span class="hljs-type">void</span>* data)</span>;
 <span class="hljs-keyword">typedef</span> <span class="hljs-title function_">void</span> <span class="hljs-params">(*napi_async_complete_callback)</span><span class="hljs-params">(napi_env env,
                                              napi_status status,
-                                             <span class="hljs-type">void</span>* data)</span>;</code></pre>
+                                             <span class="hljs-type">void</span>* data)</span>;</code> <button class="copy-button">copy</button></pre>
 <p>When these methods are invoked, the <code>data</code> parameter passed will be the
 addon-provided <code>void*</code> data that was passed into the
 <code>napi_create_async_work</code> call.</p>
 <p>Once created the async worker can be queued
 for execution using the <a href="#napi_queue_async_work"><code>napi_queue_async_work</code></a> function:</p>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_queue_async_work</span><span class="hljs-params">(napi_env env,
-                                  napi_async_work work)</span>;</code></pre>
+                                  napi_async_work work)</span>;</code> <button class="copy-button">copy</button></pre>
 <p><a href="#napi_cancel_async_work"><code>napi_cancel_async_work</code></a> can be used if the work needs
 to be cancelled before the work has started execution.</p>
 <p>After calling <a href="#napi_cancel_async_work"><code>napi_cancel_async_work</code></a>, the <code>complete</code> callback
@@ -5023,7 +5039,7 @@ callback invocation, even when it was cancelled.</p>
                                    napi_async_execute_callback execute,
                                    napi_async_complete_callback complete,
                                    <span class="hljs-type">void</span>* data,
-                                   napi_async_work* result)</span>;</code></pre>
+                                   napi_async_work* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] async_resource</code>: An optional object associated with the async work
@@ -5057,7 +5073,7 @@ the <a href="async_hooks.html#type"><code>async_hooks</code> documentation</a> f
 <span>N-API version: 1</span>
 </div>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_delete_async_work</span><span class="hljs-params">(napi_env env,
-                                   napi_async_work work)</span>;</code></pre>
+                                   napi_async_work work)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] work</code>: The handle returned by the call to <code>napi_create_async_work</code>.</li>
@@ -5071,7 +5087,7 @@ the <a href="async_hooks.html#type"><code>async_hooks</code> documentation</a> f
 <span>N-API version: 1</span>
 </div>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_queue_async_work</span><span class="hljs-params">(napi_env env,
-                                  napi_async_work work)</span>;</code></pre>
+                                  napi_async_work work)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] work</code>: The handle returned by the call to <code>napi_create_async_work</code>.</li>
@@ -5086,7 +5102,7 @@ with the same <code>napi_async_work</code> item or the result will be undefined.
 <span>N-API version: 1</span>
 </div>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_cancel_async_work</span><span class="hljs-params">(napi_env env,
-                                   napi_async_work work)</span>;</code></pre>
+                                   napi_async_work work)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] work</code>: The handle returned by the call to <code>napi_create_async_work</code>.</li>
@@ -5112,7 +5128,7 @@ the runtime.</p>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_async_init</span><span class="hljs-params">(napi_env env,
                             napi_value async_resource,
                             napi_value async_resource_name,
-                            napi_async_context* result)</span></code></pre>
+                            napi_async_context* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] async_resource</code>: Object associated with the async work
@@ -5144,7 +5160,7 @@ the linkage between async callbacks.</p>
 <span>N-API version: 1</span>
 </div>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_async_destroy</span><span class="hljs-params">(napi_env env,
-                               napi_async_context async_context)</span>;</code></pre>
+                               napi_async_context async_context)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] async_context</code>: The async context to be destroyed.</li>
@@ -5170,7 +5186,7 @@ the linkage between async callbacks.</p>
                                            napi_value func,
                                            <span class="hljs-type">size_t</span> argc,
                                            <span class="hljs-type">const</span> napi_value* argv,
-                                           napi_value* result)</span>;</code></pre>
+                                           napi_value* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] async_context</code>: Context for the async operation that is
@@ -5210,7 +5226,7 @@ JavaScript during the callback are ran before returning back to C/C++.</p>
 <pre><code class="language-c">NAPI_EXTERN napi_status <span class="hljs-title function_">napi_open_callback_scope</span><span class="hljs-params">(napi_env env,
                                                  napi_value resource_object,
                                                  napi_async_context context,
-                                                 napi_callback_scope* result)</span></code></pre>
+                                                 napi_callback_scope* result)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] resource_object</code>: An object associated with the async work
@@ -5233,7 +5249,7 @@ the required scope.</p>
 <span>N-API version: 3</span>
 </div>
 <pre><code class="language-c">NAPI_EXTERN napi_status <span class="hljs-title function_">napi_close_callback_scope</span><span class="hljs-params">(napi_env env,
-                                                  napi_callback_scope scope)</span></code></pre>
+                                                  napi_callback_scope scope)</span></code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] scope</code>: The scope to be closed.</li>
@@ -5253,7 +5269,7 @@ the required scope.</p>
 } napi_node_version;
 
 napi_status <span class="hljs-title function_">napi_get_node_version</span><span class="hljs-params">(napi_env env,
-                                  <span class="hljs-type">const</span> napi_node_version** version)</span>;</code></pre>
+                                  <span class="hljs-type">const</span> napi_node_version** version)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[out] version</code>: A pointer to version information for Node.js itself.</li>
@@ -5269,7 +5285,7 @@ value of <a href="process.html#processrelease"><code>process.release.name</code>
 <span>N-API version: 1</span>
 </div>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_get_version</span><span class="hljs-params">(napi_env env,
-                             <span class="hljs-type">uint32_t</span>* result)</span>;</code></pre>
+                             <span class="hljs-type">uint32_t</span>* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[out] result</code>: The highest version of Node-API supported.</li>
@@ -5297,7 +5313,7 @@ that does not use the function.</li>
 </div>
 <pre><code class="language-c">NAPI_EXTERN napi_status <span class="hljs-title function_">napi_adjust_external_memory</span><span class="hljs-params">(napi_env env,
                                                     <span class="hljs-type">int64_t</span> change_in_bytes,
-                                                    <span class="hljs-type">int64_t</span>* result)</span>;</code></pre>
+                                                    <span class="hljs-type">int64_t</span>* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] change_in_bytes</code>: The change in externally allocated memory that is kept
@@ -5333,7 +5349,7 @@ status = napi_create_promise(env, &#x26;deferred, &#x26;promise);
 do_something_asynchronous(deferred);
 
 <span class="hljs-comment">// Return the promise to JS</span>
-<span class="hljs-keyword">return</span> promise;</code></pre>
+<span class="hljs-keyword">return</span> promise;</code> <button class="copy-button">copy</button></pre>
 <p>The above function <code>do_something_asynchronous()</code> would perform its asynchronous
 action and then it would resolve or reject the deferred, thereby concluding the
 promise and freeing the deferred:</p>
@@ -5355,7 +5371,7 @@ status = napi_get_undefined(env, &#x26;undefined);
 <span class="hljs-keyword">if</span> (status != napi_ok) <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;
 
 <span class="hljs-comment">// At this point the deferred has been freed, so we should assign NULL to it.</span>
-deferred = <span class="hljs-literal">NULL</span>;</code></pre>
+deferred = <span class="hljs-literal">NULL</span>;</code> <button class="copy-button">copy</button></pre>
 <h4><code>napi_create_promise</code><span><a class="mark" href="#napi_create_promise" id="napi_create_promise">#</a></span><a aria-hidden="true" class="legacy" id="n_api_napi_create_promise"></a></h4>
 <div class="api_metadata">
 <span>Added in: v8.5.0</span>
@@ -5363,7 +5379,7 @@ deferred = <span class="hljs-literal">NULL</span>;</code></pre>
 </div>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_create_promise</span><span class="hljs-params">(napi_env env,
                                 napi_deferred* deferred,
-                                napi_value* promise)</span>;</code></pre>
+                                napi_value* promise)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[out] deferred</code>: A newly created deferred object which can later be passed to
@@ -5380,7 +5396,7 @@ the associated promise.</li>
 </div>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_resolve_deferred</span><span class="hljs-params">(napi_env env,
                                   napi_deferred deferred,
-                                  napi_value resolution)</span>;</code></pre>
+                                  napi_value resolution)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] deferred</code>: The deferred object whose associated promise to resolve.</li>
@@ -5400,7 +5416,7 @@ have been retained in order to be passed to this API.</p>
 </div>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_reject_deferred</span><span class="hljs-params">(napi_env env,
                                  napi_deferred deferred,
-                                 napi_value rejection)</span>;</code></pre>
+                                 napi_value rejection)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] deferred</code>: The deferred object whose associated promise to resolve.</li>
@@ -5420,7 +5436,7 @@ have been retained in order to be passed to this API.</p>
 </div>
 <pre><code class="language-c">napi_status <span class="hljs-title function_">napi_is_promise</span><span class="hljs-params">(napi_env env,
                             napi_value value,
-                            <span class="hljs-type">bool</span>* is_promise)</span>;</code></pre>
+                            <span class="hljs-type">bool</span>* is_promise)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] value</code>: The value to examine</li>
@@ -5437,7 +5453,7 @@ underlying JavaScript engine.</p>
 </div>
 <pre><code class="language-c">NAPI_EXTERN napi_status <span class="hljs-title function_">napi_run_script</span><span class="hljs-params">(napi_env env,
                                         napi_value script,
-                                        napi_value* result)</span>;</code></pre>
+                                        napi_value* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] script</code>: A JavaScript string containing the script to execute.</li>
@@ -5465,7 +5481,7 @@ a specific <code>napi_env</code>.</p>
 <span>N-API version: 2</span>
 </div>
 <pre><code class="language-c">NAPI_EXTERN napi_status <span class="hljs-title function_">napi_get_uv_event_loop</span><span class="hljs-params">(napi_env env,
-                                               <span class="hljs-keyword">struct</span> uv_loop_s** loop)</span>;</code></pre>
+                                               <span class="hljs-keyword">struct</span> uv_loop_s** loop)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[out] loop</code>: The current libuv loop instance.</li>
@@ -5598,7 +5614,7 @@ being destroyed.</p>
                                 napi_finalize thread_finalize_cb,
                                 <span class="hljs-type">void</span>* context,
                                 napi_threadsafe_function_call_js call_js_cb,
-                                napi_threadsafe_function* result)</span>;</code></pre>
+                                napi_threadsafe_function* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] func</code>: An optional JavaScript function to call from another thread. It
@@ -5631,7 +5647,7 @@ parameters and with <code>undefined</code> as its <code>this</code> value.
 </div>
 <pre><code class="language-c">NAPI_EXTERN napi_status
 <span class="hljs-title function_">napi_get_threadsafe_function_context</span><span class="hljs-params">(napi_threadsafe_function func,
-                                     <span class="hljs-type">void</span>** result)</span>;</code></pre>
+                                     <span class="hljs-type">void</span>** result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] func</code>: The thread-safe function for which to retrieve the context.</li>
 <li><code>[out] result</code>: The location where to store the context.</li>
@@ -5655,7 +5671,7 @@ parameters and with <code>undefined</code> as its <code>this</code> value.
 <pre><code class="language-c">NAPI_EXTERN napi_status
 <span class="hljs-title function_">napi_call_threadsafe_function</span><span class="hljs-params">(napi_threadsafe_function func,
                               <span class="hljs-type">void</span>* data,
-                              napi_threadsafe_function_call_mode is_blocking)</span>;</code></pre>
+                              napi_threadsafe_function_call_mode is_blocking)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] func</code>: The asynchronous thread-safe JavaScript function to invoke.</li>
 <li><code>[in] data</code>: Data to send into JavaScript via the callback <code>call_js_cb</code>
@@ -5678,7 +5694,7 @@ added to the queue if the API returns <code>napi_ok</code>.</p>
 <span>N-API version: 4</span>
 </div>
 <pre><code class="language-c">NAPI_EXTERN napi_status
-<span class="hljs-title function_">napi_acquire_threadsafe_function</span><span class="hljs-params">(napi_threadsafe_function func)</span>;</code></pre>
+<span class="hljs-title function_">napi_acquire_threadsafe_function</span><span class="hljs-params">(napi_threadsafe_function func)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] func</code>: The asynchronous thread-safe JavaScript function to start making
 use of.</li>
@@ -5695,7 +5711,7 @@ it.</p>
 </div>
 <pre><code class="language-c">NAPI_EXTERN napi_status
 <span class="hljs-title function_">napi_release_threadsafe_function</span><span class="hljs-params">(napi_threadsafe_function func,
-                                 napi_threadsafe_function_release_mode mode)</span>;</code></pre>
+                                 napi_threadsafe_function_release_mode mode)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] func</code>: The asynchronous thread-safe JavaScript function whose reference
 count to decrement.</li>
@@ -5717,7 +5733,7 @@ to any thread-safe APIs after having called this API has undefined results, as
 <span>N-API version: 4</span>
 </div>
 <pre><code class="language-c">NAPI_EXTERN napi_status
-<span class="hljs-title function_">napi_ref_threadsafe_function</span><span class="hljs-params">(napi_env env, napi_threadsafe_function func)</span>;</code></pre>
+<span class="hljs-title function_">napi_ref_threadsafe_function</span><span class="hljs-params">(napi_env env, napi_threadsafe_function func)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] func</code>: The thread-safe function to reference.</li>
@@ -5736,7 +5752,7 @@ being destroyed. <code>napi_acquire_threadsafe_function</code> and
 <span>N-API version: 4</span>
 </div>
 <pre><code class="language-c">NAPI_EXTERN napi_status
-<span class="hljs-title function_">napi_unref_threadsafe_function</span><span class="hljs-params">(napi_env env, napi_threadsafe_function func)</span>;</code></pre>
+<span class="hljs-title function_">napi_unref_threadsafe_function</span><span class="hljs-params">(napi_env env, napi_threadsafe_function func)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[in] func</code>: The thread-safe function to unreference.</li>
@@ -5753,7 +5769,7 @@ idempotent.</p>
 <p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
 <pre><code class="language-c">NAPI_EXTERN napi_status
 <span class="hljs-title function_">node_api_get_module_file_name</span><span class="hljs-params">(napi_env env, <span class="hljs-type">const</span> <span class="hljs-type">char</span>** result)</span>;
-</code></pre>
+</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
 <li><code>[out] result</code>: A URL containing the absolute path of the

@@ -324,6 +324,7 @@
                                          'lib/string_decoder.js',
                                          'lib/sys.js',
                                          'lib/test.js',
+                                         'lib/test/reporters.js',
                                          'lib/timers.js',
                                          'lib/timers/promises.js',
                                          'lib/tls.js',

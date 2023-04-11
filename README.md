@@ -5,13 +5,13 @@ This is a *fun* mod of Node.JS that initially embedded a modified version of dco
 
 Thanks to the inspiration from dcodeIO et al =D
 
-## Version 19.8.1
-Update to Node.JS 19.8.1 baseline, and TypeScript 5.0.2.
+## Version 19.9.0
+Update to Node.JS 19.9.0 baseline, and TypeScript 5.0.4.
 
 It embeds:
 * DS v1.2.1.
 * CS v2.7.0.
-* TS v5.0.2.
+* TS v5.0.4.
 * Refer to prior readmes for old changes.
 
 ## Usage
@@ -319,6 +319,8 @@ For information about the governance of the Node.js project, see
 
 ### TSC (Technical Steering Committee)
 
+#### TSC voting members
+
 <!--lint disable prohibited-strings-->
 
 * [aduh95](https://github.com/aduh95) -
@@ -329,14 +331,10 @@ For information about the governance of the Node.js project, see
   **Beth Griggs** <<bethanyngriggs@gmail.com>> (she/her)
 * [BridgeAR](https://github.com/BridgeAR) -
   **Ruben Bridgewater** <<ruben@bridgewater.de>> (he/him)
-* [ChALkeR](https://github.com/ChALkeR) -
-  **Сковорода Никита Андреевич** <<chalkerx@gmail.com>> (he/him)
 * [cjihrig](https://github.com/cjihrig) -
   **Colin Ihrig** <<cjihrig@gmail.com>> (he/him)
 * [danielleadams](https://github.com/danielleadams) -
   **Danielle Adams** <<adamzdanielle@gmail.com>> (she/her)
-* [fhinkel](https://github.com/fhinkel) -
-  **Franziska Hinkelmann** <<franziska.hinkelmann@gmail.com>> (she/her)
 * [GeoffreyBooth](https://github.com/geoffreybooth) -
   **Geoffrey Booth** <<webadmin@geoffreybooth.com>> (he/him)
 * [gireeshpunathil](https://github.com/gireeshpunathil) -
@@ -366,28 +364,43 @@ For information about the governance of the Node.js project, see
 * [Trott](https://github.com/Trott) -
   **Rich Trott** <<rtrott@gmail.com>> (he/him)
 
-<details>
-
-<summary>Emeriti</summary>
-
-### TSC emeriti
+#### TSC regular members
 
 * [addaleax](https://github.com/addaleax) -
   **Anna Henningsen** <<anna@addaleax.net>> (she/her)
 * [bnoordhuis](https://github.com/bnoordhuis) -
   **Ben Noordhuis** <<info@bnoordhuis.nl>>
-* [chrisdickinson](https://github.com/chrisdickinson) -
-  **Chris Dickinson** <<christopher.s.dickinson@gmail.com>>
+* [ChALkeR](https://github.com/ChALkeR) -
+  **Сковорода Никита Андреевич** <<chalkerx@gmail.com>> (he/him)
 * [codebytere](https://github.com/codebytere) -
   **Shelley Vohr** <<shelley.vohr@gmail.com>> (she/her)
 * [danbev](https://github.com/danbev) -
   **Daniel Bevenius** <<daniel.bevenius@gmail.com>> (he/him)
+* [fhinkel](https://github.com/fhinkel) -
+  **Franziska Hinkelmann** <<franziska.hinkelmann@gmail.com>> (she/her)
+* [gabrielschulhof](https://github.com/gabrielschulhof) -
+  **Gabriel Schulhof** <<gabrielschulhof@gmail.com>>
+* [mscdex](https://github.com/mscdex) -
+  **Brian White** <<mscdex@mscdex.net>>
+* [MylesBorins](https://github.com/MylesBorins) -
+  **Myles Borins** <<myles.borins@gmail.com>> (he/him)
+* [rvagg](https://github.com/rvagg) -
+  **Rod Vagg** <<r@va.gg>>
+* [TimothyGu](https://github.com/TimothyGu) -
+  **Tiancheng "Timothy" Gu** <<timothygu99@gmail.com>> (he/him)
+
+<details>
+
+<summary>TSC emeriti members</summary>
+
+#### TSC emeriti members
+
+* [chrisdickinson](https://github.com/chrisdickinson) -
+  **Chris Dickinson** <<christopher.s.dickinson@gmail.com>>
 * [evanlucas](https://github.com/evanlucas) -
   **Evan Lucas** <<evanlucas@me.com>> (he/him)
 * [Fishrock123](https://github.com/Fishrock123) -
   **Jeremiah Senkpiel** <<fishrock123@rocketmail.com>> (he/they)
-* [gabrielschulhof](https://github.com/gabrielschulhof) -
-  **Gabriel Schulhof** <<gabrielschulhof@gmail.com>>
 * [gibfahn](https://github.com/gibfahn) -
   **Gibson Fahnestock** <<gibfahn@gmail.com>> (he/him)
 * [indutny](https://github.com/indutny) -
@@ -398,10 +411,6 @@ For information about the governance of the Node.js project, see
   **Josh Gavant** <<josh.gavant@outlook.com>>
 * [mmarchini](https://github.com/mmarchini) -
   **Mary Marchini** <<oss@mmarchini.me>> (she/her)
-* [mscdex](https://github.com/mscdex) -
-  **Brian White** <<mscdex@mscdex.net>>
-* [MylesBorins](https://github.com/MylesBorins) -
-  **Myles Borins** <<myles.borins@gmail.com>> (he/him)
 * [nebrius](https://github.com/nebrius) -
   **Bryan Hughes** <<bryan@nebri.us>>
 * [ofrobots](https://github.com/ofrobots) -
@@ -410,16 +419,12 @@ For information about the governance of the Node.js project, see
   **Alexis Campailla** <<orangemocha@nodejs.org>>
 * [piscisaureus](https://github.com/piscisaureus) -
   **Bert Belder** <<bertbelder@gmail.com>>
-* [rvagg](https://github.com/rvagg) -
-  **Rod Vagg** <<r@va.gg>>
 * [sam-github](https://github.com/sam-github) -
   **Sam Roberts** <<vieuxtech@gmail.com>>
 * [shigeki](https://github.com/shigeki) -
   **Shigeki Ohtsu** <<ohtsu@ohtsu.org>> (he/him)
 * [thefourtheye](https://github.com/thefourtheye) -
   **Sakthipriyan Vairamani** <<thechargingvolcano@gmail.com>> (he/him)
-* [TimothyGu](https://github.com/TimothyGu) -
-  **Tiancheng "Timothy" Gu** <<timothygu99@gmail.com>> (he/him)
 * [trevnorris](https://github.com/trevnorris) -
   **Trevor Norris** <<trev.norris@gmail.com>>
 
@@ -962,8 +967,6 @@ releases on a rotation basis as outlined in the
 * Datadog
   * [bengl](https://github.com/bengl) -
     **Bryan English** <<bryan@bryanenglish.com>> (he/him)
-  * [vdeturckheim](https://github.com/vdeturckheim) -
-    **Vladimir de Turckheim** <<vlad2t@hotmail.com>> (he/him)
 * NearForm
   * [RafaelGSS](https://github.com/RafaelGSS) -
     **Rafael Gonzaga** <<rafael.nunu@hotmail.com>> (he/him)
