@@ -1077,7 +1077,7 @@ std::unique_ptr<DataQueue::Entry> DataQueue::CreateInMemoryEntryFromView(
   auto store = view->Buffer()->GetBackingStore();
   auto offset = view->ByteOffset();
   auto length = view->ByteLength();
-  view->Buffer()->Detach();
+  USE(view->Buffer()->Detach(Local<Value>()));
   return CreateInMemoryEntryFromBackingStore(std::move(store), offset, length);
 }
 

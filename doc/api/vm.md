@@ -347,7 +347,9 @@ console.log(globalVar);
 ### `script.sourceMapURL`
 
 <!-- YAML
-added: v19.1.0
+added:
+  - v19.1.0
+  - v18.13.0
 -->
 
 * {string|undefined}
@@ -966,6 +968,7 @@ added: v10.10.0
 changes:
   - version:
     - v19.6.0
+    - v18.15.0
     pr-url: https://github.com/nodejs/node/pull/46320
     description: The return value now includes `cachedDataRejected`
                  with the same semantics as the `vm.Script` version

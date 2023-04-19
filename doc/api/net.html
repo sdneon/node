@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v19.9.0">
-  <title>Net | Node.js v19.9.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v20.0.0">
+  <title>Net | Node.js v20.0.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -96,7 +96,7 @@
     <div id="column1" data-id="net" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v19.9.0 documentation</h1>
+          <h1>Node.js v20.0.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -111,7 +111,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v19.9.0</li>
+            <li class="pinned-header">Node.js v20.0.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -513,7 +513,7 @@
 
 <!--lint disable maximum-line-length-->
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v19.9.0/lib/net.js">lib/net.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v20.0.0/lib/net.js">lib/net.js</a></p>
 <p>The <code>node:net</code> module provides an asynchronous network API for creating stream-based
 TCP or <a href="#ipc-support">IPC</a> servers (<a href="#netcreateserveroptions-connectionlistener"><code>net.createServer()</code></a>) and clients
 (<a href="#netcreateconnection"><code>net.createConnection()</code></a>).</p>
@@ -1218,9 +1218,11 @@ behavior.</p>
 <details class="changelog"><summary>History</summary>
 <table>
 <tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v20.0.0</td>
+<td><p>The default value for the autoSelectFamily option is now true. The <code>--enable-network-family-autoselection</code> CLI flag has been renamed to <code>--network-family-autoselection</code>. The old name is now an alias but it is discouraged.</p></td></tr>
 <tr><td>v19.4.0</td>
 <td><p>The default value for autoSelectFamily option can be changed at runtime using <code>setDefaultAutoSelectFamily</code> or via the command line option <code>--enable-network-family-autoselection</code>.</p></td></tr>
-<tr><td>v19.3.0</td>
+<tr><td>v19.3.0, v18.13.0</td>
 <td><p>Added the <code>autoSelectFamily</code> option.</p></td></tr>
 <tr><td>v17.7.0, v16.15.0</td>
 <td><p>The <code>noDelay</code>, <code>keepAlive</code>, and <code>keepAliveInitialDelay</code> options are supported now.</p></td></tr>
@@ -1272,12 +1274,12 @@ Each connection attempt is given the amount of time specified by the <code>autoS
 option before timing out and trying the next address.
 Ignored if the <code>family</code> option is not <code>0</code> or if <code>localAddress</code> is set.
 Connection errors are not emitted if at least one connection succeeds.
-<strong>Default:</strong> initially <code>false</code>, but it can be changed at runtime using <a href="#netsetdefaultautoselectfamilyvalue"><code>net.setDefaultAutoSelectFamily(value)</code></a>
-or via the command line option <code>--enable-network-family-autoselection</code>.</li>
+If all connections attempts fails, a single <code>AggregateError</code> with all failed attempts is emitted.
+<strong>Default:</strong> <a href="#netgetdefaultautoselectfamily"><code>net.getDefaultAutoSelectFamily()</code></a></li>
 <li><code>autoSelectFamilyAttemptTimeout</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a>: The amount of time in milliseconds to wait
 for a connection attempt to finish before trying the next address when using the <code>autoSelectFamily</code> option.
 If set to a positive integer less than <code>10</code>, then the value <code>10</code> will be used instead.
-<strong>Default:</strong> initially <code>250</code>, but it can be changed at runtime using <a href="#netsetdefaultautoselectfamilyattempttimeoutvalue"><code>net.setDefaultAutoSelectFamilyAttemptTimeout(value)</code></a></li>
+<strong>Default:</strong> <a href="#netgetdefaultautoselectfamilyattempttimeout"><code>net.getDefaultAutoSelectFamilyAttemptTimeout()</code></a></li>
 </ul>
 <p>For <a href="#ipc-support">IPC</a> connections, available <code>options</code> are:</p>
 <ul>
@@ -1852,7 +1854,9 @@ server.<span class="hljs-title function_">listen</span>(<span class="hljs-number
 <div class="api_metadata">
 <span>Added in: v19.4.0</span>
 </div>
-<p>Gets the current default value of the <code>autoSelectFamily</code> option of <a href="#socketconnectoptions-connectlistener"><code>socket.connect(options)</code></a>.</p>
+<p>Gets the current default value of the <code>autoSelectFamily</code> option of <a href="#socketconnectoptions-connectlistener"><code>socket.connect(options)</code></a>.
+The initial default value is <code>true</code>, unless the command line option
+<code>--no-network-family-autoselection</code> is provided.</p>
 <ul>
 <li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> The current default value of the <code>autoSelectFamily</code> option.</li>
 </ul>
@@ -1868,7 +1872,8 @@ server.<span class="hljs-title function_">listen</span>(<span class="hljs-number
 <div class="api_metadata">
 <span>Added in: v19.8.0</span>
 </div>
-<p>Gets the current default value of the <code>autoSelectFamilyAttemptTimeout</code> option of <a href="#socketconnectoptions-connectlistener"><code>socket.connect(options)</code></a>.</p>
+<p>Gets the current default value of the <code>autoSelectFamilyAttemptTimeout</code> option of <a href="#socketconnectoptions-connectlistener"><code>socket.connect(options)</code></a>.
+The initial default value is <code>250</code>.</p>
 <ul>
 <li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The current default value of the <code>autoSelectFamilyAttemptTimeout</code> option.</li>
 </ul>

@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v19.9.0">
-  <title>Single executable applications | Node.js v19.9.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v20.0.0">
+  <title>Single executable applications | Node.js v20.0.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -96,7 +96,7 @@
     <div id="column1" data-id="single-executable-applications" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v19.9.0 documentation</h1>
+          <h1>Node.js v20.0.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -111,7 +111,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v19.9.0</li>
+            <li class="pinned-header">Node.js v20.0.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -122,6 +122,7 @@
       <div class="picker"><div class="toc"><ul>
 <li><span class="stability_1"><a href="#single-executable-applications">Single executable applications</a></span>
 <ul>
+<li><a href="#generating-single-executable-preparation-blobs">Generating single executable preparation blobs</a></li>
 <li><a href="#notes">Notes</a>
 <ul>
 <li><a href="#requireid-in-the-injected-module-is-not-file-based"><code>require(id)</code> in the injected module is not file based</a></li>
@@ -256,6 +257,7 @@
       <details id="toc" open><summary>Table of contents</summary><ul>
 <li><span class="stability_1"><a href="#single-executable-applications">Single executable applications</a></span>
 <ul>
+<li><a href="#generating-single-executable-preparation-blobs">Generating single executable preparation blobs</a></li>
 <li><a href="#notes">Notes</a>
 <ul>
 <li><a href="#requireid-in-the-injected-module-is-not-file-based"><code>require(id)</code> in the injected module is not file based</a></li>
@@ -273,23 +275,35 @@
         <h2>Single executable applications<span><a class="mark" href="#single-executable-applications" id="single-executable-applications">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_single_executable_applications"></a></h2>
 
 <p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental: This feature is being designed and will change.</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v19.9.0/lib/internal/main/single_executable_application.js">lib/internal/main/single_executable_application.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v20.0.0/lib/internal/main/single_executable_application.js">lib/internal/main/single_executable_application.js</a></p>
 <p>This feature allows the distribution of a Node.js application conveniently to a
 system that does not have Node.js installed.</p>
 <p>Node.js supports the creation of <a href="https://github.com/nodejs/single-executable">single executable applications</a> by allowing
-the injection of a JavaScript file into the <code>node</code> binary. During start up, the
-program checks if anything has been injected. If the script is found, it
-executes its contents. Otherwise Node.js operates as it normally does.</p>
-<p>The single executable application feature only supports running a single
-embedded <a href="modules.html#modules-commonjs-modules">CommonJS</a> file.</p>
-<p>A bundled JavaScript file can be turned into a single executable application
-with any tool which can inject resources into the <code>node</code> binary.</p>
+the injection of a blob prepared by Node.js, which can contain a bundled script,
+into the <code>node</code> binary. During start up, the program checks if anything has been
+injected. If the blob is found, it executes the script in the blob. Otherwise
+Node.js operates as it normally does.</p>
+<p>The single executable application feature currently only supports running a
+single embedded script using the <a href="modules.html#modules-commonjs-modules">CommonJS</a> module system.</p>
+<p>Users can create a single executable application from their bundled script
+with the <code>node</code> binary itself and any tool which can inject resources into the
+binary.</p>
 <p>Here are the steps for creating a single executable application using one such
 tool, <a href="https://github.com/nodejs/postject">postject</a>:</p>
 <ol>
 <li>
 <p>Create a JavaScript file:</p>
 <pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash"><span class="hljs-built_in">echo</span> <span class="hljs-string">'console.log(`Hello, ${process.argv[2]}!`);'</span> > hello.js</span></code> <button class="copy-button">copy</button></pre>
+</li>
+<li>
+<p>Create a configuration file building a blob that can be injected into the
+single executable application (see
+<a href="#generating-single-executable-preparation-blobs">Generating single executable preparation blobs</a> for details):</p>
+<pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash"><span class="hljs-built_in">echo</span> <span class="hljs-string">'{ "main": "hello.js", "output": "sea-prep.blob" }'</span> > sea-config.json</span></code> <button class="copy-button">copy</button></pre>
+</li>
+<li>
+<p>Generate the blob to be injected:</p>
+<pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">node --experimental-sea-config sea-config.json</span></code> <button class="copy-button">copy</button></pre>
 </li>
 <li>
 <p>Create a copy of the <code>node</code> executable and name it according to your needs:</p>
@@ -309,31 +323,31 @@ skipped, ignore any signature-related warning from postject.</p>
 <pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">signtool remove /s hello</span></code> <button class="copy-button">copy</button></pre>
 </li>
 <li>
-<p>Inject the JavaScript file into the copied binary by running <code>postject</code> with
+<p>Inject the blob into the copied binary by running <code>postject</code> with
 the following options:</p>
 <ul>
 <li><code>hello</code> - The name of the copy of the <code>node</code> executable created in step 2.</li>
-<li><code>NODE_JS_CODE</code> - The name of the resource / note / section in the binary
-where the contents of the JavaScript file will be stored.</li>
-<li><code>hello.js</code> - The name of the JavaScript file created in step 1.</li>
-<li><code>--sentinel-fuse NODE_JS_FUSE_fce680ab2cc467b6e072b8b5df1996b2</code> - The
+<li><code>NODE_SEA_BLOB</code> - The name of the resource / note / section in the binary
+where the contents of the blob will be stored.</li>
+<li><code>sea-prep.blob</code> - The name of the blob created in step 1.</li>
+<li><code>--sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2</code> - The
 <a href="https://www.electronjs.org/docs/latest/tutorial/fuses">fuse</a> used by the Node.js project to detect if a file has been injected.</li>
-<li><code>--macho-segment-name NODE_JS</code> (only needed on macOS) - The name of the
-segment in the binary where the contents of the JavaScript file will be
+<li><code>--macho-segment-name NODE_SEA</code> (only needed on macOS) - The name of the
+segment in the binary where the contents of the blob will be
 stored.</li>
 </ul>
 <p>To summarize, here is the required command for each platform:</p>
 <ul>
 <li>
 <p>On systems other than macOS:</p>
-<pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">npx postject hello NODE_JS_CODE hello.js \
-    --sentinel-fuse NODE_JS_FUSE_fce680ab2cc467b6e072b8b5df1996b2</span></code> <button class="copy-button">copy</button></pre>
+<pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">npx postject hello NODE_SEA_BLOB sea-prep.blob \
+    --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2</span></code> <button class="copy-button">copy</button></pre>
 </li>
 <li>
 <p>On macOS:</p>
-<pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">npx postject hello NODE_JS_CODE hello.js \
-    --sentinel-fuse NODE_JS_FUSE_fce680ab2cc467b6e072b8b5df1996b2 \
-    --macho-segment-name NODE_JS</span></code> <button class="copy-button">copy</button></pre>
+<pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">npx postject hello NODE_SEA_BLOB sea-prep.blob \
+    --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2 \
+    --macho-segment-name NODE_SEA</span></code> <button class="copy-button">copy</button></pre>
 </li>
 </ul>
 </li>
@@ -356,7 +370,21 @@ binary would still be runnable.</p>
 Hello, world!</code> <button class="copy-button">copy</button></pre>
 </li>
 </ol>
-<section><h3>Notes<span><a class="mark" href="#notes" id="notes">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_notes"></a></h3>
+<section><h3>Generating single executable preparation blobs<span><a class="mark" href="#generating-single-executable-preparation-blobs" id="generating-single-executable-preparation-blobs">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_generating_single_executable_preparation_blobs"></a></h3>
+<p>Single executable preparation blobs that are injected into the application can
+be generated using the <code>--experimental-sea-config</code> flag of the Node.js binary
+that will be used to build the single executable. It takes a path to a
+configuration file in JSON format. If the path passed to it isn't absolute,
+Node.js will use the path relative to the current working directory.</p>
+<p>The configuration currently reads the following top-level fields:</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"main"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/path/to/bundled/script.js"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"output"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/path/to/write/the/generated/blob.blob"</span>
+<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
+<p>If the paths are not absolute, Node.js will use the path relative to the
+current working directory. The version of the Node.js binary used to produce
+the blob must be the same as the one to which the blob will be injected.</p>
+</section><section><h3>Notes<span><a class="mark" href="#notes" id="notes">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_notes"></a></h3>
 <h4><code>require(id)</code> in the injected module is not file based<span><a class="mark" href="#requireid-in-the-injected-module-is-not-file-based" id="requireid-in-the-injected-module-is-not-file-based">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_require_id_in_the_injected_module_is_not_file_based"></a></h4>
 <p><code>require()</code> in the injected module is not the same as the <a href="modules.html#requireid"><code>require()</code></a>
 available to modules that are not injected. It also does not have any of the
@@ -377,15 +405,16 @@ equal to <a href="process.html#processexecpath"><code>process.execPath</code></a
 of <a href="process.html#processexecpath"><code>process.execPath</code></a>.</p>
 <h4>Single executable application creation process<span><a class="mark" href="#single-executable-application-creation-process" id="single-executable-application-creation-process">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_single_executable_application_creation_process"></a></h4>
 <p>A tool aiming to create a single executable Node.js application must
-inject the contents of a JavaScript file into:</p>
+inject the contents of the blob prepared with <code>--experimental-sea-config"</code>
+into:</p>
 <ul>
-<li>a resource named <code>NODE_JS_CODE</code> if the <code>node</code> binary is a <a href="https://en.wikipedia.org/wiki/Portable_Executable">PE</a> file</li>
-<li>a section named <code>NODE_JS_CODE</code> in the <code>NODE_JS</code> segment if the <code>node</code> binary
+<li>a resource named <code>NODE_SEA_BLOB</code> if the <code>node</code> binary is a <a href="https://en.wikipedia.org/wiki/Portable_Executable">PE</a> file</li>
+<li>a section named <code>NODE_SEA_BLOB</code> in the <code>NODE_SEA</code> segment if the <code>node</code> binary
 is a <a href="https://en.wikipedia.org/wiki/Mach-O">Mach-O</a> file</li>
-<li>a note named <code>NODE_JS_CODE</code> if the <code>node</code> binary is an <a href="https://en.wikipedia.org/wiki/Executable_and_Linkable_Format">ELF</a> file</li>
+<li>a note named <code>NODE_SEA_BLOB</code> if the <code>node</code> binary is an <a href="https://en.wikipedia.org/wiki/Executable_and_Linkable_Format">ELF</a> file</li>
 </ul>
 <p>Search the binary for the
-<code>NODE_JS_FUSE_fce680ab2cc467b6e072b8b5df1996b2:0</code> <a href="https://www.electronjs.org/docs/latest/tutorial/fuses">fuse</a> string and flip the
+<code>NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2:0</code> <a href="https://www.electronjs.org/docs/latest/tutorial/fuses">fuse</a> string and flip the
 last character to <code>1</code> to indicate that a resource has been injected.</p>
 <h4>Platform support<span><a class="mark" href="#platform-support" id="platform-support">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_platform_support"></a></h4>
 <p>Single-executable support is tested regularly on CI only on the following

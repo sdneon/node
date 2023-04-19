@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v19.9.0">
-  <title>Permissions | Node.js v19.9.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v20.0.0">
+  <title>Permissions | Node.js v20.0.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -96,7 +96,7 @@
     <div id="column1" data-id="permissions" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v19.9.0 documentation</h1>
+          <h1>Node.js v20.0.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -111,7 +111,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v19.9.0</li>
+            <li class="pinned-header">Node.js v20.0.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -143,6 +143,20 @@
 <li><a href="#example-import-maps-emulation">Example: [import maps][] emulation</a></li>
 </ul>
 </li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#process-based-permissions">Process-based permissions</a>
+<ul>
+<li><span class="stability_1"><a href="#permission-model">Permission Model</a></span>
+<ul>
+<li><a href="#runtime-api">Runtime API</a>
+<ul>
+<li><a href="#permissionhasscope-parameters"><code>permission.has(scope ,parameters)</code></a></li>
+</ul>
+</li>
+<li><a href="#file-system-permissions">File System Permissions</a></li>
 </ul>
 </li>
 </ul>
@@ -305,6 +319,20 @@
 </li>
 </ul>
 </li>
+<li><a href="#process-based-permissions">Process-based permissions</a>
+<ul>
+<li><span class="stability_1"><a href="#permission-model">Permission Model</a></span>
+<ul>
+<li><a href="#runtime-api">Runtime API</a>
+<ul>
+<li><a href="#permissionhasscope-parameters"><code>permission.has(scope ,parameters)</code></a></li>
+</ul>
+</li>
+<li><a href="#file-system-permissions">File System Permissions</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul></details>
@@ -316,10 +344,19 @@ Node.js process has access to or what actions the process can take
 with those resources. Permissions can also control what modules can
 be accessed by other modules.</p>
 <ul>
-<li><a href="#module-based-permissions">Module-based permissions</a> control which files
+<li>
+<p><a href="#module-based-permissions">Module-based permissions</a> control which files
 or URLs are available to other modules during application execution.
 This can be used to control what modules can be accessed by third-party
-dependencies, for example.</li>
+dependencies, for example.</p>
+</li>
+<li>
+<p><a href="#process-based-permissions">Process-based permissions</a> control the Node.js
+process's access to resources.
+The resource can be entirely allowed or denied, or actions related to it can
+be controlled. For example, file system reads can be allowed while denying
+writes.</p>
+</li>
 </ul>
 <p>If you find a potential security vulnerability, please refer to our
 <a href="https://github.com/nodejs/node/blob/main/SECURITY.md">Security Policy</a>.</p>
@@ -650,7 +687,84 @@ partially match a <code>data:</code> or <code>blob:</code> URL by partitioning t
 character, policies intentionally cannot. For <code>blob:</code> URLs import map scopes do
 not adopt the origin of the <code>blob:</code> URL.</p>
 <p>Additionally, import maps only work on <code>import</code> so it may be desirable to add a
-<code>"import"</code> condition to all dependency mappings.</p></section>
+<code>"import"</code> condition to all dependency mappings.</p>
+</section><section><h3>Process-based permissions<span><a class="mark" href="#process-based-permissions" id="process-based-permissions">#</a></span><a aria-hidden="true" class="legacy" id="permissions_process_based_permissions"></a></h3>
+<h4>Permission Model<span><a class="mark" href="#permission-model" id="permission-model">#</a></span><a aria-hidden="true" class="legacy" id="permissions_permission_model"></a></h4>
+
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<!-- name=permission-model -->
+<p>The Node.js Permission Model is a mechanism for restricting access to specific
+resources during execution.
+The API exists behind a flag <a href="cli.html#--experimental-permission"><code>--experimental-permission</code></a> which when enabled,
+will restrict access to all available permissions.</p>
+<p>The available permissions are documented by the <a href="cli.html#--experimental-permission"><code>--experimental-permission</code></a>
+flag.</p>
+<p>When starting Node.js with <code>--experimental-permission</code>,
+the ability to access the file system, spawn processes, and
+use <code>node:worker_threads</code> will be restricted.</p>
+<pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">node --experimental-permission index.js</span>
+node:internal/modules/cjs/loader:171
+  const result = internalModuleStat(filename);
+                 ^
+
+Error: Access to this API has been restricted
+    at stat (node:internal/modules/cjs/loader:171:18)
+    at Module._findPath (node:internal/modules/cjs/loader:627:16)
+    at resolveMainPath (node:internal/modules/run_main:19:25)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:76:24)
+    at node:internal/main/run_main_module:23:47 {
+  code: 'ERR_ACCESS_DENIED',
+  permission: 'FileSystemRead'
+}</code> <button class="copy-button">copy</button></pre>
+<p>Allowing access to spawning a process and creating worker threads can be done
+using the <a href="cli.html#--allow-child-process"><code>--allow-child-process</code></a> and <a href="cli.html#--allow-worker"><code>--allow-worker</code></a> respectively.</p>
+<h5>Runtime API<span><a class="mark" href="#runtime-api" id="runtime-api">#</a></span><a aria-hidden="true" class="legacy" id="permissions_runtime_api"></a></h5>
+<p>When enabling the Permission Model through the <a href="cli.html#--experimental-permission"><code>--experimental-permission</code></a>
+flag a new property <code>permission</code> is added to the <code>process</code> object.
+This property contains one function:</p>
+<h6><code>permission.has(scope ,parameters)</code><span><a class="mark" href="#permissionhasscope-parameters" id="permissionhasscope-parameters">#</a></span><a aria-hidden="true" class="legacy" id="permissions_permission_has_scope_parameters"></a></h6>
+<p>API call to check permissions at runtime (<a href="process.html#processpermissionhasscope-reference"><code>permission.has()</code></a>)</p>
+<pre><code class="language-js">process.<span class="hljs-property">permission</span>.<span class="hljs-title function_">has</span>(<span class="hljs-string">'fs.write'</span>); <span class="hljs-comment">// true</span>
+process.<span class="hljs-property">permission</span>.<span class="hljs-title function_">has</span>(<span class="hljs-string">'fs.write'</span>, <span class="hljs-string">'/home/rafaelgss/protected-folder'</span>); <span class="hljs-comment">// true</span>
+
+process.<span class="hljs-property">permission</span>.<span class="hljs-title function_">has</span>(<span class="hljs-string">'fs.read'</span>); <span class="hljs-comment">// true</span>
+process.<span class="hljs-property">permission</span>.<span class="hljs-title function_">has</span>(<span class="hljs-string">'fs.read'</span>, <span class="hljs-string">'/home/rafaelgss/protected-folder'</span>); <span class="hljs-comment">// false</span></code> <button class="copy-button">copy</button></pre>
+<h5>File System Permissions<span><a class="mark" href="#file-system-permissions" id="file-system-permissions">#</a></span><a aria-hidden="true" class="legacy" id="permissions_file_system_permissions"></a></h5>
+<p>To allow access to the file system, use the <a href="cli.html#--allow-fs-read"><code>--allow-fs-read</code></a> and
+<a href="cli.html#--allow-fs-write"><code>--allow-fs-write</code></a> flags:</p>
+<pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">node --experimental-permission --allow-fs-read=* --allow-fs-write=* index.js</span>
+Hello world!
+(node:19836) ExperimentalWarning: Permission is an experimental feature
+(Use `node --trace-warnings ...` to show where the warning was created)</code> <button class="copy-button">copy</button></pre>
+<p>The valid arguments for both flags are:</p>
+<ul>
+<li><code>*</code> - To allow the all operations to given scope (read/write).</li>
+<li>Paths delimited by comma (,) to manage reading/writing operations.</li>
+</ul>
+<p>Example:</p>
+<ul>
+<li><code>--allow-fs-read=*</code> - It will allow all <code>FileSystemRead</code> operations.</li>
+<li><code>--allow-fs-write=*</code> - It will allow all <code>FileSystemWrite</code> operations.</li>
+<li><code>--allow-fs-write=/tmp/</code> - It will allow <code>FileSystemWrite</code> access to the <code>/tmp/</code>
+folder.</li>
+<li><code>--allow-fs-read=/tmp/,/home/.gitignore</code> - It allows <code>FileSystemRead</code> access
+to the <code>/tmp/</code> folder <strong>and</strong> the <code>/home/.gitignore</code> path.</li>
+</ul>
+<p>Wildcards are supported too:</p>
+<ul>
+<li><code>--allow-fs-read:/home/test*</code> will allow read access to everything
+that matches the wildcard. e.g: <code>/home/test/file1</code> or <code>/home/test2</code></li>
+</ul>
+<p>There are constraints you need to know before using this system:</p>
+<ul>
+<li>Native modules are restricted by default when using the Permission Model.</li>
+<li>Relative paths are not supported through the CLI (<code>--allow-fs-*</code>).</li>
+<li>The model does not inherit to a child node process.</li>
+<li>The model does not inherit to a worker thread.</li>
+<li>When creating symlinks the target (first argument) should have read and
+write access.</li>
+<li>Permission changes are not retroactively applied to existing resources.</li>
+</ul></section>
         <!-- API END -->
       </div>
     </div>

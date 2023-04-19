@@ -23,6 +23,7 @@ using v8::Isolate;
 using v8::KeyCollectionMode;
 using v8::Local;
 using v8::Object;
+using v8::ObjectTemplate;
 using v8::ONLY_CONFIGURABLE;
 using v8::ONLY_ENUMERABLE;
 using v8::ONLY_WRITABLE;
@@ -376,7 +377,7 @@ void Initialize(Local<Object> target,
   Isolate* isolate = env->isolate();
 
   {
-    Local<v8::ObjectTemplate> tmpl = v8::ObjectTemplate::New(isolate);
+    Local<ObjectTemplate> tmpl = ObjectTemplate::New(isolate);
 #define V(PropertyName, _)                                                     \
   tmpl->Set(FIXED_ONE_BYTE_STRING(env->isolate(), #PropertyName),              \
             env->PropertyName());
@@ -403,6 +404,18 @@ void Initialize(Local<Object> target,
     V(kPending);
     V(kFulfilled);
     V(kRejected);
+#undef V
+
+#define V(name)                                                                \
+  constants                                                                    \
+      ->Set(context,                                                           \
+            FIXED_ONE_BYTE_STRING(isolate, #name),                             \
+            Integer::New(isolate, Environment::ExitInfoField::name))           \
+      .Check();
+
+    V(kExiting);
+    V(kExitCode);
+    V(kHasExitCode);
 #undef V
 
 #define V(name)                                                                \
@@ -451,7 +464,6 @@ void Initialize(Local<Object> target,
       NewFunctionTemplate(isolate, WeakReference::New);
   weak_ref->InstanceTemplate()->SetInternalFieldCount(
       WeakReference::kInternalFieldCount);
-  weak_ref->Inherit(BaseObject::GetConstructorTemplate(env));
   SetProtoMethod(isolate, weak_ref, "get", WeakReference::Get);
   SetProtoMethod(isolate, weak_ref, "incRef", WeakReference::IncRef);
   SetProtoMethod(isolate, weak_ref, "decRef", WeakReference::DecRef);

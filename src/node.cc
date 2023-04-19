@@ -277,22 +277,17 @@ MaybeLocal<Value> StartExecution(Environment* env, StartExecutionCallback cb) {
 
   if (cb != nullptr) {
     EscapableHandleScope scope(env->isolate());
+    // TODO(addaleax): pass the callback to the main script more directly,
+    // e.g. by making StartExecution(env, builtin) parametrizable
+    env->set_embedder_entry_point(std::move(cb));
+    auto reset_entry_point =
+        OnScopeLeave([&]() { env->set_embedder_entry_point({}); });
 
-    if (env->isolate_data()->options()->build_snapshot) {
-      // TODO(addaleax): pass the callback to the main script more directly,
-      // e.g. by making StartExecution(env, builtin) parametrizable
-      env->set_embedder_mksnapshot_entry_point(std::move(cb));
-      auto reset_entry_point =
-          OnScopeLeave([&]() { env->set_embedder_mksnapshot_entry_point({}); });
+    const char* entry = env->isolate_data()->options()->build_snapshot
+                            ? "internal/main/mksnapshot"
+                            : "internal/main/embedding";
 
-      return StartExecution(env, "internal/main/mksnapshot");
-    }
-
-    if (StartExecution(env, "internal/main/environment").IsEmpty()) return {};
-    return scope.EscapeMaybe(cb({
-        env->process_object(),
-        env->builtin_module_require(),
-    }));
+    return scope.EscapeMaybe(StartExecution(env, entry));
   }
 
   // TODO(joyeecheung): move these conditions into JS land and let the
@@ -311,18 +306,6 @@ MaybeLocal<Value> StartExecution(Environment* env, StartExecutionCallback cb) {
   if (env->argv().size() > 1) {
     first_argv = env->argv()[1];
   }
-
-#ifndef DISABLE_SINGLE_EXECUTABLE_APPLICATION
-  if (sea::IsSingleExecutable()) {
-    // TODO(addaleax): Find a way to reuse:
-    //
-    // LoadEnvironment(Environment*, const char*)
-    //
-    // instead and not add yet another main entry point here because this
-    // already duplicates existing code.
-    return StartExecution(env, "internal/main/single_executable_application");
-  }
-#endif
 
   if (first_argv == "inspect") {
     return StartExecution(env, "internal/main/inspect");
@@ -463,7 +446,13 @@ void ResetSignalHandlers() {
 #endif  // __POSIX__
 }
 
+// We use uint32_t since that can be accessed as a lock-free atomic
+// variable on all platforms that we support, which we require in
+// order for its value to be usable inside signal handlers.
 static std::atomic<uint32_t> init_process_flags = 0;
+static_assert(
+    std::is_same_v<std::underlying_type_t<ProcessInitializationFlags::Flags>,
+                   uint32_t>);
 
 static void PlatformInit(ProcessInitializationFlags::Flags flags) {
   // init_process_flags is accessed in ResetStdio(),
@@ -1089,7 +1078,7 @@ std::unique_ptr<InitializationResult> InitializeOncePerProcess(
 }
 
 void TearDownOncePerProcess() {
-  const uint64_t flags = init_process_flags.load();
+  const uint32_t flags = init_process_flags.load();
   ResetStdio();
   if (!(flags & ProcessInitializationFlags::kNoDefaultSignalHandling)) {
     ResetSignalHandlers();
@@ -1137,8 +1126,7 @@ ExitCode GenerateAndWriteSnapshotData(const SnapshotData** snapshot_data_ptr,
               "node:embedded_snapshot_main was specified as snapshot "
               "entry point but Node.js was built without embedded "
               "snapshot.\n");
-      // TODO(joyeecheung): should be kInvalidCommandLineArgument instead.
-      exit_code = ExitCode::kGenericUserError;
+      exit_code = ExitCode::kInvalidCommandLineArgument;
       return exit_code;
     }
   } else {
@@ -1171,8 +1159,7 @@ ExitCode GenerateAndWriteSnapshotData(const SnapshotData** snapshot_data_ptr,
     fprintf(stderr,
             "Cannot open %s for writing a snapshot.\n",
             snapshot_blob_path.c_str());
-    // TODO(joyeecheung): should be kStartupSnapshotFailure.
-    exit_code = ExitCode::kGenericUserError;
+    exit_code = ExitCode::kStartupSnapshotFailure;
   }
   return exit_code;
 }
@@ -1188,17 +1175,16 @@ ExitCode LoadSnapshotDataAndRun(const SnapshotData** snapshot_data_ptr,
     FILE* fp = fopen(filename.c_str(), "rb");
     if (fp == nullptr) {
       fprintf(stderr, "Cannot open %s", filename.c_str());
-      // TODO(joyeecheung): should be kStartupSnapshotFailure.
-      exit_code = ExitCode::kGenericUserError;
+      exit_code = ExitCode::kStartupSnapshotFailure;
       return exit_code;
     }
     std::unique_ptr<SnapshotData> read_data = std::make_unique<SnapshotData>();
     bool ok = SnapshotData::FromFile(read_data.get(), fp);
     fclose(fp);
     if (!ok) {
-      // If we fail to read the customized snapshot, simply exit with 1.
-      // TODO(joyeecheung): should be kStartupSnapshotFailure.
-      exit_code = ExitCode::kGenericUserError;
+      // If we fail to read the customized snapshot,
+      // simply exit with kStartupSnapshotFailure.
+      exit_code = ExitCode::kStartupSnapshotFailure;
       return exit_code;
     }
     *snapshot_data_ptr = read_data.release();
@@ -1253,6 +1239,11 @@ static ExitCode StartInternal(int argc, char** argv) {
 
   uv_loop_configure(uv_default_loop(), UV_METRICS_IDLE_TIME);
 
+  std::string sea_config = per_process::cli_options->experimental_sea_config;
+  if (!sea_config.empty()) {
+    return sea::BuildSingleExecutableBlob(sea_config);
+  }
+
   // --build-snapshot indicates that we are in snapshot building mode.
   if (per_process::cli_options->per_isolate->build_snapshot) {
     if (result->args().size() < 2) {
@@ -1273,10 +1264,6 @@ int Start(int argc, char** argv) {
   std::tie(argc, argv) = sea::FixupArgsForSEA(argc, argv);
 #endif
   return static_cast<int>(StartInternal(argc, argv));
-}
-
-int Stop(Environment* env) {
-  return Stop(env, StopFlags::kNoFlags);
 }
 
 int Stop(Environment* env, StopFlags::Flags flags) {

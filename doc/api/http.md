@@ -1518,7 +1518,9 @@ added:
  - v11.3.0
  - v10.14.0
 changes:
-  - version: v19.4.0
+  - version:
+    - v19.4.0
+    - v18.14.0
     pr-url: https://github.com/nodejs/node/pull/45778
     description: The default is now set to the minimum between 60000 (60 seconds) or `requestTimeout`.
 -->
@@ -2443,7 +2445,9 @@ as an argument to any listeners on the event.
 <!-- YAML
 added: v0.1.5
 changes:
-  - version: v19.5.0
+  - version:
+    - v19.5.0
+    - v18.14.0
     pr-url: https://github.com/nodejs/node/pull/45982
     description: >-
      The `joinDuplicateHeaders` option in the `http.request()`
@@ -2989,7 +2993,9 @@ headers with the same name.
 ### `outgoingMessage.setHeaders(headers)`
 
 <!-- YAML
-added: v19.6.0
+added:
+  - v19.6.0
+  - v18.15.0
 -->
 
 * `headers` {Headers|Map}
@@ -3253,6 +3259,10 @@ changes:
     the entire request from the client.
     See [`server.requestTimeout`][] for more information.
     **Default:** `300000`.
+  * `requireHostHeader` {boolean} It forces the server to respond with
+    a 400 (Bad Request) status code to any HTTP/1.1 request message
+    that lacks a Host header (as mandated by the specification).
+    **Default:** `true`.
   * `joinDuplicateHeaders` {boolean} It joins the field line values of multiple
     headers in a request with `, ` instead of discarding the duplicates.
     See [`message.headers`][] for more information.
@@ -3723,7 +3733,9 @@ and the `cause`, if one was provided.
 <!-- YAML
 added: v14.3.0
 changes:
-  - version: v19.5.0
+  - version:
+    - v19.5.0
+    - v18.14.0
     pr-url: https://github.com/nodejs/node/pull/46143
     description: The `label` parameter is added.
 -->

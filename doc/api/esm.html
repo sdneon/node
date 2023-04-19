@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v19.9.0">
-  <title>Modules: ECMAScript modules | Node.js v19.9.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v20.0.0">
+  <title>Modules: ECMAScript modules | Node.js v20.0.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -96,7 +96,7 @@
     <div id="column1" data-id="esm" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v19.9.0 documentation</h1>
+          <h1>Node.js v20.0.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -111,7 +111,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v19.9.0</li>
+            <li class="pinned-header">Node.js v20.0.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -432,6 +432,8 @@
 <details class="changelog"><summary>History</summary>
 <table>
 <tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v20.0.0</td>
+<td><p>Loader hooks are executed off the main thread.</p></td></tr>
 <tr><td>v18.6.0, v16.17.0</td>
 <td><p>Add support for chaining loaders.</p></td></tr>
 <tr><td>v17.1.0, v16.14.0</td>
@@ -653,6 +655,9 @@ added:
   - v13.9.0
   - v12.16.2
 changes:
+  - version: v20.0.0
+    pr-url: https://github.com/nodejs/node/pull/44710
+    description: This API now returns a string synchronously instead of a Promise.
   - version:
       - v16.2.0
       - v14.18.0
@@ -666,18 +671,19 @@ command flag enabled.</p>
 <li><code>specifier</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> The module specifier to resolve relative to <code>parent</code>.</li>
 <li><code>parent</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="url.html#the-whatwg-url-api" class="type">&#x3C;URL></a> The absolute parent module URL to resolve from. If none
 is specified, the value of <code>import.meta.url</code> is used as the default.</li>
-<li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" class="type">&#x3C;Promise></a></li>
+<li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
 </ul>
 <p>Provides a module-relative resolution function scoped to each module, returning
-the URL string.</p>
-<!-- eslint-skip -->
-<pre><code class="language-js"><span class="hljs-keyword">const</span> dependencyAsset = <span class="hljs-keyword">await</span> <span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-title function_">resolve</span>(<span class="hljs-string">'component-lib/asset.css'</span>);</code> <button class="copy-button">copy</button></pre>
+the URL string. In alignment with browser behavior, this now returns
+synchronously.</p>
+<blockquote>
+<p><strong>Caveat</strong> This can result in synchronous file-system operations, which
+can impact performance similarly to <code>require.resolve</code>.</p>
+</blockquote>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> dependencyAsset = <span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-title function_">resolve</span>(<span class="hljs-string">'component-lib/asset.css'</span>);</code> <button class="copy-button">copy</button></pre>
 <p><code>import.meta.resolve</code> also accepts a second argument which is the parent module
-from which to resolve from:</p>
-<!-- eslint-skip -->
-<pre><code class="language-js"><span class="hljs-keyword">await</span> <span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-title function_">resolve</span>(<span class="hljs-string">'./dep'</span>, <span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">url</span>);</code> <button class="copy-button">copy</button></pre>
-<p>This function is asynchronous because the ES module resolver in Node.js is
-allowed to be asynchronous.</p>
+from which to resolve:</p>
+<pre><code class="language-js"><span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-title function_">resolve</span>(<span class="hljs-string">'./dep'</span>, <span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">url</span>);</code> <button class="copy-button">copy</button></pre>
 </section><section><h3>Interoperability with CommonJS<span><a class="mark" href="#interoperability-with-commonjs" id="interoperability-with-commonjs">#</a></span><a aria-hidden="true" class="legacy" id="esm_interoperability_with_commonjs"></a></h3>
 <h4><code>import</code> statements<span><a class="mark" href="#import-statements" id="import-statements">#</a></span><a aria-hidden="true" class="legacy" id="esm_import_statements"></a></h4>
 <p>An <code>import</code> statement can reference an ES module or a CommonJS module.
@@ -914,6 +920,10 @@ to the subsequent loader's hook.</p>
 A hook that returns without calling <code>next&#x3C;hookName>()</code> <em>and</em> without returning
 <code>shortCircuit: true</code> also triggers an exception. These errors are to help
 prevent unintentional breaks in the chain.</p>
+<p>Hooks are run in a separate thread, isolated from the main. That means it is a
+different <a href="https://tc39.es/ecma262/#realm">realm</a>. The hooks thread may be
+terminated by the main thread at any time, so do not depend on asynchronous
+operations to (like <code>console.log</code>) complete.</p>
 <h5><code>resolve(specifier, context, nextResolve)</code><span><a class="mark" href="#resolvespecifier-context-nextresolve" id="resolvespecifier-context-nextresolve">#</a></span><a aria-hidden="true" class="legacy" id="esm_resolve_specifier_context_nextresolve"></a></h5>
 <div class="api_metadata">
 <details class="changelog"><summary>History</summary>
@@ -948,7 +958,7 @@ Node.js default <code>resolve</code> hook after the last user-supplied <code>res
 <li><code>context</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
 </ul>
 </li>
-<li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" class="type">&#x3C;Promise></a>
 <ul>
 <li><code>format</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> A hint to the load hook (it might be
 ignored)
@@ -961,6 +971,10 @@ terminate the chain of <code>resolve</code> hooks. <strong>Default:</strong> <co
 </ul>
 </li>
 </ul>
+<blockquote>
+<p><strong>Caveat</strong> Despite support for returning promises and async functions, calls
+to <code>resolve</code> may block the main thread which can impact performance.</p>
+</blockquote>
 <p>The <code>resolve</code> hook chain is responsible for telling Node.js where to find and
 how to cache a given <code>import</code> statement or expression. It can optionally return
 its format (such as <code>'module'</code>) as a hint to the <code>load</code> hook. If a format is
@@ -981,7 +995,7 @@ the <code>context.conditions</code> array passed into the hook. To guarantee <em
 Node.js module specifier resolution behavior</em> when calling <code>defaultResolve</code>, the
 <code>context.conditions</code> array passed to it <em>must</em> include <em>all</em> elements of the
 <code>context.conditions</code> array originally passed into the <code>resolve</code> hook.</p>
-<pre><code class="language-js"><span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">resolve</span>(<span class="hljs-params">specifier, context, nextResolve</span>) {
+<pre><code class="language-js"><span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">resolve</span>(<span class="hljs-params">specifier, context, nextResolve</span>) {
   <span class="hljs-keyword">const</span> { parentURL = <span class="hljs-literal">null</span> } = context;
 
   <span class="hljs-keyword">if</span> (<span class="hljs-title class_">Math</span>.<span class="hljs-title function_">random</span>() > <span class="hljs-number">0.5</span>) { <span class="hljs-comment">// Some condition.</span>
@@ -1292,7 +1306,7 @@ purposes.</p>
 <span class="hljs-comment">// CoffeeScript files end in .coffee, .litcoffee, or .coffee.md.</span>
 <span class="hljs-keyword">const</span> extensionsRegex = <span class="hljs-regexp">/\.coffee$|\.litcoffee$|\.coffee\.md$/</span>;
 
-<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">resolve</span>(<span class="hljs-params">specifier, context, nextResolve</span>) {
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">resolve</span>(<span class="hljs-params">specifier, context, nextResolve</span>) {
   <span class="hljs-keyword">if</span> (extensionsRegex.<span class="hljs-title function_">test</span>(specifier)) {
     <span class="hljs-keyword">const</span> { parentURL = baseURL } = context;
 
