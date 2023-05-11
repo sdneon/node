@@ -23,6 +23,7 @@
 namespace node {
 using errors::TryCatchScope;
 using v8::Array;
+using v8::Boolean;
 using v8::Context;
 using v8::EscapableHandleScope;
 using v8::Function;
@@ -528,6 +529,9 @@ NODE_EXTERN std::unique_ptr<InspectorParentHandle> GetInspectorParentHandle(
   CHECK_NOT_NULL(env);
   if (name == nullptr) name = "";
   CHECK_NE(thread_id.id, static_cast<uint64_t>(-1));
+  if (!env->should_create_inspector()) {
+    return nullptr;
+  }
 #if HAVE_INSPECTOR
   return std::make_unique<InspectorParentHandleImpl>(
       env->inspector_agent()->GetParentHandle(thread_id.id, url, name));
@@ -667,7 +671,7 @@ Maybe<bool> InitializeContextRuntime(Local<Context> context) {
   context->AllowCodeGenerationFromStrings(false);
   context->SetEmbedderData(
       ContextEmbedderIndex::kAllowCodeGenerationFromStrings,
-      is_code_generation_from_strings_allowed ? True(isolate) : False(isolate));
+      Boolean::New(isolate, is_code_generation_from_strings_allowed));
 
   if (per_process::cli_options->disable_proto == "") {
     return Just(true);
@@ -725,8 +729,7 @@ Maybe<bool> InitializeContextRuntime(Local<Context> context) {
     }
   } else if (per_process::cli_options->disable_proto != "") {
     // Validated in ProcessGlobalArgs
-    FatalError("InitializeContextRuntime()",
-               "invalid --disable-proto mode");
+    OnFatalError("InitializeContextRuntime()", "invalid --disable-proto mode");
   }
 
   return Just(true);

@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v20.0.0">
-  <title>Test runner | Node.js v20.0.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v20.1.0">
+  <title>Test runner | Node.js v20.1.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -96,7 +96,7 @@
     <div id="column1" data-id="test" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v20.0.0 documentation</h1>
+          <h1>Node.js v20.1.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -111,7 +111,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v20.0.0</li>
+            <li class="pinned-header">Node.js v20.1.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -188,6 +188,7 @@
 </li>
 <li><a href="#class-testcontext">Class: <code>TestContext</code></a>
 <ul>
+<li><a href="#contextbeforefn-options"><code>context.before([fn][, options])</code></a></li>
 <li><a href="#contextbeforeeachfn-options"><code>context.beforeEach([fn][, options])</code></a></li>
 <li><a href="#contextafterfn-options"><code>context.after([fn][, options])</code></a></li>
 <li><a href="#contextaftereachfn-options"><code>context.afterEach([fn][, options])</code></a></li>
@@ -302,7 +303,8 @@
         <span class="collapsed-arrow">&#x25ba;</span><span class="expanded-arrow">&#x25bc;</span>
         Other versions
       </a>
-      <div class="picker"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v19.x/api/test.html">19.x</a></li>
+      <div class="picker"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v20.x/api/test.html">20.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v19.x/api/test.html">19.x</a></li>
 <li><a href="https://nodejs.org/docs/latest-v18.x/api/test.html">18.x <b>LTS</b></a></li></ol></div>
     </li>
   
@@ -398,6 +400,7 @@
 </li>
 <li><a href="#class-testcontext">Class: <code>TestContext</code></a>
 <ul>
+<li><a href="#contextbeforefn-options"><code>context.before([fn][, options])</code></a></li>
 <li><a href="#contextbeforeeachfn-options"><code>context.beforeEach([fn][, options])</code></a></li>
 <li><a href="#contextafterfn-options"><code>context.after([fn][, options])</code></a></li>
 <li><a href="#contextaftereachfn-options"><code>context.afterEach([fn][, options])</code></a></li>
@@ -435,7 +438,7 @@
 </details>
 </div>
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v20.0.0/lib/test.js">lib/test.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v20.1.0/lib/test.js">lib/test.js</a></p>
 <p>The <code>node:test</code> module facilitates the creation of JavaScript tests.
 To access it:</p>
 
@@ -717,6 +720,10 @@ process finishes with an exit code of 0, the test is considered passing.
 Otherwise, the test is considered to be a failure. Test files must be
 executable by Node.js, but are not required to use the <code>node:test</code> module
 internally.</p>
+<p>Each test file is executed as if it was a regular script. That is, if the test
+file itself uses <code>node:test</code> to define tests, all of those tests will be
+executed within a single application thread, regardless of the value of the
+<code>concurrency</code> option of <a href="#testname-options-fn"><code>test()</code></a>.</p>
 </section><section><h3>Collecting code coverage<span><a class="mark" href="#collecting-code-coverage" id="collecting-code-coverage">#</a></span><a aria-hidden="true" class="legacy" id="test_collecting_code_coverage"></a></h3>
 <p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
 <p>When Node.js is started with the <a href="cli.html#--experimental-test-coverage"><code>--experimental-test-coverage</code></a>
@@ -750,10 +757,6 @@ number of lines is not explicitly provided, a single line is ignored.</p>
 <p>The test runner's code coverage functionality has the following limitations,
 which will be addressed in a future Node.js release:</p>
 <ul>
-<li>Although coverage data is collected for child processes, this information is
-not included in the coverage report. Because the command line test runner uses
-child processes to execute test files, it cannot be used with
-<code>--experimental-test-coverage</code>.</li>
 <li>Source maps are not supported.</li>
 <li>Excluding specific files or directories from the coverage report is not
 supported.</li>
@@ -1007,14 +1010,23 @@ and the <code>dot</code> reporter will output to <code>file.txt</code>:</p>
 unless a destination is explicitly provided.</p>
 </section><section><h3><code>run([options])</code><span><a class="mark" href="#runoptions" id="runoptions">#</a></span><a aria-hidden="true" class="legacy" id="test_run_options"></a></h3>
 <div class="api_metadata">
-<span>Added in: v18.9.0, v16.19.0</span>
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v20.1.0</td>
+<td><p>Add a testNamePatterns option.</p></td></tr>
+<tr><td>v18.9.0, v16.19.0</td>
+<td><p><span>Added in: v18.9.0, v16.19.0</span></p></td></tr>
+</tbody></table>
+</details>
 </div>
 <ul>
 <li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> Configuration options for running tests. The following
 properties are supported:
 <ul>
 <li><code>concurrency</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> If a number is provided,
-then that many files would run in parallel.
+then that many test processes would run in parallel, where each process
+corresponds to one test file.
 If <code>true</code>, it would run <code>os.availableParallelism() - 1</code> test files in
 parallel.
 If <code>false</code>, it would only run one test file at a time.
@@ -1033,6 +1045,12 @@ If unspecified, subtests inherit this value from their parent.
 This can be a number, or a function that takes no arguments and returns a
 number. If a nullish value is provided, each process gets its own port,
 incremented from the primary's <code>process.debugPort</code>.
+<strong>Default:</strong> <code>undefined</code>.</li>
+<li><code>testNamePatterns</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp" class="type">&#x3C;RegExp></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="type">&#x3C;Array></a> A String, RegExp or a RegExp Array,
+that can be used to only run tests whose name matches the provided pattern.
+Test name patterns are interpreted as JavaScript regular expressions.
+For each test that is executed, any corresponding test hooks, such as
+<code>beforeEach()</code>, are also run.
 <strong>Default:</strong> <code>undefined</code>.</li>
 </ul>
 </li>
@@ -1071,10 +1089,9 @@ does not have a name.</li>
 properties are supported:
 <ul>
 <li><code>concurrency</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> If a number is provided,
-then that many tests would run in parallel.
-If <code>true</code>, it would run <code>os.availableParallelism() - 1</code> tests in parallel.
-For subtests, it will be <code>Infinity</code> tests in parallel.
-If <code>false</code>, it would only run one test at a time.
+then that many tests would run in parallel within the application thread.
+If <code>true</code>, all scheduled asynchronous tests run concurrently within the
+thread. If <code>false</code>, only one test runs at a time.
 If unspecified, subtests inherit this value from their parent.
 <strong>Default:</strong> <code>false</code>.</li>
 <li><code>only</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> If truthy, and the test context is configured to run
@@ -1676,11 +1693,40 @@ undefined if test is not ran through a file.</li>
 <p>Emitted when a test starts.</p>
 </section><section><h3>Class: <code>TestContext</code><span><a class="mark" href="#class-testcontext" id="class-testcontext">#</a></span><a aria-hidden="true" class="legacy" id="test_class_testcontext"></a></h3>
 <div class="api_metadata">
-<span>Added in: v18.0.0, v16.17.0</span>
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v20.1.0</td>
+<td><p>The <code>before</code> function was added to TestContext.</p></td></tr>
+<tr><td>v18.0.0, v16.17.0</td>
+<td><p><span>Added in: v18.0.0, v16.17.0</span></p></td></tr>
+</tbody></table>
+</details>
 </div>
 <p>An instance of <code>TestContext</code> is passed to each test function in order to
 interact with the test runner. However, the <code>TestContext</code> constructor is not
 exposed as part of the API.</p>
+<h4><code>context.before([fn][, options])</code><span><a class="mark" href="#contextbeforefn-options" id="contextbeforefn-options">#</a></span><a aria-hidden="true" class="legacy" id="test_context_before_fn_options"></a></h4>
+<div class="api_metadata">
+<span>Added in: v20.1.0</span>
+</div>
+<ul>
+<li><code>fn</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> | <a href="https://tc39.es/ecma262/#sec-async-function-constructor" class="type">&#x3C;AsyncFunction></a> The hook function. The first argument
+to this function is a <a href="#class-testcontext"><code>TestContext</code></a> object. If the hook uses callbacks,
+the callback function is passed as the second argument. <strong>Default:</strong> A no-op
+function.</li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> Configuration options for the hook. The following
+properties are supported:
+<ul>
+<li><code>signal</code> <a href="globals.html#class-abortsignal" class="type">&#x3C;AbortSignal></a> Allows aborting an in-progress hook.</li>
+<li><code>timeout</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> A number of milliseconds the hook will fail after.
+If unspecified, subtests inherit this value from their parent.
+<strong>Default:</strong> <code>Infinity</code>.</li>
+</ul>
+</li>
+</ul>
+<p>This function is used to create a hook running before
+subtest of the current test.</p>
 <h4><code>context.beforeEach([fn][, options])</code><span><a class="mark" href="#contextbeforeeachfn-options" id="contextbeforeeachfn-options">#</a></span><a aria-hidden="true" class="legacy" id="test_context_beforeeach_fn_options"></a></h4>
 <div class="api_metadata">
 <span>Added in: v18.8.0, v16.18.0</span>
@@ -1865,7 +1911,7 @@ test results. <strong>Default:</strong> The <code>name</code> property of <code>
 properties are supported:
 <ul>
 <li><code>concurrency</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a> If a number is provided,
-then that many tests would run in parallel.
+then that many tests would run in parallel within the application thread.
 If <code>true</code>, it would run all subtests in parallel.
 If <code>false</code>, it would only run one test at a time.
 If unspecified, subtests inherit this value from their parent.

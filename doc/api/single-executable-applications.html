@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v20.0.0">
-  <title>Single executable applications | Node.js v20.0.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v20.1.0">
+  <title>Single executable applications | Node.js v20.1.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -96,7 +96,7 @@
     <div id="column1" data-id="single-executable-applications" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v20.0.0 documentation</h1>
+          <h1>Node.js v20.1.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -111,7 +111,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v20.0.0</li>
+            <li class="pinned-header">Node.js v20.1.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -228,7 +228,8 @@
         <span class="collapsed-arrow">&#x25ba;</span><span class="expanded-arrow">&#x25bc;</span>
         Other versions
       </a>
-      <div class="picker"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v19.x/api/single-executable-applications.html">19.x</a></li></ol></div>
+      <div class="picker"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v20.x/api/single-executable-applications.html">20.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v19.x/api/single-executable-applications.html">19.x</a></li></ol></div>
     </li>
   
             <li class="picker-header">
@@ -275,7 +276,7 @@
         <h2>Single executable applications<span><a class="mark" href="#single-executable-applications" id="single-executable-applications">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_single_executable_applications"></a></h2>
 
 <p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental: This feature is being designed and will change.</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v20.0.0/lib/internal/main/single_executable_application.js">lib/internal/main/single_executable_application.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v20.1.0/lib/internal/main/single_executable_application.js">lib/internal/main/single_executable_application.js</a></p>
 <p>This feature allows the distribution of a Node.js application conveniently to a
 system that does not have Node.js installed.</p>
 <p>Node.js supports the creation of <a href="https://github.com/nodejs/single-executable">single executable applications</a> by allowing
@@ -307,10 +308,21 @@ single executable application (see
 </li>
 <li>
 <p>Create a copy of the <code>node</code> executable and name it according to your needs:</p>
+<ul>
+<li>On systems other than Windows:</li>
+</ul>
 <pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash"><span class="hljs-built_in">cp</span> $(<span class="hljs-built_in">command</span> -v node) hello</span></code> <button class="copy-button">copy</button></pre>
+<ul>
+<li>On Windows:</li>
+</ul>
+<p>Using PowerShell:</p>
+<pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash"><span class="hljs-built_in">cp</span> (Get-Command node).Source hello.exe</span></code> <button class="copy-button">copy</button></pre>
+<p>Using Command Prompt:</p>
+<pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash"><span class="hljs-keyword">for</span> /F <span class="hljs-string">"tokens=*"</span> %n IN (<span class="hljs-string">'where.exe node'</span>) DO @(copy <span class="hljs-string">"%n"</span> hello.exe)</span></code> <button class="copy-button">copy</button></pre>
+<p>The <code>.exe</code> extension is necessary.</p>
 </li>
 <li>
-<p>Remove the signature of the binary:</p>
+<p>Remove the signature of the binary (macOS and Windows only):</p>
 <ul>
 <li>On macOS:</li>
 </ul>
@@ -320,13 +332,14 @@ single executable application (see
 </ul>
 <p><a href="https://learn.microsoft.com/en-us/windows/win32/seccrypto/signtool">signtool</a> can be used from the installed <a href="https://developer.microsoft.com/en-us/windows/downloads/windows-sdk/">Windows SDK</a>. If this step is
 skipped, ignore any signature-related warning from postject.</p>
-<pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">signtool remove /s hello</span></code> <button class="copy-button">copy</button></pre>
+<pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">signtool remove /s hello.exe</span></code> <button class="copy-button">copy</button></pre>
 </li>
 <li>
 <p>Inject the blob into the copied binary by running <code>postject</code> with
 the following options:</p>
 <ul>
-<li><code>hello</code> - The name of the copy of the <code>node</code> executable created in step 2.</li>
+<li><code>hello</code> / <code>hello.exe</code> - The name of the copy of the <code>node</code> executable
+created in step 4.</li>
 <li><code>NODE_SEA_BLOB</code> - The name of the resource / note / section in the binary
 where the contents of the blob will be stored.</li>
 <li><code>sea-prep.blob</code> - The name of the blob created in step 1.</li>
@@ -339,8 +352,13 @@ stored.</li>
 <p>To summarize, here is the required command for each platform:</p>
 <ul>
 <li>
-<p>On systems other than macOS:</p>
+<p>On Linux:</p>
 <pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">npx postject hello NODE_SEA_BLOB sea-prep.blob \
+    --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2</span></code> <button class="copy-button">copy</button></pre>
+</li>
+<li>
+<p>On Windows:</p>
+<pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">npx postject hello.exe NODE_SEA_BLOB sea-prep.blob \
     --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2</span></code> <button class="copy-button">copy</button></pre>
 </li>
 <li>
@@ -352,7 +370,7 @@ stored.</li>
 </ul>
 </li>
 <li>
-<p>Sign the binary:</p>
+<p>Sign the binary (macOS and Windows only):</p>
 <ul>
 <li>On macOS:</li>
 </ul>
@@ -362,11 +380,19 @@ stored.</li>
 </ul>
 <p>A certificate needs to be present for this to work. However, the unsigned
 binary would still be runnable.</p>
-<pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">signtool sign /fd SHA256 hello</span></code> <button class="copy-button">copy</button></pre>
+<pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">signtool sign /fd SHA256 hello.exe</span></code> <button class="copy-button">copy</button></pre>
 </li>
 <li>
 <p>Run the binary:</p>
+<ul>
+<li>On systems other than Windows</li>
+</ul>
 <pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">./hello world</span>
+Hello, world!</code> <button class="copy-button">copy</button></pre>
+<ul>
+<li>On Windows</li>
+</ul>
+<pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">.\hello.exe world</span>
 Hello, world!</code> <button class="copy-button">copy</button></pre>
 </li>
 </ol>

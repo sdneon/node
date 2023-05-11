@@ -5,8 +5,8 @@ This is a *fun* mod of Node.JS that initially embedded a modified version of dco
 
 Thanks to the inspiration from dcodeIO et al =D
 
-## Version 20.0.0
-Update to Node.JS 20.0.0 baseline.
+## Version 20.1.0
+Update to Node.JS 20.1.0 baseline.
 
 It embeds:
 * DS v1.2.1.
@@ -140,21 +140,19 @@ require('path_to_alternate_src/src_packs/ts/4.2.3/TypeScript.packed.min.js');
 `src_packs` folder is not used in Node.JS build. It's purely provided for playing around with.
 
 ### REPL mode for D Script, CoffeeScript and TypeScript
-REPL mode for D Script, CoffeeScript and TypeScript is activated by setting environment variable `NODE_REPL_SCRIPT` to 'ds', 'cs' or 'ts' respectively.
-* You can even change mode during REPL.
-  * E.g. enter this command in REPL to switch to CoffeeScript: `process.env.NODE_REPL_SCRIPT = 'cs'`
-* You should also use **_editor_** mode for entering multi-lines code blocks.
-  * Simply enter this command in REPL: `.editor`
-  * Paste or type in your code.
-  * To end and execute the code block, use shortcut: CTRL-D
-  * To cancel and exit editor, use shortcut: CTRL-C
+REPL mode for D Script, CoffeeScript and TypeScript is activated by:
+* Setting environment variable `NODE_REPL_SCRIPT` to 'ds', 'cs' or 'ts' respectively.
+  * You can even change mode during REPL.
+    * E.g. enter this command in REPL to switch to CoffeeScript: `process.env.NODE_REPL_SCRIPT = 'cs'`
+  * You should also use **_editor_** mode for entering multi-lines code blocks.
+    * Simply enter this command in REPL: `.editor`
+    * Paste or type in your code.
+    * To end and execute the code block, use shortcut: CTRL-D
+    * To cancel and exit editor, use shortcut: CTRL-C
+* Or running with commandline option '--repl=<script_type>'.
+  * E.g.: node.exe --repl=ds
 
-## Simple Steps to Build Your Own
-* Grab original Node.JS source codes for specific baseline, unzip. E.g.: [original Node.JS 17.9.0 source codes](https://github.com/nodejs/node/archive/refs/tags/v17.9.0.tar.gz)
-* Grab min archive of this mod's source codes from Releases page. E.g. [mod for 17.9.0+](https://github.com/sdneon/node/releases/download/17.9.0%2B/node-17.9.0_src.7z)
-  * Unzip and override Node.JS source.
-     * Jsut 2 _essential_ files changed/overwritten: `lib/internal/modules/cjs/loader.js` and `lib/repl.js`
-* Build as usual per Node.JS
+This mode is not available/valid for nodejs4Cpp DLL (node.DLL).
 
 ### Backward Compatibility for Win 7
 If building for Windows 7, you'll need the `deps\uv\src\win\util.c` patch to revert to use of `gethostname()` instead of new fancy `GetHostNameW()`.
@@ -327,8 +325,6 @@ For information about the governance of the Node.js project, see
   **Antoine du Hamel** <<duhamelantoine1995@gmail.com>> (he/him)
 * [apapirovski](https://github.com/apapirovski) -
   **Anatoli Papirovski** <<apapirovski@mac.com>> (he/him)
-* [BethGriggs](https://github.com/BethGriggs) -
-  **Beth Griggs** <<bethanyngriggs@gmail.com>> (she/her)
 * [BridgeAR](https://github.com/BridgeAR) -
   **Ruben Bridgewater** <<ruben@bridgewater.de>> (he/him)
 * [cjihrig](https://github.com/cjihrig) -
@@ -368,8 +364,8 @@ For information about the governance of the Node.js project, see
 
 #### TSC regular members
 
-* [addaleax](https://github.com/addaleax) -
-  **Anna Henningsen** <<anna@addaleax.net>> (she/her)
+* [BethGriggs](https://github.com/BethGriggs) -
+  **Beth Griggs** <<bethanyngriggs@gmail.com>> (she/her)
 * [bnoordhuis](https://github.com/bnoordhuis) -
   **Ben Noordhuis** <<info@bnoordhuis.nl>>
 * [ChALkeR](https://github.com/ChALkeR) -
@@ -397,6 +393,8 @@ For information about the governance of the Node.js project, see
 
 #### TSC emeriti members
 
+* [addaleax](https://github.com/addaleax) -
+  **Anna Henningsen** <<anna@addaleax.net>> (she/her)
 * [chrisdickinson](https://github.com/chrisdickinson) -
   **Chris Dickinson** <<christopher.s.dickinson@gmail.com>>
 * [evanlucas](https://github.com/evanlucas) -
@@ -532,6 +530,8 @@ For information about the governance of the Node.js project, see
   **Juan José Arboleda** <<soyjuanarbol@gmail.com>> (he/him)
 * [JungMinu](https://github.com/JungMinu) -
   **Minwoo Jung** <<nodecorelab@gmail.com>> (he/him)
+* [KhafraDev](https://github.com/KhafraDev) -
+  **Matthew Aitken** <<maitken033380023@gmail.com>> (he/him)
 * [kuriyosh](https://github.com/kuriyosh) -
   **Yoshiki Kurihara** <<yosyos0306@gmail.com>> (he/him)
 * [legendecas](https://github.com/legendecas) -
@@ -866,8 +866,6 @@ maintaining the Node.js project.
   **Xuguang Mei** <<meixuguang@gmail.com>> (he/him)
 * [Mesteery](https://github.com/Mesteery) -
   **Mestery** <<mestery@protonmail.com>> (he/him)
-* [MoLow](https://github.com/MoLow) -
-  **Moshe Atlow** <<moshe@atlow.co.il>> (he/him)
 * [PoojaDurgad](https://github.com/PoojaDurgad) -
   **Pooja Durgad** <<Pooja.D.P@ibm.com>>
 * [RaisinTen](https://github.com/RaisinTen) -
