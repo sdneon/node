@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v20.1.0">
-  <title>V8 | Node.js v20.1.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v20.2.0">
+  <title>V8 | Node.js v20.2.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -96,7 +96,7 @@
     <div id="column1" data-id="v8" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v20.1.0 documentation</h1>
+          <h1>Node.js v20.2.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -111,7 +111,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v20.1.0</li>
+            <li class="pinned-header">Node.js v20.2.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -432,7 +432,7 @@
       <div id="apicontent">
         <h2>V8<span><a class="mark" href="#v8" id="v8">#</a></span><a aria-hidden="true" class="legacy" id="v8_v8"></a></h2>
 
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v20.1.0/lib/v8.js">lib/v8.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v20.2.0/lib/v8.js">lib/v8.js</a></p>
 <p>The <code>node:v8</code> module exposes APIs that are specific to the version of <a href="https://developers.google.com/v8/">V8</a>
 built into the Node.js binary. It can be accessed using:</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> v8 = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:v8'</span>);</code> <button class="copy-button">copy</button></pre>
@@ -1178,13 +1178,10 @@ occur synchronously in the case of <code>Promise.resolve()</code> or <code>Promi
 </div>
 <p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
 <p>The <code>v8.startupSnapshot</code> interface can be used to add serialization and
-deserialization hooks for custom startup snapshots. Currently the startup
-snapshots can only be built into the Node.js binary from source.</p>
-<pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash"><span class="hljs-built_in">cd</span> /path/to/node</span>
-<span class="hljs-meta prompt_">$ </span><span class="language-bash">./configure --node-snapshot-main=entry.js</span>
-<span class="hljs-meta prompt_">$ </span><span class="language-bash">make node</span>
-<span class="hljs-meta prompt_"># </span><span class="language-bash">This binary contains the result of the execution of entry.js</span>
-<span class="hljs-meta prompt_">$ </span><span class="language-bash">out/Release/node</span></code> <button class="copy-button">copy</button></pre>
+deserialization hooks for custom startup snapshots.</p>
+<pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">node --snapshot-blob snapshot.blob --build-snapshot entry.js</span>
+<span class="hljs-meta prompt_"># </span><span class="language-bash">This launches a process with the snapshot</span>
+<span class="hljs-meta prompt_">$ </span><span class="language-bash">node --snapshot-blob snapshot.blob</span></code> <button class="copy-button">copy</button></pre>
 <p>In the example above, <code>entry.js</code> can use methods from the <code>v8.startupSnapshot</code>
 interface to specify how to save information for custom objects in the snapshot
 during serialization and how the information can be used to synchronize these
@@ -1197,36 +1194,60 @@ contains the following script:</p>
 <span class="hljs-keyword">const</span> path = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:path'</span>);
 <span class="hljs-keyword">const</span> assert = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:assert'</span>);
 
-<span class="hljs-keyword">const</span> {
-  isBuildingSnapshot,
-  addSerializeCallback,
-  addDeserializeCallback,
-  setDeserializeMainFunction,
-} = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:v8'</span>).<span class="hljs-property">startupSnapshot</span>;
+<span class="hljs-keyword">const</span> v8 = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:v8'</span>);
 
-<span class="hljs-keyword">const</span> filePath = path.<span class="hljs-title function_">resolve</span>(__dirname, <span class="hljs-string">'../x1024.txt'</span>);
-<span class="hljs-keyword">const</span> storage = {};
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">BookShelf</span> {
+  storage = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Map</span>();
 
-<span class="hljs-title function_">assert</span>(<span class="hljs-title function_">isBuildingSnapshot</span>());
+  <span class="hljs-comment">// Reading a series of files from directory and store them into storage.</span>
+  <span class="hljs-title function_">constructor</span>(<span class="hljs-params">directory, books</span>) {
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> book <span class="hljs-keyword">of</span> books) {
+      <span class="hljs-variable language_">this</span>.<span class="hljs-property">storage</span>.<span class="hljs-title function_">set</span>(book, fs.<span class="hljs-title function_">readFileSync</span>(path.<span class="hljs-title function_">join</span>(directory, book)));
+    }
+  }
 
-<span class="hljs-title function_">addSerializeCallback</span>(<span class="hljs-function">(<span class="hljs-params">{ filePath }</span>) =></span> {
-  storage[filePath] = zlib.<span class="hljs-title function_">gzipSync</span>(fs.<span class="hljs-title function_">readFileSync</span>(filePath));
-}, { filePath });
+  <span class="hljs-keyword">static</span> <span class="hljs-title function_">compressAll</span>(<span class="hljs-params">shelf</span>) {
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> [ book, content ] <span class="hljs-keyword">of</span> shelf.<span class="hljs-property">storage</span>) {
+      shelf.<span class="hljs-property">storage</span>.<span class="hljs-title function_">set</span>(book, zlib.<span class="hljs-title function_">gzipSync</span>(content));
+    }
+  }
 
-<span class="hljs-title function_">addDeserializeCallback</span>(<span class="hljs-function">(<span class="hljs-params">{ filePath }</span>) =></span> {
-  storage[filePath] = zlib.<span class="hljs-title function_">gunzipSync</span>(storage[filePath]);
-}, { filePath });
+  <span class="hljs-keyword">static</span> <span class="hljs-title function_">decompressAll</span>(<span class="hljs-params">shelf</span>) {
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> [ book, content ] <span class="hljs-keyword">of</span> shelf.<span class="hljs-property">storage</span>) {
+      shelf.<span class="hljs-property">storage</span>.<span class="hljs-title function_">set</span>(book, zlib.<span class="hljs-title function_">gunzipSync</span>(content));
+    }
+  }
+}
 
-<span class="hljs-title function_">setDeserializeMainFunction</span>(<span class="hljs-function">(<span class="hljs-params">{ filePath }</span>) =></span> {
-  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(storage[filePath].<span class="hljs-title function_">toString</span>());
-}, { filePath });</code> <button class="copy-button">copy</button></pre>
-<p>The resulted binary will simply print the data deserialized from the snapshot
-during start up:</p>
-<pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">out/Release/node</span>
-<span class="hljs-meta prompt_"># </span><span class="language-bash">Prints content of ./test/fixtures/x1024.txt</span></code> <button class="copy-button">copy</button></pre>
-<p>Currently the API is only available to a Node.js instance launched from the
-default snapshot, that is, the application deserialized from a user-land
-snapshot cannot use these APIs again.</p>
+<span class="hljs-comment">// __dirname here is where the snapshot script is placed</span>
+<span class="hljs-comment">// during snapshot building time.</span>
+<span class="hljs-keyword">const</span> shelf = <span class="hljs-keyword">new</span> <span class="hljs-title class_">BookShelf</span>(__dirname, [
+  <span class="hljs-string">'book1.en_US.txt'</span>,
+  <span class="hljs-string">'book1.es_ES.txt'</span>,
+  <span class="hljs-string">'book2.zh_CN.txt'</span>,
+]);
+
+<span class="hljs-title function_">assert</span>(v8.<span class="hljs-property">startupSnapshot</span>.<span class="hljs-title function_">isBuildingSnapshot</span>());
+<span class="hljs-comment">// On snapshot serialization, compress the books to reduce size.</span>
+v8.<span class="hljs-property">startupSnapshot</span>.<span class="hljs-title function_">addSerializeCallback</span>(<span class="hljs-title class_">BookShelf</span>.<span class="hljs-property">compressAll</span>, shelf);
+<span class="hljs-comment">// On snapshot deserialization, decompress the books.</span>
+v8.<span class="hljs-property">startupSnapshot</span>.<span class="hljs-title function_">addDeserializeCallback</span>(<span class="hljs-title class_">BookShelf</span>.<span class="hljs-property">decompressAll</span>, shelf);
+v8.<span class="hljs-property">startupSnapshot</span>.<span class="hljs-title function_">setDeserializeMainFunction</span>(<span class="hljs-function">(<span class="hljs-params">shelf</span>) =></span> {
+  <span class="hljs-comment">// process.env and process.argv are refreshed during snapshot</span>
+  <span class="hljs-comment">// deserialization.</span>
+  <span class="hljs-keyword">const</span> lang = process.<span class="hljs-property">env</span>.<span class="hljs-property">BOOK_LANG</span> || <span class="hljs-string">'en_US'</span>;
+  <span class="hljs-keyword">const</span> book = process.<span class="hljs-property">argv</span>[<span class="hljs-number">1</span>];
+  <span class="hljs-keyword">const</span> name = <span class="hljs-string">`<span class="hljs-subst">${book}</span>.<span class="hljs-subst">${lang}</span>.txt`</span>;
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(shelf.<span class="hljs-property">storage</span>.<span class="hljs-title function_">get</span>(name));
+}, shelf);</code> <button class="copy-button">copy</button></pre>
+<p>The resulted binary will get print the data deserialized from the snapshot
+during start up, using the refreshed <code>process.env</code> and <code>process.argv</code> of
+the launched process:</p>
+<pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">BOOK_LANG=es_ES node --snapshot-blob snapshot.blob book1</span>
+<span class="hljs-meta prompt_"># </span><span class="language-bash">Prints content of book1.es_ES.txt deserialized from the snapshot.</span></code> <button class="copy-button">copy</button></pre>
+<p>Currently the application deserialized from a user-land snapshot cannot
+be snapshotted again, so these APIs are only available to applications
+that are not deserialized from a user-land snapshot.</p>
 <h4><code>v8.startupSnapshot.addSerializeCallback(callback[, data])</code><span><a class="mark" href="#v8startupsnapshotaddserializecallbackcallback-data" id="v8startupsnapshotaddserializecallbackcallback-data">#</a></span><a aria-hidden="true" class="legacy" id="v8_v8_startupsnapshot_addserializecallback_callback_data"></a></h4>
 <div class="api_metadata">
 <span>Added in: v18.6.0, v16.17.0</span>

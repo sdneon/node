@@ -21,7 +21,7 @@
       },
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v20.1.0/lib/test.js\">lib/test.js</a></p>\n<p>The <code>node:test</code> module facilitates the creation of JavaScript tests.\nTo access it:</p>\n<pre><code class=\"language-mjs\">import test from 'node:test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('node:test');\n</code></pre>\n<p>This module is only available under the <code>node:</code> scheme. The following will not\nwork:</p>\n<pre><code class=\"language-mjs\">import test from 'test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('test');\n</code></pre>\n<p>Tests created via the <code>test</code> module consist of a single function that is\nprocessed in one of three ways:</p>\n<ol>\n<li>A synchronous function that is considered failing if it throws an exception,\nand is considered passing otherwise.</li>\n<li>A function that returns a <code>Promise</code> that is considered failing if the\n<code>Promise</code> rejects, and is considered passing if the <code>Promise</code> resolves.</li>\n<li>A function that receives a callback function. If the callback receives any\ntruthy value as its first argument, the test is considered failing. If a\nfalsy value is passed as the first argument to the callback, the test is\nconsidered passing. If the test function receives a callback function and\nalso returns a <code>Promise</code>, the test will fail.</li>\n</ol>\n<p>The following example illustrates how tests are written using the\n<code>test</code> module.</p>\n<pre><code class=\"language-js\">test('synchronous passing test', (t) => {\n  // This test passes because it does not throw an exception.\n  assert.strictEqual(1, 1);\n});\n\ntest('synchronous failing test', (t) => {\n  // This test fails because it throws an exception.\n  assert.strictEqual(1, 2);\n});\n\ntest('asynchronous passing test', async (t) => {\n  // This test passes because the Promise returned by the async\n  // function is not rejected.\n  assert.strictEqual(1, 1);\n});\n\ntest('asynchronous failing test', async (t) => {\n  // This test fails because the Promise returned by the async\n  // function is rejected.\n  assert.strictEqual(1, 2);\n});\n\ntest('failing test using Promises', (t) => {\n  // Promises can be used directly as well.\n  return new Promise((resolve, reject) => {\n    setImmediate(() => {\n      reject(new Error('this will cause the test to fail'));\n    });\n  });\n});\n\ntest('callback passing test', (t, done) => {\n  // done() is the callback function. When the setImmediate() runs, it invokes\n  // done() with no arguments.\n  setImmediate(done);\n});\n\ntest('callback failing test', (t, done) => {\n  // When the setImmediate() runs, done() is invoked with an Error object and\n  // the test fails.\n  setImmediate(() => {\n    done(new Error('callback failure'));\n  });\n});\n</code></pre>\n<p>If any tests fail, the process exit code is set to <code>1</code>.</p>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v20.2.0/lib/test.js\">lib/test.js</a></p>\n<p>The <code>node:test</code> module facilitates the creation of JavaScript tests.\nTo access it:</p>\n<pre><code class=\"language-mjs\">import test from 'node:test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('node:test');\n</code></pre>\n<p>This module is only available under the <code>node:</code> scheme. The following will not\nwork:</p>\n<pre><code class=\"language-mjs\">import test from 'test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('test');\n</code></pre>\n<p>Tests created via the <code>test</code> module consist of a single function that is\nprocessed in one of three ways:</p>\n<ol>\n<li>A synchronous function that is considered failing if it throws an exception,\nand is considered passing otherwise.</li>\n<li>A function that returns a <code>Promise</code> that is considered failing if the\n<code>Promise</code> rejects, and is considered passing if the <code>Promise</code> resolves.</li>\n<li>A function that receives a callback function. If the callback receives any\ntruthy value as its first argument, the test is considered failing. If a\nfalsy value is passed as the first argument to the callback, the test is\nconsidered passing. If the test function receives a callback function and\nalso returns a <code>Promise</code>, the test will fail.</li>\n</ol>\n<p>The following example illustrates how tests are written using the\n<code>test</code> module.</p>\n<pre><code class=\"language-js\">test('synchronous passing test', (t) => {\n  // This test passes because it does not throw an exception.\n  assert.strictEqual(1, 1);\n});\n\ntest('synchronous failing test', (t) => {\n  // This test fails because it throws an exception.\n  assert.strictEqual(1, 2);\n});\n\ntest('asynchronous passing test', async (t) => {\n  // This test passes because the Promise returned by the async\n  // function is not rejected.\n  assert.strictEqual(1, 1);\n});\n\ntest('asynchronous failing test', async (t) => {\n  // This test fails because the Promise returned by the async\n  // function is rejected.\n  assert.strictEqual(1, 2);\n});\n\ntest('failing test using Promises', (t) => {\n  // Promises can be used directly as well.\n  return new Promise((resolve, reject) => {\n    setImmediate(() => {\n      reject(new Error('this will cause the test to fail'));\n    });\n  });\n});\n\ntest('callback passing test', (t, done) => {\n  // done() is the callback function. When the setImmediate() runs, it invokes\n  // done() with no arguments.\n  setImmediate(done);\n});\n\ntest('callback failing test', (t, done) => {\n  // When the setImmediate() runs, done() is invoked with an Error object and\n  // the test fails.\n  setImmediate(() => {\n    done(new Error('callback failure'));\n  });\n});\n</code></pre>\n<p>If any tests fail, the process exit code is set to <code>1</code>.</p>",
       "modules": [
         {
           "textRaw": "Subtests",
@@ -247,6 +247,11 @@
             ],
             "changes": [
               {
+                "version": "v20.2.0",
+                "pr-url": "https://github.com/nodejs/node/pull/47909",
+                "description": "Added the `skip`, `todo`, and `only` shorthands."
+              },
+              {
                 "version": [
                   "v18.8.0",
                   "v16.18.0"
@@ -340,6 +345,39 @@
             }
           ],
           "desc": "<p>The <code>test()</code> function is the value imported from the <code>test</code> module. Each\ninvocation of this function results in reporting the test to the <a href=\"test.html#class-testsstream\" class=\"type\">&lt;TestsStream&gt;</a>.</p>\n<p>The <code>TestContext</code> object passed to the <code>fn</code> argument can be used to perform\nactions related to the current test. Examples include skipping the test, adding\nadditional diagnostic information, or creating subtests.</p>\n<p><code>test()</code> returns a <code>Promise</code> that resolves once the test completes.\nif <code>test()</code> is called within a <code>describe()</code> block, it resolve immediately.\nThe return value can usually be discarded for top level tests.\nHowever, the return value from subtests should be used to prevent the parent\ntest from finishing first and cancelling the subtest\nas shown in the following example.</p>\n<pre><code class=\"language-js\">test('top level test', async (t) => {\n  // The setTimeout() in the following subtest would cause it to outlive its\n  // parent test if 'await' is removed on the next line. Once the parent test\n  // completes, it will cancel any outstanding subtests.\n  await t.test('longer running subtest', async (t) => {\n    return new Promise((resolve, reject) => {\n      setTimeout(resolve, 1000);\n    });\n  });\n});\n</code></pre>\n<p>The <code>timeout</code> option can be used to fail the test if it takes longer than\n<code>timeout</code> milliseconds to complete. However, it is not a reliable mechanism for\ncanceling tests because a running test might block the application thread and\nthus prevent the scheduled cancellation.</p>"
+        },
+        {
+          "textRaw": "`test.skip([name][, options][, fn])`",
+          "type": "method",
+          "name": "skip",
+          "signatures": [
+            {
+              "params": []
+            }
+          ],
+          "desc": "<p>Shorthand for skipping a test,\nsame as <a href=\"#testname-options-fn\"><code>test([name], { skip: true }[, fn])</code></a>.</p>"
+        },
+        {
+          "textRaw": "`test.todo([name][, options][, fn])`",
+          "type": "method",
+          "name": "todo",
+          "signatures": [
+            {
+              "params": []
+            }
+          ],
+          "desc": "<p>Shorthand for marking a test as <code>TODO</code>,\nsame as <a href=\"#testname-options-fn\"><code>test([name], { todo: true }[, fn])</code></a>.</p>"
+        },
+        {
+          "textRaw": "`test.only([name][, options][, fn])`",
+          "type": "method",
+          "name": "only",
+          "signatures": [
+            {
+              "params": []
+            }
+          ],
+          "desc": "<p>Shorthand for marking a test as <code>only</code>,\nsame as <a href=\"#testname-options-fn\"><code>test([name], { only: true }[, fn])</code></a>.</p>"
         },
         {
           "textRaw": "`describe([name][, options][, fn])`",

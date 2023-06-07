@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v20.1.0">
-  <title>Node-API | Node.js v20.1.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v20.2.0">
+  <title>Node-API | Node.js v20.2.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -96,7 +96,7 @@
     <div id="column1" data-id="n-api" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v20.1.0 documentation</h1>
+          <h1>Node.js v20.2.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -111,7 +111,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v20.1.0</li>
+            <li class="pinned-header">Node.js v20.2.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -222,7 +222,7 @@
 <li><a href="#napi_escape_handle"><code>napi_escape_handle</code></a></li>
 </ul>
 </li>
-<li><a href="#references-to-objects-with-a-lifespan-longer-than-that-of-the-native-method">References to objects with a lifespan longer than that of the native method</a>
+<li><a href="#references-to-values-with-a-lifespan-longer-than-that-of-the-native-method">References to values with a lifespan longer than that of the native method</a>
 <ul>
 <li><a href="#napi_create_reference"><code>napi_create_reference</code></a></li>
 <li><a href="#napi_delete_reference"><code>napi_delete_reference</code></a></li>
@@ -692,7 +692,7 @@
 <li><a href="#napi_escape_handle"><code>napi_escape_handle</code></a></li>
 </ul>
 </li>
-<li><a href="#references-to-objects-with-a-lifespan-longer-than-that-of-the-native-method">References to objects with a lifespan longer than that of the native method</a>
+<li><a href="#references-to-values-with-a-lifespan-longer-than-that-of-the-native-method">References to values with a lifespan longer than that of the native method</a>
 <ul>
 <li><a href="#napi_create_reference"><code>napi_create_reference</code></a></li>
 <li><a href="#napi_delete_reference"><code>napi_delete_reference</code></a></li>
@@ -2160,23 +2160,33 @@ in the outer scope.</li>
 for the lifetime of the outer scope. It can only be called once per scope.
 If it is called more than once an error will be returned.</p>
 <p>This API can be called even if there is a pending JavaScript exception.</p>
-<h4>References to objects with a lifespan longer than that of the native method<span><a class="mark" href="#references-to-objects-with-a-lifespan-longer-than-that-of-the-native-method" id="references-to-objects-with-a-lifespan-longer-than-that-of-the-native-method">#</a></span><a aria-hidden="true" class="legacy" id="n_api_references_to_objects_with_a_lifespan_longer_than_that_of_the_native_method"></a></h4>
-<p>In some cases an addon will need to be able to create and reference objects
+<h4>References to values with a lifespan longer than that of the native method<span><a class="mark" href="#references-to-values-with-a-lifespan-longer-than-that-of-the-native-method" id="references-to-values-with-a-lifespan-longer-than-that-of-the-native-method">#</a></span><a aria-hidden="true" class="legacy" id="n_api_references_to_values_with_a_lifespan_longer_than_that_of_the_native_method"></a></h4>
+<p>In some cases, an addon will need to be able to create and reference values
 with a lifespan longer than that of a single native method invocation. For
 example, to create a constructor and later use that constructor
-in a request to creates instances, it must be possible to reference
+in a request to create instances, it must be possible to reference
 the constructor object across many different instance creation requests. This
 would not be possible with a normal handle returned as a <code>napi_value</code> as
 described in the earlier section. The lifespan of a normal handle is
 managed by scopes and all scopes must be closed before the end of a native
 method.</p>
-<p>Node-API provides methods to create persistent references to an object.
-Each persistent reference has an associated count with a value of 0
-or higher. The count determines if the reference will keep
-the corresponding object live. References with a count of 0 do not
-prevent the object from being collected and are often called 'weak'
-references. Any count greater than 0 will prevent the object
-from being collected.</p>
+<p>Node-API provides methods for creating persistent references to values.
+Each reference has an associated count with a value of 0 or higher,
+which determines whether the reference will keep the corresponding value alive.
+References with a count of 0 do not prevent values from being collected.
+Values of object (object, function, external) and symbol types are becoming
+'weak' references and can still be accessed while they are not collected.
+Values of other types are released when the count becomes 0
+and cannot be accessed from the reference any more.
+Any count greater than 0 will prevent the values from being collected.</p>
+<p>Symbol values have different flavors. The true weak reference behavior is
+only supported by local symbols created with the <code>Symbol()</code> constructor call.
+Globally registered symbols created with the <code>Symbol.for()</code> call remain
+always strong references because the garbage collector does not collect them.
+The same is true for well-known symbols such as <code>Symbol.iterator</code>. They are
+also never collected by the garbage collector. JavaScript's <code>WeakRef</code> and
+<code>WeakMap</code> types return an error when registered symbols are used,
+but they succeed for local and well-known symbols.</p>
 <p>References can be created with an initial reference count. The count can
 then be modified through <a href="#napi_reference_ref"><code>napi_reference_ref</code></a> and
 <a href="#napi_reference_unref"><code>napi_reference_unref</code></a>. If an object is collected while the count
@@ -2185,6 +2195,10 @@ get the object associated with the reference <a href="#napi_get_reference_value"
 will return <code>NULL</code> for the returned <code>napi_value</code>. An attempt to call
 <a href="#napi_reference_ref"><code>napi_reference_ref</code></a> for a reference whose object has been collected
 results in an error.</p>
+<p>Node-API versions 8 and earlier only allow references to be created for a
+limited set of value types, including object, external, function, and symbol.
+However, in newer Node-API versions, references can be created for any
+value type.</p>
 <p>References must be deleted once they are no longer required by the addon. When
 a reference is deleted, it will no longer prevent the corresponding object from
 being collected. Failure to delete a persistent reference results in
@@ -2211,14 +2225,16 @@ will not be freed. This can be avoided by calling
                                               napi_ref* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
-<li><code>[in] value</code>: <code>napi_value</code> representing the <code>Object</code> to which we want a
-reference.</li>
+<li><code>[in] value</code>: The <code>napi_value</code> for which a reference is being created.</li>
 <li><code>[in] initial_refcount</code>: Initial reference count for the new reference.</li>
 <li><code>[out] result</code>: <code>napi_ref</code> pointing to the new reference.</li>
 </ul>
 <p>Returns <code>napi_ok</code> if the API succeeded.</p>
 <p>This API creates a new reference with the specified reference count
-to the <code>Object</code> passed in.</p>
+to the value passed in.</p>
+<p>In Node-API version 8 and earlier, a reference could only be created for
+object, function, external, and symbol value types. However, in newer Node-API
+versions, a reference can be created for any value type.</p>
 <h5><code>napi_delete_reference</code><span><a class="mark" href="#napi_delete_reference" id="napi_delete_reference">#</a></span><a aria-hidden="true" class="legacy" id="n_api_napi_delete_reference"></a></h5>
 <div class="api_metadata">
 <span>Added in: v8.0.0</span>
@@ -2272,17 +2288,15 @@ passed in and returns the resulting reference count.</p>
 <pre><code class="language-c">NAPI_EXTERN napi_status <span class="hljs-title function_">napi_get_reference_value</span><span class="hljs-params">(napi_env env,
                                                  napi_ref ref,
                                                  napi_value* result)</span>;</code> <button class="copy-button">copy</button></pre>
-<p>the <code>napi_value passed</code> in or out of these methods is a handle to the
-object to which the reference is related.</p>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
-<li><code>[in] ref</code>: <code>napi_ref</code> for which we requesting the corresponding <code>Object</code>.</li>
-<li><code>[out] result</code>: The <code>napi_value</code> for the <code>Object</code> referenced by the
-<code>napi_ref</code>.</li>
+<li><code>[in] ref</code>: The <code>napi_ref</code> for which the corresponding value is
+being requested.</li>
+<li><code>[out] result</code>: The <code>napi_value</code> referenced by the <code>napi_ref</code>.</li>
 </ul>
 <p>Returns <code>napi_ok</code> if the API succeeded.</p>
 <p>If still valid, this API returns the <code>napi_value</code> representing the
-JavaScript <code>Object</code> associated with the <code>napi_ref</code>. Otherwise, result
+JavaScript value associated with the <code>napi_ref</code>. Otherwise, result
 will be <code>NULL</code>.</p>
 <h4>Cleanup on exit of the current Node.js environment<span><a class="mark" href="#cleanup-on-exit-of-the-current-nodejs-environment" id="cleanup-on-exit-of-the-current-nodejs-environment">#</a></span><a aria-hidden="true" class="legacy" id="n_api_cleanup_on_exit_of_the_current_node_js_environment"></a></h4>
 <p>While a Node.js process typically releases all its resources when exiting,
@@ -4768,9 +4782,8 @@ illustrates the use of <code>napi_type_tag_object()</code> and
                               napi_value* result)</span>;</code> <button class="copy-button">copy</button></pre>
 <ul>
 <li><code>[in] env</code>: The environment that the API is invoked under.</li>
-<li><code>[in] utf8name</code>: Name of the JavaScript constructor function; When wrapping a
-C++ class, we recommend for clarity that this name be the same as that of
-the C++ class.</li>
+<li><code>[in] utf8name</code>: Name of the JavaScript constructor function. For clarity,
+it is recommended to use the C++ class name when wrapping a C++ class.</li>
 <li><code>[in] length</code>: The length of the <code>utf8name</code> in bytes, or <code>NAPI_AUTO_LENGTH</code>
 if it is null-terminated.</li>
 <li><code>[in] constructor</code>: Callback function that handles constructing instances
