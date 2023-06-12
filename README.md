@@ -5,8 +5,8 @@ This is a *fun* mod of Node.JS that initially embedded a modified version of dco
 
 Thanks to the inspiration from dcodeIO et al =D
 
-## Version 20.2.0
-Update to Node.JS 20.2.0 baseline with TypeScript 5.1.3.
+## Version 20.3.0
+Update to Node.JS 20.3.0 baseline.
 
 It embeds:
 * DS v1.2.1.
@@ -155,7 +155,7 @@ REPL mode for D Script, CoffeeScript and TypeScript is activated by:
 This mode is not available/valid for nodejs4Cpp DLL (node.DLL).
 
 ### Backward Compatibility for Win 7
-If building for Windows 7, you'll need the `deps\uv\src\win\util.c` patch to revert to use of `gethostname()` instead of new fancy `GetHostNameW()`.
+If building for Windows 7, you'll need the `deps\uv\src\win\util.c` patch for uv_clock_gettime() to replace use of GetSystemTimePreciseAsFileTime() which is only available from Win8 onwards.
 If building for newer versions (>= 8.1), you may omit this patch.
 
 # Original README
@@ -257,15 +257,15 @@ files.
 
 To download `SHASUMS256.txt` using `curl`:
 
-```console
-$ curl -O https://nodejs.org/dist/vx.y.z/SHASUMS256.txt
+```bash
+curl -O https://nodejs.org/dist/vx.y.z/SHASUMS256.txt
 ```
 
 To check that a downloaded file matches the checksum, run
 it through `sha256sum` with a command such as:
 
-```console
-$ grep node-vx.y.z.tar.gz SHASUMS256.txt | sha256sum -c -
+```bash
+grep node-vx.y.z.tar.gz SHASUMS256.txt | sha256sum -c -
 ```
 
 For Current and LTS, the GPG detached signature of `SHASUMS256.txt` is in
@@ -274,16 +274,16 @@ For Current and LTS, the GPG detached signature of `SHASUMS256.txt` is in
 [the GPG keys of individuals authorized to create releases](#release-keys). To
 import the keys:
 
-```console
-$ gpg --keyserver hkps://keys.openpgp.org --recv-keys 4ED778F539E3634C779C87C6D7062848A1AB005C
+```bash
+gpg --keyserver hkps://keys.openpgp.org --recv-keys 4ED778F539E3634C779C87C6D7062848A1AB005C
 ```
 
 See [Release keys](#release-keys) for a script to import active release keys.
 
 Next, download the `SHASUMS256.txt.sig` for the release:
 
-```console
-$ curl -O https://nodejs.org/dist/vx.y.z/SHASUMS256.txt.sig
+```bash
+curl -O https://nodejs.org/dist/vx.y.z/SHASUMS256.txt.sig
 ```
 
 Then use `gpg --verify SHASUMS256.txt.sig SHASUMS256.txt` to verify
@@ -355,6 +355,8 @@ For information about the governance of the Node.js project, see
   **Richard Lau** <<rlau@redhat.com>>
 * [ronag](https://github.com/ronag) -
   **Robert Nagy** <<ronagy@icloud.com>>
+* [ruyadorno](https://github.com/ruyadorno) -
+  **Ruy Adorno** <<ruyadorno@google.com>> (he/him)
 * [targos](https://github.com/targos) -
   **Michaël Zasso** <<targos@protonmail.com>> (he/him)
 * [tniessen](https://github.com/tniessen) -
@@ -576,8 +578,6 @@ For information about the governance of the Node.js project, see
   **Ouyang Yadong** <<oyydoibh@gmail.com>> (he/him)
 * [panva](https://github.com/panva) -
   **Filip Skokan** <<panva.ip@gmail.com>> (he/him)
-* [puzpuzpuz](https://github.com/puzpuzpuz) -
-  **Andrey Pechkurov** <<apechkurov@gmail.com>> (he/him)
 * [Qard](https://github.com/Qard) -
   **Stephen Belanger** <<admin@stephenbelanger.com>> (he/him)
 * [RafaelGSS](https://github.com/RafaelGSS) -
@@ -780,6 +780,8 @@ For information about the governance of the Node.js project, see
   **Prince John Wesley** <<princejohnwesley@gmail.com>>
 * [psmarshall](https://github.com/psmarshall) -
   **Peter Marshall** <<petermarshall@chromium.org>> (he/him)
+* [puzpuzpuz](https://github.com/puzpuzpuz) -
+  **Andrey Pechkurov** <<apechkurov@gmail.com>> (he/him)
 * [refack](https://github.com/refack) -
   **Refael Ackermann (רפאל פלחי)** <<refack@gmail.com>> (he/him/הוא/אתה)
 * [rexagod](https://github.com/rexagod) -
@@ -848,6 +850,8 @@ maintaining the Node.js project.
 
 ### Triagers
 
+* [atlowChemi](https://github.com/atlowChemi) -
+  **Chemi Atlow** <<chemi@atlow.co.il>> (he/him)
 * [Ayase-252](https://github.com/Ayase-252) -
   **Qingyu Deng** <<i@ayase-lab.com>>
 * [bmuenzenmeyer](https://github.com/bmuenzenmeyer) -

@@ -20,7 +20,7 @@
                  'is_debug': 0,
                  'libdir': 'lib',
                  'llvm_version': '0.0',
-                 'napi_build_version': '8',
+                 'napi_build_version': '9',
                  'nasm_version': '2.13',
                  'node_builtin_shareable_builtins': ['deps/cjs-module-lexer/lexer.js', 'deps/cjs-module-lexer/dist/lexer.js', 'deps/undici/undici.js'],
                  'node_byteorder': 'little',

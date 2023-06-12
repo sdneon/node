@@ -8,8 +8,16 @@ DEPS_DIR="$BASE_DIR/deps"
 [ -z "$NODE" ] && NODE="$BASE_DIR/out/Release/node"
 [ -x "$NODE" ] || NODE=$(command -v node)
 
+# shellcheck disable=SC1091
+. "$BASE_DIR/tools/dep_updaters/utils.sh"
+
 NEW_VERSION="$("$NODE" --input-type=module <<'EOF'
-const res = await fetch('https://api.github.com/repos/nodejs/uvwasi/releases/latest');
+const res = await fetch('https://api.github.com/repos/nodejs/uvwasi/releases/latest',
+  process.env.GITHUB_TOKEN && {
+    headers: {
+      "Authorization": `Bearer ${process.env.GITHUB_TOKEN}`
+    },
+  });
 if (!res.ok) throw new Error(`FetchError: ${res.status} ${res.statusText}`, { cause: res });
 const { tag_name } = await res.json();
 console.log(tag_name.replace('v', ''));
@@ -45,6 +53,8 @@ cd "$WORKSPACE"
 
 echo "Fetching UVWASI source archive..."
 curl -sL -o "$UVWASI_ZIP.zip" "https://github.com/nodejs/uvwasi/archive/refs/tags/v$NEW_VERSION.zip"
+
+log_and_verify_sha256sum "uvwasi" "$UVWASI_ZIP.zip"
 
 echo "Moving existing GYP build file"
 mv "$DEPS_DIR/uvwasi/"*.gyp "$WORKSPACE/"

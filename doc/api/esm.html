@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v20.2.0">
-  <title>Modules: ECMAScript modules | Node.js v20.2.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v20.3.0">
+  <title>Modules: ECMAScript modules | Node.js v20.3.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -96,7 +96,7 @@
     <div id="column1" data-id="esm" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v20.2.0 documentation</h1>
+          <h1>Node.js v20.3.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -111,7 +111,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v20.2.0</li>
+            <li class="pinned-header">Node.js v20.3.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -191,15 +191,16 @@
 <ul>
 <li><a href="#https-loader">HTTPS loader</a></li>
 <li><a href="#transpiler-loader">Transpiler loader</a></li>
+<li><a href="#import-map-loader">"import map" loader</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#resolution-algorithm">Resolution algorithm</a>
+<li><a href="#resolution-and-loading-algorithm">Resolution and loading algorithm</a>
 <ul>
 <li><a href="#features">Features</a></li>
-<li><a href="#resolver-algorithm">Resolver algorithm</a></li>
-<li><a href="#resolver-algorithm-specification">Resolver Algorithm Specification</a></li>
+<li><a href="#resolution-algorithm">Resolution algorithm</a></li>
+<li><a href="#resolution-algorithm-specification">Resolution Algorithm Specification</a></li>
 <li><a href="#customizing-esm-specifier-resolution-algorithm">Customizing ESM specifier resolution algorithm</a></li>
 </ul>
 </li>
@@ -305,7 +306,7 @@
 <li><a href="https://nodejs.org/docs/latest-v17.x/api/esm.html">17.x</a></li>
 <li><a href="https://nodejs.org/docs/latest-v16.x/api/esm.html">16.x <b>LTS</b></a></li>
 <li><a href="https://nodejs.org/docs/latest-v15.x/api/esm.html">15.x</a></li>
-<li><a href="https://nodejs.org/docs/latest-v14.x/api/esm.html">14.x <b>LTS</b></a></li>
+<li><a href="https://nodejs.org/docs/latest-v14.x/api/esm.html">14.x</a></li>
 <li><a href="https://nodejs.org/docs/latest-v13.x/api/esm.html">13.x</a></li>
 <li><a href="https://nodejs.org/docs/latest-v12.x/api/esm.html">12.x</a></li>
 <li><a href="https://nodejs.org/docs/latest-v11.x/api/esm.html">11.x</a></li>
@@ -409,15 +410,16 @@
 <ul>
 <li><a href="#https-loader">HTTPS loader</a></li>
 <li><a href="#transpiler-loader">Transpiler loader</a></li>
+<li><a href="#import-map-loader">"import map" loader</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#resolution-algorithm">Resolution algorithm</a>
+<li><a href="#resolution-and-loading-algorithm">Resolution and loading algorithm</a>
 <ul>
 <li><a href="#features">Features</a></li>
-<li><a href="#resolver-algorithm">Resolver algorithm</a></li>
-<li><a href="#resolver-algorithm-specification">Resolver Algorithm Specification</a></li>
+<li><a href="#resolution-algorithm">Resolution algorithm</a></li>
+<li><a href="#resolution-algorithm-specification">Resolution Algorithm Specification</a></li>
 <li><a href="#customizing-esm-specifier-resolution-algorithm">Customizing ESM specifier resolution algorithm</a></li>
 </ul>
 </li>
@@ -518,8 +520,9 @@ for packages without an <a href="packages.html#exports"><code>"exports"</code></
 directly and explicitly to a full path.</p>
 </li>
 </ul>
-<p>Bare specifier resolutions are handled by the <a href="#resolver-algorithm-specification">Node.js module resolution
-algorithm</a>. All other specifier resolutions are always only resolved with
+<p>Bare specifier resolutions are handled by the <a href="#resolution-algorithm-specification">Node.js module
+resolution and loading algorithm</a>.
+All other specifier resolutions are always only resolved with
 the standard relative <a href="https://url.spec.whatwg.org/">URL</a> resolution semantics.</p>
 <p>Like in CommonJS, module files within packages can be accessed by appending a
 path to the package name unless the package's <a href="packages.html#nodejs-packagejson-field-definitions"><code>package.json</code></a> contains an
@@ -905,7 +908,7 @@ provided via a <code>--experimental-loader ./loader-name.mjs</code> argument to 
 all <code>import</code> calls. They won't apply to <code>require</code> calls; those still follow
 <a href="modules.html">CommonJS</a> rules.</p>
 <p>Loaders follow the pattern of <code>--require</code>:</p>
-<pre><code class="language-console">node \
+<pre><code class="language-bash">node \
   --experimental-loader unpkg \
   --experimental-loader http-to-https \
   --experimental-loader cache-buster</code> <button class="copy-button">copy</button></pre>
@@ -1235,28 +1238,6 @@ and there is no security.</p>
 <pre><code class="language-js"><span class="hljs-comment">// https-loader.mjs</span>
 <span class="hljs-keyword">import</span> { get } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:https'</span>;
 
-<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">resolve</span>(<span class="hljs-params">specifier, context, nextResolve</span>) {
-  <span class="hljs-keyword">const</span> { parentURL = <span class="hljs-literal">null</span> } = context;
-
-  <span class="hljs-comment">// Normally Node.js would error on specifiers starting with 'https://', so</span>
-  <span class="hljs-comment">// this hook intercepts them and converts them into absolute URLs to be</span>
-  <span class="hljs-comment">// passed along to the later hooks below.</span>
-  <span class="hljs-keyword">if</span> (specifier.<span class="hljs-title function_">startsWith</span>(<span class="hljs-string">'https://'</span>)) {
-    <span class="hljs-keyword">return</span> {
-      <span class="hljs-attr">shortCircuit</span>: <span class="hljs-literal">true</span>,
-      <span class="hljs-attr">url</span>: specifier,
-    };
-  } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (parentURL &#x26;&#x26; parentURL.<span class="hljs-title function_">startsWith</span>(<span class="hljs-string">'https://'</span>)) {
-    <span class="hljs-keyword">return</span> {
-      <span class="hljs-attr">shortCircuit</span>: <span class="hljs-literal">true</span>,
-      <span class="hljs-attr">url</span>: <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(specifier, parentURL).<span class="hljs-property">href</span>,
-    };
-  }
-
-  <span class="hljs-comment">// Let Node.js handle all other specifiers.</span>
-  <span class="hljs-keyword">return</span> <span class="hljs-title function_">nextResolve</span>(specifier);
-}
-
 <span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">load</span>(<span class="hljs-params">url, context, nextLoad</span>) {
   <span class="hljs-comment">// For JavaScript to be loaded over the network, we need to fetch and</span>
   <span class="hljs-comment">// return it.</span>
@@ -1290,9 +1271,7 @@ prints the current version of CoffeeScript per the module at the URL in
 <code>main.mjs</code>.</p>
 <h5>Transpiler loader<span><a class="mark" href="#transpiler-loader" id="transpiler-loader">#</a></span><a aria-hidden="true" class="legacy" id="esm_transpiler_loader"></a></h5>
 <p>Sources that are in formats Node.js doesn't understand can be converted into
-JavaScript using the <a href="#loadurl-context-nextload"><code>load</code> hook</a>. Before that hook gets called,
-however, a <a href="#resolvespecifier-context-nextresolve"><code>resolve</code> hook</a> needs to tell Node.js not to
-throw an error on unknown file types.</p>
+JavaScript using the <a href="#loadurl-context-nextload"><code>load</code> hook</a>.</p>
 <p>This is less performant than transpiling source files before running
 Node.js; a transpiler loader should only be used for development and testing
 purposes.</p>
@@ -1304,25 +1283,6 @@ purposes.</p>
 <span class="hljs-keyword">import</span> <span class="hljs-title class_">CoffeeScript</span> <span class="hljs-keyword">from</span> <span class="hljs-string">'coffeescript'</span>;
 
 <span class="hljs-keyword">const</span> baseURL = <span class="hljs-title function_">pathToFileURL</span>(<span class="hljs-string">`<span class="hljs-subst">${cwd()}</span>/`</span>).<span class="hljs-property">href</span>;
-
-<span class="hljs-comment">// CoffeeScript files end in .coffee, .litcoffee, or .coffee.md.</span>
-<span class="hljs-keyword">const</span> extensionsRegex = <span class="hljs-regexp">/\.coffee$|\.litcoffee$|\.coffee\.md$/</span>;
-
-<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">resolve</span>(<span class="hljs-params">specifier, context, nextResolve</span>) {
-  <span class="hljs-keyword">if</span> (extensionsRegex.<span class="hljs-title function_">test</span>(specifier)) {
-    <span class="hljs-keyword">const</span> { parentURL = baseURL } = context;
-
-    <span class="hljs-comment">// Node.js normally errors on unknown file extensions, so return a URL for</span>
-    <span class="hljs-comment">// specifiers ending in the CoffeeScript file extensions.</span>
-    <span class="hljs-keyword">return</span> {
-      <span class="hljs-attr">shortCircuit</span>: <span class="hljs-literal">true</span>,
-      <span class="hljs-attr">url</span>: <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(specifier, parentURL).<span class="hljs-property">href</span>,
-    };
-  }
-
-  <span class="hljs-comment">// Let Node.js handle all other specifiers.</span>
-  <span class="hljs-keyword">return</span> <span class="hljs-title function_">nextResolve</span>(specifier);
-}
 
 <span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">load</span>(<span class="hljs-params">url, context, nextLoad</span>) {
   <span class="hljs-keyword">if</span> (extensionsRegex.<span class="hljs-title function_">test</span>(url)) {
@@ -1407,23 +1367,77 @@ causes <code>main.coffee</code> to be turned into JavaScript after its source co
 loaded from disk but before Node.js executes it; and so on for any <code>.coffee</code>,
 <code>.litcoffee</code> or <code>.coffee.md</code> files referenced via <code>import</code> statements of any
 loaded file.</p>
-</section><section><h3>Resolution algorithm<span><a class="mark" href="#resolution-algorithm" id="resolution-algorithm">#</a></span><a aria-hidden="true" class="legacy" id="esm_resolution_algorithm"></a></h3>
+<h5>"import map" loader<span><a class="mark" href="#import-map-loader" id="import-map-loader">#</a></span><a aria-hidden="true" class="legacy" id="esm_import_map_loader"></a></h5>
+<p>The previous two loaders defined <code>load</code> hooks. This is an example of a loader
+that does its work via the <code>resolve</code> hook. This loader reads an
+<code>import-map.json</code> file that specifies which specifiers to override to another
+URL (this is a very simplistic implemenation of a small subset of the
+"import maps" specification).</p>
+<pre><code class="language-js"><span class="hljs-comment">// import-map-loader.js</span>
+<span class="hljs-keyword">import</span> fs <span class="hljs-keyword">from</span> <span class="hljs-string">'node:fs/promises'</span>;
+
+<span class="hljs-keyword">const</span> { imports } = <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">parse</span>(<span class="hljs-keyword">await</span> fs.<span class="hljs-title function_">readFile</span>(<span class="hljs-string">'import-map.json'</span>));
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">resolve</span>(<span class="hljs-params">specifier, context, nextResolve</span>) {
+  <span class="hljs-keyword">if</span> (<span class="hljs-title class_">Object</span>.<span class="hljs-title function_">hasOwn</span>(imports, specifier)) {
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">nextResolve</span>(imports[specifier], context);
+  }
+
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">nextResolve</span>(specifier, context);
+}</code> <button class="copy-button">copy</button></pre>
+<p>Let's assume we have these files:</p>
+<pre><code class="language-js"><span class="hljs-comment">// main.js</span>
+<span class="hljs-keyword">import</span> <span class="hljs-string">'a-module'</span>;</code> <button class="copy-button">copy</button></pre>
+<pre><code class="language-json"><span class="hljs-comment">// import-map.json</span>
+<span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"imports"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"a-module"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./some-module.js"</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
+<pre><code class="language-js"><span class="hljs-comment">// some-module.js</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'some module!'</span>);</code> <button class="copy-button">copy</button></pre>
+<p>If you run <code>node --experimental-loader ./import-map-loader.js main.js</code>
+the output will be <code>some module!</code>.</p>
+</section><section><h3>Resolution and loading algorithm<span><a class="mark" href="#resolution-and-loading-algorithm" id="resolution-and-loading-algorithm">#</a></span><a aria-hidden="true" class="legacy" id="esm_resolution_and_loading_algorithm"></a></h3>
 <h4>Features<span><a class="mark" href="#features" id="features">#</a></span><a aria-hidden="true" class="legacy" id="esm_features"></a></h4>
-<p>The resolver has the following properties:</p>
+<p>The default resolver has the following properties:</p>
 <ul>
 <li>FileURL-based resolution as is used by ES modules</li>
-<li>Support for builtin module loading</li>
 <li>Relative and absolute URL resolution</li>
 <li>No default extensions</li>
 <li>No folder mains</li>
 <li>Bare specifier package resolution lookup through node_modules</li>
+<li>Does not fail on unknown extensions or protocols</li>
+<li>Can optionally provide a hint of the format to the loading phase</li>
 </ul>
-<h4>Resolver algorithm<span><a class="mark" href="#resolver-algorithm" id="resolver-algorithm">#</a></span><a aria-hidden="true" class="legacy" id="esm_resolver_algorithm"></a></h4>
+<p>The default loader has the following properties</p>
+<ul>
+<li>Support for builtin module loading via <code>node:</code> URLs</li>
+<li>Support for "inline" module loading via <code>data:</code> URLs</li>
+<li>Support for <code>file:</code> module loading</li>
+<li>Fails on any other URL protocol</li>
+<li>Fails on unknown extensions for <code>file:</code> loading
+(supports only <code>.cjs</code>, <code>.js</code>, and <code>.mjs</code>)</li>
+</ul>
+<h4>Resolution algorithm<span><a class="mark" href="#resolution-algorithm" id="resolution-algorithm">#</a></span><a aria-hidden="true" class="legacy" id="esm_resolution_algorithm"></a></h4>
 <p>The algorithm to load an ES module specifier is given through the
 <strong>ESM_RESOLVE</strong> method below. It returns the resolved URL for a
 module specifier relative to a parentURL.</p>
+<p>The resolution algorithm determines the full resolved URL for a module
+load, along with its suggested module format. The resolution algorithm
+does not determine whether the resolved URL protocol can be loaded,
+or whether the file extensions are permitted, instead these validations
+are applied by Node.js during the load phase
+(for example, if it was asked to load a URL that has a protocol that is
+not <code>file:</code>, <code>data:</code>, <code>node:</code>, or if <code>--experimental-network-imports</code>
+is enabled, <code>https:</code>).</p>
+<p>The algorithm also tries to determine the format of the file based
+on the extension (see <code>ESM_FILE_FORMAT</code> algorithm below). If it does
+not recognize the file extension (eg if it is not <code>.mjs</code>, <code>.cjs</code>, or
+<code>.json</code>), then a format of <code>undefined</code> is returned,
+which will throw during the load phase.</p>
 <p>The algorithm to determine the module format of a resolved URL is
-provided by <strong>ESM_FORMAT</strong>, which returns the unique module
+provided by <strong>ESM_FILE_FORMAT</strong>, which returns the unique module
 format for any file. The <em>"module"</em> format is returned for an ECMAScript
 Module, while the <em>"commonjs"</em> format is used to indicate loading through the
 legacy CommonJS loader. Additional formats such as <em>"addon"</em> can be extended in
@@ -1447,7 +1461,7 @@ subpath in the package for the given module.</li>
 <li><em>Unsupported Directory Import</em>: The resolved path corresponds to a directory,
 which is not a supported target for module imports.</li>
 </ul>
-<h4>Resolver Algorithm Specification<span><a class="mark" href="#resolver-algorithm-specification" id="resolver-algorithm-specification">#</a></span><a aria-hidden="true" class="legacy" id="esm_resolver_algorithm_specification"></a></h4>
+<h4>Resolution Algorithm Specification<span><a class="mark" href="#resolution-algorithm-specification" id="resolution-algorithm-specification">#</a></span><a aria-hidden="true" class="legacy" id="esm_resolution_algorithm_specification"></a></h4>
 <p><strong>ESM_RESOLVE</strong>(<em>specifier</em>, <em>parentURL</em>)</p>
 <blockquote>
 <ol>
@@ -1508,7 +1522,7 @@ same URL querystring and fragment components.</li>
 URL <em>resolved</em>.</li>
 </ol>
 </li>
-<li>Load <em>resolved</em> as module format, <em>format</em>.</li>
+<li>Return <em>format</em> and <em>resolved</em> to the loading phase</li>
 </ol>
 </blockquote>
 <p><strong>PACKAGE_RESOLVE</strong>(<em>packageSpecifier</em>, <em>parentURL</em>)</p>
@@ -1856,12 +1870,12 @@ error.</li>
 <li>Return <em>"module"</em>.</li>
 </ol>
 </li>
-<li>Throw an <em>Unsupported File Extension</em> error.</li>
+<li>Return <strong>undefined</strong>.</li>
 </ol>
 </li>
 <li>Otherwise,
 <ol>
-<li>Throw an <em>Unsupported File Extension</em> error.</li>
+<li>Return <strong>undefined</strong>.</li>
 </ol>
 </li>
 </ol>

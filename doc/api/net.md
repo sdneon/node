@@ -1171,7 +1171,8 @@ added: v0.11.14
 
 * {string}
 
-The string representation of the remote IP family. `'IPv4'` or `'IPv6'`.
+The string representation of the remote IP family. `'IPv4'` or `'IPv6'`. Value may be `undefined` if
+the socket is destroyed (for example, if the client disconnected).
 
 ### `socket.remotePort`
 
@@ -1181,7 +1182,8 @@ added: v0.5.10
 
 * {integer}
 
-The numeric representation of the remote port. For example, `80` or `21`.
+The numeric representation of the remote port. For example, `80` or `21`. Value may be `undefined` if
+the socket is destroyed (for example, if the client disconnected).
 
 ### `socket.resetAndDestroy()`
 
@@ -1616,8 +1618,8 @@ server.listen(8124, () => {
 
 Test this by using `telnet`:
 
-```console
-$ telnet localhost 8124
+```bash
+telnet localhost 8124
 ```
 
 To listen on the socket `/tmp/echo.sock`:
@@ -1630,8 +1632,8 @@ server.listen('/tmp/echo.sock', () => {
 
 Use `nc` to connect to a Unix domain socket server:
 
-```console
-$ nc -U /tmp/echo.sock
+```bash
+nc -U /tmp/echo.sock
 ```
 
 ## `net.getDefaultAutoSelectFamily()`
