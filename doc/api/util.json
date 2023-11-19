@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v20.3.0/lib/util.js\">lib/util.js</a></p>\n<p>The <code>node:util</code> module supports the needs of Node.js internal APIs. Many of the\nutilities are useful for application and module developers as well. To access\nit:</p>\n<pre><code class=\"language-js\">const util = require('node:util');\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v20.9.0/lib/util.js\">lib/util.js</a></p>\n<p>The <code>node:util</code> module supports the needs of Node.js internal APIs. Many of the\nutilities are useful for application and module developers as well. To access\nit:</p>\n<pre><code class=\"language-js\">const util = require('node:util');\n</code></pre>",
       "methods": [
         {
           "textRaw": "`util.callbackify(original)`",
@@ -577,7 +577,7 @@
               ]
             }
           ],
-          "desc": "<p>The <code>util.inspect()</code> method returns a string representation of <code>object</code> that is\nintended for debugging. The output of <code>util.inspect</code> may change at any time\nand should not be depended upon programmatically. Additional <code>options</code> may be\npassed that alter the result.\n<code>util.inspect()</code> will use the constructor's name and/or <code>@@toStringTag</code> to make\nan identifiable tag for an inspected value.</p>\n<pre><code class=\"language-js\">class Foo {\n  get [Symbol.toStringTag]() {\n    return 'bar';\n  }\n}\n\nclass Bar {}\n\nconst baz = Object.create(null, { [Symbol.toStringTag]: { value: 'foo' } });\n\nutil.inspect(new Foo()); // 'Foo [bar] {}'\nutil.inspect(new Bar()); // 'Bar {}'\nutil.inspect(baz);       // '[foo] {}'\n</code></pre>\n<p>Circular references point to their anchor by using a reference index:</p>\n<pre><code class=\"language-js\">const { inspect } = require('node:util');\n\nconst obj = {};\nobj.a = [obj];\nobj.b = {};\nobj.b.inner = obj.b;\nobj.b.obj = obj;\n\nconsole.log(inspect(obj));\n// &#x3C;ref *1> {\n//   a: [ [Circular *1] ],\n//   b: &#x3C;ref *2> { inner: [Circular *2], obj: [Circular *1] }\n// }\n</code></pre>\n<p>The following example inspects all properties of the <code>util</code> object:</p>\n<pre><code class=\"language-js\">const util = require('node:util');\n\nconsole.log(util.inspect(util, { showHidden: true, depth: null }));\n</code></pre>\n<p>The following example highlights the effect of the <code>compact</code> option:</p>\n<pre><code class=\"language-js\">const util = require('node:util');\n\nconst o = {\n  a: [1, 2, [[\n    'Lorem ipsum dolor sit amet,\\nconsectetur adipiscing elit, sed do ' +\n      'eiusmod \\ntempor incididunt ut labore et dolore magna aliqua.',\n    'test',\n    'foo']], 4],\n  b: new Map([['za', 1], ['zb', 'test']]),\n};\nconsole.log(util.inspect(o, { compact: true, depth: 5, breakLength: 80 }));\n\n// { a:\n//   [ 1,\n//     2,\n//     [ [ 'Lorem ipsum dolor sit amet,\\nconsectetur [...]', // A long line\n//           'test',\n//           'foo' ] ],\n//     4 ],\n//   b: Map(2) { 'za' => 1, 'zb' => 'test' } }\n\n// Setting `compact` to false or an integer creates more reader friendly output.\nconsole.log(util.inspect(o, { compact: false, depth: 5, breakLength: 80 }));\n\n// {\n//   a: [\n//     1,\n//     2,\n//     [\n//       [\n//         'Lorem ipsum dolor sit amet,\\n' +\n//           'consectetur adipiscing elit, sed do eiusmod \\n' +\n//           'tempor incididunt ut labore et dolore magna aliqua.',\n//         'test',\n//         'foo'\n//       ]\n//     ],\n//     4\n//   ],\n//   b: Map(2) {\n//     'za' => 1,\n//     'zb' => 'test'\n//   }\n// }\n\n// Setting `breakLength` to e.g. 150 will print the \"Lorem ipsum\" text in a\n// single line.\n</code></pre>\n<p>The <code>showHidden</code> option allows <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap\"><code>WeakMap</code></a> and <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet\"><code>WeakSet</code></a> entries to be\ninspected. If there are more entries than <code>maxArrayLength</code>, there is no\nguarantee which entries are displayed. That means retrieving the same\n<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet\"><code>WeakSet</code></a> entries twice may result in different output. Furthermore, entries\nwith no remaining strong references may be garbage collected at any time.</p>\n<pre><code class=\"language-js\">const { inspect } = require('node:util');\n\nconst obj = { a: 1 };\nconst obj2 = { b: 2 };\nconst weakSet = new WeakSet([obj, obj2]);\n\nconsole.log(inspect(weakSet, { showHidden: true }));\n// WeakSet { { a: 1 }, { b: 2 } }\n</code></pre>\n<p>The <code>sorted</code> option ensures that an object's property insertion order does not\nimpact the result of <code>util.inspect()</code>.</p>\n<pre><code class=\"language-js\">const { inspect } = require('node:util');\nconst assert = require('node:assert');\n\nconst o1 = {\n  b: [2, 3, 1],\n  a: '`a` comes before `b`',\n  c: new Set([2, 3, 1]),\n};\nconsole.log(inspect(o1, { sorted: true }));\n// { a: '`a` comes before `b`', b: [ 2, 3, 1 ], c: Set(3) { 1, 2, 3 } }\nconsole.log(inspect(o1, { sorted: (a, b) => b.localeCompare(a) }));\n// { c: Set(3) { 3, 2, 1 }, b: [ 2, 3, 1 ], a: '`a` comes before `b`' }\n\nconst o2 = {\n  c: new Set([2, 1, 3]),\n  a: '`a` comes before `b`',\n  b: [2, 3, 1],\n};\nassert.strict.equal(\n  inspect(o1, { sorted: true }),\n  inspect(o2, { sorted: true }),\n);\n</code></pre>\n<p>The <code>numericSeparator</code> option adds an underscore every three digits to all\nnumbers.</p>\n<pre><code class=\"language-js\">const { inspect } = require('node:util');\n\nconst thousand = 1_000;\nconst million = 1_000_000;\nconst bigNumber = 123_456_789n;\nconst bigDecimal = 1_234.123_45;\n\nconsole.log(thousand, million, bigNumber, bigDecimal);\n// 1_000 1_000_000 123_456_789n 1_234.123_45\n</code></pre>\n<p><code>util.inspect()</code> is a synchronous method intended for debugging. Its maximum\noutput length is approximately 128 MiB. Inputs that result in longer output will\nbe truncated.</p>"
+          "desc": "<p>The <code>util.inspect()</code> method returns a string representation of <code>object</code> that is\nintended for debugging. The output of <code>util.inspect</code> may change at any time\nand should not be depended upon programmatically. Additional <code>options</code> may be\npassed that alter the result.\n<code>util.inspect()</code> will use the constructor's name and/or <code>@@toStringTag</code> to make\nan identifiable tag for an inspected value.</p>\n<pre><code class=\"language-js\">class Foo {\n  get [Symbol.toStringTag]() {\n    return 'bar';\n  }\n}\n\nclass Bar {}\n\nconst baz = Object.create(null, { [Symbol.toStringTag]: { value: 'foo' } });\n\nutil.inspect(new Foo()); // 'Foo [bar] {}'\nutil.inspect(new Bar()); // 'Bar {}'\nutil.inspect(baz);       // '[foo] {}'\n</code></pre>\n<p>Circular references point to their anchor by using a reference index:</p>\n<pre><code class=\"language-js\">const { inspect } = require('node:util');\n\nconst obj = {};\nobj.a = [obj];\nobj.b = {};\nobj.b.inner = obj.b;\nobj.b.obj = obj;\n\nconsole.log(inspect(obj));\n// &#x3C;ref *1> {\n//   a: [ [Circular *1] ],\n//   b: &#x3C;ref *2> { inner: [Circular *2], obj: [Circular *1] }\n// }\n</code></pre>\n<p>The following example inspects all properties of the <code>util</code> object:</p>\n<pre><code class=\"language-js\">const util = require('node:util');\n\nconsole.log(util.inspect(util, { showHidden: true, depth: null }));\n</code></pre>\n<p>The following example highlights the effect of the <code>compact</code> option:</p>\n<pre><code class=\"language-js\">const util = require('node:util');\n\nconst o = {\n  a: [1, 2, [[\n    'Lorem ipsum dolor sit amet,\\nconsectetur adipiscing elit, sed do ' +\n      'eiusmod \\ntempor incididunt ut labore et dolore magna aliqua.',\n    'test',\n    'foo']], 4],\n  b: new Map([['za', 1], ['zb', 'test']]),\n};\nconsole.log(util.inspect(o, { compact: true, depth: 5, breakLength: 80 }));\n\n// { a:\n//   [ 1,\n//     2,\n//     [ [ 'Lorem ipsum dolor sit amet,\\nconsectetur [...]', // A long line\n//           'test',\n//           'foo' ] ],\n//     4 ],\n//   b: Map(2) { 'za' => 1, 'zb' => 'test' } }\n\n// Setting `compact` to false or an integer creates more reader friendly output.\nconsole.log(util.inspect(o, { compact: false, depth: 5, breakLength: 80 }));\n\n// {\n//   a: [\n//     1,\n//     2,\n//     [\n//       [\n//         'Lorem ipsum dolor sit amet,\\n' +\n//           'consectetur adipiscing elit, sed do eiusmod \\n' +\n//           'tempor incididunt ut labore et dolore magna aliqua.',\n//         'test',\n//         'foo'\n//       ]\n//     ],\n//     4\n//   ],\n//   b: Map(2) {\n//     'za' => 1,\n//     'zb' => 'test'\n//   }\n// }\n\n// Setting `breakLength` to e.g. 150 will print the \"Lorem ipsum\" text in a\n// single line.\n</code></pre>\n<p>The <code>showHidden</code> option allows <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap\"><code>WeakMap</code></a> and <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet\"><code>WeakSet</code></a> entries to be\ninspected. If there are more entries than <code>maxArrayLength</code>, there is no\nguarantee which entries are displayed. That means retrieving the same\n<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet\"><code>WeakSet</code></a> entries twice may result in different output. Furthermore, entries\nwith no remaining strong references may be garbage collected at any time.</p>\n<pre><code class=\"language-js\">const { inspect } = require('node:util');\n\nconst obj = { a: 1 };\nconst obj2 = { b: 2 };\nconst weakSet = new WeakSet([obj, obj2]);\n\nconsole.log(inspect(weakSet, { showHidden: true }));\n// WeakSet { { a: 1 }, { b: 2 } }\n</code></pre>\n<p>The <code>sorted</code> option ensures that an object's property insertion order does not\nimpact the result of <code>util.inspect()</code>.</p>\n<pre><code class=\"language-js\">const { inspect } = require('node:util');\nconst assert = require('node:assert');\n\nconst o1 = {\n  b: [2, 3, 1],\n  a: '`a` comes before `b`',\n  c: new Set([2, 3, 1]),\n};\nconsole.log(inspect(o1, { sorted: true }));\n// { a: '`a` comes before `b`', b: [ 2, 3, 1 ], c: Set(3) { 1, 2, 3 } }\nconsole.log(inspect(o1, { sorted: (a, b) => b.localeCompare(a) }));\n// { c: Set(3) { 3, 2, 1 }, b: [ 2, 3, 1 ], a: '`a` comes before `b`' }\n\nconst o2 = {\n  c: new Set([2, 1, 3]),\n  a: '`a` comes before `b`',\n  b: [2, 3, 1],\n};\nassert.strict.equal(\n  inspect(o1, { sorted: true }),\n  inspect(o2, { sorted: true }),\n);\n</code></pre>\n<p>The <code>numericSeparator</code> option adds an underscore every three digits to all\nnumbers.</p>\n<pre><code class=\"language-js\">const { inspect } = require('node:util');\n\nconst thousand = 1_000;\nconst million = 1_000_000;\nconst bigNumber = 123_456_789n;\nconst bigDecimal = 1_234.123_45;\n\nconsole.log(inspect(thousand, { numericSeparator: true }));\n// 1_000\nconsole.log(inspect(million, { numericSeparator: true }));\n// 1_000_000\nconsole.log(inspect(bigNumber, { numericSeparator: true }));\n// 123_456_789n\nconsole.log(inspect(bigDecimal, { numericSeparator: true }));\n// 1_234.123_45\n</code></pre>\n<p><code>util.inspect()</code> is a synchronous method intended for debugging. Its maximum\noutput length is approximately 128 MiB. Inputs that result in longer output will\nbe truncated.</p>"
         },
         {
           "textRaw": "`util.inspect(object[, showHidden[, depth[, colors]]])`",
@@ -820,7 +820,7 @@
               ]
             }
           ],
-          "desc": "<p>The <code>util.inspect()</code> method returns a string representation of <code>object</code> that is\nintended for debugging. The output of <code>util.inspect</code> may change at any time\nand should not be depended upon programmatically. Additional <code>options</code> may be\npassed that alter the result.\n<code>util.inspect()</code> will use the constructor's name and/or <code>@@toStringTag</code> to make\nan identifiable tag for an inspected value.</p>\n<pre><code class=\"language-js\">class Foo {\n  get [Symbol.toStringTag]() {\n    return 'bar';\n  }\n}\n\nclass Bar {}\n\nconst baz = Object.create(null, { [Symbol.toStringTag]: { value: 'foo' } });\n\nutil.inspect(new Foo()); // 'Foo [bar] {}'\nutil.inspect(new Bar()); // 'Bar {}'\nutil.inspect(baz);       // '[foo] {}'\n</code></pre>\n<p>Circular references point to their anchor by using a reference index:</p>\n<pre><code class=\"language-js\">const { inspect } = require('node:util');\n\nconst obj = {};\nobj.a = [obj];\nobj.b = {};\nobj.b.inner = obj.b;\nobj.b.obj = obj;\n\nconsole.log(inspect(obj));\n// &#x3C;ref *1> {\n//   a: [ [Circular *1] ],\n//   b: &#x3C;ref *2> { inner: [Circular *2], obj: [Circular *1] }\n// }\n</code></pre>\n<p>The following example inspects all properties of the <code>util</code> object:</p>\n<pre><code class=\"language-js\">const util = require('node:util');\n\nconsole.log(util.inspect(util, { showHidden: true, depth: null }));\n</code></pre>\n<p>The following example highlights the effect of the <code>compact</code> option:</p>\n<pre><code class=\"language-js\">const util = require('node:util');\n\nconst o = {\n  a: [1, 2, [[\n    'Lorem ipsum dolor sit amet,\\nconsectetur adipiscing elit, sed do ' +\n      'eiusmod \\ntempor incididunt ut labore et dolore magna aliqua.',\n    'test',\n    'foo']], 4],\n  b: new Map([['za', 1], ['zb', 'test']]),\n};\nconsole.log(util.inspect(o, { compact: true, depth: 5, breakLength: 80 }));\n\n// { a:\n//   [ 1,\n//     2,\n//     [ [ 'Lorem ipsum dolor sit amet,\\nconsectetur [...]', // A long line\n//           'test',\n//           'foo' ] ],\n//     4 ],\n//   b: Map(2) { 'za' => 1, 'zb' => 'test' } }\n\n// Setting `compact` to false or an integer creates more reader friendly output.\nconsole.log(util.inspect(o, { compact: false, depth: 5, breakLength: 80 }));\n\n// {\n//   a: [\n//     1,\n//     2,\n//     [\n//       [\n//         'Lorem ipsum dolor sit amet,\\n' +\n//           'consectetur adipiscing elit, sed do eiusmod \\n' +\n//           'tempor incididunt ut labore et dolore magna aliqua.',\n//         'test',\n//         'foo'\n//       ]\n//     ],\n//     4\n//   ],\n//   b: Map(2) {\n//     'za' => 1,\n//     'zb' => 'test'\n//   }\n// }\n\n// Setting `breakLength` to e.g. 150 will print the \"Lorem ipsum\" text in a\n// single line.\n</code></pre>\n<p>The <code>showHidden</code> option allows <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap\"><code>WeakMap</code></a> and <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet\"><code>WeakSet</code></a> entries to be\ninspected. If there are more entries than <code>maxArrayLength</code>, there is no\nguarantee which entries are displayed. That means retrieving the same\n<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet\"><code>WeakSet</code></a> entries twice may result in different output. Furthermore, entries\nwith no remaining strong references may be garbage collected at any time.</p>\n<pre><code class=\"language-js\">const { inspect } = require('node:util');\n\nconst obj = { a: 1 };\nconst obj2 = { b: 2 };\nconst weakSet = new WeakSet([obj, obj2]);\n\nconsole.log(inspect(weakSet, { showHidden: true }));\n// WeakSet { { a: 1 }, { b: 2 } }\n</code></pre>\n<p>The <code>sorted</code> option ensures that an object's property insertion order does not\nimpact the result of <code>util.inspect()</code>.</p>\n<pre><code class=\"language-js\">const { inspect } = require('node:util');\nconst assert = require('node:assert');\n\nconst o1 = {\n  b: [2, 3, 1],\n  a: '`a` comes before `b`',\n  c: new Set([2, 3, 1]),\n};\nconsole.log(inspect(o1, { sorted: true }));\n// { a: '`a` comes before `b`', b: [ 2, 3, 1 ], c: Set(3) { 1, 2, 3 } }\nconsole.log(inspect(o1, { sorted: (a, b) => b.localeCompare(a) }));\n// { c: Set(3) { 3, 2, 1 }, b: [ 2, 3, 1 ], a: '`a` comes before `b`' }\n\nconst o2 = {\n  c: new Set([2, 1, 3]),\n  a: '`a` comes before `b`',\n  b: [2, 3, 1],\n};\nassert.strict.equal(\n  inspect(o1, { sorted: true }),\n  inspect(o2, { sorted: true }),\n);\n</code></pre>\n<p>The <code>numericSeparator</code> option adds an underscore every three digits to all\nnumbers.</p>\n<pre><code class=\"language-js\">const { inspect } = require('node:util');\n\nconst thousand = 1_000;\nconst million = 1_000_000;\nconst bigNumber = 123_456_789n;\nconst bigDecimal = 1_234.123_45;\n\nconsole.log(thousand, million, bigNumber, bigDecimal);\n// 1_000 1_000_000 123_456_789n 1_234.123_45\n</code></pre>\n<p><code>util.inspect()</code> is a synchronous method intended for debugging. Its maximum\noutput length is approximately 128 MiB. Inputs that result in longer output will\nbe truncated.</p>",
+          "desc": "<p>The <code>util.inspect()</code> method returns a string representation of <code>object</code> that is\nintended for debugging. The output of <code>util.inspect</code> may change at any time\nand should not be depended upon programmatically. Additional <code>options</code> may be\npassed that alter the result.\n<code>util.inspect()</code> will use the constructor's name and/or <code>@@toStringTag</code> to make\nan identifiable tag for an inspected value.</p>\n<pre><code class=\"language-js\">class Foo {\n  get [Symbol.toStringTag]() {\n    return 'bar';\n  }\n}\n\nclass Bar {}\n\nconst baz = Object.create(null, { [Symbol.toStringTag]: { value: 'foo' } });\n\nutil.inspect(new Foo()); // 'Foo [bar] {}'\nutil.inspect(new Bar()); // 'Bar {}'\nutil.inspect(baz);       // '[foo] {}'\n</code></pre>\n<p>Circular references point to their anchor by using a reference index:</p>\n<pre><code class=\"language-js\">const { inspect } = require('node:util');\n\nconst obj = {};\nobj.a = [obj];\nobj.b = {};\nobj.b.inner = obj.b;\nobj.b.obj = obj;\n\nconsole.log(inspect(obj));\n// &#x3C;ref *1> {\n//   a: [ [Circular *1] ],\n//   b: &#x3C;ref *2> { inner: [Circular *2], obj: [Circular *1] }\n// }\n</code></pre>\n<p>The following example inspects all properties of the <code>util</code> object:</p>\n<pre><code class=\"language-js\">const util = require('node:util');\n\nconsole.log(util.inspect(util, { showHidden: true, depth: null }));\n</code></pre>\n<p>The following example highlights the effect of the <code>compact</code> option:</p>\n<pre><code class=\"language-js\">const util = require('node:util');\n\nconst o = {\n  a: [1, 2, [[\n    'Lorem ipsum dolor sit amet,\\nconsectetur adipiscing elit, sed do ' +\n      'eiusmod \\ntempor incididunt ut labore et dolore magna aliqua.',\n    'test',\n    'foo']], 4],\n  b: new Map([['za', 1], ['zb', 'test']]),\n};\nconsole.log(util.inspect(o, { compact: true, depth: 5, breakLength: 80 }));\n\n// { a:\n//   [ 1,\n//     2,\n//     [ [ 'Lorem ipsum dolor sit amet,\\nconsectetur [...]', // A long line\n//           'test',\n//           'foo' ] ],\n//     4 ],\n//   b: Map(2) { 'za' => 1, 'zb' => 'test' } }\n\n// Setting `compact` to false or an integer creates more reader friendly output.\nconsole.log(util.inspect(o, { compact: false, depth: 5, breakLength: 80 }));\n\n// {\n//   a: [\n//     1,\n//     2,\n//     [\n//       [\n//         'Lorem ipsum dolor sit amet,\\n' +\n//           'consectetur adipiscing elit, sed do eiusmod \\n' +\n//           'tempor incididunt ut labore et dolore magna aliqua.',\n//         'test',\n//         'foo'\n//       ]\n//     ],\n//     4\n//   ],\n//   b: Map(2) {\n//     'za' => 1,\n//     'zb' => 'test'\n//   }\n// }\n\n// Setting `breakLength` to e.g. 150 will print the \"Lorem ipsum\" text in a\n// single line.\n</code></pre>\n<p>The <code>showHidden</code> option allows <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap\"><code>WeakMap</code></a> and <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet\"><code>WeakSet</code></a> entries to be\ninspected. If there are more entries than <code>maxArrayLength</code>, there is no\nguarantee which entries are displayed. That means retrieving the same\n<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet\"><code>WeakSet</code></a> entries twice may result in different output. Furthermore, entries\nwith no remaining strong references may be garbage collected at any time.</p>\n<pre><code class=\"language-js\">const { inspect } = require('node:util');\n\nconst obj = { a: 1 };\nconst obj2 = { b: 2 };\nconst weakSet = new WeakSet([obj, obj2]);\n\nconsole.log(inspect(weakSet, { showHidden: true }));\n// WeakSet { { a: 1 }, { b: 2 } }\n</code></pre>\n<p>The <code>sorted</code> option ensures that an object's property insertion order does not\nimpact the result of <code>util.inspect()</code>.</p>\n<pre><code class=\"language-js\">const { inspect } = require('node:util');\nconst assert = require('node:assert');\n\nconst o1 = {\n  b: [2, 3, 1],\n  a: '`a` comes before `b`',\n  c: new Set([2, 3, 1]),\n};\nconsole.log(inspect(o1, { sorted: true }));\n// { a: '`a` comes before `b`', b: [ 2, 3, 1 ], c: Set(3) { 1, 2, 3 } }\nconsole.log(inspect(o1, { sorted: (a, b) => b.localeCompare(a) }));\n// { c: Set(3) { 3, 2, 1 }, b: [ 2, 3, 1 ], a: '`a` comes before `b`' }\n\nconst o2 = {\n  c: new Set([2, 1, 3]),\n  a: '`a` comes before `b`',\n  b: [2, 3, 1],\n};\nassert.strict.equal(\n  inspect(o1, { sorted: true }),\n  inspect(o2, { sorted: true }),\n);\n</code></pre>\n<p>The <code>numericSeparator</code> option adds an underscore every three digits to all\nnumbers.</p>\n<pre><code class=\"language-js\">const { inspect } = require('node:util');\n\nconst thousand = 1_000;\nconst million = 1_000_000;\nconst bigNumber = 123_456_789n;\nconst bigDecimal = 1_234.123_45;\n\nconsole.log(inspect(thousand, { numericSeparator: true }));\n// 1_000\nconsole.log(inspect(million, { numericSeparator: true }));\n// 1_000_000\nconsole.log(inspect(bigNumber, { numericSeparator: true }));\n// 123_456_789n\nconsole.log(inspect(bigDecimal, { numericSeparator: true }));\n// 1_234.123_45\n</code></pre>\n<p><code>util.inspect()</code> is a synchronous method intended for debugging. Its maximum\noutput length is approximately 128 MiB. Inputs that result in longer output will\nbe truncated.</p>",
           "miscs": [
             {
               "textRaw": "Customizing `util.inspect` colors",
@@ -1094,7 +1094,13 @@
             "added": [
               "v8.0.0"
             ],
-            "changes": []
+            "changes": [
+              {
+                "version": "v20.8.0",
+                "pr-url": "https://github.com/nodejs/node/pull/49647",
+                "description": "Calling `promisify` on a function that returns a `Promise` is deprecated."
+              }
+            ]
           },
           "signatures": [
             {
@@ -1112,7 +1118,7 @@
               ]
             }
           ],
-          "desc": "<p>Takes a function following the common error-first callback style, i.e. taking\nan <code>(err, value) => ...</code> callback as the last argument, and returns a version\nthat returns promises.</p>\n<pre><code class=\"language-js\">const util = require('node:util');\nconst fs = require('node:fs');\n\nconst stat = util.promisify(fs.stat);\nstat('.').then((stats) => {\n  // Do something with `stats`\n}).catch((error) => {\n  // Handle the error.\n});\n</code></pre>\n<p>Or, equivalently using <code>async function</code>s:</p>\n<pre><code class=\"language-js\">const util = require('node:util');\nconst fs = require('node:fs');\n\nconst stat = util.promisify(fs.stat);\n\nasync function callStat() {\n  const stats = await stat('.');\n  console.log(`This directory is owned by ${stats.uid}`);\n}\n</code></pre>\n<p>If there is an <code>original[util.promisify.custom]</code> property present, <code>promisify</code>\nwill return its value, see <a href=\"#custom-promisified-functions\">Custom promisified functions</a>.</p>\n<p><code>promisify()</code> assumes that <code>original</code> is a function taking a callback as its\nfinal argument in all cases. If <code>original</code> is not a function, <code>promisify()</code>\nwill throw an error. If <code>original</code> is a function but its last argument is not\nan error-first callback, it will still be passed an error-first\ncallback as its last argument.</p>\n<p>Using <code>promisify()</code> on class methods or other methods that use <code>this</code> may not\nwork as expected unless handled specially:</p>\n<pre><code class=\"language-js\">const util = require('node:util');\n\nclass Foo {\n  constructor() {\n    this.a = 42;\n  }\n\n  bar(callback) {\n    callback(null, this.a);\n  }\n}\n\nconst foo = new Foo();\n\nconst naiveBar = util.promisify(foo.bar);\n// TypeError: Cannot read property 'a' of undefined\n// naiveBar().then(a => console.log(a));\n\nnaiveBar.call(foo).then((a) => console.log(a)); // '42'\n\nconst bindBar = naiveBar.bind(foo);\nbindBar().then((a) => console.log(a)); // '42'\n</code></pre>",
+          "desc": "<p>Takes a function following the common error-first callback style, i.e. taking\nan <code>(err, value) => ...</code> callback as the last argument, and returns a version\nthat returns promises.</p>\n<pre><code class=\"language-js\">const util = require('node:util');\nconst fs = require('node:fs');\n\nconst stat = util.promisify(fs.stat);\nstat('.').then((stats) => {\n  // Do something with `stats`\n}).catch((error) => {\n  // Handle the error.\n});\n</code></pre>\n<p>Or, equivalently using <code>async function</code>s:</p>\n<pre><code class=\"language-js\">const util = require('node:util');\nconst fs = require('node:fs');\n\nconst stat = util.promisify(fs.stat);\n\nasync function callStat() {\n  const stats = await stat('.');\n  console.log(`This directory is owned by ${stats.uid}`);\n}\n\ncallStat();\n</code></pre>\n<p>If there is an <code>original[util.promisify.custom]</code> property present, <code>promisify</code>\nwill return its value, see <a href=\"#custom-promisified-functions\">Custom promisified functions</a>.</p>\n<p><code>promisify()</code> assumes that <code>original</code> is a function taking a callback as its\nfinal argument in all cases. If <code>original</code> is not a function, <code>promisify()</code>\nwill throw an error. If <code>original</code> is a function but its last argument is not\nan error-first callback, it will still be passed an error-first\ncallback as its last argument.</p>\n<p>Using <code>promisify()</code> on class methods or other methods that use <code>this</code> may not\nwork as expected unless handled specially:</p>\n<pre><code class=\"language-js\">const util = require('node:util');\n\nclass Foo {\n  constructor() {\n    this.a = 42;\n  }\n\n  bar(callback) {\n    callback(null, this.a);\n  }\n}\n\nconst foo = new Foo();\n\nconst naiveBar = util.promisify(foo.bar);\n// TypeError: Cannot read property 'a' of undefined\n// naiveBar().then(a => console.log(a));\n\nnaiveBar.call(foo).then((a) => console.log(a)); // '42'\n\nconst bindBar = naiveBar.bind(foo);\nbindBar().then((a) => console.log(a)); // '42'\n</code></pre>",
           "modules": [
             {
               "textRaw": "Custom promisified functions",
@@ -1300,168 +1306,64 @@
           "stability": 1,
           "stabilityText": "Experimental",
           "desc": "<p>An implementation of <a href=\"https://bmeck.github.io/node-proposal-mime-api/\">the MIMEType class</a>.</p>\n<p>In accordance with browser conventions, all properties of <code>MIMEType</code> objects\nare implemented as getters and setters on the class prototype, rather than as\ndata properties on the object itself.</p>\n<p>A MIME string is a structured string containing multiple meaningful\ncomponents. When parsed, a <code>MIMEType</code> object is returned containing\nproperties for each of these components.</p>",
-          "classes": [
+          "properties": [
             {
-              "textRaw": "Class: `util.MIMEParams`",
-              "type": "class",
-              "name": "util.MIMEParams",
-              "meta": {
-                "added": [
-                  "v19.1.0",
-                  "v18.13.0"
-                ],
-                "changes": []
-              },
-              "desc": "<p>The <code>MIMEParams</code> API provides read and write access to the parameters of a\n<code>MIMEType</code>.</p>",
-              "methods": [
-                {
-                  "textRaw": "`mimeParams.delete(name)`",
-                  "type": "method",
-                  "name": "delete",
-                  "signatures": [
-                    {
-                      "params": [
-                        {
-                          "textRaw": "`name` {string}",
-                          "name": "name",
-                          "type": "string"
-                        }
-                      ]
-                    }
-                  ],
-                  "desc": "<p>Remove all name-value pairs whose name is <code>name</code>.</p>"
-                },
-                {
-                  "textRaw": "`mimeParams.entries()`",
-                  "type": "method",
-                  "name": "entries",
-                  "signatures": [
-                    {
-                      "return": {
-                        "textRaw": "Returns: {Iterator}",
-                        "name": "return",
-                        "type": "Iterator"
-                      },
-                      "params": []
-                    }
-                  ],
-                  "desc": "<p>Returns an iterator over each of the name-value pairs in the parameters.\nEach item of the iterator is a JavaScript <code>Array</code>. The first item of the array\nis the <code>name</code>, the second item of the array is the <code>value</code>.</p>"
-                },
-                {
-                  "textRaw": "`mimeParams.get(name)`",
-                  "type": "method",
-                  "name": "get",
-                  "signatures": [
-                    {
-                      "return": {
-                        "textRaw": "Returns: {string} or `null` if there is no name-value pair with the given `name`.",
-                        "name": "return",
-                        "type": "string",
-                        "desc": "or `null` if there is no name-value pair with the given `name`."
-                      },
-                      "params": [
-                        {
-                          "textRaw": "`name` {string}",
-                          "name": "name",
-                          "type": "string"
-                        }
-                      ]
-                    }
-                  ],
-                  "desc": "<p>Returns the value of the first name-value pair whose name is <code>name</code>. If there\nare no such pairs, <code>null</code> is returned.</p>"
-                },
-                {
-                  "textRaw": "`mimeParams.has(name)`",
-                  "type": "method",
-                  "name": "has",
-                  "signatures": [
-                    {
-                      "return": {
-                        "textRaw": "Returns: {boolean}",
-                        "name": "return",
-                        "type": "boolean"
-                      },
-                      "params": [
-                        {
-                          "textRaw": "`name` {string}",
-                          "name": "name",
-                          "type": "string"
-                        }
-                      ]
-                    }
-                  ],
-                  "desc": "<p>Returns <code>true</code> if there is at least one name-value pair whose name is <code>name</code>.</p>"
-                },
-                {
-                  "textRaw": "`mimeParams.keys()`",
-                  "type": "method",
-                  "name": "keys",
-                  "signatures": [
-                    {
-                      "return": {
-                        "textRaw": "Returns: {Iterator}",
-                        "name": "return",
-                        "type": "Iterator"
-                      },
-                      "params": []
-                    }
-                  ],
-                  "desc": "<p>Returns an iterator over the names of each name-value pair.</p>\n<pre><code class=\"language-mjs\">import { MIMEType } from 'node:util';\n\nconst { params } = new MIMEType('text/plain;foo=0;bar=1');\nfor (const name of params.keys()) {\n  console.log(name);\n}\n// Prints:\n//   foo\n//   bar\n</code></pre>\n<pre><code class=\"language-cjs\">const { MIMEType } = require('node:util');\n\nconst { params } = new MIMEType('text/plain;foo=0;bar=1');\nfor (const name of params.keys()) {\n  console.log(name);\n}\n// Prints:\n//   foo\n//   bar\n</code></pre>"
-                },
-                {
-                  "textRaw": "`mimeParams.set(name, value)`",
-                  "type": "method",
-                  "name": "set",
-                  "signatures": [
-                    {
-                      "params": [
-                        {
-                          "textRaw": "`name` {string}",
-                          "name": "name",
-                          "type": "string"
-                        },
-                        {
-                          "textRaw": "`value` {string}",
-                          "name": "value",
-                          "type": "string"
-                        }
-                      ]
-                    }
-                  ],
-                  "desc": "<p>Sets the value in the <code>MIMEParams</code> object associated with <code>name</code> to\n<code>value</code>. If there are any pre-existing name-value pairs whose names are <code>name</code>,\nset the first such pair's value to <code>value</code>.</p>\n<pre><code class=\"language-mjs\">import { MIMEType } from 'node:util';\n\nconst { params } = new MIMEType('text/plain;foo=0;bar=1');\nparams.set('foo', 'def');\nparams.set('baz', 'xyz');\nconsole.log(params.toString());\n// Prints: foo=def&#x26;bar=1&#x26;baz=xyz\n</code></pre>\n<pre><code class=\"language-cjs\">const { MIMEType } = require('node:util');\n\nconst { params } = new MIMEType('text/plain;foo=0;bar=1');\nparams.set('foo', 'def');\nparams.set('baz', 'xyz');\nconsole.log(params.toString());\n// Prints: foo=def&#x26;bar=1&#x26;baz=xyz\n</code></pre>"
-                },
-                {
-                  "textRaw": "`mimeParams.values()`",
-                  "type": "method",
-                  "name": "values",
-                  "signatures": [
-                    {
-                      "return": {
-                        "textRaw": "Returns: {Iterator}",
-                        "name": "return",
-                        "type": "Iterator"
-                      },
-                      "params": []
-                    }
-                  ],
-                  "desc": "<p>Returns an iterator over the values of each name-value pair.</p>"
-                }
-              ],
-              "modules": [
-                {
-                  "textRaw": "`mimeParams[@@iterator]()`",
-                  "name": "`mimeparams[@@iterator]()`",
-                  "desc": "<ul>\n<li>Returns: <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols#The_iterator_protocol\" class=\"type\">&lt;Iterator&gt;</a></li>\n</ul>\n<p>Alias for <a href=\"#mimeparamsentries\"><code>mimeParams.entries()</code></a>.</p>\n<pre><code class=\"language-mjs\">import { MIMEType } from 'node:util';\n\nconst { params } = new MIMEType('text/plain;foo=bar;xyz=baz');\nfor (const [name, value] of params) {\n  console.log(name, value);\n}\n// Prints:\n//   foo bar\n//   xyz baz\n</code></pre>\n<pre><code class=\"language-cjs\">const { MIMEType } = require('node:util');\n\nconst { params } = new MIMEType('text/plain;foo=bar;xyz=baz');\nfor (const [name, value] of params) {\n  console.log(name, value);\n}\n// Prints:\n//   foo bar\n//   xyz baz\n</code></pre>",
-                  "type": "module",
-                  "displayName": "`mimeParams[@@iterator]()`"
-                }
-              ],
+              "textRaw": "`type` {string}",
+              "type": "string",
+              "name": "type",
+              "desc": "<p>Gets and sets the type portion of the MIME.</p>\n<pre><code class=\"language-mjs\">import { MIMEType } from 'node:util';\n\nconst myMIME = new MIMEType('text/javascript');\nconsole.log(myMIME.type);\n// Prints: text\nmyMIME.type = 'application';\nconsole.log(myMIME.type);\n// Prints: application\nconsole.log(String(myMIME));\n// Prints: application/javascript\n</code></pre>\n<pre><code class=\"language-cjs\">const { MIMEType } = require('node:util');\n\nconst myMIME = new MIMEType('text/javascript');\nconsole.log(myMIME.type);\n// Prints: text\nmyMIME.type = 'application';\nconsole.log(myMIME.type);\n// Prints: application\nconsole.log(String(myMIME));\n// Prints: application/javascript\n</code></pre>"
+            },
+            {
+              "textRaw": "`subtype` {string}",
+              "type": "string",
+              "name": "subtype",
+              "desc": "<p>Gets and sets the subtype portion of the MIME.</p>\n<pre><code class=\"language-mjs\">import { MIMEType } from 'node:util';\n\nconst myMIME = new MIMEType('text/ecmascript');\nconsole.log(myMIME.subtype);\n// Prints: ecmascript\nmyMIME.subtype = 'javascript';\nconsole.log(myMIME.subtype);\n// Prints: javascript\nconsole.log(String(myMIME));\n// Prints: text/javascript\n</code></pre>\n<pre><code class=\"language-cjs\">const { MIMEType } = require('node:util');\n\nconst myMIME = new MIMEType('text/ecmascript');\nconsole.log(myMIME.subtype);\n// Prints: ecmascript\nmyMIME.subtype = 'javascript';\nconsole.log(myMIME.subtype);\n// Prints: javascript\nconsole.log(String(myMIME));\n// Prints: text/javascript\n</code></pre>"
+            },
+            {
+              "textRaw": "`essence` {string}",
+              "type": "string",
+              "name": "essence",
+              "desc": "<p>Gets the essence of the MIME. This property is read only.\nUse <code>mime.type</code> or <code>mime.subtype</code> to alter the MIME.</p>\n<pre><code class=\"language-mjs\">import { MIMEType } from 'node:util';\n\nconst myMIME = new MIMEType('text/javascript;key=value');\nconsole.log(myMIME.essence);\n// Prints: text/javascript\nmyMIME.type = 'application';\nconsole.log(myMIME.essence);\n// Prints: application/javascript\nconsole.log(String(myMIME));\n// Prints: application/javascript;key=value\n</code></pre>\n<pre><code class=\"language-cjs\">const { MIMEType } = require('node:util');\n\nconst myMIME = new MIMEType('text/javascript;key=value');\nconsole.log(myMIME.essence);\n// Prints: text/javascript\nmyMIME.type = 'application';\nconsole.log(myMIME.essence);\n// Prints: application/javascript\nconsole.log(String(myMIME));\n// Prints: application/javascript;key=value\n</code></pre>"
+            },
+            {
+              "textRaw": "`params` {MIMEParams}",
+              "type": "MIMEParams",
+              "name": "params",
+              "desc": "<p>Gets the <a href=\"#class-utilmimeparams\"><code>MIMEParams</code></a> object representing the\nparameters of the MIME. This property is read-only. See\n<a href=\"#class-utilmimeparams\"><code>MIMEParams</code></a> documentation for details.</p>"
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`mime.toString()`",
+              "type": "method",
+              "name": "toString",
               "signatures": [
                 {
-                  "params": [],
-                  "desc": "<p>Creates a new <code>MIMEParams</code> object by with empty parameters</p>\n<pre><code class=\"language-mjs\">import { MIMEParams } from 'node:util';\n\nconst myParams = new MIMEParams();\n</code></pre>\n<pre><code class=\"language-cjs\">const { MIMEParams } = require('node:util');\n\nconst myParams = new MIMEParams();\n</code></pre>"
+                  "return": {
+                    "textRaw": "Returns: {string}",
+                    "name": "return",
+                    "type": "string"
+                  },
+                  "params": []
                 }
-              ]
+              ],
+              "desc": "<p>The <code>toString()</code> method on the <code>MIMEType</code> object returns the serialized MIME.</p>\n<p>Because of the need for standard compliance, this method does not allow users\nto customize the serialization process of the MIME.</p>"
+            },
+            {
+              "textRaw": "`mime.toJSON()`",
+              "type": "method",
+              "name": "toJSON",
+              "signatures": [
+                {
+                  "return": {
+                    "textRaw": "Returns: {string}",
+                    "name": "return",
+                    "type": "string"
+                  },
+                  "params": []
+                }
+              ],
+              "desc": "<p>Alias for <a href=\"#mimetostring\"><code>mime.toString()</code></a>.</p>\n<p>This method is automatically called when an <code>MIMEType</code> object is serialized\nwith <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify\"><code>JSON.stringify()</code></a>.</p>\n<pre><code class=\"language-mjs\">import { MIMEType } from 'node:util';\n\nconst myMIMES = [\n  new MIMEType('image/png'),\n  new MIMEType('image/gif'),\n];\nconsole.log(JSON.stringify(myMIMES));\n// Prints: [\"image/png\", \"image/gif\"]\n</code></pre>\n<pre><code class=\"language-cjs\">const { MIMEType } = require('node:util');\n\nconst myMIMES = [\n  new MIMEType('image/png'),\n  new MIMEType('image/gif'),\n];\nconsole.log(JSON.stringify(myMIMES));\n// Prints: [\"image/png\", \"image/gif\"]\n</code></pre>"
             }
           ],
           "signatures": [
@@ -1475,6 +1377,168 @@
                 }
               ],
               "desc": "<p>Creates a new <code>MIMEType</code> object by parsing the <code>input</code>.</p>\n<pre><code class=\"language-mjs\">import { MIMEType } from 'node:util';\n\nconst myMIME = new MIMEType('text/plain');\n</code></pre>\n<pre><code class=\"language-cjs\">const { MIMEType } = require('node:util');\n\nconst myMIME = new MIMEType('text/plain');\n</code></pre>\n<p>A <code>TypeError</code> will be thrown if the <code>input</code> is not a valid MIME. Note\nthat an effort will be made to coerce the given values into strings. For\ninstance:</p>\n<pre><code class=\"language-mjs\">import { MIMEType } from 'node:util';\nconst myMIME = new MIMEType({ toString: () => 'text/plain' });\nconsole.log(String(myMIME));\n// Prints: text/plain\n</code></pre>\n<pre><code class=\"language-cjs\">const { MIMEType } = require('node:util');\nconst myMIME = new MIMEType({ toString: () => 'text/plain' });\nconsole.log(String(myMIME));\n// Prints: text/plain\n</code></pre>"
+            }
+          ]
+        },
+        {
+          "textRaw": "Class: `util.MIMEParams`",
+          "type": "class",
+          "name": "util.MIMEParams",
+          "meta": {
+            "added": [
+              "v19.1.0",
+              "v18.13.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>The <code>MIMEParams</code> API provides read and write access to the parameters of a\n<code>MIMEType</code>.</p>",
+          "methods": [
+            {
+              "textRaw": "`mimeParams.delete(name)`",
+              "type": "method",
+              "name": "delete",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`name` {string}",
+                      "name": "name",
+                      "type": "string"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>Remove all name-value pairs whose name is <code>name</code>.</p>"
+            },
+            {
+              "textRaw": "`mimeParams.entries()`",
+              "type": "method",
+              "name": "entries",
+              "signatures": [
+                {
+                  "return": {
+                    "textRaw": "Returns: {Iterator}",
+                    "name": "return",
+                    "type": "Iterator"
+                  },
+                  "params": []
+                }
+              ],
+              "desc": "<p>Returns an iterator over each of the name-value pairs in the parameters.\nEach item of the iterator is a JavaScript <code>Array</code>. The first item of the array\nis the <code>name</code>, the second item of the array is the <code>value</code>.</p>"
+            },
+            {
+              "textRaw": "`mimeParams.get(name)`",
+              "type": "method",
+              "name": "get",
+              "signatures": [
+                {
+                  "return": {
+                    "textRaw": "Returns: {string} or `null` if there is no name-value pair with the given `name`.",
+                    "name": "return",
+                    "type": "string",
+                    "desc": "or `null` if there is no name-value pair with the given `name`."
+                  },
+                  "params": [
+                    {
+                      "textRaw": "`name` {string}",
+                      "name": "name",
+                      "type": "string"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>Returns the value of the first name-value pair whose name is <code>name</code>. If there\nare no such pairs, <code>null</code> is returned.</p>"
+            },
+            {
+              "textRaw": "`mimeParams.has(name)`",
+              "type": "method",
+              "name": "has",
+              "signatures": [
+                {
+                  "return": {
+                    "textRaw": "Returns: {boolean}",
+                    "name": "return",
+                    "type": "boolean"
+                  },
+                  "params": [
+                    {
+                      "textRaw": "`name` {string}",
+                      "name": "name",
+                      "type": "string"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>Returns <code>true</code> if there is at least one name-value pair whose name is <code>name</code>.</p>"
+            },
+            {
+              "textRaw": "`mimeParams.keys()`",
+              "type": "method",
+              "name": "keys",
+              "signatures": [
+                {
+                  "return": {
+                    "textRaw": "Returns: {Iterator}",
+                    "name": "return",
+                    "type": "Iterator"
+                  },
+                  "params": []
+                }
+              ],
+              "desc": "<p>Returns an iterator over the names of each name-value pair.</p>\n<pre><code class=\"language-mjs\">import { MIMEType } from 'node:util';\n\nconst { params } = new MIMEType('text/plain;foo=0;bar=1');\nfor (const name of params.keys()) {\n  console.log(name);\n}\n// Prints:\n//   foo\n//   bar\n</code></pre>\n<pre><code class=\"language-cjs\">const { MIMEType } = require('node:util');\n\nconst { params } = new MIMEType('text/plain;foo=0;bar=1');\nfor (const name of params.keys()) {\n  console.log(name);\n}\n// Prints:\n//   foo\n//   bar\n</code></pre>"
+            },
+            {
+              "textRaw": "`mimeParams.set(name, value)`",
+              "type": "method",
+              "name": "set",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`name` {string}",
+                      "name": "name",
+                      "type": "string"
+                    },
+                    {
+                      "textRaw": "`value` {string}",
+                      "name": "value",
+                      "type": "string"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>Sets the value in the <code>MIMEParams</code> object associated with <code>name</code> to\n<code>value</code>. If there are any pre-existing name-value pairs whose names are <code>name</code>,\nset the first such pair's value to <code>value</code>.</p>\n<pre><code class=\"language-mjs\">import { MIMEType } from 'node:util';\n\nconst { params } = new MIMEType('text/plain;foo=0;bar=1');\nparams.set('foo', 'def');\nparams.set('baz', 'xyz');\nconsole.log(params.toString());\n// Prints: foo=def;bar=1;baz=xyz\n</code></pre>\n<pre><code class=\"language-cjs\">const { MIMEType } = require('node:util');\n\nconst { params } = new MIMEType('text/plain;foo=0;bar=1');\nparams.set('foo', 'def');\nparams.set('baz', 'xyz');\nconsole.log(params.toString());\n// Prints: foo=def;bar=1;baz=xyz\n</code></pre>"
+            },
+            {
+              "textRaw": "`mimeParams.values()`",
+              "type": "method",
+              "name": "values",
+              "signatures": [
+                {
+                  "return": {
+                    "textRaw": "Returns: {Iterator}",
+                    "name": "return",
+                    "type": "Iterator"
+                  },
+                  "params": []
+                }
+              ],
+              "desc": "<p>Returns an iterator over the values of each name-value pair.</p>"
+            }
+          ],
+          "modules": [
+            {
+              "textRaw": "`mimeParams[@@iterator]()`",
+              "name": "`mimeparams[@@iterator]()`",
+              "desc": "<ul>\n<li>Returns: <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols#The_iterator_protocol\" class=\"type\">&lt;Iterator&gt;</a></li>\n</ul>\n<p>Alias for <a href=\"#mimeparamsentries\"><code>mimeParams.entries()</code></a>.</p>\n<pre><code class=\"language-mjs\">import { MIMEType } from 'node:util';\n\nconst { params } = new MIMEType('text/plain;foo=bar;xyz=baz');\nfor (const [name, value] of params) {\n  console.log(name, value);\n}\n// Prints:\n//   foo bar\n//   xyz baz\n</code></pre>\n<pre><code class=\"language-cjs\">const { MIMEType } = require('node:util');\n\nconst { params } = new MIMEType('text/plain;foo=bar;xyz=baz');\nfor (const [name, value] of params) {\n  console.log(name, value);\n}\n// Prints:\n//   foo bar\n//   xyz baz\n</code></pre>",
+              "type": "module",
+              "displayName": "`mimeParams[@@iterator]()`"
+            }
+          ],
+          "signatures": [
+            {
+              "params": [],
+              "desc": "<p>Creates a new <code>MIMEParams</code> object by with empty parameters</p>\n<pre><code class=\"language-mjs\">import { MIMEParams } from 'node:util';\n\nconst myParams = new MIMEParams();\n</code></pre>\n<pre><code class=\"language-cjs\">const { MIMEParams } = require('node:util');\n\nconst myParams = new MIMEParams();\n</code></pre>"
             }
           ]
         },

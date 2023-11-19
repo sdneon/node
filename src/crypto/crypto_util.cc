@@ -253,7 +253,6 @@ void TestFipsCrypto(const v8::FunctionCallbackInfo<v8::Value>& args) {
   Mutex::ScopedLock lock(per_process::cli_options_mutex);
   Mutex::ScopedLock fips_lock(fips_mutex);
 
-#ifdef OPENSSL_FIPS
 #if OPENSSL_VERSION_MAJOR >= 3
   OSSL_PROVIDER* fips_provider = nullptr;
   if (OSSL_PROVIDER_available(nullptr, "fips")) {
@@ -262,11 +261,12 @@ void TestFipsCrypto(const v8::FunctionCallbackInfo<v8::Value>& args) {
   const auto enabled = fips_provider == nullptr ? 0 :
       OSSL_PROVIDER_self_test(fips_provider) ? 1 : 0;
 #else
+#ifdef OPENSSL_FIPS
   const auto enabled = FIPS_selftest() ? 1 : 0;
-#endif
 #else  // OPENSSL_FIPS
   const auto enabled = 0;
 #endif  // OPENSSL_FIPS
+#endif
 
   args.GetReturnValue().Set(enabled);
 }
@@ -402,8 +402,8 @@ ByteSource ByteSource::FromEncodedString(Environment* env,
 
 ByteSource ByteSource::FromStringOrBuffer(Environment* env,
                                           Local<Value> value) {
-  return IsAnyByteSource(value) ? FromBuffer(value)
-                                : FromString(env, value.As<String>());
+  return IsAnyBufferSource(value) ? FromBuffer(value)
+                                  : FromString(env, value.As<String>());
 }
 
 ByteSource ByteSource::FromString(Environment* env, Local<String> str,
@@ -429,9 +429,9 @@ ByteSource ByteSource::FromSecretKeyBytes(
   // A key can be passed as a string, buffer or KeyObject with type 'secret'.
   // If it is a string, we need to convert it to a buffer. We are not doing that
   // in JS to avoid creating an unprotected copy on the heap.
-  return value->IsString() || IsAnyByteSource(value) ?
-           ByteSource::FromStringOrBuffer(env, value) :
-           ByteSource::FromSymmetricKeyObjectHandle(value);
+  return value->IsString() || IsAnyBufferSource(value)
+             ? ByteSource::FromStringOrBuffer(env, value)
+             : ByteSource::FromSymmetricKeyObjectHandle(value);
 }
 
 ByteSource ByteSource::NullTerminatedCopy(Environment* env,
@@ -637,6 +637,13 @@ void SetEngine(const FunctionCallbackInfo<Value>& args) {
   if (!args[1]->Uint32Value(env->context()).To(&flags)) return;
 
   const node::Utf8Value engine_id(env->isolate(), args[0]);
+
+  if (UNLIKELY(env->permission()->enabled())) {
+    return THROW_ERR_CRYPTO_CUSTOM_ENGINE_NOT_SUPPORTED(
+        env,
+        "Programmatic selection of OpenSSL engines is unsupported while the "
+        "experimental permission model is enabled");
+  }
 
   args.GetReturnValue().Set(SetEngine(*engine_id, flags));
 }

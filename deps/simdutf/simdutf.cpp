@@ -1,4 +1,4 @@
-/* auto-generated on 2023-05-22 21:46:48 -0400. Do not edit! */
+/* auto-generated on 2023-08-11 13:30:54 -0400. Do not edit! */
 // dofile: invoked with prepath=/Users/dlemire/CVS/github/simdutf/src, filename=simdutf.cpp
 /* begin file src/simdutf.cpp */
 #include "simdutf.h"
@@ -1142,7 +1142,7 @@ simdutf_really_inline simd16<int16_t>::operator simd16<uint16_t>() const { retur
 #if SIMDUTF_CAN_ALWAYS_RUN_ICELAKE
 #define SIMDUTF_TARGET_ICELAKE
 #else
-#define SIMDUTF_TARGET_ICELAKE SIMDUTF_TARGET_REGION("avx512f,avx512dq,avx512cd,avx512bw,avx512vbmi,avx512vbmi2,avx512vl,avx2,bmi,bmi2,pclmul,lzcnt")
+#define SIMDUTF_TARGET_ICELAKE SIMDUTF_TARGET_REGION("avx512f,avx512dq,avx512cd,avx512bw,avx512vbmi,avx512vbmi2,avx512vl,avx2,bmi,bmi2,pclmul,lzcnt,popcnt")
 #endif
 
 namespace simdutf {
@@ -1442,7 +1442,7 @@ SIMDUTF_POP_DISABLE_WARNINGS
 
 #if SIMDUTF_IMPLEMENTATION_HASWELL
 
-#define SIMDUTF_TARGET_HASWELL SIMDUTF_TARGET_REGION("avx2,bmi,lzcnt")
+#define SIMDUTF_TARGET_HASWELL SIMDUTF_TARGET_REGION("avx2,bmi,lzcnt,popcnt")
 
 namespace simdutf {
 /**
@@ -2365,7 +2365,7 @@ SIMDUTF_POP_DISABLE_WARNINGS
 
 #if SIMDUTF_IMPLEMENTATION_WESTMERE
 
-#define SIMDUTF_TARGET_WESTMERE SIMDUTF_TARGET_REGION("sse4.2")
+#define SIMDUTF_TARGET_WESTMERE SIMDUTF_TARGET_REGION("sse4.2,popcnt")
 
 namespace simdutf {
 /**
@@ -10138,7 +10138,11 @@ inline simdutf_warn_unused result validate_with_errors(const char *buf, size_t l
 
 // Finds the previous leading byte and validates with errors from there
 // Used to pinpoint the location of an error when an invalid chunk is detected
-inline simdutf_warn_unused result rewind_and_validate_with_errors(const char *buf, size_t len) noexcept {
+inline simdutf_warn_unused result rewind_and_validate_with_errors(const char *start, const char *buf, size_t len) noexcept {
+  // First check that we start with a leading byte
+  if ((*start & 0b11000000) == 0b10000000) {
+    return result(error_code::TOO_LONG, 0);
+  }
   size_t extra_len{0};
   // A leading byte cannot be further than 4 bytes away
   for(int i = 0; i < 5; i++) {
@@ -14098,7 +14102,7 @@ result generic_validate_utf8_with_errors(const uint8_t * input, size_t length) {
       c.check_next_input(in);
       if(c.errors()) {
         if (count != 0) { count--; } // Sometimes the error is only detected in the next chunk
-        result res = scalar::utf8::rewind_and_validate_with_errors(reinterpret_cast<const char*>(input + count), length - count);
+        result res = scalar::utf8::rewind_and_validate_with_errors(reinterpret_cast<const char*>(input), reinterpret_cast<const char*>(input + count), length - count);
         res.count += count;
         return res;
       }
@@ -14112,7 +14116,8 @@ result generic_validate_utf8_with_errors(const uint8_t * input, size_t length) {
     reader.advance();
     c.check_eof();
     if (c.errors()) {
-      result res = scalar::utf8::rewind_and_validate_with_errors(reinterpret_cast<const char*>(input) + count, length - count);
+      if (count != 0) { count--; } // Sometimes the error is only detected in the next chunk
+      result res = scalar::utf8::rewind_and_validate_with_errors(reinterpret_cast<const char*>(input), reinterpret_cast<const char*>(input) + count, length - count);
       res.count += count;
       return res;
     } else {
@@ -18299,7 +18304,7 @@ simdutf_warn_unused result implementation::validate_utf8_with_errors(const char 
       checker.check_next_input(utf8);
       if(checker.errors()) {
         if (count != 0) { count--; } // Sometimes the error is only detected in the next chunk
-        result res = scalar::utf8::rewind_and_validate_with_errors(reinterpret_cast<const char*>(buf + count), len - count);
+        result res = scalar::utf8::rewind_and_validate_with_errors(reinterpret_cast<const char*>(buf), reinterpret_cast<const char*>(buf + count), len - count);
         res.count += count;
         return res;
       }
@@ -18310,7 +18315,7 @@ simdutf_warn_unused result implementation::validate_utf8_with_errors(const char 
       checker.check_next_input(utf8);
       if(checker.errors()) {
         if (count != 0) { count--; } // Sometimes the error is only detected in the next chunk
-        result res = scalar::utf8::rewind_and_validate_with_errors(reinterpret_cast<const char*>(buf + count), len - count);
+        result res = scalar::utf8::rewind_and_validate_with_errors(reinterpret_cast<const char*>(buf), reinterpret_cast<const char*>(buf + count), len - count);
         res.count += count;
         return res;
       } else {
@@ -21741,7 +21746,7 @@ result generic_validate_utf8_with_errors(const uint8_t * input, size_t length) {
       c.check_next_input(in);
       if(c.errors()) {
         if (count != 0) { count--; } // Sometimes the error is only detected in the next chunk
-        result res = scalar::utf8::rewind_and_validate_with_errors(reinterpret_cast<const char*>(input + count), length - count);
+        result res = scalar::utf8::rewind_and_validate_with_errors(reinterpret_cast<const char*>(input), reinterpret_cast<const char*>(input + count), length - count);
         res.count += count;
         return res;
       }
@@ -21755,7 +21760,8 @@ result generic_validate_utf8_with_errors(const uint8_t * input, size_t length) {
     reader.advance();
     c.check_eof();
     if (c.errors()) {
-      result res = scalar::utf8::rewind_and_validate_with_errors(reinterpret_cast<const char*>(input) + count, length - count);
+      if (count != 0) { count--; } // Sometimes the error is only detected in the next chunk
+      result res = scalar::utf8::rewind_and_validate_with_errors(reinterpret_cast<const char*>(input), reinterpret_cast<const char*>(input) + count, length - count);
       res.count += count;
       return res;
     } else {
@@ -23518,7 +23524,7 @@ result generic_validate_utf8_with_errors(const uint8_t * input, size_t length) {
       c.check_next_input(in);
       if(c.errors()) {
         if (count != 0) { count--; } // Sometimes the error is only detected in the next chunk
-        result res = scalar::utf8::rewind_and_validate_with_errors(reinterpret_cast<const char*>(input + count), length - count);
+        result res = scalar::utf8::rewind_and_validate_with_errors(reinterpret_cast<const char*>(input), reinterpret_cast<const char*>(input + count), length - count);
         res.count += count;
         return res;
       }
@@ -23532,7 +23538,8 @@ result generic_validate_utf8_with_errors(const uint8_t * input, size_t length) {
     reader.advance();
     c.check_eof();
     if (c.errors()) {
-      result res = scalar::utf8::rewind_and_validate_with_errors(reinterpret_cast<const char*>(input) + count, length - count);
+      if (count != 0) { count--; } // Sometimes the error is only detected in the next chunk
+      result res = scalar::utf8::rewind_and_validate_with_errors(reinterpret_cast<const char*>(input), reinterpret_cast<const char*>(input) + count, length - count);
       res.count += count;
       return res;
     } else {
@@ -27196,7 +27203,7 @@ result generic_validate_utf8_with_errors(const uint8_t * input, size_t length) {
       c.check_next_input(in);
       if(c.errors()) {
         if (count != 0) { count--; } // Sometimes the error is only detected in the next chunk
-        result res = scalar::utf8::rewind_and_validate_with_errors(reinterpret_cast<const char*>(input + count), length - count);
+        result res = scalar::utf8::rewind_and_validate_with_errors(reinterpret_cast<const char*>(input), reinterpret_cast<const char*>(input + count), length - count);
         res.count += count;
         return res;
       }
@@ -27210,7 +27217,8 @@ result generic_validate_utf8_with_errors(const uint8_t * input, size_t length) {
     reader.advance();
     c.check_eof();
     if (c.errors()) {
-      result res = scalar::utf8::rewind_and_validate_with_errors(reinterpret_cast<const char*>(input) + count, length - count);
+      if (count != 0) { count--; } // Sometimes the error is only detected in the next chunk
+      result res = scalar::utf8::rewind_and_validate_with_errors(reinterpret_cast<const char*>(input), reinterpret_cast<const char*>(input) + count, length - count);
       res.count += count;
       return res;
     } else {

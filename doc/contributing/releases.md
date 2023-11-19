@@ -182,10 +182,10 @@ metadata, as well as the GitHub labels such as `semver-minor` and
 omitted from a commit, the commit will show up because it's unsure if it's a
 duplicate or not.
 
-For a list of commits that could be landed in a patch release on v1.x:
+For a list of commits that could be landed in a minor release on v1.x:
 
 ```bash
-branch-diff v1.x-staging main --exclude-label=semver-major,semver-minor,dont-land-on-v1.x,backport-requested-v1.x,backport-blocked-v1.x,backport-open-v1.x,backported-to-v1.x --filter-release --format=simple
+branch-diff v1.x-staging main --exclude-label=semver-major,dont-land-on-v1.x,backport-requested-v1.x,backport-blocked-v1.x,backport-open-v1.x,backported-to-v1.x --filter-release --format=simple
 ```
 
 Previously released commits and version bumps do not need to be
@@ -201,12 +201,14 @@ Carefully review the list of commits:
   `baking-for-lts` tag.
 
 When you are ready to cherry-pick commits, you can automate with the following
-command. (For semver-minor releases, make sure to remove the `semver-minor` tag
-from `exclude-label`.)
+command.
 
 ```bash
-branch-diff v1.x-staging main --exclude-label=semver-major,semver-minor,dont-land-on-v1.x,backport-requested-v1.x,backport-blocked-v1.x,backport-open-v1.x,backported-to-v1.x --filter-release --format=sha --reverse | xargs git cherry-pick
+branch-diff v1.x-staging main --exclude-label=semver-major,dont-land-on-v1.x,backport-requested-v1.x,backport-blocked-v1.x,backport-open-v1.x,backported-to-v1.x --filter-release --format=sha --reverse | xargs git cherry-pick
 ```
+
+<sup>For patch releases, make sure to add the `semver-minor` tag
+to `exclude-label`<sup>
 
 When cherry-picking commits, if there are simple conflicts you can resolve
 them. Otherwise, add the `backport-requested-vN.x` label to the original PR
@@ -263,6 +265,17 @@ You can integrate the PRs into the proposal without running full CI.
 </details>
 
 ### 2. Create a new branch for the release
+
+⚠️ At this point, you can either run `git node release --prepare`:
+
+```console
+$ git node release --prepare x.y.z
+```
+
+to automate the remaining steps until step 6 or you can perform it manually
+following the below steps.
+
+***
 
 Create a new branch named `vx.y.z-proposal`, off the corresponding staging
 branch.
@@ -550,7 +563,7 @@ ecosystem.
 Use `ncu-ci` to compare `vx.x` run (10) and proposal branch (11)
 
 ```bash
-npm i -g node-core-utils
+npm i -g @node-core/utils
 ncu-ci citgm 10 11
 ```
 
@@ -802,7 +815,9 @@ git commit --amend
 </details>
 
 Even if there are no conflicts, ensure that you revert all the changes that were
-made to `src/node_version.h`.
+made to `src/node_version.h`. `NODE_VERSION_IS_RELEASE` must be `0`.
+
+<sup>Edit `src/node_version.h`, revert `NODE_VERSION_IS_RELEASE` back to `0`, and `git commit --amend`</sup>
 
 If there are conflicts in `doc` due to updated `REPLACEME`
 placeholders (that happens when a change previously landed on another release
@@ -986,9 +1001,13 @@ This script will use the promoted builds and changelog to generate the post. Run
   Refs: <full URL to your release proposal PR>
   ```
 
+* In order to trigger the CI Checks of the [nodejs.org repository][]; Please
+  attach the `github_actions:pull-request` label to the PR.
+
 * Changes to the base branch, `main`, on the [nodejs.org repository][] will
-  trigger a new build of nodejs.org so your changes should appear a few minutes
-  after pushing.
+  trigger a new build of nodejs.org, so your changes should appear a few minutes
+  after pushing. You can follow the [Deployments](https://github.com/nodejs/nodejs.org/deployments) page
+  to see when the build finishes and gets published.
 
 ### 18. Create the release on GitHub
 
@@ -1033,7 +1052,7 @@ _In whatever form you do this..._
 ### Marking a release line as LTS
 
 The process of marking a release line as LTS has been automated using
-[node-core-utils](https://github.com/nodejs/node-core-utils).
+[`@node-core/utils`](https://github.com/nodejs/node-core-utils).
 
 Start by checking out the staging branch for the release line that is going to
 be marked as LTS, e.g:
@@ -1042,10 +1061,10 @@ be marked as LTS, e.g:
 git checkout v1.x-staging
 ```
 
-Next, make sure you have **node-core-utils** installed:
+Next, make sure you have **`@node-core/utils`** installed:
 
 ```bash
-npm i -g node-core-utils
+npm i -g @node-core/utils
 ```
 
 Run the prepare LTS release command:
@@ -1091,7 +1110,7 @@ current LTS codename in its release line changelog file.
 
 The `test/parallel/test-process-release.js` file might also need to be updated.
 
-In case you can not run the automated `node-core-utils` command and you are
+In case you can not run the automated `@node-core/utils` command and you are
 currently running these steps manually it's a good idea to refer to previous
 LTS proposal PRs and make sure all required changes are covered.
 

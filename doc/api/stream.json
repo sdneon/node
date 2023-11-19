@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v20.3.0/lib/stream.js\">lib/stream.js</a></p>\n<p>A stream is an abstract interface for working with streaming data in Node.js.\nThe <code>node:stream</code> module provides an API for implementing the stream interface.</p>\n<p>There are many stream objects provided by Node.js. For instance, a\n<a href=\"http.html#class-httpincomingmessage\">request to an HTTP server</a> and <a href=\"process.html#processstdout\"><code>process.stdout</code></a>\nare both stream instances.</p>\n<p>Streams can be readable, writable, or both. All streams are instances of\n<a href=\"events.html#class-eventemitter\"><code>EventEmitter</code></a>.</p>\n<p>To access the <code>node:stream</code> module:</p>\n<pre><code class=\"language-js\">const stream = require('node:stream');\n</code></pre>\n<p>The <code>node:stream</code> module is useful for creating new types of stream instances.\nIt is usually not necessary to use the <code>node:stream</code> module to consume streams.</p>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v20.9.0/lib/stream.js\">lib/stream.js</a></p>\n<p>A stream is an abstract interface for working with streaming data in Node.js.\nThe <code>node:stream</code> module provides an API for implementing the stream interface.</p>\n<p>There are many stream objects provided by Node.js. For instance, a\n<a href=\"http.html#class-httpincomingmessage\">request to an HTTP server</a> and <a href=\"process.html#processstdout\"><code>process.stdout</code></a>\nare both stream instances.</p>\n<p>Streams can be readable, writable, or both. All streams are instances of\n<a href=\"events.html#class-eventemitter\"><code>EventEmitter</code></a>.</p>\n<p>To access the <code>node:stream</code> module:</p>\n<pre><code class=\"language-js\">const stream = require('node:stream');\n</code></pre>\n<p>The <code>node:stream</code> module is useful for creating new types of stream instances.\nIt is usually not necessary to use the <code>node:stream</code> module to consume streams.</p>",
       "modules": [
         {
           "textRaw": "Organization of this document",
@@ -282,7 +282,7 @@
                   ]
                 }
               ],
-              "desc": "<pre><code class=\"language-cjs\">const { finished } = require('node:stream/promises');\nconst fs = require('node:fs');\n\nconst rs = fs.createReadStream('archive.tar');\n\nasync function run() {\n  await finished(rs);\n  console.log('Stream is done reading.');\n}\n\nrun().catch(console.error);\nrs.resume(); // Drain the stream.\n</code></pre>\n<pre><code class=\"language-mjs\">import { finished } from 'node:stream/promises';\nimport { createReadStream } from 'node:fs';\n\nconst rs = createReadStream('archive.tar');\n\nasync function run() {\n  await finished(rs);\n  console.log('Stream is done reading.');\n}\n\nrun().catch(console.error);\nrs.resume(); // Drain the stream.\n</code></pre>\n<p>The <code>finished</code> API provides <a href=\"#streamfinishedstream-options-callback\">callback version</a>:</p>"
+              "desc": "<pre><code class=\"language-cjs\">const { finished } = require('node:stream/promises');\nconst fs = require('node:fs');\n\nconst rs = fs.createReadStream('archive.tar');\n\nasync function run() {\n  await finished(rs);\n  console.log('Stream is done reading.');\n}\n\nrun().catch(console.error);\nrs.resume(); // Drain the stream.\n</code></pre>\n<pre><code class=\"language-mjs\">import { finished } from 'node:stream/promises';\nimport { createReadStream } from 'node:fs';\n\nconst rs = createReadStream('archive.tar');\n\nasync function run() {\n  await finished(rs);\n  console.log('Stream is done reading.');\n}\n\nrun().catch(console.error);\nrs.resume(); // Drain the stream.\n</code></pre>\n<p>The <code>finished</code> API also provides a <a href=\"#streamfinishedstream-options-callback\">callback version</a>.</p>"
             }
           ],
           "miscs": [
@@ -2210,6 +2210,25 @@
                       "desc": "<pre><code class=\"language-js\">const fs = require('node:fs');\n\nasync function print(readable) {\n  readable.setEncoding('utf8');\n  let data = '';\n  for await (const chunk of readable) {\n    data += chunk;\n  }\n  console.log(data);\n}\n\nprint(fs.createReadStream('file')).catch(console.error);\n</code></pre>\n<p>If the loop terminates with a <code>break</code>, <code>return</code>, or a <code>throw</code>, the stream will\nbe destroyed. In other terms, iterating over a stream will consume the stream\nfully. The stream will be read in chunks of size equal to the <code>highWaterMark</code>\noption. In the code example above, data will be in a single chunk if the file\nhas less then 64 KiB of data because no <code>highWaterMark</code> option is provided to\n<a href=\"fs.html#fscreatereadstreampath-options\"><code>fs.createReadStream()</code></a>.</p>"
                     },
                     {
+                      "textRaw": "`readable[Symbol.asyncDispose]()`",
+                      "type": "method",
+                      "name": "[Symbol.asyncDispose]",
+                      "meta": {
+                        "added": [
+                          "v20.4.0"
+                        ],
+                        "changes": []
+                      },
+                      "stability": 1,
+                      "stabilityText": "Experimental",
+                      "signatures": [
+                        {
+                          "params": []
+                        }
+                      ],
+                      "desc": "<p>Calls <a href=\"#readabledestroyerror\"><code>readable.destroy()</code></a> with an <code>AbortError</code> and returns\na promise that fulfills when the stream is finished.</p>"
+                    },
+                    {
                       "textRaw": "`readable.compose(stream[, options])`",
                       "type": "method",
                       "name": "compose",
@@ -2303,7 +2322,13 @@
                           "v17.4.0",
                           "v16.14.0"
                         ],
-                        "changes": []
+                        "changes": [
+                          {
+                            "version": "v20.7.0",
+                            "pr-url": "https://github.com/nodejs/node/pull/49249",
+                            "description": "added `highWaterMark` in options."
+                          }
+                        ]
                       },
                       "stability": 1,
                       "stabilityText": "Experimental",
@@ -2356,6 +2381,13 @@
                                   "desc": "the maximum concurrent invocation of `fn` to call on the stream at once."
                                 },
                                 {
+                                  "textRaw": "`highWaterMark` {number} how many items to buffer while waiting for user consumption of the mapped items. **Default:** `concurrency * 2 - 1`.",
+                                  "name": "highWaterMark",
+                                  "type": "number",
+                                  "default": "`concurrency * 2 - 1`",
+                                  "desc": "how many items to buffer while waiting for user consumption of the mapped items."
+                                },
+                                {
                                   "textRaw": "`signal` {AbortSignal} allows destroying the stream if the signal is aborted.",
                                   "name": "signal",
                                   "type": "AbortSignal",
@@ -2377,7 +2409,13 @@
                           "v17.4.0",
                           "v16.14.0"
                         ],
-                        "changes": []
+                        "changes": [
+                          {
+                            "version": "v20.7.0",
+                            "pr-url": "https://github.com/nodejs/node/pull/49249",
+                            "description": "added `highWaterMark` in options."
+                          }
+                        ]
                       },
                       "stability": 1,
                       "stabilityText": "Experimental",
@@ -2428,6 +2466,13 @@
                                   "type": "number",
                                   "default": "`1`",
                                   "desc": "the maximum concurrent invocation of `fn` to call on the stream at once."
+                                },
+                                {
+                                  "textRaw": "`highWaterMark` {number} how many items to buffer while waiting for user consumption of the filtered items. **Default:** `concurrency * 2 - 1`.",
+                                  "name": "highWaterMark",
+                                  "type": "number",
+                                  "default": "`concurrency * 2 - 1`",
+                                  "desc": "how many items to buffer while waiting for user consumption of the filtered items."
                                 },
                                 {
                                   "textRaw": "`signal` {AbortSignal} allows destroying the stream if the signal is aborted.",
@@ -4986,7 +5031,7 @@
                       ]
                     }
                   ],
-                  "desc": "<p>This function MUST NOT be called by application code directly. It should be\nimplemented by child classes, and called by the internal <code>Readable</code> class\nmethods only.</p>\n<p>All <code>Transform</code> stream implementations must provide a <code>_transform()</code>\nmethod to accept input and produce output. The <code>transform._transform()</code>\nimplementation handles the bytes being written, computes an output, then passes\nthat output off to the readable portion using the <code>transform.push()</code> method.</p>\n<p>The <code>transform.push()</code> method may be called zero or more times to generate\noutput from a single input chunk, depending on how much is to be output\nas a result of the chunk.</p>\n<p>It is possible that no output is generated from any given chunk of input data.</p>\n<p>The <code>callback</code> function must be called only when the current chunk is completely\nconsumed. The first argument passed to the <code>callback</code> must be an <code>Error</code> object\nif an error occurred while processing the input or <code>null</code> otherwise. If a second\nargument is passed to the <code>callback</code>, it will be forwarded on to the\n<code>transform.push()</code> method. In other words, the following are equivalent:</p>\n<pre><code class=\"language-js\">transform.prototype._transform = function(data, encoding, callback) {\n  this.push(data);\n  callback();\n};\n\ntransform.prototype._transform = function(data, encoding, callback) {\n  callback(null, data);\n};\n</code></pre>\n<p>The <code>transform._transform()</code> method is prefixed with an underscore because it\nis internal to the class that defines it, and should never be called directly by\nuser programs.</p>\n<p><code>transform._transform()</code> is never called in parallel; streams implement a\nqueue mechanism, and to receive the next chunk, <code>callback</code> must be\ncalled, either synchronously or asynchronously.</p>"
+                  "desc": "<p>This function MUST NOT be called by application code directly. It should be\nimplemented by child classes, and called by the internal <code>Readable</code> class\nmethods only.</p>\n<p>All <code>Transform</code> stream implementations must provide a <code>_transform()</code>\nmethod to accept input and produce output. The <code>transform._transform()</code>\nimplementation handles the bytes being written, computes an output, then passes\nthat output off to the readable portion using the <code>transform.push()</code> method.</p>\n<p>The <code>transform.push()</code> method may be called zero or more times to generate\noutput from a single input chunk, depending on how much is to be output\nas a result of the chunk.</p>\n<p>It is possible that no output is generated from any given chunk of input data.</p>\n<p>The <code>callback</code> function must be called only when the current chunk is completely\nconsumed. The first argument passed to the <code>callback</code> must be an <code>Error</code> object\nif an error occurred while processing the input or <code>null</code> otherwise. If a second\nargument is passed to the <code>callback</code>, it will be forwarded on to the\n<code>transform.push()</code> method, but only if the first argument is falsy. In other\nwords, the following are equivalent:</p>\n<pre><code class=\"language-js\">transform.prototype._transform = function(data, encoding, callback) {\n  this.push(data);\n  callback();\n};\n\ntransform.prototype._transform = function(data, encoding, callback) {\n  callback(null, data);\n};\n</code></pre>\n<p>The <code>transform._transform()</code> method is prefixed with an underscore because it\nis internal to the class that defines it, and should never be called directly by\nuser programs.</p>\n<p><code>transform._transform()</code> is never called in parallel; streams implement a\nqueue mechanism, and to receive the next chunk, <code>callback</code> must be\ncalled, either synchronously or asynchronously.</p>"
                 }
               ],
               "classes": [

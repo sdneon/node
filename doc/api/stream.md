@@ -278,7 +278,7 @@ run().catch(console.error);
 rs.resume(); // Drain the stream.
 ```
 
-The `finished` API provides [callback version][stream-finished]:
+The `finished` API also provides a [callback version][stream-finished].
 
 ### Object mode
 
@@ -1904,6 +1904,17 @@ option. In the code example above, data will be in a single chunk if the file
 has less then 64 KiB of data because no `highWaterMark` option is provided to
 [`fs.createReadStream()`][].
 
+##### `readable[Symbol.asyncDispose]()`
+
+<!-- YAML
+added: v20.4.0
+-->
+
+> Stability: 1 - Experimental
+
+Calls [`readable.destroy()`][readable-destroy] with an `AbortError` and returns
+a promise that fulfills when the stream is finished.
+
 ##### `readable.compose(stream[, options])`
 
 <!-- YAML
@@ -2001,6 +2012,10 @@ showBoth();
 added:
   - v17.4.0
   - v16.14.0
+changes:
+  - version: v20.7.0
+    pr-url: https://github.com/nodejs/node/pull/49249
+    description: added `highWaterMark` in options.
 -->
 
 > Stability: 1 - Experimental
@@ -2014,6 +2029,8 @@ added:
 * `options` {Object}
   * `concurrency` {number} the maximum concurrent invocation of `fn` to call
     on the stream at once. **Default:** `1`.
+  * `highWaterMark` {number} how many items to buffer while waiting for user
+    consumption of the mapped items. **Default:** `concurrency * 2 - 1`.
   * `signal` {AbortSignal} allows destroying the stream if the signal is
     aborted.
 * Returns: {Readable} a stream mapped with the function `fn`.
@@ -2048,6 +2065,10 @@ for await (const result of dnsResults) {
 added:
   - v17.4.0
   - v16.14.0
+changes:
+  - version: v20.7.0
+    pr-url: https://github.com/nodejs/node/pull/49249
+    description: added `highWaterMark` in options.
 -->
 
 > Stability: 1 - Experimental
@@ -2060,6 +2081,8 @@ added:
 * `options` {Object}
   * `concurrency` {number} the maximum concurrent invocation of `fn` to call
     on the stream at once. **Default:** `1`.
+  * `highWaterMark` {number} how many items to buffer while waiting for user
+    consumption of the filtered items. **Default:** `concurrency * 2 - 1`.
   * `signal` {AbortSignal} allows destroying the stream if the signal is
     aborted.
 * Returns: {Readable} a stream filtered with the predicate `fn`.
@@ -4531,7 +4554,8 @@ The `callback` function must be called only when the current chunk is completely
 consumed. The first argument passed to the `callback` must be an `Error` object
 if an error occurred while processing the input or `null` otherwise. If a second
 argument is passed to the `callback`, it will be forwarded on to the
-`transform.push()` method. In other words, the following are equivalent:
+`transform.push()` method, but only if the first argument is falsy. In other
+words, the following are equivalent:
 
 ```js
 transform.prototype._transform = function(data, encoding, callback) {

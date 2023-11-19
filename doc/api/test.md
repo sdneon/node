@@ -515,6 +515,116 @@ test('spies on an object method', (t) => {
 });
 ```
 
+### Timers
+
+Mocking timers is a technique commonly used in software testing to simulate and
+control the behavior of timers, such as `setInterval` and `setTimeout`,
+without actually waiting for the specified time intervals.
+
+Refer to the [`MockTimers`][] class for a full list of methods and features.
+
+This allows developers to write more reliable and
+predictable tests for time-dependent functionality.
+
+The example below shows how to mock `setTimeout`.
+Using `.enable(['setTimeout']);`
+it will mock the `setTimeout` functions in the [node:timers](./timers.md) and
+[node:timers/promises](./timers.md#timers-promises-api) modules,
+as well as from the Node.js global context.
+
+**Note:** Destructuring functions such as
+`import { setTimeout } from 'node:timers'`
+is currently not supported by this API.
+
+```mjs
+import assert from 'node:assert';
+import { mock, test } from 'node:test';
+
+test('mocks setTimeout to be executed synchronously without having to actually wait for it', () => {
+  const fn = mock.fn();
+
+  // Optionally choose what to mock
+  mock.timers.enable(['setTimeout']);
+  setTimeout(fn, 9999);
+  assert.strictEqual(fn.mock.callCount(), 0);
+
+  // Advance in time
+  mock.timers.tick(9999);
+  assert.strictEqual(fn.mock.callCount(), 1);
+
+  // Reset the globally tracked mocks.
+  mock.timers.reset();
+
+  // If you call reset mock instance, it will also reset timers instance
+  mock.reset();
+});
+```
+
+```js
+const assert = require('node:assert');
+const { mock, test } = require('node:test');
+
+test('mocks setTimeout to be executed synchronously without having to actually wait for it', () => {
+  const fn = mock.fn();
+
+  // Optionally choose what to mock
+  mock.timers.enable(['setTimeout']);
+  setTimeout(fn, 9999);
+  assert.strictEqual(fn.mock.callCount(), 0);
+
+  // Advance in time
+  mock.timers.tick(9999);
+  assert.strictEqual(fn.mock.callCount(), 1);
+
+  // Reset the globally tracked mocks.
+  mock.timers.reset();
+
+  // If you call reset mock instance, it'll also reset timers instance
+  mock.reset();
+});
+```
+
+The same mocking functionality is also exposed in the mock property on the [`TestContext`][] object
+of each test. The benefit of mocking via the test context is
+that the test runner will automatically restore all mocked timers
+functionality once the test finishes.
+
+```mjs
+import assert from 'node:assert';
+import { test } from 'node:test';
+
+test('mocks setTimeout to be executed synchronously without having to actually wait for it', (context) => {
+  const fn = context.mock.fn();
+
+  // Optionally choose what to mock
+  context.mock.timers.enable(['setTimeout']);
+  setTimeout(fn, 9999);
+  assert.strictEqual(fn.mock.callCount(), 0);
+
+  // Advance in time
+  context.mock.timers.tick(9999);
+  assert.strictEqual(fn.mock.callCount(), 1);
+});
+```
+
+```js
+const assert = require('node:assert');
+const { test } = require('node:test');
+
+test('mocks setTimeout to be executed synchronously without having to actually wait for it', (context) => {
+  const fn = context.mock.fn();
+
+  // Optionally choose what to mock
+  context.mock.timers.enable(['setTimeout']);
+  setTimeout(fn, 9999);
+  assert.strictEqual(fn.mock.callCount(), 0);
+
+  // Advance in time
+  context.mock.timers.tick(9999);
+  assert.strictEqual(fn.mock.callCount(), 1);
+});
+```
+
 ## Test reporters
 
 <!-- YAML
@@ -543,6 +653,9 @@ The following built-reporters are supported:
   where each passing test is represented by a `.`,
   and each failing test is represented by a `X`.
 
+* `junit`
+  The junit reporter outputs test results in a jUnit XML format
+
 When `stdout` is a [TTY][], the `spec` reporter is used by default.
 Otherwise, the `tap` reporter is used by default.
 
@@ -554,11 +667,11 @@ to the test runner's output is required, use the events emitted by the
 The reporters are available via the `node:test/reporters` module:
 
 ```mjs
-import { tap, spec, dot } from 'node:test/reporters';
+import { tap, spec, dot, junit } from 'node:test/reporters';
 ```
 
 ```cjs
-const { tap, spec, dot } = require('node:test/reporters');
+const { tap, spec, dot, junit } = require('node:test/reporters');
 ```
 
 ### Custom reporters
@@ -577,6 +690,15 @@ const customReporter = new Transform({
   writableObjectMode: true,
   transform(event, encoding, callback) {
     switch (event.type) {
+      case 'test:dequeue':
+        callback(null, `test ${event.data.name} dequeued`);
+        break;
+      case 'test:enqueue':
+        callback(null, `test ${event.data.name} enqueued`);
+        break;
+      case 'test:watch:drained':
+        callback(null, 'test watch queue drained');
+        break;
       case 'test:start':
         callback(null, `test ${event.data.name} started`);
         break;
@@ -590,6 +712,8 @@ const customReporter = new Transform({
         callback(null, 'test plan');
         break;
       case 'test:diagnostic':
+      case 'test:stderr':
+      case 'test:stdout':
         callback(null, event.data.message);
         break;
       case 'test:coverage': {
@@ -611,6 +735,15 @@ const customReporter = new Transform({
   writableObjectMode: true,
   transform(event, encoding, callback) {
     switch (event.type) {
+      case 'test:dequeue':
+        callback(null, `test ${event.data.name} dequeued`);
+        break;
+      case 'test:enqueue':
+        callback(null, `test ${event.data.name} enqueued`);
+        break;
+      case 'test:watch:drained':
+        callback(null, 'test watch queue drained');
+        break;
       case 'test:start':
         callback(null, `test ${event.data.name} started`);
         break;
@@ -624,6 +757,8 @@ const customReporter = new Transform({
         callback(null, 'test plan');
         break;
       case 'test:diagnostic':
+      case 'test:stderr':
+      case 'test:stdout':
         callback(null, event.data.message);
         break;
       case 'test:coverage': {
@@ -644,6 +779,15 @@ Example of a custom reporter using a generator function:
 export default async function * customReporter(source) {
   for await (const event of source) {
     switch (event.type) {
+      case 'test:dequeue':
+        yield `test ${event.data.name} dequeued`;
+        break;
+      case 'test:enqueue':
+        yield `test ${event.data.name} enqueued`;
+        break;
+      case 'test:watch:drained':
+        yield 'test watch queue drained';
+        break;
       case 'test:start':
         yield `test ${event.data.name} started\n`;
         break;
@@ -657,6 +801,8 @@ export default async function * customReporter(source) {
         yield 'test plan';
         break;
       case 'test:diagnostic':
+      case 'test:stderr':
+      case 'test:stdout':
         yield `${event.data.message}\n`;
         break;
       case 'test:coverage': {
@@ -673,6 +819,15 @@ export default async function * customReporter(source) {
 module.exports = async function * customReporter(source) {
   for await (const event of source) {
     switch (event.type) {
+      case 'test:dequeue':
+        yield `test ${event.data.name} dequeued`;
+        break;
+      case 'test:enqueue':
+        yield `test ${event.data.name} enqueued`;
+        break;
+      case 'test:watch:drained':
+        yield 'test watch queue drained';
+        break;
       case 'test:start':
         yield `test ${event.data.name} started\n`;
         break;
@@ -686,6 +841,8 @@ module.exports = async function * customReporter(source) {
         yield 'test plan\n';
         break;
       case 'test:diagnostic':
+      case 'test:stderr':
+      case 'test:stdout':
         yield `${event.data.message}\n`;
         break;
       case 'test:coverage': {
@@ -749,6 +906,8 @@ changes:
     number. If a nullish value is provided, each process gets its own port,
     incremented from the primary's `process.debugPort`.
     **Default:** `undefined`.
+  * `only`: {boolean} If truthy, the test context will only run tests that
+    have the `only` option set
   * `setup` {Function} A function that accepts the `TestsStream` instance
     and can be used to setup listeners before any tests are run.
     **Default:** `undefined`.
@@ -764,11 +923,18 @@ changes:
     If unspecified, subtests inherit this value from their parent.
     **Default:** `Infinity`.
   * `watch` {boolean} Whether to run in watch mode or not. **Default:** `false`.
+  * `shard` {Object} Running tests in a specific shard. **Default:** `undefined`.
+    * `index` {number} is a positive integer between 1 and `<total>`
+      that specifies the index of the shard to run. This option is _required_.
+    * `total` {number} is a positive integer that specifies the total number
+      of shards to split the test files to. This option is _required_.
 * Returns: {TestsStream}
 
 ```mjs
 import { tap } from 'node:test/reporters';
+import { run } from 'node:test';
 import process from 'node:process';
+import path from 'node:path';
 
 run({ files: [path.resolve('./tests/test.js')] })
   .compose(tap)
@@ -777,6 +943,8 @@ run({ files: [path.resolve('./tests/test.js')] })
 
 ```cjs
 const { tap } = require('node:test/reporters');
+const { run } = require('node:test');
+const path = require('node:path');
 
 run({ files: [path.resolve('./tests/test.js')] })
   .compose(tap)
@@ -894,7 +1062,7 @@ same as [`test([name], { only: true }[, fn])`][it options].
   declaring all subtests and subsuites.
   The first argument to this function is a [`SuiteContext`][] object.
   **Default:** A no-op function.
-* Returns: `undefined`.
+* Returns: {Promise} Immediately fulfilled with `undefined`.
 
 The `describe()` function imported from the `node:test` module. Each
 invocation of this function results in the creation of a Subtest.
@@ -1409,12 +1577,441 @@ added:
 This function is syntax sugar for [`MockTracker.method`][] with `options.setter`
 set to `true`.
 
+## Class: `MockTimers`
+
+<!-- YAML
+added:
+  - v20.4.0
+-->
+
+> Stability: 1 - Experimental
+
+Mocking timers is a technique commonly used in software testing to simulate and
+control the behavior of timers, such as `setInterval` and `setTimeout`,
+without actually waiting for the specified time intervals.
+
+The [`MockTracker`][] provides a top-level `timers` export
+which is a `MockTimers` instance.
+
+### `timers.enable([timers])`
+
+<!-- YAML
+added:
+  - v20.4.0
+-->
+
+Enables timer mocking for the specified timers.
+
+* `timers` {Array} An optional array containing the timers to mock.
+  The currently supported timer values are `'setInterval'`, `'setTimeout'`,
+  and `'setImmediate'`.  If no value is provided, all timers (`'setInterval'`,
+  `'clearInterval'`, `'setTimeout'`, `'clearTimeout'`, `'setImmediate'`,
+  and `'clearImmediate'`) will be mocked by default.
+
+**Note:** When you enable mocking for a specific timer, its associated
+clear function will also be implicitly mocked.
+
+Example usage:
+
+```mjs
+import { mock } from 'node:test';
+mock.timers.enable(['setInterval']);
+```
+
+```cjs
+const { mock } = require('node:test');
+mock.timers.enable(['setInterval']);
+```
+
+The above example enables mocking for the `setInterval` timer and
+implicitly mocks the `clearInterval` function. Only the `setInterval`
+and `clearInterval` functions from [node:timers](./timers.md),
+[node:timers/promises](./timers.md#timers-promises-api), and
+`globalThis` will be mocked.
+
+Alternatively, if you call `mock.timers.enable()` without any parameters:
+
+All timers (`'setInterval'`, `'clearInterval'`, `'setTimeout'`, and `'clearTimeout'`)
+will be mocked. The `setInterval`, `clearInterval`, `setTimeout`, and `clearTimeout`
+functions from `node:timers`, `node:timers/promises`,
+and `globalThis` will be mocked.
+
+### `timers.reset()`
+
+<!-- YAML
+added:
+  - v20.4.0
+-->
+
+This function restores the default behavior of all mocks that were previously
+created by this  `MockTimers` instance and disassociates the mocks
+from the  `MockTracker` instance.
+
+**Note:** After each test completes, this function is called on
+the test context's  `MockTracker`.
+
+```mjs
+import { mock } from 'node:test';
+mock.timers.reset();
+```
+
+```cjs
+const { mock } = require('node:test');
+mock.timers.reset();
+```
+
+### `timers[Symbol.dispose]()`
+
+Calls `timers.reset()`.
+
+### `timers.tick(milliseconds)`
+
+<!-- YAML
+added:
+  - v20.4.0
+-->
+
+Advances time for all mocked timers.
+
+* `milliseconds` {number} The amount of time, in milliseconds,
+  to advance the timers.
+
+**Note:** This diverges from how `setTimeout` in Node.js behaves and accepts
+only positive numbers. In Node.js, `setTimeout` with negative numbers is
+only supported for web compatibility reasons.
+
+The following example mocks a `setTimeout` function and
+by using `.tick` advances in
+time triggering all pending timers.
+
+```mjs
+import assert from 'node:assert';
+import { test } from 'node:test';
+
+test('mocks setTimeout to be executed synchronously without having to actually wait for it', (context) => {
+  const fn = context.mock.fn();
+
+  context.mock.timers.enable(['setTimeout']);
+
+  setTimeout(fn, 9999);
+
+  assert.strictEqual(fn.mock.callCount(), 0);
+
+  // Advance in time
+  context.mock.timers.tick(9999);
+
+  assert.strictEqual(fn.mock.callCount(), 1);
+});
+```
+
+```cjs
+const assert = require('node:assert');
+const { test } = require('node:test');
+
+test('mocks setTimeout to be executed synchronously without having to actually wait for it', (context) => {
+  const fn = context.mock.fn();
+  context.mock.timers.enable(['setTimeout']);
+
+  setTimeout(fn, 9999);
+  assert.strictEqual(fn.mock.callCount(), 0);
+
+  // Advance in time
+  context.mock.timers.tick(9999);
+
+  assert.strictEqual(fn.mock.callCount(), 1);
+});
+```
+
+Alternativelly, the `.tick` function can be called many times
+
+```mjs
+import assert from 'node:assert';
+import { test } from 'node:test';
+
+test('mocks setTimeout to be executed synchronously without having to actually wait for it', (context) => {
+  const fn = context.mock.fn();
+  context.mock.timers.enable(['setTimeout']);
+  const nineSecs = 9000;
+  setTimeout(fn, nineSecs);
+
+  const twoSeconds = 3000;
+  context.mock.timers.tick(twoSeconds);
+  context.mock.timers.tick(twoSeconds);
+  context.mock.timers.tick(twoSeconds);
+
+  assert.strictEqual(fn.mock.callCount(), 1);
+});
+```
+
+```cjs
+const assert = require('node:assert');
+const { test } = require('node:test');
+
+test('mocks setTimeout to be executed synchronously without having to actually wait for it', (context) => {
+  const fn = context.mock.fn();
+  context.mock.timers.enable(['setTimeout']);
+  const nineSecs = 9000;
+  setTimeout(fn, nineSecs);
+
+  const twoSeconds = 3000;
+  context.mock.timers.tick(twoSeconds);
+  context.mock.timers.tick(twoSeconds);
+  context.mock.timers.tick(twoSeconds);
+
+  assert.strictEqual(fn.mock.callCount(), 1);
+});
+```
+
+#### Using clear functions
+
+As mentioned, all clear functions from timers (`clearTimeout` and `clearInterval`)
+are implicity mocked. Take a look at this example using `setTimeout`:
+
+```mjs
+import assert from 'node:assert';
+import { test } from 'node:test';
+
+test('mocks setTimeout to be executed synchronously without having to actually wait for it', (context) => {
+  const fn = context.mock.fn();
+
+  // Optionally choose what to mock
+  context.mock.timers.enable(['setTimeout']);
+  const id = setTimeout(fn, 9999);
+
+  // Implicity mocked as well
+  clearTimeout(id);
+  context.mock.timers.tick(9999);
+
+  // As that setTimeout was cleared the mock function will never be called
+  assert.strictEqual(fn.mock.callCount(), 0);
+});
+```
+
+```cjs
+const assert = require('node:assert');
+const { test } = require('node:test');
+
+test('mocks setTimeout to be executed synchronously without having to actually wait for it', (context) => {
+  const fn = context.mock.fn();
+
+  // Optionally choose what to mock
+  context.mock.timers.enable(['setTimeout']);
+  const id = setTimeout(fn, 9999);
+
+  // Implicity mocked as well
+  clearTimeout(id);
+  context.mock.timers.tick(9999);
+
+  // As that setTimeout was cleared the mock function will never be called
+  assert.strictEqual(fn.mock.callCount(), 0);
+});
+```
+
+#### Working with Node.js timers modules
+
+Once you enable mocking timers, [node:timers](./timers.md),
+[node:timers/promises](./timers.md#timers-promises-api) modules,
+and timers from the Node.js global context are enabled:
+
+**Note:** Destructuring functions such as
+`import { setTimeout } from 'node:timers'` is currently
+not supported by this API.
+
+```mjs
+import assert from 'node:assert';
+import { test } from 'node:test';
+import nodeTimers from 'node:timers';
+import nodeTimersPromises from 'node:timers/promises';
+
+test('mocks setTimeout to be executed synchronously without having to actually wait for it', async (context) => {
+  const globalTimeoutObjectSpy = context.mock.fn();
+  const nodeTimerSpy = context.mock.fn();
+  const nodeTimerPromiseSpy = context.mock.fn();
+
+  // Optionally choose what to mock
+  context.mock.timers.enable(['setTimeout']);
+  setTimeout(globalTimeoutObjectSpy, 9999);
+  nodeTimers.setTimeout(nodeTimerSpy, 9999);
+
+  const promise = nodeTimersPromises.setTimeout(9999).then(nodeTimerPromiseSpy);
+
+  // Advance in time
+  context.mock.timers.tick(9999);
+  assert.strictEqual(globalTimeoutObjectSpy.mock.callCount(), 1);
+  assert.strictEqual(nodeTimerSpy.mock.callCount(), 1);
+  await promise;
+  assert.strictEqual(nodeTimerPromiseSpy.mock.callCount(), 1);
+});
+```
+
+```cjs
+const assert = require('node:assert');
+const { test } = require('node:test');
+const nodeTimers = require('node:timers');
+const nodeTimersPromises = require('node:timers/promises');
+
+test('mocks setTimeout to be executed synchronously without having to actually wait for it', async (context) => {
+  const globalTimeoutObjectSpy = context.mock.fn();
+  const nodeTimerSpy = context.mock.fn();
+  const nodeTimerPromiseSpy = context.mock.fn();
+
+  // Optionally choose what to mock
+  context.mock.timers.enable(['setTimeout']);
+  setTimeout(globalTimeoutObjectSpy, 9999);
+  nodeTimers.setTimeout(nodeTimerSpy, 9999);
+
+  const promise = nodeTimersPromises.setTimeout(9999).then(nodeTimerPromiseSpy);
+
+  // Advance in time
+  context.mock.timers.tick(9999);
+  assert.strictEqual(globalTimeoutObjectSpy.mock.callCount(), 1);
+  assert.strictEqual(nodeTimerSpy.mock.callCount(), 1);
+  await promise;
+  assert.strictEqual(nodeTimerPromiseSpy.mock.callCount(), 1);
+});
+```
+
+In Node.js, `setInterval` from [node:timers/promises](./timers.md#timers-promises-api)
+is an `AsyncGenerator` and is also supported by this API:
+
+```mjs
+import assert from 'node:assert';
+import { test } from 'node:test';
+import nodeTimersPromises from 'node:timers/promises';
+test('should tick five times testing a real use case', async (context) => {
+  context.mock.timers.enable(['setInterval']);
+
+  const expectedIterations = 3;
+  const interval = 1000;
+  const startedAt = Date.now();
+  async function run() {
+    const times = [];
+    for await (const time of nodeTimersPromises.setInterval(interval, startedAt)) {
+      times.push(time);
+      if (times.length === expectedIterations) break;
+    }
+    return times;
+  }
+
+  const r = run();
+  context.mock.timers.tick(interval);
+  context.mock.timers.tick(interval);
+  context.mock.timers.tick(interval);
+
+  const timeResults = await r;
+  assert.strictEqual(timeResults.length, expectedIterations);
+  for (let it = 1; it < expectedIterations; it++) {
+    assert.strictEqual(timeResults[it - 1], startedAt + (interval * it));
+  }
+});
+```
+
+```cjs
+const assert = require('node:assert');
+const { test } = require('node:test');
+const nodeTimersPromises = require('node:timers/promises');
+test('should tick five times testing a real use case', async (context) => {
+  context.mock.timers.enable(['setInterval']);
+
+  const expectedIterations = 3;
+  const interval = 1000;
+  const startedAt = Date.now();
+  async function run() {
+    const times = [];
+    for await (const time of nodeTimersPromises.setInterval(interval, startedAt)) {
+      times.push(time);
+      if (times.length === expectedIterations) break;
+    }
+    return times;
+  }
+
+  const r = run();
+  context.mock.timers.tick(interval);
+  context.mock.timers.tick(interval);
+  context.mock.timers.tick(interval);
+
+  const timeResults = await r;
+  assert.strictEqual(timeResults.length, expectedIterations);
+  for (let it = 1; it < expectedIterations; it++) {
+    assert.strictEqual(timeResults[it - 1], startedAt + (interval * it));
+  }
+});
+```
+
+### `timers.runAll()`
+
+<!-- YAML
+added:
+  - v20.4.0
+-->
+
+Triggers all pending mocked timers immediately.
+
+The example below triggers all pending timers immediately,
+causing them to execute without any delay.
+
+```mjs
+import assert from 'node:assert';
+import { test } from 'node:test';
+
+test('runAll functions following the given order', (context) => {
+  context.mock.timers.enable(['setTimeout']);
+  const results = [];
+  setTimeout(() => results.push(1), 9999);
+
+  // Notice that if both timers have the same timeout,
+  // the order of execution is guaranteed
+  setTimeout(() => results.push(3), 8888);
+  setTimeout(() => results.push(2), 8888);
+
+  assert.deepStrictEqual(results, []);
+
+  context.mock.timers.runAll();
+
+  assert.deepStrictEqual(results, [3, 2, 1]);
+});
+```
+
+```cjs
+const assert = require('node:assert');
+const { test } = require('node:test');
+
+test('runAll functions following the given order', (context) => {
+  context.mock.timers.enable(['setTimeout']);
+  const results = [];
+  setTimeout(() => results.push(1), 9999);
+
+  // Notice that if both timers have the same timeout,
+  // the order of execution is guaranteed
+  setTimeout(() => results.push(3), 8888);
+  setTimeout(() => results.push(2), 8888);
+
+  assert.deepStrictEqual(results, []);
+
+  context.mock.timers.runAll();
+
+  assert.deepStrictEqual(results, [3, 2, 1]);
+});
+```
+
+**Note:** The `runAll()` function is specifically designed for
+triggering timers in the context of timer mocking.
+It does not have any effect on real-time system
+clocks or actual timers outside of the mocking environment.
+
 ## Class: `TestsStream`
 
 <!-- YAML
 added:
   - v18.9.0
   - v16.19.0
+changes:
+  - version:
+    - v20.0.0
+    - v19.9.0
+    - v18.17.0
+    pr-url: https://github.com/nodejs/node/pull/47094
+    description: added type to test:pass and test:fail events for when the test is a suite.
 -->
 
 * Extends {ReadableStream}
@@ -1439,8 +2036,18 @@ object, streaming a series of events representing the execution of the tests.
       * `coveredLinePercent` {number} The percentage of lines covered.
       * `coveredBranchPercent` {number} The percentage of branches covered.
       * `coveredFunctionPercent` {number} The percentage of functions covered.
-      * `uncoveredLineNumbers` {Array} An array of integers representing line
-        numbers that are uncovered.
+      * `functions` {Array} An array of functions representing function
+        coverage.
+        * `name` {string} The name of the function.
+        * `line` {number} The line number where the function is defined.
+        * `count` {number} The number of times the function was called.
+      * `branches` {Array} An array of branches representing branch coverage.
+        * `line` {number} The line number where the branch is defined.
+        * `count` {number} The number of times the branch was taken.
+      * `lines` {Array} An array of lines representing line
+        numbers and the number of times they were covered.
+        * `line` {number} The line number.
+        * `count` {number} The number of times the line was covered.
     * `totals` {Object} An object containing a summary of coverage for all
       files.
       * `totalLineCount` {number} The total number of lines.
@@ -1459,24 +2066,63 @@ object, streaming a series of events representing the execution of the tests.
 
 Emitted when code coverage is enabled and all tests have completed.
 
+### Event: `'test:dequeue'`
+
+* `data` {Object}
+  * `column` {number|undefined} The column number where the test is defined, or
+    `undefined` if the test was run through the REPL.
+  * `file` {string|undefined} The path of the test file,
+    `undefined` if test was run through the REPL.
+  * `line` {number|undefined} The line number where the test is defined, or
+    `undefined` if the test was run through the REPL.
+  * `name` {string} The test name.
+  * `nesting` {number} The nesting level of the test.
+
+Emitted when a test is dequeued, right before it is executed.
+
 ### Event: `'test:diagnostic'`
 
 * `data` {Object}
+  * `column` {number|undefined} The column number where the test is defined, or
+    `undefined` if the test was run through the REPL.
   * `file` {string|undefined} The path of the test file,
-    undefined if test is not ran through a file.
+    `undefined` if test was run through the REPL.
+  * `line` {number|undefined} The line number where the test is defined, or
+    `undefined` if the test was run through the REPL.
   * `message` {string} The diagnostic message.
   * `nesting` {number} The nesting level of the test.
 
 Emitted when [`context.diagnostic`][] is called.
 
+### Event: `'test:enqueue'`
+
+* `data` {Object}
+  * `column` {number|undefined} The column number where the test is defined, or
+    `undefined` if the test was run through the REPL.
+  * `file` {string|undefined} The path of the test file,
+    `undefined` if test was run through the REPL.
+  * `line` {number|undefined} The line number where the test is defined, or
+    `undefined` if the test was run through the REPL.
+  * `name` {string} The test name.
+  * `nesting` {number} The nesting level of the test.
+
+Emitted when a test is enqueued for execution.
+
 ### Event: `'test:fail'`
 
 * `data` {Object}
+  * `column` {number|undefined} The column number where the test is defined, or
+    `undefined` if the test was run through the REPL.
   * `details` {Object} Additional execution metadata.
-    * `duration` {number} The duration of the test in milliseconds.
-    * `error` {Error} The error thrown by the test.
+    * `duration_ms` {number} The duration of the test in milliseconds.
+    * `error` {Error} An error wrapping the error thrown by the test.
+      * `cause` {Error} The actual error thrown by the test.
+    * `type` {string|undefined} The type of the test, used to denote whether
+      this is a suite.
   * `file` {string|undefined} The path of the test file,
-    undefined if test is not ran through a file.
+    `undefined` if test was run through the REPL.
+  * `line` {number|undefined} The line number where the test is defined, or
+    `undefined` if the test was run through the REPL.
   * `name` {string} The test name.
   * `nesting` {number} The nesting level of the test.
   * `testNumber` {number} The ordinal number of the test.
@@ -1488,10 +2134,16 @@ Emitted when a test fails.
 ### Event: `'test:pass'`
 
 * `data` {Object}
+  * `column` {number|undefined} The column number where the test is defined, or
+    `undefined` if the test was run through the REPL.
   * `details` {Object} Additional execution metadata.
-    * `duration` {number} The duration of the test in milliseconds.
+    * `duration_ms` {number} The duration of the test in milliseconds.
+    * `type` {string|undefined} The type of the test, used to denote whether
+      this is a suite.
   * `file` {string|undefined} The path of the test file,
-    undefined if test is not ran through a file.
+    `undefined` if test was run through the REPL.
+  * `line` {number|undefined} The line number where the test is defined, or
+    `undefined` if the test was run through the REPL.
   * `name` {string} The test name.
   * `nesting` {number} The nesting level of the test.
   * `testNumber` {number} The ordinal number of the test.
@@ -1503,8 +2155,12 @@ Emitted when a test passes.
 ### Event: `'test:plan'`
 
 * `data` {Object}
+  * `column` {number|undefined} The column number where the test is defined, or
+    `undefined` if the test was run through the REPL.
   * `file` {string|undefined} The path of the test file,
-    undefined if test is not ran through a file.
+    `undefined` if test was run through the REPL.
+  * `line` {number|undefined} The line number where the test is defined, or
+    `undefined` if the test was run through the REPL.
   * `nesting` {number} The nesting level of the test.
   * `count` {number} The number of subtests that have ran.
 
@@ -1513,17 +2169,27 @@ Emitted when all subtests have completed for a given test.
 ### Event: `'test:start'`
 
 * `data` {Object}
+  * `column` {number|undefined} The column number where the test is defined, or
+    `undefined` if the test was run through the REPL.
   * `file` {string|undefined} The path of the test file,
-    undefined if test is not ran through a file.
+    `undefined` if test was run through the REPL.
+  * `line` {number|undefined} The line number where the test is defined, or
+    `undefined` if the test was run through the REPL.
   * `name` {string} The test name.
   * `nesting` {number} The nesting level of the test.
 
-Emitted when a test starts.
+Emitted when a test starts reporting its own and its subtests status.
+This event is guaranteed to be emitted in the same order as the tests are
+defined.
 
 ### Event: `'test:stderr'`
 
 * `data` {Object}
+  * `column` {number|undefined} The column number where the test is defined, or
+    `undefined` if the test was run through the REPL.
   * `file` {string} The path of the test file.
+  * `line` {number|undefined} The line number where the test is defined, or
+    `undefined` if the test was run through the REPL.
   * `message` {string} The message written to `stderr`.
 
 Emitted when a running test writes to `stderr`.
@@ -1532,7 +2198,11 @@ This event is only emitted if `--test` flag is passed.
 ### Event: `'test:stdout'`
 
 * `data` {Object}
+  * `column` {number|undefined} The column number where the test is defined, or
+    `undefined` if the test was run through the REPL.
   * `file` {string} The path of the test file.
+  * `line` {number|undefined} The line number where the test is defined, or
+    `undefined` if the test was run through the REPL.
   * `message` {string} The message written to `stdout`.
 
 Emitted when a running test writes to `stdout`.
@@ -1898,6 +2568,7 @@ added:
 [`--test-reporter`]: cli.md#--test-reporter
 [`--test`]: cli.md#--test
 [`MockFunctionContext`]: #class-mockfunctioncontext
+[`MockTimers`]: #class-mocktimers
 [`MockTracker.method`]: #mockmethodobject-methodname-implementation-options
 [`MockTracker`]: #class-mocktracker
 [`NODE_V8_COVERAGE`]: cli.md#node_v8_coveragedir

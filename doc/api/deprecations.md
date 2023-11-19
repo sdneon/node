@@ -2212,6 +2212,9 @@ Type: Documentation-only (supports [`--pending-deprecation`][])
 
 `process.binding()` is for use by Node.js internal code only.
 
+While `process.binding()` has not reached End-of-Life status in general, it is
+unavailable when [policies][] or the [permission model][] are enabled.
+
 ### DEP0112: `dgram` private APIs
 
 <!-- YAML
@@ -3375,6 +3378,48 @@ In a future version of Node.js, [`assert.CallTracker`][],
 will be removed.
 Consider using alternatives such as the [`mock`][] helper function.
 
+### DEP0174: calling `promisify` on a function that returns a `Promise`
+
+<!-- YAML
+changes:
+  - version: v20.8.0
+    pr-url: https://github.com/nodejs/node/pull/49647
+    description: Documentation-only deprecation.
+-->
+
+Type: Documentation-only
+
+Calling [`util.promisify`][] on a function that returns a <Promise> will ignore
+the result of said promise, which can lead to unhandled promise rejections.
+
+### DEP0175: `util.toUSVString`
+
+<!-- YAML
+changes:
+  - version: v20.8.0
+    pr-url: https://github.com/nodejs/node/pull/49725
+    description: Documentation-only deprecation.
+-->
+
+Type: Documentation-only
+
+The [`util.toUSVString()`][] API is deprecated. Please use
+[`String.prototype.toWellFormed`][] instead.
+
+### DEP0176: `fs.F_OK`, `fs.R_OK`, `fs.W_OK`, `fs.X_OK`
+
+<!-- YAML
+changes:
+  - version: v20.8.0
+    pr-url: https://github.com/nodejs/node/pull/49683
+    description: Documentation-only deprecation.
+-->
+
+Type: Documentation-only
+
+`F_OK`, `R_OK`, `W_OK` and `X_OK` getters exposed directly on `node:fs` are
+deprecated. Get them from `fs.constants` or `fs.promises.constants` instead.
+
 [NIST SP 800-38D]: https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf
 [RFC 6066]: https://tools.ietf.org/html/rfc6066#section-3
 [RFC 8247 Section 2.4]: https://www.rfc-editor.org/rfc/rfc8247#section-2.4
@@ -3397,6 +3442,7 @@ Consider using alternatives such as the [`mock`][] helper function.
 [`Server.getConnections()`]: net.md#servergetconnectionscallback
 [`Server.listen({fd: <number>})`]: net.md#serverlistenhandle-backlog-callback
 [`SlowBuffer`]: buffer.md#class-slowbuffer
+[`String.prototype.toWellFormed`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/toWellFormed
 [`WriteStream.open()`]: fs.md#class-fswritestream
 [`assert.CallTracker`]: assert.md#class-assertcalltracker
 [`assert`]: assert.md
@@ -3515,6 +3561,8 @@ Consider using alternatives such as the [`mock`][] helper function.
 [`util.isSymbol()`]: util.md#utilissymbolobject
 [`util.isUndefined()`]: util.md#utilisundefinedobject
 [`util.log()`]: util.md#utillogstring
+[`util.promisify`]: util.md#utilpromisifyoriginal
+[`util.toUSVString()`]: util.md#utiltousvstringstring
 [`util.types`]: util.md#utiltypes
 [`util`]: util.md
 [`worker.exitedAfterDisconnect`]: cluster.md#workerexitedafterdisconnect
@@ -3527,6 +3575,8 @@ Consider using alternatives such as the [`mock`][] helper function.
 [from_string_encoding]: buffer.md#static-method-bufferfromstring-encoding
 [legacy URL API]: url.md#legacy-url-api
 [legacy `urlObject`]: url.md#legacy-urlobject
+[permission model]: permissions.md#permission-model
+[policies]: permissions.md#policies
 [static methods of `crypto.Certificate()`]: crypto.md#class-certificate
 [subpath exports]: packages.md#subpath-exports
 [subpath imports]: packages.md#subpath-imports

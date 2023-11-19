@@ -93,8 +93,10 @@ It should look like this:
 
 ```json
 {
-  "url" : "https://github.com/owner/project/issues",
-  "email" : "project@hostname.com"
+  "bugs": {
+    "url": "https://github.com/owner/project/issues",
+    "email": "project@hostname.com"
+  }
 }
 ```
 
@@ -279,15 +281,13 @@ it will. The `.npmignore` file works just like a `.gitignore`. If there is
 a `.gitignore` file, and `.npmignore` is missing, `.gitignore`'s contents
 will be used instead.
 
-Files included with the "package.json#files" field _cannot_ be excluded
-through `.npmignore` or `.gitignore`.
-
 Certain files are always included, regardless of settings:
 
 * `package.json`
 * `README`
 * `LICENSE` / `LICENCE`
 * The file in the "main" field
+* The file(s) in the "bin" field
 
 `README` & `LICENSE` can have any case and extension.
 

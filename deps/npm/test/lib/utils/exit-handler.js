@@ -6,7 +6,7 @@ const { join, resolve } = require('path')
 const EventEmitter = require('events')
 const { format } = require('../../../lib/utils/log-file')
 const { load: loadMockNpm } = require('../../fixtures/mock-npm')
-const mockGlobals = require('../../fixtures/mock-globals')
+const mockGlobals = require('@npmcli/mock-globals')
 const { cleanCwd, cleanDate } = require('../../fixtures/clean-snapshot')
 const tmock = require('../../fixtures/tmock')
 
@@ -40,7 +40,7 @@ t.cleanSnapshot = (path) => cleanDate(cleanCwd(path))
 mockGlobals(t, {
   process: Object.assign(new EventEmitter(), {
     // these are process properties that are needed in the running code and tests
-    ...pick(process, 'execPath', 'stdout', 'stderr', 'cwd', 'chdir', 'env', 'umask'),
+    ...pick(process, 'execPath', 'stdout', 'stderr', 'stdin', 'cwd', 'chdir', 'env', 'umask'),
     argv: ['/node', ...process.argv.slice(1)],
     version: 'v1.0.0',
     kill: () => {},
@@ -53,13 +53,11 @@ mockGlobals(t, {
   }),
 }, { replace: true })
 
-const mockExitHandler = async (t, { init, load, testdir, config, mocks, files } = {}) => {
+const mockExitHandler = async (t, { config, mocks, files, ...opts } = {}) => {
   const errors = []
 
   const { npm, logMocks, ...rest } = await loadMockNpm(t, {
-    init,
-    load,
-    testdir,
+    ...opts,
     mocks: {
       '{ROOT}/package.json': {
         version: '1.0.0',
@@ -134,6 +132,8 @@ t.test('handles unknown error with logs and debug file', async (t) => {
   const { exitHandler, debugFile, logs } = await mockExitHandler(t)
 
   await exitHandler(err('Unknown error', 'ECODE'))
+  // force logfile cleaning logs to happen since those are purposefully not awaited
+  await require('timers/promises').setTimeout(200)
 
   const fileLogs = await debugFile()
   const fileLines = fileLogs.split('\n')
@@ -143,14 +143,19 @@ t.test('handles unknown error with logs and debug file', async (t) => {
 
   t.equal(process.exitCode, 1)
 
+  let skippedLogs = 0
   logs.forEach((logItem, i) => {
     const logLines = format(i, ...logItem).trim().split(os.EOL)
-    logLines.forEach((line) => {
+    for (const line of logLines) {
+      if (line.includes('logfile') && line.includes('cleaning')) {
+        skippedLogs++
+        continue
+      }
       t.match(fileLogs.trim(), line, 'log appears in debug file')
-    })
+    }
   })
 
-  t.equal(logs.length, parseInt(lastLog) + 1)
+  t.equal(logs.length - skippedLogs, parseInt(lastLog) + 1)
   t.match(logs.error, [
     ['code', 'ECODE'],
     ['ERR SUMMARY', 'Unknown error'],
@@ -592,13 +597,14 @@ t.test('exits uncleanly when only emitting exit event', async (t) => {
 
   t.match(logs.error, [['', 'Exit handler never called!']])
   t.equal(process.exitCode, 1, 'exitCode coerced to 1')
-  t.end()
 })
 
 t.test('do no fancy handling for shellouts', async t => {
-  const { exitHandler, npm, logs } = await mockExitHandler(t)
-
-  await npm.cmd('exec')
+  const { exitHandler, logs } = await mockExitHandler(t, {
+    command: 'exec',
+    exec: true,
+    argv: ['-c', 'exit'],
+  })
 
   const loudNoises = () =>
     logs.filter(([level]) => ['warn', 'error'].includes(level))
@@ -614,7 +620,6 @@ t.test('do no fancy handling for shellouts', async t => {
     t.equal(process.exitCode, 1, 'got expected exit code')
     // should log some warnings and errors, because something weird happened
     t.strictNotSame(loudNoises(), [], 'bring the noise')
-    t.end()
   })
 
   t.test('shellout with code=0 (extra weird?)', async t => {
@@ -622,6 +627,4 @@ t.test('do no fancy handling for shellouts', async t => {
     t.equal(process.exitCode, 1, 'got expected exit code')
     t.strictNotSame(loudNoises(), [], 'bring the noise')
   })
-
-  t.end()
 })

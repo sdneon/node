@@ -51,8 +51,12 @@ class BindingData : public SnapshotableObject {
   static void CanParse(const v8::FunctionCallbackInfo<v8::Value>& args);
   static bool FastCanParse(v8::Local<v8::Value> receiver,
                            const v8::FastOneByteString& input);
+  static bool FastCanParseWithBase(v8::Local<v8::Value> receiver,
+                                   const v8::FastOneByteString& input,
+                                   const v8::FastOneByteString& base);
 
   static void Format(const v8::FunctionCallbackInfo<v8::Value>& args);
+  static void GetOrigin(const v8::FunctionCallbackInfo<v8::Value>& args);
   static void Parse(const v8::FunctionCallbackInfo<v8::Value>& args);
   static void Update(const v8::FunctionCallbackInfo<v8::Value>& args);
 
@@ -71,7 +75,10 @@ class BindingData : public SnapshotableObject {
   void UpdateComponents(const ada::url_components& components,
                         const ada::scheme::type type);
 
-  static v8::CFunction fast_can_parse_;
+  static v8::CFunction fast_can_parse_methods_[];
+  static void ThrowInvalidURL(Environment* env,
+                              std::string_view input,
+                              std::optional<std::string> base);
 };
 
 std::string FromFilePath(const std::string_view file_path);

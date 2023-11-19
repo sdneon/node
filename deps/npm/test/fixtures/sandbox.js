@@ -42,11 +42,6 @@ const _get = Symbol('sandbox.proxy.get')
 const _set = Symbol('sandbox.proxy.set')
 const _logs = Symbol('sandbox.logs')
 
-// these config keys can be redacted widely
-const redactedDefaults = [
-  'tmp',
-]
-
 // we can't just replace these values everywhere because they're known to be
 // very short strings that could be present all over the place, so we only
 // replace them if they're located within quotes for now
@@ -81,7 +76,7 @@ class Sandbox extends EventEmitter {
       get: this[_get].bind(this),
       set: this[_set].bind(this),
     })
-    this[_proxy].env = {}
+    this[_proxy].env = { ...options.env }
     this[_proxy].argv = []
 
     test.cleanSnapshot = this.cleanSnapshot.bind(this)
@@ -161,12 +156,6 @@ class Sandbox extends EventEmitter {
     // and we replaced the node version first, the real execPath we're trying
     // to replace would no longer be represented, and be missed.
     if (this[_npm]) {
-      // replace default config values with placeholders
-      for (const name of redactedDefaults) {
-        const value = this[_npm].config.defaults[name]
-        clean = clean.split(normalize(value)).join(`{${name.toUpperCase()}}`)
-      }
-
       // replace vague default config values that are present within quotes
       // with placeholders
       for (const name of vagueRedactedDefaults) {
@@ -262,7 +251,9 @@ class Sandbox extends EventEmitter {
 
     const mockedLogs = mockLogs(this[_mocks])
     this[_logs] = mockedLogs.logs
+    const definitions = this[_test].mock('@npmcli/config/lib/definitions')
     const Npm = this[_test].mock('../../lib/npm.js', {
+      '@npmcli/config/lib/definitions': definitions,
       '../../lib/utils/update-notifier.js': async () => {},
       ...this[_mocks],
       ...mockedLogs.logMocks,
@@ -313,7 +304,9 @@ class Sandbox extends EventEmitter {
 
     const mockedLogs = mockLogs(this[_mocks])
     this[_logs] = mockedLogs.logs
+    const definitions = this[_test].mock('@npmcli/config/lib/definitions')
     const Npm = this[_test].mock('../../lib/npm.js', {
+      '@npmcli/config/lib/definitions': definitions,
       '../../lib/utils/update-notifier.js': async () => {},
       ...this[_mocks],
       ...mockedLogs.logMocks,
@@ -328,8 +321,8 @@ class Sandbox extends EventEmitter {
     this[_npm].output = (...args) => this[_output].push(args)
     await this[_npm].load()
 
-    const impl = await this[_npm].cmd(command)
-    return impl.completion({
+    const Cmd = Npm.cmd(command)
+    return Cmd.completion({
       partialWord: partial,
       conf: {
         argv: {

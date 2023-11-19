@@ -325,6 +325,7 @@ added: v16.11.0
   * `autoClose` {boolean} **Default:** `true`
   * `emitClose` {boolean} **Default:** `true`
   * `start` {integer}
+  * `highWaterMark` {number} **Default:** `16384`
 * Returns: {fs.WriteStream}
 
 `options` may also include a `start` option to allow writing data at some
@@ -446,7 +447,7 @@ Reads data from the file and stores that in the given buffer.
 If the file is not modified concurrently, the end-of-file is reached when the
 number of bytes read is zero.
 
-#### `filehandle.readableWebStream(options)`
+#### `filehandle.readableWebStream([options])`
 
 <!-- YAML
 added: v17.0.0
@@ -817,6 +818,16 @@ On Linux, positional writes don't work when the file is opened in append mode.
 The kernel ignores the position argument and always appends the data to
 the end of the file.
 
+#### `filehandle[Symbol.asyncDispose]()`
+
+<!-- YAML
+added: v20.4.0
+-->
+
+> Stability: 1 - Experimental
+
+An alias for `filehandle.close()`.
+
 ### `fsPromises.access(path[, mode])`
 
 <!-- YAML
@@ -987,7 +998,8 @@ changes:
   * `errorOnExist` {boolean} when `force` is `false`, and the destination
     exists, throw an error. **Default:** `false`.
   * `filter` {Function} Function to filter copied files/directories. Return
-    `true` to copy the item, `false` to ignore it. Can also return a `Promise`
+    `true` to copy the item, `false` to ignore it. When ignoring a directory,
+    all of its contents will be skipped as well. Can also return a `Promise`
     that resolves to `true` or `false` **Default:** `undefined`.
     * `src` {string} source path to copy.
     * `dest` {string} destination path to copy to.
@@ -1149,6 +1161,9 @@ makeDirectory().catch(console.error);
 <!-- YAML
 added: v10.0.0
 changes:
+  - version: v20.6.0
+    pr-url: https://github.com/nodejs/node/pull/48828
+    description: The `prefix` parameter now accepts buffers and URL.
   - version:
       - v16.5.0
       - v14.18.0
@@ -1156,7 +1171,7 @@ changes:
     description: The `prefix` parameter now accepts an empty string.
 -->
 
-* `prefix` {string}
+* `prefix` {string|Buffer|URL}
 * `options` {string|Object}
   * `encoding` {string} **Default:** `'utf8'`
 * Returns: {Promise}  Fulfills with a string containing the file system path
@@ -1668,7 +1683,7 @@ added:
     should stop.
 * Returns: {AsyncIterator} of objects with the properties:
   * `eventType` {string} The type of change
-  * `filename` {string|Buffer} The name of the file changed.
+  * `filename` {string|Buffer|null} The name of the file changed.
 
 Returns an async iterator that watches for changes on `filename`, where `filename`
 is either a file or a directory.
@@ -1805,6 +1820,10 @@ concurrent modifications on the same file or data corruption may occur.
 <!-- YAML
 added: v0.11.15
 changes:
+  - version: v20.8.0
+    pr-url: https://github.com/nodejs/node/pull/49683
+    description: The constants `fs.F_OK`, `fs.R_OK`, `fs.W_OK` and `fs.X_OK`
+                 which were present directly on `fs` are deprecated.
   - version: v18.0.0
     pr-url: https://github.com/nodejs/node/pull/41678
     description: Passing an invalid callback to the `callback` argument
@@ -2328,7 +2347,8 @@ changes:
   * `errorOnExist` {boolean} when `force` is `false`, and the destination
     exists, throw an error. **Default:** `false`.
   * `filter` {Function} Function to filter copied files/directories. Return
-    `true` to copy the item, `false` to ignore it. Can also return a `Promise`
+    `true` to copy the item, `false` to ignore it. When ignoring a directory,
+    all of its contents will be skipped as well. Can also return a `Promise`
     that resolves to `true` or `false` **Default:** `undefined`.
     * `src` {string} source path to copy.
     * `dest` {string} destination path to copy to.
@@ -2538,6 +2558,7 @@ changes:
   * `start` {integer}
   * `fs` {Object|null} **Default:** `null`
   * `signal` {AbortSignal|null} **Default:** `null`
+  * `highWaterMark` {number} **Default:** `16384`
 * Returns: {fs.WriteStream}
 
 `options` may also include a `start` option to allow writing data at some
@@ -3234,6 +3255,9 @@ See the POSIX mkdir(2) documentation for more details.
 <!-- YAML
 added: v5.10.0
 changes:
+  - version: v20.6.0
+    pr-url: https://github.com/nodejs/node/pull/48828
+    description: The `prefix` parameter now accepts buffers and URL.
   - version: v18.0.0
     pr-url: https://github.com/nodejs/node/pull/41678
     description: Passing an invalid callback to the `callback` argument
@@ -3257,7 +3281,7 @@ changes:
     description: The `callback` parameter is optional now.
 -->
 
-* `prefix` {string}
+* `prefix` {string|Buffer|URL}
 * `options` {string|Object}
   * `encoding` {string} **Default:** `'utf8'`
 * `callback` {Function}
@@ -4492,7 +4516,7 @@ changes:
   * `signal` {AbortSignal} allows closing the watcher with an AbortSignal.
 * `listener` {Function|undefined} **Default:** `undefined`
   * `eventType` {string}
-  * `filename` {string|Buffer}
+  * `filename` {string|Buffer|null}
 * Returns: {fs.FSWatcher}
 
 Watch for changes on `filename`, where `filename` is either a file or a
@@ -5246,7 +5270,8 @@ changes:
   * `errorOnExist` {boolean} when `force` is `false`, and the destination
     exists, throw an error. **Default:** `false`.
   * `filter` {Function} Function to filter copied files/directories. Return
-    `true` to copy the item, `false` to ignore it. **Default:** `undefined`
+    `true` to copy the item, `false` to ignore it. When ignoring a directory,
+    all of its contents will be skipped as well. **Default:** `undefined`
     * `src` {string} source path to copy.
     * `dest` {string} destination path to copy to.
     * Returns: {boolean}
@@ -5540,6 +5565,9 @@ See the POSIX mkdir(2) documentation for more details.
 <!-- YAML
 added: v5.10.0
 changes:
+  - version: v20.6.0
+    pr-url: https://github.com/nodejs/node/pull/48828
+    description: The `prefix` parameter now accepts buffers and URL.
   - version:
       - v16.5.0
       - v14.18.0
@@ -5547,7 +5575,7 @@ changes:
     description: The `prefix` parameter now accepts an empty string.
 -->
 
-* `prefix` {string}
+* `prefix` {string|Buffer|URL}
 * `options` {string|Object}
   * `encoding` {string} **Default:** `'utf8'`
 * Returns: {string}
@@ -7971,6 +7999,9 @@ string.
   The file is created if it does not exist.
 
 * `'r'`: Open file for reading.
+  An exception occurs if the file does not exist.
+
+* `'rs'`: Open file for reading in synchronous mode.
   An exception occurs if the file does not exist.
 
 * `'r+'`: Open file for reading and writing.

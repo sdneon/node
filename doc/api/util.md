@@ -777,8 +777,14 @@ const million = 1_000_000;
 const bigNumber = 123_456_789n;
 const bigDecimal = 1_234.123_45;
 
-console.log(thousand, million, bigNumber, bigDecimal);
-// 1_000 1_000_000 123_456_789n 1_234.123_45
+console.log(inspect(thousand, { numericSeparator: true }));
+// 1_000
+console.log(inspect(million, { numericSeparator: true }));
+// 1_000_000
+console.log(inspect(bigNumber, { numericSeparator: true }));
+// 123_456_789n
+console.log(inspect(bigDecimal, { numericSeparator: true }));
+// 1_234.123_45
 ```
 
 `util.inspect()` is a synchronous method intended for debugging. Its maximum
@@ -1080,7 +1086,7 @@ console.log(String(myMIME));
 // Prints: text/plain
 ```
 
-#### `mime.type`
+### `mime.type`
 
 * {string}
 
@@ -1112,7 +1118,7 @@ console.log(String(myMIME));
 // Prints: application/javascript
 ```
 
-#### `mime.subtype`
+### `mime.subtype`
 
 * {string}
 
@@ -1144,7 +1150,7 @@ console.log(String(myMIME));
 // Prints: text/javascript
 ```
 
-#### `mime.essence`
+### `mime.essence`
 
 * {string}
 
@@ -1177,7 +1183,7 @@ console.log(String(myMIME));
 // Prints: application/javascript;key=value
 ```
 
-#### `mime.params`
+### `mime.params`
 
 * {MIMEParams}
 
@@ -1185,7 +1191,7 @@ Gets the [`MIMEParams`][] object representing the
 parameters of the MIME. This property is read-only. See
 [`MIMEParams`][] documentation for details.
 
-#### `mime.toString()`
+### `mime.toString()`
 
 * Returns: {string}
 
@@ -1194,7 +1200,7 @@ The `toString()` method on the `MIMEType` object returns the serialized MIME.
 Because of the need for standard compliance, this method does not allow users
 to customize the serialization process of the MIME.
 
-#### `mime.toJSON()`
+### `mime.toJSON()`
 
 * Returns: {string}
 
@@ -1225,7 +1231,7 @@ console.log(JSON.stringify(myMIMES));
 // Prints: ["image/png", "image/gif"]
 ```
 
-### Class: `util.MIMEParams`
+## Class: `util.MIMEParams`
 
 <!-- YAML
 added:
@@ -1236,7 +1242,7 @@ added:
 The `MIMEParams` API provides read and write access to the parameters of a
 `MIMEType`.
 
-#### Constructor: `new MIMEParams()`
+### Constructor: `new MIMEParams()`
 
 Creates a new `MIMEParams` object by with empty parameters
 
@@ -1252,13 +1258,13 @@ const { MIMEParams } = require('node:util');
 const myParams = new MIMEParams();
 ```
 
-#### `mimeParams.delete(name)`
+### `mimeParams.delete(name)`
 
 * `name` {string}
 
 Remove all name-value pairs whose name is `name`.
 
-#### `mimeParams.entries()`
+### `mimeParams.entries()`
 
 * Returns: {Iterator}
 
@@ -1266,7 +1272,7 @@ Returns an iterator over each of the name-value pairs in the parameters.
 Each item of the iterator is a JavaScript `Array`. The first item of the array
 is the `name`, the second item of the array is the `value`.
 
-#### `mimeParams.get(name)`
+### `mimeParams.get(name)`
 
 * `name` {string}
 * Returns: {string} or `null` if there is no name-value pair with the given
@@ -1275,14 +1281,14 @@ is the `name`, the second item of the array is the `value`.
 Returns the value of the first name-value pair whose name is `name`. If there
 are no such pairs, `null` is returned.
 
-#### `mimeParams.has(name)`
+### `mimeParams.has(name)`
 
 * `name` {string}
 * Returns: {boolean}
 
 Returns `true` if there is at least one name-value pair whose name is `name`.
 
-#### `mimeParams.keys()`
+### `mimeParams.keys()`
 
 * Returns: {Iterator}
 
@@ -1312,7 +1318,7 @@ for (const name of params.keys()) {
 //   bar
 ```
 
-#### `mimeParams.set(name, value)`
+### `mimeParams.set(name, value)`
 
 * `name` {string}
 * `value` {string}
@@ -1328,7 +1334,7 @@ const { params } = new MIMEType('text/plain;foo=0;bar=1');
 params.set('foo', 'def');
 params.set('baz', 'xyz');
 console.log(params.toString());
-// Prints: foo=def&bar=1&baz=xyz
+// Prints: foo=def;bar=1;baz=xyz
 ```
 
 ```cjs
@@ -1338,16 +1344,16 @@ const { params } = new MIMEType('text/plain;foo=0;bar=1');
 params.set('foo', 'def');
 params.set('baz', 'xyz');
 console.log(params.toString());
-// Prints: foo=def&bar=1&baz=xyz
+// Prints: foo=def;bar=1;baz=xyz
 ```
 
-#### `mimeParams.values()`
+### `mimeParams.values()`
 
 * Returns: {Iterator}
 
 Returns an iterator over the values of each name-value pair.
 
-#### `mimeParams[@@iterator]()`
+### `mimeParams[@@iterator]()`
 
 * Returns: {Iterator}
 
@@ -1591,6 +1597,11 @@ $ node negate.js --no-logfile --logfile=test.log --color --no-color
 
 <!-- YAML
 added: v8.0.0
+changes:
+  - version: v20.8.0
+    pr-url: https://github.com/nodejs/node/pull/49647
+    description: Calling `promisify` on a function that returns a `Promise` is
+                 deprecated.
 -->
 
 * `original` {Function}
@@ -1624,6 +1635,8 @@ async function callStat() {
   const stats = await stat('.');
   console.log(`This directory is owned by ${stats.uid}`);
 }
+
+callStat();
 ```
 
 If there is an `original[util.promisify.custom]` property present, `promisify`

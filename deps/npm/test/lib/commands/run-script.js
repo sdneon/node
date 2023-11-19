@@ -11,6 +11,7 @@ const mockRs = async (t, { windows = false, runScript, ...opts } = {}) => {
 
   const mock = await mockNpm(t, {
     ...opts,
+    command: 'run-script',
     mocks: {
       '@npmcli/run-script': Object.assign(
         async rs => {
@@ -28,18 +29,17 @@ const mockRs = async (t, { windows = false, runScript, ...opts } = {}) => {
   return {
     ...mock,
     RUN_SCRIPTS: () => RUN_SCRIPTS,
-    runScript: { exec: (args) => mock.npm.exec('run-script', args) },
+    runScript: mock['run-script'],
     cleanLogs: () => mock.logs.error.flat().map(v => v.toString()).map(cleanCwd),
   }
 }
 
 t.test('completion', async t => {
   const completion = async (t, remain, pkg, isFish = false) => {
-    const { npm } = await mockRs(t,
+    const { runScript } = await mockRs(t,
       pkg ? { prefixDir: { 'package.json': JSON.stringify(pkg) } } : {}
     )
-    const cmd = await npm.cmd('run-script')
-    return cmd.completion({ conf: { argv: { remain } }, isFish })
+    return runScript.completion({ conf: { argv: { remain } }, isFish })
   }
 
   t.test('already have a script name', async t => {
@@ -781,12 +781,7 @@ t.test('workspaces', async t => {
   t.test('missing scripts in all workspaces', async t => {
     const { runScript, RUN_SCRIPTS, cleanLogs } = await mockWorkspaces(t, { exec: null })
 
-    await t.rejects(
-      runScript.exec(['missing-script']),
-      /Missing script: missing-script/,
-      'should throw missing script error'
-    )
-
+    await runScript.exec(['missing-script'])
     t.match(RUN_SCRIPTS(), [])
     t.strictSame(
       cleanLogs(),

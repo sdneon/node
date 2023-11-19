@@ -11,10 +11,11 @@
 #endif
 
 #include <errno.h>
-#include <sstream>
-#include <limits>
 #include <algorithm>
 #include <cstdlib>  // strtoul, errno
+#include <limits>
+#include <sstream>
+#include <string_view>
 
 using v8::Boolean;
 using v8::Context;
@@ -50,14 +51,15 @@ void DebugOptions::CheckOptions(std::vector<std::string>* errors,
                       "`node --inspect-brk` instead.");
   }
 
-  std::vector<std::string> destinations =
-      SplitString(inspect_publish_uid_string, ',');
+  using std::string_view_literals::operator""sv;
+  const std::vector<std::string_view> destinations =
+      SplitString(inspect_publish_uid_string, ","sv);
   inspect_publish_uid.console = false;
   inspect_publish_uid.http = false;
-  for (const std::string& destination : destinations) {
-    if (destination == "stderr") {
+  for (const std::string_view destination : destinations) {
+    if (destination == "stderr"sv) {
       inspect_publish_uid.console = true;
-    } else if (destination == "http") {
+    } else if (destination == "http"sv) {
       inspect_publish_uid.http = true;
     } else {
       errors->push_back("--inspect-publish-uid destination can be "
@@ -171,7 +173,7 @@ void EnvironmentOptions::CheckOptions(std::vector<std::string>* errors,
     } else if (force_repl) {
       errors->push_back("either --watch or --interactive "
                         "can be used, not both");
-    } else if (argv->size() < 1 || (*argv)[1].empty()) {
+    } else if (!test_runner && (argv->size() < 1 || (*argv)[1].empty())) {
       errors->push_back("--watch requires specifying a file");
     }
 
@@ -394,7 +396,7 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
             &EnvironmentOptions::experimental_wasm_modules,
             kAllowedInEnvvar);
   AddOption("--experimental-import-meta-resolve",
-            "experimental ES Module import.meta.resolve() support",
+            "experimental ES Module import.meta.resolve() parentURL support",
             &EnvironmentOptions::experimental_import_meta_resolve,
             kAllowedInEnvvar);
   AddOption("--experimental-permission",
@@ -573,6 +575,12 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
             "write warnings to file instead of stderr",
             &EnvironmentOptions::redirect_warnings,
             kAllowedInEnvvar);
+  AddOption(
+      "[has_env_file_string]", "", &EnvironmentOptions::has_env_file_string);
+  AddOption("--env-file",
+            "set environment variables from supplied file",
+            &EnvironmentOptions::env_file);
+  Implies("--env-file", "[has_env_file_string]");
   AddOption("--test",
             "launch test runner on startup",
             &EnvironmentOptions::test_runner);
@@ -593,6 +601,10 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
   AddOption("--test-only",
             "run tests with 'only' option set",
             &EnvironmentOptions::test_only,
+            kAllowedInEnvvar);
+  AddOption("--test-shard",
+            "run test at specific shard",
+            &EnvironmentOptions::test_shard,
             kAllowedInEnvvar);
   AddOption("--test-udp-no-try-send", "",  // For testing only.
             &EnvironmentOptions::test_udp_no_try_send);
@@ -1241,6 +1253,12 @@ void GetEmbedderOptions(const FunctionCallbackInfo<Value>& args) {
            FIXED_ONE_BYTE_STRING(env->isolate(), "noGlobalSearchPaths"),
            Boolean::New(isolate, env->no_global_search_paths()))
       .IsNothing()) return;
+
+  if (ret->Set(context,
+               FIXED_ONE_BYTE_STRING(env->isolate(), "noBrowserGlobals"),
+               Boolean::New(isolate, env->no_browser_globals()))
+          .IsNothing())
+    return;
 
   args.GetReturnValue().Set(ret);
 }

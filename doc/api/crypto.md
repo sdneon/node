@@ -1060,11 +1060,16 @@ added: v0.5.0
 * `encoding` {string} The [encoding][] of the return value.
 * Returns: {Buffer | string}
 
-Generates private and public Diffie-Hellman key values, and returns
+Generates private and public Diffie-Hellman key values unless they have been
+generated or computed already, and returns
 the public key in the specified `encoding`. This key should be
 transferred to the other party.
 If `encoding` is provided a string is returned; otherwise a
 [`Buffer`][] is returned.
+
+This function is a thin wrapper around [`DH_generate_key()`][]. In particular,
+once a private key has been generated or set, calling this function only updates
+the public key but does not generate a new private key.
 
 ### `diffieHellman.getGenerator([encoding])`
 
@@ -1131,6 +1136,10 @@ Sets the Diffie-Hellman private key. If the `encoding` argument is provided,
 `privateKey` is expected
 to be a string. If no `encoding` is provided, `privateKey` is expected
 to be a [`Buffer`][], `TypedArray`, or `DataView`.
+
+This function does not automatically compute the associated public key. Either
+[`diffieHellman.setPublicKey()`][] or [`diffieHellman.generateKeys()`][] can be
+used to manually provide the public key or to automatically derive it.
 
 ### `diffieHellman.setPublicKey(publicKey[, encoding])`
 
@@ -5581,7 +5590,7 @@ instead.
 ### Support for weak or compromised algorithms
 
 The `node:crypto` module still supports some algorithms which are already
-compromised and are not currently recommended for use. The API also allows
+compromised and are not recommended for use. The API also allows
 the use of ciphers and hashes with a small key size that are too weak for safe
 use.
 
@@ -6082,7 +6091,7 @@ See the [list of SSL OP Flags][] for details.
 [FIPS provider from OpenSSL 3]: https://www.openssl.org/docs/man3.0/man7/crypto.html#FIPS-provider
 [HTML 5.2]: https://www.w3.org/TR/html52/changes.html#features-removed
 [JWK]: https://tools.ietf.org/html/rfc7517
-[NIST SP 800-131A]: https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-131Ar1.pdf
+[NIST SP 800-131A]: https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-131Ar2.pdf
 [NIST SP 800-132]: https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-132.pdf
 [NIST SP 800-38D]: https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf
 [Nonce-Disrespecting Adversaries]: https://github.com/nonce-disrespect/nonce-disrespect
@@ -6100,6 +6109,7 @@ See the [list of SSL OP Flags][] for details.
 [Web Crypto API documentation]: webcrypto.md
 [`BN_is_prime_ex`]: https://www.openssl.org/docs/man1.1.1/man3/BN_is_prime_ex.html
 [`Buffer`]: buffer.md
+[`DH_generate_key()`]: https://www.openssl.org/docs/man3.0/man3/DH_generate_key.html
 [`DiffieHellmanGroup`]: #class-diffiehellmangroup
 [`EVP_BytesToKey`]: https://www.openssl.org/docs/man3.0/man3/EVP_BytesToKey.html
 [`KeyObject`]: #class-keyobject
@@ -6137,6 +6147,7 @@ See the [list of SSL OP Flags][] for details.
 [`crypto.webcrypto.subtle`]: webcrypto.md#class-subtlecrypto
 [`decipher.final()`]: #decipherfinaloutputencoding
 [`decipher.update()`]: #decipherupdatedata-inputencoding-outputencoding
+[`diffieHellman.generateKeys()`]: #diffiehellmangeneratekeysencoding
 [`diffieHellman.setPublicKey()`]: #diffiehellmansetpublickeypublickey-encoding
 [`ecdh.generateKeys()`]: #ecdhgeneratekeysencoding-format
 [`ecdh.setPrivateKey()`]: #ecdhsetprivatekeyprivatekey-encoding
