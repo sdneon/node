@@ -3,18 +3,31 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v20.9.0">
-  <title>Worker threads | Node.js v20.9.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v21.5.0">
+  <title>Worker threads | Node.js v21.5.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
   <link rel="canonical" href="https://nodejs.org/api/worker_threads.html">
   <script async defer src="assets/api.js" type="text/javascript"></script>
+  <script>
+      const storedTheme = localStorage.getItem('theme');
+
+      // Follow operating system theme preference
+      if (storedTheme === null && window.matchMedia) {
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        if (mq.matches) {
+          document.documentElement.classList.add('dark-mode');
+        }
+      } else if (storedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+  </script>
   <style>@media(max-width:326px){.with-13-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}</style>
 </head>
 <body class="alt apidoc" id="api-section-worker_threads">
   <div id="content" class="clearfix">
-    <div id="column2" class="interior">
+    <div role="navigation" id="column2" class="interior">
       <div id="intro" class="interior">
         <a href="/" title="Go back to the home page">
           Node.js
@@ -96,7 +109,7 @@
     <div id="column1" data-id="worker_threads" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v20.9.0 documentation</h1>
+          <h1>Node.js v21.5.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -111,7 +124,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v20.9.0</li>
+            <li class="pinned-header">Node.js v21.5.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -125,6 +138,7 @@
 <li><a href="#workergetenvironmentdatakey"><code>worker.getEnvironmentData(key)</code></a></li>
 <li><a href="#workerismainthread"><code>worker.isMainThread</code></a></li>
 <li><a href="#workermarkasuntransferableobject"><code>worker.markAsUntransferable(object)</code></a></li>
+<li><a href="#workerismarkedasuntransferableobject"><code>worker.isMarkedAsUntransferable(object)</code></a></li>
 <li><a href="#workermovemessageporttocontextport-contextifiedsandbox"><code>worker.moveMessagePortToContext(port, contextifiedSandbox)</code></a></li>
 <li><a href="#workerparentport"><code>worker.parentPort</code></a></li>
 <li><a href="#workerreceivemessageonportport"><code>worker.receiveMessageOnPort(port)</code></a></li>
@@ -291,7 +305,7 @@
         Other versions
       </a>
       <div class="picker"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v21.x/api/worker_threads.html">21.x</a></li>
-<li><a href="https://nodejs.org/docs/latest-v20.x/api/worker_threads.html">20.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v20.x/api/worker_threads.html">20.x <b>LTS</b></a></li>
 <li><a href="https://nodejs.org/docs/latest-v19.x/api/worker_threads.html">19.x</a></li>
 <li><a href="https://nodejs.org/docs/latest-v18.x/api/worker_threads.html">18.x <b>LTS</b></a></li>
 <li><a href="https://nodejs.org/docs/latest-v17.x/api/worker_threads.html">17.x</a></li>
@@ -327,12 +341,13 @@
         <hr>
       </header>
 
-      <details id="toc" open><summary>Table of contents</summary><ul>
+      <details role="navigation" id="toc" open><summary>Table of contents</summary><ul>
 <li><span class="stability_2"><a href="#worker-threads">Worker threads</a></span>
 <ul>
 <li><a href="#workergetenvironmentdatakey"><code>worker.getEnvironmentData(key)</code></a></li>
 <li><a href="#workerismainthread"><code>worker.isMainThread</code></a></li>
 <li><a href="#workermarkasuntransferableobject"><code>worker.markAsUntransferable(object)</code></a></li>
+<li><a href="#workerismarkedasuntransferableobject"><code>worker.isMarkedAsUntransferable(object)</code></a></li>
 <li><a href="#workermovemessageporttocontextport-contextifiedsandbox"><code>worker.moveMessagePortToContext(port, contextifiedSandbox)</code></a></li>
 <li><a href="#workerparentport"><code>worker.parentPort</code></a></li>
 <li><a href="#workerreceivemessageonportport"><code>worker.receiveMessageOnPort(port)</code></a></li>
@@ -406,11 +421,11 @@
 </li>
 </ul></details>
 
-      <div id="apicontent">
+      <div role="main" id="apicontent">
         <h2>Worker threads<span><a class="mark" href="#worker-threads" id="worker-threads">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_threads"></a></h2>
 
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v20.9.0/lib/worker_threads.js">lib/worker_threads.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v21.5.0/lib/worker_threads.js">lib/worker_threads.js</a></p>
 <p>The <code>node:worker_threads</code> module enables the use of threads that execute
 JavaScript in parallel. To access it:</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> worker = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:worker_threads'</span>);</code> <button class="copy-button">copy</button></pre>
@@ -509,8 +524,12 @@ automatically.</p>
 <div class="api_metadata">
 <span>Added in: v14.5.0, v12.19.0</span>
 </div>
+<ul>
+<li><code>object</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> Any arbitrary JavaScript value.</li>
+</ul>
 <p>Mark an object as not transferable. If <code>object</code> occurs in the transfer list of
-a <a href="#portpostmessagevalue-transferlist"><code>port.postMessage()</code></a> call, it is ignored.</p>
+a <a href="#portpostmessagevalue-transferlist"><code>port.postMessage()</code></a> call, an error is thrown. This is a no-op if
+<code>object</code> is a primitive value.</p>
 <p>In particular, this makes sense for objects that can be cloned, rather than
 transferred, and which are used by other objects on the sending side.
 For example, Node.js marks the <code>ArrayBuffer</code>s it uses for its
@@ -525,14 +544,37 @@ For example, Node.js marks the <code>ArrayBuffer</code>s it uses for its
 <span class="hljs-title function_">markAsUntransferable</span>(pooledBuffer);
 
 <span class="hljs-keyword">const</span> { port1 } = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MessageChannel</span>();
-port1.<span class="hljs-title function_">postMessage</span>(typedArray1, [ typedArray1.<span class="hljs-property">buffer</span> ]);
+<span class="hljs-keyword">try</span> {
+  <span class="hljs-comment">// This will throw an error, because pooledBuffer is not transferable.</span>
+  port1.<span class="hljs-title function_">postMessage</span>(typedArray1, [ typedArray1.<span class="hljs-property">buffer</span> ]);
+} <span class="hljs-keyword">catch</span> (error) {
+  <span class="hljs-comment">// error.name === 'DataCloneError'</span>
+}
 
 <span class="hljs-comment">// The following line prints the contents of typedArray1 -- it still owns</span>
-<span class="hljs-comment">// its memory and has been cloned, not transferred. Without</span>
-<span class="hljs-comment">// `markAsUntransferable()`, this would print an empty Uint8Array.</span>
+<span class="hljs-comment">// its memory and has not been transferred. Without</span>
+<span class="hljs-comment">// `markAsUntransferable()`, this would print an empty Uint8Array and the</span>
+<span class="hljs-comment">// postMessage call would have succeeded.</span>
 <span class="hljs-comment">// typedArray2 is intact as well.</span>
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(typedArray1);
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(typedArray2);</code> <button class="copy-button">copy</button></pre>
+<p>There is no equivalent to this API in browsers.</p>
+</section><section><h3><code>worker.isMarkedAsUntransferable(object)</code><span><a class="mark" href="#workerismarkedasuntransferableobject" id="workerismarkedasuntransferableobject">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_ismarkedasuntransferable_object"></a></h3>
+<div class="api_metadata">
+<span>Added in: v21.0.0</span>
+</div>
+<ul>
+<li><code>object</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> Any JavaScript value.</li>
+<li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+</ul>
+<p>Check if an object is marked as not transferable with
+<a href="#workermarkasuntransferableobject"><code>markAsUntransferable()</code></a>.</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> { markAsUntransferable, isMarkedAsUntransferable } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:worker_threads'</span>);
+
+<span class="hljs-keyword">const</span> pooledBuffer = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayBuffer</span>(<span class="hljs-number">8</span>);
+<span class="hljs-title function_">markAsUntransferable</span>(pooledBuffer);
+
+<span class="hljs-title function_">isMarkedAsUntransferable</span>(pooledBuffer);  <span class="hljs-comment">// Returns true.</span></code> <button class="copy-button">copy</button></pre>
 <p>There is no equivalent to this API in browsers.</p>
 </section><section><h3><code>worker.moveMessagePortToContext(port, contextifiedSandbox)</code><span><a class="mark" href="#workermovemessageporttocontextport-contextifiedsandbox" id="workermovemessageporttocontextport-contextifiedsandbox">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_movemessageporttocontext_port_contextifiedsandbox"></a></h3>
 <div class="api_metadata">
@@ -878,6 +920,8 @@ are part of the channel.</p>
 <details class="changelog"><summary>History</summary>
 <table>
 <tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v21.0.0</td>
+<td><p>An error is thrown when an untransferable object is in the transfer list.</p></td></tr>
 <tr><td>v15.6.0</td>
 <td><p>Added <code>X509Certificate</code> to the list of cloneable types.</p></td></tr>
 <tr><td>v15.0.0</td>
@@ -1153,7 +1197,7 @@ the thread barrier.</p>
 <details class="changelog"><summary>History</summary>
 <table>
 <tbody><tr><th>Version</th><th>Changes</th></tr>
-<tr><td>v19.8.0</td>
+<tr><td>v19.8.0, v18.16.0</td>
 <td><p>Added support for a <code>name</code> option, which allows adding a name to worker title for debugging.</p></td></tr>
 <tr><td>v14.9.0</td>
 <td><p>The <code>filename</code> parameter can be a WHATWG <code>URL</code> object using <code>data:</code> protocol.</p></td></tr>

@@ -30,7 +30,7 @@ const assert = require('assert');
 const { builtinModules } = require('module');
 
 // Load all modules to actually cover most code parts.
-builtinModules.forEach((moduleName) => {
+for (const moduleName of builtinModules) {
   if (!moduleName.includes('/')) {
     try {
       // This could throw for e.g., crypto if the binary is not compiled
@@ -40,7 +40,7 @@ builtinModules.forEach((moduleName) => {
       // Continue regardless of error.
     }
   }
-});
+}
 
 {
   const expected = [
@@ -58,6 +58,7 @@ builtinModules.forEach((moduleName) => {
     'structuredClone',
     'fetch',
     'crypto',
+    'navigator',
   ];
   assert.deepStrictEqual(new Set(Object.keys(global)), new Set(expected));
 }

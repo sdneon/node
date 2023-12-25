@@ -230,6 +230,8 @@
                                      '../../deps/icu-small/source/common/ulist.cpp',
                                      '../../deps/icu-small/source/common/ulist.h',
                                      '../../deps/icu-small/source/common/uloc.cpp',
+                                     '../../deps/icu-small/source/common/ulocale.cpp',
+                                     '../../deps/icu-small/source/common/ulocbuilder.cpp',
                                      '../../deps/icu-small/source/common/ulocimp.h',
                                      '../../deps/icu-small/source/common/uloc_keytype.cpp',
                                      '../../deps/icu-small/source/common/uloc_tag.cpp',

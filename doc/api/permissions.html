@@ -3,18 +3,31 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v20.9.0">
-  <title>Permissions | Node.js v20.9.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v21.5.0">
+  <title>Permissions | Node.js v21.5.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
   <link rel="canonical" href="https://nodejs.org/api/permissions.html">
   <script async defer src="assets/api.js" type="text/javascript"></script>
+  <script>
+      const storedTheme = localStorage.getItem('theme');
+
+      // Follow operating system theme preference
+      if (storedTheme === null && window.matchMedia) {
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        if (mq.matches) {
+          document.documentElement.classList.add('dark-mode');
+        }
+      } else if (storedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+  </script>
   
 </head>
 <body class="alt apidoc" id="api-section-permissions">
   <div id="content" class="clearfix">
-    <div id="column2" class="interior">
+    <div role="navigation" id="column2" class="interior">
       <div id="intro" class="interior">
         <a href="/" title="Go back to the home page">
           Node.js
@@ -96,7 +109,7 @@
     <div id="column1" data-id="permissions" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v20.9.0 documentation</h1>
+          <h1>Node.js v21.5.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -111,7 +124,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v20.9.0</li>
+            <li class="pinned-header">Node.js v21.5.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -260,7 +273,7 @@
         Other versions
       </a>
       <div class="picker"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v21.x/api/permissions.html">21.x</a></li>
-<li><a href="https://nodejs.org/docs/latest-v20.x/api/permissions.html">20.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v20.x/api/permissions.html">20.x <b>LTS</b></a></li>
 <li><a href="https://nodejs.org/docs/latest-v19.x/api/permissions.html">19.x</a></li>
 <li><a href="https://nodejs.org/docs/latest-v18.x/api/permissions.html">18.x <b>LTS</b></a></li>
 <li><a href="https://nodejs.org/docs/latest-v17.x/api/permissions.html">17.x</a></li>
@@ -295,7 +308,7 @@
         <hr>
       </header>
 
-      <details id="toc" open><summary>Table of contents</summary><ul>
+      <details role="navigation" id="toc" open><summary>Table of contents</summary><ul>
 <li><a href="#permissions">Permissions</a>
 <ul>
 <li><a href="#module-based-permissions">Module-based permissions</a>
@@ -343,7 +356,7 @@
 </li>
 </ul></details>
 
-      <div id="apicontent">
+      <div role="main" id="apicontent">
         <h2>Permissions<span><a class="mark" href="#permissions" id="permissions">#</a></span><a aria-hidden="true" class="legacy" id="permissions_permissions"></a></h2>
 <p>Permissions can be used to control what system resources the
 Node.js process has access to or what actions the process can take
@@ -711,7 +724,7 @@ loaded so environmental/runtime hardening is expected.</li>
 </section><section><h3>Process-based permissions<span><a class="mark" href="#process-based-permissions" id="process-based-permissions">#</a></span><a aria-hidden="true" class="legacy" id="permissions_process_based_permissions"></a></h3>
 <h4>Permission Model<span><a class="mark" href="#permission-model" id="permission-model">#</a></span><a aria-hidden="true" class="legacy" id="permissions_permission_model"></a></h4>
 
-<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a>.1 - Active development</div><p></p>
 <!-- name=permission-model -->
 <p>The Node.js Permission Model is a mechanism for restricting access to specific
 resources during execution.
@@ -735,7 +748,8 @@ Error: Access to this API has been restricted
     at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:76:24)
     at node:internal/main/run_main_module:23:47 {
   code: 'ERR_ACCESS_DENIED',
-  permission: 'FileSystemRead'
+  permission: 'FileSystemRead',
+  resource: '/home/user/index.js'
 }</code> <button class="copy-button">copy</button></pre>
 <p>Allowing access to spawning a process and creating worker threads can be done
 using the <a href="cli.html#--allow-child-process"><code>--allow-child-process</code></a> and <a href="cli.html#--allow-worker"><code>--allow-worker</code></a> respectively.</p>
@@ -789,9 +803,18 @@ Model is enabled, affecting the built-in crypto, https, and tls modules.</li>
 <li>Relative paths are not supported through the CLI (<code>--allow-fs-*</code>).</li>
 <li>The model does not inherit to a child node process.</li>
 <li>The model does not inherit to a worker thread.</li>
+<li>Symbolic links will be followed even to locations outside of the set of paths
+that access has been granted to. Relative symbolic links may allow access to
+arbitrary files and directories. When starting applications with the
+permission model enabled, you must ensure that no paths to which access has
+been granted contain relative symbolic links.</li>
 <li>When creating symlinks the target (first argument) should have read and
 write access.</li>
 <li>Permission changes are not retroactively applied to existing resources.</li>
+<li>The Permission Model is initialized after the Node.js environment is set up.
+However, certain flags such as <code>--env-file</code> or <code>--openssl-config</code> are designed
+to read files before environment initialization. As a result, such flags are
+not subject to the rules of the Permission Model.</li>
 </ul></section>
         <!-- API END -->
       </div>

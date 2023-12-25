@@ -3,18 +3,31 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v20.9.0">
-  <title>Command-line API | Node.js v20.9.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v21.5.0">
+  <title>Command-line API | Node.js v21.5.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
   <link rel="canonical" href="https://nodejs.org/api/cli.html">
   <script async defer src="assets/api.js" type="text/javascript"></script>
-  
+  <script>
+      const storedTheme = localStorage.getItem('theme');
+
+      // Follow operating system theme preference
+      if (storedTheme === null && window.matchMedia) {
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        if (mq.matches) {
+          document.documentElement.classList.add('dark-mode');
+        }
+      } else if (storedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+  </script>
+  <style>@media(max-width:478px){.with-32-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}</style>
 </head>
 <body class="alt apidoc" id="api-section-cli">
   <div id="content" class="clearfix">
-    <div id="column2" class="interior">
+    <div role="navigation" id="column2" class="interior">
       <div id="intro" class="interior">
         <a href="/" title="Go back to the home page">
           Node.js
@@ -96,7 +109,7 @@
     <div id="column1" data-id="cli" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v20.9.0 documentation</h1>
+          <h1>Node.js v21.5.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -111,7 +124,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v20.9.0</li>
+            <li class="pinned-header">Node.js v21.5.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -146,13 +159,17 @@
 <li><span class="stability_1"><a href="#--cpu-prof-interval"><code>--cpu-prof-interval</code></a></span></li>
 <li><span class="stability_1"><a href="#--cpu-prof-name"><code>--cpu-prof-name</code></a></span></li>
 <li><a href="#--diagnostic-dirdirectory"><code>--diagnostic-dir=directory</code></a></li>
+<li><span class="stability_1"><a href="#--disable-warningcode-or-type"><code>--disable-warning=code-or-type</code></a></span></li>
 <li><a href="#--disable-protomode"><code>--disable-proto=mode</code></a></li>
 <li><a href="#--disallow-code-generation-from-strings"><code>--disallow-code-generation-from-strings</code></a></li>
 <li><a href="#--dns-result-orderorder"><code>--dns-result-order=order</code></a></li>
 <li><a href="#--enable-fips"><code>--enable-fips</code></a></li>
+<li><a href="#--enable-network-family-autoselection"><code>--enable-network-family-autoselection</code></a></li>
 <li><a href="#--enable-source-maps"><code>--enable-source-maps</code></a></li>
 <li><span class="stability_1"><a href="#--env-fileconfig"><code>--env-file=config</code></a></span></li>
 <li><a href="#-e---eval-script"><code>-e</code>, <code>--eval "script"</code></a></li>
+<li><span class="stability_1"><a href="#--experimental-default-typetype"><code>--experimental-default-type=type</code></a></span></li>
+<li><span class="stability_1"><a href="#--experimental-detect-module"><code>--experimental-detect-module</code></a></span></li>
 <li><a href="#--experimental-import-meta-resolve"><code>--experimental-import-meta-resolve</code></a></li>
 <li><a href="#--experimental-loadermodule"><code>--experimental-loader=module</code></a></li>
 <li><span class="stability_1"><a href="#--experimental-network-imports"><code>--experimental-network-imports</code></a></span></li>
@@ -164,6 +181,7 @@
 <li><a href="#--experimental-vm-modules"><code>--experimental-vm-modules</code></a></li>
 <li><a href="#--experimental-wasi-unstable-preview1"><code>--experimental-wasi-unstable-preview1</code></a></li>
 <li><a href="#--experimental-wasm-modules"><code>--experimental-wasm-modules</code></a></li>
+<li><a href="#--experimental-websocket"><code>--experimental-websocket</code></a></li>
 <li><a href="#--force-context-aware"><code>--force-context-aware</code></a></li>
 <li><a href="#--force-fips"><code>--force-fips</code></a></li>
 <li><a href="#--force-node-api-uncaught-exceptions-policy"><code>--force-node-api-uncaught-exceptions-policy</code></a></li>
@@ -195,6 +213,7 @@
 <li><a href="#--no-deprecation"><code>--no-deprecation</code></a></li>
 <li><a href="#--no-experimental-fetch"><code>--no-experimental-fetch</code></a></li>
 <li><a href="#--no-experimental-global-customevent"><code>--no-experimental-global-customevent</code></a></li>
+<li><span class="stability_1"><a href="#--no-experimental-global-navigator"><code>--no-experimental-global-navigator</code></a></span></li>
 <li><a href="#--no-experimental-global-webcrypto"><code>--no-experimental-global-webcrypto</code></a></li>
 <li><a href="#--no-experimental-repl-await"><code>--no-experimental-repl-await</code></a></li>
 <li><a href="#--no-extra-info-on-fatal-exception"><code>--no-extra-info-on-fatal-exception</code></a></li>
@@ -226,11 +245,13 @@
 <li><a href="#--secure-heap-minn"><code>--secure-heap-min=n</code></a></li>
 <li><span class="stability_1"><a href="#--snapshot-blobpath"><code>--snapshot-blob=path</code></a></span></li>
 <li><a href="#--test"><code>--test</code></a></li>
+<li><a href="#--test-concurrency"><code>--test-concurrency</code></a></li>
 <li><a href="#--test-name-pattern"><code>--test-name-pattern</code></a></li>
 <li><a href="#--test-only"><code>--test-only</code></a></li>
 <li><a href="#--test-reporter"><code>--test-reporter</code></a></li>
 <li><a href="#--test-reporter-destination"><code>--test-reporter-destination</code></a></li>
 <li><a href="#--test-shard"><code>--test-shard</code></a></li>
+<li><a href="#--test-timeout"><code>--test-timeout</code></a></li>
 <li><a href="#--throw-deprecation"><code>--throw-deprecation</code></a></li>
 <li><a href="#--titletitle"><code>--title=title</code></a></li>
 <li><a href="#--tls-cipher-listlist"><code>--tls-cipher-list=list</code></a></li>
@@ -402,7 +423,7 @@
         Other versions
       </a>
       <div class="picker"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v21.x/api/cli.html">21.x</a></li>
-<li><a href="https://nodejs.org/docs/latest-v20.x/api/cli.html">20.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v20.x/api/cli.html">20.x <b>LTS</b></a></li>
 <li><a href="https://nodejs.org/docs/latest-v19.x/api/cli.html">19.x</a></li>
 <li><a href="https://nodejs.org/docs/latest-v18.x/api/cli.html">18.x <b>LTS</b></a></li>
 <li><a href="https://nodejs.org/docs/latest-v17.x/api/cli.html">17.x</a></li>
@@ -443,7 +464,7 @@
         <hr>
       </header>
 
-      <details id="toc" open><summary>Table of contents</summary><ul>
+      <details role="navigation" id="toc" open><summary>Table of contents</summary><ul>
 <li><a href="#command-line-api">Command-line API</a>
 <ul>
 <li><a href="#synopsis">Synopsis</a></li>
@@ -470,13 +491,17 @@
 <li><span class="stability_1"><a href="#--cpu-prof-interval"><code>--cpu-prof-interval</code></a></span></li>
 <li><span class="stability_1"><a href="#--cpu-prof-name"><code>--cpu-prof-name</code></a></span></li>
 <li><a href="#--diagnostic-dirdirectory"><code>--diagnostic-dir=directory</code></a></li>
+<li><span class="stability_1"><a href="#--disable-warningcode-or-type"><code>--disable-warning=code-or-type</code></a></span></li>
 <li><a href="#--disable-protomode"><code>--disable-proto=mode</code></a></li>
 <li><a href="#--disallow-code-generation-from-strings"><code>--disallow-code-generation-from-strings</code></a></li>
 <li><a href="#--dns-result-orderorder"><code>--dns-result-order=order</code></a></li>
 <li><a href="#--enable-fips"><code>--enable-fips</code></a></li>
+<li><a href="#--enable-network-family-autoselection"><code>--enable-network-family-autoselection</code></a></li>
 <li><a href="#--enable-source-maps"><code>--enable-source-maps</code></a></li>
 <li><span class="stability_1"><a href="#--env-fileconfig"><code>--env-file=config</code></a></span></li>
 <li><a href="#-e---eval-script"><code>-e</code>, <code>--eval "script"</code></a></li>
+<li><span class="stability_1"><a href="#--experimental-default-typetype"><code>--experimental-default-type=type</code></a></span></li>
+<li><span class="stability_1"><a href="#--experimental-detect-module"><code>--experimental-detect-module</code></a></span></li>
 <li><a href="#--experimental-import-meta-resolve"><code>--experimental-import-meta-resolve</code></a></li>
 <li><a href="#--experimental-loadermodule"><code>--experimental-loader=module</code></a></li>
 <li><span class="stability_1"><a href="#--experimental-network-imports"><code>--experimental-network-imports</code></a></span></li>
@@ -488,6 +513,7 @@
 <li><a href="#--experimental-vm-modules"><code>--experimental-vm-modules</code></a></li>
 <li><a href="#--experimental-wasi-unstable-preview1"><code>--experimental-wasi-unstable-preview1</code></a></li>
 <li><a href="#--experimental-wasm-modules"><code>--experimental-wasm-modules</code></a></li>
+<li><a href="#--experimental-websocket"><code>--experimental-websocket</code></a></li>
 <li><a href="#--force-context-aware"><code>--force-context-aware</code></a></li>
 <li><a href="#--force-fips"><code>--force-fips</code></a></li>
 <li><a href="#--force-node-api-uncaught-exceptions-policy"><code>--force-node-api-uncaught-exceptions-policy</code></a></li>
@@ -519,6 +545,7 @@
 <li><a href="#--no-deprecation"><code>--no-deprecation</code></a></li>
 <li><a href="#--no-experimental-fetch"><code>--no-experimental-fetch</code></a></li>
 <li><a href="#--no-experimental-global-customevent"><code>--no-experimental-global-customevent</code></a></li>
+<li><span class="stability_1"><a href="#--no-experimental-global-navigator"><code>--no-experimental-global-navigator</code></a></span></li>
 <li><a href="#--no-experimental-global-webcrypto"><code>--no-experimental-global-webcrypto</code></a></li>
 <li><a href="#--no-experimental-repl-await"><code>--no-experimental-repl-await</code></a></li>
 <li><a href="#--no-extra-info-on-fatal-exception"><code>--no-extra-info-on-fatal-exception</code></a></li>
@@ -550,11 +577,13 @@
 <li><a href="#--secure-heap-minn"><code>--secure-heap-min=n</code></a></li>
 <li><span class="stability_1"><a href="#--snapshot-blobpath"><code>--snapshot-blob=path</code></a></span></li>
 <li><a href="#--test"><code>--test</code></a></li>
+<li><a href="#--test-concurrency"><code>--test-concurrency</code></a></li>
 <li><a href="#--test-name-pattern"><code>--test-name-pattern</code></a></li>
 <li><a href="#--test-only"><code>--test-only</code></a></li>
 <li><a href="#--test-reporter"><code>--test-reporter</code></a></li>
 <li><a href="#--test-reporter-destination"><code>--test-reporter-destination</code></a></li>
 <li><a href="#--test-shard"><code>--test-shard</code></a></li>
+<li><a href="#--test-timeout"><code>--test-timeout</code></a></li>
 <li><a href="#--throw-deprecation"><code>--throw-deprecation</code></a></li>
 <li><a href="#--titletitle"><code>--title=title</code></a></li>
 <li><a href="#--tls-cipher-listlist"><code>--tls-cipher-list=list</code></a></li>
@@ -633,7 +662,7 @@
 </li>
 </ul></details>
 
-      <div id="apicontent">
+      <div role="main" id="apicontent">
         <h2>Command-line API<span><a class="mark" href="#command-line-api" id="command-line-api">#</a></span><a aria-hidden="true" class="legacy" id="cli_command_line_api"></a></h2>
 
 
@@ -649,13 +678,15 @@ debugging, multiple ways to execute scripts, and other helpful runtime options.<
 </section><section><h3>Program entry point<span><a class="mark" href="#program-entry-point" id="program-entry-point">#</a></span><a aria-hidden="true" class="legacy" id="cli_program_entry_point"></a></h3>
 <p>The program entry point is a specifier-like string. If the string is not an
 absolute path, it's resolved as a relative path from the current working
-directory. That path is then resolved by <a href="modules.html">CommonJS</a> module loader. If no
-corresponding file is found, an error is thrown.</p>
+directory. That path is then resolved by <a href="modules.html">CommonJS</a> module loader, or by the
+<a href="packages.html#modules-loaders">ES module loader</a> if <a href="#--experimental-default-typetype"><code>--experimental-default-type=module</code></a>
+is passed. If no corresponding file is found, an error is thrown.</p>
 <p>If a file is found, its path will be passed to the
 <a href="packages.html#modules-loaders">ES module loader</a> under any of the following conditions:</p>
 <ul>
 <li>The program was started with a command-line flag that forces the entry
-point to be loaded with ECMAScript module loader.</li>
+point to be loaded with ECMAScript module loader, such as <code>--import</code> or
+<a href="#--experimental-default-typetype"><code>--experimental-default-type=module</code></a>.</li>
 <li>The file has an <code>.mjs</code> extension.</li>
 <li>The file does not have a <code>.cjs</code> extension, and the nearest parent
 <code>package.json</code> file contains a top-level <a href="packages.html#type"><code>"type"</code></a> field with a value of
@@ -666,8 +697,9 @@ point to be loaded with ECMAScript module loader.</li>
 <h4>ECMAScript modules loader entry point caveat<span><a class="mark" href="#ecmascript-modules-loader-entry-point-caveat" id="ecmascript-modules-loader-entry-point-caveat">#</a></span><a aria-hidden="true" class="legacy" id="cli_ecmascript_modules_loader_entry_point_caveat"></a></h4>
 <p>When loading, the <a href="packages.html#modules-loaders">ES module loader</a> loads the program
 entry point, the <code>node</code> command will accept as input only files with <code>.js</code>,
-<code>.mjs</code>, or <code>.cjs</code> extensions; and with <code>.wasm</code> extensions when
-<a href="#--experimental-wasm-modules"><code>--experimental-wasm-modules</code></a> is enabled.</p>
+<code>.mjs</code>, or <code>.cjs</code> extensions; with <code>.wasm</code> extensions when
+<a href="#--experimental-wasm-modules"><code>--experimental-wasm-modules</code></a> is enabled; and with no extension when
+<a href="#--experimental-default-typetype"><code>--experimental-default-type=module</code></a> is passed.</p>
 </section><section><h3>Options<span><a class="mark" href="#options" id="options">#</a></span><a aria-hidden="true" class="legacy" id="cli_options"></a></h3>
 <div class="api_metadata">
 <details class="changelog"><summary>History</summary>
@@ -712,7 +744,7 @@ analysis using a debugger (such as <code>lldb</code>, <code>gdb</code>, and <cod
 <div class="api_metadata">
 <span>Added in: v20.0.0</span>
 </div>
-<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a>.1 - Active development</div><p></p>
 <p>When using the <a href="permissions.html#permission-model">Permission Model</a>, the process will not be able to spawn any
 child process by default.
 Attempts to do so will throw an <code>ERR_ACCESS_DENIED</code> unless the
@@ -750,7 +782,7 @@ Error: Access to this API has been restricted
 </tbody></table>
 </details>
 </div>
-<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a>.1 - Active development</div><p></p>
 <p>This flag configures file system read permissions using
 the <a href="permissions.html#permission-model">Permission Model</a>.</p>
 <p>The valid arguments for the <code>--allow-fs-read</code> flag are:</p>
@@ -760,7 +792,7 @@ the <a href="permissions.html#permission-model">Permission Model</a>.</p>
 Example <code>--allow-fs-read=/folder1/ --allow-fs-read=/folder1/</code></li>
 </ul>
 <p>Paths delimited by comma (<code>,</code>) are no longer allowed.
-When passing a single flag with a comma a warning will be diplayed</p>
+When passing a single flag with a comma a warning will be displayed.</p>
 <p>Examples can be found in the <a href="permissions.html#file-system-permissions">File System Permissions</a> documentation.</p>
 <p>Relative paths are NOT yet supported by the CLI flag.</p>
 <p>The initializer module also needs to be allowed. Consider the following example:</p>
@@ -793,7 +825,7 @@ Error: Access to this API has been restricted
 </tbody></table>
 </details>
 </div>
-<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a>.1 - Active development</div><p></p>
 <p>This flag configures file system write permissions using
 the <a href="permissions.html#permission-model">Permission Model</a>.</p>
 <p>The valid arguments for the <code>--allow-fs-write</code> flag are:</p>
@@ -803,14 +835,14 @@ the <a href="permissions.html#permission-model">Permission Model</a>.</p>
 Example <code>--allow-fs-read=/folder1/ --allow-fs-read=/folder1/</code></li>
 </ul>
 <p>Paths delimited by comma (<code>,</code>) are no longer allowed.
-When passing a single flag with a comma a warning will be diplayed</p>
+When passing a single flag with a comma a warning will be displayed.</p>
 <p>Examples can be found in the <a href="permissions.html#file-system-permissions">File System Permissions</a> documentation.</p>
 <p>Relative paths are NOT supported through the CLI flag.</p>
 <h4><code>--allow-worker</code><span><a class="mark" href="#--allow-worker" id="--allow-worker">#</a></span><a aria-hidden="true" class="legacy" id="cli_allow_worker"></a></h4>
 <div class="api_metadata">
 <span>Added in: v20.0.0</span>
 </div>
-<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a>.1 - Active development</div><p></p>
 <p>When using the <a href="permissions.html#permission-model">Permission Model</a>, the process will not be able to create any
 worker threads by default.
 For security reasons, the call will throw an <code>ERR_ACCESS_DENIED</code> unless the
@@ -956,6 +988,36 @@ Defaults to current working directory.</p>
 <li><a href="#--heap-prof-dir"><code>--heap-prof-dir</code></a></li>
 <li><a href="#--redirect-warningsfile"><code>--redirect-warnings</code></a></li>
 </ul>
+<h4><code>--disable-warning=code-or-type</code><span><a class="mark" href="#--disable-warningcode-or-type" id="--disable-warningcode-or-type">#</a></span><a aria-hidden="true" class="legacy" id="cli_disable_warning_code_or_type"></a></h4>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a>.1 - Active development</div><p></p>
+<div class="api_metadata">
+<span>Added in: v21.3.0</span>
+</div>
+<p>Disable specific process warnings by <code>code</code> or <code>type</code>.</p>
+<p>Warnings emitted from <a href="process.html#processemitwarningwarning-options"><code>process.emitWarning()</code></a> may contain a
+<code>code</code> and a <code>type</code>. This option will not-emit warnings that have a matching
+<code>code</code> or <code>type</code>.</p>
+<p>List of <a href="deprecations.html#list-of-deprecated-apis">deprecation warnings</a>.</p>
+<p>The Node.js core warning types are: <code>DeprecationWarning</code> and
+<code>ExperimentalWarning</code></p>
+<p>For example, the following script will not emit
+<a href="deprecations.html#dep0025-requirenodesys">DEP0025 <code>require('node:sys')</code></a> when executed with
+<code>node --disable-warning=DEP0025</code>:</p>
+
+<pre class="with-32-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> sys <span class="hljs-keyword">from</span> <span class="hljs-string">'node:sys'</span>;</code><code class="language-js cjs"><span class="hljs-keyword">const</span> sys = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:sys'</span>);</code><button class="copy-button">copy</button></pre>
+<p>For example, the following script will emit the
+<a href="deprecations.html#dep0025-requirenodesys">DEP0025 <code>require('node:sys')</code></a>, but not any Experimental
+Warnings (such as
+<a href="vm.html#vmmeasurememoryoptions">ExperimentalWarning: <code>vm.measureMemory</code> is an experimental feature</a>
+in &#x3C;=v21) when executed with <code>node --disable-warning=ExperimentalWarnings</code>:</p>
+
+<pre class="with-32-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> sys <span class="hljs-keyword">from</span> <span class="hljs-string">'node:sys'</span>;
+<span class="hljs-keyword">import</span> vm <span class="hljs-keyword">from</span> <span class="hljs-string">'node:vm'</span>;
+
+vm.<span class="hljs-title function_">measureMemory</span>();</code><code class="language-js cjs"><span class="hljs-keyword">const</span> sys = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:sys'</span>);
+<span class="hljs-keyword">const</span> vm = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:vm'</span>);
+
+vm.<span class="hljs-title function_">measureMemory</span>();</code><button class="copy-button">copy</button></pre>
 <h4><code>--disable-proto=mode</code><span><a class="mark" href="#--disable-protomode" id="--disable-protomode">#</a></span><a aria-hidden="true" class="legacy" id="cli_disable_proto_mode"></a></h4>
 <div class="api_metadata">
 <span>Added in: v13.12.0, v12.17.0</span>
@@ -996,6 +1058,12 @@ priority than <code>--dns-result-order</code>.</p>
 </div>
 <p>Enable FIPS-compliant crypto at startup. (Requires Node.js to be built
 against FIPS-compatible OpenSSL.)</p>
+<h4><code>--enable-network-family-autoselection</code><span><a class="mark" href="#--enable-network-family-autoselection" id="--enable-network-family-autoselection">#</a></span><a aria-hidden="true" class="legacy" id="cli_enable_network_family_autoselection"></a></h4>
+<div class="api_metadata">
+<span>Added in: v18.18.0</span>
+</div>
+<p>Enables the family autoselection algorithm unless connection options explicitly
+disables it.</p>
 <h4><code>--enable-source-maps</code><span><a class="mark" href="#--enable-source-maps" id="--enable-source-maps">#</a></span><a aria-hidden="true" class="legacy" id="cli_enable_source_maps"></a></h4>
 <div class="api_metadata">
 <details class="changelog"><summary>History</summary>
@@ -1058,6 +1126,54 @@ predefined in the REPL can also be used in <code>script</code>.</p>
 <p>On Windows, using <code>cmd.exe</code> a single quote will not work correctly because it
 only recognizes double <code>"</code> for quoting. In Powershell or Git bash, both <code>'</code>
 and <code>"</code> are usable.</p>
+<h4><code>--experimental-default-type=type</code><span><a class="mark" href="#--experimental-default-typetype" id="--experimental-default-typetype">#</a></span><a aria-hidden="true" class="legacy" id="cli_experimental_default_type_type"></a></h4>
+<div class="api_metadata">
+<span>Added in: v21.0.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a>.0 - Early development</div><p></p>
+<p>Define which module system, <code>module</code> or <code>commonjs</code>, to use for the following:</p>
+<ul>
+<li>
+<p>String input provided via <code>--eval</code> or STDIN, if <code>--input-type</code> is unspecified.</p>
+</li>
+<li>
+<p>Files ending in <code>.js</code> or with no extension, if there is no <code>package.json</code> file
+present in the same folder or any parent folder.</p>
+</li>
+<li>
+<p>Files ending in <code>.js</code> or with no extension, if the nearest parent
+<code>package.json</code> field lacks a <code>"type"</code> field; unless the <code>package.json</code> folder
+or any parent folder is inside a <code>node_modules</code> folder.</p>
+</li>
+</ul>
+<p>In other words, <code>--experimental-default-type=module</code> flips all the places where
+Node.js currently defaults to CommonJS to instead default to ECMAScript modules,
+with the exception of folders and subfolders below <code>node_modules</code>, for backward
+compatibility.</p>
+<p>Under <code>--experimental-default-type=module</code> and <code>--experimental-wasm-modules</code>,
+files with no extension will be treated as WebAssembly if they begin with the
+WebAssembly magic number (<code>\0asm</code>); otherwise they will be treated as ES module
+JavaScript.</p>
+<h4><code>--experimental-detect-module</code><span><a class="mark" href="#--experimental-detect-module" id="--experimental-detect-module">#</a></span><a aria-hidden="true" class="legacy" id="cli_experimental_detect_module"></a></h4>
+<div class="api_metadata">
+<span>Added in: v21.1.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a>.0 - Early development</div><p></p>
+<p>Node.js will inspect the source code of ambiguous input to determine whether it
+contains ES module syntax; if such syntax is detected, the input will be treated
+as an ES module.</p>
+<p>Ambiguous input is defined as:</p>
+<ul>
+<li>Files with a <code>.js</code> extension or no extension; and either no controlling
+<code>package.json</code> file or one that lacks a <code>type</code> field; and
+<code>--experimental-default-type</code> is not specified.</li>
+<li>String input (<code>--eval</code> or STDIN) when neither <code>--input-type</code> nor
+<code>--experimental-default-type</code> are specified.</li>
+</ul>
+<p>ES module syntax is defined as syntax that would throw when evaluated as
+CommonJS. This includes <code>import</code> and <code>export</code> statements and <code>import.meta</code>
+references. It does <em>not</em> include <code>import()</code> expressions, which are valid in
+CommonJS.</p>
 <h4><code>--experimental-import-meta-resolve</code><span><a class="mark" href="#--experimental-import-meta-resolve" id="--experimental-import-meta-resolve">#</a></span><a aria-hidden="true" class="legacy" id="cli_experimental_import_meta_resolve"></a></h4>
 <div class="api_metadata">
 <details class="changelog"><summary>History</summary>
@@ -1102,7 +1218,7 @@ Please use
 <div class="api_metadata">
 <span>Added in: v20.0.0</span>
 </div>
-<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a>.1 - Active development</div><p></p>
 <p>Enable the Permission Model for current process. When enabled, the
 following permissions are restricted:</p>
 <ul>
@@ -1134,7 +1250,7 @@ about <a href="single-executable-applications.html#generating-single-executable-
 <details class="changelog"><summary>History</summary>
 <table>
 <tbody><tr><th>Version</th><th>Changes</th></tr>
-<tr><td>v20.1.0</td>
+<tr><td>v20.1.0, v18.17.0</td>
 <td><p>This option can be used with <code>--test</code>.</p></td></tr>
 <tr><td>v19.7.0, v18.15.0</td>
 <td><p><span>Added in: v19.7.0, v18.15.0</span></p></td></tr>
@@ -1155,7 +1271,7 @@ report is not generated. See the documentation on
 <details class="changelog"><summary>History</summary>
 <table>
 <tbody><tr><th>Version</th><th>Changes</th></tr>
-<tr><td>v20.0.0</td>
+<tr><td>v20.0.0, v18.17.0</td>
 <td><p>This option is no longer required as WASI is enabled by default, but can still be passed.</p></td></tr>
 <tr><td>v13.6.0</td>
 <td><p>changed from <code>--experimental-wasi-unstable-preview0</code> to <code>--experimental-wasi-unstable-preview1</code>.</p></td></tr>
@@ -1170,6 +1286,11 @@ report is not generated. See the documentation on
 <span>Added in: v12.3.0</span>
 </div>
 <p>Enable experimental WebAssembly module support.</p>
+<h4><code>--experimental-websocket</code><span><a class="mark" href="#--experimental-websocket" id="--experimental-websocket">#</a></span><a aria-hidden="true" class="legacy" id="cli_experimental_websocket"></a></h4>
+<div class="api_metadata">
+<span>Added in: v21.0.0</span>
+</div>
+<p>Enable experimental <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebSocket"><code>WebSocket</code></a> support.</p>
 <h4><code>--force-context-aware</code><span><a class="mark" href="#--force-context-aware" id="--force-context-aware">#</a></span><a aria-hidden="true" class="legacy" id="cli_force_context_aware"></a></h4>
 <div class="api_metadata">
 <span>Added in: v12.12.0</span>
@@ -1301,10 +1422,12 @@ The output of this option is less detailed than this document.</p>
 <p>Specify ICU data load path. (Overrides <code>NODE_ICU_DATA</code>.)</p>
 <h4><code>--import=module</code><span><a class="mark" href="#--importmodule" id="--importmodule">#</a></span><a aria-hidden="true" class="legacy" id="cli_import_module"></a></h4>
 <div class="api_metadata">
-<span>Added in: v19.0.0</span>
+<span>Added in: v19.0.0, v18.18.0</span>
 </div>
 <p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
-<p>Preload the specified module at startup.</p>
+<p>Preload the specified module at startup. If the flag is provided several times,
+each module will be executed sequentially in the order they appear, starting
+with the ones provided in <a href="#node_optionsoptions"><code>NODE_OPTIONS</code></a>.</p>
 <p>Follows <a href="esm.html#modules-ecmascript-modules">ECMAScript module</a> resolution rules.
 Use <a href="#-r---require-module"><code>--require</code></a> to load a <a href="modules.html">CommonJS module</a>.
 Modules preloaded with <code>--require</code> will run before modules preloaded with <code>--import</code>.</p>
@@ -1312,18 +1435,32 @@ Modules preloaded with <code>--require</code> will run before modules preloaded 
 <div class="api_metadata">
 <span>Added in: v12.0.0</span>
 </div>
-<p>This configures Node.js to interpret string input as CommonJS or as an ES
-module. String input is input via <code>--eval</code>, <code>--print</code>, or <code>STDIN</code>.</p>
-<p>Valid values are <code>"commonjs"</code> and <code>"module"</code>. The default is <code>"commonjs"</code>.</p>
-<p>The REPL does not support this option.</p>
+<p>This configures Node.js to interpret <code>--eval</code> or <code>STDIN</code> input as CommonJS or
+as an ES module. Valid values are <code>"commonjs"</code> or <code>"module"</code>. The default is
+<code>"commonjs"</code> unless <a href="#--experimental-default-typetype"><code>--experimental-default-type=module</code></a> is used.</p>
+<p>The REPL does not support this option. Usage of <code>--input-type=module</code> with
+<a href="#-p---print-script"><code>--print</code></a> will throw an error, as <code>--print</code> does not support ES module
+syntax.</p>
 <h4><code>--insecure-http-parser</code><span><a class="mark" href="#--insecure-http-parser" id="--insecure-http-parser">#</a></span><a aria-hidden="true" class="legacy" id="cli_insecure_http_parser"></a></h4>
 <div class="api_metadata">
 <span>Added in: v13.4.0, v12.15.0, v10.19.0</span>
 </div>
-<p>Use an insecure HTTP parser that accepts invalid HTTP headers. This may allow
-interoperability with non-conformant HTTP implementations. It may also allow
-request smuggling and other HTTP attacks that rely on invalid headers being
-accepted. Avoid using this option.</p>
+<p>Enable leniency flags on the HTTP parser. This may allow
+interoperability with non-conformant HTTP implementations.</p>
+<p>When enabled, the parser will accept the following:</p>
+<ul>
+<li>Invalid HTTP headers values.</li>
+<li>Invalid HTTP versions.</li>
+<li>Allow message containing both <code>Transfer-Encoding</code>
+and <code>Content-Length</code> headers.</li>
+<li>Allow extra data after message when <code>Connection: close</code> is present.</li>
+<li>Allow extra trasfer encodings after <code>chunked</code> has been provided.</li>
+<li>Allow <code>\n</code> to be used as token separator instead of <code>\r\n</code>.</li>
+<li>Allow <code>\r\n</code> not to be provided after a chunk.</li>
+<li>Allow spaces to be present after a chunk size and before <code>\r\n</code>.</li>
+</ul>
+<p>All the above will expose your application to request smuggling
+or poisoning attack. Avoid using this option.</p>
 <h4><code>--inspect[=[host:]port]</code><span><a class="mark" href="#--inspecthostport" id="--inspecthostport">#</a></span><a aria-hidden="true" class="legacy" id="cli_inspect_host_port"></a></h4>
 <div class="api_metadata">
 <span>Added in: v6.3.0</span>
@@ -1413,12 +1550,18 @@ requiring a native C++ addon will fail and throw an exception.</p>
 <div class="api_metadata">
 <span>Added in: v18.0.0</span>
 </div>
-<p>Disable experimental support for the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API">Fetch API</a>.</p>
+<p>Disable exposition of <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API">Fetch API</a> on the global scope.</p>
 <h4><code>--no-experimental-global-customevent</code><span><a class="mark" href="#--no-experimental-global-customevent" id="--no-experimental-global-customevent">#</a></span><a aria-hidden="true" class="legacy" id="cli_no_experimental_global_customevent"></a></h4>
 <div class="api_metadata">
 <span>Added in: v19.0.0</span>
 </div>
 <p>Disable exposition of <a href="https://dom.spec.whatwg.org/#customevent">CustomEvent Web API</a> on the global scope.</p>
+<h4><code>--no-experimental-global-navigator</code><span><a class="mark" href="#--no-experimental-global-navigator" id="--no-experimental-global-navigator">#</a></span><a aria-hidden="true" class="legacy" id="cli_no_experimental_global_navigator"></a></h4>
+<div class="api_metadata">
+<span>Added in: v21.2.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<p>Disable exposition of <a href="globals.html#navigator">Navigator API</a> on the global scope.</p>
 <h4><code>--no-experimental-global-webcrypto</code><span><a class="mark" href="#--no-experimental-global-webcrypto" id="--no-experimental-global-webcrypto">#</a></span><a aria-hidden="true" class="legacy" id="cli_no_experimental_global_webcrypto"></a></h4>
 <div class="api_metadata">
 <span>Added in: v19.0.0</span>
@@ -1780,6 +1923,12 @@ status code 1.</p>
 <code>--watch-path</code>, <code>--check</code>, <code>--eval</code>, <code>--interactive</code>, or the inspector.
 See the documentation on <a href="test.html#running-tests-from-the-command-line">running tests from the command line</a>
 for more details.</p>
+<h4><code>--test-concurrency</code><span><a class="mark" href="#--test-concurrency" id="--test-concurrency">#</a></span><a aria-hidden="true" class="legacy" id="cli_test_concurrency"></a></h4>
+<div class="api_metadata">
+<span>Added in: v21.0.0</span>
+</div>
+<p>The maximum number of test files that the test runner CLI will execute
+concurrently. The default value is <code>os.availableParallelism() - 1</code>.</p>
 <h4><code>--test-name-pattern</code><span><a class="mark" href="#--test-name-pattern" id="--test-name-pattern">#</a></span><a aria-hidden="true" class="legacy" id="cli_test_name_pattern"></a></h4>
 <div class="api_metadata">
 <details class="changelog"><summary>History</summary>
@@ -1850,6 +1999,12 @@ and will run only those that happen to be in an <code>index</code> part.</p>
 <pre><code class="language-bash">node --<span class="hljs-built_in">test</span> --test-shard=1/3
 node --<span class="hljs-built_in">test</span> --test-shard=2/3
 node --<span class="hljs-built_in">test</span> --test-shard=3/3</code> <button class="copy-button">copy</button></pre>
+<h4><code>--test-timeout</code><span><a class="mark" href="#--test-timeout" id="--test-timeout">#</a></span><a aria-hidden="true" class="legacy" id="cli_test_timeout"></a></h4>
+<div class="api_metadata">
+<span>Added in: v21.2.0</span>
+</div>
+<p>A number of milliseconds the test execution will fail after. If unspecified,
+subtests inherit this value from their parent. The default value is <code>Infinity</code>.</p>
 <h4><code>--throw-deprecation</code><span><a class="mark" href="#--throw-deprecation" id="--throw-deprecation">#</a></span><a aria-hidden="true" class="legacy" id="cli_throw_deprecation"></a></h4>
 <div class="api_metadata">
 <span>Added in: v0.11.14</span>
@@ -2206,11 +2361,14 @@ node --require <span class="hljs-string">"./a.js"</span> --require <span class="
 <li><code>--conditions</code>, <code>-C</code></li>
 <li><code>--diagnostic-dir</code></li>
 <li><code>--disable-proto</code></li>
+<li><code>--disable-warning</code></li>
 <li><code>--dns-result-order</code></li>
 <li><code>--enable-fips</code></li>
 <li><code>--enable-network-family-autoselection</code></li>
 <li><code>--enable-source-maps</code></li>
 <li><code>--experimental-abortcontroller</code></li>
+<li><code>--experimental-default-type</code></li>
+<li><code>--experimental-detect-module</code></li>
 <li><code>--experimental-import-meta-resolve</code></li>
 <li><code>--experimental-json-modules</code></li>
 <li><code>--experimental-loader</code></li>
@@ -2224,6 +2382,7 @@ node --require <span class="hljs-string">"./a.js"</span> --require <span class="
 <li><code>--experimental-vm-modules</code></li>
 <li><code>--experimental-wasi-unstable-preview1</code></li>
 <li><code>--experimental-wasm-modules</code></li>
+<li><code>--experimental-websocket</code></li>
 <li><code>--force-context-aware</code></li>
 <li><code>--force-fips</code></li>
 <li><code>--force-node-api-uncaught-exceptions-policy</code></li>
@@ -2245,6 +2404,7 @@ node --require <span class="hljs-string">"./a.js"</span> --require <span class="
 <li><code>--no-deprecation</code></li>
 <li><code>--no-experimental-fetch</code></li>
 <li><code>--no-experimental-global-customevent</code></li>
+<li><code>--no-experimental-global-navigator</code></li>
 <li><code>--no-experimental-global-webcrypto</code></li>
 <li><code>--no-experimental-repl-await</code></li>
 <li><code>--no-extra-info-on-fatal-exception</code></li>

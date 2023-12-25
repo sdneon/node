@@ -264,6 +264,9 @@ void Environment::InitializeDiagnostics() {
       env->isolate()->SetAtomicsWaitCallback(nullptr, nullptr);
     }, this);
   }
+  if (options_->trace_promises) {
+    isolate_->SetPromiseHook(TracePromises);
+  }
 }
 
 static
@@ -753,6 +756,13 @@ static ExitCode ProcessGlobalArgsInternal(std::vector<std::string>* args,
                 "--no-harmony-import-assertions") == v8_args.end()) {
     v8_args.emplace_back("--harmony-import-assertions");
   }
+  // TODO(aduh95): remove this when the harmony-import-attributes flag
+  // is removed in V8.
+  if (std::find(v8_args.begin(),
+                v8_args.end(),
+                "--no-harmony-import-attributes") == v8_args.end()) {
+    v8_args.emplace_back("--harmony-import-attributes");
+  }
 
   auto env_opts = per_process::cli_options->per_isolate->per_env;
   if (std::find(v8_args.begin(), v8_args.end(),
@@ -838,6 +848,12 @@ static ExitCode InitializeNodeWithArgsInternal(
   V8::SetFlagsFromString(NODE_V8_OPTIONS, sizeof(NODE_V8_OPTIONS) - 1);
 #endif
 
+  if (!!(flags & ProcessInitializationFlags::kGeneratePredictableSnapshot) ||
+      per_process::cli_options->per_isolate->build_snapshot) {
+    v8::V8::SetFlagsFromString("--predictable");
+    v8::V8::SetFlagsFromString("--random_seed=42");
+  }
+
   // Specify this explicitly to avoid being affected by V8 changes to the
   // default value.
   V8::SetFlagsFromString("--rehash-snapshot");
@@ -853,7 +869,9 @@ static ExitCode InitializeNodeWithArgsInternal(
 
     for (const auto& file_path : file_paths) {
       std::string path = cwd + kPathSeparator + file_path;
-      per_process::dotenv_file.ParsePath(path);
+      auto path_exists = per_process::dotenv_file.ParsePath(path);
+
+      if (!path_exists) errors->push_back(file_path + ": not found");
     }
 
     per_process::dotenv_file.AssignNodeOptionsIfAvailable(&node_options);

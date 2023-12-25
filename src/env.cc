@@ -30,6 +30,7 @@
 #include <iostream>
 #include <limits>
 #include <memory>
+#include <optional>
 #include <unordered_map>
 
 namespace node {
@@ -55,6 +56,8 @@ using v8::Number;
 using v8::Object;
 using v8::ObjectTemplate;
 using v8::Private;
+using v8::Promise;
+using v8::PromiseHookType;
 using v8::Script;
 using v8::SnapshotCreator;
 using v8::StackTrace;
@@ -62,6 +65,7 @@ using v8::String;
 using v8::Symbol;
 using v8::TracingController;
 using v8::TryCatch;
+using v8::Uint32;
 using v8::Undefined;
 using v8::Value;
 using v8::WrapperDescriptor;
@@ -349,6 +353,8 @@ IsolateDataSerializeInfo IsolateData::Serialize(SnapshotCreator* creator) {
 
 void IsolateData::DeserializeProperties(const IsolateDataSerializeInfo* info) {
   size_t i = 0;
+
+  v8::Isolate::Scope isolate_scope(isolate_);
   HandleScope handle_scope(isolate_);
 
   if (per_process::enabled_debug_list.enabled(DebugCategory::MKSNAPSHOT)) {
@@ -431,6 +437,7 @@ void IsolateData::CreateProperties() {
   // One byte because our strings are ASCII and we can safely skip V8's UTF-8
   // decoding step.
 
+  v8::Isolate::Scope isolate_scope(isolate_);
   HandleScope handle_scope(isolate_);
 
 #define V(PropertyName, StringValue)                                           \
@@ -501,6 +508,7 @@ void IsolateData::CreateProperties() {
   binding::CreateInternalBindingTemplates(this);
 
   contextify::ContextifyContext::InitializeGlobalTemplates(this);
+  CreateEnvProxyTemplate(this);
 }
 
 constexpr uint16_t kDefaultCppGCEmebdderID = 0x90de;
@@ -1650,10 +1658,13 @@ void AsyncHooks::MemoryInfo(MemoryTracker* tracker) const {
 void AsyncHooks::grow_async_ids_stack() {
   async_ids_stack_.reserve(async_ids_stack_.Length() * 3);
 
-  env()->async_hooks_binding()->Set(
-      env()->context(),
-      env()->async_ids_stack_string(),
-      async_ids_stack_.GetJSArray()).Check();
+  env()
+      ->principal_realm()
+      ->async_hooks_binding()
+      ->Set(env()->context(),
+            env()->async_ids_stack_string(),
+            async_ids_stack_.GetJSArray())
+      .Check();
 }
 
 void AsyncHooks::FailWithCorruptedAsyncStack(double expected_async_id) {
@@ -1662,7 +1673,8 @@ void AsyncHooks::FailWithCorruptedAsyncStack(double expected_async_id) {
           "actual: %.f, expected: %.f)\n",
           async_id_fields_.GetValue(kExecutionAsyncId),
           expected_async_id);
-  DumpBacktrace(stderr);
+  DumpNativeBacktrace(stderr);
+  DumpJavaScriptBacktrace(stderr);
   fflush(stderr);
   // TODO(joyeecheung): should this exit code be more specific?
   if (!env()->abort_on_uncaught_exception()) Exit(ExitCode::kGenericUserError);
@@ -1829,6 +1841,60 @@ void Environment::BuildEmbedderGraph(Isolate* isolate,
   Environment* env = static_cast<Environment*>(data);
   // Start traversing embedder objects from the root Environment object.
   tracker.Track(env);
+}
+
+std::optional<uint32_t> GetPromiseId(Environment* env, Local<Promise> promise) {
+  Local<Value> id_val;
+  if (!promise->GetPrivate(env->context(), env->promise_trace_id())
+           .ToLocal(&id_val) ||
+      !id_val->IsUint32()) {
+    return std::nullopt;
+  }
+  return id_val.As<Uint32>()->Value();
+}
+
+void Environment::TracePromises(PromiseHookType type,
+                                Local<Promise> promise,
+                                Local<Value> parent) {
+  // We don't care about the execution of promises, just the
+  // creation/resolution.
+  if (type == PromiseHookType::kBefore || type == PromiseHookType::kAfter) {
+    return;
+  }
+  Isolate* isolate = Isolate::GetCurrent();
+  Local<Context> context = isolate->GetCurrentContext();
+  Environment* env = Environment::GetCurrent(context);
+  if (env == nullptr) return;
+
+  std::optional<uint32_t> parent_id;
+  if (!parent.IsEmpty() && parent->IsPromise()) {
+    parent_id = GetPromiseId(env, parent.As<Promise>());
+  }
+
+  uint32_t id = 0;
+  std::string action;
+  if (type == PromiseHookType::kInit) {
+    id = env->trace_promise_id_counter_++;
+    promise->SetPrivate(
+        context, env->promise_trace_id(), Uint32::New(isolate, id));
+    action = "created";
+  } else if (type == PromiseHookType::kResolve) {
+    auto opt = GetPromiseId(env, promise);
+    if (!opt.has_value()) return;
+    id = opt.value();
+    action = "resolved";
+  } else {
+    UNREACHABLE();
+  }
+
+  FPrintF(stderr, "[--trace-promises] ");
+  if (parent_id.has_value()) {
+    FPrintF(stderr, "promise #%d ", parent_id.value());
+  }
+  FPrintF(stderr, "%s promise #%d\n", action, id);
+  // TODO(joyeecheung): we can dump the native stack trace too if the
+  // JS stack trace is empty i.e. it may be resolved on the native side.
+  PrintCurrentStackTrace(isolate);
 }
 
 size_t Environment::NearHeapLimitCallback(void* data,

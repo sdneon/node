@@ -934,6 +934,9 @@ class Environment : public MemoryRetainer {
   inline void RemoveCleanupHook(CleanupQueue::Callback cb, void* arg);
   void RunCleanup();
 
+  static void TracePromises(v8::PromiseHookType type,
+                            v8::Local<v8::Promise> promise,
+                            v8::Local<v8::Value> parent);
   static size_t NearHeapLimitCallback(void* data,
                                       size_t current_heap_limit,
                                       size_t initial_heap_limit);
@@ -1016,8 +1019,14 @@ class Environment : public MemoryRetainer {
   };
 
  private:
-  inline void ThrowError(v8::Local<v8::Value> (*fun)(v8::Local<v8::String>),
-                         const char* errmsg);
+  // V8 has changed the constructor of exceptions, support both APIs before Node
+  // updates to V8 12.1.
+  using V8ExceptionConstructorOld =
+      v8::Local<v8::Value> (*)(v8::Local<v8::String>);
+  using V8ExceptionConstructorNew =
+      v8::Local<v8::Value> (*)(v8::Local<v8::String>, v8::Local<v8::Value>);
+  inline void ThrowError(V8ExceptionConstructorOld fun, const char* errmsg);
+  inline void ThrowError(V8ExceptionConstructorNew fun, const char* errmsg);
   void TrackContext(v8::Local<v8::Context> context);
   void UntrackContext(v8::Local<v8::Context> context);
 
@@ -1088,6 +1097,7 @@ class Environment : public MemoryRetainer {
   uint32_t module_id_counter_ = 0;
   uint32_t script_id_counter_ = 0;
   uint32_t function_id_counter_ = 0;
+  uint32_t trace_promise_id_counter_ = 0;
 
   AliasedInt32Array exit_info_;
 

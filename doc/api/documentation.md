@@ -109,7 +109,7 @@ a command-line flag. Experimental features may also emit a [warning][].
 | [Util](util.html) | (2) Stable |
 | [VM (executing JavaScript)](vm.html) | (2) Stable |
 | [Web Crypto API](webcrypto.html) | (2) Stable |
-| [Web Streams API](webstreams.html) | (1) Experimental. |
+| [Web Streams API](webstreams.html) | (2) Stable |
 | [WebAssembly System Interface (WASI)](wasi.html) | (1) Experimental |
 | [Worker threads](worker_threads.html) | (2) Stable |
 | [Zlib](zlib.html) | (2) Stable |

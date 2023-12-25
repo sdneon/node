@@ -8,7 +8,10 @@
       "meta": {
         "changes": [
           {
-            "version": "v20.0.0",
+            "version": [
+              "v20.0.0",
+              "v18.17.0"
+            ],
             "pr-url": "https://github.com/nodejs/node/pull/46067",
             "description": "Arguments are now coerced and validated as per their WebIDL definitions like in other Web Crypto API implementations."
           },
@@ -141,7 +144,7 @@
         {
           "textRaw": "Deriving bits and keys",
           "name": "deriving_bits_and_keys",
-          "desc": "<pre><code class=\"language-js\">const { subtle } = globalThis.crypto;\n\nasync function pbkdf2(pass, salt, iterations = 1000, length = 256) {\n  const ec = new TextEncoder();\n  const key = await subtle.importKey(\n    'raw',\n    ec.encode(pass),\n    'PBKDF2',\n    false,\n    ['deriveBits']);\n  const bits = await subtle.deriveBits({\n    name: 'PBKDF2',\n    hash: 'SHA-512',\n    salt: ec.encode(salt),\n    iterations,\n  }, key, length);\n  return bits;\n}\n\nasync function pbkdf2Key(pass, salt, iterations = 1000, length = 256) {\n  const ec = new TextEncoder();\n  const keyMaterial = await subtle.importKey(\n    'raw',\n    ec.encode(pass),\n    'PBKDF2',\n    false,\n    ['deriveKey']);\n  const key = await subtle.deriveKey({\n    name: 'PBKDF2',\n    hash: 'SHA-512',\n    salt: ec.encode(salt),\n    iterations,\n  }, keyMaterial, {\n    name: 'AES-GCM',\n    length: 256,\n  }, true, ['encrypt', 'decrypt']);\n  return key;\n}\n</code></pre>",
+          "desc": "<pre><code class=\"language-js\">const { subtle } = globalThis.crypto;\n\nasync function pbkdf2(pass, salt, iterations = 1000, length = 256) {\n  const ec = new TextEncoder();\n  const key = await subtle.importKey(\n    'raw',\n    ec.encode(pass),\n    'PBKDF2',\n    false,\n    ['deriveBits']);\n  const bits = await subtle.deriveBits({\n    name: 'PBKDF2',\n    hash: 'SHA-512',\n    salt: ec.encode(salt),\n    iterations,\n  }, key, length);\n  return bits;\n}\n\nasync function pbkdf2Key(pass, salt, iterations = 1000, length = 256) {\n  const ec = new TextEncoder();\n  const keyMaterial = await subtle.importKey(\n    'raw',\n    ec.encode(pass),\n    'PBKDF2',\n    false,\n    ['deriveKey']);\n  const key = await subtle.deriveKey({\n    name: 'PBKDF2',\n    hash: 'SHA-512',\n    salt: ec.encode(salt),\n    iterations,\n  }, keyMaterial, {\n    name: 'AES-GCM',\n    length,\n  }, true, ['encrypt', 'decrypt']);\n  return key;\n}\n</code></pre>",
           "type": "module",
           "displayName": "Deriving bits and keys"
         },
@@ -1301,6 +1304,11 @@
                       "textRaw": "`key`: {CryptoKey}",
                       "name": "key",
                       "type": "CryptoKey"
+                    },
+                    {
+                      "textRaw": "`data`: {ArrayBuffer|TypedArray|DataView|Buffer}",
+                      "name": "data",
+                      "type": "ArrayBuffer|TypedArray|DataView|Buffer"
                     }
                   ]
                 }

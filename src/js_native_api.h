@@ -28,7 +28,7 @@
 #ifndef NAPI_EXTERN
 #ifdef _WIN32
 #define NAPI_EXTERN __declspec(dllexport)
-#elif defined(__wasm32__)
+#elif defined(__wasm__)
 #define NAPI_EXTERN                                                            \
   __attribute__((visibility("default")))                                       \
   __attribute__((__import_module__("napi")))
@@ -93,6 +93,7 @@ NAPI_EXTERN napi_status NAPI_CDECL napi_create_string_utf16(napi_env env,
                                                             size_t length,
                                                             napi_value* result);
 #ifdef NAPI_EXPERIMENTAL
+#define NODE_API_EXPERIMENTAL_HAS_EXTERNAL_STRINGS
 NAPI_EXTERN napi_status NAPI_CDECL
 node_api_create_external_string_latin1(napi_env env,
                                        char* str,
@@ -516,6 +517,17 @@ NAPI_EXTERN napi_status NAPI_CDECL napi_add_finalizer(napi_env env,
                                                       napi_ref* result);
 
 #endif  // NAPI_VERSION >= 5
+
+#ifdef NAPI_EXPERIMENTAL
+#define NODE_API_EXPERIMENTAL_HAS_POST_FINALIZER
+
+NAPI_EXTERN napi_status NAPI_CDECL
+node_api_post_finalizer(napi_env env,
+                        napi_finalize finalize_cb,
+                        void* finalize_data,
+                        void* finalize_hint);
+
+#endif  // NAPI_EXPERIMENTAL
 
 #if NAPI_VERSION >= 6
 

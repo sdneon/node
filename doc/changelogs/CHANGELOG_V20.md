@@ -4,13 +4,9 @@
 
 <table>
 <tr>
-<th>LTS 'Iron'</th>
 <th>Current</th>
 </tr>
 <tr>
-<td>
-<a href="#20.9.0">20.9.0</a><br/>
-</td>
 <td>
 <a href="#20.8.1">20.8.1</a><br/>
 <a href="#20.8.0">20.8.0</a><br/>
@@ -30,6 +26,7 @@
 </table>
 
 * Other Versions
+  * [21.x](CHANGELOG_V21.md)
   * [19.x](CHANGELOG_V19.md)
   * [18.x](CHANGELOG_V18.md)
   * [17.x](CHANGELOG_V17.md)
@@ -50,24 +47,6 @@
   * [0.10.x](CHANGELOG_V010.md)
   * [io.js](CHANGELOG_IOJS.md)
   * [Archive](CHANGELOG_ARCHIVE.md)
-
-<a id="20.9.0"></a>
-
-## 2023-10-24, Version 20.9.0 'Iron' (LTS), @richardlau
-
-### Notable Changes
-
-This release marks the transition of Node.js 20.x into Long Term Support (LTS)
-with the codename 'Iron'. The 20.x release line now moves into "Active LTS"
-and will remain so until October 2024. After that time, it will move into
-"Maintenance" until end of life in April 2026.
-
-### Known issue
-
-Collecting code coverage via the `NODE_V8_COVERAGE` environment variable may
-lead to a hang. This is not thought to be a regression in Node.js 20 (some
-reports are on Node.js 18). For more information, including some potential
-workarounds, see issue [#49344](https://github.com/nodejs/node/issues/49344).
 
 <a id="20.8.1"></a>
 
@@ -123,7 +102,7 @@ This rework addressed a series of long-standing memory leaks and use-after-free 
 * `vm.SyntheticModule`
 * `vm.SourceTextModule`
 
-This should enable affected users (in particular Jest users) to upgrade from older versions of Node.js.
+This should enable affected users to upgrade from older versions of Node.js.
 
 Contributed by Joyee Cheung in [#48510](https://github.com/nodejs/node/pull/48510).
 
@@ -489,7 +468,7 @@ node --import ./file-that-calls-register.js ./app.js
 
 Using `--import` ensures that the customization hooks are registered before any application code runs, even the entry point.
 
-This feature was contributed by Izaak Schroeder in <https://github.com/nodejs/node/pull/48842> and <https://github.com/nodejs/node/pull/48559>
+This feature was contributed by João Lenon and Jacob Smith in <https://github.com/nodejs/node/pull/46826>, Izaak Schroeder and Jacob Smith in <https://github.com/nodejs/node/pull/48842> and <https://github.com/nodejs/node/pull/48559>
 
 #### Module customization `load` hook can now support CommonJS
 

@@ -3,18 +3,31 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v20.9.0">
-  <title>Diagnostics Channel | Node.js v20.9.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v21.5.0">
+  <title>Diagnostics Channel | Node.js v21.5.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
   <link rel="canonical" href="https://nodejs.org/api/diagnostics_channel.html">
   <script async defer src="assets/api.js" type="text/javascript"></script>
+  <script>
+      const storedTheme = localStorage.getItem('theme');
+
+      // Follow operating system theme preference
+      if (storedTheme === null && window.matchMedia) {
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        if (mq.matches) {
+          document.documentElement.classList.add('dark-mode');
+        }
+      } else if (storedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+  </script>
   <style>@media(max-width:734px){.with-64-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}</style>
 </head>
 <body class="alt apidoc" id="api-section-diagnostics_channel">
   <div id="content" class="clearfix">
-    <div id="column2" class="interior">
+    <div role="navigation" id="column2" class="interior">
       <div id="intro" class="interior">
         <a href="/" title="Go back to the home page">
           Node.js
@@ -96,7 +109,7 @@
     <div id="column1" data-id="diagnostics_channel" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v20.9.0 documentation</h1>
+          <h1>Node.js v21.5.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -111,7 +124,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v20.9.0</li>
+            <li class="pinned-header">Node.js v21.5.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -150,7 +163,7 @@
 <li><span class="stability_1"><a href="#tracingchannelunsubscribesubscribers"><code>tracingChannel.unsubscribe(subscribers)</code></a></span></li>
 <li><span class="stability_1"><a href="#tracingchanneltracesyncfn-context-thisarg-args"><code>tracingChannel.traceSync(fn[, context[, thisArg[, ...args]]])</code></a></span></li>
 <li><span class="stability_1"><a href="#tracingchanneltracepromisefn-context-thisarg-args"><code>tracingChannel.tracePromise(fn[, context[, thisArg[, ...args]]])</code></a></span></li>
-<li><span class="stability_1"><a href="#tracingchanneltracecallbackfn-position-context-thisarg-args"><code>tracingChannel.traceCallback(fn[, position[, context[, thisArg[, ...args]]]])</code></a></span></li>
+<li><span class="stability_1"><a href="#tracingchanneltracecallbackfn-position-context-thisarg-args"><code>tracingChannel.traceCallback(fn, position, context, thisArg, ...args)</code></a></span></li>
 </ul>
 </li>
 <li><a href="#tracingchannel-channels">TracingChannel Channels</a>
@@ -270,7 +283,7 @@
         Other versions
       </a>
       <div class="picker"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v21.x/api/diagnostics_channel.html">21.x</a></li>
-<li><a href="https://nodejs.org/docs/latest-v20.x/api/diagnostics_channel.html">20.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v20.x/api/diagnostics_channel.html">20.x <b>LTS</b></a></li>
 <li><a href="https://nodejs.org/docs/latest-v19.x/api/diagnostics_channel.html">19.x</a></li>
 <li><a href="https://nodejs.org/docs/latest-v18.x/api/diagnostics_channel.html">18.x <b>LTS</b></a></li>
 <li><a href="https://nodejs.org/docs/latest-v17.x/api/diagnostics_channel.html">17.x</a></li>
@@ -301,7 +314,7 @@
         <hr>
       </header>
 
-      <details id="toc" open><summary>Table of contents</summary><ul>
+      <details role="navigation" id="toc" open><summary>Table of contents</summary><ul>
 <li><span class="stability_2"><a href="#diagnostics-channel">Diagnostics Channel</a></span>
 <ul>
 <li><a href="#public-api">Public API</a>
@@ -332,7 +345,7 @@
 <li><span class="stability_1"><a href="#tracingchannelunsubscribesubscribers"><code>tracingChannel.unsubscribe(subscribers)</code></a></span></li>
 <li><span class="stability_1"><a href="#tracingchanneltracesyncfn-context-thisarg-args"><code>tracingChannel.traceSync(fn[, context[, thisArg[, ...args]]])</code></a></span></li>
 <li><span class="stability_1"><a href="#tracingchanneltracepromisefn-context-thisarg-args"><code>tracingChannel.tracePromise(fn[, context[, thisArg[, ...args]]])</code></a></span></li>
-<li><span class="stability_1"><a href="#tracingchanneltracecallbackfn-position-context-thisarg-args"><code>tracingChannel.traceCallback(fn[, position[, context[, thisArg[, ...args]]]])</code></a></span></li>
+<li><span class="stability_1"><a href="#tracingchanneltracecallbackfn-position-context-thisarg-args"><code>tracingChannel.traceCallback(fn, position, context, thisArg, ...args)</code></a></span></li>
 </ul>
 </li>
 <li><a href="#tracingchannel-channels">TracingChannel Channels</a>
@@ -359,7 +372,7 @@
 </li>
 </ul></details>
 
-      <div id="apicontent">
+      <div role="main" id="apicontent">
         <h2>Diagnostics Channel<span><a class="mark" href="#diagnostics-channel" id="diagnostics-channel">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_diagnostics_channel"></a></h2>
 <div class="api_metadata">
 <details class="changelog"><summary>History</summary>
@@ -374,7 +387,7 @@
 </div>
 
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v20.9.0/lib/diagnostics_channel.js">lib/diagnostics_channel.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v21.5.0/lib/diagnostics_channel.js">lib/diagnostics_channel.js</a></p>
 <p>The <code>node:diagnostics_channel</code> module provides an API to create named channels
 to report arbitrary message data for diagnostics purposes.</p>
 <p>It can be accessed using:</p>
@@ -1024,29 +1037,30 @@ channels.<span class="hljs-title function_">tracePromise</span>(<span class="hlj
 }, {
   <span class="hljs-attr">some</span>: <span class="hljs-string">'thing'</span>,
 });</code><button class="copy-button">copy</button></pre>
-<h5><code>tracingChannel.traceCallback(fn[, position[, context[, thisArg[, ...args]]]])</code><span><a class="mark" href="#tracingchanneltracecallbackfn-position-context-thisarg-args" id="tracingchanneltracecallbackfn-position-context-thisarg-args">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_tracingchannel_tracecallback_fn_position_context_thisarg_args"></a></h5>
+<h5><code>tracingChannel.traceCallback(fn, position, context, thisArg, ...args)</code><span><a class="mark" href="#tracingchanneltracecallbackfn-position-context-thisarg-args" id="tracingchanneltracecallbackfn-position-context-thisarg-args">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_tracingchannel_tracecallback_fn_position_context_thisarg_args"></a></h5>
 <div class="api_metadata">
 <span>Added in: v19.9.0</span>
 </div>
 <p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
 <ul>
 <li><code>fn</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> callback using function to wrap a trace around</li>
-<li><code>position</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> Zero-indexed argument position of expected callback</li>
-<li><code>context</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> Shared object to correlate trace events through</li>
+<li><code>position</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> Zero-indexed argument position of expected callback
+(defaults to last argument if <code>undefined</code> is passed)</li>
+<li><code>context</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> Shared object to correlate trace events through (defaults
+to <code>{}</code> if <code>undefined</code> is passed)</li>
 <li><code>thisArg</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> The receiver to be used for the function call</li>
-<li><code>...args</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> Optional arguments to pass to the function</li>
+<li><code>...args</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> arguments to pass to the function (must include the callback)</li>
 <li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> The return value of the given function</li>
 </ul>
-<p>Trace a callback-receiving function call. This will always produce a
+<p>Trace a callback-receiving function call. The callback is expected to follow
+the error as first arg convention typically used. This will always produce a
 <a href="#startevent"><code>start</code> event</a> and <a href="#endevent"><code>end</code> event</a> around the synchronous portion of the
 function execution, and will produce a <a href="#asyncstartevent"><code>asyncStart</code> event</a> and
 <a href="#asyncendevent"><code>asyncEnd</code> event</a> around the callback execution. It may also produce an
-<a href="#errorevent"><code>error</code> event</a> if the given function throws an error or the returned
-promise rejects. This will run the given function using
+<a href="#errorevent"><code>error</code> event</a> if the given function throws or the first argument passed to
+the callback is set. This will run the given function using
 <a href="#channelrunstorescontext-fn-thisarg-args"><code>channel.runStores(context, ...)</code></a> on the <code>start</code> channel which ensures all
 events should have any bound stores set to match this trace context.</p>
-<p>The <code>position</code> will be -1 by default to indicate the final argument should
-be used as the callback.</p>
 
 <pre class="with-64-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> diagnostics_channel <span class="hljs-keyword">from</span> <span class="hljs-string">'node:diagnostics_channel'</span>;
 

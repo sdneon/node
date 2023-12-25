@@ -3,18 +3,31 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v20.9.0">
-  <title>Modules: node:module API | Node.js v20.9.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v21.5.0">
+  <title>Modules: node:module API | Node.js v21.5.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
   <link rel="canonical" href="https://nodejs.org/api/module.html">
   <script async defer src="assets/api.js" type="text/javascript"></script>
+  <script>
+      const storedTheme = localStorage.getItem('theme');
+
+      // Follow operating system theme preference
+      if (storedTheme === null && window.matchMedia) {
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        if (mq.matches) {
+          document.documentElement.classList.add('dark-mode');
+        }
+      } else if (storedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+  </script>
   <style>@media(max-width:430px){.with-26-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:574px){.with-44-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:590px){.with-46-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:646px){.with-53-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}</style>
 </head>
 <body class="alt apidoc" id="api-section-module">
   <div id="content" class="clearfix">
-    <div id="column2" class="interior">
+    <div role="navigation" id="column2" class="interior">
       <div id="intro" class="interior">
         <a href="/" title="Go back to the home page">
           Node.js
@@ -96,7 +109,7 @@
     <div id="column1" data-id="module" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v20.9.0 documentation</h1>
+          <h1>Node.js v21.5.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -111,7 +124,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v20.9.0</li>
+            <li class="pinned-header">Node.js v21.5.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -141,7 +154,6 @@
 <li><span class="stability_1"><a href="#initialize"><code>initialize()</code></a></span></li>
 <li><span class="stability_1"><a href="#resolvespecifier-context-nextresolve"><code>resolve(specifier, context, nextResolve)</code></a></span></li>
 <li><span class="stability_1"><a href="#loadurl-context-nextload"><code>load(url, context, nextLoad)</code></a></span></li>
-<li><span class="stability_1"><a href="#globalpreload"><code>globalPreload()</code></a></span></li>
 </ul>
 </li>
 <li><a href="#examples">Examples</a>
@@ -263,7 +275,7 @@
         Other versions
       </a>
       <div class="picker"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v21.x/api/module.html">21.x</a></li>
-<li><a href="https://nodejs.org/docs/latest-v20.x/api/module.html">20.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v20.x/api/module.html">20.x <b>LTS</b></a></li>
 <li><a href="https://nodejs.org/docs/latest-v19.x/api/module.html">19.x</a></li>
 <li><a href="https://nodejs.org/docs/latest-v18.x/api/module.html">18.x <b>LTS</b></a></li>
 <li><a href="https://nodejs.org/docs/latest-v17.x/api/module.html">17.x</a></li>
@@ -297,7 +309,7 @@
         <hr>
       </header>
 
-      <details id="toc" open><summary>Table of contents</summary><ul>
+      <details role="navigation" id="toc" open><summary>Table of contents</summary><ul>
 <li><a href="#modules-nodemodule-api">Modules: <code>node:module</code> API</a>
 <ul>
 <li><a href="#the-module-object">The <code>Module</code> object</a>
@@ -319,7 +331,6 @@
 <li><span class="stability_1"><a href="#initialize"><code>initialize()</code></a></span></li>
 <li><span class="stability_1"><a href="#resolvespecifier-context-nextresolve"><code>resolve(specifier, context, nextResolve)</code></a></span></li>
 <li><span class="stability_1"><a href="#loadurl-context-nextload"><code>load(url, context, nextLoad)</code></a></span></li>
-<li><span class="stability_1"><a href="#globalpreload"><code>globalPreload()</code></a></span></li>
 </ul>
 </li>
 <li><a href="#examples">Examples</a>
@@ -348,7 +359,7 @@
 </li>
 </ul></details>
 
-      <div id="apicontent">
+      <div role="main" id="apicontent">
         <h2>Modules: <code>node:module</code> API<span><a class="mark" href="#modules-nodemodule-api" id="modules-nodemodule-api">#</a></span><a aria-hidden="true" class="legacy" id="module_modules_node_module_api"></a></h2>
 
 <div class="api_metadata">
@@ -427,6 +438,10 @@ URL, such as <code>import.meta.url</code>, you can pass that URL here. <strong>D
 <code>'data:'</code></li>
 <li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
 <ul>
+<li><code>parentURL</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="url.html#the-whatwg-url-api" class="type">&#x3C;URL></a> If you want to resolve <code>specifier</code> relative to a
+base URL, such as <code>import.meta.url</code>, you can pass that URL here. This
+property is ignored if the <code>parentURL</code> is supplied as the second argument.
+<strong>Default:</strong> <code>'data:'</code></li>
 <li><code>data</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> Any arbitrary, cloneable JavaScript value to pass into the
 <a href="#initialize"><code>initialize</code></a> hook.</li>
 <li><code>transferList</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object[]></a> <a href="worker_threads.html#portpostmessagevalue-transferlist">transferrable objects</a> to be passed into the
@@ -703,6 +718,8 @@ port1.<span class="hljs-title function_">on</span>(<span class="hljs-string">'me
 <details class="changelog"><summary>History</summary>
 <table>
 <tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v21.0.0</td>
+<td><p>The property <code>context.importAssertions</code> is replaced with <code>context.importAttributes</code>. Using the old name is still supported and will emit an experimental warning.</p></td></tr>
 <tr><td>v18.6.0, v16.17.0</td>
 <td><p>Add support for chaining resolve hooks. Each hook must either call <code>nextResolve()</code> or include a <code>shortCircuit</code> property set to <code>true</code> in its return.</p></td></tr>
 <tr><td>v17.1.0, v16.14.0</td>
@@ -716,8 +733,8 @@ port1.<span class="hljs-title function_">on</span>(<span class="hljs-string">'me
 <li><code>context</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
 <ul>
 <li><code>conditions</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a> Export conditions of the relevant <code>package.json</code></li>
-<li><code>importAssertions</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> An object whose key-value pairs represent the
-assertions for the module to import</li>
+<li><code>importAttributes</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> An object whose key-value pairs represent the
+attributes for the module to import</li>
 <li><code>parentURL</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> The module importing this one, or undefined
 if this is the Node.js entry point</li>
 </ul>
@@ -734,7 +751,7 @@ Node.js default <code>resolve</code> hook after the last user-supplied <code>res
 <li><code>format</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> A hint to the load hook (it might be
 ignored)
 <code>'builtin' | 'commonjs' | 'json' | 'module' | 'wasm'</code></li>
-<li><code>importAssertions</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> The import assertions to use when
+<li><code>importAttributes</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> The import attributes to use when
 caching the module (optional; if excluded the input will be used)</li>
 <li><code>shortCircuit</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> A signal that this hook intends to
 terminate the chain of <code>resolve</code> hooks. <strong>Default:</strong> <code>false</code></li>
@@ -753,10 +770,10 @@ a format is specified, the <code>load</code> hook is ultimately responsible for 
 the final <code>format</code> value (and it is free to ignore the hint provided by
 <code>resolve</code>); if <code>resolve</code> provides a <code>format</code>, a custom <code>load</code> hook is required
 even if only to pass the value to the Node.js default <code>load</code> hook.</p>
-<p>Import type assertions are part of the cache key for saving loaded modules into
+<p>Import type attributes are part of the cache key for saving loaded modules into
 the internal module cache. The <code>resolve</code> hook is responsible for returning an
-<code>importAssertions</code> object if the module should be cached with different
-assertions than were present in the source code.</p>
+<code>importAttributes</code> object if the module should be cached with different
+attributes than were present in the source code.</p>
 <p>The <code>conditions</code> property in <code>context</code> is an array of conditions for
 <a href="packages.html#conditional-exports">package exports conditions</a> that apply to this resolution
 request. They can be used for looking up conditional mappings elsewhere or to
@@ -813,7 +830,7 @@ Node.js module specifier resolution behavior</em> when calling <code>defaultReso
 <li><code>conditions</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a> Export conditions of the relevant <code>package.json</code></li>
 <li><code>format</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> The format optionally supplied by the
 <code>resolve</code> hook chain</li>
-<li><code>importAssertions</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+<li><code>importAttributes</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
 </ul>
 </li>
 <li><code>nextLoad</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> The subsequent <code>load</code> hook in the chain, or the
@@ -888,7 +905,8 @@ loader and <code>require</code>/<code>require.resolve</code> calls will not go t
 registered hooks. This behavior for nullish <code>source</code> is temporary — in the
 future, nullish <code>source</code> will not be supported.</li>
 </ul>
-<p>The Node.js internal <code>load</code> implementation, which is the value of <code>next</code> for the
+<p>When <code>node</code> is run with <code>--experimental-default-type=commonjs</code>, the Node.js
+internal <code>load</code> implementation, which is the value of <code>next</code> for the
 last hook in the <code>load</code> chain, returns <code>null</code> for <code>source</code> when <code>format</code> is
 <code>'commonjs'</code> for backward compatibility. Here is an example hook that would
 opt-in to using the non-default behavior:</p>
@@ -942,71 +960,6 @@ a supported one, for example <code>yaml</code> to <code>module</code>.</p>
 }</code> <button class="copy-button">copy</button></pre>
 <p>In a more advanced scenario, this can also be used to transform an unsupported
 source to a supported one (see <a href="#examples">Examples</a> below).</p>
-<h5><code>globalPreload()</code><span><a class="mark" href="#globalpreload" id="globalpreload">#</a></span><a aria-hidden="true" class="legacy" id="module_globalpreload"></a></h5>
-<div class="api_metadata">
-<details class="changelog"><summary>History</summary>
-<table>
-<tbody><tr><th>Version</th><th>Changes</th></tr>
-<tr><td>v18.6.0, v16.17.0</td>
-<td><p>Add support for chaining globalPreload hooks.</p></td></tr>
-</tbody></table>
-</details>
-</div>
-<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a>.0 - Early development</div><p></p>
-<blockquote>
-<p><strong>Warning:</strong> This hook will be removed in a future version. Use
-<a href="#initialize"><code>initialize</code></a> instead. When a hooks module has an <code>initialize</code> export,
-<code>globalPreload</code> will be ignored.</p>
-</blockquote>
-<ul>
-<li><code>context</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> Information to assist the preload code
-<ul>
-<li><code>port</code> <a href="worker_threads.html#class-messageport" class="type">&#x3C;MessagePort></a></li>
-</ul>
-</li>
-<li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> Code to run before application startup</li>
-</ul>
-<p>Sometimes it might be necessary to run some code inside of the same global
-scope that the application runs in. This hook allows the return of a string
-that is run as a sloppy-mode script on startup.</p>
-<p>Similar to how CommonJS wrappers work, the code runs in an implicit function
-scope. The only argument is a <code>require</code>-like function that can be used to load
-builtins like "fs": <code>getBuiltin(request: string)</code>.</p>
-<p>If the code needs more advanced <code>require</code> features, it has to construct
-its own <code>require</code> using  <code>module.createRequire()</code>.</p>
-<pre><code class="language-js mjs"><span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">globalPreload</span>(<span class="hljs-params">context</span>) {
-  <span class="hljs-keyword">return</span> <span class="hljs-string">`\
-globalThis.someInjectedProperty = 42;
-console.log('I just set some globals!');
-
-const { createRequire } = getBuiltin('module');
-const { cwd } = getBuiltin('process');
-
-const require = createRequire(cwd() + '/&#x3C;preload>');
-// [...]
-`</span>;
-}</code> <button class="copy-button">copy</button></pre>
-<p>Another argument is provided to the preload code: <code>port</code>. This is available as a
-parameter to the hook and inside of the source text returned by the hook. This
-functionality has been moved to the <code>initialize</code> hook.</p>
-<p>Care must be taken in order to properly call <a href="worker_threads.html#portref"><code>port.ref()</code></a> and
-<a href="worker_threads.html#portunref"><code>port.unref()</code></a> to prevent a process from being in a state where it won't
-close normally.</p>
-<pre><code class="language-js mjs"><span class="hljs-comment">/**
- * This example has the application context send a message to the hook
- * and sends the message back to the application context
- */</span>
-<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">globalPreload</span>(<span class="hljs-params">{ port }</span>) {
-  port.<span class="hljs-property">onmessage</span> = <span class="hljs-function">(<span class="hljs-params">evt</span>) =></span> {
-    port.<span class="hljs-title function_">postMessage</span>(evt.<span class="hljs-property">data</span>);
-  };
-  <span class="hljs-keyword">return</span> <span class="hljs-string">`\
-    port.postMessage('console.log("I went to the hook and back");');
-    port.onmessage = (evt) => {
-      eval(evt.data);
-    };
-  `</span>;
-}</code> <button class="copy-button">copy</button></pre>
 <h4>Examples<span><a class="mark" href="#examples" id="examples">#</a></span><a aria-hidden="true" class="legacy" id="module_examples"></a></h4>
 <p>The various module customization hooks can be used together to accomplish
 wide-ranging customizations of the Node.js code loading and evaluation

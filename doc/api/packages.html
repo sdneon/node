@@ -3,18 +3,31 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v20.9.0">
-  <title>Modules: Packages | Node.js v20.9.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v21.5.0">
+  <title>Modules: Packages | Node.js v21.5.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
   <link rel="canonical" href="https://nodejs.org/api/packages.html">
   <script async defer src="assets/api.js" type="text/javascript"></script>
+  <script>
+      const storedTheme = localStorage.getItem('theme');
+
+      // Follow operating system theme preference
+      if (storedTheme === null && window.matchMedia) {
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        if (mq.matches) {
+          document.documentElement.classList.add('dark-mode');
+        }
+      } else if (storedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+  </script>
   
 </head>
 <body class="alt apidoc" id="api-section-packages">
   <div id="content" class="clearfix">
-    <div id="column2" class="interior">
+    <div role="navigation" id="column2" class="interior">
       <div id="intro" class="interior">
         <a href="/" title="Go back to the home page">
           Node.js
@@ -96,7 +109,7 @@
     <div id="column1" data-id="packages" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v20.9.0 documentation</h1>
+          <h1>Node.js v21.5.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -111,7 +124,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v20.9.0</li>
+            <li class="pinned-header">Node.js v21.5.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -125,6 +138,7 @@
 <li><a href="#introduction">Introduction</a></li>
 <li><a href="#determining-module-system">Determining module system</a>
 <ul>
+<li><a href="#introduction_1">Introduction</a></li>
 <li><a href="#modules-loaders">Modules loaders</a></li>
 <li><a href="#packagejson-and-file-extensions"><code>package.json</code> and file extensions</a></li>
 <li><a href="#--input-type-flag"><code>--input-type</code> flag</a></li>
@@ -267,7 +281,7 @@
         Other versions
       </a>
       <div class="picker"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v21.x/api/packages.html">21.x</a></li>
-<li><a href="https://nodejs.org/docs/latest-v20.x/api/packages.html">20.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v20.x/api/packages.html">20.x <b>LTS</b></a></li>
 <li><a href="https://nodejs.org/docs/latest-v19.x/api/packages.html">19.x</a></li>
 <li><a href="https://nodejs.org/docs/latest-v18.x/api/packages.html">18.x <b>LTS</b></a></li>
 <li><a href="https://nodejs.org/docs/latest-v17.x/api/packages.html">17.x</a></li>
@@ -301,12 +315,13 @@
         <hr>
       </header>
 
-      <details id="toc" open><summary>Table of contents</summary><ul>
+      <details role="navigation" id="toc" open><summary>Table of contents</summary><ul>
 <li><a href="#modules-packages">Modules: Packages</a>
 <ul>
 <li><a href="#introduction">Introduction</a></li>
 <li><a href="#determining-module-system">Determining module system</a>
 <ul>
+<li><a href="#introduction_1">Introduction</a></li>
 <li><a href="#modules-loaders">Modules loaders</a></li>
 <li><a href="#packagejson-and-file-extensions"><code>package.json</code> and file extensions</a></li>
 <li><a href="#--input-type-flag"><code>--input-type</code> flag</a></li>
@@ -356,7 +371,7 @@
 </li>
 </ul></details>
 
-      <div id="apicontent">
+      <div role="main" id="apicontent">
         <h2>Modules: Packages<span><a class="mark" href="#modules-packages" id="modules-packages">#</a></span><a aria-hidden="true" class="legacy" id="packages_modules_packages"></a></h2>
 
 
@@ -389,6 +404,7 @@ named <code>node_modules</code>.</p>
 <p>This page provides guidance for package authors writing <code>package.json</code> files
 along with a reference for the <a href="#nodejs-packagejson-field-definitions"><code>package.json</code></a> fields defined by Node.js.</p>
 </section><section><h3>Determining module system<span><a class="mark" href="#determining-module-system" id="determining-module-system">#</a></span><a aria-hidden="true" class="legacy" id="packages_determining_module_system"></a></h3>
+<h4>Introduction<span><a class="mark" href="#introduction_1" id="introduction_1">#</a></span><a aria-hidden="true" class="legacy" id="packages_introduction_1"></a></h4>
 <p>Node.js will treat the following as <a href="esm.html">ES modules</a> when passed to <code>node</code> as the
 initial input, or when referenced by <code>import</code> statements or <code>import()</code>
 expressions:</p>
@@ -404,15 +420,20 @@ contains a top-level <a href="#type"><code>"type"</code></a> field with a value 
 <p>Strings passed in as an argument to <code>--eval</code>, or piped to <code>node</code> via <code>STDIN</code>,
 with the flag <code>--input-type=module</code>.</p>
 </li>
+<li>
+<p>When using <a href="cli.html#--experimental-detect-module"><code>--experimental-detect-module</code></a>, code containing syntax only
+successfully parsed as <a href="esm.html">ES modules</a>, such as <code>import</code> or <code>export</code>
+statements or <code>import.meta</code>, having no explicit marker of how it should be
+interpreted. Explicit markers are <code>.mjs</code> or <code>.cjs</code> extensions, <code>package.json</code>
+<code>"type"</code> fields with either <code>"module"</code> or <code>"commonjs"</code> values, or
+<code>--input-type</code> or <code>--experimental-default-type</code> flags. Dynamic <code>import()</code>
+expressions are supported in either CommonJS or ES modules and would not
+cause a file to be treated as an ES module.</p>
+</li>
 </ul>
-<p>Node.js will treat as <a href="modules.html">CommonJS</a> all other forms of input, such as <code>.js</code> files
-where the nearest parent <code>package.json</code> file contains no top-level <code>"type"</code>
-field, or string input without the flag <code>--input-type</code>. This behavior is to
-preserve backward compatibility. However, now that Node.js supports both
-CommonJS and ES modules, it is best to be explicit whenever possible. Node.js
-will treat the following as CommonJS when passed to <code>node</code> as the initial input,
-or when referenced by <code>import</code> statements, <code>import()</code> expressions, or
-<code>require()</code> expressions:</p>
+<p>Node.js will treat the following as <a href="modules.html">CommonJS</a> when passed to <code>node</code> as the
+initial input, or when referenced by <code>import</code> statements or <code>import()</code>
+expressions:</p>
 <ul>
 <li>
 <p>Files with a <code>.cjs</code> extension.</p>
@@ -426,11 +447,34 @@ contains a top-level field <a href="#type"><code>"type"</code></a> with a value 
 via <code>STDIN</code>, with the flag <code>--input-type=commonjs</code>.</p>
 </li>
 </ul>
-<p>Package authors should include the <a href="#type"><code>"type"</code></a> field, even in packages where
-all sources are CommonJS. Being explicit about the <code>type</code> of the package will
-future-proof the package in case the default type of Node.js ever changes, and
-it will also make things easier for build tools and loaders to determine how the
-files in the package should be interpreted.</p>
+<p>Aside from these explicit cases, there are other cases where Node.js defaults to
+one module system or the other based on the value of the
+<a href="cli.html#--experimental-default-typetype"><code>--experimental-default-type</code></a> flag:</p>
+<ul>
+<li>
+<p>Files ending in <code>.js</code> or with no extension, if there is no <code>package.json</code> file
+present in the same folder or any parent folder.</p>
+</li>
+<li>
+<p>Files ending in <code>.js</code> or with no extension, if the nearest parent
+<code>package.json</code> field lacks a <code>"type"</code> field; unless the folder is inside a
+<code>node_modules</code> folder. (Package scopes under <code>node_modules</code> are always treated
+as CommonJS when the <code>package.json</code> file lacks a <code>"type"</code> field, regardless
+of <code>--experimental-default-type</code>, for backward compatibility.)</p>
+</li>
+<li>
+<p>Strings passed in as an argument to <code>--eval</code> or piped to <code>node</code> via <code>STDIN</code>,
+when <code>--input-type</code> is unspecified.</p>
+</li>
+</ul>
+<p>This flag currently defaults to <code>"commonjs"</code>, but it may change in the future to
+default to <code>"module"</code>. For this reason it is best to be explicit wherever
+possible; in particular, package authors should always include the <a href="#type"><code>"type"</code></a>
+field in their <code>package.json</code> files, even in packages where all sources are
+CommonJS. Being explicit about the <code>type</code> of the package will future-proof the
+package in case the default type of Node.js ever changes, and it will also make
+things easier for build tools and loaders to determine how the files in the
+package should be interpreted.</p>
 <h4>Modules loaders<span><a class="mark" href="#modules-loaders" id="modules-loaders">#</a></span><a aria-hidden="true" class="legacy" id="packages_modules_loaders"></a></h4>
 <p>Node.js has two systems for resolving a specifier and loading modules.</p>
 <p>There is the CommonJS module loader:</p>

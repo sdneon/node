@@ -5,12 +5,16 @@
 <!-- YAML
 added: v16.5.0
 changes:
+  - version:
+    - v21.0.0
+    pr-url: https://github.com/nodejs/node/pull/45684
+    description: No longer experimental.
   - version: v18.0.0
     pr-url: https://github.com/nodejs/node/pull/42225
     description: Use of this API no longer emit a runtime warning.
 -->
 
-> Stability: 1 - Experimental.
+> Stability: 2 - Stable
 
 An implementation of the [WHATWG Streams Standard][].
 
@@ -202,7 +206,7 @@ added: v16.5.0
 * `transform` {Object}
   * `readable` {ReadableStream} The `ReadableStream` to which
     `transform.writable` will push the potentially modified data
-    is receives from this `ReadableStream`.
+    it receives from this `ReadableStream`.
   * `writable` {WritableStream} The `WritableStream` to which this
     `ReadableStream`'s data will be written.
 * `options` {Object}
@@ -1416,9 +1420,13 @@ changes:
 
 <!-- YAML
 added: v17.0.0
+changes:
+  - version: v21.2.0
+    pr-url: https://github.com/nodejs/node/pull/50097
+    description: format now accepts `deflate-raw` value.
 -->
 
-* `format` {string} One of either `'deflate'` or `'gzip'`.
+* `format` {string} One of `'deflate'`, `'deflate-raw'`, or `'gzip'`.
 
 #### `compressionStream.readable`
 
@@ -1450,9 +1458,13 @@ changes:
 
 <!-- YAML
 added: v17.0.0
+changes:
+  - version: v21.2.0
+    pr-url: https://github.com/nodejs/node/pull/50097
+    description: format now accepts `deflate-raw` value.
 -->
 
-* `format` {string} One of either `'deflate'` or `'gzip'`.
+* `format` {string} One of `'deflate'`, `'deflate-raw'`, or `'gzip'`.
 
 #### `decompressionStream.readable`
 

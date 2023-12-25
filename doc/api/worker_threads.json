@@ -8,7 +8,7 @@
       "introduced_in": "v10.5.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v20.9.0/lib/worker_threads.js\">lib/worker_threads.js</a></p>\n<p>The <code>node:worker_threads</code> module enables the use of threads that execute\nJavaScript in parallel. To access it:</p>\n<pre><code class=\"language-js\">const worker = require('node:worker_threads');\n</code></pre>\n<p>Workers (threads) are useful for performing CPU-intensive JavaScript operations.\nThey do not help much with I/O-intensive work. The Node.js built-in\nasynchronous I/O operations are more efficient than Workers can be.</p>\n<p>Unlike <code>child_process</code> or <code>cluster</code>, <code>worker_threads</code> can share memory. They do\nso by transferring <code>ArrayBuffer</code> instances or sharing <code>SharedArrayBuffer</code>\ninstances.</p>\n<pre><code class=\"language-js\">const {\n  Worker, isMainThread, parentPort, workerData,\n} = require('node:worker_threads');\n\nif (isMainThread) {\n  module.exports = function parseJSAsync(script) {\n    return new Promise((resolve, reject) => {\n      const worker = new Worker(__filename, {\n        workerData: script,\n      });\n      worker.on('message', resolve);\n      worker.on('error', reject);\n      worker.on('exit', (code) => {\n        if (code !== 0)\n          reject(new Error(`Worker stopped with exit code ${code}`));\n      });\n    });\n  };\n} else {\n  const { parse } = require('some-js-parsing-library');\n  const script = workerData;\n  parentPort.postMessage(parse(script));\n}\n</code></pre>\n<p>The above example spawns a Worker thread for each <code>parseJSAsync()</code> call. In\npractice, use a pool of Workers for these kinds of tasks. Otherwise, the\noverhead of creating Workers would likely exceed their benefit.</p>\n<p>When implementing a worker pool, use the <a href=\"async_hooks.html#class-asyncresource\"><code>AsyncResource</code></a> API to inform\ndiagnostic tools (e.g. to provide asynchronous stack traces) about the\ncorrelation between tasks and their outcomes. See\n<a href=\"async_context.html#using-asyncresource-for-a-worker-thread-pool\">\"Using <code>AsyncResource</code> for a <code>Worker</code> thread pool\"</a>\nin the <code>async_hooks</code> documentation for an example implementation.</p>\n<p>Worker threads inherit non-process-specific options by default. Refer to\n<a href=\"#new-workerfilename-options\"><code>Worker constructor options</code></a> to know how to customize worker thread options,\nspecifically <code>argv</code> and <code>execArgv</code> options.</p>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v21.5.0/lib/worker_threads.js\">lib/worker_threads.js</a></p>\n<p>The <code>node:worker_threads</code> module enables the use of threads that execute\nJavaScript in parallel. To access it:</p>\n<pre><code class=\"language-js\">const worker = require('node:worker_threads');\n</code></pre>\n<p>Workers (threads) are useful for performing CPU-intensive JavaScript operations.\nThey do not help much with I/O-intensive work. The Node.js built-in\nasynchronous I/O operations are more efficient than Workers can be.</p>\n<p>Unlike <code>child_process</code> or <code>cluster</code>, <code>worker_threads</code> can share memory. They do\nso by transferring <code>ArrayBuffer</code> instances or sharing <code>SharedArrayBuffer</code>\ninstances.</p>\n<pre><code class=\"language-js\">const {\n  Worker, isMainThread, parentPort, workerData,\n} = require('node:worker_threads');\n\nif (isMainThread) {\n  module.exports = function parseJSAsync(script) {\n    return new Promise((resolve, reject) => {\n      const worker = new Worker(__filename, {\n        workerData: script,\n      });\n      worker.on('message', resolve);\n      worker.on('error', reject);\n      worker.on('exit', (code) => {\n        if (code !== 0)\n          reject(new Error(`Worker stopped with exit code ${code}`));\n      });\n    });\n  };\n} else {\n  const { parse } = require('some-js-parsing-library');\n  const script = workerData;\n  parentPort.postMessage(parse(script));\n}\n</code></pre>\n<p>The above example spawns a Worker thread for each <code>parseJSAsync()</code> call. In\npractice, use a pool of Workers for these kinds of tasks. Otherwise, the\noverhead of creating Workers would likely exceed their benefit.</p>\n<p>When implementing a worker pool, use the <a href=\"async_hooks.html#class-asyncresource\"><code>AsyncResource</code></a> API to inform\ndiagnostic tools (e.g. to provide asynchronous stack traces) about the\ncorrelation between tasks and their outcomes. See\n<a href=\"async_context.html#using-asyncresource-for-a-worker-thread-pool\">\"Using <code>AsyncResource</code> for a <code>Worker</code> thread pool\"</a>\nin the <code>async_hooks</code> documentation for an example implementation.</p>\n<p>Worker threads inherit non-process-specific options by default. Refer to\n<a href=\"#new-workerfilename-options\"><code>Worker constructor options</code></a> to know how to customize worker thread options,\nspecifically <code>argv</code> and <code>execArgv</code> options.</p>",
       "methods": [
         {
           "textRaw": "`worker.getEnvironmentData(key)`",
@@ -62,10 +62,46 @@
           },
           "signatures": [
             {
-              "params": []
+              "params": [
+                {
+                  "textRaw": "`object` {any} Any arbitrary JavaScript value.",
+                  "name": "object",
+                  "type": "any",
+                  "desc": "Any arbitrary JavaScript value."
+                }
+              ]
             }
           ],
-          "desc": "<p>Mark an object as not transferable. If <code>object</code> occurs in the transfer list of\na <a href=\"#portpostmessagevalue-transferlist\"><code>port.postMessage()</code></a> call, it is ignored.</p>\n<p>In particular, this makes sense for objects that can be cloned, rather than\ntransferred, and which are used by other objects on the sending side.\nFor example, Node.js marks the <code>ArrayBuffer</code>s it uses for its\n<a href=\"buffer.html#static-method-bufferallocunsafesize\"><code>Buffer</code> pool</a> with this.</p>\n<p>This operation cannot be undone.</p>\n<pre><code class=\"language-js\">const { MessageChannel, markAsUntransferable } = require('node:worker_threads');\n\nconst pooledBuffer = new ArrayBuffer(8);\nconst typedArray1 = new Uint8Array(pooledBuffer);\nconst typedArray2 = new Float64Array(pooledBuffer);\n\nmarkAsUntransferable(pooledBuffer);\n\nconst { port1 } = new MessageChannel();\nport1.postMessage(typedArray1, [ typedArray1.buffer ]);\n\n// The following line prints the contents of typedArray1 -- it still owns\n// its memory and has been cloned, not transferred. Without\n// `markAsUntransferable()`, this would print an empty Uint8Array.\n// typedArray2 is intact as well.\nconsole.log(typedArray1);\nconsole.log(typedArray2);\n</code></pre>\n<p>There is no equivalent to this API in browsers.</p>"
+          "desc": "<p>Mark an object as not transferable. If <code>object</code> occurs in the transfer list of\na <a href=\"#portpostmessagevalue-transferlist\"><code>port.postMessage()</code></a> call, an error is thrown. This is a no-op if\n<code>object</code> is a primitive value.</p>\n<p>In particular, this makes sense for objects that can be cloned, rather than\ntransferred, and which are used by other objects on the sending side.\nFor example, Node.js marks the <code>ArrayBuffer</code>s it uses for its\n<a href=\"buffer.html#static-method-bufferallocunsafesize\"><code>Buffer</code> pool</a> with this.</p>\n<p>This operation cannot be undone.</p>\n<pre><code class=\"language-js\">const { MessageChannel, markAsUntransferable } = require('node:worker_threads');\n\nconst pooledBuffer = new ArrayBuffer(8);\nconst typedArray1 = new Uint8Array(pooledBuffer);\nconst typedArray2 = new Float64Array(pooledBuffer);\n\nmarkAsUntransferable(pooledBuffer);\n\nconst { port1 } = new MessageChannel();\ntry {\n  // This will throw an error, because pooledBuffer is not transferable.\n  port1.postMessage(typedArray1, [ typedArray1.buffer ]);\n} catch (error) {\n  // error.name === 'DataCloneError'\n}\n\n// The following line prints the contents of typedArray1 -- it still owns\n// its memory and has not been transferred. Without\n// `markAsUntransferable()`, this would print an empty Uint8Array and the\n// postMessage call would have succeeded.\n// typedArray2 is intact as well.\nconsole.log(typedArray1);\nconsole.log(typedArray2);\n</code></pre>\n<p>There is no equivalent to this API in browsers.</p>"
+        },
+        {
+          "textRaw": "`worker.isMarkedAsUntransferable(object)`",
+          "type": "method",
+          "name": "isMarkedAsUntransferable",
+          "meta": {
+            "added": [
+              "v21.0.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "return": {
+                "textRaw": "Returns: {boolean}",
+                "name": "return",
+                "type": "boolean"
+              },
+              "params": [
+                {
+                  "textRaw": "`object` {any} Any JavaScript value.",
+                  "name": "object",
+                  "type": "any",
+                  "desc": "Any JavaScript value."
+                }
+              ]
+            }
+          ],
+          "desc": "<p>Check if an object is marked as not transferable with\n<a href=\"#workermarkasuntransferableobject\"><code>markAsUntransferable()</code></a>.</p>\n<pre><code class=\"language-js\">const { markAsUntransferable, isMarkedAsUntransferable } = require('node:worker_threads');\n\nconst pooledBuffer = new ArrayBuffer(8);\nmarkAsUntransferable(pooledBuffer);\n\nisMarkedAsUntransferable(pooledBuffer);  // Returns true.\n</code></pre>\n<p>There is no equivalent to this API in browsers.</p>"
         },
         {
           "textRaw": "`worker.moveMessagePortToContext(port, contextifiedSandbox)`",
@@ -520,6 +556,11 @@
                   "v10.5.0"
                 ],
                 "changes": [
+                  {
+                    "version": "v21.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/47604",
+                    "description": "An error is thrown when an untransferable object is in the transfer list."
+                  },
                   {
                     "version": [
                       "v15.14.0",

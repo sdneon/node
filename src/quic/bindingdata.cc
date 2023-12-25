@@ -64,6 +64,7 @@ void BindingData::Initialize(Environment* env, Local<Object> target) {
 
 void BindingData::RegisterExternalReferences(
     ExternalReferenceRegistry* registry) {
+  registry->Register(IllegalConstructor);
   registry->Register(SetCallbacks);
   registry->Register(FlushPacketFreelist);
 }
@@ -196,6 +197,19 @@ NgHttp3CallbackScope::~NgHttp3CallbackScope() {
 bool NgHttp3CallbackScope::in_nghttp3_callback(Environment* env) {
   auto& binding = BindingData::Get(env);
   return binding.in_nghttp3_callback_scope;
+}
+
+CallbackScopeBase::CallbackScopeBase(Environment* env)
+    : env(env), context_scope(env->context()), try_catch(env->isolate()) {}
+
+CallbackScopeBase::~CallbackScopeBase() {
+  if (try_catch.HasCaught()) {
+    if (!try_catch.HasTerminated() && env->can_call_into_js()) {
+      errors::TriggerUncaughtException(env->isolate(), try_catch);
+    } else {
+      try_catch.ReThrow();
+    }
+  }
 }
 
 void IllegalConstructor(const FunctionCallbackInfo<Value>& args) {

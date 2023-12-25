@@ -431,7 +431,17 @@ describe('Loader hooks', { concurrency: true }, () => {
         fixtures.path('empty.js'),
       ]);
 
-      assert.strictEqual(stderr.match(/`globalPreload` is an experimental feature/g).length, 1);
+      assert.strictEqual(stderr.match(/`globalPreload` has been removed; use `initialize` instead/g).length, 1);
+    });
+
+    it('should not emit warning when initialize is supplied', async () => {
+      const { stderr } = await spawnPromisified(execPath, [
+        '--experimental-loader',
+        'data:text/javascript,export function globalPreload(){}export function initialize(){}',
+        fixtures.path('empty.js'),
+      ]);
+
+      assert.doesNotMatch(stderr, /`globalPreload` has been removed; use `initialize` instead/);
     });
   });
 
@@ -733,6 +743,74 @@ describe('Loader hooks', { concurrency: true }, () => {
 
     assert.strictEqual(stderr, '');
     assert.strictEqual(stdout, 'resolve passthru\n'.repeat(10));
+    assert.strictEqual(code, 0);
+    assert.strictEqual(signal, null);
+  });
+
+  it('should support source maps in commonjs translator', async () => {
+    const readFile = async () => {};
+    const hook = `
+    import { readFile } from 'node:fs/promises';
+    export ${
+  async function load(url, context, nextLoad) {
+    const resolved = await nextLoad(url, context);
+    if (context.format === 'commonjs') {
+      resolved.source = await readFile(new URL(url));
+    }
+    return resolved;
+  }
+}`;
+
+    const { code, signal, stdout, stderr } = await spawnPromisified(execPath, [
+      '--no-warnings',
+      '--enable-source-maps',
+      '--import',
+      `data:text/javascript,${encodeURIComponent(`
+      import{ register } from "node:module";
+      register(${
+  JSON.stringify('data:text/javascript,' + encodeURIComponent(hook))
+});
+      `)}`,
+      fixtures.path('source-map/throw-on-require.js'),
+    ]);
+
+    assert.strictEqual(stdout, '');
+    assert.match(stderr, /throw-on-require\.ts:9:9/);
+    assert.strictEqual(code, 1);
+    assert.strictEqual(signal, null);
+  });
+
+  it('should handle mixed of opt-in modules and non-opt-in ones', async () => {
+    const { code, signal, stdout, stderr } = await spawnPromisified(execPath, [
+      '--no-warnings',
+      '--experimental-loader',
+      `data:text/javascript,const fixtures=${JSON.stringify(fixtures.path('empty.js'))};export ${
+        encodeURIComponent(function resolve(s, c, n) {
+          if (s.endsWith('entry-point')) {
+            return {
+              shortCircuit: true,
+              url: 'file:///c:/virtual-entry-point',
+              format: 'commonjs',
+            };
+          }
+          return n(s, c);
+        })
+      }export ${
+        encodeURIComponent(async function load(u, c, n) {
+          if (u === 'file:///c:/virtual-entry-point') {
+            return {
+              shortCircuit: true,
+              source: `"use strict";require(${JSON.stringify(fixtures)});console.log("Hello");`,
+              format: 'commonjs',
+            };
+          }
+          return n(u, c);
+        })}`,
+      'entry-point',
+    ]);
+
+    assert.strictEqual(stderr, '');
+    assert.strictEqual(stdout, 'Hello\n');
     assert.strictEqual(code, 0);
     assert.strictEqual(signal, null);
   });

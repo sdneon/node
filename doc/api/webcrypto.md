@@ -2,7 +2,9 @@
 
 <!-- YAML
 changes:
-  - version: v20.0.0
+  - version:
+    - v20.0.0
+    - v18.17.0
     pr-url: https://github.com/nodejs/node/pull/46067
     description: Arguments are now coerced and validated as per their WebIDL
       definitions like in other Web Crypto API implementations.
@@ -328,7 +330,7 @@ async function pbkdf2Key(pass, salt, iterations = 1000, length = 256) {
     iterations,
   }, keyMaterial, {
     name: 'AES-GCM',
-    length: 256,
+    length,
   }, true, ['encrypt', 'decrypt']);
   return key;
 }
@@ -682,6 +684,7 @@ added: v15.0.0
 
 * `algorithm`: {RsaOaepParams|AesCtrParams|AesCbcParams|AesGcmParams}
 * `key`: {CryptoKey}
+* `data`: {ArrayBuffer|TypedArray|DataView|Buffer}
 * Returns: {Promise} containing {ArrayBuffer}
 
 Using the method and parameters specified by `algorithm` and the keying

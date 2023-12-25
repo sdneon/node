@@ -36,9 +36,6 @@
 namespace node {
 namespace inspector {
 namespace {
-
-using node::OnFatalError;
-
 using v8::Context;
 using v8::Function;
 using v8::HandleScope;
@@ -253,8 +250,8 @@ class ChannelImpl final : public v8_inspector::V8Inspector::Channel,
                        "[inspector received] %s\n",
                        raw_message);
     std::unique_ptr<protocol::DictionaryValue> value =
-        protocol::DictionaryValue::cast(protocol::StringUtil::parseMessage(
-            raw_message, false));
+        protocol::DictionaryValue::cast(
+            protocol::StringUtil::parseJSON(message));
     int call_id;
     std::string method;
     node_dispatcher_->parseCommand(value.get(), &call_id, &method);
@@ -917,8 +914,7 @@ void Agent::ToggleAsyncHook(Isolate* isolate, Local<Function> fn) {
   USE(fn->Call(context, Undefined(isolate), 0, nullptr));
   if (try_catch.HasCaught() && !try_catch.HasTerminated()) {
     PrintCaughtException(isolate, context, try_catch);
-    OnFatalError("\nnode::inspector::Agent::ToggleAsyncHook",
-                 "Cannot toggle Inspector's AsyncHook, please report this.");
+    UNREACHABLE("Cannot toggle Inspector's AsyncHook, please report this.");
   }
 }
 

@@ -20,12 +20,12 @@
         {
           "textRaw": "Program entry point",
           "name": "program_entry_point",
-          "desc": "<p>The program entry point is a specifier-like string. If the string is not an\nabsolute path, it's resolved as a relative path from the current working\ndirectory. That path is then resolved by <a href=\"modules.html\">CommonJS</a> module loader. If no\ncorresponding file is found, an error is thrown.</p>\n<p>If a file is found, its path will be passed to the\n<a href=\"packages.html#modules-loaders\">ES module loader</a> under any of the following conditions:</p>\n<ul>\n<li>The program was started with a command-line flag that forces the entry\npoint to be loaded with ECMAScript module loader.</li>\n<li>The file has an <code>.mjs</code> extension.</li>\n<li>The file does not have a <code>.cjs</code> extension, and the nearest parent\n<code>package.json</code> file contains a top-level <a href=\"packages.html#type\"><code>\"type\"</code></a> field with a value of\n<code>\"module\"</code>.</li>\n</ul>\n<p>Otherwise, the file is loaded using the CommonJS module loader. See\n<a href=\"packages.html#modules-loaders\">Modules loaders</a> for more details.</p>",
+          "desc": "<p>The program entry point is a specifier-like string. If the string is not an\nabsolute path, it's resolved as a relative path from the current working\ndirectory. That path is then resolved by <a href=\"modules.html\">CommonJS</a> module loader, or by the\n<a href=\"packages.html#modules-loaders\">ES module loader</a> if <a href=\"#--experimental-default-typetype\"><code>--experimental-default-type=module</code></a>\nis passed. If no corresponding file is found, an error is thrown.</p>\n<p>If a file is found, its path will be passed to the\n<a href=\"packages.html#modules-loaders\">ES module loader</a> under any of the following conditions:</p>\n<ul>\n<li>The program was started with a command-line flag that forces the entry\npoint to be loaded with ECMAScript module loader, such as <code>--import</code> or\n<a href=\"#--experimental-default-typetype\"><code>--experimental-default-type=module</code></a>.</li>\n<li>The file has an <code>.mjs</code> extension.</li>\n<li>The file does not have a <code>.cjs</code> extension, and the nearest parent\n<code>package.json</code> file contains a top-level <a href=\"packages.html#type\"><code>\"type\"</code></a> field with a value of\n<code>\"module\"</code>.</li>\n</ul>\n<p>Otherwise, the file is loaded using the CommonJS module loader. See\n<a href=\"packages.html#modules-loaders\">Modules loaders</a> for more details.</p>",
           "modules": [
             {
               "textRaw": "ECMAScript modules loader entry point caveat",
               "name": "ecmascript_modules_loader_entry_point_caveat",
-              "desc": "<p>When loading, the <a href=\"packages.html#modules-loaders\">ES module loader</a> loads the program\nentry point, the <code>node</code> command will accept as input only files with <code>.js</code>,\n<code>.mjs</code>, or <code>.cjs</code> extensions; and with <code>.wasm</code> extensions when\n<a href=\"#--experimental-wasm-modules\"><code>--experimental-wasm-modules</code></a> is enabled.</p>",
+              "desc": "<p>When loading, the <a href=\"packages.html#modules-loaders\">ES module loader</a> loads the program\nentry point, the <code>node</code> command will accept as input only files with <code>.js</code>,\n<code>.mjs</code>, or <code>.cjs</code> extensions; with <code>.wasm</code> extensions when\n<a href=\"#--experimental-wasm-modules\"><code>--experimental-wasm-modules</code></a> is enabled; and with no extension when\n<a href=\"#--experimental-default-typetype\"><code>--experimental-default-type=module</code></a> is passed.</p>",
               "type": "module",
               "displayName": "ECMAScript modules loader entry point caveat"
             }
@@ -96,7 +96,7 @@
                 "changes": []
               },
               "stability": 1,
-              "stabilityText": "Experimental",
+              "stabilityText": ".1 - Active development",
               "desc": "<p>When using the <a href=\"permissions.html#permission-model\">Permission Model</a>, the process will not be able to spawn any\nchild process by default.\nAttempts to do so will throw an <code>ERR_ACCESS_DENIED</code> unless the\nuser explicitly passes the <code>--allow-child-process</code> flag when starting Node.js.</p>\n<p>Example:</p>\n<pre><code class=\"language-js\">const childProcess = require('node:child_process');\n// Attempt to bypass the permission\nchildProcess.spawn('node', ['-e', 'require(\"fs\").writeFileSync(\"/new-file\", \"example\")']);\n</code></pre>\n<pre><code class=\"language-console\">$ node --experimental-permission --allow-fs-read=* index.js\nnode:internal/child_process:388\n  const err = this._handle.spawn(options);\n                           ^\nError: Access to this API has been restricted\n    at ChildProcess.spawn (node:internal/child_process:388:28)\n    at Object.spawn (node:child_process:723:9)\n    at Object.&#x3C;anonymous> (/home/index.js:3:14)\n    at Module._compile (node:internal/modules/cjs/loader:1120:14)\n    at Module._extensions..js (node:internal/modules/cjs/loader:1174:10)\n    at Module.load (node:internal/modules/cjs/loader:998:32)\n    at Module._load (node:internal/modules/cjs/loader:839:12)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:81:12)\n    at node:internal/main/run_main_module:17:47 {\n  code: 'ERR_ACCESS_DENIED',\n  permission: 'ChildProcess'\n}\n</code></pre>",
               "type": "module",
               "displayName": "`--allow-child-process`"
@@ -117,8 +117,8 @@
                 ]
               },
               "stability": 1,
-              "stabilityText": "Experimental",
-              "desc": "<p>This flag configures file system read permissions using\nthe <a href=\"permissions.html#permission-model\">Permission Model</a>.</p>\n<p>The valid arguments for the <code>--allow-fs-read</code> flag are:</p>\n<ul>\n<li><code>*</code> - To allow all <code>FileSystemRead</code> operations.</li>\n<li>Multiple paths can be allowed using multiple <code>--allow-fs-read</code> flags.\nExample <code>--allow-fs-read=/folder1/ --allow-fs-read=/folder1/</code></li>\n</ul>\n<p>Paths delimited by comma (<code>,</code>) are no longer allowed.\nWhen passing a single flag with a comma a warning will be diplayed</p>\n<p>Examples can be found in the <a href=\"permissions.html#file-system-permissions\">File System Permissions</a> documentation.</p>\n<p>Relative paths are NOT yet supported by the CLI flag.</p>\n<p>The initializer module also needs to be allowed. Consider the following example:</p>\n<pre><code class=\"language-console\">$ node --experimental-permission t.js\nnode:internal/modules/cjs/loader:162\n  const result = internalModuleStat(filename);\n                 ^\n\nError: Access to this API has been restricted\n    at stat (node:internal/modules/cjs/loader:162:18)\n    at Module._findPath (node:internal/modules/cjs/loader:640:16)\n    at resolveMainPath (node:internal/modules/run_main:15:25)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:53:24)\n    at node:internal/main/run_main_module:23:47 {\n  code: 'ERR_ACCESS_DENIED',\n  permission: 'FileSystemRead',\n  resource: '/Users/rafaelgss/repos/os/node/t.js'\n}\n</code></pre>\n<p>The process needs to have access to the <code>index.js</code> module:</p>\n<pre><code class=\"language-bash\">node --experimental-permission --allow-fs-read=/path/to/index.js index.js\n</code></pre>",
+              "stabilityText": ".1 - Active development",
+              "desc": "<p>This flag configures file system read permissions using\nthe <a href=\"permissions.html#permission-model\">Permission Model</a>.</p>\n<p>The valid arguments for the <code>--allow-fs-read</code> flag are:</p>\n<ul>\n<li><code>*</code> - To allow all <code>FileSystemRead</code> operations.</li>\n<li>Multiple paths can be allowed using multiple <code>--allow-fs-read</code> flags.\nExample <code>--allow-fs-read=/folder1/ --allow-fs-read=/folder1/</code></li>\n</ul>\n<p>Paths delimited by comma (<code>,</code>) are no longer allowed.\nWhen passing a single flag with a comma a warning will be displayed.</p>\n<p>Examples can be found in the <a href=\"permissions.html#file-system-permissions\">File System Permissions</a> documentation.</p>\n<p>Relative paths are NOT yet supported by the CLI flag.</p>\n<p>The initializer module also needs to be allowed. Consider the following example:</p>\n<pre><code class=\"language-console\">$ node --experimental-permission t.js\nnode:internal/modules/cjs/loader:162\n  const result = internalModuleStat(filename);\n                 ^\n\nError: Access to this API has been restricted\n    at stat (node:internal/modules/cjs/loader:162:18)\n    at Module._findPath (node:internal/modules/cjs/loader:640:16)\n    at resolveMainPath (node:internal/modules/run_main:15:25)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:53:24)\n    at node:internal/main/run_main_module:23:47 {\n  code: 'ERR_ACCESS_DENIED',\n  permission: 'FileSystemRead',\n  resource: '/Users/rafaelgss/repos/os/node/t.js'\n}\n</code></pre>\n<p>The process needs to have access to the <code>index.js</code> module:</p>\n<pre><code class=\"language-bash\">node --experimental-permission --allow-fs-read=/path/to/index.js index.js\n</code></pre>",
               "type": "module",
               "displayName": "`--allow-fs-read`"
             },
@@ -138,8 +138,8 @@
                 ]
               },
               "stability": 1,
-              "stabilityText": "Experimental",
-              "desc": "<p>This flag configures file system write permissions using\nthe <a href=\"permissions.html#permission-model\">Permission Model</a>.</p>\n<p>The valid arguments for the <code>--allow-fs-write</code> flag are:</p>\n<ul>\n<li><code>*</code> - To allow all <code>FileSystemWrite</code> operations.</li>\n<li>Multiple paths can be allowed using multiple <code>--allow-fs-read</code> flags.\nExample <code>--allow-fs-read=/folder1/ --allow-fs-read=/folder1/</code></li>\n</ul>\n<p>Paths delimited by comma (<code>,</code>) are no longer allowed.\nWhen passing a single flag with a comma a warning will be diplayed</p>\n<p>Examples can be found in the <a href=\"permissions.html#file-system-permissions\">File System Permissions</a> documentation.</p>\n<p>Relative paths are NOT supported through the CLI flag.</p>",
+              "stabilityText": ".1 - Active development",
+              "desc": "<p>This flag configures file system write permissions using\nthe <a href=\"permissions.html#permission-model\">Permission Model</a>.</p>\n<p>The valid arguments for the <code>--allow-fs-write</code> flag are:</p>\n<ul>\n<li><code>*</code> - To allow all <code>FileSystemWrite</code> operations.</li>\n<li>Multiple paths can be allowed using multiple <code>--allow-fs-read</code> flags.\nExample <code>--allow-fs-read=/folder1/ --allow-fs-read=/folder1/</code></li>\n</ul>\n<p>Paths delimited by comma (<code>,</code>) are no longer allowed.\nWhen passing a single flag with a comma a warning will be displayed.</p>\n<p>Examples can be found in the <a href=\"permissions.html#file-system-permissions\">File System Permissions</a> documentation.</p>\n<p>Relative paths are NOT supported through the CLI flag.</p>",
               "type": "module",
               "displayName": "`--allow-fs-write`"
             },
@@ -153,7 +153,7 @@
                 "changes": []
               },
               "stability": 1,
-              "stabilityText": "Experimental",
+              "stabilityText": ".1 - Active development",
               "desc": "<p>When using the <a href=\"permissions.html#permission-model\">Permission Model</a>, the process will not be able to create any\nworker threads by default.\nFor security reasons, the call will throw an <code>ERR_ACCESS_DENIED</code> unless the\nuser explicitly pass the flag <code>--allow-worker</code> in the main Node.js process.</p>\n<p>Example:</p>\n<pre><code class=\"language-js\">const { Worker } = require('node:worker_threads');\n// Attempt to bypass the permission\nnew Worker(__filename);\n</code></pre>\n<pre><code class=\"language-console\">$ node --experimental-permission --allow-fs-read=* index.js\nnode:internal/worker:188\n    this[kHandle] = new WorkerImpl(url,\n                    ^\n\nError: Access to this API has been restricted\n    at new Worker (node:internal/worker:188:21)\n    at Object.&#x3C;anonymous> (/home/index.js.js:3:1)\n    at Module._compile (node:internal/modules/cjs/loader:1120:14)\n    at Module._extensions..js (node:internal/modules/cjs/loader:1174:10)\n    at Module.load (node:internal/modules/cjs/loader:998:32)\n    at Module._load (node:internal/modules/cjs/loader:839:12)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:81:12)\n    at node:internal/main/run_main_module:17:47 {\n  code: 'ERR_ACCESS_DENIED',\n  permission: 'WorkerThreads'\n}\n</code></pre>",
               "type": "module",
               "displayName": "`--allow-worker`"
@@ -290,6 +290,21 @@
               "displayName": "`--diagnostic-dir=directory`"
             },
             {
+              "textRaw": "`--disable-warning=code-or-type`",
+              "name": "`--disable-warning=code-or-type`",
+              "stability": 1,
+              "stabilityText": ".1 - Active development",
+              "meta": {
+                "added": [
+                  "v21.3.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>Disable specific process warnings by <code>code</code> or <code>type</code>.</p>\n<p>Warnings emitted from <a href=\"process.html#processemitwarningwarning-options\"><code>process.emitWarning()</code></a> may contain a\n<code>code</code> and a <code>type</code>. This option will not-emit warnings that have a matching\n<code>code</code> or <code>type</code>.</p>\n<p>List of <a href=\"deprecations.html#list-of-deprecated-apis\">deprecation warnings</a>.</p>\n<p>The Node.js core warning types are: <code>DeprecationWarning</code> and\n<code>ExperimentalWarning</code></p>\n<p>For example, the following script will not emit\n<a href=\"deprecations.html#dep0025-requirenodesys\">DEP0025 <code>require('node:sys')</code></a> when executed with\n<code>node --disable-warning=DEP0025</code>:</p>\n<pre><code class=\"language-mjs\">import sys from 'node:sys';\n</code></pre>\n<pre><code class=\"language-cjs\">const sys = require('node:sys');\n</code></pre>\n<p>For example, the following script will emit the\n<a href=\"deprecations.html#dep0025-requirenodesys\">DEP0025 <code>require('node:sys')</code></a>, but not any Experimental\nWarnings (such as\n<a href=\"vm.html#vmmeasurememoryoptions\">ExperimentalWarning: <code>vm.measureMemory</code> is an experimental feature</a>\nin &#x3C;=v21) when executed with <code>node --disable-warning=ExperimentalWarnings</code>:</p>\n<pre><code class=\"language-mjs\">import sys from 'node:sys';\nimport vm from 'node:vm';\n\nvm.measureMemory();\n</code></pre>\n<pre><code class=\"language-cjs\">const sys = require('node:sys');\nconst vm = require('node:vm');\n\nvm.measureMemory();\n</code></pre>",
+              "type": "module",
+              "displayName": "`--disable-warning=code-or-type`"
+            },
+            {
               "textRaw": "`--disable-proto=mode`",
               "name": "`--disable-proto=mode`",
               "meta": {
@@ -350,6 +365,19 @@
               "displayName": "`--enable-fips`"
             },
             {
+              "textRaw": "`--enable-network-family-autoselection`",
+              "name": "`--enable-network-family-autoselection`",
+              "meta": {
+                "added": [
+                  "v18.18.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>Enables the family autoselection algorithm unless connection options explicitly\ndisables it.</p>",
+              "type": "module",
+              "displayName": "`--enable-network-family-autoselection`"
+            },
+            {
               "textRaw": "`--enable-source-maps`",
               "name": "`--enable-source-maps`",
               "meta": {
@@ -404,6 +432,36 @@
               "desc": "<p>Evaluate the following argument as JavaScript. The modules which are\npredefined in the REPL can also be used in <code>script</code>.</p>\n<p>On Windows, using <code>cmd.exe</code> a single quote will not work correctly because it\nonly recognizes double <code>\"</code> for quoting. In Powershell or Git bash, both <code>'</code>\nand <code>\"</code> are usable.</p>",
               "type": "module",
               "displayName": "`-e`, `--eval \"script\"`"
+            },
+            {
+              "textRaw": "`--experimental-default-type=type`",
+              "name": "`--experimental-default-type=type`",
+              "meta": {
+                "added": [
+                  "v21.0.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": ".0 - Early development",
+              "desc": "<p>Define which module system, <code>module</code> or <code>commonjs</code>, to use for the following:</p>\n<ul>\n<li>\n<p>String input provided via <code>--eval</code> or STDIN, if <code>--input-type</code> is unspecified.</p>\n</li>\n<li>\n<p>Files ending in <code>.js</code> or with no extension, if there is no <code>package.json</code> file\npresent in the same folder or any parent folder.</p>\n</li>\n<li>\n<p>Files ending in <code>.js</code> or with no extension, if the nearest parent\n<code>package.json</code> field lacks a <code>\"type\"</code> field; unless the <code>package.json</code> folder\nor any parent folder is inside a <code>node_modules</code> folder.</p>\n</li>\n</ul>\n<p>In other words, <code>--experimental-default-type=module</code> flips all the places where\nNode.js currently defaults to CommonJS to instead default to ECMAScript modules,\nwith the exception of folders and subfolders below <code>node_modules</code>, for backward\ncompatibility.</p>\n<p>Under <code>--experimental-default-type=module</code> and <code>--experimental-wasm-modules</code>,\nfiles with no extension will be treated as WebAssembly if they begin with the\nWebAssembly magic number (<code>\\0asm</code>); otherwise they will be treated as ES module\nJavaScript.</p>",
+              "type": "module",
+              "displayName": "`--experimental-default-type=type`"
+            },
+            {
+              "textRaw": "`--experimental-detect-module`",
+              "name": "`--experimental-detect-module`",
+              "meta": {
+                "added": [
+                  "v21.1.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": ".0 - Early development",
+              "desc": "<p>Node.js will inspect the source code of ambiguous input to determine whether it\ncontains ES module syntax; if such syntax is detected, the input will be treated\nas an ES module.</p>\n<p>Ambiguous input is defined as:</p>\n<ul>\n<li>Files with a <code>.js</code> extension or no extension; and either no controlling\n<code>package.json</code> file or one that lacks a <code>type</code> field; and\n<code>--experimental-default-type</code> is not specified.</li>\n<li>String input (<code>--eval</code> or STDIN) when neither <code>--input-type</code> nor\n<code>--experimental-default-type</code> are specified.</li>\n</ul>\n<p>ES module syntax is defined as syntax that would throw when evaluated as\nCommonJS. This includes <code>import</code> and <code>export</code> statements and <code>import.meta</code>\nreferences. It does <em>not</em> include <code>import()</code> expressions, which are valid in\nCommonJS.</p>",
+              "type": "module",
+              "displayName": "`--experimental-detect-module`"
             },
             {
               "textRaw": "`--experimental-import-meta-resolve`",
@@ -470,7 +528,7 @@
                 "changes": []
               },
               "stability": 1,
-              "stabilityText": "Experimental",
+              "stabilityText": ".1 - Active development",
               "desc": "<p>Enable the Permission Model for current process. When enabled, the\nfollowing permissions are restricted:</p>\n<ul>\n<li>File System - manageable through\n<a href=\"#--allow-fs-read\"><code>--allow-fs-read</code></a>, <a href=\"#--allow-fs-write\"><code>--allow-fs-write</code></a> flags</li>\n<li>Child Process - manageable through <a href=\"#--allow-child-process\"><code>--allow-child-process</code></a> flag</li>\n<li>Worker Threads - manageable through <a href=\"#--allow-worker\"><code>--allow-worker</code></a> flag</li>\n</ul>",
               "type": "module",
               "displayName": "`--experimental-permission`"
@@ -527,7 +585,10 @@
                 ],
                 "changes": [
                   {
-                    "version": "v20.1.0",
+                    "version": [
+                      "v20.1.0",
+                      "v18.17.0"
+                    ],
                     "pr-url": "https://github.com/nodejs/node/pull/47686",
                     "description": "This option can be used with `--test`."
                   }
@@ -560,7 +621,10 @@
                 ],
                 "changes": [
                   {
-                    "version": "v20.0.0",
+                    "version": [
+                      "v20.0.0",
+                      "v18.17.0"
+                    ],
                     "pr-url": "https://github.com/nodejs/node/pull/47286",
                     "description": "This option is no longer required as WASI is enabled by default, but can still be passed."
                   },
@@ -587,6 +651,19 @@
               "desc": "<p>Enable experimental WebAssembly module support.</p>",
               "type": "module",
               "displayName": "`--experimental-wasm-modules`"
+            },
+            {
+              "textRaw": "`--experimental-websocket`",
+              "name": "`--experimental-websocket`",
+              "meta": {
+                "added": [
+                  "v21.0.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>Enable experimental <a href=\"https://developer.mozilla.org/en-US/docs/Web/API/WebSocket\"><code>WebSocket</code></a> support.</p>",
+              "type": "module",
+              "displayName": "`--experimental-websocket`"
             },
             {
               "textRaw": "`--force-context-aware`",
@@ -763,13 +840,14 @@
               "name": "`--import=module`",
               "meta": {
                 "added": [
-                  "v19.0.0"
+                  "v19.0.0",
+                  "v18.18.0"
                 ],
                 "changes": []
               },
               "stability": 1,
               "stabilityText": "Experimental",
-              "desc": "<p>Preload the specified module at startup.</p>\n<p>Follows <a href=\"esm.html#modules-ecmascript-modules\">ECMAScript module</a> resolution rules.\nUse <a href=\"#-r---require-module\"><code>--require</code></a> to load a <a href=\"modules.html\">CommonJS module</a>.\nModules preloaded with <code>--require</code> will run before modules preloaded with <code>--import</code>.</p>",
+              "desc": "<p>Preload the specified module at startup. If the flag is provided several times,\neach module will be executed sequentially in the order they appear, starting\nwith the ones provided in <a href=\"#node_optionsoptions\"><code>NODE_OPTIONS</code></a>.</p>\n<p>Follows <a href=\"esm.html#modules-ecmascript-modules\">ECMAScript module</a> resolution rules.\nUse <a href=\"#-r---require-module\"><code>--require</code></a> to load a <a href=\"modules.html\">CommonJS module</a>.\nModules preloaded with <code>--require</code> will run before modules preloaded with <code>--import</code>.</p>",
               "type": "module",
               "displayName": "`--import=module`"
             },
@@ -782,7 +860,7 @@
                 ],
                 "changes": []
               },
-              "desc": "<p>This configures Node.js to interpret string input as CommonJS or as an ES\nmodule. String input is input via <code>--eval</code>, <code>--print</code>, or <code>STDIN</code>.</p>\n<p>Valid values are <code>\"commonjs\"</code> and <code>\"module\"</code>. The default is <code>\"commonjs\"</code>.</p>\n<p>The REPL does not support this option.</p>",
+              "desc": "<p>This configures Node.js to interpret <code>--eval</code> or <code>STDIN</code> input as CommonJS or\nas an ES module. Valid values are <code>\"commonjs\"</code> or <code>\"module\"</code>. The default is\n<code>\"commonjs\"</code> unless <a href=\"#--experimental-default-typetype\"><code>--experimental-default-type=module</code></a> is used.</p>\n<p>The REPL does not support this option. Usage of <code>--input-type=module</code> with\n<a href=\"#-p---print-script\"><code>--print</code></a> will throw an error, as <code>--print</code> does not support ES module\nsyntax.</p>",
               "type": "module",
               "displayName": "`--input-type=type`"
             },
@@ -797,7 +875,7 @@
                 ],
                 "changes": []
               },
-              "desc": "<p>Use an insecure HTTP parser that accepts invalid HTTP headers. This may allow\ninteroperability with non-conformant HTTP implementations. It may also allow\nrequest smuggling and other HTTP attacks that rely on invalid headers being\naccepted. Avoid using this option.</p>",
+              "desc": "<p>Enable leniency flags on the HTTP parser. This may allow\ninteroperability with non-conformant HTTP implementations.</p>\n<p>When enabled, the parser will accept the following:</p>\n<ul>\n<li>Invalid HTTP headers values.</li>\n<li>Invalid HTTP versions.</li>\n<li>Allow message containing both <code>Transfer-Encoding</code>\nand <code>Content-Length</code> headers.</li>\n<li>Allow extra data after message when <code>Connection: close</code> is present.</li>\n<li>Allow extra trasfer encodings after <code>chunked</code> has been provided.</li>\n<li>Allow <code>\\n</code> to be used as token separator instead of <code>\\r\\n</code>.</li>\n<li>Allow <code>\\r\\n</code> not to be provided after a chunk.</li>\n<li>Allow spaces to be present after a chunk size and before <code>\\r\\n</code>.</li>\n</ul>\n<p>All the above will expose your application to request smuggling\nor poisoning attack. Avoid using this option.</p>",
               "type": "module",
               "displayName": "`--insecure-http-parser`"
             },
@@ -951,7 +1029,7 @@
                 ],
                 "changes": []
               },
-              "desc": "<p>Disable experimental support for the <a href=\"https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API\">Fetch API</a>.</p>",
+              "desc": "<p>Disable exposition of <a href=\"https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API\">Fetch API</a> on the global scope.</p>",
               "type": "module",
               "displayName": "`--no-experimental-fetch`"
             },
@@ -967,6 +1045,21 @@
               "desc": "<p>Disable exposition of <a href=\"https://dom.spec.whatwg.org/#customevent\">CustomEvent Web API</a> on the global scope.</p>",
               "type": "module",
               "displayName": "`--no-experimental-global-customevent`"
+            },
+            {
+              "textRaw": "`--no-experimental-global-navigator`",
+              "name": "`--no-experimental-global-navigator`",
+              "meta": {
+                "added": [
+                  "v21.2.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "desc": "<p>Disable exposition of <a href=\"globals.html#navigator\">Navigator API</a> on the global scope.</p>",
+              "type": "module",
+              "displayName": "`--no-experimental-global-navigator`"
             },
             {
               "textRaw": "`--no-experimental-global-webcrypto`",
@@ -1501,6 +1594,19 @@
               "displayName": "`--test`"
             },
             {
+              "textRaw": "`--test-concurrency`",
+              "name": "`--test-concurrency`",
+              "meta": {
+                "added": [
+                  "v21.0.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>The maximum number of test files that the test runner CLI will execute\nconcurrently. The default value is <code>os.availableParallelism() - 1</code>.</p>",
+              "type": "module",
+              "displayName": "`--test-concurrency`"
+            },
+            {
               "textRaw": "`--test-name-pattern`",
               "name": "`--test-name-pattern`",
               "meta": {
@@ -1591,6 +1697,19 @@
               "desc": "<p>Test suite shard to execute in a format of <code>&#x3C;index>/&#x3C;total></code>, where</p>\n<p><code>index</code> is a positive integer, index of divided parts\n<code>total</code> is a positive integer, total of divided part\nThis command will divide all tests files into <code>total</code> equal parts,\nand will run only those that happen to be in an <code>index</code> part.</p>\n<p>For example, to split your tests suite into three parts, use this:</p>\n<pre><code class=\"language-bash\">node --test --test-shard=1/3\nnode --test --test-shard=2/3\nnode --test --test-shard=3/3\n</code></pre>",
               "type": "module",
               "displayName": "`--test-shard`"
+            },
+            {
+              "textRaw": "`--test-timeout`",
+              "name": "`--test-timeout`",
+              "meta": {
+                "added": [
+                  "v21.2.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>A number of milliseconds the test execution will fail after. If unspecified,\nsubtests inherit this value from their parent. The default value is <code>Infinity</code>.</p>",
+              "type": "module",
+              "displayName": "`--test-timeout`"
             },
             {
               "textRaw": "`--throw-deprecation`",
@@ -2141,7 +2260,7 @@
                 ],
                 "changes": []
               },
-              "desc": "<p>A space-separated list of command-line options. <code>options...</code> are interpreted\nbefore command-line options, so command-line options will override or\ncompound after anything in <code>options...</code>. Node.js will exit with an error if\nan option that is not allowed in the environment is used, such as <code>-p</code> or a\nscript file.</p>\n<p>If an option value contains a space, it can be escaped using double quotes:</p>\n<pre><code class=\"language-bash\">NODE_OPTIONS='--require \"./my path/file.js\"'\n</code></pre>\n<p>A singleton flag passed as a command-line option will override the same flag\npassed into <code>NODE_OPTIONS</code>:</p>\n<pre><code class=\"language-bash\"># The inspector will be available on port 5555\nNODE_OPTIONS='--inspect=localhost:4444' node --inspect=localhost:5555\n</code></pre>\n<p>A flag that can be passed multiple times will be treated as if its\n<code>NODE_OPTIONS</code> instances were passed first, and then its command-line\ninstances afterwards:</p>\n<pre><code class=\"language-bash\">NODE_OPTIONS='--require \"./a.js\"' node --require \"./b.js\"\n# is equivalent to:\nnode --require \"./a.js\" --require \"./b.js\"\n</code></pre>\n<p>Node.js options that are allowed are:</p>\n<!-- node-options-node start -->\n<ul>\n<li><code>--allow-child-process</code></li>\n<li><code>--allow-fs-read</code></li>\n<li><code>--allow-fs-write</code></li>\n<li><code>--allow-worker</code></li>\n<li><code>--conditions</code>, <code>-C</code></li>\n<li><code>--diagnostic-dir</code></li>\n<li><code>--disable-proto</code></li>\n<li><code>--dns-result-order</code></li>\n<li><code>--enable-fips</code></li>\n<li><code>--enable-network-family-autoselection</code></li>\n<li><code>--enable-source-maps</code></li>\n<li><code>--experimental-abortcontroller</code></li>\n<li><code>--experimental-import-meta-resolve</code></li>\n<li><code>--experimental-json-modules</code></li>\n<li><code>--experimental-loader</code></li>\n<li><code>--experimental-modules</code></li>\n<li><code>--experimental-network-imports</code></li>\n<li><code>--experimental-permission</code></li>\n<li><code>--experimental-policy</code></li>\n<li><code>--experimental-shadow-realm</code></li>\n<li><code>--experimental-specifier-resolution</code></li>\n<li><code>--experimental-top-level-await</code></li>\n<li><code>--experimental-vm-modules</code></li>\n<li><code>--experimental-wasi-unstable-preview1</code></li>\n<li><code>--experimental-wasm-modules</code></li>\n<li><code>--force-context-aware</code></li>\n<li><code>--force-fips</code></li>\n<li><code>--force-node-api-uncaught-exceptions-policy</code></li>\n<li><code>--frozen-intrinsics</code></li>\n<li><code>--heapsnapshot-near-heap-limit</code></li>\n<li><code>--heapsnapshot-signal</code></li>\n<li><code>--http-parser</code></li>\n<li><code>--icu-data-dir</code></li>\n<li><code>--import</code></li>\n<li><code>--input-type</code></li>\n<li><code>--insecure-http-parser</code></li>\n<li><code>--inspect-brk</code></li>\n<li><code>--inspect-port</code>, <code>--debug-port</code></li>\n<li><code>--inspect-publish-uid</code></li>\n<li><code>--inspect</code></li>\n<li><code>--max-http-header-size</code></li>\n<li><code>--napi-modules</code></li>\n<li><code>--no-addons</code></li>\n<li><code>--no-deprecation</code></li>\n<li><code>--no-experimental-fetch</code></li>\n<li><code>--no-experimental-global-customevent</code></li>\n<li><code>--no-experimental-global-webcrypto</code></li>\n<li><code>--no-experimental-repl-await</code></li>\n<li><code>--no-extra-info-on-fatal-exception</code></li>\n<li><code>--no-force-async-hooks-checks</code></li>\n<li><code>--no-global-search-paths</code></li>\n<li><code>--no-network-family-autoselection</code></li>\n<li><code>--no-warnings</code></li>\n<li><code>--node-memory-debug</code></li>\n<li><code>--openssl-config</code></li>\n<li><code>--openssl-legacy-provider</code></li>\n<li><code>--openssl-shared-config</code></li>\n<li><code>--pending-deprecation</code></li>\n<li><code>--policy-integrity</code></li>\n<li><code>--preserve-symlinks-main</code></li>\n<li><code>--preserve-symlinks</code></li>\n<li><code>--prof-process</code></li>\n<li><code>--redirect-warnings</code></li>\n<li><code>--report-compact</code></li>\n<li><code>--report-dir</code>, <code>--report-directory</code></li>\n<li><code>--report-filename</code></li>\n<li><code>--report-on-fatalerror</code></li>\n<li><code>--report-on-signal</code></li>\n<li><code>--report-signal</code></li>\n<li><code>--report-uncaught-exception</code></li>\n<li><code>--require</code>, <code>-r</code></li>\n<li><code>--secure-heap-min</code></li>\n<li><code>--secure-heap</code></li>\n<li><code>--snapshot-blob</code></li>\n<li><code>--test-only</code></li>\n<li><code>--test-reporter-destination</code></li>\n<li><code>--test-reporter</code></li>\n<li><code>--test-shard</code></li>\n<li><code>--throw-deprecation</code></li>\n<li><code>--title</code></li>\n<li><code>--tls-cipher-list</code></li>\n<li><code>--tls-keylog</code></li>\n<li><code>--tls-max-v1.2</code></li>\n<li><code>--tls-max-v1.3</code></li>\n<li><code>--tls-min-v1.0</code></li>\n<li><code>--tls-min-v1.1</code></li>\n<li><code>--tls-min-v1.2</code></li>\n<li><code>--tls-min-v1.3</code></li>\n<li><code>--trace-atomics-wait</code></li>\n<li><code>--trace-deprecation</code></li>\n<li><code>--trace-event-categories</code></li>\n<li><code>--trace-event-file-pattern</code></li>\n<li><code>--trace-events-enabled</code></li>\n<li><code>--trace-exit</code></li>\n<li><code>--trace-sigint</code></li>\n<li><code>--trace-sync-io</code></li>\n<li><code>--trace-tls</code></li>\n<li><code>--trace-uncaught</code></li>\n<li><code>--trace-warnings</code></li>\n<li><code>--track-heap-objects</code></li>\n<li><code>--unhandled-rejections</code></li>\n<li><code>--use-bundled-ca</code></li>\n<li><code>--use-largepages</code></li>\n<li><code>--use-openssl-ca</code></li>\n<li><code>--v8-pool-size</code></li>\n<li><code>--watch-path</code></li>\n<li><code>--watch-preserve-output</code></li>\n<li><code>--watch</code></li>\n<li><code>--zero-fill-buffers</code></li>\n</ul>\n<!-- node-options-node end -->\n<p>V8 options that are allowed are:</p>\n<!-- node-options-v8 start -->\n<ul>\n<li><code>--abort-on-uncaught-exception</code></li>\n<li><code>--disallow-code-generation-from-strings</code></li>\n<li><code>--enable-etw-stack-walking</code></li>\n<li><code>--huge-max-old-generation-size</code></li>\n<li><code>--interpreted-frames-native-stack</code></li>\n<li><code>--jitless</code></li>\n<li><code>--max-old-space-size</code></li>\n<li><code>--max-semi-space-size</code></li>\n<li><code>--perf-basic-prof-only-functions</code></li>\n<li><code>--perf-basic-prof</code></li>\n<li><code>--perf-prof-unwinding-info</code></li>\n<li><code>--perf-prof</code></li>\n<li><code>--stack-trace-limit</code></li>\n</ul>\n<!-- node-options-v8 end -->\n<p><code>--perf-basic-prof-only-functions</code>, <code>--perf-basic-prof</code>,\n<code>--perf-prof-unwinding-info</code>, and <code>--perf-prof</code> are only available on Linux.</p>\n<p><code>--enable-etw-stack-walking</code> is only available on Windows.</p>",
+              "desc": "<p>A space-separated list of command-line options. <code>options...</code> are interpreted\nbefore command-line options, so command-line options will override or\ncompound after anything in <code>options...</code>. Node.js will exit with an error if\nan option that is not allowed in the environment is used, such as <code>-p</code> or a\nscript file.</p>\n<p>If an option value contains a space, it can be escaped using double quotes:</p>\n<pre><code class=\"language-bash\">NODE_OPTIONS='--require \"./my path/file.js\"'\n</code></pre>\n<p>A singleton flag passed as a command-line option will override the same flag\npassed into <code>NODE_OPTIONS</code>:</p>\n<pre><code class=\"language-bash\"># The inspector will be available on port 5555\nNODE_OPTIONS='--inspect=localhost:4444' node --inspect=localhost:5555\n</code></pre>\n<p>A flag that can be passed multiple times will be treated as if its\n<code>NODE_OPTIONS</code> instances were passed first, and then its command-line\ninstances afterwards:</p>\n<pre><code class=\"language-bash\">NODE_OPTIONS='--require \"./a.js\"' node --require \"./b.js\"\n# is equivalent to:\nnode --require \"./a.js\" --require \"./b.js\"\n</code></pre>\n<p>Node.js options that are allowed are:</p>\n<!-- node-options-node start -->\n<ul>\n<li><code>--allow-child-process</code></li>\n<li><code>--allow-fs-read</code></li>\n<li><code>--allow-fs-write</code></li>\n<li><code>--allow-worker</code></li>\n<li><code>--conditions</code>, <code>-C</code></li>\n<li><code>--diagnostic-dir</code></li>\n<li><code>--disable-proto</code></li>\n<li><code>--disable-warning</code></li>\n<li><code>--dns-result-order</code></li>\n<li><code>--enable-fips</code></li>\n<li><code>--enable-network-family-autoselection</code></li>\n<li><code>--enable-source-maps</code></li>\n<li><code>--experimental-abortcontroller</code></li>\n<li><code>--experimental-default-type</code></li>\n<li><code>--experimental-detect-module</code></li>\n<li><code>--experimental-import-meta-resolve</code></li>\n<li><code>--experimental-json-modules</code></li>\n<li><code>--experimental-loader</code></li>\n<li><code>--experimental-modules</code></li>\n<li><code>--experimental-network-imports</code></li>\n<li><code>--experimental-permission</code></li>\n<li><code>--experimental-policy</code></li>\n<li><code>--experimental-shadow-realm</code></li>\n<li><code>--experimental-specifier-resolution</code></li>\n<li><code>--experimental-top-level-await</code></li>\n<li><code>--experimental-vm-modules</code></li>\n<li><code>--experimental-wasi-unstable-preview1</code></li>\n<li><code>--experimental-wasm-modules</code></li>\n<li><code>--experimental-websocket</code></li>\n<li><code>--force-context-aware</code></li>\n<li><code>--force-fips</code></li>\n<li><code>--force-node-api-uncaught-exceptions-policy</code></li>\n<li><code>--frozen-intrinsics</code></li>\n<li><code>--heapsnapshot-near-heap-limit</code></li>\n<li><code>--heapsnapshot-signal</code></li>\n<li><code>--http-parser</code></li>\n<li><code>--icu-data-dir</code></li>\n<li><code>--import</code></li>\n<li><code>--input-type</code></li>\n<li><code>--insecure-http-parser</code></li>\n<li><code>--inspect-brk</code></li>\n<li><code>--inspect-port</code>, <code>--debug-port</code></li>\n<li><code>--inspect-publish-uid</code></li>\n<li><code>--inspect</code></li>\n<li><code>--max-http-header-size</code></li>\n<li><code>--napi-modules</code></li>\n<li><code>--no-addons</code></li>\n<li><code>--no-deprecation</code></li>\n<li><code>--no-experimental-fetch</code></li>\n<li><code>--no-experimental-global-customevent</code></li>\n<li><code>--no-experimental-global-navigator</code></li>\n<li><code>--no-experimental-global-webcrypto</code></li>\n<li><code>--no-experimental-repl-await</code></li>\n<li><code>--no-extra-info-on-fatal-exception</code></li>\n<li><code>--no-force-async-hooks-checks</code></li>\n<li><code>--no-global-search-paths</code></li>\n<li><code>--no-network-family-autoselection</code></li>\n<li><code>--no-warnings</code></li>\n<li><code>--node-memory-debug</code></li>\n<li><code>--openssl-config</code></li>\n<li><code>--openssl-legacy-provider</code></li>\n<li><code>--openssl-shared-config</code></li>\n<li><code>--pending-deprecation</code></li>\n<li><code>--policy-integrity</code></li>\n<li><code>--preserve-symlinks-main</code></li>\n<li><code>--preserve-symlinks</code></li>\n<li><code>--prof-process</code></li>\n<li><code>--redirect-warnings</code></li>\n<li><code>--report-compact</code></li>\n<li><code>--report-dir</code>, <code>--report-directory</code></li>\n<li><code>--report-filename</code></li>\n<li><code>--report-on-fatalerror</code></li>\n<li><code>--report-on-signal</code></li>\n<li><code>--report-signal</code></li>\n<li><code>--report-uncaught-exception</code></li>\n<li><code>--require</code>, <code>-r</code></li>\n<li><code>--secure-heap-min</code></li>\n<li><code>--secure-heap</code></li>\n<li><code>--snapshot-blob</code></li>\n<li><code>--test-only</code></li>\n<li><code>--test-reporter-destination</code></li>\n<li><code>--test-reporter</code></li>\n<li><code>--test-shard</code></li>\n<li><code>--throw-deprecation</code></li>\n<li><code>--title</code></li>\n<li><code>--tls-cipher-list</code></li>\n<li><code>--tls-keylog</code></li>\n<li><code>--tls-max-v1.2</code></li>\n<li><code>--tls-max-v1.3</code></li>\n<li><code>--tls-min-v1.0</code></li>\n<li><code>--tls-min-v1.1</code></li>\n<li><code>--tls-min-v1.2</code></li>\n<li><code>--tls-min-v1.3</code></li>\n<li><code>--trace-atomics-wait</code></li>\n<li><code>--trace-deprecation</code></li>\n<li><code>--trace-event-categories</code></li>\n<li><code>--trace-event-file-pattern</code></li>\n<li><code>--trace-events-enabled</code></li>\n<li><code>--trace-exit</code></li>\n<li><code>--trace-sigint</code></li>\n<li><code>--trace-sync-io</code></li>\n<li><code>--trace-tls</code></li>\n<li><code>--trace-uncaught</code></li>\n<li><code>--trace-warnings</code></li>\n<li><code>--track-heap-objects</code></li>\n<li><code>--unhandled-rejections</code></li>\n<li><code>--use-bundled-ca</code></li>\n<li><code>--use-largepages</code></li>\n<li><code>--use-openssl-ca</code></li>\n<li><code>--v8-pool-size</code></li>\n<li><code>--watch-path</code></li>\n<li><code>--watch-preserve-output</code></li>\n<li><code>--watch</code></li>\n<li><code>--zero-fill-buffers</code></li>\n</ul>\n<!-- node-options-node end -->\n<p>V8 options that are allowed are:</p>\n<!-- node-options-v8 start -->\n<ul>\n<li><code>--abort-on-uncaught-exception</code></li>\n<li><code>--disallow-code-generation-from-strings</code></li>\n<li><code>--enable-etw-stack-walking</code></li>\n<li><code>--huge-max-old-generation-size</code></li>\n<li><code>--interpreted-frames-native-stack</code></li>\n<li><code>--jitless</code></li>\n<li><code>--max-old-space-size</code></li>\n<li><code>--max-semi-space-size</code></li>\n<li><code>--perf-basic-prof-only-functions</code></li>\n<li><code>--perf-basic-prof</code></li>\n<li><code>--perf-prof-unwinding-info</code></li>\n<li><code>--perf-prof</code></li>\n<li><code>--stack-trace-limit</code></li>\n</ul>\n<!-- node-options-v8 end -->\n<p><code>--perf-basic-prof-only-functions</code>, <code>--perf-basic-prof</code>,\n<code>--perf-prof-unwinding-info</code>, and <code>--perf-prof</code> are only available on Linux.</p>\n<p><code>--enable-etw-stack-walking</code> is only available on Windows.</p>",
               "type": "module",
               "displayName": "`NODE_OPTIONS=options...`"
             },

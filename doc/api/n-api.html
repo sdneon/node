@@ -3,18 +3,31 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v20.9.0">
-  <title>Node-API | Node.js v20.9.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v21.5.0">
+  <title>Node-API | Node.js v21.5.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
   <link rel="canonical" href="https://nodejs.org/api/n-api.html">
   <script async defer src="assets/api.js" type="text/javascript"></script>
+  <script>
+      const storedTheme = localStorage.getItem('theme');
+
+      // Follow operating system theme preference
+      if (storedTheme === null && window.matchMedia) {
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        if (mq.matches) {
+          document.documentElement.classList.add('dark-mode');
+        }
+      } else if (storedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+  </script>
   
 </head>
 <body class="alt apidoc" id="api-section-n-api">
   <div id="content" class="clearfix">
-    <div id="column2" class="interior">
+    <div role="navigation" id="column2" class="interior">
       <div id="intro" class="interior">
         <a href="/" title="Go back to the home page">
           Node.js
@@ -96,7 +109,7 @@
     <div id="column1" data-id="n-api" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v20.9.0 documentation</h1>
+          <h1>Node.js v21.5.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -111,7 +124,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v20.9.0</li>
+            <li class="pinned-header">Node.js v21.5.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -389,7 +402,11 @@
 <li><a href="#napi_remove_wrap"><code>napi_remove_wrap</code></a></li>
 <li><a href="#napi_type_tag_object"><code>napi_type_tag_object</code></a></li>
 <li><a href="#napi_check_object_type_tag"><code>napi_check_object_type_tag</code></a></li>
-<li><a href="#napi_add_finalizer"><code>napi_add_finalizer</code></a></li>
+<li><a href="#napi_add_finalizer"><code>napi_add_finalizer</code></a>
+<ul>
+<li><span class="stability_1"><a href="#node_api_post_finalizer"><code>node_api_post_finalizer</code></a></span></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#simple-asynchronous-operations">Simple asynchronous operations</a>
@@ -554,7 +571,7 @@
         Other versions
       </a>
       <div class="picker"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v21.x/api/n-api.html">21.x</a></li>
-<li><a href="https://nodejs.org/docs/latest-v20.x/api/n-api.html">20.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v20.x/api/n-api.html">20.x <b>LTS</b></a></li>
 <li><a href="https://nodejs.org/docs/latest-v19.x/api/n-api.html">19.x</a></li>
 <li><a href="https://nodejs.org/docs/latest-v18.x/api/n-api.html">18.x <b>LTS</b></a></li>
 <li><a href="https://nodejs.org/docs/latest-v17.x/api/n-api.html">17.x</a></li>
@@ -592,7 +609,7 @@
         <hr>
       </header>
 
-      <details id="toc" open><summary>Table of contents</summary><ul>
+      <details role="navigation" id="toc" open><summary>Table of contents</summary><ul>
 <li><span class="stability_2"><a href="#node-api">Node-API</a></span>
 <ul>
 <li><a href="#implications-of-abi-stability">Implications of ABI stability</a></li>
@@ -862,7 +879,11 @@
 <li><a href="#napi_remove_wrap"><code>napi_remove_wrap</code></a></li>
 <li><a href="#napi_type_tag_object"><code>napi_type_tag_object</code></a></li>
 <li><a href="#napi_check_object_type_tag"><code>napi_check_object_type_tag</code></a></li>
-<li><a href="#napi_add_finalizer"><code>napi_add_finalizer</code></a></li>
+<li><a href="#napi_add_finalizer"><code>napi_add_finalizer</code></a>
+<ul>
+<li><span class="stability_1"><a href="#node_api_post_finalizer"><code>node_api_post_finalizer</code></a></span></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#simple-asynchronous-operations">Simple asynchronous operations</a>
@@ -934,7 +955,7 @@
 </li>
 </ul></details>
 
-      <div id="apicontent">
+      <div role="main" id="apicontent">
         <h2>Node-API<span><a class="mark" href="#node-api" id="node-api">#</a></span><a aria-hidden="true" class="legacy" id="n_api_node_api"></a></h2>
 
 
@@ -1105,11 +1126,30 @@ in the specified (and earlier) versions.</p>
 <p>In this case the entire API surface, including any experimental APIs, will be
 available to the module code.</p>
 </section><section><h3>Node-API version matrix<span><a class="mark" href="#node-api-version-matrix" id="node-api-version-matrix">#</a></span><a aria-hidden="true" class="legacy" id="n_api_node_api_version_matrix"></a></h3>
-<p>Node-API versions are additive and versioned independently from Node.js.
-Version 4 is an extension to version 3 in that it has all of the APIs
-from version 3 with some additions. This means that it is not necessary
-to recompile for new versions of Node.js which are
-listed as supporting a later version.</p>
+<p>Up until version 9, Node-API versions were additive and versioned
+independently from Node.js. This meant that any version was
+an extension to the previous version in that it had all of
+the APIs from the previous version with some additions. Each
+Node.js version only supported a single Node-API version.
+For example v18.15.0 supports only Node-API version 8. ABI stability was
+achieved because 8 was a strict superset of all previous versions.</p>
+<p>As of version 9, while Node-API versions continue to be versioned
+independently an add-on that ran with Node-API version 9 may need
+code updates to run with Node-API version 10. ABI stability
+is maintained, however, because Node.js versions that support
+Node-API versions higher than 8 will support all versions
+between 8 and the highest version they support and will default
+to providing the version 8 APIs unless an add-on opts into a
+higher Node-API version. This approach provides the flexibility
+of better optimizing existing Node-API functions while
+maintaining ABI stability. Existing add-ons can continue to run without
+recompilation using an earlier version of Node-API. If an add-on
+needs functionality from a newer Node-API version, changes to existing
+code and recompilation will be needed to use those new functions anyway.</p>
+<p>In versions of Node.js that support Node-API version 9 and later, defining
+<code>NAPI_VERSION=X</code> and using the existing add-on initialization macros
+will bake in the requested Node-API version that will be used at runtime
+into the add-on. If <code>NAPI_VERSION</code> is not set it will default to 8.</p>
 <p>This table may not be up to date in older streams, the most up to date
 information is in the latest API documentation in:
 <a href="https://nodejs.org/docs/latest/api/n-api.html#node-api-version-matrix">Node-API version matrix</a></p>
@@ -3056,7 +3096,7 @@ string. The native string is copied.</p>
 <a href="https://tc39.github.io/ecma262/#sec-ecmascript-language-types-string-type">Section 6.1.4</a> of the ECMAScript Language Specification.</p>
 <h5><code>node_api_create_external_string_latin1</code><span><a class="mark" href="#node_api_create_external_string_latin1" id="node_api_create_external_string_latin1">#</a></span><a aria-hidden="true" class="legacy" id="n_api_node_api_create_external_string_latin1"></a></h5>
 <div class="api_metadata">
-<span>Added in: v20.4.0</span>
+<span>Added in: v20.4.0, v18.18.0</span>
 </div>
 <p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
 <pre><code class="language-c">napi_status
@@ -3122,7 +3162,7 @@ The native string is copied.</p>
 <a href="https://tc39.github.io/ecma262/#sec-ecmascript-language-types-string-type">Section 6.1.4</a> of the ECMAScript Language Specification.</p>
 <h5><code>node_api_create_external_string_utf16</code><span><a class="mark" href="#node_api_create_external_string_utf16" id="node_api_create_external_string_utf16">#</a></span><a aria-hidden="true" class="legacy" id="n_api_node_api_create_external_string_utf16"></a></h5>
 <div class="api_metadata">
-<span>Added in: v20.4.0</span>
+<span>Added in: v20.4.0, v18.18.0</span>
 </div>
 <p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
 <pre><code class="language-c">napi_status
@@ -5065,6 +5105,33 @@ in <code>js_object</code> has been garbage-collected.</p>
 invocation. If it is deleted before then, then the finalize callback may never
 be invoked. Therefore, when obtaining a reference a finalize callback is also
 required in order to enable correct disposal of the reference.</p>
+<h5><code>node_api_post_finalizer</code><span><a class="mark" href="#node_api_post_finalizer" id="node_api_post_finalizer">#</a></span><a aria-hidden="true" class="legacy" id="n_api_node_api_post_finalizer"></a></h5>
+<div class="api_metadata">
+<span>Added in: v21.0.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<pre><code class="language-c">napi_status <span class="hljs-title function_">node_api_post_finalizer</span><span class="hljs-params">(napi_env env,
+                                    napi_finalize finalize_cb,
+                                    <span class="hljs-type">void</span>* finalize_data,
+                                    <span class="hljs-type">void</span>* finalize_hint)</span>;</code> <button class="copy-button">copy</button></pre>
+<ul>
+<li><code>[in] env</code>: The environment that the API is invoked under.</li>
+<li><code>[in] finalize_cb</code>: Native callback that will be used to free the
+native data when the JavaScript object has been garbage-collected.
+<a href="#napi_finalize"><code>napi_finalize</code></a> provides more details.</li>
+<li><code>[in] finalize_data</code>: Optional data to be passed to <code>finalize_cb</code>.</li>
+<li><code>[in] finalize_hint</code>: Optional contextual hint that is passed to the
+finalize callback.</li>
+</ul>
+<p>Returns <code>napi_ok</code> if the API succeeded.</p>
+<p>Schedules a <code>napi_finalize</code> callback to be called asynchronously in the
+event loop.</p>
+<p>Normally, finalizers are called while the GC (garbage collector) collects
+objects. At that point calling any Node-API that may cause changes in the GC
+state will be disabled and will crash Node.js.</p>
+<p><code>node_api_post_finalizer</code> helps to work around this limitation by allowing the
+add-on to defer calls to such Node-APIs to a point in time outside of the GC
+finalization.</p>
 </section><section><h3>Simple asynchronous operations<span><a class="mark" href="#simple-asynchronous-operations" id="simple-asynchronous-operations">#</a></span><a aria-hidden="true" class="legacy" id="n_api_simple_asynchronous_operations"></a></h3>
 <p>Addon modules often need to leverage async helpers from libuv as part of their
 implementation. This allows them to schedule work to be executed asynchronously

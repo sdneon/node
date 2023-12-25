@@ -79,7 +79,19 @@ void GetSockOrPeerName(const v8::FunctionCallbackInfo<v8::Value>& args) {
   args.GetReturnValue().Set(err);
 }
 
-void PrintStackTrace(v8::Isolate* isolate, v8::Local<v8::StackTrace> stack);
+constexpr int kMaxFrameCountForLogging = 10;
+v8::MaybeLocal<v8::StackTrace> GetCurrentStackTrace(
+    v8::Isolate* isolate, int frame_count = kMaxFrameCountForLogging);
+
+enum class StackTracePrefix {
+  kAt,  // "    at "
+  kNumber
+};
+void PrintCurrentStackTrace(v8::Isolate* isolate,
+                            StackTracePrefix prefix = StackTracePrefix::kAt);
+void PrintStackTrace(v8::Isolate* isolate,
+                     v8::Local<v8::StackTrace> stack,
+                     StackTracePrefix prefix = StackTracePrefix::kAt);
 void PrintCaughtException(v8::Isolate* isolate,
                           v8::Local<v8::Context> context,
                           const v8::TryCatch& try_catch);
@@ -180,16 +192,13 @@ static v8::MaybeLocal<v8::Object> New(Environment* env,
   char* src = reinterpret_cast<char*>(buf->out());
   const size_t len_in_bytes = buf->length() * sizeof(buf->out()[0]);
 
-  if (buf->IsAllocated())
+  if (buf->IsAllocated()) {
     ret = New(env, src, len_in_bytes);
-  else if (!buf->IsInvalidated())
-    ret = Copy(env, src, len_in_bytes);
-
-  if (ret.IsEmpty())
-    return ret;
-
-  if (buf->IsAllocated())
+    // new always takes ownership of src
     buf->Release();
+  } else if (!buf->IsInvalidated()) {
+    ret = Copy(env, src, len_in_bytes);
+  }
 
   return ret;
 }
