@@ -5,7 +5,7 @@ This is a *fun* mod of Node.JS that initially embedded a modified version of dco
 
 Thanks to the inspiration from dcodeIO et al =D
 
-## Version 21.9.05
+## Version 21.5.0
 Update to Node.JS 21.5.0 baseline and TypeScript 5.3.3.
 
 It embeds:
