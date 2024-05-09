@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cstdint>
 #if defined(NODE_WANT_INTERNALS) && NODE_WANT_INTERNALS
 #if HAVE_OPENSSL && NODE_OPENSSL_HAS_QUIC
 
@@ -159,6 +158,7 @@ class Stream : public AsyncWrap,
   // if the application does not support headers, a maximimum number of headers
   // have already been added, or the maximum total header length is reached.
   bool AddHeader(const Header& header);
+  void set_headers_kind(HeadersKind kind);
 
   SET_NO_MEMORY_INFO()
   SET_MEMORY_INFO_NAME(Stream)
@@ -170,6 +170,9 @@ class Stream : public AsyncWrap,
   // Notifies the JavaScript side that sending data on the stream has been
   // blocked because of flow control restriction.
   void EmitBlocked();
+
+  // Delivers the set of inbound headers that have been collected.
+  void EmitHeaders();
 
  private:
   struct Impl;
@@ -185,9 +188,6 @@ class Stream : public AsyncWrap,
 
   // Notifies the JavaScript side that the stream has been destroyed.
   void EmitClose(const QuicError& error);
-
-  // Delivers the set of inbound headers that have been collected.
-  void EmitHeaders();
 
   // Notifies the JavaScript side that the stream has been reset.
   void EmitReset(const QuicError& error);

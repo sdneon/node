@@ -2,6 +2,7 @@
   'variables': {
     'configuring_node%': 0,
     'asan%': 0,
+    'ubsan%': 0,
     'werror': '',                     # Turn off -Werror in V8 build.
     'visibility%': 'hidden',          # V8's visibility setting
     'target_arch%': 'ia32',           # set v8's target architecture
@@ -36,7 +37,7 @@
 
     # Reset this number to 0 on major V8 upgrades.
     # Increment by one for each non-official patch applied to deps/v8.
-    'v8_embedder_string': '-node.18',
+    'v8_embedder_string': '-node.11',
 
     ##### V8 defaults for Node.js #####
 
@@ -285,7 +286,10 @@
       'VCCLCompilerTool': {
         'AdditionalOptions': [
           '/Zc:__cplusplus',
-          '-std:c++17'
+          # The following option enables c++20 on Windows. This is needed for V8 v12.4+
+          '-std:c++20',
+          # The following option reduces the "error C1060: compiler is out of heap space"
+          '/Zm2000',
         ],
         'BufferSecurityCheck': 'true',
         'DebugInformationFormat': 1,          # /Z7 embed info in .obj files
@@ -371,6 +375,29 @@
         'target_conditions': [
           ['_type!="static_library"', {
             'xcode_settings': {'OTHER_LDFLAGS': ['-fsanitize=address']},
+          }],
+        ],
+      }],
+      ['ubsan == 1 and OS != "mac" and OS != "zos"', {
+        'cflags+': [
+          '-fno-omit-frame-pointer',
+          '-fsanitize=undefined',
+        ],
+        'defines': [ 'UNDEFINED_SANITIZER'],
+        'cflags!': [ '-fno-omit-frame-pointer' ],
+        'ldflags': [ '-fsanitize=undefined' ],
+      }],
+      ['ubsan == 1 and OS == "mac"', {
+        'xcode_settings': {
+          'OTHER_CFLAGS+': [
+            '-fno-omit-frame-pointer',
+            '-fsanitize=undefined',
+            '-DUNDEFINED_SANITIZER'
+          ],
+        },
+        'target_conditions': [
+          ['_type!="static_library"', {
+            'xcode_settings': {'OTHER_LDFLAGS': ['-fsanitize=undefined']},
           }],
         ],
       }],

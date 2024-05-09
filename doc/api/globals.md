@@ -4,9 +4,10 @@
 
 <!-- type=misc -->
 
-These objects are available in all modules. The following variables may appear
-to be global but are not. They exist only in the scope of modules, see the
-[module system documentation][]:
+These objects are available in all modules.
+
+The following variables may appear to be global but are not. They exist only in
+the scope of [CommonJS modules][]:
 
 * [`__dirname`][]
 * [`__filename`][]
@@ -484,7 +485,7 @@ changes:
     description: No longer experimental.
   - version: v18.0.0
     pr-url: https://github.com/nodejs/node/pull/41811
-    description: No longer behind `--experimental-global-fetch` CLI flag.
+    description: No longer behind `--experimental-fetch` CLI flag.
 -->
 
 > Stability: 2 - Stable
@@ -514,7 +515,7 @@ changes:
     description: No longer experimental.
   - version: v18.0.0
     pr-url: https://github.com/nodejs/node/pull/41811
-    description: No longer behind `--experimental-global-fetch` CLI flag.
+    description: No longer behind `--experimental-fetch` CLI flag.
 -->
 
 > Stability: 2 - Stable
@@ -553,7 +554,7 @@ changes:
     description: No longer experimental.
   - version: v18.0.0
     pr-url: https://github.com/nodejs/node/pull/41811
-    description: No longer behind `--experimental-global-fetch` CLI flag.
+    description: No longer behind `--experimental-fetch` CLI flag.
 -->
 
 > Stability: 2 - Stable
@@ -901,7 +902,7 @@ changes:
     description: No longer experimental.
   - version: v18.0.0
     pr-url: https://github.com/nodejs/node/pull/41811
-    description: No longer behind `--experimental-global-fetch` CLI flag.
+    description: No longer behind `--experimental-fetch` CLI flag.
 -->
 
 > Stability: 2 - Stable
@@ -921,7 +922,7 @@ changes:
     description: No longer experimental.
   - version: v18.0.0
     pr-url: https://github.com/nodejs/node/pull/41811
-    description: No longer behind `--experimental-global-fetch` CLI flag.
+    description: No longer behind `--experimental-fetch` CLI flag.
 -->
 
 > Stability: 2 - Stable
@@ -1094,13 +1095,19 @@ The object that acts as the namespace for all W3C
 ## `WebSocket`
 
 <!-- YAML
-added: v21.0.0
+added:
+  - v21.0.0
+  - v20.10.0
+changes:
+  - version: v22.0.0
+    pr-url: https://github.com/nodejs/node/pull/51594
+    description: No longer behind `--experimental-websocket` CLI flag.
 -->
 
 > Stability: 1 - Experimental.
 
-A browser-compatible implementation of [`WebSocket`][]. Enable this API
-with the [`--experimental-websocket`][] CLI flag.
+A browser-compatible implementation of [`WebSocket`][]. Disable this API
+with the [`--no-experimental-websocket`][] CLI flag.
 
 ## Class: `WritableStream`
 
@@ -1133,14 +1140,15 @@ added: v18.0.0
 A browser-compatible implementation of [`WritableStreamDefaultWriter`][].
 
 [CommonJS module]: modules.md
+[CommonJS modules]: modules.md
 [ECMAScript module]: esm.md
 [Navigator API]: https://html.spec.whatwg.org/multipage/system-state.html#the-navigator-object
 [RFC 5646]: https://www.rfc-editor.org/rfc/rfc5646.txt
 [Web Crypto API]: webcrypto.md
-[`--experimental-websocket`]: cli.md#--experimental-websocket
 [`--no-experimental-global-customevent`]: cli.md#--no-experimental-global-customevent
 [`--no-experimental-global-navigator`]: cli.md#--no-experimental-global-navigator
 [`--no-experimental-global-webcrypto`]: cli.md#--no-experimental-global-webcrypto
+[`--no-experimental-websocket`]: cli.md#--no-experimental-websocket
 [`AbortController`]: https://developer.mozilla.org/en-US/docs/Web/API/AbortController
 [`ByteLengthQueuingStrategy`]: webstreams.md#class-bytelengthqueuingstrategy
 [`CompressionStream`]: webstreams.md#class-compressionstream
@@ -1200,7 +1208,6 @@ A browser-compatible implementation of [`WritableStreamDefaultWriter`][].
 [`window.navigator`]: https://developer.mozilla.org/en-US/docs/Web/API/Window/navigator
 [buffer section]: buffer.md
 [built-in objects]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects
-[module system documentation]: modules.md
 [timers]: timers.md
 [webassembly-mdn]: https://developer.mozilla.org/en-US/docs/WebAssembly
 [webassembly-org]: https://webassembly.org

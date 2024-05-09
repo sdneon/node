@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v21.5.0">
-  <title>Inspector | Node.js v21.5.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v22.1.0">
+  <title>Inspector | Node.js v22.1.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -109,7 +109,7 @@
     <div id="column1" data-id="inspector" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v21.5.0 documentation</h1>
+          <h1>Node.js v22.1.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -124,11 +124,11 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v21.5.0</li>
+            <li class="pinned-header">Node.js v22.1.0</li>
             
     <li class="picker-header">
       <a href="#">
-        <span class="collapsed-arrow">&#x25ba;</span><span class="expanded-arrow">&#x25bc;</span>
+        <span class="picker-arrow"></span>
         Table of contents
       </a>
 
@@ -186,6 +186,7 @@
 <li><a href="#inspectorwaitfordebugger"><code>inspector.waitForDebugger()</code></a></li>
 </ul>
 </li>
+<li><a href="#support-of-breakpoints">Support of breakpoints</a></li>
 </ul>
 </li>
 </ul></div></div>
@@ -194,7 +195,7 @@
             
     <li class="picker-header">
       <a href="#">
-        <span class="collapsed-arrow">&#x25ba;</span><span class="expanded-arrow">&#x25bc;</span>
+        <span class="picker-arrow"></span>
         Index
       </a>
 
@@ -279,10 +280,11 @@
             
     <li class="picker-header">
       <a href="#">
-        <span class="collapsed-arrow">&#x25ba;</span><span class="expanded-arrow">&#x25bc;</span>
+        <span class="picker-arrow"></span>
         Other versions
       </a>
-      <div class="picker"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v21.x/api/inspector.html">21.x</a></li>
+      <div class="picker"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v22.x/api/inspector.html">22.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v21.x/api/inspector.html">21.x</a></li>
 <li><a href="https://nodejs.org/docs/latest-v20.x/api/inspector.html">20.x <b>LTS</b></a></li>
 <li><a href="https://nodejs.org/docs/latest-v19.x/api/inspector.html">19.x</a></li>
 <li><a href="https://nodejs.org/docs/latest-v18.x/api/inspector.html">18.x <b>LTS</b></a></li>
@@ -300,7 +302,7 @@
   
             <li class="picker-header">
               <a href="#">
-                <span class="collapsed-arrow">&#x25ba;</span><span class="expanded-arrow">&#x25bc;</span>
+                <span class="picker-arrow"></span>
                 Options
               </a>
         
@@ -375,6 +377,7 @@
 <li><a href="#inspectorwaitfordebugger"><code>inspector.waitForDebugger()</code></a></li>
 </ul>
 </li>
+<li><a href="#support-of-breakpoints">Support of breakpoints</a></li>
 </ul>
 </li>
 </ul></details>
@@ -383,7 +386,7 @@
         <h2>Inspector<span><a class="mark" href="#inspector" id="inspector">#</a></span><a aria-hidden="true" class="legacy" id="inspector_inspector"></a></h2>
 
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v21.5.0/lib/inspector.js">lib/inspector.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v22.1.0/lib/inspector.js">lib/inspector.js</a></p>
 <p>The <code>node:inspector</code> module provides an API for interacting with the V8
 inspector.</p>
 <p>It can be accessed using:</p>
@@ -424,6 +427,10 @@ command.</p>
 <pre><code class="language-js">session.<span class="hljs-title function_">on</span>(<span class="hljs-string">'inspectorNotification'</span>, <span class="hljs-function">(<span class="hljs-params">message</span>) =></span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(message.<span class="hljs-property">method</span>));
 <span class="hljs-comment">// Debugger.paused</span>
 <span class="hljs-comment">// Debugger.resumed</span></code> <button class="copy-button">copy</button></pre>
+<blockquote>
+<p><strong>Caveat</strong> Breakpoints with same-thread session is not recommended, see
+<a href="#support-of-breakpoints">support of breakpoints</a>.</p>
+</blockquote>
 <p>It is also possible to subscribe only to notifications with specific method:</p>
 <h5>Event: <code>&#x3C;inspector-protocol-method></code>;<span><a class="mark" href="#event-inspector-protocol-method" id="event-inspector-protocol-method">#</a></span><a aria-hidden="true" class="legacy" id="inspector_event_inspector_protocol_method"></a></h5>
 <div class="api_metadata">
@@ -441,6 +448,10 @@ execution is suspended (through breakpoints, for example):</p>
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(params.<span class="hljs-property">hitBreakpoints</span>);
 });
 <span class="hljs-comment">// [ '/the/file/that/has/the/breakpoint.js:11:0' ]</span></code> <button class="copy-button">copy</button></pre>
+<blockquote>
+<p><strong>Caveat</strong> Breakpoints with same-thread session is not recommended, see
+<a href="#support-of-breakpoints">support of breakpoints</a>.</p>
+</blockquote>
 <h5><code>session.connect()</code><span><a class="mark" href="#sessionconnect" id="sessionconnect">#</a></span><a aria-hidden="true" class="legacy" id="inspector_session_connect"></a></h5>
 <div class="api_metadata">
 <span>Added in: v8.0.0</span>
@@ -551,6 +562,10 @@ command.</p>
 <pre><code class="language-js">session.<span class="hljs-title function_">on</span>(<span class="hljs-string">'inspectorNotification'</span>, <span class="hljs-function">(<span class="hljs-params">message</span>) =></span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(message.<span class="hljs-property">method</span>));
 <span class="hljs-comment">// Debugger.paused</span>
 <span class="hljs-comment">// Debugger.resumed</span></code> <button class="copy-button">copy</button></pre>
+<blockquote>
+<p><strong>Caveat</strong> Breakpoints with same-thread session is not recommended, see
+<a href="#support-of-breakpoints">support of breakpoints</a>.</p>
+</blockquote>
 <p>It is also possible to subscribe only to notifications with specific method:</p>
 <h5>Event: <code>&#x3C;inspector-protocol-method></code>;<span><a class="mark" href="#event-inspector-protocol-method_1" id="event-inspector-protocol-method_1">#</a></span><a aria-hidden="true" class="legacy" id="inspector_event_inspector_protocol_method_1"></a></h5>
 <div class="api_metadata">
@@ -568,6 +583,10 @@ execution is suspended (through breakpoints, for example):</p>
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(params.<span class="hljs-property">hitBreakpoints</span>);
 });
 <span class="hljs-comment">// [ '/the/file/that/has/the/breakpoint.js:11:0' ]</span></code> <button class="copy-button">copy</button></pre>
+<blockquote>
+<p><strong>Caveat</strong> Breakpoints with same-thread session is not recommended, see
+<a href="#support-of-breakpoints">support of breakpoints</a>.</p>
+</blockquote>
 <h5><code>session.connect()</code><span><a class="mark" href="#sessionconnect_1" id="sessionconnect_1">#</a></span><a aria-hidden="true" class="legacy" id="inspector_session_connect_1"></a></h5>
 <div class="api_metadata">
 <span>Added in: v8.0.0</span>
@@ -700,7 +719,7 @@ console.</p>
 <strong>Default:</strong> what was specified on the CLI.</li>
 <li><code>wait</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> Block until a client has connected. Optional.
 <strong>Default:</strong> <code>false</code>.</li>
-<li>Returns: <a href="https://tc39.es/proposal-explicit-resource-management/#sec-disposable-interface" class="type">&#x3C;Disposable></a> that calls <a href="#inspectorclose"><code>inspector.close()</code></a>.</li>
+<li>Returns: <a href="https://tc39.es/proposal-explicit-resource-management/#sec-disposable-interface" class="type">&#x3C;Disposable></a> A Disposable that calls <a href="#inspectorclose"><code>inspector.close()</code></a>.</li>
 </ul>
 <p>Activate inspector on host and port. Equivalent to
 <code>node --inspect=[[host:]port]</code>, but can be done programmatically after node has
@@ -732,7 +751,17 @@ undefined</code> <button class="copy-button">copy</button></pre>
 </div>
 <p>Blocks until a client (existing or connected later) has sent
 <code>Runtime.runIfWaitingForDebugger</code> command.</p>
-<p>An exception will be thrown if there is no active inspector.</p></section>
+<p>An exception will be thrown if there is no active inspector.</p>
+</section><section><h3>Support of breakpoints<span><a class="mark" href="#support-of-breakpoints" id="support-of-breakpoints">#</a></span><a aria-hidden="true" class="legacy" id="inspector_support_of_breakpoints"></a></h3>
+<p>The Chrome DevTools Protocol <a href="https://chromedevtools.github.io/devtools-protocol/v8/Debugger"><code>Debugger</code> domain</a> allows an
+<code>inspector.Session</code> to attach to a program and set breakpoints to step through
+the codes.</p>
+<p>However, setting breakpoints with a same-thread <code>inspector.Session</code>, which is
+connected by <a href="#sessionconnect"><code>session.connect()</code></a>, should be avoided as the program being
+attached and paused is exactly the debugger itself. Instead, try connect to the
+main thread by <a href="#sessionconnecttomainthread"><code>session.connectToMainThread()</code></a> and set breakpoints in a
+worker thread, or connect with a <a href="debugger.html">Debugger</a> program over WebSocket
+connection.</p></section>
         <!-- API END -->
       </div>
     </div>

@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v21.5.0">
-  <title>Modules: Packages | Node.js v21.5.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v22.1.0">
+  <title>Modules: Packages | Node.js v22.1.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -109,7 +109,7 @@
     <div id="column1" data-id="packages" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v21.5.0 documentation</h1>
+          <h1>Node.js v22.1.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -124,11 +124,11 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v21.5.0</li>
+            <li class="pinned-header">Node.js v22.1.0</li>
             
     <li class="picker-header">
       <a href="#">
-        <span class="collapsed-arrow">&#x25ba;</span><span class="expanded-arrow">&#x25bc;</span>
+        <span class="picker-arrow"></span>
         Table of contents
       </a>
 
@@ -192,7 +192,7 @@
             
     <li class="picker-header">
       <a href="#">
-        <span class="collapsed-arrow">&#x25ba;</span><span class="expanded-arrow">&#x25bc;</span>
+        <span class="picker-arrow"></span>
         Index
       </a>
 
@@ -277,10 +277,11 @@
             
     <li class="picker-header">
       <a href="#">
-        <span class="collapsed-arrow">&#x25ba;</span><span class="expanded-arrow">&#x25bc;</span>
+        <span class="picker-arrow"></span>
         Other versions
       </a>
-      <div class="picker"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v21.x/api/packages.html">21.x</a></li>
+      <div class="picker"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v22.x/api/packages.html">22.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v21.x/api/packages.html">21.x</a></li>
 <li><a href="https://nodejs.org/docs/latest-v20.x/api/packages.html">20.x <b>LTS</b></a></li>
 <li><a href="https://nodejs.org/docs/latest-v19.x/api/packages.html">19.x</a></li>
 <li><a href="https://nodejs.org/docs/latest-v18.x/api/packages.html">18.x <b>LTS</b></a></li>
@@ -294,7 +295,7 @@
   
             <li class="picker-header">
               <a href="#">
-                <span class="collapsed-arrow">&#x25ba;</span><span class="expanded-arrow">&#x25bc;</span>
+                <span class="picker-arrow"></span>
                 Options
               </a>
         
@@ -491,14 +492,15 @@ extensions (<code>.js</code>, <code>.json</code>, and finally <code>.node</code>
 <code>process.dlopen()</code>.</li>
 <li>It treats all files that lack <code>.json</code> or <code>.node</code> extensions as JavaScript
 text files.</li>
-<li>It cannot be used to load ECMAScript modules (although it is possible to
-<a href="modules.html#the-mjs-extension">load ECMASCript modules from CommonJS modules</a>). When used to load a
-JavaScript text file that is not an ECMAScript module, it loads it as a
-CommonJS module.</li>
+<li>It can only be used to <a href="modules.html#loading-ecmascript-modules-using-require">load ECMASCript modules from CommonJS modules</a> if
+the module graph is synchronous (that contains no top-level <code>await</code>) when
+<code>--experimental-require-module</code> is enabled.
+When used to load a JavaScript text file that is not an ECMAScript module,
+the file will be loaded as a CommonJS module.</li>
 </ul>
 <p>There is the ECMAScript module loader:</p>
 <ul>
-<li>It is asynchronous.</li>
+<li>It is asynchronous, unless it's being used to load modules for <code>require()</code>.</li>
 <li>It is responsible for handling <code>import</code> statements and <code>import()</code> expressions.</li>
 <li>It is not monkey patchable, can be customized using <a href="esm.html#loaders">loader hooks</a>.</li>
 <li>It does not support folders as modules, directory indexes (e.g.
@@ -859,9 +861,9 @@ target file. <em>Always mutually exclusive with <code>"require"</code>.</em></li
 <li><code>"require"</code> - matches when the package is loaded via <code>require()</code>. The
 referenced file should be loadable with <code>require()</code> although the condition
 matches regardless of the module format of the target file. Expected
-formats include CommonJS, JSON, and native addons but not ES modules as
-<code>require()</code> doesn't support them. <em>Always mutually exclusive with
-<code>"import"</code>.</em></li>
+formats include CommonJS, JSON, native addons, and ES modules
+if <code>--experimental-require-module</code> is enabled. <em>Always mutually
+exclusive with <code>"import"</code>.</em></li>
 <li><code>"default"</code> - the generic fallback that always matches. Can be a CommonJS
 or ES module file. <em>This condition should always come last.</em></li>
 </ul>

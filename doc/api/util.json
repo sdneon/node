@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v21.5.0/lib/util.js\">lib/util.js</a></p>\n<p>The <code>node:util</code> module supports the needs of Node.js internal APIs. Many of the\nutilities are useful for application and module developers as well. To access\nit:</p>\n<pre><code class=\"language-js\">const util = require('node:util');\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v22.1.0/lib/util.js\">lib/util.js</a></p>\n<p>The <code>node:util</code> module supports the needs of Node.js internal APIs. Many of the\nutilities are useful for application and module developers as well. To access\nit:</p>\n<pre><code class=\"language-js\">const util = require('node:util');\n</code></pre>",
       "methods": [
         {
           "textRaw": "`util.callbackify(original)`",
@@ -1087,6 +1087,32 @@
           ]
         },
         {
+          "textRaw": "`util.parseEnv(content)`",
+          "type": "method",
+          "name": "parseEnv",
+          "stability": 1,
+          "stabilityText": ".1 - Active development",
+          "meta": {
+            "added": [
+              "v21.7.0",
+              "v20.12.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`content` {string}",
+                  "name": "content",
+                  "type": "string"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>The raw contents of a <code>.env</code> file.</p>\n<ul>\n<li>Returns: <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a></li>\n</ul>\n<p>Given an example <code>.env</code> file:</p>\n<pre><code class=\"language-cjs\">const { parseEnv } = require('node:util');\n\nparseEnv('HELLO=world\\nHELLO=oh my\\n');\n// Returns: { HELLO: 'oh my' }\n</code></pre>\n<pre><code class=\"language-mjs\">import { parseEnv } from 'node:util';\n\nparseEnv('HELLO=world\\nHELLO=oh my\\n');\n// Returns: { HELLO: 'oh my' }\n</code></pre>"
+        },
+        {
           "textRaw": "`util.promisify(original)`",
           "type": "method",
           "name": "promisify",
@@ -1180,6 +1206,39 @@
             }
           ],
           "desc": "<p>Returns <code>str</code> with any ANSI escape codes removed.</p>\n<pre><code class=\"language-js\">console.log(util.stripVTControlCharacters('\\u001B[4mvalue\\u001B[0m'));\n// Prints \"value\"\n</code></pre>"
+        },
+        {
+          "textRaw": "`util.styleText(format, text)`",
+          "type": "method",
+          "name": "styleText",
+          "stability": 1,
+          "stabilityText": ".1 - Active development",
+          "meta": {
+            "added": [
+              "v21.7.0",
+              "v20.12.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`format` {string | Array} A text format or an Array of text formats defined in `util.inspect.colors`.",
+                  "name": "format",
+                  "type": "string | Array",
+                  "desc": "A text format or an Array of text formats defined in `util.inspect.colors`."
+                },
+                {
+                  "textRaw": "`text` {string} The text to to be formatted.",
+                  "name": "text",
+                  "type": "string",
+                  "desc": "The text to to be formatted."
+                }
+              ]
+            }
+          ],
+          "desc": "<p>This function returns a formatted text considering the <code>format</code> passed.</p>\n<pre><code class=\"language-mjs\">import { styleText } from 'node:util';\nconst errorMessage = styleText('red', 'Error! Error!');\nconsole.log(errorMessage);\n</code></pre>\n<pre><code class=\"language-cjs\">const { styleText } = require('node:util');\nconst errorMessage = styleText('red', 'Error! Error!');\nconsole.log(errorMessage);\n</code></pre>\n<p><code>util.inspect.colors</code> also provides text formats such as <code>italic</code>, and\n<code>underline</code> and you can combine both:</p>\n<pre><code class=\"language-cjs\">console.log(\n  util.styleText(['underline', 'italic'], 'My italic underlined message'),\n);\n</code></pre>\n<p>When passing an array of formats, the order of the format applied\nis left to right so the following style might overwrite the previous one.</p>\n<pre><code class=\"language-cjs\">console.log(\n  util.styleText(['red', 'green'], 'text'), // green\n);\n</code></pre>\n<p>The full list of formats can be found in <a href=\"#modifiers\">modifiers</a>.</p>"
         },
         {
           "textRaw": "`util.toUSVString(string)`",
@@ -1434,10 +1493,10 @@
               "signatures": [
                 {
                   "return": {
-                    "textRaw": "Returns: {string} or `null` if there is no name-value pair with the given `name`.",
+                    "textRaw": "Returns: {string | null} A string or `null` if there is no name-value pair with the given `name`.",
                     "name": "return",
-                    "type": "string",
-                    "desc": "or `null` if there is no name-value pair with the given `name`."
+                    "type": "string | null",
+                    "desc": "A string or `null` if there is no name-value pair with the given `name`."
                   },
                   "params": [
                     {
@@ -2942,39 +3001,6 @@
                 }
               ],
               "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet\"><code>WeakSet</code></a> instance.</p>\n<pre><code class=\"language-js\">util.types.isWeakSet(new WeakSet());  // Returns true\n</code></pre>"
-            },
-            {
-              "textRaw": "`util.types.isWebAssemblyCompiledModule(value)`",
-              "type": "method",
-              "name": "isWebAssemblyCompiledModule",
-              "meta": {
-                "added": [
-                  "v10.0.0"
-                ],
-                "deprecated": [
-                  "v14.0.0"
-                ],
-                "changes": []
-              },
-              "stability": 0,
-              "stabilityText": "Deprecated: Use `value instanceof WebAssembly.Module` instead.",
-              "signatures": [
-                {
-                  "return": {
-                    "textRaw": "Returns: {boolean}",
-                    "name": "return",
-                    "type": "boolean"
-                  },
-                  "params": [
-                    {
-                      "textRaw": "`value` {any}",
-                      "name": "value",
-                      "type": "any"
-                    }
-                  ]
-                }
-              ],
-              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Module\"><code>WebAssembly.Module</code></a> instance.</p>\n<pre><code class=\"language-js\">const module = new WebAssembly.Module(wasmBuffer);\nutil.types.isWebAssemblyCompiledModule(module);  // Returns true\n</code></pre>"
             }
           ]
         }

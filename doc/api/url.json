@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v21.5.0/lib/url.js\">lib/url.js</a></p>\n<p>The <code>node:url</code> module provides utilities for URL resolution and parsing. It can\nbe accessed using:</p>\n<pre><code class=\"language-mjs\">import url from 'node:url';\n</code></pre>\n<pre><code class=\"language-cjs\">const url = require('node:url');\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v22.1.0/lib/url.js\">lib/url.js</a></p>\n<p>The <code>node:url</code> module provides utilities for URL resolution and parsing. It can\nbe accessed using:</p>\n<pre><code class=\"language-mjs\">import url from 'node:url';\n</code></pre>\n<pre><code class=\"language-cjs\">const url = require('node:url');\n</code></pre>",
       "modules": [
         {
           "textRaw": "URL strings and URL objects",
@@ -435,10 +435,10 @@
                   "signatures": [
                     {
                       "return": {
-                        "textRaw": "Returns: {string} or `null` if there is no name-value pair with the given `name`.",
+                        "textRaw": "Returns: {string | null} A string or `null` if there is no name-value pair with the given `name`.",
                         "name": "return",
-                        "type": "string",
-                        "desc": "or `null` if there is no name-value pair with the given `name`."
+                        "type": "string | null",
+                        "desc": "A string or `null` if there is no name-value pair with the given `name`."
                       },
                       "params": [
                         {
@@ -750,14 +750,20 @@
               "desc": "<p>Returns the Unicode serialization of the <code>domain</code>. If <code>domain</code> is an invalid\ndomain, the empty string is returned.</p>\n<p>It performs the inverse operation to <a href=\"#urldomaintoasciidomain\"><code>url.domainToASCII()</code></a>.</p>\n<pre><code class=\"language-mjs\">import url from 'node:url';\n\nconsole.log(url.domainToUnicode('xn--espaol-zwa.com'));\n// Prints español.com\nconsole.log(url.domainToUnicode('xn--fiq228c.com'));\n// Prints 中文.com\nconsole.log(url.domainToUnicode('xn--iñvalid.com'));\n// Prints an empty string\n</code></pre>\n<pre><code class=\"language-cjs\">const url = require('node:url');\n\nconsole.log(url.domainToUnicode('xn--espaol-zwa.com'));\n// Prints español.com\nconsole.log(url.domainToUnicode('xn--fiq228c.com'));\n// Prints 中文.com\nconsole.log(url.domainToUnicode('xn--iñvalid.com'));\n// Prints an empty string\n</code></pre>"
             },
             {
-              "textRaw": "`url.fileURLToPath(url)`",
+              "textRaw": "`url.fileURLToPath(url[, options])`",
               "type": "method",
               "name": "fileURLToPath",
               "meta": {
                 "added": [
                   "v10.12.0"
                 ],
-                "changes": []
+                "changes": [
+                  {
+                    "version": "v22.1.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/52509",
+                    "description": "The `options` argument can now be used to determine how to parse the `path` argument."
+                  }
+                ]
               },
               "signatures": [
                 {
@@ -773,6 +779,20 @@
                       "name": "url",
                       "type": "URL | string",
                       "desc": "The file URL string or URL object to convert to a path."
+                    },
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`windows` {boolean|undefined} `true` if the `path` should be return as a windows filepath, `false` for posix, and `undefined` for the system default. **Default:** `undefined`.",
+                          "name": "windows",
+                          "type": "boolean|undefined",
+                          "default": "`undefined`",
+                          "desc": "`true` if the `path` should be return as a windows filepath, `false` for posix, and `undefined` for the system default."
+                        }
+                      ]
                     }
                   ]
                 }
@@ -844,14 +864,20 @@
               "desc": "<p>Returns a customizable serialization of a URL <code>String</code> representation of a\n<a href=\"#the-whatwg-url-api\">WHATWG URL</a> object.</p>\n<p>The URL object has both a <code>toString()</code> method and <code>href</code> property that return\nstring serializations of the URL. These are not, however, customizable in\nany way. The <code>url.format(URL[, options])</code> method allows for basic customization\nof the output.</p>\n<pre><code class=\"language-mjs\">import url from 'node:url';\nconst myURL = new URL('https://a:b@測試?abc#foo');\n\nconsole.log(myURL.href);\n// Prints https://a:b@xn--g6w251d/?abc#foo\n\nconsole.log(myURL.toString());\n// Prints https://a:b@xn--g6w251d/?abc#foo\n\nconsole.log(url.format(myURL, { fragment: false, unicode: true, auth: false }));\n// Prints 'https://測試/?abc'\n</code></pre>\n<pre><code class=\"language-cjs\">const url = require('node:url');\nconst myURL = new URL('https://a:b@測試?abc#foo');\n\nconsole.log(myURL.href);\n// Prints https://a:b@xn--g6w251d/?abc#foo\n\nconsole.log(myURL.toString());\n// Prints https://a:b@xn--g6w251d/?abc#foo\n\nconsole.log(url.format(myURL, { fragment: false, unicode: true, auth: false }));\n// Prints 'https://測試/?abc'\n</code></pre>"
             },
             {
-              "textRaw": "`url.pathToFileURL(path)`",
+              "textRaw": "`url.pathToFileURL(path[, options])`",
               "type": "method",
               "name": "pathToFileURL",
               "meta": {
                 "added": [
                   "v10.12.0"
                 ],
-                "changes": []
+                "changes": [
+                  {
+                    "version": "v22.1.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/52509",
+                    "description": "The `options` argument can now be used to determine how to return the `path` value."
+                  }
+                ]
               },
               "signatures": [
                 {
@@ -867,6 +893,20 @@
                       "name": "path",
                       "type": "string",
                       "desc": "The path to convert to a File URL."
+                    },
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`windows` {boolean|undefined} `true` if the `path` should be treated as a windows filepath, `false` for posix, and `undefined` for the system default. **Default:** `undefined`.",
+                          "name": "windows",
+                          "type": "boolean|undefined",
+                          "default": "`undefined`",
+                          "desc": "`true` if the `path` should be treated as a windows filepath, `false` for posix, and `undefined` for the system default."
+                        }
+                      ]
                     }
                   ]
                 }

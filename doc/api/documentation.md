@@ -21,7 +21,7 @@ Throughout the documentation are indications of a section's stability. Some APIs
 are so proven and so relied upon that they are unlikely to ever change at all.
 Others are brand new and experimental, or known to be hazardous.
 
-The stability indices are as follows:
+The stability indexes are as follows:
 
 > Stability: 0 - Deprecated. The feature may emit warnings. Backward
 > compatibility is not guaranteed.
@@ -96,7 +96,7 @@ a command-line flag. Experimental features may also emit a [warning][].
 | [Query string](querystring.html) | (2) Stable |
 | [Readline](readline.html) | (2) Stable |
 | [REPL](repl.html) | (2) Stable |
-| [Single executable applications](single-executable-applications.html) | (1) Experimental: This feature is being designed and will change. |
+| [Single executable applications](single-executable-applications.html) | (1) .1 - Active development |
 | [Stream](stream.html) | (2) Stable |
 | [String decoder](string_decoder.html) | (2) Stable |
 | [Test runner](test.html) | (2) Stable |

@@ -24,7 +24,7 @@
       "introduced_in": "v15.1.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v21.5.0/lib/diagnostics_channel.js\">lib/diagnostics_channel.js</a></p>\n<p>The <code>node:diagnostics_channel</code> module provides an API to create named channels\nto report arbitrary message data for diagnostics purposes.</p>\n<p>It can be accessed using:</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\n</code></pre>\n<p>It is intended that a module writer wanting to report diagnostics messages\nwill create one or many top-level channels to report messages through.\nChannels may also be acquired at runtime but it is not encouraged\ndue to the additional overhead of doing so. Channels may be exported for\nconvenience, but as long as the name is known it can be acquired anywhere.</p>\n<p>If you intend for your module to produce diagnostics data for others to\nconsume it is recommended that you include documentation of what named\nchannels are used along with the shape of the message data. Channel names\nshould generally include the module name to avoid collisions with data from\nother modules.</p>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v22.1.0/lib/diagnostics_channel.js\">lib/diagnostics_channel.js</a></p>\n<p>The <code>node:diagnostics_channel</code> module provides an API to create named channels\nto report arbitrary message data for diagnostics purposes.</p>\n<p>It can be accessed using:</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\n</code></pre>\n<p>It is intended that a module writer wanting to report diagnostics messages\nwill create one or many top-level channels to report messages through.\nChannels may also be acquired at runtime but it is not encouraged\ndue to the additional overhead of doing so. Channels may be exported for\nconvenience, but as long as the name is known it can be acquired anywhere.</p>\n<p>If you intend for your module to produce diagnostics data for others to\nconsume it is recommended that you include documentation of what named\nchannels are used along with the shape of the message data. Channel names\nshould generally include the module name to avoid collisions with data from\nother modules.</p>",
       "modules": [
         {
           "textRaw": "Public API",
@@ -185,7 +185,8 @@
                   "name": "tracingChannel",
                   "meta": {
                     "added": [
-                      "v19.9.0"
+                      "v19.9.0",
+                      "v18.19.0"
                     ],
                     "changes": []
                   },
@@ -218,7 +219,7 @@
             {
               "textRaw": "TracingChannel Channels",
               "name": "tracingchannel_channels",
-              "desc": "<p>A TracingChannel is a collection of several diagnostics_channels representing\nspecific points in the execution lifecycle of a single traceable action. The\nbehavior is split into five diagnostics_channels consisting of <code>start</code>,\n<code>end</code>, <code>asyncStart</code>, <code>asyncEnd</code>, and <code>error</code>. A single traceable action will\nshare the same event object between all events, this can be helpful for\nmanaging correlation through a weakmap.</p>\n<p>These event objects will be extended with <code>result</code> or <code>error</code> values when\nthe task \"completes\". In the case of a synchronous task the <code>result</code> will be\nthe return value and the <code>error</code> will be anything thrown from the function.\nWith callback-based async functions the <code>result</code> will be the second argument\nof the callback while the <code>error</code> will either be a thrown error visible in the\n<code>end</code> event or the first callback argument in either of the <code>asyncStart</code> or\n<code>asyncEnd</code> events.</p>\n<p>Tracing channels should follow a naming pattern of:</p>\n<ul>\n<li><code>tracing:module.class.method:start</code> or <code>tracing:module.function:start</code></li>\n<li><code>tracing:module.class.method:end</code> or <code>tracing:module.function:end</code></li>\n<li><code>tracing:module.class.method:asyncStart</code> or <code>tracing:module.function:asyncStart</code></li>\n<li><code>tracing:module.class.method:asyncEnd</code> or <code>tracing:module.function:asyncEnd</code></li>\n<li><code>tracing:module.class.method:error</code> or <code>tracing:module.function:error</code></li>\n</ul>",
+              "desc": "<p>A TracingChannel is a collection of several diagnostics_channels representing\nspecific points in the execution lifecycle of a single traceable action. The\nbehavior is split into five diagnostics_channels consisting of <code>start</code>,\n<code>end</code>, <code>asyncStart</code>, <code>asyncEnd</code>, and <code>error</code>. A single traceable action will\nshare the same event object between all events, this can be helpful for\nmanaging correlation through a weakmap.</p>\n<p>These event objects will be extended with <code>result</code> or <code>error</code> values when\nthe task \"completes\". In the case of a synchronous task the <code>result</code> will be\nthe return value and the <code>error</code> will be anything thrown from the function.\nWith callback-based async functions the <code>result</code> will be the second argument\nof the callback while the <code>error</code> will either be a thrown error visible in the\n<code>end</code> event or the first callback argument in either of the <code>asyncStart</code> or\n<code>asyncEnd</code> events.</p>\n<p>To ensure only correct trace graphs are formed, events should only be published\nif subscribers are present prior to starting the trace. Subscriptions which are\nadded after the trace begins should not receive future events from that trace,\nonly future traces will be seen.</p>\n<p>Tracing channels should follow a naming pattern of:</p>\n<ul>\n<li><code>tracing:module.class.method:start</code> or <code>tracing:module.function:start</code></li>\n<li><code>tracing:module.class.method:end</code> or <code>tracing:module.function:end</code></li>\n<li><code>tracing:module.class.method:asyncStart</code> or <code>tracing:module.function:asyncStart</code></li>\n<li><code>tracing:module.class.method:asyncEnd</code> or <code>tracing:module.function:asyncEnd</code></li>\n<li><code>tracing:module.class.method:error</code> or <code>tracing:module.function:error</code></li>\n</ul>",
               "methods": [
                 {
                   "textRaw": "`start(event)`",
@@ -521,7 +522,8 @@
                   "name": "bindStore",
                   "meta": {
                     "added": [
-                      "v19.9.0"
+                      "v19.9.0",
+                      "v18.19.0"
                     ],
                     "changes": []
                   },
@@ -553,7 +555,8 @@
                   "name": "unbindStore",
                   "meta": {
                     "added": [
-                      "v19.9.0"
+                      "v19.9.0",
+                      "v18.19.0"
                     ],
                     "changes": []
                   },
@@ -585,7 +588,8 @@
                   "name": "runStores",
                   "meta": {
                     "added": [
-                      "v19.9.0"
+                      "v19.9.0",
+                      "v18.19.0"
                     ],
                     "changes": []
                   },
@@ -631,7 +635,8 @@
               "name": "TracingChannel",
               "meta": {
                 "added": [
-                  "v19.9.0"
+                  "v19.9.0",
+                  "v18.19.0"
                 ],
                 "changes": []
               },
@@ -645,7 +650,8 @@
                   "name": "subscribe",
                   "meta": {
                     "added": [
-                      "v19.9.0"
+                      "v19.9.0",
+                      "v18.19.0"
                     ],
                     "changes": []
                   },
@@ -703,7 +709,8 @@
                   "name": "unsubscribe",
                   "meta": {
                     "added": [
-                      "v19.9.0"
+                      "v19.9.0",
+                      "v18.19.0"
                     ],
                     "changes": []
                   },
@@ -767,7 +774,8 @@
                   "name": "traceSync",
                   "meta": {
                     "added": [
-                      "v19.9.0"
+                      "v19.9.0",
+                      "v18.19.0"
                     ],
                     "changes": []
                   },
@@ -809,7 +817,7 @@
                       ]
                     }
                   ],
-                  "desc": "<p>Trace a synchronous function call. This will always produce a <a href=\"#startevent\"><code>start</code> event</a>\nand <a href=\"#endevent\"><code>end</code> event</a> around the execution and may produce an <a href=\"#errorevent\"><code>error</code> event</a>\nif the given function throws an error. This will run the given function using\n<a href=\"#channelrunstorescontext-fn-thisarg-args\"><code>channel.runStores(context, ...)</code></a> on the <code>start</code> channel which ensures all\nevents should have any bound stores set to match this trace context.</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\n\nconst channels = diagnostics_channel.tracingChannel('my-channel');\n\nchannels.traceSync(() => {\n  // Do something\n}, {\n  some: 'thing',\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\n\nconst channels = diagnostics_channel.tracingChannel('my-channel');\n\nchannels.traceSync(() => {\n  // Do something\n}, {\n  some: 'thing',\n});\n</code></pre>"
+                  "desc": "<p>Trace a synchronous function call. This will always produce a <a href=\"#startevent\"><code>start</code> event</a>\nand <a href=\"#endevent\"><code>end</code> event</a> around the execution and may produce an <a href=\"#errorevent\"><code>error</code> event</a>\nif the given function throws an error. This will run the given function using\n<a href=\"#channelrunstorescontext-fn-thisarg-args\"><code>channel.runStores(context, ...)</code></a> on the <code>start</code> channel which ensures all\nevents should have any bound stores set to match this trace context.</p>\n<p>To ensure only correct trace graphs are formed, events will only be published\nif subscribers are present prior to starting the trace. Subscriptions which are\nadded after the trace begins will not receive future events from that trace,\nonly future traces will be seen.</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\n\nconst channels = diagnostics_channel.tracingChannel('my-channel');\n\nchannels.traceSync(() => {\n  // Do something\n}, {\n  some: 'thing',\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\n\nconst channels = diagnostics_channel.tracingChannel('my-channel');\n\nchannels.traceSync(() => {\n  // Do something\n}, {\n  some: 'thing',\n});\n</code></pre>"
                 },
                 {
                   "textRaw": "`tracingChannel.tracePromise(fn[, context[, thisArg[, ...args]]])`",
@@ -817,7 +825,8 @@
                   "name": "tracePromise",
                   "meta": {
                     "added": [
-                      "v19.9.0"
+                      "v19.9.0",
+                      "v18.19.0"
                     ],
                     "changes": []
                   },
@@ -859,7 +868,7 @@
                       ]
                     }
                   ],
-                  "desc": "<p>Trace a promise-returning function call. This will always produce a\n<a href=\"#startevent\"><code>start</code> event</a> and <a href=\"#endevent\"><code>end</code> event</a> around the synchronous portion of the\nfunction execution, and will produce an <a href=\"#asyncstartevent\"><code>asyncStart</code> event</a> and\n<a href=\"#asyncendevent\"><code>asyncEnd</code> event</a> when a promise continuation is reached. It may also\nproduce an <a href=\"#errorevent\"><code>error</code> event</a> if the given function throws an error or the\nreturned promise rejects. This will run the given function using\n<a href=\"#channelrunstorescontext-fn-thisarg-args\"><code>channel.runStores(context, ...)</code></a> on the <code>start</code> channel which ensures all\nevents should have any bound stores set to match this trace context.</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\n\nconst channels = diagnostics_channel.tracingChannel('my-channel');\n\nchannels.tracePromise(async () => {\n  // Do something\n}, {\n  some: 'thing',\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\n\nconst channels = diagnostics_channel.tracingChannel('my-channel');\n\nchannels.tracePromise(async () => {\n  // Do something\n}, {\n  some: 'thing',\n});\n</code></pre>"
+                  "desc": "<p>Trace a promise-returning function call. This will always produce a\n<a href=\"#startevent\"><code>start</code> event</a> and <a href=\"#endevent\"><code>end</code> event</a> around the synchronous portion of the\nfunction execution, and will produce an <a href=\"#asyncstartevent\"><code>asyncStart</code> event</a> and\n<a href=\"#asyncendevent\"><code>asyncEnd</code> event</a> when a promise continuation is reached. It may also\nproduce an <a href=\"#errorevent\"><code>error</code> event</a> if the given function throws an error or the\nreturned promise rejects. This will run the given function using\n<a href=\"#channelrunstorescontext-fn-thisarg-args\"><code>channel.runStores(context, ...)</code></a> on the <code>start</code> channel which ensures all\nevents should have any bound stores set to match this trace context.</p>\n<p>To ensure only correct trace graphs are formed, events will only be published\nif subscribers are present prior to starting the trace. Subscriptions which are\nadded after the trace begins will not receive future events from that trace,\nonly future traces will be seen.</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\n\nconst channels = diagnostics_channel.tracingChannel('my-channel');\n\nchannels.tracePromise(async () => {\n  // Do something\n}, {\n  some: 'thing',\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\n\nconst channels = diagnostics_channel.tracingChannel('my-channel');\n\nchannels.tracePromise(async () => {\n  // Do something\n}, {\n  some: 'thing',\n});\n</code></pre>"
                 },
                 {
                   "textRaw": "`tracingChannel.traceCallback(fn, position, context, thisArg, ...args)`",
@@ -867,7 +876,8 @@
                   "name": "traceCallback",
                   "meta": {
                     "added": [
-                      "v19.9.0"
+                      "v19.9.0",
+                      "v18.19.0"
                     ],
                     "changes": []
                   },
@@ -915,7 +925,7 @@
                       ]
                     }
                   ],
-                  "desc": "<p>Trace a callback-receiving function call. The callback is expected to follow\nthe error as first arg convention typically used. This will always produce a\n<a href=\"#startevent\"><code>start</code> event</a> and <a href=\"#endevent\"><code>end</code> event</a> around the synchronous portion of the\nfunction execution, and will produce a <a href=\"#asyncstartevent\"><code>asyncStart</code> event</a> and\n<a href=\"#asyncendevent\"><code>asyncEnd</code> event</a> around the callback execution. It may also produce an\n<a href=\"#errorevent\"><code>error</code> event</a> if the given function throws or the first argument passed to\nthe callback is set. This will run the given function using\n<a href=\"#channelrunstorescontext-fn-thisarg-args\"><code>channel.runStores(context, ...)</code></a> on the <code>start</code> channel which ensures all\nevents should have any bound stores set to match this trace context.</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\n\nconst channels = diagnostics_channel.tracingChannel('my-channel');\n\nchannels.traceCallback((arg1, callback) => {\n  // Do something\n  callback(null, 'result');\n}, 1, {\n  some: 'thing',\n}, thisArg, arg1, callback);\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\n\nconst channels = diagnostics_channel.tracingChannel('my-channel');\n\nchannels.traceCallback((arg1, callback) => {\n  // Do something\n  callback(null, 'result');\n}, {\n  some: 'thing',\n}, thisArg, arg1, callback);\n</code></pre>\n<p>The callback will also be run with <a href=\"#channelrunstorescontext-fn-thisarg-args\"><code>channel.runStores(context, ...)</code></a> which\nenables context loss recovery in some cases.</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\nimport { AsyncLocalStorage } from 'node:async_hooks';\n\nconst channels = diagnostics_channel.tracingChannel('my-channel');\nconst myStore = new AsyncLocalStorage();\n\n// The start channel sets the initial store data to something\n// and stores that store data value on the trace context object\nchannels.start.bindStore(myStore, (data) => {\n  const span = new Span(data);\n  data.span = span;\n  return span;\n});\n\n// Then asyncStart can restore from that data it stored previously\nchannels.asyncStart.bindStore(myStore, (data) => {\n  return data.span;\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\nconst { AsyncLocalStorage } = require('node:async_hooks');\n\nconst channels = diagnostics_channel.tracingChannel('my-channel');\nconst myStore = new AsyncLocalStorage();\n\n// The start channel sets the initial store data to something\n// and stores that store data value on the trace context object\nchannels.start.bindStore(myStore, (data) => {\n  const span = new Span(data);\n  data.span = span;\n  return span;\n});\n\n// Then asyncStart can restore from that data it stored previously\nchannels.asyncStart.bindStore(myStore, (data) => {\n  return data.span;\n});\n</code></pre>"
+                  "desc": "<p>Trace a callback-receiving function call. The callback is expected to follow\nthe error as first arg convention typically used. This will always produce a\n<a href=\"#startevent\"><code>start</code> event</a> and <a href=\"#endevent\"><code>end</code> event</a> around the synchronous portion of the\nfunction execution, and will produce a <a href=\"#asyncstartevent\"><code>asyncStart</code> event</a> and\n<a href=\"#asyncendevent\"><code>asyncEnd</code> event</a> around the callback execution. It may also produce an\n<a href=\"#errorevent\"><code>error</code> event</a> if the given function throws or the first argument passed to\nthe callback is set. This will run the given function using\n<a href=\"#channelrunstorescontext-fn-thisarg-args\"><code>channel.runStores(context, ...)</code></a> on the <code>start</code> channel which ensures all\nevents should have any bound stores set to match this trace context.</p>\n<p>To ensure only correct trace graphs are formed, events will only be published\nif subscribers are present prior to starting the trace. Subscriptions which are\nadded after the trace begins will not receive future events from that trace,\nonly future traces will be seen.</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\n\nconst channels = diagnostics_channel.tracingChannel('my-channel');\n\nchannels.traceCallback((arg1, callback) => {\n  // Do something\n  callback(null, 'result');\n}, 1, {\n  some: 'thing',\n}, thisArg, arg1, callback);\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\n\nconst channels = diagnostics_channel.tracingChannel('my-channel');\n\nchannels.traceCallback((arg1, callback) => {\n  // Do something\n  callback(null, 'result');\n}, {\n  some: 'thing',\n}, thisArg, arg1, callback);\n</code></pre>\n<p>The callback will also be run with <a href=\"#channelrunstorescontext-fn-thisarg-args\"><code>channel.runStores(context, ...)</code></a> which\nenables context loss recovery in some cases.</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\nimport { AsyncLocalStorage } from 'node:async_hooks';\n\nconst channels = diagnostics_channel.tracingChannel('my-channel');\nconst myStore = new AsyncLocalStorage();\n\n// The start channel sets the initial store data to something\n// and stores that store data value on the trace context object\nchannels.start.bindStore(myStore, (data) => {\n  const span = new Span(data);\n  data.span = span;\n  return span;\n});\n\n// Then asyncStart can restore from that data it stored previously\nchannels.asyncStart.bindStore(myStore, (data) => {\n  return data.span;\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\nconst { AsyncLocalStorage } = require('node:async_hooks');\n\nconst channels = diagnostics_channel.tracingChannel('my-channel');\nconst myStore = new AsyncLocalStorage();\n\n// The start channel sets the initial store data to something\n// and stores that store data value on the trace context object\nchannels.start.bindStore(myStore, (data) => {\n  const span = new Span(data);\n  data.span = span;\n  return span;\n});\n\n// Then asyncStart can restore from that data it stored previously\nchannels.asyncStart.bindStore(myStore, (data) => {\n  return data.span;\n});\n</code></pre>"
                 }
               ]
             }

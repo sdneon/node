@@ -8,7 +8,7 @@
       "introduced_in": "v0.3.6",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v21.5.0/lib/crypto.js\">lib/crypto.js</a></p>\n<p>The <code>node:crypto</code> module provides cryptographic functionality that includes a\nset of wrappers for OpenSSL's hash, HMAC, cipher, decipher, sign, and verify\nfunctions.</p>\n<pre><code class=\"language-mjs\">const { createHmac } = await import('node:crypto');\n\nconst secret = 'abcdefg';\nconst hash = createHmac('sha256', secret)\n               .update('I love cupcakes')\n               .digest('hex');\nconsole.log(hash);\n// Prints:\n//   c0fa1bc00531bd78ef38c628449c5102aeabd49b5dc3a2a516ea6ea959d6658e\n</code></pre>\n<pre><code class=\"language-cjs\">const { createHmac } = require('node:crypto');\n\nconst secret = 'abcdefg';\nconst hash = createHmac('sha256', secret)\n               .update('I love cupcakes')\n               .digest('hex');\nconsole.log(hash);\n// Prints:\n//   c0fa1bc00531bd78ef38c628449c5102aeabd49b5dc3a2a516ea6ea959d6658e\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v22.1.0/lib/crypto.js\">lib/crypto.js</a></p>\n<p>The <code>node:crypto</code> module provides cryptographic functionality that includes a\nset of wrappers for OpenSSL's hash, HMAC, cipher, decipher, sign, and verify\nfunctions.</p>\n<pre><code class=\"language-mjs\">const { createHmac } = await import('node:crypto');\n\nconst secret = 'abcdefg';\nconst hash = createHmac('sha256', secret)\n               .update('I love cupcakes')\n               .digest('hex');\nconsole.log(hash);\n// Prints:\n//   c0fa1bc00531bd78ef38c628449c5102aeabd49b5dc3a2a516ea6ea959d6658e\n</code></pre>\n<pre><code class=\"language-cjs\">const { createHmac } = require('node:crypto');\n\nconst secret = 'abcdefg';\nconst hash = createHmac('sha256', secret)\n               .update('I love cupcakes')\n               .digest('hex');\nconsole.log(hash);\n// Prints:\n//   c0fa1bc00531bd78ef38c628449c5102aeabd49b5dc3a2a516ea6ea959d6658e\n</code></pre>",
       "modules": [
         {
           "textRaw": "Determining if crypto support is unavailable",
@@ -182,74 +182,6 @@
               "desc": "<p>Checks the primality of the <code>candidate</code>.</p>"
             },
             {
-              "textRaw": "`crypto.createCipher(algorithm, password[, options])`",
-              "type": "method",
-              "name": "createCipher",
-              "meta": {
-                "added": [
-                  "v0.1.94"
-                ],
-                "deprecated": [
-                  "v10.0.0"
-                ],
-                "changes": [
-                  {
-                    "version": [
-                      "v17.9.0",
-                      "v16.17.0"
-                    ],
-                    "pr-url": "https://github.com/nodejs/node/pull/42427",
-                    "description": "The `authTagLength` option is now optional when using the `chacha20-poly1305` cipher and defaults to 16 bytes."
-                  },
-                  {
-                    "version": "v15.0.0",
-                    "pr-url": "https://github.com/nodejs/node/pull/35093",
-                    "description": "The password argument can be an ArrayBuffer and is limited to a maximum of 2 ** 31 - 1 bytes."
-                  },
-                  {
-                    "version": "v10.10.0",
-                    "pr-url": "https://github.com/nodejs/node/pull/21447",
-                    "description": "Ciphers in OCB mode are now supported."
-                  },
-                  {
-                    "version": "v10.2.0",
-                    "pr-url": "https://github.com/nodejs/node/pull/20235",
-                    "description": "The `authTagLength` option can now be used to produce shorter authentication tags in GCM mode and defaults to 16 bytes."
-                  }
-                ]
-              },
-              "stability": 0,
-              "stabilityText": "Deprecated: Use [`crypto.createCipheriv()`][] instead.",
-              "signatures": [
-                {
-                  "return": {
-                    "textRaw": "Returns: {Cipher}",
-                    "name": "return",
-                    "type": "Cipher"
-                  },
-                  "params": [
-                    {
-                      "textRaw": "`algorithm` {string}",
-                      "name": "algorithm",
-                      "type": "string"
-                    },
-                    {
-                      "textRaw": "`password` {string|ArrayBuffer|Buffer|TypedArray|DataView}",
-                      "name": "password",
-                      "type": "string|ArrayBuffer|Buffer|TypedArray|DataView"
-                    },
-                    {
-                      "textRaw": "`options` {Object} [`stream.transform` options][]",
-                      "name": "options",
-                      "type": "Object",
-                      "desc": "[`stream.transform` options][]"
-                    }
-                  ]
-                }
-              ],
-              "desc": "<p>Creates and returns a <code>Cipher</code> object that uses the given <code>algorithm</code> and\n<code>password</code>.</p>\n<p>The <code>options</code> argument controls stream behavior and is optional except when a\ncipher in CCM or OCB mode (e.g. <code>'aes-128-ccm'</code>) is used. In that case, the\n<code>authTagLength</code> option is required and specifies the length of the\nauthentication tag in bytes, see <a href=\"#ccm-mode\">CCM mode</a>. In GCM mode, the <code>authTagLength</code>\noption is not required but can be used to set the length of the authentication\ntag that will be returned by <code>getAuthTag()</code> and defaults to 16 bytes.\nFor <code>chacha20-poly1305</code>, the <code>authTagLength</code> option defaults to 16 bytes.</p>\n<p>The <code>algorithm</code> is dependent on OpenSSL, examples are <code>'aes192'</code>, etc. On\nrecent OpenSSL releases, <code>openssl list -cipher-algorithms</code> will\ndisplay the available cipher algorithms.</p>\n<p>The <code>password</code> is used to derive the cipher key and initialization vector (IV).\nThe value must be either a <code>'latin1'</code> encoded string, a <a href=\"buffer.html\"><code>Buffer</code></a>, a\n<code>TypedArray</code>, or a <code>DataView</code>.</p>\n<p><strong class=\"critical\">This function is semantically insecure for all\nsupported ciphers and fatally flawed for ciphers in counter mode (such as CTR,\nGCM, or CCM).</strong></p>\n<p>The implementation of <code>crypto.createCipher()</code> derives keys using the OpenSSL\nfunction <a href=\"https://www.openssl.org/docs/man3.0/man3/EVP_BytesToKey.html\"><code>EVP_BytesToKey</code></a> with the digest algorithm set to MD5, one\niteration, and no salt. The lack of salt allows dictionary attacks as the same\npassword always creates the same key. The low iteration count and\nnon-cryptographically secure hash algorithm allow passwords to be tested very\nrapidly.</p>\n<p>In line with OpenSSL's recommendation to use a more modern algorithm instead of\n<a href=\"https://www.openssl.org/docs/man3.0/man3/EVP_BytesToKey.html\"><code>EVP_BytesToKey</code></a> it is recommended that developers derive a key and IV on\ntheir own using <a href=\"#cryptoscryptpassword-salt-keylen-options-callback\"><code>crypto.scrypt()</code></a> and to use <a href=\"#cryptocreatecipherivalgorithm-key-iv-options\"><code>crypto.createCipheriv()</code></a>\nto create the <code>Cipher</code> object. Users should not use ciphers with counter mode\n(e.g. CTR, GCM, or CCM) in <code>crypto.createCipher()</code>. A warning is emitted when\nthey are used in order to avoid the risk of IV reuse that causes\nvulnerabilities. For the case when IV is reused in GCM, see <a href=\"https://github.com/nonce-disrespect/nonce-disrespect\">Nonce-Disrespecting\nAdversaries</a> for details.</p>"
-            },
-            {
               "textRaw": "`crypto.createCipheriv(algorithm, key, iv[, options])`",
               "type": "method",
               "name": "createCipheriv",
@@ -334,64 +266,6 @@
                 }
               ],
               "desc": "<p>Creates and returns a <code>Cipher</code> object, with the given <code>algorithm</code>, <code>key</code> and\ninitialization vector (<code>iv</code>).</p>\n<p>The <code>options</code> argument controls stream behavior and is optional except when a\ncipher in CCM or OCB mode (e.g. <code>'aes-128-ccm'</code>) is used. In that case, the\n<code>authTagLength</code> option is required and specifies the length of the\nauthentication tag in bytes, see <a href=\"#ccm-mode\">CCM mode</a>. In GCM mode, the <code>authTagLength</code>\noption is not required but can be used to set the length of the authentication\ntag that will be returned by <code>getAuthTag()</code> and defaults to 16 bytes.\nFor <code>chacha20-poly1305</code>, the <code>authTagLength</code> option defaults to 16 bytes.</p>\n<p>The <code>algorithm</code> is dependent on OpenSSL, examples are <code>'aes192'</code>, etc. On\nrecent OpenSSL releases, <code>openssl list -cipher-algorithms</code> will\ndisplay the available cipher algorithms.</p>\n<p>The <code>key</code> is the raw key used by the <code>algorithm</code> and <code>iv</code> is an\n<a href=\"https://en.wikipedia.org/wiki/Initialization_vector\">initialization vector</a>. Both arguments must be <code>'utf8'</code> encoded strings,\n<a href=\"buffer.html\">Buffers</a>, <code>TypedArray</code>, or <code>DataView</code>s. The <code>key</code> may optionally be\na <a href=\"#class-keyobject\"><code>KeyObject</code></a> of type <code>secret</code>. If the cipher does not need\nan initialization vector, <code>iv</code> may be <code>null</code>.</p>\n<p>When passing strings for <code>key</code> or <code>iv</code>, please consider\n<a href=\"#using-strings-as-inputs-to-cryptographic-apis\">caveats when using strings as inputs to cryptographic APIs</a>.</p>\n<p>Initialization vectors should be unpredictable and unique; ideally, they will be\ncryptographically random. They do not have to be secret: IVs are typically just\nadded to ciphertext messages unencrypted. It may sound contradictory that\nsomething has to be unpredictable and unique, but does not have to be secret;\nremember that an attacker must not be able to predict ahead of time what a\ngiven IV will be.</p>"
-            },
-            {
-              "textRaw": "`crypto.createDecipher(algorithm, password[, options])`",
-              "type": "method",
-              "name": "createDecipher",
-              "meta": {
-                "added": [
-                  "v0.1.94"
-                ],
-                "deprecated": [
-                  "v10.0.0"
-                ],
-                "changes": [
-                  {
-                    "version": [
-                      "v17.9.0",
-                      "v16.17.0"
-                    ],
-                    "pr-url": "https://github.com/nodejs/node/pull/42427",
-                    "description": "The `authTagLength` option is now optional when using the `chacha20-poly1305` cipher and defaults to 16 bytes."
-                  },
-                  {
-                    "version": "v10.10.0",
-                    "pr-url": "https://github.com/nodejs/node/pull/21447",
-                    "description": "Ciphers in OCB mode are now supported."
-                  }
-                ]
-              },
-              "stability": 0,
-              "stabilityText": "Deprecated: Use [`crypto.createDecipheriv()`][] instead.",
-              "signatures": [
-                {
-                  "return": {
-                    "textRaw": "Returns: {Decipher}",
-                    "name": "return",
-                    "type": "Decipher"
-                  },
-                  "params": [
-                    {
-                      "textRaw": "`algorithm` {string}",
-                      "name": "algorithm",
-                      "type": "string"
-                    },
-                    {
-                      "textRaw": "`password` {string|ArrayBuffer|Buffer|TypedArray|DataView}",
-                      "name": "password",
-                      "type": "string|ArrayBuffer|Buffer|TypedArray|DataView"
-                    },
-                    {
-                      "textRaw": "`options` {Object} [`stream.transform` options][]",
-                      "name": "options",
-                      "type": "Object",
-                      "desc": "[`stream.transform` options][]"
-                    }
-                  ]
-                }
-              ],
-              "desc": "<p>Creates and returns a <code>Decipher</code> object that uses the given <code>algorithm</code> and\n<code>password</code> (key).</p>\n<p>The <code>options</code> argument controls stream behavior and is optional except when a\ncipher in CCM or OCB mode (e.g. <code>'aes-128-ccm'</code>) is used. In that case, the\n<code>authTagLength</code> option is required and specifies the length of the\nauthentication tag in bytes, see <a href=\"#ccm-mode\">CCM mode</a>.\nFor <code>chacha20-poly1305</code>, the <code>authTagLength</code> option defaults to 16 bytes.</p>\n<p><strong class=\"critical\">This function is semantically insecure for all\nsupported ciphers and fatally flawed for ciphers in counter mode (such as CTR,\nGCM, or CCM).</strong></p>\n<p>The implementation of <code>crypto.createDecipher()</code> derives keys using the OpenSSL\nfunction <a href=\"https://www.openssl.org/docs/man3.0/man3/EVP_BytesToKey.html\"><code>EVP_BytesToKey</code></a> with the digest algorithm set to MD5, one\niteration, and no salt. The lack of salt allows dictionary attacks as the same\npassword always creates the same key. The low iteration count and\nnon-cryptographically secure hash algorithm allow passwords to be tested very\nrapidly.</p>\n<p>In line with OpenSSL's recommendation to use a more modern algorithm instead of\n<a href=\"https://www.openssl.org/docs/man3.0/man3/EVP_BytesToKey.html\"><code>EVP_BytesToKey</code></a> it is recommended that developers derive a key and IV on\ntheir own using <a href=\"#cryptoscryptpassword-salt-keylen-options-callback\"><code>crypto.scrypt()</code></a> and to use <a href=\"#cryptocreatedecipherivalgorithm-key-iv-options\"><code>crypto.createDecipheriv()</code></a>\nto create the <code>Decipher</code> object.</p>"
             },
             {
               "textRaw": "`crypto.createDecipheriv(algorithm, key, iv[, options])`",
@@ -946,6 +820,50 @@
                 }
               ],
               "desc": "<p>Computes the Diffie-Hellman secret based on a <code>privateKey</code> and a <code>publicKey</code>.\nBoth keys must have the same <code>asymmetricKeyType</code>, which must be one of <code>'dh'</code>\n(for Diffie-Hellman), <code>'ec'</code> (for ECDH), <code>'x448'</code>, or <code>'x25519'</code> (for ECDH-ES).</p>"
+            },
+            {
+              "textRaw": "`crypto.hash(algorithm, data[, outputEncoding])`",
+              "type": "method",
+              "name": "hash",
+              "meta": {
+                "added": [
+                  "v21.7.0",
+                  "v20.12.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": ".2 - Release candidate",
+              "signatures": [
+                {
+                  "return": {
+                    "textRaw": "Returns: {string|Buffer}",
+                    "name": "return",
+                    "type": "string|Buffer"
+                  },
+                  "params": [
+                    {
+                      "textRaw": "`algorithm` {string|undefined}",
+                      "name": "algorithm",
+                      "type": "string|undefined"
+                    },
+                    {
+                      "textRaw": "`data` {string|Buffer|TypedArray|DataView} When `data` is a string, it will be encoded as UTF-8 before being hashed. If a different input encoding is desired for a string input, user could encode the string into a `TypedArray` using either `TextEncoder` or `Buffer.from()` and passing the encoded `TypedArray` into this API instead.",
+                      "name": "data",
+                      "type": "string|Buffer|TypedArray|DataView",
+                      "desc": "When `data` is a string, it will be encoded as UTF-8 before being hashed. If a different input encoding is desired for a string input, user could encode the string into a `TypedArray` using either `TextEncoder` or `Buffer.from()` and passing the encoded `TypedArray` into this API instead."
+                    },
+                    {
+                      "textRaw": "`outputEncoding` {string|undefined} [Encoding][encoding] used to encode the returned digest. **Default:** `'hex'`.",
+                      "name": "outputEncoding",
+                      "type": "string|undefined",
+                      "default": "`'hex'`",
+                      "desc": "[Encoding][encoding] used to encode the returned digest."
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>A utility for creating one-shot hash digests of data. It can be faster than\nthe object-based <code>crypto.createHash()</code> when hashing a smaller amount of data\n(&#x3C;= 5MB) that's readily available. If the data can be big or if it is streamed,\nit's still recommended to use <code>crypto.createHash()</code> instead.</p>\n<p>The <code>algorithm</code> is dependent on the available algorithms supported by the\nversion of OpenSSL on the platform. Examples are <code>'sha256'</code>, <code>'sha512'</code>, etc.\nOn recent releases of OpenSSL, <code>openssl list -digest-algorithms</code> will\ndisplay the available digest algorithms.</p>\n<p>Example:</p>\n<pre><code class=\"language-cjs\">const crypto = require('node:crypto');\nconst { Buffer } = require('node:buffer');\n\n// Hashing a string and return the result as a hex-encoded string.\nconst string = 'Node.js';\n// 10b3493287f831e81a438811a1ffba01f8cec4b7\nconsole.log(crypto.hash('sha1', string));\n\n// Encode a base64-encoded string into a Buffer, hash it and return\n// the result as a buffer.\nconst base64 = 'Tm9kZS5qcw==';\n// &#x3C;Buffer 10 b3 49 32 87 f8 31 e8 1a 43 88 11 a1 ff ba 01 f8 ce c4 b7>\nconsole.log(crypto.hash('sha1', Buffer.from(base64, 'base64'), 'buffer'));\n</code></pre>\n<pre><code class=\"language-mjs\">import crypto from 'node:crypto';\nimport { Buffer } from 'node:buffer';\n\n// Hashing a string and return the result as a hex-encoded string.\nconst string = 'Node.js';\n// 10b3493287f831e81a438811a1ffba01f8cec4b7\nconsole.log(crypto.hash('sha1', string));\n\n// Encode a base64-encoded string into a Buffer, hash it and return\n// the result as a buffer.\nconst base64 = 'Tm9kZS5qcw==';\n// &#x3C;Buffer 10 b3 49 32 87 f8 31 e8 1a 43 88 11 a1 ff ba 01 f8 ce c4 b7>\nconsole.log(crypto.hash('sha1', Buffer.from(base64, 'base64'), 'buffer'));\n</code></pre>"
             },
             {
               "textRaw": "`crypto.generateKey(type, options, callback)`",
@@ -2095,6 +2013,15 @@
                 ],
                 "changes": [
                   {
+                    "version": [
+                      "v21.6.2",
+                      "v20.11.1",
+                      "v18.19.1"
+                    ],
+                    "pr-url": "https://github.com/nodejs-private/node-private/pull/515",
+                    "description": "The `RSA_PKCS1_PADDING` padding was disabled unless the OpenSSL build supports implicit rejection."
+                  },
+                  {
                     "version": "v15.0.0",
                     "pr-url": "https://github.com/nodejs/node/pull/35093",
                     "description": "Added string, ArrayBuffer, and CryptoKey as allowable key types. The oaepLabel can be an ArrayBuffer. The buffer can be a string or ArrayBuffer. All types that accept buffers are limited to a maximum of 2 ** 31 - 1 bytes."
@@ -2121,7 +2048,7 @@
                   "params": []
                 }
               ],
-              "desc": "<!--lint disable maximum-line-length remark-lint-->\n<ul>\n<li><code>privateKey</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer\" class=\"type\">&lt;ArrayBuffer&gt;</a> | <a href=\"buffer.html#class-buffer\" class=\"type\">&lt;Buffer&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\" class=\"type\">&lt;TypedArray&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView\" class=\"type\">&lt;DataView&gt;</a> | <a href=\"crypto.html#class-keyobject\" class=\"type\">&lt;KeyObject&gt;</a> | <a href=\"webcrypto.html#class-cryptokey\" class=\"type\">&lt;CryptoKey&gt;</a>\n<ul>\n<li><code>oaepHash</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> The hash function to use for OAEP padding and MGF1.\n<strong>Default:</strong> <code>'sha1'</code></li>\n<li><code>oaepLabel</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer\" class=\"type\">&lt;ArrayBuffer&gt;</a> | <a href=\"buffer.html#class-buffer\" class=\"type\">&lt;Buffer&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\" class=\"type\">&lt;TypedArray&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView\" class=\"type\">&lt;DataView&gt;</a> The label to\nuse for OAEP padding. If not specified, no label is used.</li>\n<li><code>padding</code> <a href=\"crypto.html#cryptoconstants\" class=\"type\">&lt;crypto.constants&gt;</a> An optional padding value defined in\n<code>crypto.constants</code>, which may be: <code>crypto.constants.RSA_NO_PADDING</code>,\n<code>crypto.constants.RSA_PKCS1_PADDING</code>, or\n<code>crypto.constants.RSA_PKCS1_OAEP_PADDING</code>.</li>\n</ul>\n</li>\n<li><code>buffer</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer\" class=\"type\">&lt;ArrayBuffer&gt;</a> | <a href=\"buffer.html#class-buffer\" class=\"type\">&lt;Buffer&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\" class=\"type\">&lt;TypedArray&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView\" class=\"type\">&lt;DataView&gt;</a></li>\n<li>Returns: <a href=\"buffer.html#class-buffer\" class=\"type\">&lt;Buffer&gt;</a> A new <code>Buffer</code> with the decrypted content.</li>\n</ul>\n<!--lint enable maximum-line-length remark-lint-->\n<p>Decrypts <code>buffer</code> with <code>privateKey</code>. <code>buffer</code> was previously encrypted using\nthe corresponding public key, for example using <a href=\"#cryptopublicencryptkey-buffer\"><code>crypto.publicEncrypt()</code></a>.</p>\n<p>If <code>privateKey</code> is not a <a href=\"#class-keyobject\"><code>KeyObject</code></a>, this function behaves as if\n<code>privateKey</code> had been passed to <a href=\"#cryptocreateprivatekeykey\"><code>crypto.createPrivateKey()</code></a>. If it is an\nobject, the <code>padding</code> property can be passed. Otherwise, this function uses\n<code>RSA_PKCS1_OAEP_PADDING</code>.</p>"
+              "desc": "<!--lint disable maximum-line-length remark-lint-->\n<ul>\n<li><code>privateKey</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer\" class=\"type\">&lt;ArrayBuffer&gt;</a> | <a href=\"buffer.html#class-buffer\" class=\"type\">&lt;Buffer&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\" class=\"type\">&lt;TypedArray&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView\" class=\"type\">&lt;DataView&gt;</a> | <a href=\"crypto.html#class-keyobject\" class=\"type\">&lt;KeyObject&gt;</a> | <a href=\"webcrypto.html#class-cryptokey\" class=\"type\">&lt;CryptoKey&gt;</a>\n<ul>\n<li><code>oaepHash</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> The hash function to use for OAEP padding and MGF1.\n<strong>Default:</strong> <code>'sha1'</code></li>\n<li><code>oaepLabel</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer\" class=\"type\">&lt;ArrayBuffer&gt;</a> | <a href=\"buffer.html#class-buffer\" class=\"type\">&lt;Buffer&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\" class=\"type\">&lt;TypedArray&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView\" class=\"type\">&lt;DataView&gt;</a> The label to\nuse for OAEP padding. If not specified, no label is used.</li>\n<li><code>padding</code> <a href=\"crypto.html#cryptoconstants\" class=\"type\">&lt;crypto.constants&gt;</a> An optional padding value defined in\n<code>crypto.constants</code>, which may be: <code>crypto.constants.RSA_NO_PADDING</code>,\n<code>crypto.constants.RSA_PKCS1_PADDING</code>, or\n<code>crypto.constants.RSA_PKCS1_OAEP_PADDING</code>.</li>\n</ul>\n</li>\n<li><code>buffer</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer\" class=\"type\">&lt;ArrayBuffer&gt;</a> | <a href=\"buffer.html#class-buffer\" class=\"type\">&lt;Buffer&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\" class=\"type\">&lt;TypedArray&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView\" class=\"type\">&lt;DataView&gt;</a></li>\n<li>Returns: <a href=\"buffer.html#class-buffer\" class=\"type\">&lt;Buffer&gt;</a> A new <code>Buffer</code> with the decrypted content.</li>\n</ul>\n<!--lint enable maximum-line-length remark-lint-->\n<p>Decrypts <code>buffer</code> with <code>privateKey</code>. <code>buffer</code> was previously encrypted using\nthe corresponding public key, for example using <a href=\"#cryptopublicencryptkey-buffer\"><code>crypto.publicEncrypt()</code></a>.</p>\n<p>If <code>privateKey</code> is not a <a href=\"#class-keyobject\"><code>KeyObject</code></a>, this function behaves as if\n<code>privateKey</code> had been passed to <a href=\"#cryptocreateprivatekeykey\"><code>crypto.createPrivateKey()</code></a>. If it is an\nobject, the <code>padding</code> property can be passed. Otherwise, this function uses\n<code>RSA_PKCS1_OAEP_PADDING</code>.</p>\n<p>Using <code>crypto.constants.RSA_PKCS1_PADDING</code> in <a href=\"#cryptoprivatedecryptprivatekey-buffer\"><code>crypto.privateDecrypt()</code></a>\nrequires OpenSSL to support implicit rejection (<code>rsa_pkcs1_implicit_rejection</code>).\nIf the version of OpenSSL used by Node.js does not support this feature,\nattempting to use <code>RSA_PKCS1_PADDING</code> will fail.</p>"
             },
             {
               "textRaw": "`crypto.privateEncrypt(privateKey, buffer)`",
@@ -2963,7 +2890,7 @@
             {
               "textRaw": "OpenSSL options",
               "name": "openssl_options",
-              "desc": "<p>See the <a href=\"https://wiki.openssl.org/index.php/List_of_SSL_OP_Flags#Table_of_Options\">list of SSL OP Flags</a> for details.</p>\n<table>\n  <tr>\n    <th>Constant</th>\n    <th>Description</th>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_ALL</code></td>\n    <td>Applies multiple bug workarounds within OpenSSL. See\n    <a href=\"https://www.openssl.org/docs/man3.0/man3/SSL_CTX_set_options.html\">https://www.openssl.org/docs/man3.0/man3/SSL_CTX_set_options.html</a>\n    for detail.</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_ALLOW_NO_DHE_KEX</code></td>\n    <td>Instructs OpenSSL to allow a non-[EC]DHE-based key exchange mode\n    for TLS v1.3</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION</code></td>\n    <td>Allows legacy insecure renegotiation between OpenSSL and unpatched\n    clients or servers. See\n    <a href=\"https://www.openssl.org/docs/man3.0/man3/SSL_CTX_set_options.html\">https://www.openssl.org/docs/man3.0/man3/SSL_CTX_set_options.html</a>.</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_CIPHER_SERVER_PREFERENCE</code></td>\n    <td>Attempts to use the server's preferences instead of the client's when\n    selecting a cipher. Behavior depends on protocol version. See\n    <a href=\"https://www.openssl.org/docs/man3.0/man3/SSL_CTX_set_options.html\">https://www.openssl.org/docs/man3.0/man3/SSL_CTX_set_options.html</a>.</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_CISCO_ANYCONNECT</code></td>\n    <td>Instructs OpenSSL to use Cisco's \"speshul\" version of DTLS_BAD_VER.</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_COOKIE_EXCHANGE</code></td>\n    <td>Instructs OpenSSL to turn on cookie exchange.</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_CRYPTOPRO_TLSEXT_BUG</code></td>\n    <td>Instructs OpenSSL to add server-hello extension from an early version\n    of the cryptopro draft.</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS</code></td>\n    <td>Instructs OpenSSL to disable a SSL 3.0/TLS 1.0 vulnerability\n    workaround added in OpenSSL 0.9.6d.</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_LEGACY_SERVER_CONNECT</code></td>\n    <td>Allows initial connection to servers that do not support RI.</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_NO_COMPRESSION</code></td>\n    <td>Instructs OpenSSL to disable support for SSL/TLS compression.</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_NO_ENCRYPT_THEN_MAC</code></td>\n    <td>Instructs OpenSSL to disable encrypt-then-MAC.</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_NO_QUERY_MTU</code></td>\n    <td></td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_NO_RENEGOTIATION</code></td>\n    <td>Instructs OpenSSL to disable renegotiation.</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION</code></td>\n    <td>Instructs OpenSSL to always start a new session when performing\n    renegotiation.</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_NO_SSLv2</code></td>\n    <td>Instructs OpenSSL to turn off SSL v2</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_NO_SSLv3</code></td>\n    <td>Instructs OpenSSL to turn off SSL v3</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_NO_TICKET</code></td>\n    <td>Instructs OpenSSL to disable use of RFC4507bis tickets.</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_NO_TLSv1</code></td>\n    <td>Instructs OpenSSL to turn off TLS v1</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_NO_TLSv1_1</code></td>\n    <td>Instructs OpenSSL to turn off TLS v1.1</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_NO_TLSv1_2</code></td>\n    <td>Instructs OpenSSL to turn off TLS v1.2</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_NO_TLSv1_3</code></td>\n    <td>Instructs OpenSSL to turn off TLS v1.3</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_PRIORITIZE_CHACHA</code></td>\n    <td>Instructs OpenSSL server to prioritize ChaCha20-Poly1305\n    when the client does.\n    This option has no effect if\n    <code>SSL_OP_CIPHER_SERVER_PREFERENCE</code>\n    is not enabled.</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_TLS_ROLLBACK_BUG</code></td>\n    <td>Instructs OpenSSL to disable version rollback attack detection.</td>\n  </tr>\n</table>",
+              "desc": "<p>See the <a href=\"https://wiki.openssl.org/index.php/List_of_SSL_OP_Flags#Table_of_Options\">list of SSL OP Flags</a> for details.</p>\n<table>\n  <tr>\n    <th>Constant</th>\n    <th>Description</th>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_ALL</code></td>\n    <td>Applies multiple bug workarounds within OpenSSL. See\n    <a href=\"https://www.openssl.org/docs/man3.0/man3/SSL_CTX_set_options.html\">https://www.openssl.org/docs/man3.0/man3/SSL_CTX_set_options.html</a>\n    for detail.</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_ALLOW_NO_DHE_KEX</code></td>\n    <td>Instructs OpenSSL to allow a non-[EC]DHE-based key exchange mode\n    for TLS v1.3</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION</code></td>\n    <td>Allows legacy insecure renegotiation between OpenSSL and unpatched\n    clients or servers. See\n    <a href=\"https://www.openssl.org/docs/man3.0/man3/SSL_CTX_set_options.html\">https://www.openssl.org/docs/man3.0/man3/SSL_CTX_set_options.html</a>.</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_CIPHER_SERVER_PREFERENCE</code></td>\n    <td>Attempts to use the server's preferences instead of the client's when\n    selecting a cipher. Behavior depends on protocol version. See\n    <a href=\"https://www.openssl.org/docs/man3.0/man3/SSL_CTX_set_options.html\">https://www.openssl.org/docs/man3.0/man3/SSL_CTX_set_options.html</a>.</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_CISCO_ANYCONNECT</code></td>\n    <td>Instructs OpenSSL to use Cisco's version identifier of DTLS_BAD_VER.</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_COOKIE_EXCHANGE</code></td>\n    <td>Instructs OpenSSL to turn on cookie exchange.</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_CRYPTOPRO_TLSEXT_BUG</code></td>\n    <td>Instructs OpenSSL to add server-hello extension from an early version\n    of the cryptopro draft.</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS</code></td>\n    <td>Instructs OpenSSL to disable a SSL 3.0/TLS 1.0 vulnerability\n    workaround added in OpenSSL 0.9.6d.</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_LEGACY_SERVER_CONNECT</code></td>\n    <td>Allows initial connection to servers that do not support RI.</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_NO_COMPRESSION</code></td>\n    <td>Instructs OpenSSL to disable support for SSL/TLS compression.</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_NO_ENCRYPT_THEN_MAC</code></td>\n    <td>Instructs OpenSSL to disable encrypt-then-MAC.</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_NO_QUERY_MTU</code></td>\n    <td></td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_NO_RENEGOTIATION</code></td>\n    <td>Instructs OpenSSL to disable renegotiation.</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION</code></td>\n    <td>Instructs OpenSSL to always start a new session when performing\n    renegotiation.</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_NO_SSLv2</code></td>\n    <td>Instructs OpenSSL to turn off SSL v2</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_NO_SSLv3</code></td>\n    <td>Instructs OpenSSL to turn off SSL v3</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_NO_TICKET</code></td>\n    <td>Instructs OpenSSL to disable use of RFC4507bis tickets.</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_NO_TLSv1</code></td>\n    <td>Instructs OpenSSL to turn off TLS v1</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_NO_TLSv1_1</code></td>\n    <td>Instructs OpenSSL to turn off TLS v1.1</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_NO_TLSv1_2</code></td>\n    <td>Instructs OpenSSL to turn off TLS v1.2</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_NO_TLSv1_3</code></td>\n    <td>Instructs OpenSSL to turn off TLS v1.3</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_PRIORITIZE_CHACHA</code></td>\n    <td>Instructs OpenSSL server to prioritize ChaCha20-Poly1305\n    when the client does.\n    This option has no effect if\n    <code>SSL_OP_CIPHER_SERVER_PREFERENCE</code>\n    is not enabled.</td>\n  </tr>\n  <tr>\n    <td><code>SSL_OP_TLS_ROLLBACK_BUG</code></td>\n    <td>Instructs OpenSSL to disable version rollback attack detection.</td>\n  </tr>\n</table>",
               "type": "module",
               "displayName": "OpenSSL options"
             },
@@ -3272,7 +3199,7 @@
             ],
             "changes": []
           },
-          "desc": "<ul>\n<li>Extends: <a href=\"stream.html#class-streamtransform\" class=\"type\">&lt;stream.Transform&gt;</a></li>\n</ul>\n<p>Instances of the <code>Cipher</code> class are used to encrypt data. The class can be\nused in one of two ways:</p>\n<ul>\n<li>As a <a href=\"stream.html\">stream</a> that is both readable and writable, where plain unencrypted\ndata is written to produce encrypted data on the readable side, or</li>\n<li>Using the <a href=\"#cipherupdatedata-inputencoding-outputencoding\"><code>cipher.update()</code></a> and <a href=\"#cipherfinaloutputencoding\"><code>cipher.final()</code></a> methods to produce\nthe encrypted data.</li>\n</ul>\n<p>The <a href=\"#cryptocreatecipheralgorithm-password-options\"><code>crypto.createCipher()</code></a> or <a href=\"#cryptocreatecipherivalgorithm-key-iv-options\"><code>crypto.createCipheriv()</code></a> methods are\nused to create <code>Cipher</code> instances. <code>Cipher</code> objects are not to be created\ndirectly using the <code>new</code> keyword.</p>\n<p>Example: Using <code>Cipher</code> objects as streams:</p>\n<pre><code class=\"language-mjs\">const {\n  scrypt,\n  randomFill,\n  createCipheriv,\n} = await import('node:crypto');\n\nconst algorithm = 'aes-192-cbc';\nconst password = 'Password used to generate key';\n\n// First, we'll generate the key. The key length is dependent on the algorithm.\n// In this case for aes192, it is 24 bytes (192 bits).\nscrypt(password, 'salt', 24, (err, key) => {\n  if (err) throw err;\n  // Then, we'll generate a random initialization vector\n  randomFill(new Uint8Array(16), (err, iv) => {\n    if (err) throw err;\n\n    // Once we have the key and iv, we can create and use the cipher...\n    const cipher = createCipheriv(algorithm, key, iv);\n\n    let encrypted = '';\n    cipher.setEncoding('hex');\n\n    cipher.on('data', (chunk) => encrypted += chunk);\n    cipher.on('end', () => console.log(encrypted));\n\n    cipher.write('some clear text data');\n    cipher.end();\n  });\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  scrypt,\n  randomFill,\n  createCipheriv,\n} = require('node:crypto');\n\nconst algorithm = 'aes-192-cbc';\nconst password = 'Password used to generate key';\n\n// First, we'll generate the key. The key length is dependent on the algorithm.\n// In this case for aes192, it is 24 bytes (192 bits).\nscrypt(password, 'salt', 24, (err, key) => {\n  if (err) throw err;\n  // Then, we'll generate a random initialization vector\n  randomFill(new Uint8Array(16), (err, iv) => {\n    if (err) throw err;\n\n    // Once we have the key and iv, we can create and use the cipher...\n    const cipher = createCipheriv(algorithm, key, iv);\n\n    let encrypted = '';\n    cipher.setEncoding('hex');\n\n    cipher.on('data', (chunk) => encrypted += chunk);\n    cipher.on('end', () => console.log(encrypted));\n\n    cipher.write('some clear text data');\n    cipher.end();\n  });\n});\n</code></pre>\n<p>Example: Using <code>Cipher</code> and piped streams:</p>\n<pre><code class=\"language-mjs\">import {\n  createReadStream,\n  createWriteStream,\n} from 'node:fs';\n\nimport {\n  pipeline,\n} from 'node:stream';\n\nconst {\n  scrypt,\n  randomFill,\n  createCipheriv,\n} = await import('node:crypto');\n\nconst algorithm = 'aes-192-cbc';\nconst password = 'Password used to generate key';\n\n// First, we'll generate the key. The key length is dependent on the algorithm.\n// In this case for aes192, it is 24 bytes (192 bits).\nscrypt(password, 'salt', 24, (err, key) => {\n  if (err) throw err;\n  // Then, we'll generate a random initialization vector\n  randomFill(new Uint8Array(16), (err, iv) => {\n    if (err) throw err;\n\n    const cipher = createCipheriv(algorithm, key, iv);\n\n    const input = createReadStream('test.js');\n    const output = createWriteStream('test.enc');\n\n    pipeline(input, cipher, output, (err) => {\n      if (err) throw err;\n    });\n  });\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  createReadStream,\n  createWriteStream,\n} = require('node:fs');\n\nconst {\n  pipeline,\n} = require('node:stream');\n\nconst {\n  scrypt,\n  randomFill,\n  createCipheriv,\n} = require('node:crypto');\n\nconst algorithm = 'aes-192-cbc';\nconst password = 'Password used to generate key';\n\n// First, we'll generate the key. The key length is dependent on the algorithm.\n// In this case for aes192, it is 24 bytes (192 bits).\nscrypt(password, 'salt', 24, (err, key) => {\n  if (err) throw err;\n  // Then, we'll generate a random initialization vector\n  randomFill(new Uint8Array(16), (err, iv) => {\n    if (err) throw err;\n\n    const cipher = createCipheriv(algorithm, key, iv);\n\n    const input = createReadStream('test.js');\n    const output = createWriteStream('test.enc');\n\n    pipeline(input, cipher, output, (err) => {\n      if (err) throw err;\n    });\n  });\n});\n</code></pre>\n<p>Example: Using the <a href=\"#cipherupdatedata-inputencoding-outputencoding\"><code>cipher.update()</code></a> and <a href=\"#cipherfinaloutputencoding\"><code>cipher.final()</code></a> methods:</p>\n<pre><code class=\"language-mjs\">const {\n  scrypt,\n  randomFill,\n  createCipheriv,\n} = await import('node:crypto');\n\nconst algorithm = 'aes-192-cbc';\nconst password = 'Password used to generate key';\n\n// First, we'll generate the key. The key length is dependent on the algorithm.\n// In this case for aes192, it is 24 bytes (192 bits).\nscrypt(password, 'salt', 24, (err, key) => {\n  if (err) throw err;\n  // Then, we'll generate a random initialization vector\n  randomFill(new Uint8Array(16), (err, iv) => {\n    if (err) throw err;\n\n    const cipher = createCipheriv(algorithm, key, iv);\n\n    let encrypted = cipher.update('some clear text data', 'utf8', 'hex');\n    encrypted += cipher.final('hex');\n    console.log(encrypted);\n  });\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  scrypt,\n  randomFill,\n  createCipheriv,\n} = require('node:crypto');\n\nconst algorithm = 'aes-192-cbc';\nconst password = 'Password used to generate key';\n\n// First, we'll generate the key. The key length is dependent on the algorithm.\n// In this case for aes192, it is 24 bytes (192 bits).\nscrypt(password, 'salt', 24, (err, key) => {\n  if (err) throw err;\n  // Then, we'll generate a random initialization vector\n  randomFill(new Uint8Array(16), (err, iv) => {\n    if (err) throw err;\n\n    const cipher = createCipheriv(algorithm, key, iv);\n\n    let encrypted = cipher.update('some clear text data', 'utf8', 'hex');\n    encrypted += cipher.final('hex');\n    console.log(encrypted);\n  });\n});\n</code></pre>",
+          "desc": "<ul>\n<li>Extends: <a href=\"stream.html#class-streamtransform\" class=\"type\">&lt;stream.Transform&gt;</a></li>\n</ul>\n<p>Instances of the <code>Cipher</code> class are used to encrypt data. The class can be\nused in one of two ways:</p>\n<ul>\n<li>As a <a href=\"stream.html\">stream</a> that is both readable and writable, where plain unencrypted\ndata is written to produce encrypted data on the readable side, or</li>\n<li>Using the <a href=\"#cipherupdatedata-inputencoding-outputencoding\"><code>cipher.update()</code></a> and <a href=\"#cipherfinaloutputencoding\"><code>cipher.final()</code></a> methods to produce\nthe encrypted data.</li>\n</ul>\n<p>The <a href=\"#cryptocreatecipherivalgorithm-key-iv-options\"><code>crypto.createCipheriv()</code></a> method is\nused to create <code>Cipher</code> instances. <code>Cipher</code> objects are not to be created\ndirectly using the <code>new</code> keyword.</p>\n<p>Example: Using <code>Cipher</code> objects as streams:</p>\n<pre><code class=\"language-mjs\">const {\n  scrypt,\n  randomFill,\n  createCipheriv,\n} = await import('node:crypto');\n\nconst algorithm = 'aes-192-cbc';\nconst password = 'Password used to generate key';\n\n// First, we'll generate the key. The key length is dependent on the algorithm.\n// In this case for aes192, it is 24 bytes (192 bits).\nscrypt(password, 'salt', 24, (err, key) => {\n  if (err) throw err;\n  // Then, we'll generate a random initialization vector\n  randomFill(new Uint8Array(16), (err, iv) => {\n    if (err) throw err;\n\n    // Once we have the key and iv, we can create and use the cipher...\n    const cipher = createCipheriv(algorithm, key, iv);\n\n    let encrypted = '';\n    cipher.setEncoding('hex');\n\n    cipher.on('data', (chunk) => encrypted += chunk);\n    cipher.on('end', () => console.log(encrypted));\n\n    cipher.write('some clear text data');\n    cipher.end();\n  });\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  scrypt,\n  randomFill,\n  createCipheriv,\n} = require('node:crypto');\n\nconst algorithm = 'aes-192-cbc';\nconst password = 'Password used to generate key';\n\n// First, we'll generate the key. The key length is dependent on the algorithm.\n// In this case for aes192, it is 24 bytes (192 bits).\nscrypt(password, 'salt', 24, (err, key) => {\n  if (err) throw err;\n  // Then, we'll generate a random initialization vector\n  randomFill(new Uint8Array(16), (err, iv) => {\n    if (err) throw err;\n\n    // Once we have the key and iv, we can create and use the cipher...\n    const cipher = createCipheriv(algorithm, key, iv);\n\n    let encrypted = '';\n    cipher.setEncoding('hex');\n\n    cipher.on('data', (chunk) => encrypted += chunk);\n    cipher.on('end', () => console.log(encrypted));\n\n    cipher.write('some clear text data');\n    cipher.end();\n  });\n});\n</code></pre>\n<p>Example: Using <code>Cipher</code> and piped streams:</p>\n<pre><code class=\"language-mjs\">import {\n  createReadStream,\n  createWriteStream,\n} from 'node:fs';\n\nimport {\n  pipeline,\n} from 'node:stream';\n\nconst {\n  scrypt,\n  randomFill,\n  createCipheriv,\n} = await import('node:crypto');\n\nconst algorithm = 'aes-192-cbc';\nconst password = 'Password used to generate key';\n\n// First, we'll generate the key. The key length is dependent on the algorithm.\n// In this case for aes192, it is 24 bytes (192 bits).\nscrypt(password, 'salt', 24, (err, key) => {\n  if (err) throw err;\n  // Then, we'll generate a random initialization vector\n  randomFill(new Uint8Array(16), (err, iv) => {\n    if (err) throw err;\n\n    const cipher = createCipheriv(algorithm, key, iv);\n\n    const input = createReadStream('test.js');\n    const output = createWriteStream('test.enc');\n\n    pipeline(input, cipher, output, (err) => {\n      if (err) throw err;\n    });\n  });\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  createReadStream,\n  createWriteStream,\n} = require('node:fs');\n\nconst {\n  pipeline,\n} = require('node:stream');\n\nconst {\n  scrypt,\n  randomFill,\n  createCipheriv,\n} = require('node:crypto');\n\nconst algorithm = 'aes-192-cbc';\nconst password = 'Password used to generate key';\n\n// First, we'll generate the key. The key length is dependent on the algorithm.\n// In this case for aes192, it is 24 bytes (192 bits).\nscrypt(password, 'salt', 24, (err, key) => {\n  if (err) throw err;\n  // Then, we'll generate a random initialization vector\n  randomFill(new Uint8Array(16), (err, iv) => {\n    if (err) throw err;\n\n    const cipher = createCipheriv(algorithm, key, iv);\n\n    const input = createReadStream('test.js');\n    const output = createWriteStream('test.enc');\n\n    pipeline(input, cipher, output, (err) => {\n      if (err) throw err;\n    });\n  });\n});\n</code></pre>\n<p>Example: Using the <a href=\"#cipherupdatedata-inputencoding-outputencoding\"><code>cipher.update()</code></a> and <a href=\"#cipherfinaloutputencoding\"><code>cipher.final()</code></a> methods:</p>\n<pre><code class=\"language-mjs\">const {\n  scrypt,\n  randomFill,\n  createCipheriv,\n} = await import('node:crypto');\n\nconst algorithm = 'aes-192-cbc';\nconst password = 'Password used to generate key';\n\n// First, we'll generate the key. The key length is dependent on the algorithm.\n// In this case for aes192, it is 24 bytes (192 bits).\nscrypt(password, 'salt', 24, (err, key) => {\n  if (err) throw err;\n  // Then, we'll generate a random initialization vector\n  randomFill(new Uint8Array(16), (err, iv) => {\n    if (err) throw err;\n\n    const cipher = createCipheriv(algorithm, key, iv);\n\n    let encrypted = cipher.update('some clear text data', 'utf8', 'hex');\n    encrypted += cipher.final('hex');\n    console.log(encrypted);\n  });\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  scrypt,\n  randomFill,\n  createCipheriv,\n} = require('node:crypto');\n\nconst algorithm = 'aes-192-cbc';\nconst password = 'Password used to generate key';\n\n// First, we'll generate the key. The key length is dependent on the algorithm.\n// In this case for aes192, it is 24 bytes (192 bits).\nscrypt(password, 'salt', 24, (err, key) => {\n  if (err) throw err;\n  // Then, we'll generate a random initialization vector\n  randomFill(new Uint8Array(16), (err, iv) => {\n    if (err) throw err;\n\n    const cipher = createCipheriv(algorithm, key, iv);\n\n    let encrypted = cipher.update('some clear text data', 'utf8', 'hex');\n    encrypted += cipher.final('hex');\n    console.log(encrypted);\n  });\n});\n</code></pre>",
           "methods": [
             {
               "textRaw": "`cipher.final([outputEncoding])`",
@@ -3340,10 +3267,10 @@
               "signatures": [
                 {
                   "return": {
-                    "textRaw": "Returns: {Cipher} for method chaining.",
+                    "textRaw": "Returns: {Cipher} The same `Cipher` instance for method chaining.",
                     "name": "return",
                     "type": "Cipher",
-                    "desc": "for method chaining."
+                    "desc": "The same `Cipher` instance for method chaining."
                   },
                   "params": [
                     {
@@ -3388,10 +3315,10 @@
               "signatures": [
                 {
                   "return": {
-                    "textRaw": "Returns: {Cipher} for method chaining.",
+                    "textRaw": "Returns: {Cipher} The same `Cipher` instance for method chaining.",
                     "name": "return",
                     "type": "Cipher",
-                    "desc": "for method chaining."
+                    "desc": "The same `Cipher` instance for method chaining."
                   },
                   "params": [
                     {
@@ -3463,7 +3390,7 @@
             ],
             "changes": []
           },
-          "desc": "<ul>\n<li>Extends: <a href=\"stream.html#class-streamtransform\" class=\"type\">&lt;stream.Transform&gt;</a></li>\n</ul>\n<p>Instances of the <code>Decipher</code> class are used to decrypt data. The class can be\nused in one of two ways:</p>\n<ul>\n<li>As a <a href=\"stream.html\">stream</a> that is both readable and writable, where plain encrypted\ndata is written to produce unencrypted data on the readable side, or</li>\n<li>Using the <a href=\"#decipherupdatedata-inputencoding-outputencoding\"><code>decipher.update()</code></a> and <a href=\"#decipherfinaloutputencoding\"><code>decipher.final()</code></a> methods to\nproduce the unencrypted data.</li>\n</ul>\n<p>The <a href=\"#cryptocreatedecipheralgorithm-password-options\"><code>crypto.createDecipher()</code></a> or <a href=\"#cryptocreatedecipherivalgorithm-key-iv-options\"><code>crypto.createDecipheriv()</code></a> methods are\nused to create <code>Decipher</code> instances. <code>Decipher</code> objects are not to be created\ndirectly using the <code>new</code> keyword.</p>\n<p>Example: Using <code>Decipher</code> objects as streams:</p>\n<pre><code class=\"language-mjs\">import { Buffer } from 'node:buffer';\nconst {\n  scryptSync,\n  createDecipheriv,\n} = await import('node:crypto');\n\nconst algorithm = 'aes-192-cbc';\nconst password = 'Password used to generate key';\n// Key length is dependent on the algorithm. In this case for aes192, it is\n// 24 bytes (192 bits).\n// Use the async `crypto.scrypt()` instead.\nconst key = scryptSync(password, 'salt', 24);\n// The IV is usually passed along with the ciphertext.\nconst iv = Buffer.alloc(16, 0); // Initialization vector.\n\nconst decipher = createDecipheriv(algorithm, key, iv);\n\nlet decrypted = '';\ndecipher.on('readable', () => {\n  let chunk;\n  while (null !== (chunk = decipher.read())) {\n    decrypted += chunk.toString('utf8');\n  }\n});\ndecipher.on('end', () => {\n  console.log(decrypted);\n  // Prints: some clear text data\n});\n\n// Encrypted with same algorithm, key and iv.\nconst encrypted =\n  'e5f79c5915c02171eec6b212d5520d44480993d7d622a7c4c2da32f6efda0ffa';\ndecipher.write(encrypted, 'hex');\ndecipher.end();\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  scryptSync,\n  createDecipheriv,\n} = require('node:crypto');\nconst { Buffer } = require('node:buffer');\n\nconst algorithm = 'aes-192-cbc';\nconst password = 'Password used to generate key';\n// Key length is dependent on the algorithm. In this case for aes192, it is\n// 24 bytes (192 bits).\n// Use the async `crypto.scrypt()` instead.\nconst key = scryptSync(password, 'salt', 24);\n// The IV is usually passed along with the ciphertext.\nconst iv = Buffer.alloc(16, 0); // Initialization vector.\n\nconst decipher = createDecipheriv(algorithm, key, iv);\n\nlet decrypted = '';\ndecipher.on('readable', () => {\n  let chunk;\n  while (null !== (chunk = decipher.read())) {\n    decrypted += chunk.toString('utf8');\n  }\n});\ndecipher.on('end', () => {\n  console.log(decrypted);\n  // Prints: some clear text data\n});\n\n// Encrypted with same algorithm, key and iv.\nconst encrypted =\n  'e5f79c5915c02171eec6b212d5520d44480993d7d622a7c4c2da32f6efda0ffa';\ndecipher.write(encrypted, 'hex');\ndecipher.end();\n</code></pre>\n<p>Example: Using <code>Decipher</code> and piped streams:</p>\n<pre><code class=\"language-mjs\">import {\n  createReadStream,\n  createWriteStream,\n} from 'node:fs';\nimport { Buffer } from 'node:buffer';\nconst {\n  scryptSync,\n  createDecipheriv,\n} = await import('node:crypto');\n\nconst algorithm = 'aes-192-cbc';\nconst password = 'Password used to generate key';\n// Use the async `crypto.scrypt()` instead.\nconst key = scryptSync(password, 'salt', 24);\n// The IV is usually passed along with the ciphertext.\nconst iv = Buffer.alloc(16, 0); // Initialization vector.\n\nconst decipher = createDecipheriv(algorithm, key, iv);\n\nconst input = createReadStream('test.enc');\nconst output = createWriteStream('test.js');\n\ninput.pipe(decipher).pipe(output);\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  createReadStream,\n  createWriteStream,\n} = require('node:fs');\nconst {\n  scryptSync,\n  createDecipheriv,\n} = require('node:crypto');\nconst { Buffer } = require('node:buffer');\n\nconst algorithm = 'aes-192-cbc';\nconst password = 'Password used to generate key';\n// Use the async `crypto.scrypt()` instead.\nconst key = scryptSync(password, 'salt', 24);\n// The IV is usually passed along with the ciphertext.\nconst iv = Buffer.alloc(16, 0); // Initialization vector.\n\nconst decipher = createDecipheriv(algorithm, key, iv);\n\nconst input = createReadStream('test.enc');\nconst output = createWriteStream('test.js');\n\ninput.pipe(decipher).pipe(output);\n</code></pre>\n<p>Example: Using the <a href=\"#decipherupdatedata-inputencoding-outputencoding\"><code>decipher.update()</code></a> and <a href=\"#decipherfinaloutputencoding\"><code>decipher.final()</code></a> methods:</p>\n<pre><code class=\"language-mjs\">import { Buffer } from 'node:buffer';\nconst {\n  scryptSync,\n  createDecipheriv,\n} = await import('node:crypto');\n\nconst algorithm = 'aes-192-cbc';\nconst password = 'Password used to generate key';\n// Use the async `crypto.scrypt()` instead.\nconst key = scryptSync(password, 'salt', 24);\n// The IV is usually passed along with the ciphertext.\nconst iv = Buffer.alloc(16, 0); // Initialization vector.\n\nconst decipher = createDecipheriv(algorithm, key, iv);\n\n// Encrypted using same algorithm, key and iv.\nconst encrypted =\n  'e5f79c5915c02171eec6b212d5520d44480993d7d622a7c4c2da32f6efda0ffa';\nlet decrypted = decipher.update(encrypted, 'hex', 'utf8');\ndecrypted += decipher.final('utf8');\nconsole.log(decrypted);\n// Prints: some clear text data\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  scryptSync,\n  createDecipheriv,\n} = require('node:crypto');\nconst { Buffer } = require('node:buffer');\n\nconst algorithm = 'aes-192-cbc';\nconst password = 'Password used to generate key';\n// Use the async `crypto.scrypt()` instead.\nconst key = scryptSync(password, 'salt', 24);\n// The IV is usually passed along with the ciphertext.\nconst iv = Buffer.alloc(16, 0); // Initialization vector.\n\nconst decipher = createDecipheriv(algorithm, key, iv);\n\n// Encrypted using same algorithm, key and iv.\nconst encrypted =\n  'e5f79c5915c02171eec6b212d5520d44480993d7d622a7c4c2da32f6efda0ffa';\nlet decrypted = decipher.update(encrypted, 'hex', 'utf8');\ndecrypted += decipher.final('utf8');\nconsole.log(decrypted);\n// Prints: some clear text data\n</code></pre>",
+          "desc": "<ul>\n<li>Extends: <a href=\"stream.html#class-streamtransform\" class=\"type\">&lt;stream.Transform&gt;</a></li>\n</ul>\n<p>Instances of the <code>Decipher</code> class are used to decrypt data. The class can be\nused in one of two ways:</p>\n<ul>\n<li>As a <a href=\"stream.html\">stream</a> that is both readable and writable, where plain encrypted\ndata is written to produce unencrypted data on the readable side, or</li>\n<li>Using the <a href=\"#decipherupdatedata-inputencoding-outputencoding\"><code>decipher.update()</code></a> and <a href=\"#decipherfinaloutputencoding\"><code>decipher.final()</code></a> methods to\nproduce the unencrypted data.</li>\n</ul>\n<p>The <a href=\"#cryptocreatedecipherivalgorithm-key-iv-options\"><code>crypto.createDecipheriv()</code></a> method is\nused to create <code>Decipher</code> instances. <code>Decipher</code> objects are not to be created\ndirectly using the <code>new</code> keyword.</p>\n<p>Example: Using <code>Decipher</code> objects as streams:</p>\n<pre><code class=\"language-mjs\">import { Buffer } from 'node:buffer';\nconst {\n  scryptSync,\n  createDecipheriv,\n} = await import('node:crypto');\n\nconst algorithm = 'aes-192-cbc';\nconst password = 'Password used to generate key';\n// Key length is dependent on the algorithm. In this case for aes192, it is\n// 24 bytes (192 bits).\n// Use the async `crypto.scrypt()` instead.\nconst key = scryptSync(password, 'salt', 24);\n// The IV is usually passed along with the ciphertext.\nconst iv = Buffer.alloc(16, 0); // Initialization vector.\n\nconst decipher = createDecipheriv(algorithm, key, iv);\n\nlet decrypted = '';\ndecipher.on('readable', () => {\n  let chunk;\n  while (null !== (chunk = decipher.read())) {\n    decrypted += chunk.toString('utf8');\n  }\n});\ndecipher.on('end', () => {\n  console.log(decrypted);\n  // Prints: some clear text data\n});\n\n// Encrypted with same algorithm, key and iv.\nconst encrypted =\n  'e5f79c5915c02171eec6b212d5520d44480993d7d622a7c4c2da32f6efda0ffa';\ndecipher.write(encrypted, 'hex');\ndecipher.end();\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  scryptSync,\n  createDecipheriv,\n} = require('node:crypto');\nconst { Buffer } = require('node:buffer');\n\nconst algorithm = 'aes-192-cbc';\nconst password = 'Password used to generate key';\n// Key length is dependent on the algorithm. In this case for aes192, it is\n// 24 bytes (192 bits).\n// Use the async `crypto.scrypt()` instead.\nconst key = scryptSync(password, 'salt', 24);\n// The IV is usually passed along with the ciphertext.\nconst iv = Buffer.alloc(16, 0); // Initialization vector.\n\nconst decipher = createDecipheriv(algorithm, key, iv);\n\nlet decrypted = '';\ndecipher.on('readable', () => {\n  let chunk;\n  while (null !== (chunk = decipher.read())) {\n    decrypted += chunk.toString('utf8');\n  }\n});\ndecipher.on('end', () => {\n  console.log(decrypted);\n  // Prints: some clear text data\n});\n\n// Encrypted with same algorithm, key and iv.\nconst encrypted =\n  'e5f79c5915c02171eec6b212d5520d44480993d7d622a7c4c2da32f6efda0ffa';\ndecipher.write(encrypted, 'hex');\ndecipher.end();\n</code></pre>\n<p>Example: Using <code>Decipher</code> and piped streams:</p>\n<pre><code class=\"language-mjs\">import {\n  createReadStream,\n  createWriteStream,\n} from 'node:fs';\nimport { Buffer } from 'node:buffer';\nconst {\n  scryptSync,\n  createDecipheriv,\n} = await import('node:crypto');\n\nconst algorithm = 'aes-192-cbc';\nconst password = 'Password used to generate key';\n// Use the async `crypto.scrypt()` instead.\nconst key = scryptSync(password, 'salt', 24);\n// The IV is usually passed along with the ciphertext.\nconst iv = Buffer.alloc(16, 0); // Initialization vector.\n\nconst decipher = createDecipheriv(algorithm, key, iv);\n\nconst input = createReadStream('test.enc');\nconst output = createWriteStream('test.js');\n\ninput.pipe(decipher).pipe(output);\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  createReadStream,\n  createWriteStream,\n} = require('node:fs');\nconst {\n  scryptSync,\n  createDecipheriv,\n} = require('node:crypto');\nconst { Buffer } = require('node:buffer');\n\nconst algorithm = 'aes-192-cbc';\nconst password = 'Password used to generate key';\n// Use the async `crypto.scrypt()` instead.\nconst key = scryptSync(password, 'salt', 24);\n// The IV is usually passed along with the ciphertext.\nconst iv = Buffer.alloc(16, 0); // Initialization vector.\n\nconst decipher = createDecipheriv(algorithm, key, iv);\n\nconst input = createReadStream('test.enc');\nconst output = createWriteStream('test.js');\n\ninput.pipe(decipher).pipe(output);\n</code></pre>\n<p>Example: Using the <a href=\"#decipherupdatedata-inputencoding-outputencoding\"><code>decipher.update()</code></a> and <a href=\"#decipherfinaloutputencoding\"><code>decipher.final()</code></a> methods:</p>\n<pre><code class=\"language-mjs\">import { Buffer } from 'node:buffer';\nconst {\n  scryptSync,\n  createDecipheriv,\n} = await import('node:crypto');\n\nconst algorithm = 'aes-192-cbc';\nconst password = 'Password used to generate key';\n// Use the async `crypto.scrypt()` instead.\nconst key = scryptSync(password, 'salt', 24);\n// The IV is usually passed along with the ciphertext.\nconst iv = Buffer.alloc(16, 0); // Initialization vector.\n\nconst decipher = createDecipheriv(algorithm, key, iv);\n\n// Encrypted using same algorithm, key and iv.\nconst encrypted =\n  'e5f79c5915c02171eec6b212d5520d44480993d7d622a7c4c2da32f6efda0ffa';\nlet decrypted = decipher.update(encrypted, 'hex', 'utf8');\ndecrypted += decipher.final('utf8');\nconsole.log(decrypted);\n// Prints: some clear text data\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  scryptSync,\n  createDecipheriv,\n} = require('node:crypto');\nconst { Buffer } = require('node:buffer');\n\nconst algorithm = 'aes-192-cbc';\nconst password = 'Password used to generate key';\n// Use the async `crypto.scrypt()` instead.\nconst key = scryptSync(password, 'salt', 24);\n// The IV is usually passed along with the ciphertext.\nconst iv = Buffer.alloc(16, 0); // Initialization vector.\n\nconst decipher = createDecipheriv(algorithm, key, iv);\n\n// Encrypted using same algorithm, key and iv.\nconst encrypted =\n  'e5f79c5915c02171eec6b212d5520d44480993d7d622a7c4c2da32f6efda0ffa';\nlet decrypted = decipher.update(encrypted, 'hex', 'utf8');\ndecrypted += decipher.final('utf8');\nconsole.log(decrypted);\n// Prints: some clear text data\n</code></pre>",
           "methods": [
             {
               "textRaw": "`decipher.final([outputEncoding])`",
@@ -3519,10 +3446,10 @@
               "signatures": [
                 {
                   "return": {
-                    "textRaw": "Returns: {Decipher} for method chaining.",
+                    "textRaw": "Returns: {Decipher} The same Decipher for method chaining.",
                     "name": "return",
                     "type": "Decipher",
-                    "desc": "for method chaining."
+                    "desc": "The same Decipher for method chaining."
                   },
                   "params": [
                     {
@@ -3564,6 +3491,11 @@
                 ],
                 "changes": [
                   {
+                    "version": "v22.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/52345",
+                    "description": "Using GCM tag lengths other than 128 bits without specifying the `authTagLength` option when creating `decipher` is deprecated."
+                  },
+                  {
                     "version": "v15.0.0",
                     "pr-url": "https://github.com/nodejs/node/pull/35093",
                     "description": "The buffer argument can be a string or ArrayBuffer and is limited to no more than 2 ** 31 - 1 bytes."
@@ -3583,10 +3515,10 @@
               "signatures": [
                 {
                   "return": {
-                    "textRaw": "Returns: {Decipher} for method chaining.",
+                    "textRaw": "Returns: {Decipher} The same Decipher for method chaining.",
                     "name": "return",
                     "type": "Decipher",
-                    "desc": "for method chaining."
+                    "desc": "The same Decipher for method chaining."
                   },
                   "params": [
                     {
@@ -3618,10 +3550,10 @@
               "signatures": [
                 {
                   "return": {
-                    "textRaw": "Returns: {Decipher} for method chaining.",
+                    "textRaw": "Returns: {Decipher} The same Decipher for method chaining.",
                     "name": "return",
                     "type": "Decipher",
-                    "desc": "for method chaining."
+                    "desc": "The same Decipher for method chaining."
                   },
                   "params": [
                     {
@@ -5070,7 +5002,7 @@
                 ],
                 "changes": []
               },
-              "desc": "<p>The date/time from which this certificate is considered valid.</p>"
+              "desc": "<p>The date/time from which this certificate is valid.</p>"
             },
             {
               "textRaw": "`validTo` Type: {string}",
@@ -5082,7 +5014,7 @@
                 ],
                 "changes": []
               },
-              "desc": "<p>The date/time until which this certificate is considered valid.</p>"
+              "desc": "<p>The date/time until which this certificate is valid.</p>"
             }
           ],
           "methods": [
