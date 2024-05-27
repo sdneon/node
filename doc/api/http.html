@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v22.1.0">
-  <title>HTTP | Node.js v22.1.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v22.2.0">
+  <title>HTTP | Node.js v22.2.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -109,7 +109,7 @@
     <div id="column1" data-id="http" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v22.1.0 documentation</h1>
+          <h1>Node.js v22.2.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -124,7 +124,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v22.1.0</li>
+            <li class="pinned-header">Node.js v22.2.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -670,7 +670,7 @@
         <h2>HTTP<span><a class="mark" href="#http" id="http">#</a></span><a aria-hidden="true" class="legacy" id="http_http"></a></h2>
 
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v22.1.0/lib/http.js">lib/http.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v22.2.0/lib/http.js">lib/http.js</a></p>
 <p>To use the HTTP server and client one must <code>require('node:http')</code>.</p>
 <p>The HTTP interfaces in Node.js are designed to support many features
 of the protocol which have been traditionally difficult to use.
@@ -2048,17 +2048,87 @@ type other than <a href="net.html#class-netsocket" class="type">&#x3C;net.Socket
 connected to this server which are not sending a request or waiting for
 a response.
 See <a href="net.html#serverclosecallback"><code>net.Server.close()</code></a>.</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> http = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:http'</span>);
+
+<span class="hljs-keyword">const</span> server = http.<span class="hljs-title function_">createServer</span>({ <span class="hljs-attr">keepAliveTimeout</span>: <span class="hljs-number">60000</span> }, <span class="hljs-function">(<span class="hljs-params">req, res</span>) =></span> {
+  res.<span class="hljs-title function_">writeHead</span>(<span class="hljs-number">200</span>, { <span class="hljs-string">'Content-Type'</span>: <span class="hljs-string">'application/json'</span> });
+  res.<span class="hljs-title function_">end</span>(<span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>({
+    <span class="hljs-attr">data</span>: <span class="hljs-string">'Hello World!'</span>,
+  }));
+});
+
+server.<span class="hljs-title function_">listen</span>(<span class="hljs-number">8000</span>);
+<span class="hljs-comment">// Close the server after 10 seconds</span>
+<span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =></span> {
+  server.<span class="hljs-title function_">close</span>(<span class="hljs-function">() =></span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'server on port 8000 closed successfully'</span>);
+  });
+}, <span class="hljs-number">10000</span>);</code> <button class="copy-button">copy</button></pre>
 <h4><code>server.closeAllConnections()</code><span><a class="mark" href="#servercloseallconnections" id="servercloseallconnections">#</a></span><a aria-hidden="true" class="legacy" id="http_server_closeallconnections"></a></h4>
 <div class="api_metadata">
 <span>Added in: v18.2.0</span>
 </div>
-<p>Closes all connections connected to this server.</p>
+<p>Closes all connections connected to this server, including active connections
+connected to this server which are sending a request or waiting for a response.</p>
+<blockquote>
+<p>This is a forceful way of closing all connections and should be used with
+caution. Whenever using this in conjunction with <code>server.close</code>, calling this
+<em>after</em> <code>server.close</code> is recommended as to avoid race conditions where new
+connections are created between a call to this and a call to <code>server.close</code>.</p>
+</blockquote>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> http = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:http'</span>);
+
+<span class="hljs-keyword">const</span> server = http.<span class="hljs-title function_">createServer</span>({ <span class="hljs-attr">keepAliveTimeout</span>: <span class="hljs-number">60000</span> }, <span class="hljs-function">(<span class="hljs-params">req, res</span>) =></span> {
+  res.<span class="hljs-title function_">writeHead</span>(<span class="hljs-number">200</span>, { <span class="hljs-string">'Content-Type'</span>: <span class="hljs-string">'application/json'</span> });
+  res.<span class="hljs-title function_">end</span>(<span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>({
+    <span class="hljs-attr">data</span>: <span class="hljs-string">'Hello World!'</span>,
+  }));
+});
+
+server.<span class="hljs-title function_">listen</span>(<span class="hljs-number">8000</span>);
+<span class="hljs-comment">// Close the server after 10 seconds</span>
+<span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =></span> {
+  server.<span class="hljs-title function_">close</span>(<span class="hljs-function">() =></span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'server on port 8000 closed successfully'</span>);
+  });
+  <span class="hljs-comment">// Closes all connections, ensuring the server closes successfully</span>
+  server.<span class="hljs-title function_">closeAllConnections</span>();
+}, <span class="hljs-number">10000</span>);</code> <button class="copy-button">copy</button></pre>
 <h4><code>server.closeIdleConnections()</code><span><a class="mark" href="#servercloseidleconnections" id="servercloseidleconnections">#</a></span><a aria-hidden="true" class="legacy" id="http_server_closeidleconnections"></a></h4>
 <div class="api_metadata">
 <span>Added in: v18.2.0</span>
 </div>
 <p>Closes all connections connected to this server which are not sending a request
 or waiting for a response.</p>
+<blockquote>
+<p>Starting with Node.js 19.0.0, there's no need for calling this method in
+conjunction with <code>server.close</code> to reap <code>keep-alive</code> connections. Using it
+won't cause any harm though, and it can be useful to ensure backwards
+compatibility for libraries and applications that need to support versions
+older than 19.0.0. Whenever using this in conjunction with <code>server.close</code>,
+calling this <em>after</em> <code>server.close</code> is recommended as to avoid race
+conditions where new connections are created between a call to this and a
+call to <code>server.close</code>.</p>
+</blockquote>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> http = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:http'</span>);
+
+<span class="hljs-keyword">const</span> server = http.<span class="hljs-title function_">createServer</span>({ <span class="hljs-attr">keepAliveTimeout</span>: <span class="hljs-number">60000</span> }, <span class="hljs-function">(<span class="hljs-params">req, res</span>) =></span> {
+  res.<span class="hljs-title function_">writeHead</span>(<span class="hljs-number">200</span>, { <span class="hljs-string">'Content-Type'</span>: <span class="hljs-string">'application/json'</span> });
+  res.<span class="hljs-title function_">end</span>(<span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>({
+    <span class="hljs-attr">data</span>: <span class="hljs-string">'Hello World!'</span>,
+  }));
+});
+
+server.<span class="hljs-title function_">listen</span>(<span class="hljs-number">8000</span>);
+<span class="hljs-comment">// Close the server after 10 seconds</span>
+<span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =></span> {
+  server.<span class="hljs-title function_">close</span>(<span class="hljs-function">() =></span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'server on port 8000 closed successfully'</span>);
+  });
+  <span class="hljs-comment">// Closes idle connections, such as keep-alive connections. Server will close</span>
+  <span class="hljs-comment">// once remaining active connections are terminated</span>
+  server.<span class="hljs-title function_">closeIdleConnections</span>();
+}, <span class="hljs-number">10000</span>);</code> <button class="copy-button">copy</button></pre>
 <h4><code>server.headersTimeout</code><span><a class="mark" href="#serverheaderstimeout" id="serverheaderstimeout">#</a></span><a aria-hidden="true" class="legacy" id="http_server_headerstimeout"></a></h4>
 <div class="api_metadata">
 <details class="changelog"><summary>History</summary>

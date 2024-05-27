@@ -1096,12 +1096,6 @@ void Environment::InitializeCompileCache() {
       dir_from_env.empty()) {
     return;
   }
-  if (!options()->experimental_policy.empty()) {
-    Debug(this,
-          DebugCategory::COMPILE_CACHE,
-          "[compile cache] skipping cache because policy is enabled");
-    return;
-  }
   auto handler = std::make_unique<CompileCacheHandler>(this);
   if (handler->InitializeDirectory(this, dir_from_env)) {
     compile_cache_handler_ = std::move(handler);
@@ -1116,6 +1110,13 @@ void Environment::InitializeCompileCache() {
 void Environment::ExitEnv(StopFlags::Flags flags) {
   // Should not access non-thread-safe methods here.
   set_stopping(true);
+
+#if HAVE_INSPECTOR
+  if (inspector_agent_) {
+    inspector_agent_->StopIfWaitingForConnect();
+  }
+#endif
+
   if ((flags & StopFlags::kDoNotTerminateIsolate) == 0)
     isolate_->TerminateExecution();
   SetImmediateThreadsafe([](Environment* env) {

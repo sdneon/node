@@ -565,6 +565,45 @@ const vm = require('node:vm');
 vm.measureMemory();
 ```
 
+### `--disable-wasm-trap-handler`
+
+<!-- YAML
+added: v22.2.0
+-->
+
+By default, Node.js enables trap-handler-based WebAssembly bound
+checks. As a result, V8 does not need to insert inline bound checks
+int the code compiled from WebAssembly which may speedup WebAssembly
+execution significantly, but this optimization requires allocating
+a big virtual memory cage (currently 10GB). If the Node.js process
+does not have access to a large enough virtual memory address space
+due to system configurations or hardware limitations, users won't
+be able to run any WebAssembly that involves allocation in this
+virtual memory cage and will see an out-of-memory error.
+
+```console
+$ ulimit -v 5000000
+$ node -p "new WebAssembly.Memory({ initial: 10, maximum: 100 });"
+[eval]:1
+new WebAssembly.Memory({ initial: 10, maximum: 100 });
+^
+
+RangeError: WebAssembly.Memory(): could not allocate memory
+    at [eval]:1:1
+    at runScriptInThisContext (node:internal/vm:209:10)
+    at node:internal/process/execution:118:14
+    at [eval]-wrapper:6:24
+    at runScript (node:internal/process/execution:101:62)
+    at evalScript (node:internal/process/execution:136:3)
+    at node:internal/main/eval_string:49:3
+
+```
+
+`--disable-wasm-trap-handler` disables this optimization so that
+users can at least run WebAssembly (with less optimal performance)
+when the virtual memory address space available to their Node.js
+process is lower than what the V8 WebAssembly memory cage needs.
+
 ### `--disable-proto=mode`
 
 <!-- YAML
@@ -878,16 +917,6 @@ following permissions are restricted:
   [`--allow-fs-read`][], [`--allow-fs-write`][] flags
 * Child Process - manageable through [`--allow-child-process`][] flag
 * Worker Threads - manageable through [`--allow-worker`][] flag
-
-### `--experimental-policy`
-
-<!-- YAML
-added: v11.8.0
--->
-
-> Stability: 0 - Deprecated: Will be removed shortly.
-
-Use the specified file as a security policy.
 
 ### `--experimental-require-module`
 
@@ -1241,6 +1270,7 @@ Activate inspector on `host:port`. Default is `127.0.0.1:9229`.
 V8 inspector integration allows tools such as Chrome DevTools and IDEs to debug
 and profile Node.js instances. The tools attach to Node.js instances via a
 tcp port and communicate using the [Chrome DevTools Protocol][].
+See [V8 Inspector integration for Node.js][] for further explanation on Node.js debugger.
 
 <!-- Anchor to make sure old links find a target -->
 
@@ -1271,6 +1301,8 @@ added: v7.6.0
 Activate inspector on `host:port` and break at start of user script.
 Default `host:port` is `127.0.0.1:9229`.
 
+See [V8 Inspector integration for Node.js][] for further explanation on Node.js debugger.
+
 ### `--inspect-port=[host:]port`
 
 <!-- YAML
@@ -1291,6 +1323,17 @@ Specify ways of the inspector web socket url exposure.
 
 By default inspector websocket url is available in stderr and under `/json/list`
 endpoint on `http://host:port/json/list`.
+
+### `--inspect-wait[=[host:]port]`
+
+<!-- YAML
+added: v22.2.0
+-->
+
+Activate inspector on `host:port` and wait for debugger to be attached.
+Default `host:port` is `127.0.0.1:9229`.
+
+See [V8 Inspector integration for Node.js][] for further explanation on Node.js debugger.
 
 ### `-i`, `--interactive`
 
@@ -1527,18 +1570,6 @@ unless either the `--pending-deprecation` command-line flag, or the
 `NODE_PENDING_DEPRECATION=1` environment variable, is set. Pending deprecations
 are used to provide a kind of selective "early warning" mechanism that
 developers may leverage to detect deprecated API usage.
-
-### `--policy-integrity=sri`
-
-<!-- YAML
-added: v12.7.0
--->
-
-> Stability: 0 - Deprecated: Will be removed shortly.
-
-Instructs Node.js to error prior to running any code if the policy does not have
-the specified integrity. It expects a [Subresource Integrity][] string as a
-parameter.
 
 ### `--preserve-symlinks`
 
@@ -2656,6 +2687,7 @@ one is included in the list below.
 * `--diagnostic-dir`
 * `--disable-proto`
 * `--disable-warning`
+* `--disable-wasm-trap-handler`
 * `--dns-result-order`
 * `--enable-fips`
 * `--enable-network-family-autoselection`
@@ -2669,7 +2701,6 @@ one is included in the list below.
 * `--experimental-modules`
 * `--experimental-network-imports`
 * `--experimental-permission`
-* `--experimental-policy`
 * `--experimental-print-required-tla`
 * `--experimental-require-module`
 * `--experimental-shadow-realm`
@@ -2692,6 +2723,7 @@ one is included in the list below.
 * `--inspect-brk`
 * `--inspect-port`, `--debug-port`
 * `--inspect-publish-uid`
+* `--inspect-wait`
 * `--inspect`
 * `--max-http-header-size`
 * `--napi-modules`
@@ -2714,7 +2746,6 @@ one is included in the list below.
 * `--openssl-legacy-provider`
 * `--openssl-shared-config`
 * `--pending-deprecation`
-* `--policy-integrity`
 * `--preserve-symlinks-main`
 * `--preserve-symlinks`
 * `--prof-process`
@@ -3189,7 +3220,7 @@ node --stack-trace-limit=12 -p -e "Error.stackTraceLimit" # prints 12
 [ScriptCoverage]: https://chromedevtools.github.io/devtools-protocol/tot/Profiler#type-ScriptCoverage
 [ShadowRealm]: https://github.com/tc39/proposal-shadowrealm
 [Source Map]: https://sourcemaps.info/spec.html
-[Subresource Integrity]: https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity
+[V8 Inspector integration for Node.js]: debugger.md#v8-inspector-integration-for-nodejs
 [V8 JavaScript code coverage]: https://v8project.blogspot.com/2017/12/javascript-code-coverage.html
 [V8 code cache]: https://v8.dev/blog/code-caching-for-devs
 [Web Crypto API]: webcrypto.md

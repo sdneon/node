@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v22.1.0/lib/stream.js\">lib/stream.js</a></p>\n<p>A stream is an abstract interface for working with streaming data in Node.js.\nThe <code>node:stream</code> module provides an API for implementing the stream interface.</p>\n<p>There are many stream objects provided by Node.js. For instance, a\n<a href=\"http.html#class-httpincomingmessage\">request to an HTTP server</a> and <a href=\"process.html#processstdout\"><code>process.stdout</code></a>\nare both stream instances.</p>\n<p>Streams can be readable, writable, or both. All streams are instances of\n<a href=\"events.html#class-eventemitter\"><code>EventEmitter</code></a>.</p>\n<p>To access the <code>node:stream</code> module:</p>\n<pre><code class=\"language-js\">const stream = require('node:stream');\n</code></pre>\n<p>The <code>node:stream</code> module is useful for creating new types of stream instances.\nIt is usually not necessary to use the <code>node:stream</code> module to consume streams.</p>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v22.2.0/lib/stream.js\">lib/stream.js</a></p>\n<p>A stream is an abstract interface for working with streaming data in Node.js.\nThe <code>node:stream</code> module provides an API for implementing the stream interface.</p>\n<p>There are many stream objects provided by Node.js. For instance, a\n<a href=\"http.html#class-httpincomingmessage\">request to an HTTP server</a> and <a href=\"process.html#processstdout\"><code>process.stdout</code></a>\nare both stream instances.</p>\n<p>Streams can be readable, writable, or both. All streams are instances of\n<a href=\"events.html#class-eventemitter\"><code>EventEmitter</code></a>.</p>\n<p>To access the <code>node:stream</code> module:</p>\n<pre><code class=\"language-js\">const stream = require('node:stream');\n</code></pre>\n<p>The <code>node:stream</code> module is useful for creating new types of stream instances.\nIt is usually not necessary to use the <code>node:stream</code> module to consume streams.</p>",
       "modules": [
         {
           "textRaw": "Organization of this document",
@@ -52,7 +52,17 @@
                 "added": [
                   "v15.0.0"
                 ],
-                "changes": []
+                "changes": [
+                  {
+                    "version": [
+                      "v18.0.0",
+                      "v17.2.0",
+                      "v16.14.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/40886",
+                    "description": "Add the `end` option, which can be set to `false` to prevent automatically closing the destination stream when the source ends."
+                  }
+                ]
               },
               "signatures": [
                 {
@@ -115,9 +125,10 @@
                       ]
                     },
                     {
-                      "textRaw": "`options` {Object}",
+                      "textRaw": "`options` {Object} Pipeline options",
                       "name": "options",
                       "type": "Object",
+                      "desc": "Pipeline options",
                       "options": [
                         {
                           "textRaw": "`signal` {AbortSignal}",
@@ -125,9 +136,11 @@
                           "type": "AbortSignal"
                         },
                         {
-                          "textRaw": "`end` {boolean}",
+                          "textRaw": "`end` {boolean} End the destination stream when the source stream ends. Transform streams are always ended, even if this value is `false`. **Default:** `true`.",
                           "name": "end",
-                          "type": "boolean"
+                          "type": "boolean",
+                          "default": "`true`",
+                          "desc": "End the destination stream when the source stream ends. Transform streams are always ended, even if this value is `false`."
                         }
                       ]
                     }
@@ -144,7 +157,17 @@
                 "added": [
                   "v15.0.0"
                 ],
-                "changes": []
+                "changes": [
+                  {
+                    "version": [
+                      "v18.0.0",
+                      "v17.2.0",
+                      "v16.14.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/40886",
+                    "description": "Add the `end` option, which can be set to `false` to prevent automatically closing the destination stream when the source ends."
+                  }
+                ]
               },
               "signatures": [
                 {
@@ -207,9 +230,10 @@
                       ]
                     },
                     {
-                      "textRaw": "`options` {Object}",
+                      "textRaw": "`options` {Object} Pipeline options",
                       "name": "options",
                       "type": "Object",
+                      "desc": "Pipeline options",
                       "options": [
                         {
                           "textRaw": "`signal` {AbortSignal}",
@@ -217,9 +241,11 @@
                           "type": "AbortSignal"
                         },
                         {
-                          "textRaw": "`end` {boolean}",
+                          "textRaw": "`end` {boolean} End the destination stream when the source stream ends. Transform streams are always ended, even if this value is `false`. **Default:** `true`.",
                           "name": "end",
-                          "type": "boolean"
+                          "type": "boolean",
+                          "default": "`true`",
+                          "desc": "End the destination stream when the source stream ends. Transform streams are always ended, even if this value is `false`."
                         }
                       ]
                     }
@@ -300,7 +326,7 @@
               "textRaw": "Buffering",
               "name": "Buffering",
               "type": "misc",
-              "desc": "<p>Both <a href=\"#class-streamwritable\"><code>Writable</code></a> and <a href=\"#class-streamreadable\"><code>Readable</code></a> streams will store data in an internal\nbuffer.</p>\n<p>The amount of data potentially buffered depends on the <code>highWaterMark</code> option\npassed into the stream's constructor. For normal streams, the <code>highWaterMark</code>\noption specifies a <a href=\"#highwatermark-discrepancy-after-calling-readablesetencoding\">total number of bytes</a>. For streams operating\nin object mode, the <code>highWaterMark</code> specifies a total number of objects.</p>\n<p>Data is buffered in <code>Readable</code> streams when the implementation calls\n<a href=\"#readablepushchunk-encoding\"><code>stream.push(chunk)</code></a>. If the consumer of the Stream does not\ncall <a href=\"#readablereadsize\"><code>stream.read()</code></a>, the data will sit in the internal\nqueue until it is consumed.</p>\n<p>Once the total size of the internal read buffer reaches the threshold specified\nby <code>highWaterMark</code>, the stream will temporarily stop reading data from the\nunderlying resource until the data currently buffered can be consumed (that is,\nthe stream will stop calling the internal <a href=\"#readable_readsize\"><code>readable._read()</code></a> method that is\nused to fill the read buffer).</p>\n<p>Data is buffered in <code>Writable</code> streams when the\n<a href=\"#writablewritechunk-encoding-callback\"><code>writable.write(chunk)</code></a> method is called repeatedly. While the\ntotal size of the internal write buffer is below the threshold set by\n<code>highWaterMark</code>, calls to <code>writable.write()</code> will return <code>true</code>. Once\nthe size of the internal buffer reaches or exceeds the <code>highWaterMark</code>, <code>false</code>\nwill be returned.</p>\n<p>A key goal of the <code>stream</code> API, particularly the <a href=\"#readablepipedestination-options\"><code>stream.pipe()</code></a> method,\nis to limit the buffering of data to acceptable levels such that sources and\ndestinations of differing speeds will not overwhelm the available memory.</p>\n<p>The <code>highWaterMark</code> option is a threshold, not a limit: it dictates the amount\nof data that a stream buffers before it stops asking for more data. It does not\nenforce a strict memory limitation in general. Specific stream implementations\nmay choose to enforce stricter limits but doing so is optional.</p>\n<p>Because <a href=\"#class-streamduplex\"><code>Duplex</code></a> and <a href=\"#class-streamtransform\"><code>Transform</code></a> streams are both <code>Readable</code> and\n<code>Writable</code>, each maintains <em>two</em> separate internal buffers used for reading and\nwriting, allowing each side to operate independently of the other while\nmaintaining an appropriate and efficient flow of data. For example,\n<a href=\"net.html#class-netsocket\"><code>net.Socket</code></a> instances are <a href=\"#class-streamduplex\"><code>Duplex</code></a> streams whose <code>Readable</code> side allows\nconsumption of data received <em>from</em> the socket and whose <code>Writable</code> side allows\nwriting data <em>to</em> the socket. Because data may be written to the socket at a\nfaster or slower rate than data is received, each side should\noperate (and buffer) independently of the other.</p>\n<p>The mechanics of the internal buffering are an internal implementation detail\nand may be changed at any time. However, for certain advanced implementations,\nthe internal buffers can be retrieved using <code>writable.writableBuffer</code> or\n<code>readable.readableBuffer</code>. Use of these undocumented properties is discouraged.</p>"
+              "desc": "<p>Both <a href=\"#class-streamwritable\"><code>Writable</code></a> and <a href=\"#class-streamreadable\"><code>Readable</code></a> streams will store data in an internal\nbuffer.</p>\n<p>The amount of data potentially buffered depends on the <code>highWaterMark</code> option\npassed into the stream's constructor. For normal streams, the <code>highWaterMark</code>\noption specifies a <a href=\"#highwatermark-discrepancy-after-calling-readablesetencoding\">total number of bytes</a>. For streams operating\nin object mode, the <code>highWaterMark</code> specifies a total number of objects. For\nstreams operating on (but not decoding) strings, the <code>highWaterMark</code> specifies\na total number of UTF-16 code units.</p>\n<p>Data is buffered in <code>Readable</code> streams when the implementation calls\n<a href=\"#readablepushchunk-encoding\"><code>stream.push(chunk)</code></a>. If the consumer of the Stream does not\ncall <a href=\"#readablereadsize\"><code>stream.read()</code></a>, the data will sit in the internal\nqueue until it is consumed.</p>\n<p>Once the total size of the internal read buffer reaches the threshold specified\nby <code>highWaterMark</code>, the stream will temporarily stop reading data from the\nunderlying resource until the data currently buffered can be consumed (that is,\nthe stream will stop calling the internal <a href=\"#readable_readsize\"><code>readable._read()</code></a> method that is\nused to fill the read buffer).</p>\n<p>Data is buffered in <code>Writable</code> streams when the\n<a href=\"#writablewritechunk-encoding-callback\"><code>writable.write(chunk)</code></a> method is called repeatedly. While the\ntotal size of the internal write buffer is below the threshold set by\n<code>highWaterMark</code>, calls to <code>writable.write()</code> will return <code>true</code>. Once\nthe size of the internal buffer reaches or exceeds the <code>highWaterMark</code>, <code>false</code>\nwill be returned.</p>\n<p>A key goal of the <code>stream</code> API, particularly the <a href=\"#readablepipedestination-options\"><code>stream.pipe()</code></a> method,\nis to limit the buffering of data to acceptable levels such that sources and\ndestinations of differing speeds will not overwhelm the available memory.</p>\n<p>The <code>highWaterMark</code> option is a threshold, not a limit: it dictates the amount\nof data that a stream buffers before it stops asking for more data. It does not\nenforce a strict memory limitation in general. Specific stream implementations\nmay choose to enforce stricter limits but doing so is optional.</p>\n<p>Because <a href=\"#class-streamduplex\"><code>Duplex</code></a> and <a href=\"#class-streamtransform\"><code>Transform</code></a> streams are both <code>Readable</code> and\n<code>Writable</code>, each maintains <em>two</em> separate internal buffers used for reading and\nwriting, allowing each side to operate independently of the other while\nmaintaining an appropriate and efficient flow of data. For example,\n<a href=\"net.html#class-netsocket\"><code>net.Socket</code></a> instances are <a href=\"#class-streamduplex\"><code>Duplex</code></a> streams whose <code>Readable</code> side allows\nconsumption of data received <em>from</em> the socket and whose <code>Writable</code> side allows\nwriting data <em>to</em> the socket. Because data may be written to the socket at a\nfaster or slower rate than data is received, each side should\noperate (and buffer) independently of the other.</p>\n<p>The mechanics of the internal buffering are an internal implementation detail\nand may be changed at any time. However, for certain advanced implementations,\nthe internal buffers can be retrieved using <code>writable.writableBuffer</code> or\n<code>readable.readableBuffer</code>. Use of these undocumented properties is discouraged.</p>"
             }
           ],
           "type": "module",

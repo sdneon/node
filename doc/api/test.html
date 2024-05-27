@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v22.1.0">
-  <title>Test runner | Node.js v22.1.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v22.2.0">
+  <title>Test runner | Node.js v22.2.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -109,7 +109,7 @@
     <div id="column1" data-id="test" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v22.1.0 documentation</h1>
+          <h1>Node.js v22.2.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -124,7 +124,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v22.1.0</li>
+            <li class="pinned-header">Node.js v22.2.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -250,6 +250,7 @@
 <li><a href="#contextaftereachfn-options"><code>context.afterEach([fn][, options])</code></a></li>
 <li><a href="#contextdiagnosticmessage"><code>context.diagnostic(message)</code></a></li>
 <li><a href="#contextname"><code>context.name</code></a></li>
+<li><span class="stability_1"><a href="#contextplancount"><code>context.plan(count)</code></a></span></li>
 <li><a href="#contextrunonlyshouldrunonlytests"><code>context.runOnly(shouldRunOnlyTests)</code></a></li>
 <li><a href="#contextsignal"><code>context.signal</code></a></li>
 <li><a href="#contextskipmessage"><code>context.skip([message])</code></a></li>
@@ -507,6 +508,7 @@
 <li><a href="#contextaftereachfn-options"><code>context.afterEach([fn][, options])</code></a></li>
 <li><a href="#contextdiagnosticmessage"><code>context.diagnostic(message)</code></a></li>
 <li><a href="#contextname"><code>context.name</code></a></li>
+<li><span class="stability_1"><a href="#contextplancount"><code>context.plan(count)</code></a></span></li>
 <li><a href="#contextrunonlyshouldrunonlytests"><code>context.runOnly(shouldRunOnlyTests)</code></a></li>
 <li><a href="#contextsignal"><code>context.signal</code></a></li>
 <li><a href="#contextskipmessage"><code>context.skip([message])</code></a></li>
@@ -539,7 +541,7 @@
 </details>
 </div>
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v22.1.0/lib/test.js">lib/test.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v22.2.0/lib/test.js">lib/test.js</a></p>
 <p>The <code>node:test</code> module facilitates the creation of JavaScript tests.
 To access it:</p>
 
@@ -1651,6 +1653,10 @@ the test is <code>TODO</code>. <strong>Default:</strong> <code>false</code>.</li
 <li><code>timeout</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> A number of milliseconds the test will fail after.
 If unspecified, subtests inherit this value from their parent.
 <strong>Default:</strong> <code>Infinity</code>.</li>
+<li><code>plan</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The number of assertions and subtests expected to be run in the test.
+If the number of assertions run in the test does not match the number
+specified in the plan, the test will fail.
+<strong>Default:</strong> <code>undefined</code>.</li>
 </ul>
 </li>
 <li><code>fn</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> | <a href="https://tc39.es/ecma262/#sec-async-function-constructor" class="type">&#x3C;AsyncFunction></a> The function under test. The first argument
@@ -3016,6 +3022,44 @@ not return a value.</p>
 <span>Added in: v18.8.0, v16.18.0</span>
 </div>
 <p>The name of the test.</p>
+<h4><code>context.plan(count)</code><span><a class="mark" href="#contextplancount" id="contextplancount">#</a></span><a aria-hidden="true" class="legacy" id="test_context_plan_count"></a></h4>
+<div class="api_metadata">
+<span>Added in: v22.2.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<ul>
+<li><code>count</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The number of assertions and subtests that are expected to run.</li>
+</ul>
+<p>This function is used to set the number of assertions and subtests that are expected to run
+within the test. If the number of assertions and subtests that run does not match the
+expected count, the test will fail.</p>
+<blockquote>
+<p>Note: To make sure assertions are tracked, <code>t.assert</code> must be used instead of <code>assert</code> directly.</p>
+</blockquote>
+<pre><code class="language-js"><span class="hljs-title function_">test</span>(<span class="hljs-string">'top level test'</span>, <span class="hljs-function">(<span class="hljs-params">t</span>) =></span> {
+  t.<span class="hljs-title function_">plan</span>(<span class="hljs-number">2</span>);
+  t.<span class="hljs-property">assert</span>.<span class="hljs-title function_">ok</span>(<span class="hljs-string">'some relevant assertion here'</span>);
+  t.<span class="hljs-title function_">subtest</span>(<span class="hljs-string">'subtest'</span>, <span class="hljs-function">() =></span> {});
+});</code> <button class="copy-button">copy</button></pre>
+<p>When working with asynchronous code, the <code>plan</code> function can be used to ensure that the
+correct number of assertions are run:</p>
+<pre><code class="language-js"><span class="hljs-title function_">test</span>(<span class="hljs-string">'planning with streams'</span>, <span class="hljs-function">(<span class="hljs-params">t, done</span>) =></span> {
+  <span class="hljs-keyword">function</span>* <span class="hljs-title function_">generate</span>(<span class="hljs-params"></span>) {
+    <span class="hljs-keyword">yield</span> <span class="hljs-string">'a'</span>;
+    <span class="hljs-keyword">yield</span> <span class="hljs-string">'b'</span>;
+    <span class="hljs-keyword">yield</span> <span class="hljs-string">'c'</span>;
+  }
+  <span class="hljs-keyword">const</span> expected = [<span class="hljs-string">'a'</span>, <span class="hljs-string">'b'</span>, <span class="hljs-string">'c'</span>];
+  t.<span class="hljs-title function_">plan</span>(expected.<span class="hljs-property">length</span>);
+  <span class="hljs-keyword">const</span> stream = <span class="hljs-title class_">Readable</span>.<span class="hljs-title function_">from</span>(<span class="hljs-title function_">generate</span>());
+  stream.<span class="hljs-title function_">on</span>(<span class="hljs-string">'data'</span>, <span class="hljs-function">(<span class="hljs-params">chunk</span>) =></span> {
+    t.<span class="hljs-property">assert</span>.<span class="hljs-title function_">strictEqual</span>(chunk, expected.<span class="hljs-title function_">shift</span>());
+  });
+
+  stream.<span class="hljs-title function_">on</span>(<span class="hljs-string">'end'</span>, <span class="hljs-function">() =></span> {
+    <span class="hljs-title function_">done</span>();
+  });
+});</code> <button class="copy-button">copy</button></pre>
 <h4><code>context.runOnly(shouldRunOnlyTests)</code><span><a class="mark" href="#contextrunonlyshouldrunonlytests" id="contextrunonlyshouldrunonlytests">#</a></span><a aria-hidden="true" class="legacy" id="test_context_runonly_shouldrunonlytests"></a></h4>
 <div class="api_metadata">
 <span>Added in: v18.0.0, v16.17.0</span>
@@ -3115,6 +3159,10 @@ the test is <code>TODO</code>. <strong>Default:</strong> <code>false</code>.</li
 <li><code>timeout</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> A number of milliseconds the test will fail after.
 If unspecified, subtests inherit this value from their parent.
 <strong>Default:</strong> <code>Infinity</code>.</li>
+<li><code>plan</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The number of assertions and subtests expected to be run in the test.
+If the number of assertions run in the test does not match the number
+specified in the plan, the test will fail.
+<strong>Default:</strong> <code>undefined</code>.</li>
 </ul>
 </li>
 <li><code>fn</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> | <a href="https://tc39.es/ecma262/#sec-async-function-constructor" class="type">&#x3C;AsyncFunction></a> The function under test. The first argument
@@ -3128,7 +3176,7 @@ behaves in the same fashion as the top level <a href="#testname-options-fn"><cod
 <pre><code class="language-js"><span class="hljs-title function_">test</span>(<span class="hljs-string">'top level test'</span>, <span class="hljs-keyword">async</span> (t) => {
   <span class="hljs-keyword">await</span> t.<span class="hljs-title function_">test</span>(
     <span class="hljs-string">'This is a subtest'</span>,
-    { <span class="hljs-attr">only</span>: <span class="hljs-literal">false</span>, <span class="hljs-attr">skip</span>: <span class="hljs-literal">false</span>, <span class="hljs-attr">concurrency</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">todo</span>: <span class="hljs-literal">false</span> },
+    { <span class="hljs-attr">only</span>: <span class="hljs-literal">false</span>, <span class="hljs-attr">skip</span>: <span class="hljs-literal">false</span>, <span class="hljs-attr">concurrency</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">todo</span>: <span class="hljs-literal">false</span>, <span class="hljs-attr">plan</span>: <span class="hljs-number">4</span> },
     <span class="hljs-function">(<span class="hljs-params">t</span>) =></span> {
       assert.<span class="hljs-title function_">ok</span>(<span class="hljs-string">'some relevant assertion here'</span>);
     },

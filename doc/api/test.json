@@ -21,7 +21,7 @@
       },
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v22.1.0/lib/test.js\">lib/test.js</a></p>\n<p>The <code>node:test</code> module facilitates the creation of JavaScript tests.\nTo access it:</p>\n<pre><code class=\"language-mjs\">import test from 'node:test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('node:test');\n</code></pre>\n<p>This module is only available under the <code>node:</code> scheme. The following will not\nwork:</p>\n<pre><code class=\"language-mjs\">import test from 'test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('test');\n</code></pre>\n<p>Tests created via the <code>test</code> module consist of a single function that is\nprocessed in one of three ways:</p>\n<ol>\n<li>A synchronous function that is considered failing if it throws an exception,\nand is considered passing otherwise.</li>\n<li>A function that returns a <code>Promise</code> that is considered failing if the\n<code>Promise</code> rejects, and is considered passing if the <code>Promise</code> fulfills.</li>\n<li>A function that receives a callback function. If the callback receives any\ntruthy value as its first argument, the test is considered failing. If a\nfalsy value is passed as the first argument to the callback, the test is\nconsidered passing. If the test function receives a callback function and\nalso returns a <code>Promise</code>, the test will fail.</li>\n</ol>\n<p>The following example illustrates how tests are written using the\n<code>test</code> module.</p>\n<pre><code class=\"language-js\">test('synchronous passing test', (t) => {\n  // This test passes because it does not throw an exception.\n  assert.strictEqual(1, 1);\n});\n\ntest('synchronous failing test', (t) => {\n  // This test fails because it throws an exception.\n  assert.strictEqual(1, 2);\n});\n\ntest('asynchronous passing test', async (t) => {\n  // This test passes because the Promise returned by the async\n  // function is settled and not rejected.\n  assert.strictEqual(1, 1);\n});\n\ntest('asynchronous failing test', async (t) => {\n  // This test fails because the Promise returned by the async\n  // function is rejected.\n  assert.strictEqual(1, 2);\n});\n\ntest('failing test using Promises', (t) => {\n  // Promises can be used directly as well.\n  return new Promise((resolve, reject) => {\n    setImmediate(() => {\n      reject(new Error('this will cause the test to fail'));\n    });\n  });\n});\n\ntest('callback passing test', (t, done) => {\n  // done() is the callback function. When the setImmediate() runs, it invokes\n  // done() with no arguments.\n  setImmediate(done);\n});\n\ntest('callback failing test', (t, done) => {\n  // When the setImmediate() runs, done() is invoked with an Error object and\n  // the test fails.\n  setImmediate(() => {\n    done(new Error('callback failure'));\n  });\n});\n</code></pre>\n<p>If any tests fail, the process exit code is set to <code>1</code>.</p>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v22.2.0/lib/test.js\">lib/test.js</a></p>\n<p>The <code>node:test</code> module facilitates the creation of JavaScript tests.\nTo access it:</p>\n<pre><code class=\"language-mjs\">import test from 'node:test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('node:test');\n</code></pre>\n<p>This module is only available under the <code>node:</code> scheme. The following will not\nwork:</p>\n<pre><code class=\"language-mjs\">import test from 'test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('test');\n</code></pre>\n<p>Tests created via the <code>test</code> module consist of a single function that is\nprocessed in one of three ways:</p>\n<ol>\n<li>A synchronous function that is considered failing if it throws an exception,\nand is considered passing otherwise.</li>\n<li>A function that returns a <code>Promise</code> that is considered failing if the\n<code>Promise</code> rejects, and is considered passing if the <code>Promise</code> fulfills.</li>\n<li>A function that receives a callback function. If the callback receives any\ntruthy value as its first argument, the test is considered failing. If a\nfalsy value is passed as the first argument to the callback, the test is\nconsidered passing. If the test function receives a callback function and\nalso returns a <code>Promise</code>, the test will fail.</li>\n</ol>\n<p>The following example illustrates how tests are written using the\n<code>test</code> module.</p>\n<pre><code class=\"language-js\">test('synchronous passing test', (t) => {\n  // This test passes because it does not throw an exception.\n  assert.strictEqual(1, 1);\n});\n\ntest('synchronous failing test', (t) => {\n  // This test fails because it throws an exception.\n  assert.strictEqual(1, 2);\n});\n\ntest('asynchronous passing test', async (t) => {\n  // This test passes because the Promise returned by the async\n  // function is settled and not rejected.\n  assert.strictEqual(1, 1);\n});\n\ntest('asynchronous failing test', async (t) => {\n  // This test fails because the Promise returned by the async\n  // function is rejected.\n  assert.strictEqual(1, 2);\n});\n\ntest('failing test using Promises', (t) => {\n  // Promises can be used directly as well.\n  return new Promise((resolve, reject) => {\n    setImmediate(() => {\n      reject(new Error('this will cause the test to fail'));\n    });\n  });\n});\n\ntest('callback passing test', (t, done) => {\n  // done() is the callback function. When the setImmediate() runs, it invokes\n  // done() with no arguments.\n  setImmediate(done);\n});\n\ntest('callback failing test', (t, done) => {\n  // When the setImmediate() runs, done() is invoked with an Error object and\n  // the test fails.\n  setImmediate(() => {\n    done(new Error('callback failure'));\n  });\n});\n</code></pre>\n<p>If any tests fail, the process exit code is set to <code>1</code>.</p>",
       "modules": [
         {
           "textRaw": "Subtests",
@@ -520,6 +520,13 @@
                       "type": "number",
                       "default": "`Infinity`",
                       "desc": "A number of milliseconds the test will fail after. If unspecified, subtests inherit this value from their parent."
+                    },
+                    {
+                      "textRaw": "`plan` {number} The number of assertions and subtests expected to be run in the test. If the number of assertions run in the test does not match the number specified in the plan, the test will fail. **Default:** `undefined`.",
+                      "name": "plan",
+                      "type": "number",
+                      "default": "`undefined`",
+                      "desc": "The number of assertions and subtests expected to be run in the test. If the number of assertions run in the test does not match the number specified in the plan, the test will fail."
                     }
                   ]
                 },
@@ -2474,6 +2481,32 @@
               "desc": "<p>This function is used to write diagnostics to the output. Any diagnostic\ninformation is included at the end of the test's results. This function does\nnot return a value.</p>\n<pre><code class=\"language-js\">test('top level test', (t) => {\n  t.diagnostic('A diagnostic message');\n});\n</code></pre>"
             },
             {
+              "textRaw": "`context.plan(count)`",
+              "type": "method",
+              "name": "plan",
+              "meta": {
+                "added": [
+                  "v22.2.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`count` {number} The number of assertions and subtests that are expected to run.",
+                      "name": "count",
+                      "type": "number",
+                      "desc": "The number of assertions and subtests that are expected to run."
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>This function is used to set the number of assertions and subtests that are expected to run\nwithin the test. If the number of assertions and subtests that run does not match the\nexpected count, the test will fail.</p>\n<blockquote>\n<p>Note: To make sure assertions are tracked, <code>t.assert</code> must be used instead of <code>assert</code> directly.</p>\n</blockquote>\n<pre><code class=\"language-js\">test('top level test', (t) => {\n  t.plan(2);\n  t.assert.ok('some relevant assertion here');\n  t.subtest('subtest', () => {});\n});\n</code></pre>\n<p>When working with asynchronous code, the <code>plan</code> function can be used to ensure that the\ncorrect number of assertions are run:</p>\n<pre><code class=\"language-js\">test('planning with streams', (t, done) => {\n  function* generate() {\n    yield 'a';\n    yield 'b';\n    yield 'c';\n  }\n  const expected = ['a', 'b', 'c'];\n  t.plan(expected.length);\n  const stream = Readable.from(generate());\n  stream.on('data', (chunk) => {\n    t.assert.strictEqual(chunk, expected.shift());\n  });\n\n  stream.on('end', () => {\n    done();\n  });\n});\n</code></pre>"
+            },
+            {
               "textRaw": "`context.runOnly(shouldRunOnlyTests)`",
               "type": "method",
               "name": "runOnly",
@@ -2638,6 +2671,13 @@
                           "type": "number",
                           "default": "`Infinity`",
                           "desc": "A number of milliseconds the test will fail after. If unspecified, subtests inherit this value from their parent."
+                        },
+                        {
+                          "textRaw": "`plan` {number} The number of assertions and subtests expected to be run in the test. If the number of assertions run in the test does not match the number specified in the plan, the test will fail. **Default:** `undefined`.",
+                          "name": "plan",
+                          "type": "number",
+                          "default": "`undefined`",
+                          "desc": "The number of assertions and subtests expected to be run in the test. If the number of assertions run in the test does not match the number specified in the plan, the test will fail."
                         }
                       ]
                     },
@@ -2651,7 +2691,7 @@
                   ]
                 }
               ],
-              "desc": "<p>This function is used to create subtests under the current test. This function\nbehaves in the same fashion as the top level <a href=\"#testname-options-fn\"><code>test()</code></a> function.</p>\n<pre><code class=\"language-js\">test('top level test', async (t) => {\n  await t.test(\n    'This is a subtest',\n    { only: false, skip: false, concurrency: 1, todo: false },\n    (t) => {\n      assert.ok('some relevant assertion here');\n    },\n  );\n});\n</code></pre>"
+              "desc": "<p>This function is used to create subtests under the current test. This function\nbehaves in the same fashion as the top level <a href=\"#testname-options-fn\"><code>test()</code></a> function.</p>\n<pre><code class=\"language-js\">test('top level test', async (t) => {\n  await t.test(\n    'This is a subtest',\n    { only: false, skip: false, concurrency: 1, todo: false, plan: 4 },\n    (t) => {\n      assert.ok('some relevant assertion here');\n    },\n  );\n});\n</code></pre>"
             }
           ],
           "properties": [

@@ -71,6 +71,8 @@ class DebugOptions : public Options {
   bool allow_attaching_debugger = true;
   // --inspect
   bool inspector_enabled = false;
+  // --inspect-wait
+  bool inspect_wait = false;
   // --debug
   bool deprecated_debug = false;
   // --inspect-brk
@@ -93,6 +95,10 @@ class DebugOptions : public Options {
   }
 
   bool wait_for_connect() const {
+    return break_first_line || break_node_first_line || inspect_wait;
+  }
+
+  bool should_break_first_line() const {
     return break_first_line || break_node_first_line;
   }
 
@@ -119,9 +125,6 @@ class EnvironmentOptions : public Options {
   bool experimental_import_meta_resolve = false;
   std::string input_type;  // Value of --input-type
   std::string type;        // Value of --experimental-default-type
-  std::string experimental_policy;
-  std::string experimental_policy_integrity;
-  bool has_policy_integrity_string = false;
   bool experimental_permission = false;
   std::vector<std::string> allow_fs_read;
   std::vector<std::string> allow_fs_write;
@@ -162,7 +165,6 @@ class EnvironmentOptions : public Options {
   bool heap_prof = false;
 #endif  // HAVE_INSPECTOR
   std::string redirect_warnings;
-  std::string run;
   std::string diagnostic_dir;
   std::string env_file;
   bool has_env_file_string = false;
@@ -283,6 +285,7 @@ class PerProcessOptions : public Options {
   bool print_v8_help = false;
   bool print_version = false;
   std::string experimental_sea_config;
+  std::string run;
 
 #ifdef NODE_HAVE_I18N_SUPPORT
   std::string icu_data_dir;
@@ -309,6 +312,8 @@ class PerProcessOptions : public Options {
   bool openssl_legacy_provider = false;
   bool openssl_shared_config = false;
 #endif
+
+  bool disable_wasm_trap_handler = false;
 
   // Per-process because reports can be triggered outside a known V8 context.
   bool report_on_fatalerror = false;
@@ -520,7 +525,10 @@ class OptionsParser {
   template <typename OtherOptions>
   friend class OptionsParser;
 
-  friend void GetCLIOptions(const v8::FunctionCallbackInfo<v8::Value>& args);
+  friend void GetCLIOptionsValues(
+      const v8::FunctionCallbackInfo<v8::Value>& args);
+  friend void GetCLIOptionsInfo(
+      const v8::FunctionCallbackInfo<v8::Value>& args);
   friend std::string GetBashCompletion();
 };
 
