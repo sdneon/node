@@ -52,7 +52,7 @@ let typescript=dummy;try{
             return '';
         }
         orgFilename ??= '';
-        noSrcMap ??= false;
+        noSrcMap ??= !orgFilename;
         nestLvl ??= 1;
 
         //
