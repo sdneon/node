@@ -7,6 +7,7 @@ Thanks to the inspiration from dcodeIO et al =D
 
 ## Version 22.2.0
 Update to Node.JS 22.2.0 baseline.
+* Add experimental sourcemapping.
 
 It embeds:
 * DS v1.2.1.
@@ -140,6 +141,10 @@ require('path_to_alternate_src/src_packs/ts/4.2.3/TypeScript.packed.min.js');
 ```
 
 `src_packs` folder is not used in Node.JS build. It's purely provided for playing around with.
+
+#### Command-line Option
+Use `--experimental-external-dscript` command-line option to override the internal D Script transpiler with that in external `dscript.js` file in current working directory. This is loaded before running your main code.
+An example is provided in `src-packs/ds`
 
 ### REPL mode for D Script, CoffeeScript and TypeScript
 REPL mode for D Script, CoffeeScript and TypeScript is activated by:

@@ -210,6 +210,7 @@ class EnvironmentOptions : public Options {
   bool print_eval = false;
   bool force_repl = false;
   std::string repl_lang;
+  bool experimental_external_dscript;
 
   bool insecure_http_parser = false;
 

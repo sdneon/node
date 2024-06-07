@@ -768,6 +768,9 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
   AddOption("--repl",
             "use D Script, CoffeeScript or TypeScript in REPL (default: JS; options: ds, cs, ts)",
            &EnvironmentOptions::repl_lang);
+  AddOption("--experimental-external-dscript",
+            "load and use external D Script transpiler",
+            &EnvironmentOptions::experimental_external_dscript);
 
   AddOption("--napi-modules", "", NoOp{}, kAllowedInEnvvar);
 
