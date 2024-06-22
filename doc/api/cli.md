@@ -269,6 +269,53 @@ Examples can be found in the [File System Permissions][] documentation.
 
 Relative paths are NOT supported through the CLI flag.
 
+### `--allow-wasi`
+
+<!-- YAML
+added: v22.3.0
+-->
+
+> Stability: 1.1 - Active development
+
+When using the [Permission Model][], the process will not be capable of creating
+any WASI instances by default.
+For security reasons, the call will throw an `ERR_ACCESS_DENIED` unless the
+user explicitly passes the flag `--allow-wasi` in the main Node.js process.
+
+Example:
+
+```js
+const { WASI } = require('node:wasi');
+// Attempt to bypass the permission
+new WASI({
+  version: 'preview1',
+  // Attempt to mount the whole filesystem
+  preopens: {
+    '/': '/',
+  },
+});
+```
+
+```console
+$ node --experimental-permission --allow-fs-read=* index.js
+node:wasi:99
+    const wrap = new _WASI(args, env, preopens, stdio);
+                 ^
+
+Error: Access to this API has been restricted
+    at new WASI (node:wasi:99:18)
+    at Object.<anonymous> (/home/index.js:3:1)
+    at Module._compile (node:internal/modules/cjs/loader:1476:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1555:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:191:14)
+    at node:internal/main/run_main_module:30:49 {
+  code: 'ERR_ACCESS_DENIED',
+  permission: 'WASI',
+}
+```
+
 ### `--allow-worker`
 
 <!-- YAML
@@ -626,6 +673,23 @@ Make built-in language features like `eval` and `new Function` that generate
 code from strings throw an exception instead. This does not affect the Node.js
 `node:vm` module.
 
+### `--expose-gc`
+
+<!-- YAML
+added: v22.3.0
+-->
+
+> Stability: 1 - Experimental. This flag is inherited from V8 and is subject to
+> change upstream.
+
+This flag will expose the gc extension from V8.
+
+```js
+if (globalThis.gc) {
+  globalThis.gc();
+}
+```
+
 ### `--dns-result-order=order`
 
 <!-- YAML
@@ -851,6 +915,14 @@ CommonJS. This includes the following:
 * Lexical redeclarations of the CommonJS wrapper variables (`require`, `module`,
   `exports`, `__dirname`, `__filename`).
 
+### `--experimental-eventsource`
+
+<!-- YAML
+added: v22.3.0
+-->
+
+Enable exposition of [EventSource Web API][] on the global scope.
+
 ### `--experimental-import-meta-resolve`
 
 <!-- YAML
@@ -917,6 +989,7 @@ following permissions are restricted:
   [`--allow-fs-read`][], [`--allow-fs-write`][] flags
 * Child Process - manageable through [`--allow-child-process`][] flag
 * Worker Threads - manageable through [`--allow-worker`][] flag
+* WASI - manageable through [`--allow-wasi`][] flag
 
 ### `--experimental-require-module`
 
@@ -970,6 +1043,26 @@ When used in conjunction with the `node:test` module, a code coverage report is
 generated as part of the test runner output. If no tests are run, a coverage
 report is not generated. See the documentation on
 [collecting code coverage from tests][] for more details.
+
+### `--experimental-test-module-mocks`
+
+<!-- YAML
+added: v22.3.0
+-->
+
+> Stability: 1.0 - Early development
+
+Enable module mocking in the test runner.
+
+### `--experimental-test-snapshots`
+
+<!-- YAML
+added: v22.3.0
+-->
+
+> Stability: 1.0 - Early development
+
+Enable [snapshot testing][] in the test runner.
 
 ### `--experimental-vm-modules`
 
@@ -1857,6 +1950,18 @@ Modules preloaded with `--require` will run before modules preloaded with `--imp
 
 <!-- YAML
 added: v22.0.0
+changes:
+  - version: v22.3.0
+    pr-url: https://github.com/nodejs/node/pull/53032
+    description: NODE_RUN_SCRIPT_NAME environment variable is added.
+  - version: v22.3.0
+    pr-url: https://github.com/nodejs/node/pull/53058
+    description: NODE_RUN_PACKAGE_JSON_PATH environment variable is added.
+  - version: v22.3.0
+    pr-url: https://github.com/nodejs/node/pull/53154
+    description: Traverses up to the root directory and finds
+                 a `package.json` file to run the command from, and updates
+                 `PATH` environment variable accordingly.
 -->
 
 > Stability: 1.1 - Active development
@@ -1864,9 +1969,13 @@ added: v22.0.0
 This runs a specified command from a package.json's `"scripts"` object.
 If no `"command"` is provided, it will list the available scripts.
 
-`--run` prepends `./node_modules/.bin`, relative to the current
-working directory, to the `PATH` in order to execute the binaries from
-dependencies.
+`--run` will traverse up to the root directory and finds a `package.json`
+file to run the command from.
+
+`--run` prepends `./node_modules/.bin` for each ancestor of
+the current directory, to the `PATH` in order to execute the binaries from
+different folders where multiple `node_modules` directories are present, if
+`ancestor-folder/node_modules/.bin` is a directory.
 
 For example, the following command will run the `test` script of
 the `package.json` in the current folder:
@@ -1891,11 +2000,17 @@ cases.
 Some features of other `run` implementations that are intentionally excluded
 are:
 
-* Searching for `package.json` files outside the current folder.
-* Prepending the `.bin` or `node_modules/.bin` paths of folders outside the
-  current folder.
 * Running `pre` or `post` scripts in addition to the specified script.
 * Defining package manager-specific environment variables.
+
+#### Environment variables
+
+The following environment variables are set when running a script with `--run`:
+
+* `NODE_RUN_SCRIPT_NAME`: The name of the script being run. For example, if
+  `--run` is used to run `test`, the value of this variable will be `test`.
+* `NODE_RUN_PACKAGE_JSON_PATH`: The path to the `package.json` that is being
+  processed.
 
 ### `--secure-heap=n`
 
@@ -2110,6 +2225,18 @@ added:
 
 A number of milliseconds the test execution will fail after. If unspecified,
 subtests inherit this value from their parent. The default value is `Infinity`.
+
+### `--test-update-snapshots`
+
+<!-- YAML
+added: v22.3.0
+-->
+
+> Stability: 1.0 - Early development
+
+Regenerates the snapshot file used by the test runner for [snapshot testing][].
+Node.js must be started with the `--experimental-test-snapshots` flag in order
+to use this functionality.
 
 ### `--throw-deprecation`
 
@@ -2682,6 +2809,7 @@ one is included in the list below.
 * `--allow-child-process`
 * `--allow-fs-read`
 * `--allow-fs-write`
+* `--allow-wasi`
 * `--allow-worker`
 * `--conditions`, `-C`
 * `--diagnostic-dir`
@@ -2695,6 +2823,7 @@ one is included in the list below.
 * `--experimental-abortcontroller`
 * `--experimental-default-type`
 * `--experimental-detect-module`
+* `--experimental-eventsource`
 * `--experimental-import-meta-resolve`
 * `--experimental-json-modules`
 * `--experimental-loader`
@@ -2807,6 +2936,7 @@ V8 options that are allowed are:
 * `--abort-on-uncaught-exception`
 * `--disallow-code-generation-from-strings`
 * `--enable-etw-stack-walking`
+* `--expose-gc`
 * `--huge-max-old-generation-size`
 * `--interpreted-frames-native-stack`
 * `--jitless`
@@ -2886,6 +3016,13 @@ equivalent to using the `--redirect-warnings=file` command-line flag.
 added:
  - v13.0.0
  - v12.16.0
+changes:
+  - version:
+     - v22.3.0
+    pr-url: https://github.com/nodejs/node/pull/52905
+    description:
+      Remove the possibility to use this env var with
+      kDisableNodeOptionsEnv for embedders.
 -->
 
 Path to a Node.js module which will be loaded in place of the built-in REPL.
@@ -3129,6 +3266,8 @@ documented here:
 
 ### `--enable-etw-stack-walking`
 
+### `--expose-gc`
+
 ### `--harmony-shadow-realm`
 
 ### `--huge-max-old-generation-size`
@@ -3205,6 +3344,7 @@ node --stack-trace-limit=12 -p -e "Error.stackTraceLimit" # prints 12
 [CustomEvent Web API]: https://dom.spec.whatwg.org/#customevent
 [DEP0025 warning]: deprecations.md#dep0025-requirenodesys
 [ECMAScript module]: esm.md#modules-ecmascript-modules
+[EventSource Web API]: https://html.spec.whatwg.org/multipage/server-sent-events.html#server-sent-events
 [ExperimentalWarning: `vm.measureMemory` is an experimental feature]: vm.md#vmmeasurememoryoptions
 [Fetch API]: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API
 [File System Permissions]: permissions.md#file-system-permissions
@@ -3228,6 +3368,7 @@ node --stack-trace-limit=12 -p -e "Error.stackTraceLimit" # prints 12
 [`--allow-child-process`]: #--allow-child-process
 [`--allow-fs-read`]: #--allow-fs-read
 [`--allow-fs-write`]: #--allow-fs-write
+[`--allow-wasi`]: #--allow-wasi
 [`--allow-worker`]: #--allow-worker
 [`--build-snapshot`]: #--build-snapshot
 [`--cpu-prof-dir`]: #--cpu-prof-dir
@@ -3280,6 +3421,7 @@ node --stack-trace-limit=12 -p -e "Error.stackTraceLimit" # prints 12
 [security warning]: #warning-binding-inspector-to-a-public-ipport-combination-is-insecure
 [semi-space]: https://www.memorymanagement.org/glossary/s.html#semi.space
 [single executable application]: single-executable-applications.md
+[snapshot testing]: test.md#snapshot-testing
 [test reporters]: test.md#test-reporters
 [timezone IDs]: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 [tracking issue for user-land snapshots]: https://github.com/nodejs/node/issues/44014

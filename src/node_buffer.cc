@@ -57,6 +57,7 @@ using v8::ArrayBufferView;
 using v8::BackingStore;
 using v8::Context;
 using v8::EscapableHandleScope;
+using v8::FastApiTypedArray;
 using v8::FunctionCallbackInfo;
 using v8::Global;
 using v8::HandleScope;
@@ -665,7 +666,7 @@ void Fill(const FunctionCallbackInfo<Value>& args) {
   } else if (enc == UCS2) {
     str_length = str_obj->Length() * sizeof(uint16_t);
     node::TwoByteValue str(env->isolate(), args[1]);
-    if (IsBigEndian())
+    if constexpr (IsBigEndian())
       SwapBytes16(reinterpret_cast<char*>(&str[0]), str_length);
 
     memcpy(ts_obj_data + start, *str, std::min(str_length, fill_length));
@@ -843,6 +844,23 @@ void Compare(const FunctionCallbackInfo<Value> &args) {
   args.GetReturnValue().Set(val);
 }
 
+int32_t FastCompare(v8::Local<v8::Value>,
+                    const FastApiTypedArray<uint8_t>& a,
+                    const FastApiTypedArray<uint8_t>& b) {
+  uint8_t* data_a;
+  uint8_t* data_b;
+  CHECK(a.getStorageIfAligned(&data_a));
+  CHECK(b.getStorageIfAligned(&data_b));
+
+  size_t cmp_length = std::min(a.length(), b.length());
+
+  return normalizeCompareVal(
+      cmp_length > 0 ? memcmp(data_a, data_b, cmp_length) : 0,
+      a.length(),
+      b.length());
+}
+
+static v8::CFunction fast_compare(v8::CFunction::Make(FastCompare));
 
 // Computes the offset for starting an indexOf or lastIndexOf search.
 // Returns either a valid offset in [0...<length - 1>], ie inside the Buffer,
@@ -942,7 +960,7 @@ void IndexOfString(const FunctionCallbackInfo<Value>& args) {
       return args.GetReturnValue().Set(-1);
     }
 
-    if (IsBigEndian()) {
+    if constexpr (IsBigEndian()) {
       StringBytes::InlineDecoder decoder;
       if (decoder.Decode(env, needle, enc).IsNothing()) return;
       const uint16_t* decoded_string =
@@ -1409,7 +1427,7 @@ void Initialize(Local<Object> target,
                             SlowByteLengthUtf8,
                             &fast_byte_length_utf8);
   SetMethod(context, target, "copy", Copy);
-  SetMethodNoSideEffect(context, target, "compare", Compare);
+  SetFastMethodNoSideEffect(context, target, "compare", Compare, &fast_compare);
   SetMethodNoSideEffect(context, target, "compareOffset", CompareOffset);
   SetMethod(context, target, "fill", Fill);
   SetMethodNoSideEffect(context, target, "indexOfBuffer", IndexOfBuffer);
@@ -1469,6 +1487,8 @@ void RegisterExternalReferences(ExternalReferenceRegistry* registry) {
   registry->Register(FastByteLengthUtf8);
   registry->Register(Copy);
   registry->Register(Compare);
+  registry->Register(FastCompare);
+  registry->Register(fast_compare.GetTypeInfo());
   registry->Register(CompareOffset);
   registry->Register(Fill);
   registry->Register(IndexOfBuffer);

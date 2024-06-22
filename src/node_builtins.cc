@@ -11,7 +11,6 @@ namespace node {
 namespace builtins {
 
 using v8::Context;
-using v8::DEFAULT;
 using v8::EscapableHandleScope;
 using v8::Function;
 using v8::FunctionCallbackInfo;
@@ -265,7 +264,7 @@ MaybeLocal<Function> BuiltinLoader::LookupAndCompileInternal(
   std::string filename_s = std::string("node:") + id;
   Local<String> filename =
       OneByteString(isolate, filename_s.c_str(), filename_s.size());
-  ScriptOrigin origin(isolate, filename, 0, 0, true);
+  ScriptOrigin origin(filename, 0, 0, true);
 
   BuiltinCodeCacheData cached_data{};
   {
@@ -710,7 +709,6 @@ void BuiltinLoader::CreatePerIsolateProperties(IsolateData* isolate_data,
                                 nullptr,
                                 Local<Value>(),
                                 None,
-                                DEFAULT,
                                 SideEffectType::kHasNoSideEffect);
 
   target->SetNativeDataProperty(FIXED_ONE_BYTE_STRING(isolate, "builtinIds"),
@@ -718,7 +716,6 @@ void BuiltinLoader::CreatePerIsolateProperties(IsolateData* isolate_data,
                                 nullptr,
                                 Local<Value>(),
                                 None,
-                                DEFAULT,
                                 SideEffectType::kHasNoSideEffect);
 
   target->SetNativeDataProperty(
@@ -727,7 +724,6 @@ void BuiltinLoader::CreatePerIsolateProperties(IsolateData* isolate_data,
       nullptr,
       Local<Value>(),
       None,
-      DEFAULT,
       SideEffectType::kHasNoSideEffect);
 
   target->SetNativeDataProperty(FIXED_ONE_BYTE_STRING(isolate, "natives"),
@@ -735,7 +731,6 @@ void BuiltinLoader::CreatePerIsolateProperties(IsolateData* isolate_data,
                                 nullptr,
                                 Local<Value>(),
                                 None,
-                                DEFAULT,
                                 SideEffectType::kHasNoSideEffect);
 
   SetMethod(isolate, target, "getCacheUsage", BuiltinLoader::GetCacheUsage);

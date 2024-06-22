@@ -398,6 +398,11 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
             &EnvironmentOptions::enable_source_maps,
             kAllowedInEnvvar);
   AddOption("--experimental-abortcontroller", "", NoOp{}, kAllowedInEnvvar);
+  AddOption("--experimental-eventsource",
+            "experimental EventSource API",
+            &EnvironmentOptions::experimental_eventsource,
+            kAllowedInEnvvar,
+            false);
   AddOption("--experimental-fetch",
             "experimental Fetch API",
             &EnvironmentOptions::experimental_fetch,
@@ -463,6 +468,10 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
             "allow use of child process when any permissions are set",
             &EnvironmentOptions::allow_child_process,
             kAllowedInEnvvar);
+  AddOption("--allow-wasi",
+            "allow wasi when any permissions are set",
+            &EnvironmentOptions::allow_wasi,
+            kAllowedInEnvvar);
   AddOption("--allow-worker",
             "allow worker threads when any permissions are set",
             &EnvironmentOptions::allow_worker_threads,
@@ -480,6 +489,7 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
   AddOption("--experimental-report", "", NoOp{}, kAllowedInEnvvar);
   AddOption(
       "--experimental-wasi-unstable-preview1", "", NoOp{}, kAllowedInEnvvar);
+  AddOption("--expose-gc", "expose gc extension", V8Option{}, kAllowedInEnvvar);
   AddOption("--expose-internals", "", &EnvironmentOptions::expose_internals);
   AddOption("--frozen-intrinsics",
             "experimental frozen intrinsics support",
@@ -630,9 +640,18 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
   AddOption("--test-timeout",
             "specify test runner timeout",
             &EnvironmentOptions::test_runner_timeout);
+  AddOption("--test-update-snapshots",
+            "regenerate test snapshots",
+            &EnvironmentOptions::test_runner_update_snapshots);
   AddOption("--experimental-test-coverage",
             "enable code coverage in the test runner",
             &EnvironmentOptions::test_runner_coverage);
+  AddOption("--experimental-test-module-mocks",
+            "enable module mocking in the test runner",
+            &EnvironmentOptions::test_runner_module_mocks);
+  AddOption("--experimental-test-snapshots",
+            "enable snapshot testing in the test runner",
+            &EnvironmentOptions::test_runner_snapshots);
   AddOption("--test-name-pattern",
             "run tests whose name matches this regular expression",
             &EnvironmentOptions::test_name_pattern);

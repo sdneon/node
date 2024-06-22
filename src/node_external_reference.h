@@ -27,6 +27,10 @@ using CFunctionCallbackWithStrings =
     bool (*)(v8::Local<v8::Value>,
              const v8::FastOneByteString& input,
              const v8::FastOneByteString& base);
+using CFunctionCallbackWithTwoUint8Arrays =
+    int32_t (*)(v8::Local<v8::Value>,
+                const v8::FastApiTypedArray<uint8_t>&,
+                const v8::FastApiTypedArray<uint8_t>&);
 using CFunctionCallbackWithTwoUint8ArraysFallback =
     bool (*)(v8::Local<v8::Value>,
              const v8::FastApiTypedArray<uint8_t>&,
@@ -56,6 +60,7 @@ class ExternalReferenceRegistry {
   V(CFunctionCallbackWithBool)                                                 \
   V(CFunctionCallbackWithString)                                               \
   V(CFunctionCallbackWithStrings)                                              \
+  V(CFunctionCallbackWithTwoUint8Arrays)                                       \
   V(CFunctionCallbackWithTwoUint8ArraysFallback)                               \
   V(CFunctionWithUint32)                                                       \
   V(CFunctionWithDoubleReturnDouble)                                           \
@@ -63,8 +68,6 @@ class ExternalReferenceRegistry {
   V(CFunctionWithBool)                                                         \
   V(const v8::CFunctionInfo*)                                                  \
   V(v8::FunctionCallback)                                                      \
-  V(v8::AccessorGetterCallback)                                                \
-  V(v8::AccessorSetterCallback)                                                \
   V(v8::AccessorNameGetterCallback)                                            \
   V(v8::AccessorNameSetterCallback)                                            \
   V(v8::NamedPropertyGetterCallback)                                           \

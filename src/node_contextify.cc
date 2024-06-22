@@ -886,16 +886,15 @@ void ContextifyScript::New(const FunctionCallbackInfo<Value>& args) {
   host_defined_options->Set(
       isolate, loader::HostDefinedOptions::kID, id_symbol);
 
-  ScriptOrigin origin(isolate,
-                      filename,
-                      line_offset,                          // line offset
-                      column_offset,                        // column offset
-                      true,                                 // is cross origin
-                      -1,                                   // script id
-                      Local<Value>(),                       // source map URL
-                      false,                                // is opaque (?)
-                      false,                                // is WASM
-                      false,                                // is ES Module
+  ScriptOrigin origin(filename,
+                      line_offset,     // line offset
+                      column_offset,   // column offset
+                      true,            // is cross origin
+                      -1,              // script id
+                      Local<Value>(),  // source map URL
+                      false,           // is opaque (?)
+                      false,           // is WASM
+                      false,           // is ES Module
                       host_defined_options);
   ScriptCompiler::Source source(code, origin, cached_data);
   ScriptCompiler::CompileOptions compile_options =
@@ -1006,7 +1005,7 @@ MaybeLocal<Function> CompileFunction(Local<Context> context,
                                      Local<String> filename,
                                      Local<String> content,
                                      std::vector<Local<String>>* parameters) {
-  ScriptOrigin script_origin(context->GetIsolate(), filename, 0, 0, true);
+  ScriptOrigin script_origin(filename, 0, 0, true);
   ScriptCompiler::Source script_source(content, script_origin);
 
   return ScriptCompiler::CompileFunction(context,
@@ -1116,7 +1115,6 @@ bool ContextifyScript::EvalMachine(Local<Context> context,
   }
 
   TryCatchScope try_catch(env);
-  Isolate::SafeForTerminationScope safe_for_termination(env->isolate());
   ContextifyScript* wrapped_script;
   ASSIGN_OR_RETURN_UNWRAP(&wrapped_script, args.Holder(), false);
   Local<UnboundScript> unbound_script =
@@ -1270,8 +1268,7 @@ void ContextifyContext::CompileFunction(
   Local<PrimitiveArray> host_defined_options =
       loader::ModuleWrap::GetHostDefinedOptions(isolate, id_symbol);
 
-  ScriptOrigin origin(isolate,
-                      filename,
+  ScriptOrigin origin(filename,
                       line_offset,     // line offset
                       column_offset,   // column offset
                       true,            // is cross origin
@@ -1445,15 +1442,15 @@ static MaybeLocal<Function> CompileFunctionForCJSLoader(Environment* env,
                                                         Local<Context> context,
                                                         Local<String> code,
                                                         Local<String> filename,
-                                                        bool* cache_rejected) {
+                                                        bool* cache_rejected,
+                                                        bool is_cjs_scope) {
   Isolate* isolate = context->GetIsolate();
   EscapableHandleScope scope(isolate);
 
   Local<Symbol> symbol = env->vm_dynamic_import_default_internal();
   Local<PrimitiveArray> hdo =
       loader::ModuleWrap::GetHostDefinedOptions(isolate, symbol);
-  ScriptOrigin origin(isolate,
-                      filename,
+  ScriptOrigin origin(filename,
                       0,               // line offset
                       0,               // column offset
                       true,            // is cross origin
@@ -1498,7 +1495,10 @@ static MaybeLocal<Function> CompileFunctionForCJSLoader(Environment* env,
     options = ScriptCompiler::kConsumeCodeCache;
   }
 
-  std::vector<Local<String>> params = GetCJSParameters(env->isolate_data());
+  std::vector<Local<String>> params;
+  if (is_cjs_scope) {
+    params = GetCJSParameters(env->isolate_data());
+  }
   MaybeLocal<Function> maybe_fn = ScriptCompiler::CompileFunction(
       context,
       &source,
@@ -1560,7 +1560,7 @@ static void CompileFunctionForCJSLoader(
     ShouldNotAbortOnUncaughtScope no_abort_scope(realm->env());
     TryCatchScope try_catch(env);
     if (!CompileFunctionForCJSLoader(
-             env, context, code, filename, &cache_rejected)
+             env, context, code, filename, &cache_rejected, true)
              .ToLocal(&fn)) {
       CHECK(try_catch.HasCaught());
       CHECK(!try_catch.HasTerminated());
@@ -1698,11 +1698,15 @@ static void ContainsModuleSyntax(const FunctionCallbackInfo<Value>& args) {
   CHECK(args[1]->IsString());
   Local<String> filename = args[1].As<String>();
 
-  // Argument 2: resource name (URL for ES module).
+  // Argument 3: resource name (URL for ES module).
   Local<String> resource_name = filename;
   if (args[2]->IsString()) {
     resource_name = args[2].As<String>();
   }
+  // Argument 4: flag to indicate if CJS variables should not be in scope
+  // (they should be for normal CommonJS modules, but not for the
+  // CommonJS eval scope).
+  bool cjs_var = !args[3]->IsString();
 
   bool cache_rejected = false;
   Local<String> message;
@@ -1711,7 +1715,7 @@ static void ContainsModuleSyntax(const FunctionCallbackInfo<Value>& args) {
     TryCatchScope try_catch(env);
     ShouldNotAbortOnUncaughtScope no_abort_scope(env);
     if (CompileFunctionForCJSLoader(
-            env, context, code, filename, &cache_rejected)
+            env, context, code, filename, &cache_rejected, cjs_var)
             .ToLocal(&fn)) {
       args.GetReturnValue().Set(false);
       return;

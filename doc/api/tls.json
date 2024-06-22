@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v22.2.0/lib/tls.js\">lib/tls.js</a></p>\n<p>The <code>node:tls</code> module provides an implementation of the Transport Layer Security\n(TLS) and Secure Socket Layer (SSL) protocols that is built on top of OpenSSL.\nThe module can be accessed using:</p>\n<pre><code class=\"language-js\">const tls = require('node:tls');\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v22.3.0/lib/tls.js\">lib/tls.js</a></p>\n<p>The <code>node:tls</code> module provides an implementation of the Transport Layer Security\n(TLS) and Secure Socket Layer (SSL) protocols that is built on top of OpenSSL.\nThe module can be accessed using:</p>\n<pre><code class=\"language-js\">const tls = require('node:tls');\n</code></pre>",
       "modules": [
         {
           "textRaw": "Determining if crypto support is unavailable",
@@ -38,7 +38,7 @@
               "textRaw": "Pre-shared keys",
               "name": "Pre-shared keys",
               "type": "misc",
-              "desc": "<p>TLS-PSK support is available as an alternative to normal certificate-based\nauthentication. It uses a pre-shared key instead of certificates to\nauthenticate a TLS connection, providing mutual authentication.\nTLS-PSK and public key infrastructure are not mutually exclusive. Clients and\nservers can accommodate both, choosing either of them during the normal cipher\nnegotiation step.</p>\n<p>TLS-PSK is only a good choice where means exist to securely share a\nkey with every connecting machine, so it does not replace the public key\ninfrastructure (PKI) for the majority of TLS uses.\nThe TLS-PSK implementation in OpenSSL has seen many security flaws in\nrecent years, mostly because it is used only by a minority of applications.\nPlease consider all alternative solutions before switching to PSK ciphers.\nUpon generating PSK it is of critical importance to use sufficient entropy as\ndiscussed in <a href=\"https://tools.ietf.org/html/rfc4086\">RFC 4086</a>. Deriving a shared secret from a password or other\nlow-entropy sources is not secure.</p>\n<p>PSK ciphers are disabled by default, and using TLS-PSK thus requires explicitly\nspecifying a cipher suite with the <code>ciphers</code> option. The list of available\nciphers can be retrieved via <code>openssl ciphers -v 'PSK'</code>. All TLS 1.3\nciphers are eligible for PSK and can be retrieved via\n<code>openssl ciphers -v -s -tls1_3 -psk</code>.</p>\n<p>According to the <a href=\"https://tools.ietf.org/html/rfc4279\">RFC 4279</a>, PSK identities up to 128 bytes in length and\nPSKs up to 64 bytes in length must be supported. As of OpenSSL 1.1.0\nmaximum identity size is 128 bytes, and maximum PSK length is 256 bytes.</p>\n<p>The current implementation doesn't support asynchronous PSK callbacks due to the\nlimitations of the underlying OpenSSL API.</p>"
+              "desc": "<p>TLS-PSK support is available as an alternative to normal certificate-based\nauthentication. It uses a pre-shared key instead of certificates to\nauthenticate a TLS connection, providing mutual authentication.\nTLS-PSK and public key infrastructure are not mutually exclusive. Clients and\nservers can accommodate both, choosing either of them during the normal cipher\nnegotiation step.</p>\n<p>TLS-PSK is only a good choice where means exist to securely share a\nkey with every connecting machine, so it does not replace the public key\ninfrastructure (PKI) for the majority of TLS uses.\nThe TLS-PSK implementation in OpenSSL has seen many security flaws in\nrecent years, mostly because it is used only by a minority of applications.\nPlease consider all alternative solutions before switching to PSK ciphers.\nUpon generating PSK it is of critical importance to use sufficient entropy as\ndiscussed in <a href=\"https://tools.ietf.org/html/rfc4086\">RFC 4086</a>. Deriving a shared secret from a password or other\nlow-entropy sources is not secure.</p>\n<p>PSK ciphers are disabled by default, and using TLS-PSK thus requires explicitly\nspecifying a cipher suite with the <code>ciphers</code> option. The list of available\nciphers can be retrieved via <code>openssl ciphers -v 'PSK'</code>. All TLS 1.3\nciphers are eligible for PSK and can be retrieved via\n<code>openssl ciphers -v -s -tls1_3 -psk</code>.\nOn the client connection, a custom <code>checkServerIdentity</code> should be passed\nbecause the default one will fail in the absence of a certificate.</p>\n<p>According to the <a href=\"https://tools.ietf.org/html/rfc4279\">RFC 4279</a>, PSK identities up to 128 bytes in length and\nPSKs up to 64 bytes in length must be supported. As of OpenSSL 1.1.0\nmaximum identity size is 128 bytes, and maximum PSK length is 256 bytes.</p>\n<p>The current implementation doesn't support asynchronous PSK callbacks due to the\nlimitations of the underlying OpenSSL API.</p>\n<p>To use TLS-PSK, client and server must specify the <code>pskCallback</code> option,\na function that returns the PSK to use (which must be compatible with\nthe selected cipher's digest).</p>\n<p>It will be called first on the client:</p>\n<ul>\n<li>hint: <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> optional message sent from the server to help the client\ndecide which identity to use during negotiation.\nAlways <code>null</code> if TLS 1.3 is used.</li>\n<li>Returns: <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a> in the form\n<code>{ psk: &#x3C;Buffer|TypedArray|DataView>, identity: &#x3C;string> }</code> or <code>null</code>.</li>\n</ul>\n<p>Then on the server:</p>\n<ul>\n<li>socket: <a href=\"tls.html#class-tlstlssocket\" class=\"type\">&lt;tls.TLSSocket&gt;</a> the server socket instance, equivalent to <code>this</code>.</li>\n<li>identity: <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> identity parameter sent from the client.</li>\n<li>Returns: <a href=\"buffer.html#class-buffer\" class=\"type\">&lt;Buffer&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\" class=\"type\">&lt;TypedArray&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView\" class=\"type\">&lt;DataView&gt;</a> the PSK (or <code>null</code>).</li>\n</ul>\n<p>A return value of <code>null</code> stops the negotiation process and sends an\n<code>unknown_psk_identity</code> alert message to the other party.\nIf the server wishes to hide the fact that the PSK identity was not known,\nthe callback must provide some random data as <code>psk</code> to make the connection\nfail with <code>decrypt_error</code> before negotiation is finished.</p>"
             },
             {
               "textRaw": "Client-initiated renegotiation attack mitigation",
@@ -1459,24 +1459,10 @@
                       "desc": "If not `false`, the server certificate is verified against the list of supplied CAs. An `'error'` event is emitted if verification fails; `err.code` contains the OpenSSL error code."
                     },
                     {
-                      "textRaw": "`pskCallback` {Function}When negotiating TLS-PSK (pre-shared keys), this function is called with optional identity `hint` provided by the server or `null` in case of TLS 1.3 where `hint` was removed. It will be necessary to provide a custom `tls.checkServerIdentity()` for the connection as the default one will try to check host name/IP of the server against the certificate but that's not applicable for PSK because there won't be a certificate present. More information can be found in the [RFC 4279][].",
+                      "textRaw": "`pskCallback` {Function} For TLS-PSK negotiation, see [Pre-shared keys][].",
                       "name": "pskCallback",
                       "type": "Function",
-                      "desc": "When negotiating TLS-PSK (pre-shared keys), this function is called with optional identity `hint` provided by the server or `null` in case of TLS 1.3 where `hint` was removed. It will be necessary to provide a custom `tls.checkServerIdentity()` for the connection as the default one will try to check host name/IP of the server against the certificate but that's not applicable for PSK because there won't be a certificate present. More information can be found in the [RFC 4279][].",
-                      "options": [
-                        {
-                          "textRaw": "hint: {string} optional message sent from the server to help client decide which identity to use during negotiation. Always `null` if TLS 1.3 is used.",
-                          "name": "hint",
-                          "type": "string",
-                          "desc": "optional message sent from the server to help client decide which identity to use during negotiation. Always `null` if TLS 1.3 is used."
-                        },
-                        {
-                          "textRaw": "Returns: {Object} An object in the form `{ psk: <Buffer|TypedArray|DataView>, identity: <string> }` or `null` to stop the negotiation process. `psk` must be compatible with the selected cipher's digest. `identity` must use UTF-8 encoding.",
-                          "name": "return",
-                          "type": "Object",
-                          "desc": "An object in the form `{ psk: <Buffer|TypedArray|DataView>, identity: <string> }` or `null` to stop the negotiation process. `psk` must be compatible with the selected cipher's digest. `identity` must use UTF-8 encoding."
-                        }
-                      ]
+                      "desc": "For TLS-PSK negotiation, see [Pre-shared keys][]."
                     },
                     {
                       "textRaw": "`ALPNProtocols`: {string\\[]|Buffer\\[]|TypedArray\\[]|DataView\\[]|Buffer| TypedArray|DataView} An array of strings, `Buffer`s, `TypedArray`s, or `DataView`s, or a single `Buffer`, `TypedArray`, or `DataView` containing the supported ALPN protocols. `Buffer`s should have the format `[len][name][len][name]...` e.g. `'\\x08http/1.1\\x08http/1.0'`, where the `len` byte is the length of the next protocol name. Passing an array is usually much simpler, e.g. `['http/1.1', 'http/1.0']`. Protocols earlier in the list have higher preference than those later.",
@@ -2089,30 +2075,10 @@
                       "desc": "48-bytes of cryptographically strong pseudorandom data. See [Session Resumption][] for more information."
                     },
                     {
-                      "textRaw": "`pskCallback` {Function}When negotiating TLS-PSK (pre-shared keys), this function is called with the identity provided by the client. If the return value is `null` the negotiation process will stop and an \"unknown\\_psk\\_identity\" alert message will be sent to the other party. If the server wishes to hide the fact that the PSK identity was not known, the callback must provide some random data as `psk` to make the connection fail with \"decrypt\\_error\" before negotiation is finished. PSK ciphers are disabled by default, and using TLS-PSK thus requires explicitly specifying a cipher suite with the `ciphers` option. More information can be found in the [RFC 4279][].",
+                      "textRaw": "`pskCallback` {Function} For TLS-PSK negotiation, see [Pre-shared keys][].",
                       "name": "pskCallback",
                       "type": "Function",
-                      "desc": "When negotiating TLS-PSK (pre-shared keys), this function is called with the identity provided by the client. If the return value is `null` the negotiation process will stop and an \"unknown\\_psk\\_identity\" alert message will be sent to the other party. If the server wishes to hide the fact that the PSK identity was not known, the callback must provide some random data as `psk` to make the connection fail with \"decrypt\\_error\" before negotiation is finished. PSK ciphers are disabled by default, and using TLS-PSK thus requires explicitly specifying a cipher suite with the `ciphers` option. More information can be found in the [RFC 4279][].",
-                      "options": [
-                        {
-                          "textRaw": "socket: {tls.TLSSocket} the server [`tls.TLSSocket`][] instance for this connection.",
-                          "name": "socket",
-                          "type": "tls.TLSSocket",
-                          "desc": "the server [`tls.TLSSocket`][] instance for this connection."
-                        },
-                        {
-                          "textRaw": "identity: {string} identity parameter sent from the client.",
-                          "name": "identity",
-                          "type": "string",
-                          "desc": "identity parameter sent from the client."
-                        },
-                        {
-                          "textRaw": "Returns: {Buffer|TypedArray|DataView} pre-shared key that must either be a buffer or `null` to stop the negotiation process. Returned PSK must be compatible with the selected cipher's digest.",
-                          "name": "return",
-                          "type": "Buffer|TypedArray|DataView",
-                          "desc": "pre-shared key that must either be a buffer or `null` to stop the negotiation process. Returned PSK must be compatible with the selected cipher's digest."
-                        }
-                      ]
+                      "desc": "For TLS-PSK negotiation, see [Pre-shared keys][]."
                     },
                     {
                       "textRaw": "`pskIdentityHint` {string} optional hint to send to a client to help with selecting the identity during TLS-PSK negotiation. Will be ignored in TLS 1.3. Upon failing to set pskIdentityHint `'tlsClientError'` will be emitted with `'ERR_TLS_PSK_SET_IDENTIY_HINT_FAILED'` code.",

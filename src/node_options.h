@@ -115,6 +115,7 @@ class EnvironmentOptions : public Options {
   bool require_module = false;
   std::string dns_result_order;
   bool enable_source_maps = false;
+  bool experimental_eventsource = false;
   bool experimental_fetch = true;
   bool experimental_websocket = true;
   bool experimental_global_customevent = true;
@@ -130,6 +131,7 @@ class EnvironmentOptions : public Options {
   std::vector<std::string> allow_fs_write;
   bool allow_addons = false;
   bool allow_child_process = false;
+  bool allow_wasi = false;
   bool allow_worker_threads = false;
   bool experimental_repl_await = true;
   bool experimental_vm_modules = false;
@@ -173,6 +175,9 @@ class EnvironmentOptions : public Options {
   uint64_t test_runner_timeout = 0;
   bool test_runner_coverage = false;
   bool test_runner_force_exit = false;
+  bool test_runner_module_mocks = false;
+  bool test_runner_snapshots = false;
+  bool test_runner_update_snapshots = false;
   std::vector<std::string> test_name_pattern;
   std::vector<std::string> test_reporter;
   std::vector<std::string> test_reporter_destination;

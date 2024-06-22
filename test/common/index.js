@@ -189,7 +189,7 @@ if (process.env.NODE_TEST_WITH_ASYNC_HOOKS) {
       }
       initHandles[id] = {
         resource,
-        stack: inspect(new Error()).substr(6),
+        stack: inspect(new Error()).slice(6),
       };
     },
     before() { },
@@ -280,6 +280,7 @@ function platformTimeout(ms) {
 }
 
 let knownGlobals = [
+  AbortController,
   atob,
   btoa,
   clearImmediate,
@@ -291,15 +292,6 @@ let knownGlobals = [
   setTimeout,
   queueMicrotask,
 ];
-
-// TODO(@jasnell): This check can be temporary. AbortController is
-// not currently supported in either Node.js 12 or 10, making it
-// difficult to run tests comparatively on those versions. Once
-// all supported versions have AbortController as a global, this
-// check can be removed and AbortController can be added to the
-// knownGlobals list above.
-if (global.AbortController)
-  knownGlobals.push(global.AbortController);
 
 if (global.gc) {
   knownGlobals.push(global.gc);
@@ -331,6 +323,10 @@ if (global.PerformanceMeasure) {
 // can add this to the list above instead.
 if (global.structuredClone) {
   knownGlobals.push(global.structuredClone);
+}
+
+if (global.EventSource) {
+  knownGlobals.push(EventSource);
 }
 
 if (global.fetch) {

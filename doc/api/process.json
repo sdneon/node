@@ -7,7 +7,7 @@
       "name": "Process",
       "introduced_in": "v0.10.0",
       "type": "global",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v22.2.0/lib/process.js\">lib/process.js</a></p>\n<p>The <code>process</code> object provides information about, and control over, the current\nNode.js process.</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\n</code></pre>\n<pre><code class=\"language-cjs\">const process = require('node:process');\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v22.3.0/lib/process.js\">lib/process.js</a></p>\n<p>The <code>process</code> object provides information about, and control over, the current\nNode.js process.</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\n</code></pre>\n<pre><code class=\"language-cjs\">const process = require('node:process');\n</code></pre>",
       "modules": [
         {
           "textRaw": "Process events",
@@ -729,6 +729,35 @@
             }
           ],
           "desc": "<p>The <code>process.getActiveResourcesInfo()</code> method returns an array of strings\ncontaining the types of the active resources that are currently keeping the\nevent loop alive.</p>\n<pre><code class=\"language-mjs\">import { getActiveResourcesInfo } from 'node:process';\nimport { setTimeout } from 'node:timers';\n\nconsole.log('Before:', getActiveResourcesInfo());\nsetTimeout(() => {}, 1000);\nconsole.log('After:', getActiveResourcesInfo());\n// Prints:\n//   Before: [ 'CloseReq', 'TTYWrap', 'TTYWrap', 'TTYWrap' ]\n//   After: [ 'CloseReq', 'TTYWrap', 'TTYWrap', 'TTYWrap', 'Timeout' ]\n</code></pre>\n<pre><code class=\"language-cjs\">const { getActiveResourcesInfo } = require('node:process');\nconst { setTimeout } = require('node:timers');\n\nconsole.log('Before:', getActiveResourcesInfo());\nsetTimeout(() => {}, 1000);\nconsole.log('After:', getActiveResourcesInfo());\n// Prints:\n//   Before: [ 'TTYWrap', 'TTYWrap', 'TTYWrap' ]\n//   After: [ 'TTYWrap', 'TTYWrap', 'TTYWrap', 'Timeout' ]\n</code></pre>"
+        },
+        {
+          "textRaw": "`process.getBuiltinModule(id)`",
+          "type": "method",
+          "name": "getBuiltinModule",
+          "meta": {
+            "added": [
+              "v22.3.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "return": {
+                "textRaw": "Returns: {Object|undefined}",
+                "name": "return",
+                "type": "Object|undefined"
+              },
+              "params": [
+                {
+                  "textRaw": "`id` {string} ID of the built-in module being requested.",
+                  "name": "id",
+                  "type": "string",
+                  "desc": "ID of the built-in module being requested."
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>process.getBuiltinModule(id)</code> provides a way to load built-in modules\nin a globally available function. ES Modules that need to support\nother environments can use it to conditionally load a Node.js built-in\nwhen it is run in Node.js, without having to deal with the resolution\nerror that can be thrown by <code>import</code> in a non-Node.js environment or\nhaving to use dynamic <code>import()</code> which either turns the module into\nan asynchronous module, or turns a synchronous API into an asynchronous one.</p>\n<pre><code class=\"language-mjs\">if (globalThis.process?.getBuiltinModule) {\n  // Run in Node.js, use the Node.js fs module.\n  const fs = globalThis.process.getBuiltinModule('fs');\n  // If `require()` is needed to load user-modules, use createRequire()\n  const module = globalThis.process.getBuiltinModule('module');\n  const require = module.createRequire(import.meta.url);\n  const foo = require('foo');\n}\n</code></pre>\n<p>If <code>id</code> specifies a built-in module available in the current Node.js process,\n<code>process.getBuiltinModule(id)</code> method returns the corresponding built-in\nmodule. If <code>id</code> does not correspond to any built-in module, <code>undefined</code>\nis returned.</p>\n<p><code>process.getBuiltinModule(id)</code> accepts built-in module IDs that are recognized\nby <a href=\"module.html#moduleisbuiltinmodulename\"><code>module.isBuiltin(id)</code></a>. Some built-in modules must be loaded with the\n<code>node:</code> prefix, see <a href=\"modules.html#built-in-modules-with-mandatory-node-prefix\">built-in modules with mandatory <code>node:</code> prefix</a>.\nThe references returned by <code>process.getBuiltinModule(id)</code> always point to\nthe built-in module corresponding to <code>id</code> even if users modify\n<a href=\"modules.html#requirecache\"><code>require.cache</code></a> so that <code>require(id)</code> returns something else.</p>"
         },
         {
           "textRaw": "`process.getegid()`",

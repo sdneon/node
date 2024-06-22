@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v22.2.0">
-  <title>Process | Node.js v22.2.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v22.3.0">
+  <title>Process | Node.js v22.3.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -109,7 +109,7 @@
     <div id="column1" data-id="process" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v22.2.0 documentation</h1>
+          <h1>Node.js v22.3.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -124,7 +124,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v22.2.0</li>
+            <li class="pinned-header">Node.js v22.3.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -193,6 +193,7 @@
 <li><a href="#processexitcode"><code>process.exit([code])</code></a></li>
 <li><a href="#processexitcode_1"><code>process.exitCode</code></a></li>
 <li><span class="stability_1"><a href="#processgetactiveresourcesinfo"><code>process.getActiveResourcesInfo()</code></a></span></li>
+<li><a href="#processgetbuiltinmoduleid"><code>process.getBuiltinModule(id)</code></a></li>
 <li><a href="#processgetegid"><code>process.getegid()</code></a></li>
 <li><a href="#processgeteuid"><code>process.geteuid()</code></a></li>
 <li><a href="#processgetgid"><code>process.getgid()</code></a></li>
@@ -473,6 +474,7 @@
 <li><a href="#processexitcode"><code>process.exit([code])</code></a></li>
 <li><a href="#processexitcode_1"><code>process.exitCode</code></a></li>
 <li><span class="stability_1"><a href="#processgetactiveresourcesinfo"><code>process.getActiveResourcesInfo()</code></a></span></li>
+<li><a href="#processgetbuiltinmoduleid"><code>process.getBuiltinModule(id)</code></a></li>
 <li><a href="#processgetegid"><code>process.getegid()</code></a></li>
 <li><a href="#processgeteuid"><code>process.geteuid()</code></a></li>
 <li><a href="#processgetgid"><code>process.getgid()</code></a></li>
@@ -558,7 +560,7 @@
         <h2>Process<span><a class="mark" href="#process" id="process">#</a></span><a aria-hidden="true" class="legacy" id="process_process"></a></h2>
 
 
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v22.2.0/lib/process.js">lib/process.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v22.3.0/lib/process.js">lib/process.js</a></p>
 <p>The <code>process</code> object provides information about, and control over, the current
 Node.js process.</p>
 
@@ -2061,6 +2063,39 @@ event loop alive.</p>
 <span class="hljs-comment">// Prints:</span>
 <span class="hljs-comment">//   Before: [ 'TTYWrap', 'TTYWrap', 'TTYWrap' ]</span>
 <span class="hljs-comment">//   After: [ 'TTYWrap', 'TTYWrap', 'TTYWrap', 'Timeout' ]</span></code><button class="copy-button">copy</button></pre>
+</section><section><h3><code>process.getBuiltinModule(id)</code><span><a class="mark" href="#processgetbuiltinmoduleid" id="processgetbuiltinmoduleid">#</a></span><a aria-hidden="true" class="legacy" id="process_process_getbuiltinmodule_id"></a></h3>
+<div class="api_metadata">
+<span>Added in: v22.3.0</span>
+</div>
+<ul>
+<li><code>id</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> ID of the built-in module being requested.</li>
+<li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a></li>
+</ul>
+<p><code>process.getBuiltinModule(id)</code> provides a way to load built-in modules
+in a globally available function. ES Modules that need to support
+other environments can use it to conditionally load a Node.js built-in
+when it is run in Node.js, without having to deal with the resolution
+error that can be thrown by <code>import</code> in a non-Node.js environment or
+having to use dynamic <code>import()</code> which either turns the module into
+an asynchronous module, or turns a synchronous API into an asynchronous one.</p>
+<pre><code class="language-js mjs"><span class="hljs-keyword">if</span> (globalThis.<span class="hljs-property">process</span>?.<span class="hljs-property">getBuiltinModule</span>) {
+  <span class="hljs-comment">// Run in Node.js, use the Node.js fs module.</span>
+  <span class="hljs-keyword">const</span> fs = globalThis.<span class="hljs-property">process</span>.<span class="hljs-title function_">getBuiltinModule</span>(<span class="hljs-string">'fs'</span>);
+  <span class="hljs-comment">// If `require()` is needed to load user-modules, use createRequire()</span>
+  <span class="hljs-keyword">const</span> <span class="hljs-variable language_">module</span> = globalThis.<span class="hljs-property">process</span>.<span class="hljs-title function_">getBuiltinModule</span>(<span class="hljs-string">'module'</span>);
+  <span class="hljs-keyword">const</span> <span class="hljs-built_in">require</span> = <span class="hljs-variable language_">module</span>.<span class="hljs-title function_">createRequire</span>(<span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">url</span>);
+  <span class="hljs-keyword">const</span> foo = <span class="hljs-built_in">require</span>(<span class="hljs-string">'foo'</span>);
+}</code> <button class="copy-button">copy</button></pre>
+<p>If <code>id</code> specifies a built-in module available in the current Node.js process,
+<code>process.getBuiltinModule(id)</code> method returns the corresponding built-in
+module. If <code>id</code> does not correspond to any built-in module, <code>undefined</code>
+is returned.</p>
+<p><code>process.getBuiltinModule(id)</code> accepts built-in module IDs that are recognized
+by <a href="module.html#moduleisbuiltinmodulename"><code>module.isBuiltin(id)</code></a>. Some built-in modules must be loaded with the
+<code>node:</code> prefix, see <a href="modules.html#built-in-modules-with-mandatory-node-prefix">built-in modules with mandatory <code>node:</code> prefix</a>.
+The references returned by <code>process.getBuiltinModule(id)</code> always point to
+the built-in module corresponding to <code>id</code> even if users modify
+<a href="modules.html#requirecache"><code>require.cache</code></a> so that <code>require(id)</code> returns something else.</p>
 </section><section><h3><code>process.getegid()</code><span><a class="mark" href="#processgetegid" id="processgetegid">#</a></span><a aria-hidden="true" class="legacy" id="process_process_getegid"></a></h3>
 <div class="api_metadata">
 <span>Added in: v2.0.0</span>

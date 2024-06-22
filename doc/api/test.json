@@ -21,7 +21,7 @@
       },
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v22.2.0/lib/test.js\">lib/test.js</a></p>\n<p>The <code>node:test</code> module facilitates the creation of JavaScript tests.\nTo access it:</p>\n<pre><code class=\"language-mjs\">import test from 'node:test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('node:test');\n</code></pre>\n<p>This module is only available under the <code>node:</code> scheme. The following will not\nwork:</p>\n<pre><code class=\"language-mjs\">import test from 'test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('test');\n</code></pre>\n<p>Tests created via the <code>test</code> module consist of a single function that is\nprocessed in one of three ways:</p>\n<ol>\n<li>A synchronous function that is considered failing if it throws an exception,\nand is considered passing otherwise.</li>\n<li>A function that returns a <code>Promise</code> that is considered failing if the\n<code>Promise</code> rejects, and is considered passing if the <code>Promise</code> fulfills.</li>\n<li>A function that receives a callback function. If the callback receives any\ntruthy value as its first argument, the test is considered failing. If a\nfalsy value is passed as the first argument to the callback, the test is\nconsidered passing. If the test function receives a callback function and\nalso returns a <code>Promise</code>, the test will fail.</li>\n</ol>\n<p>The following example illustrates how tests are written using the\n<code>test</code> module.</p>\n<pre><code class=\"language-js\">test('synchronous passing test', (t) => {\n  // This test passes because it does not throw an exception.\n  assert.strictEqual(1, 1);\n});\n\ntest('synchronous failing test', (t) => {\n  // This test fails because it throws an exception.\n  assert.strictEqual(1, 2);\n});\n\ntest('asynchronous passing test', async (t) => {\n  // This test passes because the Promise returned by the async\n  // function is settled and not rejected.\n  assert.strictEqual(1, 1);\n});\n\ntest('asynchronous failing test', async (t) => {\n  // This test fails because the Promise returned by the async\n  // function is rejected.\n  assert.strictEqual(1, 2);\n});\n\ntest('failing test using Promises', (t) => {\n  // Promises can be used directly as well.\n  return new Promise((resolve, reject) => {\n    setImmediate(() => {\n      reject(new Error('this will cause the test to fail'));\n    });\n  });\n});\n\ntest('callback passing test', (t, done) => {\n  // done() is the callback function. When the setImmediate() runs, it invokes\n  // done() with no arguments.\n  setImmediate(done);\n});\n\ntest('callback failing test', (t, done) => {\n  // When the setImmediate() runs, done() is invoked with an Error object and\n  // the test fails.\n  setImmediate(() => {\n    done(new Error('callback failure'));\n  });\n});\n</code></pre>\n<p>If any tests fail, the process exit code is set to <code>1</code>.</p>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v22.3.0/lib/test.js\">lib/test.js</a></p>\n<p>The <code>node:test</code> module facilitates the creation of JavaScript tests.\nTo access it:</p>\n<pre><code class=\"language-mjs\">import test from 'node:test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('node:test');\n</code></pre>\n<p>This module is only available under the <code>node:</code> scheme. The following will not\nwork:</p>\n<pre><code class=\"language-mjs\">import test from 'test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('test');\n</code></pre>\n<p>Tests created via the <code>test</code> module consist of a single function that is\nprocessed in one of three ways:</p>\n<ol>\n<li>A synchronous function that is considered failing if it throws an exception,\nand is considered passing otherwise.</li>\n<li>A function that returns a <code>Promise</code> that is considered failing if the\n<code>Promise</code> rejects, and is considered passing if the <code>Promise</code> fulfills.</li>\n<li>A function that receives a callback function. If the callback receives any\ntruthy value as its first argument, the test is considered failing. If a\nfalsy value is passed as the first argument to the callback, the test is\nconsidered passing. If the test function receives a callback function and\nalso returns a <code>Promise</code>, the test will fail.</li>\n</ol>\n<p>The following example illustrates how tests are written using the\n<code>test</code> module.</p>\n<pre><code class=\"language-js\">test('synchronous passing test', (t) => {\n  // This test passes because it does not throw an exception.\n  assert.strictEqual(1, 1);\n});\n\ntest('synchronous failing test', (t) => {\n  // This test fails because it throws an exception.\n  assert.strictEqual(1, 2);\n});\n\ntest('asynchronous passing test', async (t) => {\n  // This test passes because the Promise returned by the async\n  // function is settled and not rejected.\n  assert.strictEqual(1, 1);\n});\n\ntest('asynchronous failing test', async (t) => {\n  // This test fails because the Promise returned by the async\n  // function is rejected.\n  assert.strictEqual(1, 2);\n});\n\ntest('failing test using Promises', (t) => {\n  // Promises can be used directly as well.\n  return new Promise((resolve, reject) => {\n    setImmediate(() => {\n      reject(new Error('this will cause the test to fail'));\n    });\n  });\n});\n\ntest('callback passing test', (t, done) => {\n  // done() is the callback function. When the setImmediate() runs, it invokes\n  // done() with no arguments.\n  setImmediate(done);\n});\n\ntest('callback failing test', (t, done) => {\n  // When the setImmediate() runs, done() is invoked with an Error object and\n  // the test fails.\n  setImmediate(() => {\n    done(new Error('callback failure'));\n  });\n});\n</code></pre>\n<p>If any tests fail, the process exit code is set to <code>1</code>.</p>",
       "modules": [
         {
           "textRaw": "Subtests",
@@ -153,6 +153,15 @@
           "displayName": "Mocking"
         },
         {
+          "textRaw": "Snapshot testing",
+          "name": "snapshot_testing",
+          "stability": 1,
+          "stabilityText": ".0 - Early development",
+          "desc": "<p>Snapshot tests allow arbitrary values to be serialized into string values and\ncompared against a set of known good values. The known good values are known as\nsnapshots, and are stored in a snapshot file. Snapshot files are managed by the\ntest runner, but are designed to be human readable to aid in debugging. Best\npractice is for snapshot files to be checked into source control along with your\ntest files. In order to enable snapshot testing, Node.js must be started with\nthe <a href=\"cli.html#--experimental-test-snapshots\"><code>--experimental-test-snapshots</code></a> command-line flag.</p>\n<p>Snapshot files are generated by starting Node.js with the\n<a href=\"cli.html#--test-update-snapshots\"><code>--test-update-snapshots</code></a> command-line flag. A separate snapshot file is\ngenerated for each test file. By default, the snapshot file has the same name\nas <code>process.argv[1]</code> with a <code>.snapshot</code> file extension. This behavior can be\nconfigured using the <code>snapshot.setResolveSnapshotPath()</code> function. Each\nsnapshot assertion corresponds to an export in the snapshot file.</p>\n<p>An example snapshot test is shown below. The first time this test is executed,\nit will fail because the corresponding snapshot file does not exist.</p>\n<pre><code class=\"language-js\">// test.js\nsuite('suite of snapshot tests', () => {\n  test('snapshot test', (t) => {\n    t.assert.snapshot({ value1: 1, value2: 2 });\n    t.assert.snapshot(5);\n  });\n});\n</code></pre>\n<p>Generate the snapshot file by running the test file with\n<code>--test-update-snapshots</code>. The test should pass, and a file named\n<code>test.js.snapshot</code> is created in the same directory as the test file. The\ncontents of the snapshot file are shown below. Each snapshot is identified by\nthe full name of test and a counter to differentiate between snapshots in the\nsame test.</p>\n<pre><code class=\"language-js\">exports[`suite of snapshot tests > snapshot test 1`] = `\n{\n  \"value1\": 1,\n  \"value2\": 2\n}\n`;\n\nexports[`suite of snapshot tests > snapshot test 2`] = `\n5\n`;\n</code></pre>\n<p>Once the snapshot file is created, run the tests again without the\n<code>--test-update-snapshots</code> flag. The tests should pass now.</p>",
+          "type": "module",
+          "displayName": "Snapshot testing"
+        },
+        {
           "textRaw": "Test reporters",
           "name": "test_reporters",
           "meta": {
@@ -190,6 +199,75 @@
           ],
           "type": "module",
           "displayName": "Test reporters"
+        },
+        {
+          "textRaw": "`snapshot`",
+          "name": "`snapshot`",
+          "meta": {
+            "added": [
+              "v22.3.0"
+            ],
+            "changes": []
+          },
+          "stability": 1,
+          "stabilityText": ".0 - Early development",
+          "desc": "<p>An object whose methods are used to configure default snapshot settings in the\ncurrent process. It is possible to apply the same configuration to all files by\nplacing common configuration code in a module preloaded with <code>--require</code> or\n<code>--import</code>.</p>",
+          "methods": [
+            {
+              "textRaw": "`snapshot.setDefaultSnapshotSerializers(serializers)`",
+              "type": "method",
+              "name": "setDefaultSnapshotSerializers",
+              "meta": {
+                "added": [
+                  "v22.3.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": ".0 - Early development",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`serializers` {Array} An array of synchronous functions used as the default serializers for snapshot tests.",
+                      "name": "serializers",
+                      "type": "Array",
+                      "desc": "An array of synchronous functions used as the default serializers for snapshot tests."
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>This function is used to customize the default serialization mechanism used by\nthe test runner. By default, the test runner performs serialization by calling\n<code>JSON.stringify(value, null, 2)</code> on the provided value. <code>JSON.stringify()</code> does\nhave limitations regarding circular structures and supported data types. If a\nmore robust serialization mechanism is required, this function should be used.</p>"
+            },
+            {
+              "textRaw": "`snapshot.setResolveSnapshotPath(fn)`",
+              "type": "method",
+              "name": "setResolveSnapshotPath",
+              "meta": {
+                "added": [
+                  "v22.3.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": ".0 - Early development",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`fn` {Function} A function used to compute the location of the snapshot file. The function receives the path of the test file as its only argument. If the `process.argv[1]` is not associated with a file (for example in the REPL), the input is undefined. `fn()` must return a string specifying the location of the snapshot file.",
+                      "name": "fn",
+                      "type": "Function",
+                      "desc": "A function used to compute the location of the snapshot file. The function receives the path of the test file as its only argument. If the `process.argv[1]` is not associated with a file (for example in the REPL), the input is undefined. `fn()` must return a string specifying the location of the snapshot file."
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>This function is used to customize the location of the snapshot file used for\nsnapshot testing. By default, the snapshot filename is the same as the entry\npoint filename with a <code>.snapshot</code> file extension.</p>"
+            }
+          ],
+          "type": "module",
+          "displayName": "`snapshot`"
         }
       ],
       "methods": [
@@ -1031,6 +1109,39 @@
           ]
         },
         {
+          "textRaw": "Class: `MockModuleContext`",
+          "type": "class",
+          "name": "MockModuleContext",
+          "meta": {
+            "added": [
+              "v22.3.0"
+            ],
+            "changes": []
+          },
+          "stability": 1,
+          "stabilityText": ".0 - Early development",
+          "desc": "<p>The <code>MockModuleContext</code> class is used to manipulate the behavior of module mocks\ncreated via the <a href=\"#class-mocktracker\"><code>MockTracker</code></a> APIs.</p>",
+          "methods": [
+            {
+              "textRaw": "`ctx.restore()`",
+              "type": "method",
+              "name": "restore",
+              "meta": {
+                "added": [
+                  "v22.3.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>Resets the implementation of the mock module.</p>"
+            }
+          ]
+        },
+        {
           "textRaw": "Class: `MockTracker`",
           "type": "class",
           "name": "MockTracker",
@@ -1189,6 +1300,65 @@
               "desc": "<p>This function is used to create a mock on an existing object method. The\nfollowing example demonstrates how a mock is created on an existing object\nmethod.</p>\n<pre><code class=\"language-js\">test('spies on an object method', (t) => {\n  const number = {\n    value: 5,\n    subtract(a) {\n      return this.value - a;\n    },\n  };\n\n  t.mock.method(number, 'subtract');\n  assert.strictEqual(number.subtract.mock.calls.length, 0);\n  assert.strictEqual(number.subtract(3), 2);\n  assert.strictEqual(number.subtract.mock.calls.length, 1);\n\n  const call = number.subtract.mock.calls[0];\n\n  assert.deepStrictEqual(call.arguments, [3]);\n  assert.strictEqual(call.result, 2);\n  assert.strictEqual(call.error, undefined);\n  assert.strictEqual(call.target, undefined);\n  assert.strictEqual(call.this, number);\n});\n</code></pre>"
             },
             {
+              "textRaw": "`mock.module(specifier[, options])`",
+              "type": "method",
+              "name": "module",
+              "meta": {
+                "added": [
+                  "v22.3.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": ".0 - Early development",
+              "signatures": [
+                {
+                  "return": {
+                    "textRaw": "Returns: {MockModuleContext} An object that can be used to manipulate the mock.",
+                    "name": "return",
+                    "type": "MockModuleContext",
+                    "desc": "An object that can be used to manipulate the mock."
+                  },
+                  "params": [
+                    {
+                      "textRaw": "`specifier` {string} A string identifying the module to mock.",
+                      "name": "specifier",
+                      "type": "string",
+                      "desc": "A string identifying the module to mock."
+                    },
+                    {
+                      "textRaw": "`options` {Object} Optional configuration options for the mock module. The following properties are supported:",
+                      "name": "options",
+                      "type": "Object",
+                      "desc": "Optional configuration options for the mock module. The following properties are supported:",
+                      "options": [
+                        {
+                          "textRaw": "`cache` {boolean} If `false`, each call to `require()` or `import()` generates a new mock module. If `true`, subsequent calls will return the same module mock, and the mock module is inserted into the CommonJS cache. **Default:** false.",
+                          "name": "cache",
+                          "type": "boolean",
+                          "default": "false",
+                          "desc": "If `false`, each call to `require()` or `import()` generates a new mock module. If `true`, subsequent calls will return the same module mock, and the mock module is inserted into the CommonJS cache."
+                        },
+                        {
+                          "textRaw": "`defaultExport` {any} An optional value used as the mocked module's default export. If this value is not provided, ESM mocks do not include a default export. If the mock is a CommonJS or builtin module, this setting is used as the value of `module.exports`. If this value is not provided, CJS and builtin mocks use an empty object as the value of `module.exports`.",
+                          "name": "defaultExport",
+                          "type": "any",
+                          "desc": "An optional value used as the mocked module's default export. If this value is not provided, ESM mocks do not include a default export. If the mock is a CommonJS or builtin module, this setting is used as the value of `module.exports`. If this value is not provided, CJS and builtin mocks use an empty object as the value of `module.exports`."
+                        },
+                        {
+                          "textRaw": "`namedExports` {Object} An optional object whose keys and values are used to create the named exports of the mock module. If the mock is a CommonJS or builtin module, these values are copied onto `module.exports`. Therefore, if a mock is created with both named exports and a non-object default export, the mock will throw an exception when used as a CJS or builtin module.",
+                          "name": "namedExports",
+                          "type": "Object",
+                          "desc": "An optional object whose keys and values are used to create the named exports of the mock module. If the mock is a CommonJS or builtin module, these values are copied onto `module.exports`. Therefore, if a mock is created with both named exports and a non-object default export, the mock will throw an exception when used as a CJS or builtin module."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>This function is used to mock the exports of ECMAScript modules, CommonJS\nmodules, and Node.js builtin modules. Any references to the original module\nprior to mocking are not impacted. The following example demonstrates how a mock\nis created for a module.</p>\n<pre><code class=\"language-js\">test('mocks a builtin module in both module systems', async (t) => {\n  // Create a mock of 'node:readline' with a named export named 'fn', which\n  // does not exist in the original 'node:readline' module.\n  const mock = t.mock.module('node:readline', {\n    namedExports: { fn() { return 42; } },\n  });\n\n  let esmImpl = await import('node:readline');\n  let cjsImpl = require('node:readline');\n\n  // cursorTo() is an export of the original 'node:readline' module.\n  assert.strictEqual(esmImpl.cursorTo, undefined);\n  assert.strictEqual(cjsImpl.cursorTo, undefined);\n  assert.strictEqual(esmImpl.fn(), 42);\n  assert.strictEqual(cjsImpl.fn(), 42);\n\n  mock.restore();\n\n  // The mock is restored, so the original builtin module is returned.\n  esmImpl = await import('node:readline');\n  cjsImpl = require('node:readline');\n\n  assert.strictEqual(typeof esmImpl.cursorTo, 'function');\n  assert.strictEqual(typeof cjsImpl.cursorTo, 'function');\n  assert.strictEqual(esmImpl.fn, undefined);\n  assert.strictEqual(cjsImpl.fn, undefined);\n});\n</code></pre>"
+            },
+            {
               "textRaw": "`mock.reset()`",
               "type": "method",
               "name": "reset",
@@ -1284,7 +1454,7 @@
                   "params": []
                 }
               ],
-              "desc": "<p>Enables timer mocking for the specified timers.</p>\n<ul>\n<li><code>enableOptions</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a> Optional configuration options for enabling timer\nmocking. The following properties are supported:\n<ul>\n<li><code>apis</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array\" class=\"type\">&lt;Array&gt;</a> An optional array containing the timers to mock.\nThe currently supported timer values are <code>'setInterval'</code>, <code>'setTimeout'</code>, <code>'setImmediate'</code>,\nand <code>'Date'</code>. <strong>Default:</strong> <code>['setInterval', 'setTimeout', 'setImmediate', 'Date']</code>.\nIf no array is provided, all time related APIs (<code>'setInterval'</code>, <code>'clearInterval'</code>,\n<code>'setTimeout'</code>, <code>'clearTimeout'</code>, and <code>'Date'</code>) will be mocked by default.</li>\n<li><code>now</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date\" class=\"type\">&lt;Date&gt;</a> An optional number or Date object representing the\ninitial time (in milliseconds) to use as the value\nfor <code>Date.now()</code>. <strong>Default:</strong> <code>0</code>.</li>\n</ul>\n</li>\n</ul>\n<p><strong>Note:</strong> When you enable mocking for a specific timer, its associated\nclear function will also be implicitly mocked.</p>\n<p><strong>Note:</strong> Mocking <code>Date</code> will affect the behavior of the mocked timers\nas they use the same internal clock.</p>\n<p>Example usage without setting initial time:</p>\n<pre><code class=\"language-mjs\">import { mock } from 'node:test';\nmock.timers.enable({ apis: ['setInterval'] });\n</code></pre>\n<pre><code class=\"language-cjs\">const { mock } = require('node:test');\nmock.timers.enable({ apis: ['setInterval'] });\n</code></pre>\n<p>The above example enables mocking for the <code>setInterval</code> timer and\nimplicitly mocks the <code>clearInterval</code> function. Only the <code>setInterval</code>\nand <code>clearInterval</code> functions from <a href=\"./timers.html\">node:timers</a>,\n<a href=\"./timers.html#timers-promises-api\">node:timers/promises</a>, and\n<code>globalThis</code> will be mocked.</p>\n<p>Example usage with initial time set</p>\n<pre><code class=\"language-mjs\">import { mock } from 'node:test';\nmock.timers.enable({ apis: ['Date'], now: 1000 });\n</code></pre>\n<pre><code class=\"language-cjs\">const { mock } = require('node:test');\nmock.timers.enable({ apis: ['Date'], now: 1000 });\n</code></pre>\n<p>Example usage with initial Date object as time set</p>\n<pre><code class=\"language-mjs\">import { mock } from 'node:test';\nmock.timers.enable({ apis: ['Date'], now: new Date() });\n</code></pre>\n<pre><code class=\"language-cjs\">const { mock } = require('node:test');\nmock.timers.enable({ apis: ['Date'], now: new Date() });\n</code></pre>\n<p>Alternatively, if you call <code>mock.timers.enable()</code> without any parameters:</p>\n<p>All timers (<code>'setInterval'</code>, <code>'clearInterval'</code>, <code>'setTimeout'</code>, and <code>'clearTimeout'</code>)\nwill be mocked. The <code>setInterval</code>, <code>clearInterval</code>, <code>setTimeout</code>, and <code>clearTimeout</code>\nfunctions from <code>node:timers</code>, <code>node:timers/promises</code>,\nand <code>globalThis</code> will be mocked. As well as the global <code>Date</code> object.</p>"
+              "desc": "<p>Enables timer mocking for the specified timers.</p>\n<ul>\n<li><code>enableOptions</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a> Optional configuration options for enabling timer\nmocking. The following properties are supported:\n<ul>\n<li><code>apis</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array\" class=\"type\">&lt;Array&gt;</a> An optional array containing the timers to mock.\nThe currently supported timer values are <code>'setInterval'</code>, <code>'setTimeout'</code>, <code>'setImmediate'</code>,\nand <code>'Date'</code>. <strong>Default:</strong> <code>['setInterval', 'setTimeout', 'setImmediate', 'Date']</code>.\nIf no array is provided, all time related APIs (<code>'setInterval'</code>, <code>'clearInterval'</code>,\n<code>'setTimeout'</code>, <code>'clearTimeout'</code>, <code>'setImmediate'</code>, <code>'clearImmediate'</code>, and\n<code>'Date'</code>) will be mocked by default.</li>\n<li><code>now</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date\" class=\"type\">&lt;Date&gt;</a> An optional number or Date object representing the\ninitial time (in milliseconds) to use as the value\nfor <code>Date.now()</code>. <strong>Default:</strong> <code>0</code>.</li>\n</ul>\n</li>\n</ul>\n<p><strong>Note:</strong> When you enable mocking for a specific timer, its associated\nclear function will also be implicitly mocked.</p>\n<p><strong>Note:</strong> Mocking <code>Date</code> will affect the behavior of the mocked timers\nas they use the same internal clock.</p>\n<p>Example usage without setting initial time:</p>\n<pre><code class=\"language-mjs\">import { mock } from 'node:test';\nmock.timers.enable({ apis: ['setInterval'] });\n</code></pre>\n<pre><code class=\"language-cjs\">const { mock } = require('node:test');\nmock.timers.enable({ apis: ['setInterval'] });\n</code></pre>\n<p>The above example enables mocking for the <code>setInterval</code> timer and\nimplicitly mocks the <code>clearInterval</code> function. Only the <code>setInterval</code>\nand <code>clearInterval</code> functions from <a href=\"./timers.html\">node:timers</a>,\n<a href=\"./timers.html#timers-promises-api\">node:timers/promises</a>, and\n<code>globalThis</code> will be mocked.</p>\n<p>Example usage with initial time set</p>\n<pre><code class=\"language-mjs\">import { mock } from 'node:test';\nmock.timers.enable({ apis: ['Date'], now: 1000 });\n</code></pre>\n<pre><code class=\"language-cjs\">const { mock } = require('node:test');\nmock.timers.enable({ apis: ['Date'], now: 1000 });\n</code></pre>\n<p>Example usage with initial Date object as time set</p>\n<pre><code class=\"language-mjs\">import { mock } from 'node:test';\nmock.timers.enable({ apis: ['Date'], now: new Date() });\n</code></pre>\n<pre><code class=\"language-cjs\">const { mock } = require('node:test');\nmock.timers.enable({ apis: ['Date'], now: new Date() });\n</code></pre>\n<p>Alternatively, if you call <code>mock.timers.enable()</code> without any parameters:</p>\n<p>All timers (<code>'setInterval'</code>, <code>'clearInterval'</code>, <code>'setTimeout'</code>, <code>'clearTimeout'</code>,\n<code>'setImmediate'</code>, and <code>'clearImmediate'</code>) will be mocked. The <code>setInterval</code>,\n<code>clearInterval</code>, <code>setTimeout</code>, <code>clearTimeout</code>, <code>setImmediate</code>, and\n<code>clearImmediate</code> functions from <code>node:timers</code>, <code>node:timers/promises</code>, and\n<code>globalThis</code> will be mocked. As well as the global <code>Date</code> object.</p>"
             },
             {
               "textRaw": "`timers.reset()`",
@@ -1316,7 +1486,7 @@
               "desc": "<p>Calls <code>timers.reset()</code>.</p>"
             },
             {
-              "textRaw": "`timers.tick(milliseconds)`",
+              "textRaw": "`timers.tick([milliseconds])`",
               "type": "method",
               "name": "tick",
               "meta": {
@@ -1331,12 +1501,12 @@
                   "params": []
                 }
               ],
-              "desc": "<p>Advances time for all mocked timers.</p>\n<ul>\n<li><code>milliseconds</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> The amount of time, in milliseconds,\nto advance the timers.</li>\n</ul>\n<p><strong>Note:</strong> This diverges from how <code>setTimeout</code> in Node.js behaves and accepts\nonly positive numbers. In Node.js, <code>setTimeout</code> with negative numbers is\nonly supported for web compatibility reasons.</p>\n<p>The following example mocks a <code>setTimeout</code> function and\nby using <code>.tick</code> advances in\ntime triggering all pending timers.</p>\n<pre><code class=\"language-mjs\">import assert from 'node:assert';\nimport { test } from 'node:test';\n\ntest('mocks setTimeout to be executed synchronously without having to actually wait for it', (context) => {\n  const fn = context.mock.fn();\n\n  context.mock.timers.enable({ apis: ['setTimeout'] });\n\n  setTimeout(fn, 9999);\n\n  assert.strictEqual(fn.mock.callCount(), 0);\n\n  // Advance in time\n  context.mock.timers.tick(9999);\n\n  assert.strictEqual(fn.mock.callCount(), 1);\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const assert = require('node:assert');\nconst { test } = require('node:test');\n\ntest('mocks setTimeout to be executed synchronously without having to actually wait for it', (context) => {\n  const fn = context.mock.fn();\n  context.mock.timers.enable({ apis: ['setTimeout'] });\n\n  setTimeout(fn, 9999);\n  assert.strictEqual(fn.mock.callCount(), 0);\n\n  // Advance in time\n  context.mock.timers.tick(9999);\n\n  assert.strictEqual(fn.mock.callCount(), 1);\n});\n</code></pre>\n<p>Alternativelly, the <code>.tick</code> function can be called many times</p>\n<pre><code class=\"language-mjs\">import assert from 'node:assert';\nimport { test } from 'node:test';\n\ntest('mocks setTimeout to be executed synchronously without having to actually wait for it', (context) => {\n  const fn = context.mock.fn();\n  context.mock.timers.enable({ apis: ['setTimeout'] });\n  const nineSecs = 9000;\n  setTimeout(fn, nineSecs);\n\n  const twoSeconds = 3000;\n  context.mock.timers.tick(twoSeconds);\n  context.mock.timers.tick(twoSeconds);\n  context.mock.timers.tick(twoSeconds);\n\n  assert.strictEqual(fn.mock.callCount(), 1);\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const assert = require('node:assert');\nconst { test } = require('node:test');\n\ntest('mocks setTimeout to be executed synchronously without having to actually wait for it', (context) => {\n  const fn = context.mock.fn();\n  context.mock.timers.enable({ apis: ['setTimeout'] });\n  const nineSecs = 9000;\n  setTimeout(fn, nineSecs);\n\n  const twoSeconds = 3000;\n  context.mock.timers.tick(twoSeconds);\n  context.mock.timers.tick(twoSeconds);\n  context.mock.timers.tick(twoSeconds);\n\n  assert.strictEqual(fn.mock.callCount(), 1);\n});\n</code></pre>\n<p>Advancing time using <code>.tick</code> will also advance the time for any <code>Date</code> object\ncreated after the mock was enabled (if <code>Date</code> was also set to be mocked).</p>\n<pre><code class=\"language-mjs\">import assert from 'node:assert';\nimport { test } from 'node:test';\n\ntest('mocks setTimeout to be executed synchronously without having to actually wait for it', (context) => {\n  const fn = context.mock.fn();\n\n  context.mock.timers.enable({ apis: ['setTimeout', 'Date'] });\n  setTimeout(fn, 9999);\n\n  assert.strictEqual(fn.mock.callCount(), 0);\n  assert.strictEqual(Date.now(), 0);\n\n  // Advance in time\n  context.mock.timers.tick(9999);\n  assert.strictEqual(fn.mock.callCount(), 1);\n  assert.strictEqual(Date.now(), 9999);\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const assert = require('node:assert');\nconst { test } = require('node:test');\n\ntest('mocks setTimeout to be executed synchronously without having to actually wait for it', (context) => {\n  const fn = context.mock.fn();\n  context.mock.timers.enable({ apis: ['setTimeout', 'Date'] });\n\n  setTimeout(fn, 9999);\n  assert.strictEqual(fn.mock.callCount(), 0);\n  assert.strictEqual(Date.now(), 0);\n\n  // Advance in time\n  context.mock.timers.tick(9999);\n  assert.strictEqual(fn.mock.callCount(), 1);\n  assert.strictEqual(Date.now(), 9999);\n});\n</code></pre>",
+              "desc": "<p>Advances time for all mocked timers.</p>\n<ul>\n<li><code>milliseconds</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> The amount of time, in milliseconds,\nto advance the timers. <strong>Default:</strong> <code>1</code>.</li>\n</ul>\n<p><strong>Note:</strong> This diverges from how <code>setTimeout</code> in Node.js behaves and accepts\nonly positive numbers. In Node.js, <code>setTimeout</code> with negative numbers is\nonly supported for web compatibility reasons.</p>\n<p>The following example mocks a <code>setTimeout</code> function and\nby using <code>.tick</code> advances in\ntime triggering all pending timers.</p>\n<pre><code class=\"language-mjs\">import assert from 'node:assert';\nimport { test } from 'node:test';\n\ntest('mocks setTimeout to be executed synchronously without having to actually wait for it', (context) => {\n  const fn = context.mock.fn();\n\n  context.mock.timers.enable({ apis: ['setTimeout'] });\n\n  setTimeout(fn, 9999);\n\n  assert.strictEqual(fn.mock.callCount(), 0);\n\n  // Advance in time\n  context.mock.timers.tick(9999);\n\n  assert.strictEqual(fn.mock.callCount(), 1);\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const assert = require('node:assert');\nconst { test } = require('node:test');\n\ntest('mocks setTimeout to be executed synchronously without having to actually wait for it', (context) => {\n  const fn = context.mock.fn();\n  context.mock.timers.enable({ apis: ['setTimeout'] });\n\n  setTimeout(fn, 9999);\n  assert.strictEqual(fn.mock.callCount(), 0);\n\n  // Advance in time\n  context.mock.timers.tick(9999);\n\n  assert.strictEqual(fn.mock.callCount(), 1);\n});\n</code></pre>\n<p>Alternativelly, the <code>.tick</code> function can be called many times</p>\n<pre><code class=\"language-mjs\">import assert from 'node:assert';\nimport { test } from 'node:test';\n\ntest('mocks setTimeout to be executed synchronously without having to actually wait for it', (context) => {\n  const fn = context.mock.fn();\n  context.mock.timers.enable({ apis: ['setTimeout'] });\n  const nineSecs = 9000;\n  setTimeout(fn, nineSecs);\n\n  const threeSeconds = 3000;\n  context.mock.timers.tick(threeSeconds);\n  context.mock.timers.tick(threeSeconds);\n  context.mock.timers.tick(threeSeconds);\n\n  assert.strictEqual(fn.mock.callCount(), 1);\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const assert = require('node:assert');\nconst { test } = require('node:test');\n\ntest('mocks setTimeout to be executed synchronously without having to actually wait for it', (context) => {\n  const fn = context.mock.fn();\n  context.mock.timers.enable({ apis: ['setTimeout'] });\n  const nineSecs = 9000;\n  setTimeout(fn, nineSecs);\n\n  const threeSeconds = 3000;\n  context.mock.timers.tick(threeSeconds);\n  context.mock.timers.tick(threeSeconds);\n  context.mock.timers.tick(threeSeconds);\n\n  assert.strictEqual(fn.mock.callCount(), 1);\n});\n</code></pre>\n<p>Advancing time using <code>.tick</code> will also advance the time for any <code>Date</code> object\ncreated after the mock was enabled (if <code>Date</code> was also set to be mocked).</p>\n<pre><code class=\"language-mjs\">import assert from 'node:assert';\nimport { test } from 'node:test';\n\ntest('mocks setTimeout to be executed synchronously without having to actually wait for it', (context) => {\n  const fn = context.mock.fn();\n\n  context.mock.timers.enable({ apis: ['setTimeout', 'Date'] });\n  setTimeout(fn, 9999);\n\n  assert.strictEqual(fn.mock.callCount(), 0);\n  assert.strictEqual(Date.now(), 0);\n\n  // Advance in time\n  context.mock.timers.tick(9999);\n  assert.strictEqual(fn.mock.callCount(), 1);\n  assert.strictEqual(Date.now(), 9999);\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const assert = require('node:assert');\nconst { test } = require('node:test');\n\ntest('mocks setTimeout to be executed synchronously without having to actually wait for it', (context) => {\n  const fn = context.mock.fn();\n  context.mock.timers.enable({ apis: ['setTimeout', 'Date'] });\n\n  setTimeout(fn, 9999);\n  assert.strictEqual(fn.mock.callCount(), 0);\n  assert.strictEqual(Date.now(), 0);\n\n  // Advance in time\n  context.mock.timers.tick(9999);\n  assert.strictEqual(fn.mock.callCount(), 1);\n  assert.strictEqual(Date.now(), 9999);\n});\n</code></pre>",
               "modules": [
                 {
                   "textRaw": "Using clear functions",
                   "name": "using_clear_functions",
-                  "desc": "<p>As mentioned, all clear functions from timers (<code>clearTimeout</code> and <code>clearInterval</code>)\nare implicity mocked. Take a look at this example using <code>setTimeout</code>:</p>\n<pre><code class=\"language-mjs\">import assert from 'node:assert';\nimport { test } from 'node:test';\n\ntest('mocks setTimeout to be executed synchronously without having to actually wait for it', (context) => {\n  const fn = context.mock.fn();\n\n  // Optionally choose what to mock\n  context.mock.timers.enable({ apis: ['setTimeout'] });\n  const id = setTimeout(fn, 9999);\n\n  // Implicity mocked as well\n  clearTimeout(id);\n  context.mock.timers.tick(9999);\n\n  // As that setTimeout was cleared the mock function will never be called\n  assert.strictEqual(fn.mock.callCount(), 0);\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const assert = require('node:assert');\nconst { test } = require('node:test');\n\ntest('mocks setTimeout to be executed synchronously without having to actually wait for it', (context) => {\n  const fn = context.mock.fn();\n\n  // Optionally choose what to mock\n  context.mock.timers.enable({ apis: ['setTimeout'] });\n  const id = setTimeout(fn, 9999);\n\n  // Implicity mocked as well\n  clearTimeout(id);\n  context.mock.timers.tick(9999);\n\n  // As that setTimeout was cleared the mock function will never be called\n  assert.strictEqual(fn.mock.callCount(), 0);\n});\n</code></pre>",
+                  "desc": "<p>As mentioned, all clear functions from timers (<code>clearTimeout</code>, <code>clearInterval</code>,and\n<code>clearImmediate</code>) are implicitly mocked. Take a look at this example using <code>setTimeout</code>:</p>\n<pre><code class=\"language-mjs\">import assert from 'node:assert';\nimport { test } from 'node:test';\n\ntest('mocks setTimeout to be executed synchronously without having to actually wait for it', (context) => {\n  const fn = context.mock.fn();\n\n  // Optionally choose what to mock\n  context.mock.timers.enable({ apis: ['setTimeout'] });\n  const id = setTimeout(fn, 9999);\n\n  // Implicitly mocked as well\n  clearTimeout(id);\n  context.mock.timers.tick(9999);\n\n  // As that setTimeout was cleared the mock function will never be called\n  assert.strictEqual(fn.mock.callCount(), 0);\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const assert = require('node:assert');\nconst { test } = require('node:test');\n\ntest('mocks setTimeout to be executed synchronously without having to actually wait for it', (context) => {\n  const fn = context.mock.fn();\n\n  // Optionally choose what to mock\n  context.mock.timers.enable({ apis: ['setTimeout'] });\n  const id = setTimeout(fn, 9999);\n\n  // Implicitly mocked as well\n  clearTimeout(id);\n  context.mock.timers.tick(9999);\n\n  // As that setTimeout was cleared the mock function will never be called\n  assert.strictEqual(fn.mock.callCount(), 0);\n});\n</code></pre>",
                   "type": "module",
                   "displayName": "Using clear functions"
                 },
@@ -2169,22 +2339,10 @@
                   "type": "Object",
                   "options": [
                     {
-                      "textRaw": "`column` {number|undefined} The column number where the test is defined, or `undefined` if the test was run through the REPL.",
-                      "name": "column",
-                      "type": "number|undefined",
-                      "desc": "The column number where the test is defined, or `undefined` if the test was run through the REPL."
-                    },
-                    {
                       "textRaw": "`file` {string} The path of the test file.",
                       "name": "file",
                       "type": "string",
                       "desc": "The path of the test file."
-                    },
-                    {
-                      "textRaw": "`line` {number|undefined} The line number where the test is defined, or `undefined` if the test was run through the REPL.",
-                      "name": "line",
-                      "type": "number|undefined",
-                      "desc": "The line number where the test is defined, or `undefined` if the test was run through the REPL."
                     },
                     {
                       "textRaw": "`message` {string} The message written to `stderr`.",
@@ -2208,22 +2366,10 @@
                   "type": "Object",
                   "options": [
                     {
-                      "textRaw": "`column` {number|undefined} The column number where the test is defined, or `undefined` if the test was run through the REPL.",
-                      "name": "column",
-                      "type": "number|undefined",
-                      "desc": "The column number where the test is defined, or `undefined` if the test was run through the REPL."
-                    },
-                    {
                       "textRaw": "`file` {string} The path of the test file.",
                       "name": "file",
                       "type": "string",
                       "desc": "The path of the test file."
-                    },
-                    {
-                      "textRaw": "`line` {number|undefined} The line number where the test is defined, or `undefined` if the test was run through the REPL.",
-                      "name": "line",
-                      "type": "number|undefined",
-                      "desc": "The line number where the test is defined, or `undefined` if the test was run through the REPL."
                     },
                     {
                       "textRaw": "`message` {string} The message written to `stdout`.",
@@ -2504,7 +2650,7 @@
                   ]
                 }
               ],
-              "desc": "<p>This function is used to set the number of assertions and subtests that are expected to run\nwithin the test. If the number of assertions and subtests that run does not match the\nexpected count, the test will fail.</p>\n<blockquote>\n<p>Note: To make sure assertions are tracked, <code>t.assert</code> must be used instead of <code>assert</code> directly.</p>\n</blockquote>\n<pre><code class=\"language-js\">test('top level test', (t) => {\n  t.plan(2);\n  t.assert.ok('some relevant assertion here');\n  t.subtest('subtest', () => {});\n});\n</code></pre>\n<p>When working with asynchronous code, the <code>plan</code> function can be used to ensure that the\ncorrect number of assertions are run:</p>\n<pre><code class=\"language-js\">test('planning with streams', (t, done) => {\n  function* generate() {\n    yield 'a';\n    yield 'b';\n    yield 'c';\n  }\n  const expected = ['a', 'b', 'c'];\n  t.plan(expected.length);\n  const stream = Readable.from(generate());\n  stream.on('data', (chunk) => {\n    t.assert.strictEqual(chunk, expected.shift());\n  });\n\n  stream.on('end', () => {\n    done();\n  });\n});\n</code></pre>"
+              "desc": "<p>This function is used to set the number of assertions and subtests that are expected to run\nwithin the test. If the number of assertions and subtests that run does not match the\nexpected count, the test will fail.</p>\n<blockquote>\n<p>Note: To make sure assertions are tracked, <code>t.assert</code> must be used instead of <code>assert</code> directly.</p>\n</blockquote>\n<pre><code class=\"language-js\">test('top level test', (t) => {\n  t.plan(2);\n  t.assert.ok('some relevant assertion here');\n  t.test('subtest', () => {});\n});\n</code></pre>\n<p>When working with asynchronous code, the <code>plan</code> function can be used to ensure that the\ncorrect number of assertions are run:</p>\n<pre><code class=\"language-js\">test('planning with streams', (t, done) => {\n  function* generate() {\n    yield 'a';\n    yield 'b';\n    yield 'c';\n  }\n  const expected = ['a', 'b', 'c'];\n  t.plan(expected.length);\n  const stream = Readable.from(generate());\n  stream.on('data', (chunk) => {\n    t.assert.strictEqual(chunk, expected.shift());\n  });\n\n  stream.on('end', () => {\n    done();\n  });\n});\n</code></pre>"
             },
             {
               "textRaw": "`context.runOnly(shouldRunOnlyTests)`",
@@ -2695,6 +2841,71 @@
             }
           ],
           "properties": [
+            {
+              "textRaw": "`context.assert`",
+              "name": "assert",
+              "meta": {
+                "added": [
+                  "v22.2.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>An object containing assertion methods bound to <code>context</code>. The top-level\nfunctions from the <code>node:assert</code> module are exposed here for the purpose of\ncreating test plans.</p>\n<pre><code class=\"language-js\">test('test', (t) => {\n  t.plan(1);\n  t.assert.strictEqual(true, true);\n});\n</code></pre>",
+              "methods": [
+                {
+                  "textRaw": "`context.assert.snapshot(value[, options])`",
+                  "type": "method",
+                  "name": "snapshot",
+                  "meta": {
+                    "added": [
+                      "v22.3.0"
+                    ],
+                    "changes": []
+                  },
+                  "stability": 1,
+                  "stabilityText": ".0 - Early development",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`value` {any} A value to serialize to a string. If Node.js was started with the [`--test-update-snapshots`][] flag, the serialized value is written to the snapshot file. Otherwise, the serialized value is compared to the corresponding value in the existing snapshot file.",
+                          "name": "value",
+                          "type": "any",
+                          "desc": "A value to serialize to a string. If Node.js was started with the [`--test-update-snapshots`][] flag, the serialized value is written to the snapshot file. Otherwise, the serialized value is compared to the corresponding value in the existing snapshot file."
+                        },
+                        {
+                          "textRaw": "`options` {Object} Optional configuration options. The following properties are supported:",
+                          "name": "options",
+                          "type": "Object",
+                          "desc": "Optional configuration options. The following properties are supported:",
+                          "options": [
+                            {
+                              "textRaw": "`serializers` {Array} An array of synchronous functions used to serialize `value` into a string. `value` is passed as the only argument to the first serializer function. The return value of each serializer is passed as input to the next serializer. Once all serializers have run, the resulting value is coerced to a string. **Default:** If no serializers are provided, the test runner's default serializers are used.",
+                              "name": "serializers",
+                              "type": "Array",
+                              "default": "If no serializers are provided, the test runner's default serializers are used",
+                              "desc": "An array of synchronous functions used to serialize `value` into a string. `value` is passed as the only argument to the first serializer function. The return value of each serializer is passed as input to the next serializer. Once all serializers have run, the resulting value is coerced to a string."
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>This function implements assertions for snapshot testing.</p>\n<pre><code class=\"language-js\">test('snapshot test with default serialization', (t) => {\n  t.assert.snapshot({ value1: 1, value2: 2 });\n});\n\ntest('snapshot test with custom serialization', (t) => {\n  t.assert.snapshot({ value3: 3, value4: 4 }, {\n    serializers: [(value) => JSON.stringify(value)]\n  });\n});\n</code></pre>"
+                }
+              ]
+            },
+            {
+              "textRaw": "`context.fullName`",
+              "name": "fullName",
+              "meta": {
+                "added": [
+                  "v22.3.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>The name of the test and each of its ancestors, separated by <code>></code>.</p>"
+            },
             {
               "textRaw": "`context.name`",
               "name": "name",

@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v22.2.0">
-  <title>Modules: CommonJS modules | Node.js v22.2.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v22.3.0">
+  <title>Modules: CommonJS modules | Node.js v22.3.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -109,7 +109,7 @@
     <div id="column1" data-id="modules" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v22.2.0 documentation</h1>
+          <h1>Node.js v22.3.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -124,7 +124,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v22.2.0</li>
+            <li class="pinned-header">Node.js v22.3.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -145,7 +145,11 @@
 <li><a href="#module-caching-caveats">Module caching caveats</a></li>
 </ul>
 </li>
-<li><a href="#core-modules">Core modules</a></li>
+<li><a href="#built-in-modules">Built-in modules</a>
+<ul>
+<li><a href="#built-in-modules-with-mandatory-node-prefix">Built-in modules with mandatory <code>node:</code> prefix</a></li>
+</ul>
+</li>
 <li><a href="#cycles">Cycles</a></li>
 <li><a href="#file-modules">File modules</a></li>
 <li><span class="stability_3"><a href="#folders-as-modules">Folders as modules</a></span></li>
@@ -347,7 +351,11 @@
 <li><a href="#module-caching-caveats">Module caching caveats</a></li>
 </ul>
 </li>
-<li><a href="#core-modules">Core modules</a></li>
+<li><a href="#built-in-modules">Built-in modules</a>
+<ul>
+<li><a href="#built-in-modules-with-mandatory-node-prefix">Built-in modules with mandatory <code>node:</code> prefix</a></li>
+</ul>
+</li>
 <li><a href="#cycles">Cycles</a></li>
 <li><a href="#file-modules">File modules</a></li>
 <li><span class="stability_3"><a href="#folders-as-modules">Folders as modules</a></span></li>
@@ -717,7 +725,7 @@ resolved filenames can point to the same file, but the cache will still treat
 them as different modules and will reload the file multiple times. For example,
 <code>require('./foo')</code> and <code>require('./FOO')</code> return two different objects,
 irrespective of whether or not <code>./foo</code> and <code>./FOO</code> are the same file.</p>
-</section><section><h3>Core modules<span><a class="mark" href="#core-modules" id="core-modules">#</a></span><a aria-hidden="true" class="legacy" id="modules_core_modules"></a></h3>
+</section><section><h3>Built-in modules<span><a class="mark" href="#built-in-modules" id="built-in-modules">#</a></span><a aria-hidden="true" class="legacy" id="modules_built_in_modules"></a></h3>
 
 <div class="api_metadata">
 <details class="changelog"><summary>History</summary>
@@ -730,17 +738,27 @@ irrespective of whether or not <code>./foo</code> and <code>./FOO</code> are the
 </div>
 <p>Node.js has several modules compiled into the binary. These modules are
 described in greater detail elsewhere in this documentation.</p>
-<p>The core modules are defined within the Node.js source and are located in the
+<p>The built-in modules are defined within the Node.js source and are located in the
 <code>lib/</code> folder.</p>
-<p>Core modules can be identified using the <code>node:</code> prefix, in which case
+<p>built-in modules can be identified using the <code>node:</code> prefix, in which case
 it bypasses the <code>require</code> cache. For instance, <code>require('node:http')</code> will
 always return the built in HTTP module, even if there is <code>require.cache</code> entry
 by that name.</p>
-<p>Some core modules are always preferentially loaded if their identifier is
+<p>Some built-in modules are always preferentially loaded if their identifier is
 passed to <code>require()</code>. For instance, <code>require('http')</code> will always
 return the built-in HTTP module, even if there is a file by that name. The list
-of core modules that can be loaded without using the <code>node:</code> prefix is exposed
+of built-in modules that can be loaded without using the <code>node:</code> prefix is exposed
 as <a href="module.html#modulebuiltinmodules"><code>module.builtinModules</code></a>.</p>
+<h4>Built-in modules with mandatory <code>node:</code> prefix<span><a class="mark" href="#built-in-modules-with-mandatory-node-prefix" id="built-in-modules-with-mandatory-node-prefix">#</a></span><a aria-hidden="true" class="legacy" id="modules_built_in_modules_with_mandatory_node_prefix"></a></h4>
+<p>When being loaded by <code>require()</code>, some built-in modules must be requested with the
+<code>node:</code> prefix. This requirement exists to prevent newly introduced built-in
+modules from having a conflict with user land packages that already have
+taken the name. Currently the built-in modules that requires the <code>node:</code> prefix are:</p>
+<ul>
+<li><a href="single-executable-applications.html#single-executable-application-api"><code>node:sea</code></a></li>
+<li><a href="test.html"><code>node:test</code></a></li>
+<li><a href="test.html#test-reporters"><code>node:test/reporters</code></a></li>
+</ul>
 </section><section><h3>Cycles<span><a class="mark" href="#cycles" id="cycles">#</a></span><a aria-hidden="true" class="legacy" id="modules_cycles"></a></h3>
 
 <p>When there are circular <code>require()</code> calls, a module might not have finished
@@ -837,7 +855,7 @@ folders as modules, and work for both <code>require</code> and <code>import</cod
 </section><section><h3>Loading from <code>node_modules</code> folders<span><a class="mark" href="#loading-from-node_modules-folders" id="loading-from-node_modules-folders">#</a></span><a aria-hidden="true" class="legacy" id="modules_loading_from_node_modules_folders"></a></h3>
 
 <p>If the module identifier passed to <code>require()</code> is not a
-<a href="#core-modules">core</a> module, and does not begin with <code>'/'</code>, <code>'../'</code>, or
+<a href="#built-in-modules">built-in</a> module, and does not begin with <code>'/'</code>, <code>'../'</code>, or
 <code>'./'</code>, then Node.js starts at the directory of the current module, and
 adds <code>/node_modules</code>, and attempts to load the module from that location.
 Node.js will not append <code>node_modules</code> to a path already ending in

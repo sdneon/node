@@ -625,8 +625,8 @@ Refs: #24448, <https://github.com/microsoft/vcpkg/issues/37518>, [vcpkg](https:/
 * The current [version of Python][Python versions] from the
   [Microsoft Store](https://apps.microsoft.com/store/search?publisher=Python+Software+Foundation)
 * The "Desktop development with C++" workload from
-  [Visual Studio 2022](https://visualstudio.microsoft.com/downloads/) or
-  the "C++ build tools" workload from the
+  [Visual Studio 2022 (17.6 or newer)](https://visualstudio.microsoft.com/downloads/)
+  or the "C++ build tools" workload from the
   [Build Tools](https://aka.ms/vs/17/release/vs_buildtools.exe),
   with the default optional components
 * Basic Unix tools required for some tests,
@@ -691,6 +691,15 @@ disk space.
   git clone https://github.com/nodejs/node.git
   cd node
   ```
+
+> \[!TIP]
+> If you are building from a Windows machine, symlinks are disabled by default, and can be enabled by cloning
+> with the `-c core.symlinks=true` flag.
+>
+> ```powershell
+> git clone -c core.symlinks=true <repository_url>
+> ```
+
 * If the path to your build directory contains a space or a non-ASCII character,
   the build will likely fail
 

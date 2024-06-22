@@ -5,14 +5,17 @@ This is a *fun* mod of Node.JS that initially embedded a modified version of dco
 
 Thanks to the inspiration from dcodeIO et al =D
 
-## Version 22.2.0
-Update to Node.JS 22.2.0 baseline.
-* Add experimental sourcemapping.
+## Version 22.3.0
+* Update to Node.JS 22.3.0 baseline, D Script 1.2.2 and TypeScript 5.5.2.
+* Add experimental stuff:
+  * D Script now has sourcemap.
+  * Replace D Script transpiler via external JS file. See `--experimental-external-dscript` commandline option.
+  * Register bundled modules loaded, so that they can found via `require()`.
 
 It embeds:
-* DS v1.2.1.
+* DS v1.2.2.
 * CS v2.7.0.
-* TS v5.4.5.
+* TS v5.5.2.
 * Refer to prior readmes for old changes.
 
 Built with VS 2022 v17.9.3 (rollback'd), as v17.10.0 fails!
@@ -160,6 +163,40 @@ REPL mode for D Script, CoffeeScript and TypeScript is activated by:
   * E.g.: node.exe --repl=ds
 
 This mode is not available/valid for nodejs4Cpp DLL (node.DLL).
+
+### Register Bundled Module
+If you use bundled modules (packed for example by [browserify](https://github.com/fossamagna/node-browserify) or [Webpack](https://webpack.js.org/)), the modules can now be registered using `global.registerPackedModule(name, module)` and subsequently obtained via `require(name)`.
+`require()` will work as usual in typical Node.JS module-scoped style. If it (actually is require.resolve) fails, then it will try to find in bundled modules, and return it if found. If not the require.resolve's error is rethrown.
+
+**Example**
+Register the modules to be exposed, in your WebPacked codes by calling `registerPackedModule`:
+```js
+//webpacked_bundle.min.js
+...
+var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+(() => {
+function pack()
+{
+    registerPackedModule('@turf/turf', __webpack_require__(83855));
+    registerPackedModule('moment', moment);
+    registerPackedModule('express', __webpack_require__(26083));
+    registerPackedModule('http-proxy', __webpack_require__(99528));
+    registerPackedModule('abort-controller', __webpack_require__(44203));
+    registerPackedModule('geo-coordinates-parser', __webpack_require__(33185));
+}
+pack();
+...
+```
+Then in your app codes, use `require` as usual:
+```js
+//your app
+require('./webpacked_bundle.min.js'); //load the minified bundle
+const turf = require('@turf/turf'),
+    moment = require('moment'),
+    ...
+    { convert } = require('geo-coordinates-parser');
+```
 
 ## Build Info
 From Node.JS 22.x, VS2022 is needed; as VS2019 fails to compile some template syntax in V8 codes.
@@ -354,6 +391,8 @@ For information about the governance of the Node.js project, see
   **Joyee Cheung** <<joyeec9h3@gmail.com>> (she/her)
 * [legendecas](https://github.com/legendecas) -
   **Chengzhong Wu** <<legendecas@gmail.com>> (he/him)
+* [marco-ippolito](https://github.com/marco-ippolito) -
+  **Marco Ippolito** <<marcoippolito54@gmail.com>> (he/him)
 * [mcollina](https://github.com/mcollina) -
   **Matteo Collina** <<matteo.collina@gmail.com>> (he/him)
 * [mhdawson](https://github.com/mhdawson) -
@@ -605,6 +644,8 @@ For information about the governance of the Node.js project, see
   **Paolo Insogna** <<paolo@cowtech.it>> (he/him)
 * [srl295](https://github.com/srl295) -
   **Steven R Loomis** <<srl295@gmail.com>>
+* [StefanStojanovic](https://github.com/StefanStojanovic) -
+  **Stefan Stojanovic** <<stefan.stojanovic@janeasystems.com>> (he/him)
 * [sxa](https://github.com/sxa) -
   **Stewart X Addison** <<sxa@redhat.com>> (he/him)
 * [targos](https://github.com/targos) -
@@ -627,8 +668,6 @@ For information about the governance of the Node.js project, see
   **Daijiro Wachi** <<daijiro.wachi@gmail.com>> (he/him)
 * [XadillaX](https://github.com/XadillaX) -
   **Khaidi Chu** <<i@2333.moe>> (he/him)
-* [yashLadha](https://github.com/yashLadha) -
-  **Yash Ladha** <<yash@yashladha.in>> (he/him)
 * [zcbenz](https://github.com/zcbenz) -
   **Cheng Zhao** <<zcbenz@gmail.com>> (he/him)
 * [ZYSzys](https://github.com/ZYSzys) -
@@ -877,6 +916,8 @@ For information about the governance of the Node.js project, see
   **Thomas Watson** <<w@tson.dk>>
 * [whitlockjc](https://github.com/whitlockjc) -
   **Jeremy Whitlock** <<jwhitlock@apache.org>>
+* [yashLadha](https://github.com/yashLadha) -
+  **Yash Ladha** <<yash@yashladha.in>> (he/him)
 * [yhwang](https://github.com/yhwang) -
   **Yihong Wang** <<yh.wang@ibm.com>>
 * [yorkie](https://github.com/yorkie) -
