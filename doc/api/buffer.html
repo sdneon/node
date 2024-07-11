@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v22.3.0">
-  <title>Buffer | Node.js v22.3.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v22.4.1">
+  <title>Buffer | Node.js v22.4.1 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -109,7 +109,7 @@
     <div id="column1" data-id="buffer" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v22.3.0 documentation</h1>
+          <h1>Node.js v22.4.1 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -124,7 +124,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v22.3.0</li>
+            <li class="pinned-header">Node.js v22.4.1</li>
             
     <li class="picker-header">
       <a href="#">
@@ -574,7 +574,7 @@
         <h2>Buffer<span><a class="mark" href="#buffer" id="buffer">#</a></span><a aria-hidden="true" class="legacy" id="buffer_buffer"></a></h2>
 
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v22.3.0/lib/buffer.js">lib/buffer.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v22.4.1/lib/buffer.js">lib/buffer.js</a></p>
 <p><code>Buffer</code> objects are used to represent a fixed-length sequence of bytes. Many
 Node.js APIs support <code>Buffer</code>s.</p>
 <p>The <code>Buffer</code> class is a subclass of JavaScript's <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array"><code>Uint8Array</code></a> class and
@@ -1251,7 +1251,7 @@ buf.<span class="hljs-title function_">fill</span>(<span class="hljs-number">0</
 <p>The <code>Buffer</code> module pre-allocates an internal <code>Buffer</code> instance of
 size <a href="#class-property-bufferpoolsize"><code>Buffer.poolSize</code></a> that is used as a pool for the fast allocation of new
 <code>Buffer</code> instances created using <a href="#static-method-bufferallocunsafesize"><code>Buffer.allocUnsafe()</code></a>, <a href="#static-method-bufferfromarray"><code>Buffer.from(array)</code></a>,
-and <a href="#static-method-bufferconcatlist-totallength"><code>Buffer.concat()</code></a> only when <code>size</code> is less than
+<a href="#static-method-bufferfromstring-encoding"><code>Buffer.from(string)</code></a>, and <a href="#static-method-bufferconcatlist-totallength"><code>Buffer.concat()</code></a> only when <code>size</code> is less than
 <code>Buffer.poolSize >>> 1</code> (floor of <a href="#class-property-bufferpoolsize"><code>Buffer.poolSize</code></a> divided by two).</p>
 <p>Use of this pre-allocated internal memory pool is a key difference between
 calling <code>Buffer.alloc(size, fill)</code> vs. <code>Buffer.allocUnsafe(size).fill(fill)</code>.
@@ -1285,11 +1285,11 @@ initialized</em>. The contents of the newly created <code>Buffer</code> are unkn
 <em>may contain sensitive data</em>. Use <a href="#buffillvalue-offset-end-encoding"><code>buf.fill(0)</code></a> to initialize
 such <code>Buffer</code> instances with zeroes.</p>
 <p>When using <a href="#static-method-bufferallocunsafesize"><code>Buffer.allocUnsafe()</code></a> to allocate new <code>Buffer</code> instances,
-allocations under 4 KiB are sliced from a single pre-allocated <code>Buffer</code>. This
-allows applications to avoid the garbage collection overhead of creating many
-individually allocated <code>Buffer</code> instances. This approach improves both
-performance and memory usage by eliminating the need to track and clean up as
-many individual <code>ArrayBuffer</code> objects.</p>
+allocations less than <code>Buffer.poolSize >>> 1</code> (4KiB when default poolSize is used) are sliced
+from a single pre-allocated <code>Buffer</code>. This allows applications to avoid the
+garbage collection overhead of creating many individually allocated <code>Buffer</code>
+instances. This approach improves both performance and memory usage by
+eliminating the need to track and clean up as many individual <code>ArrayBuffer</code> objects.</p>
 <p>However, in the case where a developer may need to retain a small chunk of
 memory from a pool for an indeterminate amount of time, it may be appropriate
 to create an un-pooled <code>Buffer</code> instance using <code>Buffer.allocUnsafeSlow()</code> and
@@ -1725,6 +1725,8 @@ the character encoding to be used when converting <code>string</code> into bytes
 <span class="hljs-comment">// Prints: this is a tÃ©st</span></code><button class="copy-button">copy</button></pre>
 <p>A <code>TypeError</code> will be thrown if <code>string</code> is not a string or another type
 appropriate for <code>Buffer.from()</code> variants.</p>
+<p><a href="#static-method-bufferfromstring-encoding"><code>Buffer.from(string)</code></a> may also use the internal <code>Buffer</code> pool like
+<a href="#static-method-bufferallocunsafesize"><code>Buffer.allocUnsafe()</code></a> does.</p>
 <h4>Static method: <code>Buffer.isBuffer(obj)</code><span><a class="mark" href="#static-method-bufferisbufferobj" id="static-method-bufferisbufferobj">#</a></span><a aria-hidden="true" class="legacy" id="buffer_static_method_buffer_isbuffer_obj"></a></h4>
 <div class="api_metadata">
 <span>Added in: v0.1.101</span>
@@ -5120,10 +5122,10 @@ new uninitialized <code>Buffer</code> of the specified <code>size</code>. Becaus
 uninitialized, the allocated segment of memory might contain old data that is
 potentially sensitive.</li>
 </ul>
-<p><code>Buffer</code> instances returned by <a href="#static-method-bufferallocunsafesize"><code>Buffer.allocUnsafe()</code></a> and
-<a href="#static-method-bufferfromarray"><code>Buffer.from(array)</code></a> <em>may</em> be allocated off a shared internal memory pool
-if <code>size</code> is less than or equal to half <a href="#class-property-bufferpoolsize"><code>Buffer.poolSize</code></a>. Instances
-returned by <a href="#static-method-bufferallocunsafeslowsize"><code>Buffer.allocUnsafeSlow()</code></a> <em>never</em> use the shared internal
+<p><code>Buffer</code> instances returned by <a href="#static-method-bufferallocunsafesize"><code>Buffer.allocUnsafe()</code></a>, <a href="#static-method-bufferfromstring-encoding"><code>Buffer.from(string)</code></a>,
+<a href="#static-method-bufferconcatlist-totallength"><code>Buffer.concat()</code></a> and <a href="#static-method-bufferfromarray"><code>Buffer.from(array)</code></a> <em>may</em> be allocated off a shared
+internal memory pool if <code>size</code> is less than or equal to half <a href="#class-property-bufferpoolsize"><code>Buffer.poolSize</code></a>.
+Instances returned by <a href="#static-method-bufferallocunsafeslowsize"><code>Buffer.allocUnsafeSlow()</code></a> <em>never</em> use the shared internal
 memory pool.</p>
 <h4>The <code>--zero-fill-buffers</code> command-line option<span><a class="mark" href="#the---zero-fill-buffers-command-line-option" id="the---zero-fill-buffers-command-line-option">#</a></span><a aria-hidden="true" class="legacy" id="buffer_the_zero_fill_buffers_command_line_option"></a></h4>
 <div class="api_metadata">

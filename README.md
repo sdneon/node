@@ -5,17 +5,13 @@ This is a *fun* mod of Node.JS that initially embedded a modified version of dco
 
 Thanks to the inspiration from dcodeIO et al =D
 
-## Version 22.3.0
-* Update to Node.JS 22.3.0 baseline, D Script 1.2.2 and TypeScript 5.5.2.
-* Add experimental stuff:
-  * D Script now has sourcemap.
-  * Replace D Script transpiler via external JS file. See `--experimental-external-dscript` commandline option.
-  * Register bundled modules loaded, so that they can found via `require()`.
+## Version 22.4.1
+* Update to Node.JS 22.4.1 baseline, and TypeScript v5.5.3.
 
 It embeds:
 * DS v1.2.2.
 * CS v2.7.0.
-* TS v5.5.2.
+* TS v5.5.3.
 * Refer to prior readmes for old changes.
 
 Built with VS 2022 v17.9.3 (rollback'd), as v17.10.0 fails!
@@ -666,8 +662,6 @@ For information about the governance of the Node.js project, see
   **Mohammed Keyvanzadeh** <<mohammadkeyvanzade94@gmail.com>> (he/him)
 * [watilde](https://github.com/watilde) -
   **Daijiro Wachi** <<daijiro.wachi@gmail.com>> (he/him)
-* [XadillaX](https://github.com/XadillaX) -
-  **Khaidi Chu** <<i@2333.moe>> (he/him)
 * [zcbenz](https://github.com/zcbenz) -
   **Cheng Zhao** <<zcbenz@gmail.com>> (he/him)
 * [ZYSzys](https://github.com/ZYSzys) -
@@ -916,6 +910,8 @@ For information about the governance of the Node.js project, see
   **Thomas Watson** <<w@tson.dk>>
 * [whitlockjc](https://github.com/whitlockjc) -
   **Jeremy Whitlock** <<jwhitlock@apache.org>>
+* [XadillaX](https://github.com/XadillaX) -
+  **Khaidi Chu** <<i@2333.moe>> (he/him)
 * [yashLadha](https://github.com/yashLadha) -
   **Yash Ladha** <<yash@yashladha.in>> (he/him)
 * [yhwang](https://github.com/yhwang) -

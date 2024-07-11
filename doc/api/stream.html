@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v22.3.0">
-  <title>Stream | Node.js v22.3.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v22.4.1">
+  <title>Stream | Node.js v22.4.1 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -109,7 +109,7 @@
     <div id="column1" data-id="stream" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v22.3.0 documentation</h1>
+          <h1>Node.js v22.4.1 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -124,7 +124,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v22.3.0</li>
+            <li class="pinned-header">Node.js v22.4.1</li>
             
     <li class="picker-header">
       <a href="#">
@@ -175,6 +175,7 @@
 <li><a href="#writablewritablelength"><code>writable.writableLength</code></a></li>
 <li><a href="#writablewritableneeddrain"><code>writable.writableNeedDrain</code></a></li>
 <li><a href="#writablewritableobjectmode"><code>writable.writableObjectMode</code></a></li>
+<li><span class="stability_1"><a href="#writablesymbolasyncdispose"><code>writable[Symbol.asyncDispose]()</code></a></span></li>
 <li><a href="#writablewritechunk-encoding-callback"><code>writable.write(chunk[, encoding][, callback])</code></a></li>
 </ul>
 </li>
@@ -515,6 +516,7 @@
 <li><a href="#writablewritablelength"><code>writable.writableLength</code></a></li>
 <li><a href="#writablewritableneeddrain"><code>writable.writableNeedDrain</code></a></li>
 <li><a href="#writablewritableobjectmode"><code>writable.writableObjectMode</code></a></li>
+<li><span class="stability_1"><a href="#writablesymbolasyncdispose"><code>writable[Symbol.asyncDispose]()</code></a></span></li>
 <li><a href="#writablewritechunk-encoding-callback"><code>writable.write(chunk[, encoding][, callback])</code></a></li>
 </ul>
 </li>
@@ -675,10 +677,10 @@
 </ul></details>
 
       <div role="main" id="apicontent">
-        <h2>Stream<a class="srclink" href="https://github.com/nodejs/node/blob/2e7a7765d6de1d7ddfe8d1575279579d3d089c93/lib/stream.js#L55">[src]</a><span><a class="mark" href="#stream" id="stream">#</a></span><a aria-hidden="true" class="legacy" id="stream_stream"></a></h2>
+        <h2>Stream<a class="srclink" href="https://github.com/nodejs/node/blob/8512434d2beea2ca2fcb85d13175fa30a95ecf77/lib/stream.js#L55">[src]</a><span><a class="mark" href="#stream" id="stream">#</a></span><a aria-hidden="true" class="legacy" id="stream_stream"></a></h2>
 
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v22.3.0/lib/stream.js">lib/stream.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v22.4.1/lib/stream.js">lib/stream.js</a></p>
 <p>A stream is an abstract interface for working with streaming data in Node.js.
 The <code>node:stream</code> module provides an API for implementing the stream interface.</p>
 <p>There are many stream objects provided by Node.js. For instance, a
@@ -1458,6 +1460,13 @@ the status of the <code>highWaterMark</code>.</p>
 <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
 </ul>
 <p>Getter for the property <code>objectMode</code> of a given <code>Writable</code> stream.</p>
+<h6><code>writable[Symbol.asyncDispose]()</code><span><a class="mark" href="#writablesymbolasyncdispose" id="writablesymbolasyncdispose">#</a></span><a aria-hidden="true" class="legacy" id="stream_writable_symbol_asyncdispose"></a></h6>
+<div class="api_metadata">
+<span>Added in: v22.4.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<p>Calls <a href="#writabledestroyerror"><code>writable.destroy()</code></a> with an <code>AbortError</code> and returns
+a promise that fulfills when the stream is finished.</p>
 <h6><code>writable.write(chunk[, encoding][, callback])</code><span><a class="mark" href="#writablewritechunk-encoding-callback" id="writablewritechunk-encoding-callback">#</a></span><a aria-hidden="true" class="legacy" id="stream_writable_write_chunk_encoding_callback"></a></h6>
 <div class="api_metadata">
 <details class="changelog"><summary>History</summary>
@@ -1736,9 +1745,11 @@ and <code>readableFlowing</code> is not <code>false</code>.</p>
 </details>
 </div>
 <p>The <code>'readable'</code> event is emitted when there is data available to be read from
-the stream or when the end of the stream has been reached. Effectively, the
-<code>'readable'</code> event indicates that the stream has new information. If data is
-available, <a href="#readablereadsize"><code>stream.read()</code></a> will return that data.</p>
+the stream, up to the configured high water mark (<code>state.highWaterMark</code>). Effectively,
+it indicates that the stream has new information within the buffer. If data is available
+within this buffer, <a href="#readablereadsize"><code>stream.read()</code></a> can be called to retrieve that data.
+Additionally, the <code>'readable'</code> event may also be emitted when the end of the stream has been
+reached.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> readable = <span class="hljs-title function_">getReadableStreamSomehow</span>();
 readable.<span class="hljs-title function_">on</span>(<span class="hljs-string">'readable'</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
   <span class="hljs-comment">// There is some data to read now.</span>
@@ -1951,13 +1962,14 @@ readable.<span class="hljs-title function_">on</span>(<span class="hljs-string">
 readable.<span class="hljs-title function_">on</span>(<span class="hljs-string">'end'</span>, <span class="hljs-function">() =></span> {
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'Reached end of stream.'</span>);
 });</code> <button class="copy-button">copy</button></pre>
-<p>Each call to <code>readable.read()</code> returns a chunk of data, or <code>null</code>. The chunks
-are not concatenated. A <code>while</code> loop is necessary to consume all data
-currently in the buffer. When reading a large file <code>.read()</code> may return <code>null</code>,
-having consumed all buffered content so far, but there is still more data to
-come not yet buffered. In this case a new <code>'readable'</code> event will be emitted
-when there is more data in the buffer. Finally the <code>'end'</code> event will be
-emitted when there is no more data to come.</p>
+<p>Each call to <code>readable.read()</code> returns a chunk of data or <code>null</code>, signifying
+that there's no more data to read at that moment. These chunks aren't automatically
+concatenated. Because a single <code>read()</code> call does not return all the data, using
+a while loop may be necessary to continuously read chunks until all data is retrieved.
+When reading a large file, <code>.read()</code> might return <code>null</code> temporarily, indicating
+that it has consumed all buffered content but there may be more data yet to be
+buffered. In such cases, a new <code>'readable'</code> event is emitted once there's more
+data in the buffer, and the <code>'end'</code> event signifies the end of data transmission.</p>
 <p>Therefore to read a file's whole contents from a <code>readable</code>, it is necessary
 to collect chunks across multiple <code>'readable'</code> events:</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> chunks = [];
@@ -3630,7 +3642,7 @@ reader.<span class="hljs-title function_">read</span>().<span class="hljs-title 
 <li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a></li>
 </ul>
 <p>Returns the default highWaterMark used by streams.
-Defaults to <code>16384</code> (16 KiB), or <code>16</code> for <code>objectMode</code>.</p>
+Defaults to <code>65536</code> (64 KiB), or <code>16</code> for <code>objectMode</code>.</p>
 <h4><code>stream.setDefaultHighWaterMark(objectMode, value)</code><span><a class="mark" href="#streamsetdefaulthighwatermarkobjectmode-value" id="streamsetdefaulthighwatermarkobjectmode-value">#</a></span><a aria-hidden="true" class="legacy" id="stream_stream_setdefaulthighwatermark_objectmode_value"></a></h4>
 <div class="api_metadata">
 <span>Added in: v19.9.0, v18.17.0</span>
