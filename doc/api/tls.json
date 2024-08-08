@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v22.4.1/lib/tls.js\">lib/tls.js</a></p>\n<p>The <code>node:tls</code> module provides an implementation of the Transport Layer Security\n(TLS) and Secure Socket Layer (SSL) protocols that is built on top of OpenSSL.\nThe module can be accessed using:</p>\n<pre><code class=\"language-js\">const tls = require('node:tls');\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v22.6.0/lib/tls.js\">lib/tls.js</a></p>\n<p>The <code>node:tls</code> module provides an implementation of the Transport Layer Security\n(TLS) and Secure Socket Layer (SSL) protocols that is built on top of OpenSSL.\nThe module can be accessed using:</p>\n<pre><code class=\"language-js\">const tls = require('node:tls');\n</code></pre>",
       "modules": [
         {
           "textRaw": "Determining if crypto support is unavailable",
@@ -81,6 +81,29 @@
           "desc": "<p>Node.js is built with a default suite of enabled and disabled TLS ciphers. This\ndefault cipher list can be configured when building Node.js to allow\ndistributions to provide their own default list.</p>\n<p>The following command can be used to show the default cipher suite:</p>\n<pre><code class=\"language-console\">node -p crypto.constants.defaultCoreCipherList | tr ':' '\\n'\nTLS_AES_256_GCM_SHA384\nTLS_CHACHA20_POLY1305_SHA256\nTLS_AES_128_GCM_SHA256\nECDHE-RSA-AES128-GCM-SHA256\nECDHE-ECDSA-AES128-GCM-SHA256\nECDHE-RSA-AES256-GCM-SHA384\nECDHE-ECDSA-AES256-GCM-SHA384\nDHE-RSA-AES128-GCM-SHA256\nECDHE-RSA-AES128-SHA256\nDHE-RSA-AES128-SHA256\nECDHE-RSA-AES256-SHA384\nDHE-RSA-AES256-SHA384\nECDHE-RSA-AES256-SHA256\nDHE-RSA-AES256-SHA256\nHIGH\n!aNULL\n!eNULL\n!EXPORT\n!DES\n!RC4\n!MD5\n!PSK\n!SRP\n!CAMELLIA\n</code></pre>\n<p>This default can be replaced entirely using the <a href=\"cli.html#--tls-cipher-listlist\"><code>--tls-cipher-list</code></a>\ncommand-line switch (directly, or via the <a href=\"cli.html#node_optionsoptions\"><code>NODE_OPTIONS</code></a> environment\nvariable). For instance, the following makes <code>ECDHE-RSA-AES128-GCM-SHA256:!RC4</code>\nthe default TLS cipher suite:</p>\n<pre><code class=\"language-bash\">node --tls-cipher-list='ECDHE-RSA-AES128-GCM-SHA256:!RC4' server.js\n\nexport NODE_OPTIONS=--tls-cipher-list='ECDHE-RSA-AES128-GCM-SHA256:!RC4'\nnode server.js\n</code></pre>\n<p>To verify, use the following command to show the set cipher list, note the\ndifference between <code>defaultCoreCipherList</code> and <code>defaultCipherList</code>:</p>\n<pre><code class=\"language-bash\">node --tls-cipher-list='ECDHE-RSA-AES128-GCM-SHA256:!RC4' -p crypto.constants.defaultCipherList | tr ':' '\\n'\nECDHE-RSA-AES128-GCM-SHA256\n!RC4\n</code></pre>\n<p>i.e. the <code>defaultCoreCipherList</code> list is set at compilation time and the\n<code>defaultCipherList</code> is set at runtime.</p>\n<p>To modify the default cipher suites from within the runtime, modify the\n<code>tls.DEFAULT_CIPHERS</code> variable, this must be performed before listening on any\nsockets, it will not affect sockets already opened. For example:</p>\n<pre><code class=\"language-js\">// Remove Obsolete CBC Ciphers and RSA Key Exchange based Ciphers as they don't provide Forward Secrecy\ntls.DEFAULT_CIPHERS +=\n  ':!ECDHE-RSA-AES128-SHA:!ECDHE-RSA-AES128-SHA256:!ECDHE-RSA-AES256-SHA:!ECDHE-RSA-AES256-SHA384' +\n  ':!ECDHE-ECDSA-AES128-SHA:!ECDHE-ECDSA-AES128-SHA256:!ECDHE-ECDSA-AES256-SHA:!ECDHE-ECDSA-AES256-SHA384' +\n  ':!kRSA';\n</code></pre>\n<p>The default can also be replaced on a per client or server basis using the\n<code>ciphers</code> option from <a href=\"#tlscreatesecurecontextoptions\"><code>tls.createSecureContext()</code></a>, which is also available\nin <a href=\"#tlscreateserveroptions-secureconnectionlistener\"><code>tls.createServer()</code></a>, <a href=\"#tlsconnectoptions-callback\"><code>tls.connect()</code></a>, and when creating new\n<a href=\"#class-tlstlssocket\"><code>tls.TLSSocket</code></a>s.</p>\n<p>The ciphers list can contain a mixture of TLSv1.3 cipher suite names, the ones\nthat start with <code>'TLS_'</code>, and specifications for TLSv1.2 and below cipher\nsuites. The TLSv1.2 ciphers support a legacy specification format, consult\nthe OpenSSL <a href=\"https://www.openssl.org/docs/man1.1.1/man1/ciphers.html#CIPHER-LIST-FORMAT\">cipher list format</a> documentation for details, but those\nspecifications do <em>not</em> apply to TLSv1.3 ciphers. The TLSv1.3 suites can only\nbe enabled by including their full name in the cipher list. They cannot, for\nexample, be enabled or disabled by using the legacy TLSv1.2 <code>'EECDH'</code> or\n<code>'!EECDH'</code> specification.</p>\n<p>Despite the relative order of TLSv1.3 and TLSv1.2 cipher suites, the TLSv1.3\nprotocol is significantly more secure than TLSv1.2, and will always be chosen\nover TLSv1.2 if the handshake indicates it is supported, and if any TLSv1.3\ncipher suites are enabled.</p>\n<p>The default cipher suite included within Node.js has been carefully\nselected to reflect current security best practices and risk mitigation.\nChanging the default cipher suite can have a significant impact on the security\nof an application. The <code>--tls-cipher-list</code> switch and <code>ciphers</code> option should by\nused only if absolutely necessary.</p>\n<p>The default cipher suite prefers GCM ciphers for <a href=\"https://www.chromium.org/Home/chromium-security/education/tls#TOC-Cipher-Suites\">Chrome's 'modern\ncryptography' setting</a> and also prefers ECDHE and DHE ciphers for perfect\nforward secrecy, while offering <em>some</em> backward compatibility.</p>\n<p>Old clients that rely on insecure and deprecated RC4 or DES-based ciphers\n(like Internet Explorer 6) cannot complete the handshaking process with\nthe default configuration. If these clients <em>must</em> be supported, the\n<a href=\"https://wiki.mozilla.org/Security/Server_Side_TLS\">TLS recommendations</a> may offer a compatible cipher suite. For more details\non the format, see the OpenSSL <a href=\"https://www.openssl.org/docs/man1.1.1/man1/ciphers.html#CIPHER-LIST-FORMAT\">cipher list format</a> documentation.</p>\n<p>There are only five TLSv1.3 cipher suites:</p>\n<ul>\n<li><code>'TLS_AES_256_GCM_SHA384'</code></li>\n<li><code>'TLS_CHACHA20_POLY1305_SHA256'</code></li>\n<li><code>'TLS_AES_128_GCM_SHA256'</code></li>\n<li><code>'TLS_AES_128_CCM_SHA256'</code></li>\n<li><code>'TLS_AES_128_CCM_8_SHA256'</code></li>\n</ul>\n<p>The first three are enabled by default. The two <code>CCM</code>-based suites are supported\nby TLSv1.3 because they may be more performant on constrained systems, but they\nare not enabled by default since they offer less security.</p>",
           "type": "module",
           "displayName": "Modifying the default TLS cipher suite"
+        },
+        {
+          "textRaw": "OpenSSL security level",
+          "name": "openssl_security_level",
+          "desc": "<p>The OpenSSL library enforces security levels to control the minimum acceptable\nlevel of security for cryptographic operations. OpenSSL's security levels range\nfrom 0 to 5, with each level imposing stricter security requirements. The default\nsecurity level is 1, which is generally suitable for most modern applications.\nHowever, some legacy features and protocols, such as TLSv1, require a lower\nsecurity level (<code>SECLEVEL=0</code>) to function properly. For more detailed information,\nplease refer to the <a href=\"https://www.openssl.org/docs/manmaster/man3/SSL_CTX_set_security_level.html#DEFAULT-CALLBACK-BEHAVIOUR\">OpenSSL documentation on security levels</a>.</p>",
+          "modules": [
+            {
+              "textRaw": "Setting security levels",
+              "name": "setting_security_levels",
+              "desc": "<p>To adjust the security level in your Node.js application, you can include <code>@SECLEVEL=X</code>\nwithin a cipher string, where <code>X</code> is the desired security level. For example,\nto set the security level to 0 while using the default OpenSSL cipher list, you could use:</p>\n<pre><code class=\"language-js\">const tls = require('node:tls');\nconst port = 443;\n\ntls.createServer({ciphers: 'DEFAULT@SECLEVEL=0', minVersion: 'TLSv1'}, function (socket) {\n  console.log('Client connected with protocol:', socket.getProtocol());\n  socket.end();\n  this.close();\n}).\nlisten(port, () => {\n  tls.connect(port, {ciphers: 'DEFAULT@SECLEVEL=0', maxVersion: 'TLSv1'});\n});\n</code></pre>\n<p>This approach sets the security level to 0, allowing the use of legacy features while still\nleveraging the default OpenSSL ciphers.</p>",
+              "type": "module",
+              "displayName": "Setting security levels"
+            },
+            {
+              "textRaw": "Using [`--tls-cipher-list`][]",
+              "name": "using_[`--tls-cipher-list`][]",
+              "desc": "<p>You can also set the security level and ciphers from the command line using the\n<code>--tls-cipher-list=DEFAULT@SECLEVEL=X</code> as described in <a href=\"#modifying-the-default-tls-cipher-suite\">Modifying the default TLS cipher suite</a>.\nHowever, it is generally discouraged to use the command line option for setting ciphers and it is\npreferable to configure the ciphers for individual contexts within your application code,\nas this approach provides finer control and reduces the risk of globally downgrading the security level.</p>",
+              "type": "module",
+              "displayName": "Using [`--tls-cipher-list`][]"
+            }
+          ],
+          "type": "module",
+          "displayName": "OpenSSL security level"
         },
         {
           "textRaw": "X509 certificate error codes",
@@ -1066,6 +1089,30 @@
               "desc": "<p>The <code>tlsSocket.renegotiate()</code> method initiates a TLS renegotiation process.\nUpon completion, the <code>callback</code> function will be passed a single argument\nthat is either an <code>Error</code> (if the request failed) or <code>null</code>.</p>\n<p>This method can be used to request a peer's certificate after the secure\nconnection has been established.</p>\n<p>When running as the server, the socket will be destroyed with an error after\n<code>handshakeTimeout</code> timeout.</p>\n<p>For TLSv1.3, renegotiation cannot be initiated, it is not supported by the\nprotocol.</p>"
             },
             {
+              "textRaw": "`tlsSocket.setKeyCert(context)`",
+              "type": "method",
+              "name": "setKeyCert",
+              "meta": {
+                "added": [
+                  "v22.5.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`context` {Object|tls.SecureContext} An object containing at least `key` and `cert` properties from the [`tls.createSecureContext()`][] `options`, or a TLS context object created with [`tls.createSecureContext()`][] itself.",
+                      "name": "context",
+                      "type": "Object|tls.SecureContext",
+                      "desc": "An object containing at least `key` and `cert` properties from the [`tls.createSecureContext()`][] `options`, or a TLS context object created with [`tls.createSecureContext()`][] itself."
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>The <code>tlsSocket.setKeyCert()</code> method sets the private key and certificate to use\nfor the socket. This is mainly useful if you wish to select a server certificate\nfrom a TLS server's <code>ALPNCallback</code>.</p>"
+            },
+            {
               "textRaw": "`tlsSocket.setMaxSendFragment(size)`",
               "type": "method",
               "name": "setMaxSendFragment",
@@ -1788,11 +1835,11 @@
                       "desc": "Optionally set the maximum TLS version to allow. One of `'TLSv1.3'`, `'TLSv1.2'`, `'TLSv1.1'`, or `'TLSv1'`. Cannot be specified along with the `secureProtocol` option; use one or the other."
                     },
                     {
-                      "textRaw": "`minVersion` {string} Optionally set the minimum TLS version to allow. One of `'TLSv1.3'`, `'TLSv1.2'`, `'TLSv1.1'`, or `'TLSv1'`. Cannot be specified along with the `secureProtocol` option; use one or the other. Avoid setting to less than TLSv1.2, but it may be required for interoperability. **Default:** [`tls.DEFAULT_MIN_VERSION`][].",
+                      "textRaw": "`minVersion` {string} Optionally set the minimum TLS version to allow. One of `'TLSv1.3'`, `'TLSv1.2'`, `'TLSv1.1'`, or `'TLSv1'`. Cannot be specified along with the `secureProtocol` option; use one or the other. Avoid setting to less than TLSv1.2, but it may be required for interoperability. Versions before TLSv1.2 may require downgrading the [OpenSSL Security Level][]. **Default:** [`tls.DEFAULT_MIN_VERSION`][].",
                       "name": "minVersion",
                       "type": "string",
                       "default": "[`tls.DEFAULT_MIN_VERSION`][]",
-                      "desc": "Optionally set the minimum TLS version to allow. One of `'TLSv1.3'`, `'TLSv1.2'`, `'TLSv1.1'`, or `'TLSv1'`. Cannot be specified along with the `secureProtocol` option; use one or the other. Avoid setting to less than TLSv1.2, but it may be required for interoperability."
+                      "desc": "Optionally set the minimum TLS version to allow. One of `'TLSv1.3'`, `'TLSv1.2'`, `'TLSv1.1'`, or `'TLSv1'`. Cannot be specified along with the `secureProtocol` option; use one or the other. Avoid setting to less than TLSv1.2, but it may be required for interoperability. Versions before TLSv1.2 may require downgrading the [OpenSSL Security Level][]."
                     },
                     {
                       "textRaw": "`passphrase` {string} Shared passphrase used for a single private key and/or a PFX.",
@@ -2185,7 +2232,7 @@
           "desc": "The default value of the `maxVersion` option of [`tls.createSecureContext()`][]. It can be assigned any of the supported TLS protocol versions, `'TLSv1.3'`, `'TLSv1.2'`, `'TLSv1.1'`, or `'TLSv1'`."
         },
         {
-          "textRaw": "`DEFAULT_MIN_VERSION` {string} The default value of the `minVersion` option of [`tls.createSecureContext()`][]. It can be assigned any of the supported TLS protocol versions, `'TLSv1.3'`, `'TLSv1.2'`, `'TLSv1.1'`, or `'TLSv1'`. **Default:** `'TLSv1.2'`, unless changed using CLI options. Using `--tls-min-v1.0` sets the default to `'TLSv1'`. Using `--tls-min-v1.1` sets the default to `'TLSv1.1'`. Using `--tls-min-v1.3` sets the default to `'TLSv1.3'`. If multiple of the options are provided, the lowest minimum is used.",
+          "textRaw": "`DEFAULT_MIN_VERSION` {string} The default value of the `minVersion` option of [`tls.createSecureContext()`][]. It can be assigned any of the supported TLS protocol versions, `'TLSv1.3'`, `'TLSv1.2'`, `'TLSv1.1'`, or `'TLSv1'`. Versions before TLSv1.2 may require downgrading the [OpenSSL Security Level][]. **Default:** `'TLSv1.2'`, unless changed using CLI options. Using `--tls-min-v1.0` sets the default to `'TLSv1'`. Using `--tls-min-v1.1` sets the default to `'TLSv1.1'`. Using `--tls-min-v1.3` sets the default to `'TLSv1.3'`. If multiple of the options are provided, the lowest minimum is used.",
           "type": "string",
           "name": "DEFAULT_MIN_VERSION",
           "meta": {
@@ -2195,7 +2242,7 @@
             "changes": []
           },
           "default": "`'TLSv1.2'`, unless changed using CLI options. Using `--tls-min-v1.0` sets the default to `'TLSv1'`. Using `--tls-min-v1.1` sets the default to `'TLSv1.1'`. Using `--tls-min-v1.3` sets the default to `'TLSv1.3'`. If multiple of the options are provided, the lowest minimum is used",
-          "desc": "The default value of the `minVersion` option of [`tls.createSecureContext()`][]. It can be assigned any of the supported TLS protocol versions, `'TLSv1.3'`, `'TLSv1.2'`, `'TLSv1.1'`, or `'TLSv1'`."
+          "desc": "The default value of the `minVersion` option of [`tls.createSecureContext()`][]. It can be assigned any of the supported TLS protocol versions, `'TLSv1.3'`, `'TLSv1.2'`, `'TLSv1.1'`, or `'TLSv1'`. Versions before TLSv1.2 may require downgrading the [OpenSSL Security Level][]."
         },
         {
           "textRaw": "`DEFAULT_CIPHERS` {string} The default value of the `ciphers` option of [`tls.createSecureContext()`][]. It can be assigned any of the supported OpenSSL ciphers. Defaults to the content of `crypto.constants.defaultCoreCipherList`, unless changed using CLI options using `--tls-default-ciphers`.",

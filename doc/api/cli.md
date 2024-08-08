@@ -858,6 +858,9 @@ export USERNAME="nodejs" # will result in `nodejs` as the value.
 <!-- YAML
 added: v0.5.2
 changes:
+  - version: v22.6.0
+    pr-url: https://github.com/nodejs/node/pull/53725
+    description: Eval now supports experimental type-stripping.
   - version: v5.11.0
     pr-url: https://github.com/nodejs/node/pull/5348
     description: Built-in libraries are now available as predefined variables.
@@ -869,6 +872,9 @@ predefined in the REPL can also be used in `script`.
 On Windows, using `cmd.exe` a single quote will not work correctly because it
 only recognizes double `"` for quoting. In Powershell or Git bash, both `'`
 and `"` are usable.
+
+It is possible to run code containing inline types by passing
+[`--experimental-strip-types`][].
 
 ### `--experimental-default-type=type`
 
@@ -982,17 +988,16 @@ changes:
 Specify the `module` containing exported [module customization hooks][].
 `module` may be any string accepted as an [`import` specifier][].
 
-### `--experimental-network-imports`
+### `--experimental-network-inspection`
 
 <!-- YAML
 added:
-  - v17.6.0
-  - v16.15.0
+  - v22.6.0
 -->
 
 > Stability: 1 - Experimental
 
-Enable experimental support for the `https:` protocol in `import` specifiers.
+Enable experimental support for the network inspection with Chrome DevTools.
 
 ### `--experimental-permission`
 
@@ -1044,6 +1049,25 @@ added:
 -->
 
 Use this flag to enable [ShadowRealm][] support.
+
+### `--experimental-sqlite`
+
+<!-- YAML
+added: v22.5.0
+-->
+
+Enable the experimental [`node:sqlite`][] module.
+
+### `--experimental-strip-types`
+
+<!-- YAML
+added: v22.6.0
+-->
+
+> Stability: 1.0 - Early development
+
+Enable experimental type-stripping for TypeScript files.
+For more information, see the [TypeScript type-stripping][] documentation.
 
 ### `--experimental-test-coverage`
 
@@ -1406,7 +1430,8 @@ or poisoning attack. Avoid using this option.
 added: v6.3.0
 -->
 
-Activate inspector on `host:port`. Default is `127.0.0.1:9229`.
+Activate inspector on `host:port`. Default is `127.0.0.1:9229`. If port `0` is
+specified, a random available port will be used.
 
 V8 inspector integration allows tools such as Chrome DevTools and IDEs to debug
 and profile Node.js instances. The tools attach to Node.js instances via a
@@ -1440,7 +1465,8 @@ added: v7.6.0
 -->
 
 Activate inspector on `host:port` and break at start of user script.
-Default `host:port` is `127.0.0.1:9229`.
+Default `host:port` is `127.0.0.1:9229`. If port `0` is specified,
+a random available port will be used.
 
 See [V8 Inspector integration for Node.js][] for further explanation on Node.js debugger.
 
@@ -1453,7 +1479,8 @@ added: v7.6.0
 Set the `host:port` to be used when the inspector is activated.
 Useful when activating the inspector by sending the `SIGUSR1` signal.
 
-Default host is `127.0.0.1`.
+Default host is `127.0.0.1`. If port `0` is specified,
+a random available port will be used.
 
 See the [security warning][] below regarding the `host`
 parameter usage.
@@ -1472,7 +1499,8 @@ added: v22.2.0
 -->
 
 Activate inspector on `host:port` and wait for debugger to be attached.
-Default `host:port` is `127.0.0.1:9229`.
+Default `host:port` is `127.0.0.1:9229`. If port `0` is specified,
+a random available port will be used.
 
 See [V8 Inspector integration for Node.js][] for further explanation on Node.js debugger.
 
@@ -2026,7 +2054,7 @@ changes:
 > Stability: 1.2 - Release candidate
 
 This runs a specified command from a package.json's `"scripts"` object.
-If no `"command"` is provided, it will list the available scripts.
+If a missing `"command"` is provided, it will list the available scripts.
 
 `--run` will traverse up to the root directory and finds a `package.json`
 file to run the command from.
@@ -2165,6 +2193,40 @@ added:
 
 The maximum number of test files that the test runner CLI will execute
 concurrently. The default value is `os.availableParallelism() - 1`.
+
+### `--test-coverage-exclude`
+
+<!-- YAML
+added:
+  - v22.5.0
+-->
+
+> Stability: 1 - Experimental
+
+Excludes specific files from code coverage using a glob pattern, which can match
+both absolute and relative file paths.
+
+This option may be specified multiple times to exclude multiple glob patterns.
+
+If both `--test-coverage-exclude` and `--test-coverage-include` are provided,
+files must meet **both** criteria to be included in the coverage report.
+
+### `--test-coverage-include`
+
+<!-- YAML
+added:
+  - v22.5.0
+-->
+
+> Stability: 1 - Experimental
+
+Includes specific files in code coverage using a glob pattern, which can match
+both absolute and relative file paths.
+
+This option may be specified multiple times to include multiple glob patterns.
+
+If both `--test-coverage-exclude` and `--test-coverage-include` are provided,
+files must meet **both** criteria to be included in the coverage report.
 
 ### `--test-force-exit`
 
@@ -2887,12 +2949,13 @@ one is included in the list below.
 * `--experimental-json-modules`
 * `--experimental-loader`
 * `--experimental-modules`
-* `--experimental-network-imports`
 * `--experimental-permission`
 * `--experimental-print-required-tla`
 * `--experimental-require-module`
 * `--experimental-shadow-realm`
 * `--experimental-specifier-resolution`
+* `--experimental-sqlite`
+* `--experimental-strip-types`
 * `--experimental-top-level-await`
 * `--experimental-vm-modules`
 * `--experimental-wasi-unstable-preview1`
@@ -2952,6 +3015,8 @@ one is included in the list below.
 * `--secure-heap-min`
 * `--secure-heap`
 * `--snapshot-blob`
+* `--test-coverage-exclude`
+* `--test-coverage-include`
 * `--test-only`
 * `--test-reporter-destination`
 * `--test-reporter`
@@ -3421,6 +3486,7 @@ node --stack-trace-limit=12 -p -e "Error.stackTraceLimit" # prints 12
 [ScriptCoverage]: https://chromedevtools.github.io/devtools-protocol/tot/Profiler#type-ScriptCoverage
 [ShadowRealm]: https://github.com/tc39/proposal-shadowrealm
 [Source Map]: https://sourcemaps.info/spec.html
+[TypeScript type-stripping]: typescript.md#type-stripping
 [V8 Inspector integration for Node.js]: debugger.md#v8-inspector-integration-for-nodejs
 [V8 JavaScript code coverage]: https://v8project.blogspot.com/2017/12/javascript-code-coverage.html
 [V8 code cache]: https://v8.dev/blog/code-caching-for-devs
@@ -3436,6 +3502,7 @@ node --stack-trace-limit=12 -p -e "Error.stackTraceLimit" # prints 12
 [`--diagnostic-dir`]: #--diagnostic-dirdirectory
 [`--experimental-default-type=module`]: #--experimental-default-typetype
 [`--experimental-sea-config`]: single-executable-applications.md#generating-single-executable-preparation-blobs
+[`--experimental-strip-types`]: #--experimental-strip-types
 [`--experimental-wasm-modules`]: #--experimental-wasm-modules
 [`--heap-prof-dir`]: #--heap-prof-dir
 [`--import`]: #--importmodule
@@ -3458,6 +3525,7 @@ node --stack-trace-limit=12 -p -e "Error.stackTraceLimit" # prints 12
 [`dnsPromises.lookup()`]: dns.md#dnspromiseslookuphostname-options
 [`import` specifier]: esm.md#import-specifiers
 [`net.getDefaultAutoSelectFamilyAttemptTimeout()`]: net.md#netgetdefaultautoselectfamilyattempttimeout
+[`node:sqlite`]: sqlite.md
 [`process.setUncaughtExceptionCaptureCallback()`]: process.md#processsetuncaughtexceptioncapturecallbackfn
 [`process.setuid()`]: process.md#processsetuidid
 [`setuid(2)`]: https://man7.org/linux/man-pages/man2/setuid.2.html

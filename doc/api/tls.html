@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v22.4.1">
-  <title>TLS (SSL) | Node.js v22.4.1 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v22.6.0">
+  <title>TLS (SSL) | Node.js v22.6.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -70,6 +70,7 @@
 <li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
 <li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
 <li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
 <li><a href="net.html" class="nav-net">Net</a></li>
 <li><a href="os.html" class="nav-os">OS</a></li>
 <li><a href="path.html" class="nav-path">Path</a></li>
@@ -82,6 +83,7 @@
 <li><a href="repl.html" class="nav-repl">REPL</a></li>
 <li><a href="report.html" class="nav-report">Report</a></li>
 <li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
 <li><a href="stream.html" class="nav-stream">Stream</a></li>
 <li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
 <li><a href="test.html" class="nav-test">Test runner</a></li>
@@ -109,7 +111,7 @@
     <div id="column1" data-id="tls" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v22.4.1 documentation</h1>
+          <h1>Node.js v22.6.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -124,7 +126,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v22.4.1</li>
+            <li class="pinned-header">Node.js v22.6.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -151,6 +153,12 @@
 </ul>
 </li>
 <li><a href="#modifying-the-default-tls-cipher-suite">Modifying the default TLS cipher suite</a></li>
+<li><a href="#openssl-security-level">OpenSSL security level</a>
+<ul>
+<li><a href="#setting-security-levels">Setting security levels</a></li>
+<li><a href="#using---tls-cipher-list">Using [<code>--tls-cipher-list</code>][]</a></li>
+</ul>
+</li>
 <li><a href="#x509-certificate-error-codes">X509 certificate error codes</a></li>
 <li><span class="stability_0"><a href="#class-tlscryptostream">Class: <code>tls.CryptoStream</code></a></span>
 <ul>
@@ -217,6 +225,7 @@
 <li><a href="#tlssocketremotefamily"><code>tlsSocket.remoteFamily</code></a></li>
 <li><a href="#tlssocketremoteport"><code>tlsSocket.remotePort</code></a></li>
 <li><a href="#tlssocketrenegotiateoptions-callback"><code>tlsSocket.renegotiate(options, callback)</code></a></li>
+<li><a href="#tlssocketsetkeycertcontext"><code>tlsSocket.setKeyCert(context)</code></a></li>
 <li><a href="#tlssocketsetmaxsendfragmentsize"><code>tlsSocket.setMaxSendFragment(size)</code></a></li>
 </ul>
 </li>
@@ -287,6 +296,7 @@
 <li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
 <li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
 <li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
 <li><a href="net.html" class="nav-net">Net</a></li>
 <li><a href="os.html" class="nav-os">OS</a></li>
 <li><a href="path.html" class="nav-path">Path</a></li>
@@ -299,6 +309,7 @@
 <li><a href="repl.html" class="nav-repl">REPL</a></li>
 <li><a href="report.html" class="nav-report">Report</a></li>
 <li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
 <li><a href="stream.html" class="nav-stream">Stream</a></li>
 <li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
 <li><a href="test.html" class="nav-test">Test runner</a></li>
@@ -394,6 +405,12 @@
 </ul>
 </li>
 <li><a href="#modifying-the-default-tls-cipher-suite">Modifying the default TLS cipher suite</a></li>
+<li><a href="#openssl-security-level">OpenSSL security level</a>
+<ul>
+<li><a href="#setting-security-levels">Setting security levels</a></li>
+<li><a href="#using---tls-cipher-list">Using [<code>--tls-cipher-list</code>][]</a></li>
+</ul>
+</li>
 <li><a href="#x509-certificate-error-codes">X509 certificate error codes</a></li>
 <li><span class="stability_0"><a href="#class-tlscryptostream">Class: <code>tls.CryptoStream</code></a></span>
 <ul>
@@ -460,6 +477,7 @@
 <li><a href="#tlssocketremotefamily"><code>tlsSocket.remoteFamily</code></a></li>
 <li><a href="#tlssocketremoteport"><code>tlsSocket.remotePort</code></a></li>
 <li><a href="#tlssocketrenegotiateoptions-callback"><code>tlsSocket.renegotiate(options, callback)</code></a></li>
+<li><a href="#tlssocketsetkeycertcontext"><code>tlsSocket.setKeyCert(context)</code></a></li>
 <li><a href="#tlssocketsetmaxsendfragmentsize"><code>tlsSocket.setMaxSendFragment(size)</code></a></li>
 </ul>
 </li>
@@ -484,7 +502,7 @@
         <h2>TLS (SSL)<span><a class="mark" href="#tls-ssl" id="tls-ssl">#</a></span><a aria-hidden="true" class="legacy" id="tls_tls_ssl"></a></h2>
 
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v22.4.1/lib/tls.js">lib/tls.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v22.6.0/lib/tls.js">lib/tls.js</a></p>
 <p>The <code>node:tls</code> module provides an implementation of the Transport Layer Security
 (TLS) and Secure Socket Layer (SSL) protocols that is built on top of OpenSSL.
 The module can be accessed using:</p>
@@ -812,6 +830,37 @@ on the format, see the OpenSSL <a href="https://www.openssl.org/docs/man1.1.1/ma
 <p>The first three are enabled by default. The two <code>CCM</code>-based suites are supported
 by TLSv1.3 because they may be more performant on constrained systems, but they
 are not enabled by default since they offer less security.</p>
+</section><section><h3>OpenSSL security level<span><a class="mark" href="#openssl-security-level" id="openssl-security-level">#</a></span><a aria-hidden="true" class="legacy" id="tls_openssl_security_level"></a></h3>
+<p>The OpenSSL library enforces security levels to control the minimum acceptable
+level of security for cryptographic operations. OpenSSL's security levels range
+from 0 to 5, with each level imposing stricter security requirements. The default
+security level is 1, which is generally suitable for most modern applications.
+However, some legacy features and protocols, such as TLSv1, require a lower
+security level (<code>SECLEVEL=0</code>) to function properly. For more detailed information,
+please refer to the <a href="https://www.openssl.org/docs/manmaster/man3/SSL_CTX_set_security_level.html#DEFAULT-CALLBACK-BEHAVIOUR">OpenSSL documentation on security levels</a>.</p>
+<h4>Setting security levels<span><a class="mark" href="#setting-security-levels" id="setting-security-levels">#</a></span><a aria-hidden="true" class="legacy" id="tls_setting_security_levels"></a></h4>
+<p>To adjust the security level in your Node.js application, you can include <code>@SECLEVEL=X</code>
+within a cipher string, where <code>X</code> is the desired security level. For example,
+to set the security level to 0 while using the default OpenSSL cipher list, you could use:</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> tls = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:tls'</span>);
+<span class="hljs-keyword">const</span> port = <span class="hljs-number">443</span>;
+
+tls.<span class="hljs-title function_">createServer</span>({<span class="hljs-attr">ciphers</span>: <span class="hljs-string">'DEFAULT@SECLEVEL=0'</span>, <span class="hljs-attr">minVersion</span>: <span class="hljs-string">'TLSv1'</span>}, <span class="hljs-keyword">function</span> (<span class="hljs-params">socket</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'Client connected with protocol:'</span>, socket.<span class="hljs-title function_">getProtocol</span>());
+  socket.<span class="hljs-title function_">end</span>();
+  <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">close</span>();
+}).
+<span class="hljs-title function_">listen</span>(port, <span class="hljs-function">() =></span> {
+  tls.<span class="hljs-title function_">connect</span>(port, {<span class="hljs-attr">ciphers</span>: <span class="hljs-string">'DEFAULT@SECLEVEL=0'</span>, <span class="hljs-attr">maxVersion</span>: <span class="hljs-string">'TLSv1'</span>});
+});</code> <button class="copy-button">copy</button></pre>
+<p>This approach sets the security level to 0, allowing the use of legacy features while still
+leveraging the default OpenSSL ciphers.</p>
+<h4>Using <a href="cli.html#--tls-cipher-listlist"><code>--tls-cipher-list</code></a><span><a class="mark" href="#using---tls-cipher-list" id="using---tls-cipher-list">#</a></span><a aria-hidden="true" class="legacy" id="tls_using_tls_cipher_list"></a></h4>
+<p>You can also set the security level and ciphers from the command line using the
+<code>--tls-cipher-list=DEFAULT@SECLEVEL=X</code> as described in <a href="#modifying-the-default-tls-cipher-suite">Modifying the default TLS cipher suite</a>.
+However, it is generally discouraged to use the command line option for setting ciphers and it is
+preferable to configure the ciphers for individual contexts within your application code,
+as this approach provides finer control and reduces the risk of globally downgrading the security level.</p>
 </section><section><h3>X509 certificate error codes<span><a class="mark" href="#x509-certificate-error-codes" id="x509-certificate-error-codes">#</a></span><a aria-hidden="true" class="legacy" id="tls_x509_certificate_error_codes"></a></h3>
 <p>Multiple functions can fail due to certificate errors that are reported by
 OpenSSL. In such a case, the function provides an <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="type">&#x3C;Error></a> via its callback that
@@ -1727,6 +1776,18 @@ connection has been established.</p>
 <code>handshakeTimeout</code> timeout.</p>
 <p>For TLSv1.3, renegotiation cannot be initiated, it is not supported by the
 protocol.</p>
+<h4><code>tlsSocket.setKeyCert(context)</code><span><a class="mark" href="#tlssocketsetkeycertcontext" id="tlssocketsetkeycertcontext">#</a></span><a aria-hidden="true" class="legacy" id="tls_tlssocket_setkeycert_context"></a></h4>
+<div class="api_metadata">
+<span>Added in: v22.5.0</span>
+</div>
+<ul>
+<li><code>context</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> | <a href="tls.html#tlscreatesecurecontextoptions" class="type">&#x3C;tls.SecureContext></a> An object containing at least <code>key</code> and
+<code>cert</code> properties from the <a href="#tlscreatesecurecontextoptions"><code>tls.createSecureContext()</code></a> <code>options</code>, or a
+TLS context object created with <a href="#tlscreatesecurecontextoptions"><code>tls.createSecureContext()</code></a> itself.</li>
+</ul>
+<p>The <code>tlsSocket.setKeyCert()</code> method sets the private key and certificate to use
+for the socket. This is mainly useful if you wish to select a server certificate
+from a TLS server's <code>ALPNCallback</code>.</p>
 <h4><code>tlsSocket.setMaxSendFragment(size)</code><span><a class="mark" href="#tlssocketsetmaxsendfragmentsize" id="tlssocketsetmaxsendfragmentsize">#</a></span><a aria-hidden="true" class="legacy" id="tls_tlssocket_setmaxsendfragment_size"></a></h4>
 <div class="api_metadata">
 <span>Added in: v0.11.11</span>
@@ -2064,7 +2125,7 @@ along with the <code>secureProtocol</code> option; use one or the other.
 of <code>'TLSv1.3'</code>, <code>'TLSv1.2'</code>, <code>'TLSv1.1'</code>, or <code>'TLSv1'</code>. Cannot be specified
 along with the <code>secureProtocol</code> option; use one or the other. Avoid
 setting to less than TLSv1.2, but it may be required for
-interoperability.
+interoperability. Versions before TLSv1.2 may require downgrading the <a href="#openssl-security-level">OpenSSL Security Level</a>.
 <strong>Default:</strong> <a href="#tlsdefault_min_version"><code>tls.DEFAULT_MIN_VERSION</code></a>.</li>
 <li><code>passphrase</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> Shared passphrase used for a single private key and/or
 a PFX.</li>
@@ -2359,6 +2420,7 @@ highest maximum is used.</li>
 <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> The default value of the <code>minVersion</code> option of
 <a href="#tlscreatesecurecontextoptions"><code>tls.createSecureContext()</code></a>. It can be assigned any of the supported TLS
 protocol versions, <code>'TLSv1.3'</code>, <code>'TLSv1.2'</code>, <code>'TLSv1.1'</code>, or <code>'TLSv1'</code>.
+Versions before TLSv1.2 may require downgrading the <a href="#openssl-security-level">OpenSSL Security Level</a>.
 <strong>Default:</strong> <code>'TLSv1.2'</code>, unless changed using CLI options. Using
 <code>--tls-min-v1.0</code> sets the default to <code>'TLSv1'</code>. Using <code>--tls-min-v1.1</code> sets
 the default to <code>'TLSv1.1'</code>. Using <code>--tls-min-v1.3</code> sets the default to

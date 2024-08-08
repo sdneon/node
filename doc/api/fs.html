@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v22.4.1">
-  <title>File system | Node.js v22.4.1 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v22.6.0">
+  <title>File system | Node.js v22.6.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -70,6 +70,7 @@
 <li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
 <li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
 <li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
 <li><a href="net.html" class="nav-net">Net</a></li>
 <li><a href="os.html" class="nav-os">OS</a></li>
 <li><a href="path.html" class="nav-path">Path</a></li>
@@ -82,6 +83,7 @@
 <li><a href="repl.html" class="nav-repl">REPL</a></li>
 <li><a href="report.html" class="nav-report">Report</a></li>
 <li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
 <li><a href="stream.html" class="nav-stream">Stream</a></li>
 <li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
 <li><a href="test.html" class="nav-test">Test runner</a></li>
@@ -109,7 +111,7 @@
     <div id="column1" data-id="fs" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v22.4.1 documentation</h1>
+          <h1>Node.js v22.6.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -124,7 +126,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v22.4.1</li>
+            <li class="pinned-header">Node.js v22.6.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -535,6 +537,7 @@
 <li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
 <li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
 <li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
 <li><a href="net.html" class="nav-net">Net</a></li>
 <li><a href="os.html" class="nav-os">OS</a></li>
 <li><a href="path.html" class="nav-path">Path</a></li>
@@ -547,6 +550,7 @@
 <li><a href="repl.html" class="nav-repl">REPL</a></li>
 <li><a href="report.html" class="nav-report">Report</a></li>
 <li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
 <li><a href="stream.html" class="nav-stream">Stream</a></li>
 <li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
 <li><a href="test.html" class="nav-test">Test runner</a></li>
@@ -981,7 +985,7 @@
 
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
 
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v22.4.1/lib/fs.js">lib/fs.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v22.6.0/lib/fs.js">lib/fs.js</a></p>
 <p>The <code>node:fs</code> module enables interacting with the file system in a
 way modeled on standard POSIX functions.</p>
 <p>To use the promise-based APIs:</p>
@@ -3471,7 +3475,7 @@ should be passed to <a href="net.html#class-netsocket" class="type">&#x3C;net.So
 </ul>
 </li>
 </ul>
-<p>Test whether or not the given path exists by checking with the file system.
+<p>Test whether or not the element at the given <code>path</code> exists by checking with the file system.
 Then call the <code>callback</code> argument with either true or false:</p>
 <pre><code class="language-js mjs"><span class="hljs-keyword">import</span> { exists } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:fs'</span>;
 
@@ -3483,6 +3487,8 @@ callbacks.</strong> Normally, the first parameter to a Node.js callback is an <c
 parameter, optionally followed by other parameters. The <code>fs.exists()</code> callback
 has only one boolean parameter. This is one reason <code>fs.access()</code> is recommended
 instead of <code>fs.exists()</code>.</p>
+<p>If <code>path</code> is a symbolic link, it is followed. Thus, if <code>path</code> exists but points
+to a non-existent element, the callback will receive the value <code>false</code>.</p>
 <p>Using <code>fs.exists()</code> to check for the existence of a file before calling
 <code>fs.open()</code>, <code>fs.readFile()</code>, or <code>fs.writeFile()</code> is not recommended. Doing
 so introduces a race condition, since other processes may change the file's

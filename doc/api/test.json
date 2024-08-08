@@ -21,7 +21,7 @@
       },
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v22.4.1/lib/test.js\">lib/test.js</a></p>\n<p>The <code>node:test</code> module facilitates the creation of JavaScript tests.\nTo access it:</p>\n<pre><code class=\"language-mjs\">import test from 'node:test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('node:test');\n</code></pre>\n<p>This module is only available under the <code>node:</code> scheme. The following will not\nwork:</p>\n<pre><code class=\"language-mjs\">import test from 'test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('test');\n</code></pre>\n<p>Tests created via the <code>test</code> module consist of a single function that is\nprocessed in one of three ways:</p>\n<ol>\n<li>A synchronous function that is considered failing if it throws an exception,\nand is considered passing otherwise.</li>\n<li>A function that returns a <code>Promise</code> that is considered failing if the\n<code>Promise</code> rejects, and is considered passing if the <code>Promise</code> fulfills.</li>\n<li>A function that receives a callback function. If the callback receives any\ntruthy value as its first argument, the test is considered failing. If a\nfalsy value is passed as the first argument to the callback, the test is\nconsidered passing. If the test function receives a callback function and\nalso returns a <code>Promise</code>, the test will fail.</li>\n</ol>\n<p>The following example illustrates how tests are written using the\n<code>test</code> module.</p>\n<pre><code class=\"language-js\">test('synchronous passing test', (t) => {\n  // This test passes because it does not throw an exception.\n  assert.strictEqual(1, 1);\n});\n\ntest('synchronous failing test', (t) => {\n  // This test fails because it throws an exception.\n  assert.strictEqual(1, 2);\n});\n\ntest('asynchronous passing test', async (t) => {\n  // This test passes because the Promise returned by the async\n  // function is settled and not rejected.\n  assert.strictEqual(1, 1);\n});\n\ntest('asynchronous failing test', async (t) => {\n  // This test fails because the Promise returned by the async\n  // function is rejected.\n  assert.strictEqual(1, 2);\n});\n\ntest('failing test using Promises', (t) => {\n  // Promises can be used directly as well.\n  return new Promise((resolve, reject) => {\n    setImmediate(() => {\n      reject(new Error('this will cause the test to fail'));\n    });\n  });\n});\n\ntest('callback passing test', (t, done) => {\n  // done() is the callback function. When the setImmediate() runs, it invokes\n  // done() with no arguments.\n  setImmediate(done);\n});\n\ntest('callback failing test', (t, done) => {\n  // When the setImmediate() runs, done() is invoked with an Error object and\n  // the test fails.\n  setImmediate(() => {\n    done(new Error('callback failure'));\n  });\n});\n</code></pre>\n<p>If any tests fail, the process exit code is set to <code>1</code>.</p>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v22.6.0/lib/test.js\">lib/test.js</a></p>\n<p>The <code>node:test</code> module facilitates the creation of JavaScript tests.\nTo access it:</p>\n<pre><code class=\"language-mjs\">import test from 'node:test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('node:test');\n</code></pre>\n<p>This module is only available under the <code>node:</code> scheme. The following will not\nwork:</p>\n<pre><code class=\"language-mjs\">import test from 'test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('test');\n</code></pre>\n<p>Tests created via the <code>test</code> module consist of a single function that is\nprocessed in one of three ways:</p>\n<ol>\n<li>A synchronous function that is considered failing if it throws an exception,\nand is considered passing otherwise.</li>\n<li>A function that returns a <code>Promise</code> that is considered failing if the\n<code>Promise</code> rejects, and is considered passing if the <code>Promise</code> fulfills.</li>\n<li>A function that receives a callback function. If the callback receives any\ntruthy value as its first argument, the test is considered failing. If a\nfalsy value is passed as the first argument to the callback, the test is\nconsidered passing. If the test function receives a callback function and\nalso returns a <code>Promise</code>, the test will fail.</li>\n</ol>\n<p>The following example illustrates how tests are written using the\n<code>test</code> module.</p>\n<pre><code class=\"language-js\">test('synchronous passing test', (t) => {\n  // This test passes because it does not throw an exception.\n  assert.strictEqual(1, 1);\n});\n\ntest('synchronous failing test', (t) => {\n  // This test fails because it throws an exception.\n  assert.strictEqual(1, 2);\n});\n\ntest('asynchronous passing test', async (t) => {\n  // This test passes because the Promise returned by the async\n  // function is settled and not rejected.\n  assert.strictEqual(1, 1);\n});\n\ntest('asynchronous failing test', async (t) => {\n  // This test fails because the Promise returned by the async\n  // function is rejected.\n  assert.strictEqual(1, 2);\n});\n\ntest('failing test using Promises', (t) => {\n  // Promises can be used directly as well.\n  return new Promise((resolve, reject) => {\n    setImmediate(() => {\n      reject(new Error('this will cause the test to fail'));\n    });\n  });\n});\n\ntest('callback passing test', (t, done) => {\n  // done() is the callback function. When the setImmediate() runs, it invokes\n  // done() with no arguments.\n  setImmediate(done);\n});\n\ntest('callback failing test', (t, done) => {\n  // When the setImmediate() runs, done() is invoked with an Error object and\n  // the test fails.\n  setImmediate(() => {\n    done(new Error('callback failure'));\n  });\n});\n</code></pre>\n<p>If any tests fail, the process exit code is set to <code>1</code>.</p>",
       "modules": [
         {
           "textRaw": "Subtests",
@@ -114,16 +114,9 @@
             {
               "textRaw": "Coverage reporters",
               "name": "coverage_reporters",
-              "desc": "<p>The tap and spec reporters will print a summary of the coverage statistics.\nThere is also an lcov reporter that will generate an lcov file which can be\nused as an in depth coverage report.</p>\n<pre><code class=\"language-bash\">node --test --experimental-test-coverage --test-reporter=lcov --test-reporter-destination=lcov.info\n</code></pre>",
+              "desc": "<p>The tap and spec reporters will print a summary of the coverage statistics.\nThere is also an lcov reporter that will generate an lcov file which can be\nused as an in depth coverage report.</p>\n<pre><code class=\"language-bash\">node --test --experimental-test-coverage --test-reporter=lcov --test-reporter-destination=lcov.info\n</code></pre>\n<ul>\n<li>No test results are reported by this reporter.</li>\n<li>This reporter should ideally be used alongside another reporter.</li>\n</ul>",
               "type": "module",
               "displayName": "Coverage reporters"
-            },
-            {
-              "textRaw": "Limitations",
-              "name": "limitations",
-              "desc": "<p>The test runner's code coverage functionality does not support excluding\nspecific files or directories from the coverage report.</p>",
-              "type": "module",
-              "displayName": "Limitations"
             }
           ],
           "type": "module",
@@ -132,7 +125,7 @@
         {
           "textRaw": "Mocking",
           "name": "mocking",
-          "desc": "<p>The <code>node:test</code> module supports mocking during testing via a top-level <code>mock</code>\nobject. The following example creates a spy on a function that adds two numbers\ntogether. The spy is then used to assert that the function was called as\nexpected.</p>\n<pre><code class=\"language-mjs\">import assert from 'node:assert';\nimport { mock, test } from 'node:test';\n\ntest('spies on a function', () => {\n  const sum = mock.fn((a, b) => {\n    return a + b;\n  });\n\n  assert.strictEqual(sum.mock.calls.length, 0);\n  assert.strictEqual(sum(3, 4), 7);\n  assert.strictEqual(sum.mock.calls.length, 1);\n\n  const call = sum.mock.calls[0];\n  assert.deepStrictEqual(call.arguments, [3, 4]);\n  assert.strictEqual(call.result, 7);\n  assert.strictEqual(call.error, undefined);\n\n  // Reset the globally tracked mocks.\n  mock.reset();\n});\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\nconst assert = require('node:assert');\nconst { mock, test } = require('node:test');\n\ntest('spies on a function', () => {\n  const sum = mock.fn((a, b) => {\n    return a + b;\n  });\n\n  assert.strictEqual(sum.mock.calls.length, 0);\n  assert.strictEqual(sum(3, 4), 7);\n  assert.strictEqual(sum.mock.calls.length, 1);\n\n  const call = sum.mock.calls[0];\n  assert.deepStrictEqual(call.arguments, [3, 4]);\n  assert.strictEqual(call.result, 7);\n  assert.strictEqual(call.error, undefined);\n\n  // Reset the globally tracked mocks.\n  mock.reset();\n});\n</code></pre>\n<p>The same mocking functionality is also exposed on the <a href=\"#class-testcontext\"><code>TestContext</code></a> object\nof each test. The following example creates a spy on an object method using the\nAPI exposed on the <code>TestContext</code>. The benefit of mocking via the test context is\nthat the test runner will automatically restore all mocked functionality once\nthe test finishes.</p>\n<pre><code class=\"language-js\">test('spies on an object method', (t) => {\n  const number = {\n    value: 5,\n    add(a) {\n      return this.value + a;\n    },\n  };\n\n  t.mock.method(number, 'add');\n  assert.strictEqual(number.add.mock.calls.length, 0);\n  assert.strictEqual(number.add(3), 8);\n  assert.strictEqual(number.add.mock.calls.length, 1);\n\n  const call = number.add.mock.calls[0];\n\n  assert.deepStrictEqual(call.arguments, [3]);\n  assert.strictEqual(call.result, 8);\n  assert.strictEqual(call.target, undefined);\n  assert.strictEqual(call.this, number);\n});\n</code></pre>",
+          "desc": "<p>The <code>node:test</code> module supports mocking during testing via a top-level <code>mock</code>\nobject. The following example creates a spy on a function that adds two numbers\ntogether. The spy is then used to assert that the function was called as\nexpected.</p>\n<pre><code class=\"language-mjs\">import assert from 'node:assert';\nimport { mock, test } from 'node:test';\n\ntest('spies on a function', () => {\n  const sum = mock.fn((a, b) => {\n    return a + b;\n  });\n\n  assert.strictEqual(sum.mock.callCount(), 0);\n  assert.strictEqual(sum(3, 4), 7);\n  assert.strictEqual(sum.mock.callCount(), 1);\n\n  const call = sum.mock.calls[0];\n  assert.deepStrictEqual(call.arguments, [3, 4]);\n  assert.strictEqual(call.result, 7);\n  assert.strictEqual(call.error, undefined);\n\n  // Reset the globally tracked mocks.\n  mock.reset();\n});\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\nconst assert = require('node:assert');\nconst { mock, test } = require('node:test');\n\ntest('spies on a function', () => {\n  const sum = mock.fn((a, b) => {\n    return a + b;\n  });\n\n  assert.strictEqual(sum.mock.callCount(), 0);\n  assert.strictEqual(sum(3, 4), 7);\n  assert.strictEqual(sum.mock.callCount(), 1);\n\n  const call = sum.mock.calls[0];\n  assert.deepStrictEqual(call.arguments, [3, 4]);\n  assert.strictEqual(call.result, 7);\n  assert.strictEqual(call.error, undefined);\n\n  // Reset the globally tracked mocks.\n  mock.reset();\n});\n</code></pre>\n<p>The same mocking functionality is also exposed on the <a href=\"#class-testcontext\"><code>TestContext</code></a> object\nof each test. The following example creates a spy on an object method using the\nAPI exposed on the <code>TestContext</code>. The benefit of mocking via the test context is\nthat the test runner will automatically restore all mocked functionality once\nthe test finishes.</p>\n<pre><code class=\"language-js\">test('spies on an object method', (t) => {\n  const number = {\n    value: 5,\n    add(a) {\n      return this.value + a;\n    },\n  };\n\n  t.mock.method(number, 'add');\n  assert.strictEqual(number.add.mock.callCount(), 0);\n  assert.strictEqual(number.add(3), 8);\n  assert.strictEqual(number.add.mock.callCount(), 1);\n\n  const call = number.add.mock.calls[0];\n\n  assert.deepStrictEqual(call.arguments, [3]);\n  assert.strictEqual(call.result, 8);\n  assert.strictEqual(call.target, undefined);\n  assert.strictEqual(call.this, number);\n});\n</code></pre>",
           "modules": [
             {
               "textRaw": "Timers",
@@ -282,6 +275,11 @@
             ],
             "changes": [
               {
+                "version": "v22.6.0",
+                "pr-url": "https://github.com/nodejs/node/pull/53866",
+                "description": "Added the `globPatterns` option."
+              },
+              {
                 "version": "v22.0.0",
                 "pr-url": "https://github.com/nodejs/node/pull/52038",
                 "description": "Added the `forceExit` option."
@@ -331,6 +329,13 @@
                       "desc": "Configures the test runner to exit the process once all known tests have finished executing even if the event loop would otherwise remain active."
                     },
                     {
+                      "textRaw": "`globPatterns`: {Array} An array containing the list of glob patterns to match test files. This option cannot be used together with `files`. **Default:** matching files from [test runner execution model][].",
+                      "name": "globPatterns",
+                      "type": "Array",
+                      "default": "matching files from [test runner execution model][]",
+                      "desc": "An array containing the list of glob patterns to match test files. This option cannot be used together with `files`."
+                    },
+                    {
                       "textRaw": "`inspectPort` {number|Function} Sets inspector port of test child process. This can be a number, or a function that takes no arguments and returns a number. If a nullish value is provided, each process gets its own port, incremented from the primary's `process.debugPort`. **Default:** `undefined`.",
                       "name": "inspectPort",
                       "type": "number|Function",
@@ -362,6 +367,13 @@
                       "type": "string|RegExp|Array",
                       "default": "`undefined`",
                       "desc": "A String, RegExp or a RegExp Array, that can be used to only run tests whose name matches the provided pattern. Test name patterns are interpreted as JavaScript regular expressions. For each test that is executed, any corresponding test hooks, such as `beforeEach()`, are also run."
+                    },
+                    {
+                      "textRaw": "`testSkipPatterns` {string|RegExp|Array} A String, RegExp or a RegExp Array, that can be used to exclude running tests whose name matches the provided pattern. Test name patterns are interpreted as JavaScript regular expressions. For each test that is executed, any corresponding test hooks, such as `beforeEach()`, are also run. **Default:** `undefined`.",
+                      "name": "testSkipPatterns",
+                      "type": "string|RegExp|Array",
+                      "default": "`undefined`",
+                      "desc": "A String, RegExp or a RegExp Array, that can be used to exclude running tests whose name matches the provided pattern. Test name patterns are interpreted as JavaScript regular expressions. For each test that is executed, any corresponding test hooks, such as `beforeEach()`, are also run."
                     },
                     {
                       "textRaw": "`timeout` {number} A number of milliseconds the test execution will fail after. If unspecified, subtests inherit this value from their parent. **Default:** `Infinity`.",
@@ -1297,7 +1309,7 @@
                   ]
                 }
               ],
-              "desc": "<p>This function is used to create a mock on an existing object method. The\nfollowing example demonstrates how a mock is created on an existing object\nmethod.</p>\n<pre><code class=\"language-js\">test('spies on an object method', (t) => {\n  const number = {\n    value: 5,\n    subtract(a) {\n      return this.value - a;\n    },\n  };\n\n  t.mock.method(number, 'subtract');\n  assert.strictEqual(number.subtract.mock.calls.length, 0);\n  assert.strictEqual(number.subtract(3), 2);\n  assert.strictEqual(number.subtract.mock.calls.length, 1);\n\n  const call = number.subtract.mock.calls[0];\n\n  assert.deepStrictEqual(call.arguments, [3]);\n  assert.strictEqual(call.result, 2);\n  assert.strictEqual(call.error, undefined);\n  assert.strictEqual(call.target, undefined);\n  assert.strictEqual(call.this, number);\n});\n</code></pre>"
+              "desc": "<p>This function is used to create a mock on an existing object method. The\nfollowing example demonstrates how a mock is created on an existing object\nmethod.</p>\n<pre><code class=\"language-js\">test('spies on an object method', (t) => {\n  const number = {\n    value: 5,\n    subtract(a) {\n      return this.value - a;\n    },\n  };\n\n  t.mock.method(number, 'subtract');\n  assert.strictEqual(number.subtract.mock.callCount(), 0);\n  assert.strictEqual(number.subtract(3), 2);\n  assert.strictEqual(number.subtract.mock.callCount(), 1);\n\n  const call = number.subtract.mock.calls[0];\n\n  assert.deepStrictEqual(call.arguments, [3]);\n  assert.strictEqual(call.result, 2);\n  assert.strictEqual(call.error, undefined);\n  assert.strictEqual(call.target, undefined);\n  assert.strictEqual(call.this, number);\n});\n</code></pre>"
             },
             {
               "textRaw": "`mock.module(specifier[, options])`",
@@ -2837,7 +2849,7 @@
                   ]
                 }
               ],
-              "desc": "<p>This function is used to create subtests under the current test. This function\nbehaves in the same fashion as the top level <a href=\"#testname-options-fn\"><code>test()</code></a> function.</p>\n<pre><code class=\"language-js\">test('top level test', async (t) => {\n  await t.test(\n    'This is a subtest',\n    { only: false, skip: false, concurrency: 1, todo: false, plan: 4 },\n    (t) => {\n      assert.ok('some relevant assertion here');\n    },\n  );\n});\n</code></pre>"
+              "desc": "<p>This function is used to create subtests under the current test. This function\nbehaves in the same fashion as the top level <a href=\"#testname-options-fn\"><code>test()</code></a> function.</p>\n<pre><code class=\"language-js\">test('top level test', async (t) => {\n  await t.test(\n    'This is a subtest',\n    { only: false, skip: false, concurrency: 1, todo: false, plan: 1 },\n    (t) => {\n      t.assert.ok('some relevant assertion here');\n    },\n  );\n});\n</code></pre>"
             }
           ],
           "properties": [
@@ -2896,6 +2908,17 @@
               ]
             },
             {
+              "textRaw": "`context.filePath`",
+              "name": "filePath",
+              "meta": {
+                "added": [
+                  "v22.6.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>The absolute path of the test file that created the current test. If a test file\nimports additional modules that generate tests, the imported tests will return\nthe path of the root test file.</p>"
+            },
+            {
               "textRaw": "`context.fullName`",
               "name": "fullName",
               "meta": {
@@ -2946,6 +2969,17 @@
           },
           "desc": "<p>An instance of <code>SuiteContext</code> is passed to each suite function in order to\ninteract with the test runner. However, the <code>SuiteContext</code> constructor is not\nexposed as part of the API.</p>",
           "properties": [
+            {
+              "textRaw": "`context.filePath`",
+              "name": "filePath",
+              "meta": {
+                "added": [
+                  "v22.6.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>The absolute path of the test file that created the current suite. If a test\nfile imports additional modules that generate suites, the imported suites will\nreturn the path of the root test file.</p>"
+            },
             {
               "textRaw": "`context.name`",
               "name": "name",

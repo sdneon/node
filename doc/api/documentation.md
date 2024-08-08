@@ -97,6 +97,7 @@ a command-line flag. Experimental features may also emit a [warning][].
 | [Readline](readline.html) | (2) Stable |
 | [REPL](repl.html) | (2) Stable |
 | [Single executable applications](single-executable-applications.html) | (1) .1 - Active development |
+| [SQLite](sqlite.html) | (1)  |
 | [Stream](stream.html) | (2) Stable |
 | [String decoder](string_decoder.html) | (2) Stable |
 | [Test runner](test.html) | (2) Stable |

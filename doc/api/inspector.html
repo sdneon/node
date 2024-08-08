@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v22.4.1">
-  <title>Inspector | Node.js v22.4.1 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v22.6.0">
+  <title>Inspector | Node.js v22.6.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -70,6 +70,7 @@
 <li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
 <li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
 <li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
 <li><a href="net.html" class="nav-net">Net</a></li>
 <li><a href="os.html" class="nav-os">OS</a></li>
 <li><a href="path.html" class="nav-path">Path</a></li>
@@ -82,6 +83,7 @@
 <li><a href="repl.html" class="nav-repl">REPL</a></li>
 <li><a href="report.html" class="nav-report">Report</a></li>
 <li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
 <li><a href="stream.html" class="nav-stream">Stream</a></li>
 <li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
 <li><a href="test.html" class="nav-test">Test runner</a></li>
@@ -109,7 +111,7 @@
     <div id="column1" data-id="inspector" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v22.4.1 documentation</h1>
+          <h1>Node.js v22.6.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -124,7 +126,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v22.4.1</li>
+            <li class="pinned-header">Node.js v22.6.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -186,6 +188,13 @@
 <li><a href="#inspectorwaitfordebugger"><code>inspector.waitForDebugger()</code></a></li>
 </ul>
 </li>
+<li><a href="#integration-with-devtools">Integration with DevTools</a>
+<ul>
+<li><span class="stability_1"><a href="#inspectornetworkrequestwillbesentparams"><code>inspector.Network.requestWillBeSent([params])</code></a></span></li>
+<li><span class="stability_1"><a href="#inspectornetworkresponsereceivedparams"><code>inspector.Network.responseReceived([params])</code></a></span></li>
+<li><span class="stability_1"><a href="#inspectornetworkloadingfinishedparams"><code>inspector.Network.loadingFinished([params])</code></a></span></li>
+</ul>
+</li>
 <li><a href="#support-of-breakpoints">Support of breakpoints</a></li>
 </ul>
 </li>
@@ -241,6 +250,7 @@
 <li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
 <li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
 <li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
 <li><a href="net.html" class="nav-net">Net</a></li>
 <li><a href="os.html" class="nav-os">OS</a></li>
 <li><a href="path.html" class="nav-path">Path</a></li>
@@ -253,6 +263,7 @@
 <li><a href="repl.html" class="nav-repl">REPL</a></li>
 <li><a href="report.html" class="nav-report">Report</a></li>
 <li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
 <li><a href="stream.html" class="nav-stream">Stream</a></li>
 <li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
 <li><a href="test.html" class="nav-test">Test runner</a></li>
@@ -377,6 +388,13 @@
 <li><a href="#inspectorwaitfordebugger"><code>inspector.waitForDebugger()</code></a></li>
 </ul>
 </li>
+<li><a href="#integration-with-devtools">Integration with DevTools</a>
+<ul>
+<li><span class="stability_1"><a href="#inspectornetworkrequestwillbesentparams"><code>inspector.Network.requestWillBeSent([params])</code></a></span></li>
+<li><span class="stability_1"><a href="#inspectornetworkresponsereceivedparams"><code>inspector.Network.responseReceived([params])</code></a></span></li>
+<li><span class="stability_1"><a href="#inspectornetworkloadingfinishedparams"><code>inspector.Network.loadingFinished([params])</code></a></span></li>
+</ul>
+</li>
 <li><a href="#support-of-breakpoints">Support of breakpoints</a></li>
 </ul>
 </li>
@@ -386,7 +404,7 @@
         <h2>Inspector<span><a class="mark" href="#inspector" id="inspector">#</a></span><a aria-hidden="true" class="legacy" id="inspector_inspector"></a></h2>
 
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v22.4.1/lib/inspector.js">lib/inspector.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v22.6.0/lib/inspector.js">lib/inspector.js</a></p>
 <p>The <code>node:inspector</code> module provides an API for interacting with the V8
 inspector.</p>
 <p>It can be accessed using:</p>
@@ -752,6 +770,55 @@ undefined</code> <button class="copy-button">copy</button></pre>
 <p>Blocks until a client (existing or connected later) has sent
 <code>Runtime.runIfWaitingForDebugger</code> command.</p>
 <p>An exception will be thrown if there is no active inspector.</p>
+</section><section><h3>Integration with DevTools<span><a class="mark" href="#integration-with-devtools" id="integration-with-devtools">#</a></span><a aria-hidden="true" class="legacy" id="inspector_integration_with_devtools"></a></h3>
+<p>The <code>node:inspector</code> module provides an API for integrating with devtools that support Chrome DevTools Protocol.
+DevTools frontends connected to a running Node.js instance can capture protocol events emitted from the instance
+and display them accordingly to facilitate debugging.
+The following methods broadcast a protocol event to all connected frontends.
+The <code>params</code> passed to the methods can be optional, depending on the protocol.</p>
+<pre><code class="language-js"><span class="hljs-comment">// The `Network.requestWillBeSent` event will be fired.</span>
+inspector.<span class="hljs-property">Network</span>.<span class="hljs-title function_">requestWillBeSent</span>({
+  <span class="hljs-attr">requestId</span>: <span class="hljs-string">'request-id-1'</span>,
+  <span class="hljs-attr">timestamp</span>: <span class="hljs-title class_">Date</span>.<span class="hljs-title function_">now</span>() / <span class="hljs-number">1000</span>,
+  <span class="hljs-attr">wallTime</span>: <span class="hljs-title class_">Date</span>.<span class="hljs-title function_">now</span>(),
+  <span class="hljs-attr">request</span>: {
+    <span class="hljs-attr">url</span>: <span class="hljs-string">'https://nodejs.org/en'</span>,
+    <span class="hljs-attr">method</span>: <span class="hljs-string">'GET'</span>,
+  }
+});</code> <button class="copy-button">copy</button></pre>
+<h4><code>inspector.Network.requestWillBeSent([params])</code><span><a class="mark" href="#inspectornetworkrequestwillbesentparams" id="inspectornetworkrequestwillbesentparams">#</a></span><a aria-hidden="true" class="legacy" id="inspector_inspector_network_requestwillbesent_params"></a></h4>
+<div class="api_metadata">
+<span>Added in: v22.6.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<ul>
+<li><code>params</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+</ul>
+<p>This feature is only available with the <code>--experimental-network-inspection</code> flag enabled.</p>
+<p>Broadcasts the <code>Network.requestWillBeSent</code> event to connected frontends. This event indicates that
+the application is about to send an HTTP request.</p>
+<h4><code>inspector.Network.responseReceived([params])</code><span><a class="mark" href="#inspectornetworkresponsereceivedparams" id="inspectornetworkresponsereceivedparams">#</a></span><a aria-hidden="true" class="legacy" id="inspector_inspector_network_responsereceived_params"></a></h4>
+<div class="api_metadata">
+<span>Added in: v22.6.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<ul>
+<li><code>params</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+</ul>
+<p>This feature is only available with the <code>--experimental-network-inspection</code> flag enabled.</p>
+<p>Broadcasts the <code>Network.responseReceived</code> event to connected frontends. This event indicates that
+HTTP response is available.</p>
+<h4><code>inspector.Network.loadingFinished([params])</code><span><a class="mark" href="#inspectornetworkloadingfinishedparams" id="inspectornetworkloadingfinishedparams">#</a></span><a aria-hidden="true" class="legacy" id="inspector_inspector_network_loadingfinished_params"></a></h4>
+<div class="api_metadata">
+<span>Added in: v22.6.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<ul>
+<li><code>params</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+</ul>
+<p>This feature is only available with the <code>--experimental-network-inspection</code> flag enabled.</p>
+<p>Broadcasts the <code>Network.loadingFinished</code> event to connected frontends. This event indicates that
+HTTP request has finished loading.</p>
 </section><section><h3>Support of breakpoints<span><a class="mark" href="#support-of-breakpoints" id="support-of-breakpoints">#</a></span><a aria-hidden="true" class="legacy" id="inspector_support_of_breakpoints"></a></h3>
 <p>The Chrome DevTools Protocol <a href="https://chromedevtools.github.io/devtools-protocol/v8/Debugger"><code>Debugger</code> domain</a> allows an
 <code>inspector.Session</code> to attach to a program and set breakpoints to step through

@@ -129,14 +129,14 @@ void Dotenv::ParseContent(const std::string_view input) {
     key = content.substr(0, equal);
     content.remove_prefix(equal + 1);
     key = trim_spaces(key);
+    content = trim_spaces(content);
 
     if (key.empty()) {
       break;
     }
 
     // Remove export prefix from key
-    auto have_export = key.compare(0, 7, "export ") == 0;
-    if (have_export) {
+    if (key.starts_with("export ")) {
       key.remove_prefix(7);
     }
 

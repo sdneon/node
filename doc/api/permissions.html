@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v22.4.1">
-  <title>Permissions | Node.js v22.4.1 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v22.6.0">
+  <title>Permissions | Node.js v22.6.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -70,6 +70,7 @@
 <li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
 <li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
 <li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
 <li><a href="net.html" class="nav-net">Net</a></li>
 <li><a href="os.html" class="nav-os">OS</a></li>
 <li><a href="path.html" class="nav-path">Path</a></li>
@@ -82,6 +83,7 @@
 <li><a href="repl.html" class="nav-repl">REPL</a></li>
 <li><a href="report.html" class="nav-report">Report</a></li>
 <li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
 <li><a href="stream.html" class="nav-stream">Stream</a></li>
 <li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
 <li><a href="test.html" class="nav-test">Test runner</a></li>
@@ -109,7 +111,7 @@
     <div id="column1" data-id="permissions" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v22.4.1 documentation</h1>
+          <h1>Node.js v22.6.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -124,7 +126,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v22.4.1</li>
+            <li class="pinned-header">Node.js v22.6.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -231,6 +233,7 @@
 <li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
 <li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
 <li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
 <li><a href="net.html" class="nav-net">Net</a></li>
 <li><a href="os.html" class="nav-os">OS</a></li>
 <li><a href="path.html" class="nav-path">Path</a></li>
@@ -243,6 +246,7 @@
 <li><a href="repl.html" class="nav-repl">REPL</a></li>
 <li><a href="report.html" class="nav-report">Report</a></li>
 <li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
 <li><a href="stream.html" class="nav-stream">Stream</a></li>
 <li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
 <li><a href="test.html" class="nav-test">Test runner</a></li>
@@ -799,6 +803,13 @@ that matches the wildcard. e.g: <code>/home/test/file1</code> or <code>/home/tes
 </ul>
 <p>After passing a wildcard character (<code>*</code>) all subsequent characters will
 be ignored. For example: <code>/home/*.js</code> will work similar to <code>/home/*</code>.</p>
+<p>When the permission model is initialized, it will automatically add a wildcard
+(*) if the specified directory exists. For example, if <code>/home/test/files</code>
+exists, it will be treated as <code>/home/test/files/*</code>. However, if the directory
+does not exist, the wildcard will not be added, and access will be limited to
+<code>/home/test/files</code>. If you want to allow access to a folder that does not exist
+yet, make sure to explicitly include the wildcard:
+<code>/my-path/folder-do-not-exist/*</code>.</p>
 <h5>Permission Model constraints<span><a class="mark" href="#permission-model-constraints" id="permission-model-constraints">#</a></span><a aria-hidden="true" class="legacy" id="permissions_permission_model_constraints"></a></h5>
 <p>There are constraints you need to know before using this system:</p>
 <ul>
@@ -816,7 +827,8 @@ be ignored. For example: <code>/home/*.js</code> will work similar to <code>/hom
 <li>The Permission Model is initialized after the Node.js environment is set up.
 However, certain flags such as <code>--env-file</code> or <code>--openssl-config</code> are designed
 to read files before environment initialization. As a result, such flags are
-not subject to the rules of the Permission Model.</li>
+not subject to the rules of the Permission Model. The same applies for V8
+flags that can be set via runtime through <code>v8.setFlagsFromString</code>.</li>
 <li>OpenSSL engines cannot be requested at runtime when the Permission
 Model is enabled, affecting the built-in crypto, https, and tls modules.</li>
 <li>Using existing file descriptors via the <code>node:fs</code> module bypasses the

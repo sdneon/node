@@ -56,6 +56,7 @@
       'deps/acorn/acorn/dist/acorn.js',
       'deps/acorn/acorn-walk/dist/walk.js',
       'deps/minimatch/index.js',
+      'deps/amaro/dist/index.js',
       '<@(node_builtin_shareable_builtins)',
     ],
     'node_sources': [
@@ -135,6 +136,7 @@
       'src/node_shadow_realm.cc',
       'src/node_snapshotable.cc',
       'src/node_sockaddr.cc',
+      'src/node_sqlite.cc',
       'src/node_stat_watcher.cc',
       'src/node_symbols.cc',
       'src/node_task_queue.cc',
@@ -264,6 +266,7 @@
       'src/node_snapshot_builder.h',
       'src/node_sockaddr.h',
       'src/node_sockaddr-inl.h',
+      'src/node_sqlite.h',
       'src/node_stat_watcher.h',
       'src/node_union_bytes.h',
       'src/node_url.h',
@@ -948,6 +951,9 @@
             '<@(node_crypto_sources)',
             '<@(node_quic_sources)',
           ],
+          'dependencies': [
+            'deps/ncrypto/ncrypto.gyp:ncrypto',
+          ],
         }],
         [ 'OS in "linux freebsd mac solaris" and '
           'target_arch=="x64" and '
@@ -1209,6 +1215,9 @@
           'defines': [
             'HAVE_OPENSSL=1',
           ],
+          'dependencies': [
+            'deps/ncrypto/ncrypto.gyp:ncrypto',
+          ],
           'sources': [ '<@(node_cctest_openssl_sources)' ],
         }],
         ['v8_enable_inspector==1', {
@@ -1402,6 +1411,9 @@
           'defines': [ 'NODE_MKSNAPSHOT_USE_ARRAY_LITERALS=1' ],
         }],
         [ 'node_use_openssl=="true"', {
+          'dependencies': [
+            'deps/ncrypto/ncrypto.gyp:ncrypto',
+          ],
           'defines': [
             'HAVE_OPENSSL=1',
           ],
