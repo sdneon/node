@@ -16,7 +16,7 @@
         {
           "textRaw": "The `Module` object",
           "name": "the_`module`_object",
-          "desc": "<ul>\n<li><a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a></li>\n</ul>\n<p>Provides general utility methods when interacting with instances of\n<code>Module</code>, the <a href=\"modules.html#the-module-object\"><code>module</code></a> variable often seen in <a href=\"modules.html\">CommonJS</a> modules. Accessed\nvia <code>import 'node:module'</code> or <code>require('node:module')</code>.</p>",
+          "desc": "<ul>\n<li><a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a></li>\n</ul>\n<p>Provides general utility methods when interacting with instances of\n<code>Module</code>, the <a href=\"#the-module-object\"><code>module</code></a> variable often seen in <a href=\"modules.html\">CommonJS</a> modules. Accessed\nvia <code>import 'node:module'</code> or <code>require('node:module')</code>.</p>",
           "properties": [
             {
               "textRaw": "`builtinModules` {string\\[]}",
@@ -31,6 +31,19 @@
                 "changes": []
               },
               "desc": "<p>A list of the names of all modules provided by Node.js. Can be used to verify\nif a module is maintained by a third party or not.</p>\n<p>Note: the list doesn't contain <a href=\"modules.html#built-in-modules-with-mandatory-node-prefix\">prefix-only modules</a> like <code>node:test</code>.</p>\n<p><code>module</code> in this context isn't the same object that's provided\nby the <a href=\"modules.html#the-module-wrapper\">module wrapper</a>. To access it, require the <code>Module</code> module:</p>\n<pre><code class=\"language-mjs\">// module.mjs\n// In an ECMAScript module\nimport { builtinModules as builtin } from 'node:module';\n</code></pre>\n<pre><code class=\"language-cjs\">// module.cjs\n// In a CommonJS module\nconst builtin = require('node:module').builtinModules;\n</code></pre>"
+            },
+            {
+              "textRaw": "`module.constants.compileCacheStatus`",
+              "name": "compileCacheStatus",
+              "meta": {
+                "added": [
+                  "v22.8.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": ".1 - Active Development",
+              "desc": "<p>The following constants are returned as the <code>status</code> field in the object returned by\n<a href=\"#moduleenablecompilecachecachedir\"><code>module.enableCompileCache()</code></a> to indicate the result of the attempt to enable the\n<a href=\"#module-compile-cache\">module compile cache</a>.</p>\n<table>\n  <tr>\n    <th>Constant</th>\n    <th>Description</th>\n  </tr>\n  <tr>\n    <td><code>ENABLED</code></td>\n    <td>\n      Node.js has enabled the compile cache successfully. The directory used to store the\n      compile cache will be returned in the <code>directory</code> field in the\n      returned object.\n    </td>\n  </tr>\n  <tr>\n    <td><code>ALREADY_ENABLED</code></td>\n    <td>\n      The compile cache has already been enabled before, either by a previous call to\n      <code>module.enableCompileCache()</code>, or by the <code>NODE_COMPILE_CACHE=dir</code>\n      environment variable. The directory used to store the\n      compile cache will be returned in the <code>directory</code> field in the\n      returned object.\n    </td>\n  </tr>\n  <tr>\n    <td><code>FAILED</code></td>\n    <td>\n      Node.js fails to enable the compile cache. This can be caused by the lack of\n      permission to use the specified directory, or various kinds of file system errors.\n      The detail of the failure will be returned in the <code>message</code> field in the\n      returned object.\n    </td>\n  </tr>\n  <tr>\n    <td><code>DISABLED</code></td>\n    <td>\n      Node.js cannot enable the compile cache because the environment variable\n      <code>NODE_DISABLE_COMPILE_CACHE=1</code> has been set.\n    </td>\n  </tr>\n</table>"
             }
           ],
           "methods": [
@@ -63,6 +76,102 @@
                 }
               ],
               "desc": "<pre><code class=\"language-mjs\">import { createRequire } from 'node:module';\nconst require = createRequire(import.meta.url);\n\n// sibling-module.js is a CommonJS module.\nconst siblingModule = require('./sibling-module');\n</code></pre>"
+            },
+            {
+              "textRaw": "`module.enableCompileCache([cacheDir])`",
+              "type": "method",
+              "name": "enableCompileCache",
+              "meta": {
+                "added": [
+                  "v22.8.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": ".1 - Active Development",
+              "signatures": [
+                {
+                  "return": {
+                    "textRaw": "Returns: {Object}",
+                    "name": "return",
+                    "type": "Object",
+                    "options": [
+                      {
+                        "textRaw": "`status` {integer} One of the [`module.constants.compileCacheStatus`][]",
+                        "name": "status",
+                        "type": "integer",
+                        "desc": "One of the [`module.constants.compileCacheStatus`][]"
+                      },
+                      {
+                        "textRaw": "`message` {string|undefined} If Node.js cannot enable the compile cache, this contains the error message. Only set if `status` is `module.constants.compileCacheStatus.FAILED`.",
+                        "name": "message",
+                        "type": "string|undefined",
+                        "desc": "If Node.js cannot enable the compile cache, this contains the error message. Only set if `status` is `module.constants.compileCacheStatus.FAILED`."
+                      },
+                      {
+                        "textRaw": "`directory` {string|undefined} If the compile cache is enabled, this contains the directory where the compile cache is stored. Only set if `status` is `module.constants.compileCacheStatus.ENABLED` or `module.constants.compileCacheStatus.ALREADY_ENABLED`.",
+                        "name": "directory",
+                        "type": "string|undefined",
+                        "desc": "If the compile cache is enabled, this contains the directory where the compile cache is stored. Only set if `status` is `module.constants.compileCacheStatus.ENABLED` or `module.constants.compileCacheStatus.ALREADY_ENABLED`."
+                      }
+                    ]
+                  },
+                  "params": [
+                    {
+                      "textRaw": "`cacheDir` {string|undefined} Optional path to specify the directory where the compile cache will be stored/retrieved.",
+                      "name": "cacheDir",
+                      "type": "string|undefined",
+                      "desc": "Optional path to specify the directory where the compile cache will be stored/retrieved."
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>Enable <a href=\"#module-compile-cache\">module compile cache</a> in the current Node.js instance.</p>\n<p>If <code>cacheDir</code> is not specified, Node.js will either use the directory specified by the\n<a href=\"cli.html#node_compile_cachedir\"><code>NODE_COMPILE_CACHE=dir</code></a> environment variable if it's set, or use\n<code>path.join(os.tmpdir(), 'node-compile-cache')</code> otherwise. For general use cases, it's\nrecommended to call <code>module.enableCompileCache()</code> without specifying the <code>cacheDir</code>,\nso that the directory can be overriden by the <code>NODE_COMPILE_CACHE</code> environment\nvariable when necessary.</p>\n<p>Since compile cache is supposed to be a quiet optimization that is not required for the\napplication to be functional, this method is designed to not throw any exception when the\ncompile cache cannot be enabled. Instead, it will return an object containing an error\nmessage in the <code>message</code> field to aid debugging.\nIf compile cache is enabled successefully, the <code>directory</code> field in the returned object\ncontains the path to the directory where the compile cache is stored. The <code>status</code>\nfield in the returned object would be one of the <code>module.constants.compileCacheStatus</code>\nvalues to indicate the result of the attempt to enable the <a href=\"#module-compile-cache\">module compile cache</a>.</p>\n<p>This method only affects the current Node.js instance. To enable it in child worker threads,\neither call this method in child worker threads too, or set the\n<code>process.env.NODE_COMPILE_CACHE</code> value to compile cache directory so the behavior can\nbe inheritend into the child workers. The directory can be obtained either from the\n<code>directory</code> field returned by this method, or with <a href=\"#modulegetcompilecachedir\"><code>module.getCompileCacheDir()</code></a>.</p>",
+              "modules": [
+                {
+                  "textRaw": "Module compile cache",
+                  "name": "module_compile_cache",
+                  "meta": {
+                    "added": [
+                      "v22.1.0"
+                    ],
+                    "changes": [
+                      {
+                        "version": "v22.8.0",
+                        "pr-url": "https://github.com/nodejs/node/pull/54501",
+                        "description": "add initial JavaScript APIs for runtime access."
+                      }
+                    ]
+                  },
+                  "desc": "<p>The module compile cache can be enabled either using the <a href=\"#moduleenablecompilecachecachedir\"><code>module.enableCompileCache()</code></a>\nmethod or the <a href=\"cli.html#node_compile_cachedir\"><code>NODE_COMPILE_CACHE=dir</code></a> environment variable. After it is enabled,\nwhenever Node.js compiles a CommonJS or a ECMAScript Module, it will use on-disk\n<a href=\"https://v8.dev/blog/code-caching-for-devs\">V8 code cache</a> persisted in the specified directory to speed up the compilation.\nThis may slow down the first load of a module graph, but subsequent loads of the same module\ngraph may get a significant speedup if the contents of the modules do not change.</p>\n<p>To clean up the generated compile cache on disk, simply remove the cache directory. The cache\ndirectory will be recreated the next time the same directory is used for for compile cache\nstorage. To avoid filling up the disk with stale cache, it is recommended to use a directory\nunder the <a href=\"os.html#ostmpdir\"><code>os.tmpdir()</code></a>. If the compile cache is enabled by a call to\n<a href=\"#moduleenablecompilecachecachedir\"><code>module.enableCompileCache()</code></a> without specifying the directory, Node.js will use\nthe <a href=\"cli.html#node_compile_cachedir\"><code>NODE_COMPILE_CACHE=dir</code></a> environment variable if it's set, or defaults\nto <code>path.join(os.tmpdir(), 'node-compile-cache')</code> otherwise. To locate the compile cache\ndirectory used by a running Node.js instance, use <a href=\"#modulegetcompilecachedir\"><code>module.getCompileCacheDir()</code></a>.</p>\n<p>Currently when using the compile cache with <a href=\"https://v8project.blogspot.com/2017/12/javascript-code-coverage.html\">V8 JavaScript code coverage</a>, the\ncoverage being collected by V8 may be less precise in functions that are\ndeserialized from the code cache. It's recommended to turn this off when\nrunning tests to generate precise coverage.</p>\n<p>The enabled module compile cache can be disabled by the <a href=\"cli.html#node_disable_compile_cache1\"><code>NODE_DISABLE_COMPILE_CACHE=1</code></a>\nenvironment variable. This can be useful when the compile cache leads to unexpected or\nundesired behaviors (e.g. less precise test coverage).</p>\n<p>Compilation cache generated by one version of Node.js can not be reused by a different\nversion of Node.js. Cache generated by different versions of Node.js will be stored\nseparately if the same base directory is used to persist the cache, so they can co-exist.</p>",
+                  "type": "module",
+                  "displayName": "Module compile cache"
+                }
+              ]
+            },
+            {
+              "textRaw": "`module.getCompileCacheDir()`",
+              "type": "method",
+              "name": "getCompileCacheDir",
+              "meta": {
+                "added": [
+                  "v22.8.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": ".1 - Active Development",
+              "signatures": [
+                {
+                  "return": {
+                    "textRaw": "Returns: {string|undefined} Path to the [module compile cache][] directory if it is enabled, or `undefined` otherwise.",
+                    "name": "return",
+                    "type": "string|undefined",
+                    "desc": "Path to the [module compile cache][] directory if it is enabled, or `undefined` otherwise."
+                  },
+                  "params": []
+                }
+              ]
             },
             {
               "textRaw": "`module.isBuiltin(moduleName)`",

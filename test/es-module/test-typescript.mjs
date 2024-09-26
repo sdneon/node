@@ -1,7 +1,9 @@
-import { spawnPromisified } from '../common/index.mjs';
+import { skip, spawnPromisified } from '../common/index.mjs';
 import * as fixtures from '../common/fixtures.mjs';
 import { match, strictEqual } from 'node:assert';
 import { test } from 'node:test';
+
+if (!process.config.variables.node_use_amaro) skip('Requires Amaro');
 
 test('execute a TypeScript file', async () => {
   const result = await spawnPromisified(process.execPath, [
@@ -23,6 +25,18 @@ test('execute a TypeScript file with imports', async () => {
 
   strictEqual(result.stderr, '');
   match(result.stdout, /Hello, TypeScript!/);
+  strictEqual(result.code, 0);
+});
+
+test('execute a TypeScript file with imports', async () => {
+  const result = await spawnPromisified(process.execPath, [
+    '--no-warnings',
+    '--eval',
+    `assert.throws(() => require(${JSON.stringify(fixtures.path('typescript/ts/test-import-fs.ts'))}), {code: 'ERR_REQUIRE_ESM'})`,
+  ]);
+
+  strictEqual(result.stderr, '');
+  strictEqual(result.stdout, '');
   strictEqual(result.code, 0);
 });
 

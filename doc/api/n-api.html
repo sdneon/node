@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v22.6.0">
-  <title>Node-API | Node.js v22.6.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v22.9.0">
+  <title>Node-API | Node.js v22.9.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -111,7 +111,7 @@
     <div id="column1" data-id="n-api" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v22.6.0 documentation</h1>
+          <h1>Node.js v22.9.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -126,7 +126,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v22.6.0</li>
+            <li class="pinned-header">Node.js v22.9.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -303,7 +303,13 @@
 <li><a href="#napi_create_string_utf16"><code>napi_create_string_utf16</code></a></li>
 <li><span class="stability_1"><a href="#node_api_create_external_string_utf16"><code>node_api_create_external_string_utf16</code></a></span></li>
 <li><a href="#napi_create_string_utf8"><code>napi_create_string_utf8</code></a></li>
+</ul>
+</li>
+<li><a href="#functions-to-create-optimized-property-keys">Functions to create optimized property keys</a>
+<ul>
+<li><span class="stability_1"><a href="#node_api_create_property_key_latin1"><code>node_api_create_property_key_latin1</code></a></span></li>
 <li><span class="stability_1"><a href="#node_api_create_property_key_utf16"><code>node_api_create_property_key_utf16</code></a></span></li>
+<li><span class="stability_1"><a href="#node_api_create_property_key_utf8"><code>node_api_create_property_key_utf8</code></a></span></li>
 </ul>
 </li>
 <li><a href="#functions-to-convert-from-node-api-to-c-types">Functions to convert from Node-API to C types</a>
@@ -786,7 +792,13 @@
 <li><a href="#napi_create_string_utf16"><code>napi_create_string_utf16</code></a></li>
 <li><span class="stability_1"><a href="#node_api_create_external_string_utf16"><code>node_api_create_external_string_utf16</code></a></span></li>
 <li><a href="#napi_create_string_utf8"><code>napi_create_string_utf8</code></a></li>
+</ul>
+</li>
+<li><a href="#functions-to-create-optimized-property-keys">Functions to create optimized property keys</a>
+<ul>
+<li><span class="stability_1"><a href="#node_api_create_property_key_latin1"><code>node_api_create_property_key_latin1</code></a></span></li>
 <li><span class="stability_1"><a href="#node_api_create_property_key_utf16"><code>node_api_create_property_key_utf16</code></a></span></li>
+<li><span class="stability_1"><a href="#node_api_create_property_key_utf8"><code>node_api_create_property_key_utf8</code></a></span></li>
 </ul>
 </li>
 <li><a href="#functions-to-convert-from-node-api-to-c-types">Functions to convert from Node-API to C types</a>
@@ -3286,6 +3298,43 @@ is null-terminated.</li>
 The native string is copied.</p>
 <p>The JavaScript <code>string</code> type is described in
 <a href="https://tc39.github.io/ecma262/#sec-ecmascript-language-types-string-type">Section 6.1.4</a> of the ECMAScript Language Specification.</p>
+<h4>Functions to create optimized property keys<span><a class="mark" href="#functions-to-create-optimized-property-keys" id="functions-to-create-optimized-property-keys">#</a></span><a aria-hidden="true" class="legacy" id="n_api_functions_to_create_optimized_property_keys"></a></h4>
+<p>Many JavaScript engines including V8 use internalized strings as keys
+to set and get property values. They typically use a hash table to create
+and lookup such strings. While it adds some cost per key creation, it improves
+the performance after that by enabling comparison of string pointers instead
+of the whole strings.</p>
+<p>If a new JavaScript string is intended to be used as a property key, then for
+some JavaScript engines it will be more efficient to use the functions in this
+section. Otherwise, use the <code>napi_create_string_utf8</code> or
+<code>node_api_create_external_string_utf8</code> series functions as there may be
+additional overhead in creating/storing strings with the property key
+creation methods.</p>
+<h5><code>node_api_create_property_key_latin1</code><span><a class="mark" href="#node_api_create_property_key_latin1" id="node_api_create_property_key_latin1">#</a></span><a aria-hidden="true" class="legacy" id="n_api_node_api_create_property_key_latin1"></a></h5>
+<div class="api_metadata">
+<span>Added in: v22.9.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<pre><code class="language-c">napi_status NAPI_CDECL <span class="hljs-title function_">node_api_create_property_key_latin1</span><span class="hljs-params">(napi_env env,
+                                                           <span class="hljs-type">const</span> <span class="hljs-type">char</span>* str,
+                                                           <span class="hljs-type">size_t</span> length,
+                                                           napi_value* result)</span>;</code> <button class="copy-button">copy</button></pre>
+<ul>
+<li><code>[in] env</code>: The environment that the API is invoked under.</li>
+<li><code>[in] str</code>: Character buffer representing an ISO-8859-1-encoded string.</li>
+<li><code>[in] length</code>: The length of the string in bytes, or <code>NAPI_AUTO_LENGTH</code> if it
+is null-terminated.</li>
+<li><code>[out] result</code>: A <code>napi_value</code> representing an optimized JavaScript <code>string</code>
+to be used as a property key for objects.</li>
+</ul>
+<p>Returns <code>napi_ok</code> if the API succeeded.</p>
+<p>This API creates an optimized JavaScript <code>string</code> value from
+an ISO-8859-1-encoded C string to be used as a property key for objects.
+The native string is copied. In contrast with <code>napi_create_string_latin1</code>,
+subsequent calls to this function with the same <code>str</code> pointer may benefit from a speedup
+in the creation of the requested <code>napi_value</code>, depending on the engine.</p>
+<p>The JavaScript <code>string</code> type is described in
+<a href="https://tc39.github.io/ecma262/#sec-ecmascript-language-types-string-type">Section 6.1.4</a> of the ECMAScript Language Specification.</p>
 <h5><code>node_api_create_property_key_utf16</code><span><a class="mark" href="#node_api_create_property_key_utf16" id="node_api_create_property_key_utf16">#</a></span><a aria-hidden="true" class="legacy" id="n_api_node_api_create_property_key_utf16"></a></h5>
 <div class="api_metadata">
 <span>Added in: v21.7.0, v20.12.0</span>
@@ -3307,17 +3356,29 @@ to be used as a property key for objects.</li>
 <p>This API creates an optimized JavaScript <code>string</code> value from
 a UTF16-LE-encoded C string to be used as a property key for objects.
 The native string is copied.</p>
-<p>Many JavaScript engines including V8 use internalized strings as keys
-to set and get property values. They typically use a hash table to create
-and lookup such strings. While it adds some cost per key creation, it improves
-the performance after that by enabling comparison of string pointers instead
-of the whole strings.</p>
-<p>If a new JavaScript string is intended to be used as a property key, then for
-some JavaScript engines it will be more efficient to use
-the <code>node_api_create_property_key_utf16</code> function.
-Otherwise, use the <code>napi_create_string_utf16</code> or
-<code>node_api_create_external_string_utf16</code> functions as there may be additional
-overhead in creating/storing strings with this method.</p>
+<p>The JavaScript <code>string</code> type is described in
+<a href="https://tc39.github.io/ecma262/#sec-ecmascript-language-types-string-type">Section 6.1.4</a> of the ECMAScript Language Specification.</p>
+<h5><code>node_api_create_property_key_utf8</code><span><a class="mark" href="#node_api_create_property_key_utf8" id="node_api_create_property_key_utf8">#</a></span><a aria-hidden="true" class="legacy" id="n_api_node_api_create_property_key_utf8"></a></h5>
+<div class="api_metadata">
+<span>Added in: v22.9.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<pre><code class="language-c">napi_status NAPI_CDECL <span class="hljs-title function_">node_api_create_property_key_utf8</span><span class="hljs-params">(napi_env env,
+                                                         <span class="hljs-type">const</span> <span class="hljs-type">char</span>* str,
+                                                         <span class="hljs-type">size_t</span> length,
+                                                         napi_value* result)</span>;</code> <button class="copy-button">copy</button></pre>
+<ul>
+<li><code>[in] env</code>: The environment that the API is invoked under.</li>
+<li><code>[in] str</code>: Character buffer representing a UTF8-encoded string.</li>
+<li><code>[in] length</code>: The length of the string in two-byte code units, or
+<code>NAPI_AUTO_LENGTH</code> if it is null-terminated.</li>
+<li><code>[out] result</code>: A <code>napi_value</code> representing an optimized JavaScript <code>string</code>
+to be used as a property key for objects.</li>
+</ul>
+<p>Returns <code>napi_ok</code> if the API succeeded.</p>
+<p>This API creates an optimized JavaScript <code>string</code> value from
+a UTF8-encoded C string to be used as a property key for objects.
+The native string is copied.</p>
 <p>The JavaScript <code>string</code> type is described in
 <a href="https://tc39.github.io/ecma262/#sec-ecmascript-language-types-string-type">Section 6.1.4</a> of the ECMAScript Language Specification.</p>
 <h4>Functions to convert from Node-API to C types<span><a class="mark" href="#functions-to-convert-from-node-api-to-c-types" id="functions-to-convert-from-node-api-to-c-types">#</a></span><a aria-hidden="true" class="legacy" id="n_api_functions_to_convert_from_node_api_to_c_types"></a></h4>

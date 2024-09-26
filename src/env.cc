@@ -320,7 +320,6 @@ std::ostream& operator<<(std::ostream& output, const SnapshotMetadata& i) {
          << "  \"" << i.node_version << "\", // node_version\n"
          << "  \"" << i.node_arch << "\", // node_arch\n"
          << "  \"" << i.node_platform << "\", // node_platform\n"
-         << "  " << i.v8_cache_version_tag << ", // v8_cache_version_tag\n"
          << "  " << i.flags << ", // flags\n"
          << "}";
   return output;
@@ -538,19 +537,35 @@ Mutex IsolateData::isolate_data_mutex_;
 std::unordered_map<uint16_t, std::unique_ptr<PerIsolateWrapperData>>
     IsolateData::wrapper_data_map_;
 
+IsolateData* IsolateData::CreateIsolateData(
+    Isolate* isolate,
+    uv_loop_t* loop,
+    MultiIsolatePlatform* platform,
+    ArrayBufferAllocator* allocator,
+    const EmbedderSnapshotData* embedder_snapshot_data,
+    std::shared_ptr<PerIsolateOptions> options) {
+  const SnapshotData* snapshot_data =
+      SnapshotData::FromEmbedderWrapper(embedder_snapshot_data);
+  if (options == nullptr) {
+    options = per_process::cli_options->per_isolate->Clone();
+  }
+  return new IsolateData(
+      isolate, loop, platform, allocator, snapshot_data, options);
+}
+
 IsolateData::IsolateData(Isolate* isolate,
                          uv_loop_t* event_loop,
                          MultiIsolatePlatform* platform,
                          ArrayBufferAllocator* node_allocator,
-                         const SnapshotData* snapshot_data)
+                         const SnapshotData* snapshot_data,
+                         std::shared_ptr<PerIsolateOptions> options)
     : isolate_(isolate),
       event_loop_(event_loop),
       node_allocator_(node_allocator == nullptr ? nullptr
                                                 : node_allocator->GetImpl()),
       platform_(platform),
-      snapshot_data_(snapshot_data) {
-  options_.reset(
-      new PerIsolateOptions(*(per_process::cli_options->per_isolate)));
+      snapshot_data_(snapshot_data),
+      options_(std::move(options)) {
   v8::CppHeap* cpp_heap = isolate->GetCppHeap();
 
   uint16_t cppgc_id = kDefaultCppGCEmbedderID;
@@ -1113,15 +1128,47 @@ void Environment::InitializeCompileCache() {
       dir_from_env.empty()) {
     return;
   }
-  auto handler = std::make_unique<CompileCacheHandler>(this);
-  if (handler->InitializeDirectory(this, dir_from_env)) {
-    compile_cache_handler_ = std::move(handler);
-    AtExit(
-        [](void* env) {
-          static_cast<Environment*>(env)->compile_cache_handler()->Persist();
-        },
-        this);
+  EnableCompileCache(dir_from_env);
+}
+
+CompileCacheEnableResult Environment::EnableCompileCache(
+    const std::string& cache_dir) {
+  CompileCacheEnableResult result;
+  std::string disable_env;
+  if (credentials::SafeGetenv(
+          "NODE_DISABLE_COMPILE_CACHE", &disable_env, env_vars())) {
+    result.status = CompileCacheEnableStatus::DISABLED;
+    result.message = "Disabled by NODE_DISABLE_COMPILE_CACHE";
+    Debug(this,
+          DebugCategory::COMPILE_CACHE,
+          "[compile cache] %s.\n",
+          result.message);
+    return result;
   }
+
+  if (!compile_cache_handler_) {
+    std::unique_ptr<CompileCacheHandler> handler =
+        std::make_unique<CompileCacheHandler>(this);
+    result = handler->Enable(this, cache_dir);
+    if (result.status == CompileCacheEnableStatus::ENABLED) {
+      compile_cache_handler_ = std::move(handler);
+      AtExit(
+          [](void* env) {
+            static_cast<Environment*>(env)->compile_cache_handler()->Persist();
+          },
+          this);
+    }
+    if (!result.message.empty()) {
+      Debug(this,
+            DebugCategory::COMPILE_CACHE,
+            "[compile cache] %s\n",
+            result.message);
+    }
+  } else {
+    result.status = CompileCacheEnableStatus::ALREADY_ENABLED;
+    result.cache_directory = compile_cache_handler_->cache_dir();
+  }
+  return result;
 }
 
 void Environment::ExitEnv(StopFlags::Flags flags) {
@@ -1242,6 +1289,11 @@ void Environment::RunCleanup() {
   // Only BaseObject's cleanups are registered as per-realm cleanup hooks now.
   // Defer the BaseObject cleanup after handles are cleaned up.
   CleanupHandles();
+
+  while (!cleanable_queue_.IsEmpty()) {
+    Cleanable* cleanable = cleanable_queue_.PopFront();
+    cleanable->Clean();
+  }
 
   while (!cleanup_queue_.empty() || principal_realm_->HasCleanupHooks() ||
          native_immediates_.size() > 0 ||

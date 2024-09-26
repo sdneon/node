@@ -89,6 +89,7 @@ a command-line flag. Experimental features may also emit a [warning][].
 | [Inspector](inspector.html) | (2) Stable |
 | [Modules: `node:module` API](module.html) | (1) .2 - Release candidate |
 | [Modules: CommonJS modules](modules.html) | (2) Stable |
+| [Modules: TypeScript](typescript.html) | (1) .0 - Early development |
 | [OS](os.html) | (2) Stable |
 | [Path](path.html) | (2) Stable |
 | [Performance measurement APIs](perf_hooks.html) | (2) Stable |

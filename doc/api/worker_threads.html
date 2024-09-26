@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v22.6.0">
-  <title>Worker threads | Node.js v22.6.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v22.9.0">
+  <title>Worker threads | Node.js v22.9.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -111,7 +111,7 @@
     <div id="column1" data-id="worker_threads" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v22.6.0 documentation</h1>
+          <h1>Node.js v22.9.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -126,7 +126,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v22.6.0</li>
+            <li class="pinned-header">Node.js v22.9.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -432,7 +432,7 @@
         <h2>Worker threads<span><a class="mark" href="#worker-threads" id="worker-threads">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_threads"></a></h2>
 
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v22.6.0/lib/worker_threads.js">lib/worker_threads.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v22.9.0/lib/worker_threads.js">lib/worker_threads.js</a></p>
 <p>The <code>node:worker_threads</code> module enables the use of threads that execute
 JavaScript in parallel. To access it:</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> worker = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:worker_threads'</span>);</code> <button class="copy-button">copy</button></pre>
@@ -642,7 +642,7 @@ using <code>worker.postMessage()</code> are available in this thread using
 </div>
 <p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a>.1 - Active development</div><p></p>
 <ul>
-<li><code>destination</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The target thread ID. If the thread ID is invalid, a
+<li><code>threadId</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The target thread ID. If the thread ID is invalid, a
 <a href="errors.html#err_worker_messaging_failed"><code>ERR_WORKER_MESSAGING_FAILED</code></a> error will be thrown. If the target thread ID is the current thread ID,
 a <a href="errors.html#err_worker_messaging_same_thread"><code>ERR_WORKER_MESSAGING_SAME_THREAD</code></a> error will be thrown.</li>
 <li><code>value</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> The value to send.</li>
@@ -667,10 +667,8 @@ and the <a href="#workerpostmessagevalue-transferlist"><code>worker.postMessage(
 the last one will try to communicate with the main thread.</p>
 
 <pre class="with-41-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { fileURLToPath } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:url'</span>;
-<span class="hljs-keyword">import</span> { once } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:events'</span>;
 <span class="hljs-keyword">import</span> process <span class="hljs-keyword">from</span> <span class="hljs-string">'node:process'</span>;
 <span class="hljs-keyword">import</span> {
-  isMainThread,
   postMessageToThread,
   threadId,
   workerData,
@@ -701,9 +699,7 @@ the last one will try to communicate with the main thread.</p>
   <span class="hljs-keyword">await</span> <span class="hljs-title function_">postMessageToThread</span>(<span class="hljs-number">0</span>, { <span class="hljs-attr">message</span>: <span class="hljs-string">'ping'</span> });
 }
 
-channel.<span class="hljs-property">onmessage</span> = channel.<span class="hljs-property">close</span>;</code><code class="language-js cjs"><span class="hljs-keyword">const</span> { once } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:events'</span>);
-<span class="hljs-keyword">const</span> {
-  isMainThread,
+channel.<span class="hljs-property">onmessage</span> = channel.<span class="hljs-property">close</span>;</code><code class="language-js cjs"><span class="hljs-keyword">const</span> {
   postMessageToThread,
   threadId,
   workerData,
@@ -1381,11 +1377,11 @@ including no <code>ArrayBuffer</code>s. Even if these limits are set, the proces
 still abort if it encounters a global out-of-memory situation.
 <ul>
 <li><code>maxOldGenerationSizeMb</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The maximum size of the main heap in
-MB. If the command-line argument <a href="cli.html#--max-old-space-sizesize-in-megabytes"><code>--max-old-space-size</code></a> is set, it
+MB. If the command-line argument <a href="cli.html#--max-old-space-sizesize-in-mib"><code>--max-old-space-size</code></a> is set, it
 overrides this setting.</li>
 <li><code>maxYoungGenerationSizeMb</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The maximum size of a heap space for
 recently created objects. If the command-line argument
-<a href="cli.html#--max-semi-space-sizesize-in-megabytes"><code>--max-semi-space-size</code></a> is set, it overrides this setting.</li>
+<a href="cli.html#--max-semi-space-sizesize-in-mib"><code>--max-semi-space-size</code></a> is set, it overrides this setting.</li>
 <li><code>codeRangeSizeMb</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The size of a pre-allocated memory range
 used for generated code.</li>
 <li><code>stackSizeMb</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The default maximum stack size for the thread.

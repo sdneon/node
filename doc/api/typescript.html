@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v22.6.0">
-  <title>Modules: TypeScript | Node.js v22.6.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v22.9.0">
+  <title>Modules: TypeScript | Node.js v22.9.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -111,7 +111,7 @@
     <div id="column1" data-id="typescript" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v22.6.0 documentation</h1>
+          <h1>Node.js v22.9.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -126,7 +126,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v22.6.0</li>
+            <li class="pinned-header">Node.js v22.9.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -135,14 +135,14 @@
       </a>
 
       <div class="picker"><div class="toc"><ul>
-<li><a href="#modules-typescript">Modules: TypeScript</a>
+<li><span class="stability_1"><a href="#modules-typescript">Modules: TypeScript</a></span>
 <ul>
 <li><a href="#enabling">Enabling</a></li>
 <li><a href="#full-typescript-support">Full TypeScript support</a></li>
 <li><span class="stability_1"><a href="#type-stripping">Type stripping</a></span>
 <ul>
 <li><a href="#determining-module-system">Determining module system</a></li>
-<li><a href="#unsupported-typescript-features">Unsupported TypeScript features</a></li>
+<li><a href="#typescript-features">TypeScript features</a></li>
 <li><a href="#importing-types-without-type-keyword">Importing types without <code>type</code> keyword</a></li>
 <li><a href="#non-file-forms-of-input">Non-file forms of input</a></li>
 <li><a href="#source-maps">Source maps</a></li>
@@ -266,14 +266,14 @@
       </header>
 
       <details role="navigation" id="toc" open><summary>Table of contents</summary><ul>
-<li><a href="#modules-typescript">Modules: TypeScript</a>
+<li><span class="stability_1"><a href="#modules-typescript">Modules: TypeScript</a></span>
 <ul>
 <li><a href="#enabling">Enabling</a></li>
 <li><a href="#full-typescript-support">Full TypeScript support</a></li>
 <li><span class="stability_1"><a href="#type-stripping">Type stripping</a></span>
 <ul>
 <li><a href="#determining-module-system">Determining module system</a></li>
-<li><a href="#unsupported-typescript-features">Unsupported TypeScript features</a></li>
+<li><a href="#typescript-features">TypeScript features</a></li>
 <li><a href="#importing-types-without-type-keyword">Importing types without <code>type</code> keyword</a></li>
 <li><a href="#non-file-forms-of-input">Non-file forms of input</a></li>
 <li><a href="#source-maps">Source maps</a></li>
@@ -286,6 +286,16 @@
 
       <div role="main" id="apicontent">
         <h2>Modules: TypeScript<span><a class="mark" href="#modules-typescript" id="modules-typescript">#</a></span><a aria-hidden="true" class="legacy" id="typescript_modules_typescript"></a></h2>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v22.7.0</td>
+<td><p>Added <code>--experimental-transform-types</code> flag.</p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a>.0 - Early development</div><p></p>
 <section><h3>Enabling<span><a class="mark" href="#enabling" id="enabling">#</a></span><a aria-hidden="true" class="legacy" id="typescript_enabling"></a></h3>
 <p>There are two ways to enable runtime TypeScript support in Node.js:</p>
 <ol>
@@ -321,13 +331,15 @@ manager you're using for your project. For example, with <code>npm</code>:</p>
 </div>
 <p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a>.0 - Early development</div><p></p>
 <p>The flag <a href="cli.html#--experimental-strip-types"><code>--experimental-strip-types</code></a> enables Node.js to run TypeScript
-files that contain only type annotations. Such files contain no TypeScript
-features that require transformation, such as enums or namespaces. Node.js will
-replace inline type annotations with whitespace, and no type checking is
-performed. TypeScript features that depend on settings within <code>tsconfig.json</code>,
+files. By default Node.js will execute only files that contain no
+TypeScript features that require transformation, such as enums or namespaces.
+Node.js will replace inline type annotations with whitespace,
+and no type checking is performed.
+To enable the transformation of such features
+use the flag <a href="cli.html#--experimental-transform-types"><code>--experimental-transform-types</code></a>.
+TypeScript features that depend on settings within <code>tsconfig.json</code>,
 such as paths or converting newer JavaScript syntax to older standards, are
-intentionally unsupported. To get fuller TypeScript support, including support
-for enums and namespaces and paths, see <a href="#full-typescript-support">Full TypeScript support</a>.</p>
+intentionally unsupported. To get full TypeScript support, see <a href="#full-typescript-support">Full TypeScript support</a>.</p>
 <p>The type stripping feature is designed to be lightweight.
 By intentionally not supporting syntaxes that require JavaScript code
 generation, and by replacing inline types with whitespace, Node.js can run
@@ -354,18 +366,21 @@ calls: <code>require('./file.ts')</code>, not <code>require('./file')</code>, si
 <p>The <code>tsconfig.json</code> option <code>allowImportingTsExtensions</code> will allow the
 TypeScript compiler <code>tsc</code> to type-check files with <code>import</code> specifiers that
 include the <code>.ts</code> extension.</p>
-<h4>Unsupported TypeScript features<span><a class="mark" href="#unsupported-typescript-features" id="unsupported-typescript-features">#</a></span><a aria-hidden="true" class="legacy" id="typescript_unsupported_typescript_features"></a></h4>
+<h4>TypeScript features<span><a class="mark" href="#typescript-features" id="typescript-features">#</a></span><a aria-hidden="true" class="legacy" id="typescript_typescript_features"></a></h4>
 <p>Since Node.js is only removing inline types, any TypeScript features that
-involve <em>replacing</em> TypeScript syntax with new JavaScript syntax will error.
-This is by design. To run TypeScript with such features, see
-<a href="#full-typescript-support">Full TypeScript support</a>.</p>
-<p>The most prominent unsupported features that require transformation are:</p>
+involve <em>replacing</em> TypeScript syntax with new JavaScript syntax will error,
+unless the flag <a href="cli.html#--experimental-transform-types"><code>--experimental-transform-types</code></a> is passed.</p>
+<p>The most prominent features that require transformation are:</p>
 <ul>
 <li><code>Enum</code></li>
-<li><code>experimentalDecorators</code></li>
 <li><code>namespaces</code></li>
+<li><code>legacy module</code></li>
 <li>parameter properties</li>
 </ul>
+<p>Since Decorators are currently a <a href="https://github.com/tc39/proposal-decorators">TC39 Stage 3 proposal</a>
+and will soon be supported by the JavaScript engine,
+they are not transformed and will result in a parser error.
+This is a temporary limitation and will be resolved in the future.</p>
 <p>In addition, Node.js does not read <code>tsconfig.json</code> files and does not support
 features that depend on settings within <code>tsconfig.json</code>, such as paths or
 converting newer JavaScript syntax into older standards.</p>
@@ -387,8 +402,9 @@ will be determined by <code>--input-type</code>, as it is for JavaScript.</p>
 <code>inspect</code>.</p>
 <h4>Source maps<span><a class="mark" href="#source-maps" id="source-maps">#</a></span><a aria-hidden="true" class="legacy" id="typescript_source_maps"></a></h4>
 <p>Since inline types are replaced by whitespace, source maps are unnecessary for
-correct line numbers in stack traces; and Node.js does not generate them. For
-source maps support, see <a href="#full-typescript-support">Full TypeScript support</a>.</p>
+correct line numbers in stack traces; and Node.js does not generate them.
+When <a href="cli.html#--experimental-transform-types"><code>--experimental-transform-types</code></a> is enabled, source-maps
+are enabled by default.</p>
 <h4>Type stripping in dependencies<span><a class="mark" href="#type-stripping-in-dependencies" id="type-stripping-in-dependencies">#</a></span><a aria-hidden="true" class="legacy" id="typescript_type_stripping_in_dependencies"></a></h4>
 <p>To discourage package authors from publishing packages written in TypeScript,
 Node.js will by default refuse to handle TypeScript files inside folders under

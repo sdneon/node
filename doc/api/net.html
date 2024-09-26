@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v22.6.0">
-  <title>Net | Node.js v22.6.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v22.9.0">
+  <title>Net | Node.js v22.9.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -111,7 +111,7 @@
     <div id="column1" data-id="net" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v22.6.0 documentation</h1>
+          <h1>Node.js v22.9.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -126,7 +126,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v22.6.0</li>
+            <li class="pinned-header">Node.js v22.9.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -541,7 +541,7 @@
 
 <!--lint disable maximum-line-length-->
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v22.6.0/lib/net.js">lib/net.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v22.9.0/lib/net.js">lib/net.js</a></p>
 <p>The <code>node:net</code> module provides an asynchronous network API for creating stream-based
 TCP or <a href="#ipc-support">IPC</a> servers (<a href="#netcreateserveroptions-connectionlistener"><code>net.createServer()</code></a>) and clients
 (<a href="#netcreateconnection"><code>net.createConnection()</code></a>).</p>
@@ -1082,6 +1082,22 @@ automatically end the writable side when the readable side ends. See
 <code>false</code>.</li>
 <li><code>fd</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> If specified, wrap around an existing socket with
 the given file descriptor, otherwise a new socket will be created.</li>
+<li><code>onread</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> If specified, incoming data is stored in a single <code>buffer</code>
+and passed to the supplied <code>callback</code> when data arrives on the socket.
+This will cause the streaming functionality to not provide any data.
+The socket will emit events like <code>'error'</code>, <code>'end'</code>, and <code>'close'</code>
+as usual. Methods like <code>pause()</code> and <code>resume()</code> will also behave as
+expected.
+<ul>
+<li><code>buffer</code> <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array" class="type">&#x3C;Uint8Array></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> Either a reusable chunk of memory to
+use for storing incoming data or a function that returns such.</li>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> This function is called for every chunk of incoming
+data. Two arguments are passed to it: the number of bytes written to
+<code>buffer</code> and a reference to <code>buffer</code>. Return <code>false</code> from this function to
+implicitly <code>pause()</code> the socket. This function will be executed in the
+global context.</li>
+</ul>
+</li>
 <li><code>readable</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> Allow reads on the socket when an <code>fd</code> is passed,
 otherwise ignored. <strong>Default:</strong> <code>false</code>.</li>
 <li><code>signal</code> <a href="globals.html#class-abortsignal" class="type">&#x3C;AbortSignal></a> An Abort signal that may be used to destroy the
@@ -1380,38 +1396,6 @@ immediately after the socket is established. <strong>Default:</strong> <code>fal
 See <a href="#identifying-paths-for-ipc-connections">Identifying paths for IPC connections</a>. If provided, the TCP-specific
 options above are ignored.</li>
 </ul>
-<p>For both types, available <code>options</code> include:</p>
-<ul>
-<li><code>onread</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> If specified, incoming data is stored in a single <code>buffer</code>
-and passed to the supplied <code>callback</code> when data arrives on the socket.
-This will cause the streaming functionality to not provide any data.
-The socket will emit events like <code>'error'</code>, <code>'end'</code>, and <code>'close'</code>
-as usual. Methods like <code>pause()</code> and <code>resume()</code> will also behave as
-expected.
-<ul>
-<li><code>buffer</code> <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array" class="type">&#x3C;Uint8Array></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> Either a reusable chunk of memory to
-use for storing incoming data or a function that returns such.</li>
-<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> This function is called for every chunk of incoming
-data. Two arguments are passed to it: the number of bytes written to
-<code>buffer</code> and a reference to <code>buffer</code>. Return <code>false</code> from this function to
-implicitly <code>pause()</code> the socket. This function will be executed in the
-global context.</li>
-</ul>
-</li>
-</ul>
-<p>Following is an example of a client using the <code>onread</code> option:</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> net = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:net'</span>);
-net.<span class="hljs-title function_">connect</span>({
-  <span class="hljs-attr">port</span>: <span class="hljs-number">80</span>,
-  <span class="hljs-attr">onread</span>: {
-    <span class="hljs-comment">// Reuses a 4KiB Buffer for every read from the socket.</span>
-    <span class="hljs-attr">buffer</span>: <span class="hljs-title class_">Buffer</span>.<span class="hljs-title function_">alloc</span>(<span class="hljs-number">4</span> * <span class="hljs-number">1024</span>),
-    <span class="hljs-attr">callback</span>: <span class="hljs-keyword">function</span>(<span class="hljs-params">nread, buf</span>) {
-      <span class="hljs-comment">// Received data is available in `buf` from 0 to `nread`.</span>
-      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(buf.<span class="hljs-title function_">toString</span>(<span class="hljs-string">'utf8'</span>, <span class="hljs-number">0</span>, nread));
-    },
-  },
-});</code> <button class="copy-button">copy</button></pre>
 <h5><code>socket.connect(path[, connectListener])</code><span><a class="mark" href="#socketconnectpath-connectlistener" id="socketconnectpath-connectlistener">#</a></span><a aria-hidden="true" class="legacy" id="net_socket_connect_path_connectlistener"></a></h5>
 <ul>
 <li><code>path</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> Path the client should connect to. See
@@ -1825,6 +1809,22 @@ client.<span class="hljs-title function_">on</span>(<span class="hljs-string">'e
 });</code> <button class="copy-button">copy</button></pre>
 <p>To connect on the socket <code>/tmp/echo.sock</code>:</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> client = net.<span class="hljs-title function_">createConnection</span>({ <span class="hljs-attr">path</span>: <span class="hljs-string">'/tmp/echo.sock'</span> });</code> <button class="copy-button">copy</button></pre>
+<p>Following is an example of a client using the <code>port</code> and <code>onread</code>
+option. In this case, the <code>onread</code> option will be only used to call
+<code>new net.Socket([options])</code> and the <code>port</code> option will be used to
+call <code>socket.connect(options[, connectListener])</code>.</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> net = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:net'</span>);
+net.<span class="hljs-title function_">createConnection</span>({
+  <span class="hljs-attr">port</span>: <span class="hljs-number">80</span>,
+  <span class="hljs-attr">onread</span>: {
+    <span class="hljs-comment">// Reuses a 4KiB Buffer for every read from the socket.</span>
+    <span class="hljs-attr">buffer</span>: <span class="hljs-title class_">Buffer</span>.<span class="hljs-title function_">alloc</span>(<span class="hljs-number">4</span> * <span class="hljs-number">1024</span>),
+    <span class="hljs-attr">callback</span>: <span class="hljs-keyword">function</span>(<span class="hljs-params">nread, buf</span>) {
+      <span class="hljs-comment">// Received data is available in `buf` from 0 to `nread`.</span>
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(buf.<span class="hljs-title function_">toString</span>(<span class="hljs-string">'utf8'</span>, <span class="hljs-number">0</span>, nread));
+    },
+  },
+});</code> <button class="copy-button">copy</button></pre>
 <h4><code>net.createConnection(path[, connectListener])</code><span><a class="mark" href="#netcreateconnectionpath-connectlistener" id="netcreateconnectionpath-connectlistener">#</a></span><a aria-hidden="true" class="legacy" id="net_net_createconnection_path_connectlistener"></a></h4>
 <div class="api_metadata">
 <span>Added in: v0.1.90</span>

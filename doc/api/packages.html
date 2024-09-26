@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v22.6.0">
-  <title>Modules: Packages | Node.js v22.6.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v22.9.0">
+  <title>Modules: Packages | Node.js v22.9.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -111,7 +111,7 @@
     <div id="column1" data-id="packages" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v22.6.0 documentation</h1>
+          <h1>Node.js v22.9.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -126,7 +126,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v22.6.0</li>
+            <li class="pinned-header">Node.js v22.9.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -141,6 +141,7 @@
 <li><a href="#determining-module-system">Determining module system</a>
 <ul>
 <li><a href="#introduction_1">Introduction</a></li>
+<li><span class="stability_1"><a href="#syntax-detection">Syntax detection</a></span></li>
 <li><a href="#modules-loaders">Modules loaders</a></li>
 <li><a href="#packagejson-and-file-extensions"><code>package.json</code> and file extensions</a></li>
 <li><a href="#--input-type-flag"><code>--input-type</code> flag</a></li>
@@ -327,6 +328,7 @@
 <li><a href="#determining-module-system">Determining module system</a>
 <ul>
 <li><a href="#introduction_1">Introduction</a></li>
+<li><span class="stability_1"><a href="#syntax-detection">Syntax detection</a></span></li>
 <li><a href="#modules-loaders">Modules loaders</a></li>
 <li><a href="#packagejson-and-file-extensions"><code>package.json</code> and file extensions</a></li>
 <li><a href="#--input-type-flag"><code>--input-type</code> flag</a></li>
@@ -426,14 +428,14 @@ contains a top-level <a href="#type"><code>"type"</code></a> field with a value 
 with the flag <code>--input-type=module</code>.</p>
 </li>
 <li>
-<p>When using <a href="cli.html#--experimental-detect-module"><code>--experimental-detect-module</code></a>, code containing syntax only
-successfully parsed as <a href="esm.html">ES modules</a>, such as <code>import</code> or <code>export</code>
-statements or <code>import.meta</code>, having no explicit marker of how it should be
-interpreted. Explicit markers are <code>.mjs</code> or <code>.cjs</code> extensions, <code>package.json</code>
-<code>"type"</code> fields with either <code>"module"</code> or <code>"commonjs"</code> values, or
-<code>--input-type</code> or <code>--experimental-default-type</code> flags. Dynamic <code>import()</code>
-expressions are supported in either CommonJS or ES modules and would not
-cause a file to be treated as an ES module.</p>
+<p>Code containing syntax only successfully parsed as <a href="esm.html">ES modules</a>, such as
+<code>import</code> or <code>export</code> statements or <code>import.meta</code>, with no explicit marker of
+how it should be interpreted. Explicit markers are <code>.mjs</code> or <code>.cjs</code>
+extensions, <code>package.json</code> <code>"type"</code> fields with either <code>"module"</code> or
+<code>"commonjs"</code> values, or <code>--input-type</code> or <code>--experimental-default-type</code> flags.
+Dynamic <code>import()</code> expressions are supported in either CommonJS or ES modules
+and would not force a file to be treated as an ES module. See
+<a href="#syntax-detection">Syntax detection</a>.</p>
 </li>
 </ul>
 <p>Node.js will treat the following as <a href="modules.html">CommonJS</a> when passed to <code>node</code> as the
@@ -480,6 +482,41 @@ CommonJS. Being explicit about the <code>type</code> of the package will future-
 package in case the default type of Node.js ever changes, and it will also make
 things easier for build tools and loaders to determine how the files in the
 package should be interpreted.</p>
+<h4>Syntax detection<span><a class="mark" href="#syntax-detection" id="syntax-detection">#</a></span><a aria-hidden="true" class="legacy" id="packages_syntax_detection"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v22.7.0</td>
+<td><p>Syntax detection is enabled by default.</p></td></tr>
+<tr><td>v21.1.0, v20.10.0</td>
+<td><p><span>Added in: v21.1.0, v20.10.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a>.2 - Release candidate</div><p></p>
+<p>Node.js will inspect the source code of ambiguous input to determine whether it
+contains ES module syntax; if such syntax is detected, the input will be treated
+as an ES module.</p>
+<p>Ambiguous input is defined as:</p>
+<ul>
+<li>Files with a <code>.js</code> extension or no extension; and either no controlling
+<code>package.json</code> file or one that lacks a <code>type</code> field; and
+<code>--experimental-default-type</code> is not specified.</li>
+<li>String input (<code>--eval</code> or STDIN) when neither <code>--input-type</code> nor
+<code>--experimental-default-type</code> are specified.</li>
+</ul>
+<p>ES module syntax is defined as syntax that would throw when evaluated as
+CommonJS. This includes the following:</p>
+<ul>
+<li><code>import</code> statements (but <em>not</em> <code>import()</code> expressions, which are valid in
+CommonJS).</li>
+<li><code>export</code> statements.</li>
+<li><code>import.meta</code> references.</li>
+<li><code>await</code> at the top level of a module.</li>
+<li>Lexical redeclarations of the CommonJS wrapper variables (<code>require</code>, <code>module</code>,
+<code>exports</code>, <code>__dirname</code>, <code>__filename</code>).</li>
+</ul>
 <h4>Modules loaders<span><a class="mark" href="#modules-loaders" id="modules-loaders">#</a></span><a aria-hidden="true" class="legacy" id="packages_modules_loaders"></a></h4>
 <p>Node.js has two systems for resolving a specifier and loading modules.</p>
 <p>There is the CommonJS module loader:</p>

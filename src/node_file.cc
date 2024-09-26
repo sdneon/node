@@ -1051,6 +1051,14 @@ static int32_t FastInternalModuleStat(
     const FastOneByteString& input,
     // NOLINTNEXTLINE(runtime/references) This is V8 api.
     FastApiCallbackOptions& options) {
+  // This needs a HandleScope which needs an isolate.
+  Isolate* isolate = Isolate::TryGetCurrent();
+  if (!isolate) {
+    options.fallback = true;
+    return -1;
+  }
+
+  HandleScope scope(isolate);
   Environment* env = Environment::GetCurrent(recv->GetCreationContextChecked());
 
   auto path = std::filesystem::path(input.data, input.data + input.length);
@@ -3044,7 +3052,14 @@ static void CpSyncCheckPaths(const FunctionCallbackInfo<Value>& args) {
                         ? std::filesystem::symlink_status(src_path, error_code)
                         : std::filesystem::status(src_path, error_code);
   if (error_code) {
-    return env->ThrowUVException(EEXIST, "lstat", nullptr, src.out());
+#ifdef _WIN32
+    int errorno = uv_translate_sys_error(error_code.value());
+#else
+    int errorno =
+        error_code.value() > 0 ? -error_code.value() : error_code.value();
+#endif
+    return env->ThrowUVException(
+        errorno, dereference ? "stat" : "lstat", nullptr, src.out());
   }
   auto dest_status =
       dereference ? std::filesystem::symlink_status(dest_path, error_code)
@@ -3052,7 +3067,9 @@ static void CpSyncCheckPaths(const FunctionCallbackInfo<Value>& args) {
 
   bool dest_exists = !error_code && dest_status.type() !=
                                         std::filesystem::file_type::not_found;
-  bool src_is_dir = src_status.type() == std::filesystem::file_type::directory;
+  bool src_is_dir =
+      (src_status.type() == std::filesystem::file_type::directory) ||
+      (dereference && src_status.type() == std::filesystem::file_type::symlink);
 
   if (!error_code) {
     // Check if src and dest are identical.
@@ -3235,8 +3252,14 @@ void BindingData::LegacyMainResolve(const FunctionCallbackInfo<Value>& args) {
 
     for (int i = 0; i < legacy_main_extensions_with_main_end; i++) {
       file_path = *initial_file_path + std::string(legacy_main_extensions[i]);
+      // TODO(anonrig): Remove this when ToNamespacedPath supports std::string
+      Local<Value> local_file_path =
+          Buffer::Copy(env->isolate(), file_path.c_str(), file_path.size())
+              .ToLocalChecked();
+      BufferValue buff_file_path(isolate, local_file_path);
+      ToNamespacedPath(env, &buff_file_path);
 
-      switch (FilePathIsFile(env, file_path)) {
+      switch (FilePathIsFile(env, buff_file_path.ToString())) {
         case BindingData::FilePathIsFileReturnType::kIsFile:
           return args.GetReturnValue().Set(i);
         case BindingData::FilePathIsFileReturnType::kIsNotFile:
@@ -3272,8 +3295,14 @@ void BindingData::LegacyMainResolve(const FunctionCallbackInfo<Value>& args) {
        i < legacy_main_extensions_package_fallback_end;
        i++) {
     file_path = *initial_file_path + std::string(legacy_main_extensions[i]);
+    // TODO(anonrig): Remove this when ToNamespacedPath supports std::string
+    Local<Value> local_file_path =
+        Buffer::Copy(env->isolate(), file_path.c_str(), file_path.size())
+            .ToLocalChecked();
+    BufferValue buff_file_path(isolate, local_file_path);
+    ToNamespacedPath(env, &buff_file_path);
 
-    switch (FilePathIsFile(env, file_path)) {
+    switch (FilePathIsFile(env, buff_file_path.ToString())) {
       case BindingData::FilePathIsFileReturnType::kIsFile:
         return args.GetReturnValue().Set(i);
       case BindingData::FilePathIsFileReturnType::kIsNotFile:

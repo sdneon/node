@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v22.6.0">
-  <title>Test runner | Node.js v22.6.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v22.9.0">
+  <title>Test runner | Node.js v22.9.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -111,7 +111,7 @@
     <div id="column1" data-id="test" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v22.6.0 documentation</h1>
+          <h1>Node.js v22.9.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -126,7 +126,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v22.6.0</li>
+            <li class="pinned-header">Node.js v22.9.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -585,7 +585,7 @@
 </details>
 </div>
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v22.6.0/lib/test.js">lib/test.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v22.9.0/lib/test.js">lib/test.js</a></p>
 <p>The <code>node:test</code> module facilitates the creation of JavaScript tests.
 To access it:</p>
 
@@ -752,10 +752,10 @@ alias for <a href="#testname-options-fn"><code>test()</code></a>.</p>
 
 <pre class="with-46-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { describe, it } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:test'</span>;</code><code class="language-js cjs"><span class="hljs-keyword">const</span> { describe, it } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:test'</span>);</code><button class="copy-button">copy</button></pre>
 </section><section><h3><code>only</code> tests<span><a class="mark" href="#only-tests" id="only-tests">#</a></span><a aria-hidden="true" class="legacy" id="test_only_tests"></a></h3>
-<p>If Node.js is started with the <a href="cli.html#--test-only"><code>--test-only</code></a> command-line option, it is
-possible to skip all tests except for a selected subset by passing
-the <code>only</code> option to the tests that should run. When a test with the <code>only</code>
-option is set, all subtests are also run.
+<p>If Node.js is started with the <a href="cli.html#--test-only"><code>--test-only</code></a> command-line option, or test
+isolation is disabled, it is possible to skip all tests except for a selected
+subset by passing the <code>only</code> option to the tests that should run. When a test
+with the <code>only</code> option is set, all subtests are also run.
 If a suite has the <code>only</code> option set, all tests within the suite are run,
 unless it has descendants with the <code>only</code> option set, in which case only those
 tests are run.</p>
@@ -920,16 +920,23 @@ prevent shell expansion, which can reduce portability across systems.</p>
 More information on the test file execution can be found
 in the <a href="#test-runner-execution-model">test runner execution model</a> section.</p>
 <h4>Test runner execution model<span><a class="mark" href="#test-runner-execution-model" id="test-runner-execution-model">#</a></span><a aria-hidden="true" class="legacy" id="test_test_runner_execution_model"></a></h4>
-<p>Each matching test file is executed in a separate child process. The maximum
-number of child processes running at any time is controlled by the
-<a href="cli.html#--test-concurrency"><code>--test-concurrency</code></a> flag. If the child process finishes with an exit code
-of 0, the test is considered passing. Otherwise, the test is considered to be a
-failure. Test files must be executable by Node.js, but are not required to use
-the <code>node:test</code> module internally.</p>
+<p>When process-level test isolation is enabled, each matching test file is
+executed in a separate child process. The maximum number of child processes
+running at any time is controlled by the <a href="cli.html#--test-concurrency"><code>--test-concurrency</code></a> flag. If the
+child process finishes with an exit code of 0, the test is considered passing.
+Otherwise, the test is considered to be a failure. Test files must be executable
+by Node.js, but are not required to use the <code>node:test</code> module internally.</p>
 <p>Each test file is executed as if it was a regular script. That is, if the test
 file itself uses <code>node:test</code> to define tests, all of those tests will be
 executed within a single application thread, regardless of the value of the
 <code>concurrency</code> option of <a href="#testname-options-fn"><code>test()</code></a>.</p>
+<p>When process-level test isolation is disabled, each matching test file is
+imported into the test runner process. Once all test files have been loaded, the
+top level tests are executed with a concurrency of one. Because the test files
+are all run within the same context, it is possible for tests to interact with
+each other in ways that are not possible when isolation is enabled. For example,
+if a test relies on global state, it is possible for that state to be modified
+by a test originating from another file.</p>
 </section><section><h3>Collecting code coverage<span><a class="mark" href="#collecting-code-coverage" id="collecting-code-coverage">#</a></span><a aria-hidden="true" class="legacy" id="test_collecting_code_coverage"></a></h3>
 <p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
 <p>When Node.js is started with the <a href="cli.html#--experimental-test-coverage"><code>--experimental-test-coverage</code></a>
@@ -937,7 +944,8 @@ command-line flag, code coverage is collected and statistics are reported once
 all tests have completed. If the <a href="cli.html#node_v8_coveragedir"><code>NODE_V8_COVERAGE</code></a> environment variable is
 used to specify a code coverage directory, the generated V8 coverage files are
 written to that directory. Node.js core modules and files within
-<code>node_modules/</code> directories are not included in the coverage report. If
+<code>node_modules/</code> directories are, by default, not included in the coverage report.
+However, they can be explicity included via the <a href="cli.html#--test-coverage-include"><code>--test-coverage-include</code></a> flag. If
 coverage is enabled, the coverage report is sent to any <a href="#test-reporters">test reporters</a> via
 the <code>'test:coverage'</code> event.</p>
 <p>Coverage can be disabled on a series of lines using the following
@@ -1316,7 +1324,7 @@ the <a href="cli.html#--experimental-test-snapshots"><code>--experimental-test-s
 <p>Snapshot files are generated by starting Node.js with the
 <a href="cli.html#--test-update-snapshots"><code>--test-update-snapshots</code></a> command-line flag. A separate snapshot file is
 generated for each test file. By default, the snapshot file has the same name
-as <code>process.argv[1]</code> with a <code>.snapshot</code> file extension. This behavior can be
+as the test file with a <code>.snapshot</code> file extension. This behavior can be
 configured using the <code>snapshot.setResolveSnapshotPath()</code> function. Each
 snapshot assertion corresponds to an export in the snapshot file.</p>
 <p>An example snapshot test is shown below. The first time this test is executed,
@@ -1491,13 +1499,13 @@ Reporters should transform events emitted by a <a href="test.html#class-testsstr
   <span class="hljs-keyword">for</span> <span class="hljs-keyword">await</span> (<span class="hljs-keyword">const</span> event <span class="hljs-keyword">of</span> source) {
     <span class="hljs-keyword">switch</span> (event.<span class="hljs-property">type</span>) {
       <span class="hljs-keyword">case</span> <span class="hljs-string">'test:dequeue'</span>:
-        <span class="hljs-keyword">yield</span> <span class="hljs-string">`test <span class="hljs-subst">${event.data.name}</span> dequeued`</span>;
+        <span class="hljs-keyword">yield</span> <span class="hljs-string">`test <span class="hljs-subst">${event.data.name}</span> dequeued\n`</span>;
         <span class="hljs-keyword">break</span>;
       <span class="hljs-keyword">case</span> <span class="hljs-string">'test:enqueue'</span>:
-        <span class="hljs-keyword">yield</span> <span class="hljs-string">`test <span class="hljs-subst">${event.data.name}</span> enqueued`</span>;
+        <span class="hljs-keyword">yield</span> <span class="hljs-string">`test <span class="hljs-subst">${event.data.name}</span> enqueued\n`</span>;
         <span class="hljs-keyword">break</span>;
       <span class="hljs-keyword">case</span> <span class="hljs-string">'test:watch:drained'</span>:
-        <span class="hljs-keyword">yield</span> <span class="hljs-string">'test watch queue drained'</span>;
+        <span class="hljs-keyword">yield</span> <span class="hljs-string">'test watch queue drained\n'</span>;
         <span class="hljs-keyword">break</span>;
       <span class="hljs-keyword">case</span> <span class="hljs-string">'test:start'</span>:
         <span class="hljs-keyword">yield</span> <span class="hljs-string">`test <span class="hljs-subst">${event.data.name}</span> started\n`</span>;
@@ -1509,7 +1517,7 @@ Reporters should transform events emitted by a <a href="test.html#class-testsstr
         <span class="hljs-keyword">yield</span> <span class="hljs-string">`test <span class="hljs-subst">${event.data.name}</span> failed\n`</span>;
         <span class="hljs-keyword">break</span>;
       <span class="hljs-keyword">case</span> <span class="hljs-string">'test:plan'</span>:
-        <span class="hljs-keyword">yield</span> <span class="hljs-string">'test plan'</span>;
+        <span class="hljs-keyword">yield</span> <span class="hljs-string">'test plan\n'</span>;
         <span class="hljs-keyword">break</span>;
       <span class="hljs-keyword">case</span> <span class="hljs-string">'test:diagnostic'</span>:
       <span class="hljs-keyword">case</span> <span class="hljs-string">'test:stderr'</span>:
@@ -1527,13 +1535,13 @@ Reporters should transform events emitted by a <a href="test.html#class-testsstr
   <span class="hljs-keyword">for</span> <span class="hljs-keyword">await</span> (<span class="hljs-keyword">const</span> event <span class="hljs-keyword">of</span> source) {
     <span class="hljs-keyword">switch</span> (event.<span class="hljs-property">type</span>) {
       <span class="hljs-keyword">case</span> <span class="hljs-string">'test:dequeue'</span>:
-        <span class="hljs-keyword">yield</span> <span class="hljs-string">`test <span class="hljs-subst">${event.data.name}</span> dequeued`</span>;
+        <span class="hljs-keyword">yield</span> <span class="hljs-string">`test <span class="hljs-subst">${event.data.name}</span> dequeued\n`</span>;
         <span class="hljs-keyword">break</span>;
       <span class="hljs-keyword">case</span> <span class="hljs-string">'test:enqueue'</span>:
-        <span class="hljs-keyword">yield</span> <span class="hljs-string">`test <span class="hljs-subst">${event.data.name}</span> enqueued`</span>;
+        <span class="hljs-keyword">yield</span> <span class="hljs-string">`test <span class="hljs-subst">${event.data.name}</span> enqueued\n`</span>;
         <span class="hljs-keyword">break</span>;
       <span class="hljs-keyword">case</span> <span class="hljs-string">'test:watch:drained'</span>:
-        <span class="hljs-keyword">yield</span> <span class="hljs-string">'test watch queue drained'</span>;
+        <span class="hljs-keyword">yield</span> <span class="hljs-string">'test watch queue drained\n'</span>;
         <span class="hljs-keyword">break</span>;
       <span class="hljs-keyword">case</span> <span class="hljs-string">'test:start'</span>:
         <span class="hljs-keyword">yield</span> <span class="hljs-string">`test <span class="hljs-subst">${event.data.name}</span> started\n`</span>;
@@ -1580,6 +1588,8 @@ unless a destination is explicitly provided.</p>
 <details class="changelog"><summary>History</summary>
 <table>
 <tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v22.8.0</td>
+<td><p>Added the <code>isolation</code> option.</p></td></tr>
 <tr><td>v22.6.0</td>
 <td><p>Added the <code>globPatterns</code> option.</p></td></tr>
 <tr><td>v22.0.0</td>
@@ -1613,8 +1623,13 @@ match test files. This option cannot be used together with <code>files</code>.
 <li><code>inspectPort</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> Sets inspector port of test child process.
 This can be a number, or a function that takes no arguments and returns a
 number. If a nullish value is provided, each process gets its own port,
-incremented from the primary's <code>process.debugPort</code>.
-<strong>Default:</strong> <code>undefined</code>.</li>
+incremented from the primary's <code>process.debugPort</code>. This option is ignored
+if the <code>isolation</code> option is set to <code>'none'</code> as no child processes are
+spawned. <strong>Default:</strong> <code>undefined</code>.</li>
+<li><code>isolation</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> Configures the type of test isolation. If set to
+<code>'process'</code>, each test file is run in a separate child process. If set to
+<code>'none'</code>, all test files run in the current process. <strong>Default:</strong>
+<code>'process'</code>.</li>
 <li><code>only</code>: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> If truthy, the test context will only run tests that
 have the <code>only</code> option set</li>
 <li><code>setup</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> A function that accepts the <code>TestsStream</code> instance
@@ -1977,9 +1992,9 @@ more robust serialization mechanism is required, this function should be used.</
 <ul>
 <li><code>fn</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> A function used to compute the location of the snapshot file.
 The function receives the path of the test file as its only argument. If the
-<code>process.argv[1]</code> is not associated with a file (for example in the REPL),
-the input is undefined. <code>fn()</code> must return a string specifying the location of
-the snapshot file.</li>
+test is not associated with a file (for example in the REPL), the input is
+undefined. <code>fn()</code> must return a string specifying the location of the snapshot
+snapshot file.</li>
 </ul>
 <p>This function is used to customize the location of the snapshot file used for
 snapshot testing. By default, the snapshot filename is the same as the entry
@@ -2233,7 +2248,7 @@ method.</p>
 </div>
 <p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a>.0 - Early development</div><p></p>
 <ul>
-<li><code>specifier</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> A string identifying the module to mock.</li>
+<li><code>specifier</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="url.html#the-whatwg-url-api" class="type">&#x3C;URL></a> A string identifying the module to mock.</li>
 <li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> Optional configuration options for the mock module. The
 following properties are supported:
 <ul>
@@ -2842,6 +2857,14 @@ numbers and the number of times they were covered.
 <li><code>count</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The number of times the line was covered.</li>
 </ul>
 </li>
+</ul>
+</li>
+<li><code>thresholds</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> An object containing whether or not the coverage for
+each coverage type.
+<ul>
+<li><code>function</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The function coverage threshold.</li>
+<li><code>branch</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The branch coverage threshold.</li>
+<li><code>line</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The line coverage threshold.</li>
 </ul>
 </li>
 <li><code>totals</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> An object containing a summary of coverage for all

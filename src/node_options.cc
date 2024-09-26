@@ -143,6 +143,18 @@ void EnvironmentOptions::CheckOptions(std::vector<std::string>* errors,
   }
 
   if (test_runner) {
+    if (test_isolation == "none") {
+      debug_options_.allow_attaching_debugger = true;
+    } else {
+      if (test_isolation != "process") {
+        errors->push_back("invalid value for --experimental-test-isolation");
+      }
+
+#ifndef ALLOW_ATTACHING_DEBUGGER_IN_TEST_RUNNER
+      debug_options_.allow_attaching_debugger = false;
+#endif
+    }
+
     if (syntax_check_only) {
       errors->push_back("either --test or --check can be used, not both");
     }
@@ -159,10 +171,6 @@ void EnvironmentOptions::CheckOptions(std::vector<std::string>* errors,
       errors->push_back(
           "--watch-path cannot be used in combination with --test");
     }
-
-#ifndef ALLOW_ATTACHING_DEBUGGER_IN_TEST_RUNNER
-    debug_options_.allow_attaching_debugger = false;
-#endif
   }
 
   if (watch_mode) {
@@ -356,7 +364,8 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
             "when ambiguous modules fail to evaluate because they contain "
             "ES module syntax, try again to evaluate them as ES modules",
             &EnvironmentOptions::detect_module,
-            kAllowedInEnvvar);
+            kAllowedInEnvvar,
+            true);
   AddOption("--experimental-print-required-tla",
             "Print pending top-level await. If --experimental-require-module "
             "is true, evaluate asynchronous graphs loaded by `require()` but "
@@ -498,6 +507,10 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
   AddOption(
       "--experimental-wasi-unstable-preview1", "", NoOp{}, kAllowedInEnvvar);
   AddOption("--expose-gc", "expose gc extension", V8Option{}, kAllowedInEnvvar);
+  AddOption("--experimental-async-context-frame",
+            "Improve AsyncLocalStorage performance with AsyncContextFrame",
+            &EnvironmentOptions::async_context_frame,
+            kAllowedInEnvvar);
   AddOption("--expose-internals", "", &EnvironmentOptions::expose_internals);
   AddOption("--frozen-intrinsics",
             "experimental frozen intrinsics support",
@@ -639,6 +652,10 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
             "set environment variables from supplied file",
             &EnvironmentOptions::env_file);
   Implies("--env-file", "[has_env_file_string]");
+  AddOption("--env-file-if-exists",
+            "set environment variables from supplied file",
+            &EnvironmentOptions::optional_env_file);
+  Implies("--env-file-if-exists", "[has_env_file_string]");
   AddOption("--test",
             "launch test runner on startup",
             &EnvironmentOptions::test_runner);
@@ -657,6 +674,22 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
   AddOption("--experimental-test-coverage",
             "enable code coverage in the test runner",
             &EnvironmentOptions::test_runner_coverage);
+  AddOption("--test-coverage-branches",
+            "the branch coverage minimum threshold",
+            &EnvironmentOptions::test_coverage_branches,
+            kAllowedInEnvvar);
+  AddOption("--test-coverage-functions",
+            "the function coverage minimum threshold",
+            &EnvironmentOptions::test_coverage_functions,
+            kAllowedInEnvvar);
+  AddOption("--test-coverage-lines",
+            "the line coverage minimum threshold",
+            &EnvironmentOptions::test_coverage_lines,
+            kAllowedInEnvvar);
+
+  AddOption("--experimental-test-isolation",
+            "configures the type of test isolation used in the test runner",
+            &EnvironmentOptions::test_isolation);
   AddOption("--experimental-test-module-mocks",
             "enable module mocking in the test runner",
             &EnvironmentOptions::test_runner_module_mocks);
@@ -665,7 +698,8 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
             &EnvironmentOptions::test_runner_snapshots);
   AddOption("--test-name-pattern",
             "run tests whose name matches this regular expression",
-            &EnvironmentOptions::test_name_pattern);
+            &EnvironmentOptions::test_name_pattern,
+            kAllowedInEnvvar);
   AddOption("--test-reporter",
             "report test output using the given reporter",
             &EnvironmentOptions::test_reporter,
@@ -684,7 +718,8 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
             kAllowedInEnvvar);
   AddOption("--test-skip-pattern",
             "run tests whose name do not match this regular expression",
-            &EnvironmentOptions::test_skip_pattern);
+            &EnvironmentOptions::test_skip_pattern,
+            kAllowedInEnvvar);
   AddOption("--test-coverage-include",
             "include files in coverage report that match this glob pattern",
             &EnvironmentOptions::coverage_include_pattern,
@@ -801,6 +836,14 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
             &EnvironmentOptions::experimental_strip_types,
             kAllowedInEnvvar);
   Implies("--experimental-strip-types", "--experimental-detect-module");
+
+  AddOption("--experimental-transform-types",
+            "enable transformation of TypeScript-only"
+            "syntax into JavaScript code",
+            &EnvironmentOptions::experimental_transform_types,
+            kAllowedInEnvvar);
+  Implies("--experimental-transform-types", "--experimental-strip-types");
+  Implies("--experimental-transform-types", "--enable-source-maps");
   AddOption("--interactive",
             "always enter the REPL even if stdin does not appear "
             "to be a terminal",
@@ -856,7 +899,7 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
             " (default: false)",
             &EnvironmentOptions::report_exclude_network,
             kAllowedInEnvvar);
-}
+}  // NOLINT(readability/fn_size)
 
 PerIsolateOptionsParser::PerIsolateOptionsParser(
   const EnvironmentOptionsParser& eop) {

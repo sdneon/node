@@ -1570,6 +1570,30 @@
                   "desc": "<pre><code class=\"language-c\">napi_status napi_create_string_utf8(napi_env env,\n                                    const char* str,\n                                    size_t length,\n                                    napi_value* result)\n</code></pre>\n<ul>\n<li><code>[in] env</code>: The environment that the API is invoked under.</li>\n<li><code>[in] str</code>: Character buffer representing a UTF8-encoded string.</li>\n<li><code>[in] length</code>: The length of the string in bytes, or <code>NAPI_AUTO_LENGTH</code> if it\nis null-terminated.</li>\n<li><code>[out] result</code>: A <code>napi_value</code> representing a JavaScript <code>string</code>.</li>\n</ul>\n<p>Returns <code>napi_ok</code> if the API succeeded.</p>\n<p>This API creates a JavaScript <code>string</code> value from a UTF8-encoded C string.\nThe native string is copied.</p>\n<p>The JavaScript <code>string</code> type is described in\n<a href=\"https://tc39.github.io/ecma262/#sec-ecmascript-language-types-string-type\">Section 6.1.4</a> of the ECMAScript Language Specification.</p>",
                   "type": "module",
                   "displayName": "`napi_create_string_utf8`"
+                }
+              ],
+              "type": "module",
+              "displayName": "Functions to convert from C types to Node-API"
+            },
+            {
+              "textRaw": "Functions to create optimized property keys",
+              "name": "functions_to_create_optimized_property_keys",
+              "desc": "<p>Many JavaScript engines including V8 use internalized strings as keys\nto set and get property values. They typically use a hash table to create\nand lookup such strings. While it adds some cost per key creation, it improves\nthe performance after that by enabling comparison of string pointers instead\nof the whole strings.</p>\n<p>If a new JavaScript string is intended to be used as a property key, then for\nsome JavaScript engines it will be more efficient to use the functions in this\nsection. Otherwise, use the <code>napi_create_string_utf8</code> or\n<code>node_api_create_external_string_utf8</code> series functions as there may be\nadditional overhead in creating/storing strings with the property key\ncreation methods.</p>",
+              "modules": [
+                {
+                  "textRaw": "`node_api_create_property_key_latin1`",
+                  "name": "`node_api_create_property_key_latin1`",
+                  "meta": {
+                    "added": [
+                      "v22.9.0"
+                    ],
+                    "changes": []
+                  },
+                  "stability": 1,
+                  "stabilityText": "Experimental",
+                  "desc": "<pre><code class=\"language-c\">napi_status NAPI_CDECL node_api_create_property_key_latin1(napi_env env,\n                                                           const char* str,\n                                                           size_t length,\n                                                           napi_value* result);\n</code></pre>\n<ul>\n<li><code>[in] env</code>: The environment that the API is invoked under.</li>\n<li><code>[in] str</code>: Character buffer representing an ISO-8859-1-encoded string.</li>\n<li><code>[in] length</code>: The length of the string in bytes, or <code>NAPI_AUTO_LENGTH</code> if it\nis null-terminated.</li>\n<li><code>[out] result</code>: A <code>napi_value</code> representing an optimized JavaScript <code>string</code>\nto be used as a property key for objects.</li>\n</ul>\n<p>Returns <code>napi_ok</code> if the API succeeded.</p>\n<p>This API creates an optimized JavaScript <code>string</code> value from\nan ISO-8859-1-encoded C string to be used as a property key for objects.\nThe native string is copied. In contrast with <code>napi_create_string_latin1</code>,\nsubsequent calls to this function with the same <code>str</code> pointer may benefit from a speedup\nin the creation of the requested <code>napi_value</code>, depending on the engine.</p>\n<p>The JavaScript <code>string</code> type is described in\n<a href=\"https://tc39.github.io/ecma262/#sec-ecmascript-language-types-string-type\">Section 6.1.4</a> of the ECMAScript Language Specification.</p>",
+                  "type": "module",
+                  "displayName": "`node_api_create_property_key_latin1`"
                 },
                 {
                   "textRaw": "`node_api_create_property_key_utf16`",
@@ -1583,13 +1607,28 @@
                   },
                   "stability": 1,
                   "stabilityText": "Experimental",
-                  "desc": "<pre><code class=\"language-c\">napi_status NAPI_CDECL node_api_create_property_key_utf16(napi_env env,\n                                                          const char16_t* str,\n                                                          size_t length,\n                                                          napi_value* result);\n</code></pre>\n<ul>\n<li><code>[in] env</code>: The environment that the API is invoked under.</li>\n<li><code>[in] str</code>: Character buffer representing a UTF16-LE-encoded string.</li>\n<li><code>[in] length</code>: The length of the string in two-byte code units, or\n<code>NAPI_AUTO_LENGTH</code> if it is null-terminated.</li>\n<li><code>[out] result</code>: A <code>napi_value</code> representing an optimized JavaScript <code>string</code>\nto be used as a property key for objects.</li>\n</ul>\n<p>Returns <code>napi_ok</code> if the API succeeded.</p>\n<p>This API creates an optimized JavaScript <code>string</code> value from\na UTF16-LE-encoded C string to be used as a property key for objects.\nThe native string is copied.</p>\n<p>Many JavaScript engines including V8 use internalized strings as keys\nto set and get property values. They typically use a hash table to create\nand lookup such strings. While it adds some cost per key creation, it improves\nthe performance after that by enabling comparison of string pointers instead\nof the whole strings.</p>\n<p>If a new JavaScript string is intended to be used as a property key, then for\nsome JavaScript engines it will be more efficient to use\nthe <code>node_api_create_property_key_utf16</code> function.\nOtherwise, use the <code>napi_create_string_utf16</code> or\n<code>node_api_create_external_string_utf16</code> functions as there may be additional\noverhead in creating/storing strings with this method.</p>\n<p>The JavaScript <code>string</code> type is described in\n<a href=\"https://tc39.github.io/ecma262/#sec-ecmascript-language-types-string-type\">Section 6.1.4</a> of the ECMAScript Language Specification.</p>",
+                  "desc": "<pre><code class=\"language-c\">napi_status NAPI_CDECL node_api_create_property_key_utf16(napi_env env,\n                                                          const char16_t* str,\n                                                          size_t length,\n                                                          napi_value* result);\n</code></pre>\n<ul>\n<li><code>[in] env</code>: The environment that the API is invoked under.</li>\n<li><code>[in] str</code>: Character buffer representing a UTF16-LE-encoded string.</li>\n<li><code>[in] length</code>: The length of the string in two-byte code units, or\n<code>NAPI_AUTO_LENGTH</code> if it is null-terminated.</li>\n<li><code>[out] result</code>: A <code>napi_value</code> representing an optimized JavaScript <code>string</code>\nto be used as a property key for objects.</li>\n</ul>\n<p>Returns <code>napi_ok</code> if the API succeeded.</p>\n<p>This API creates an optimized JavaScript <code>string</code> value from\na UTF16-LE-encoded C string to be used as a property key for objects.\nThe native string is copied.</p>\n<p>The JavaScript <code>string</code> type is described in\n<a href=\"https://tc39.github.io/ecma262/#sec-ecmascript-language-types-string-type\">Section 6.1.4</a> of the ECMAScript Language Specification.</p>",
                   "type": "module",
                   "displayName": "`node_api_create_property_key_utf16`"
+                },
+                {
+                  "textRaw": "`node_api_create_property_key_utf8`",
+                  "name": "`node_api_create_property_key_utf8`",
+                  "meta": {
+                    "added": [
+                      "v22.9.0"
+                    ],
+                    "changes": []
+                  },
+                  "stability": 1,
+                  "stabilityText": "Experimental",
+                  "desc": "<pre><code class=\"language-c\">napi_status NAPI_CDECL node_api_create_property_key_utf8(napi_env env,\n                                                         const char* str,\n                                                         size_t length,\n                                                         napi_value* result);\n</code></pre>\n<ul>\n<li><code>[in] env</code>: The environment that the API is invoked under.</li>\n<li><code>[in] str</code>: Character buffer representing a UTF8-encoded string.</li>\n<li><code>[in] length</code>: The length of the string in two-byte code units, or\n<code>NAPI_AUTO_LENGTH</code> if it is null-terminated.</li>\n<li><code>[out] result</code>: A <code>napi_value</code> representing an optimized JavaScript <code>string</code>\nto be used as a property key for objects.</li>\n</ul>\n<p>Returns <code>napi_ok</code> if the API succeeded.</p>\n<p>This API creates an optimized JavaScript <code>string</code> value from\na UTF8-encoded C string to be used as a property key for objects.\nThe native string is copied.</p>\n<p>The JavaScript <code>string</code> type is described in\n<a href=\"https://tc39.github.io/ecma262/#sec-ecmascript-language-types-string-type\">Section 6.1.4</a> of the ECMAScript Language Specification.</p>",
+                  "type": "module",
+                  "displayName": "`node_api_create_property_key_utf8`"
                 }
               ],
               "type": "module",
-              "displayName": "Functions to convert from C types to Node-API"
+              "displayName": "Functions to create optimized property keys"
             },
             {
               "textRaw": "Functions to convert from Node-API to C types",

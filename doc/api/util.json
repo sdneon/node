@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v22.6.0/lib/util.js\">lib/util.js</a></p>\n<p>The <code>node:util</code> module supports the needs of Node.js internal APIs. Many of the\nutilities are useful for application and module developers as well. To access\nit:</p>\n<pre><code class=\"language-js\">const util = require('node:util');\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v22.9.0/lib/util.js\">lib/util.js</a></p>\n<p>The <code>node:util</code> module supports the needs of Node.js internal APIs. Many of the\nutilities are useful for application and module developers as well. To access\nit:</p>\n<pre><code class=\"language-js\">const util = require('node:util');\n</code></pre>",
       "methods": [
         {
           "textRaw": "`util.callbackify(original)`",
@@ -248,6 +248,65 @@
             }
           ],
           "desc": "<p>This function is identical to <a href=\"#utilformatformat-args\"><code>util.format()</code></a>, except in that it takes\nan <code>inspectOptions</code> argument which specifies options that are passed along to\n<a href=\"#utilinspectobject-options\"><code>util.inspect()</code></a>.</p>\n<pre><code class=\"language-js\">util.formatWithOptions({ colors: true }, 'See object %O', { foo: 42 });\n// Returns 'See object { foo: 42 }', where `42` is colored as a number\n// when printed to a terminal.\n</code></pre>"
+        },
+        {
+          "textRaw": "`util.getCallSite(frames)`",
+          "type": "method",
+          "name": "getCallSite",
+          "stability": 1,
+          "stabilityText": ".1 - Active development",
+          "meta": {
+            "added": [
+              "v22.9.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "return": {
+                "textRaw": "Returns: {Object\\[]} An array of stacktrace objects",
+                "name": "return",
+                "type": "Object\\[]",
+                "desc": "An array of stacktrace objects",
+                "options": [
+                  {
+                    "textRaw": "`functionName` {string} Returns the name of the function associated with this stack frame.",
+                    "name": "functionName",
+                    "type": "string",
+                    "desc": "Returns the name of the function associated with this stack frame."
+                  },
+                  {
+                    "textRaw": "`scriptName` {string} Returns the name of the resource that contains the script for the function for this StackFrame.",
+                    "name": "scriptName",
+                    "type": "string",
+                    "desc": "Returns the name of the resource that contains the script for the function for this StackFrame."
+                  },
+                  {
+                    "textRaw": "`lineNumber` {number} Returns the number, 1-based, of the line for the associate function call.",
+                    "name": "lineNumber",
+                    "type": "number",
+                    "desc": "Returns the number, 1-based, of the line for the associate function call."
+                  },
+                  {
+                    "textRaw": "`column` {number} Returns the 1-based column offset on the line for the associated function call.",
+                    "name": "column",
+                    "type": "number",
+                    "desc": "Returns the 1-based column offset on the line for the associated function call."
+                  }
+                ]
+              },
+              "params": [
+                {
+                  "textRaw": "`frames` {number} Number of frames returned in the stacktrace. **Default:** `10`. Allowable range is between 1 and 200.",
+                  "name": "frames",
+                  "type": "number",
+                  "default": "`10`. Allowable range is between 1 and 200",
+                  "desc": "Number of frames returned in the stacktrace."
+                }
+              ]
+            }
+          ],
+          "desc": "<p>Returns an array of stacktrace objects containing the stack of\nthe caller function.</p>\n<pre><code class=\"language-js\">const util = require('node:util');\n\nfunction exampleFunction() {\n  const callSites = util.getCallSite();\n\n  console.log('Call Sites:');\n  callSites.forEach((callSite, index) => {\n    console.log(`CallSite ${index + 1}:`);\n    console.log(`Function Name: ${callSite.functionName}`);\n    console.log(`Script Name: ${callSite.scriptName}`);\n    console.log(`Line Number: ${callSite.lineNumer}`);\n    console.log(`Column Number: ${callSite.column}`);\n  });\n  // CallSite 1:\n  // Function Name: exampleFunction\n  // Script Name: /home/example.js\n  // Line Number: 5\n  // Column Number: 26\n\n  // CallSite 2:\n  // Function Name: anotherFunction\n  // Script Name: /home/example.js\n  // Line Number: 22\n  // Column Number: 3\n\n  // ...\n}\n\n// A function to simulate another stack layer\nfunction anotherFunction() {\n  exampleFunction();\n}\n\nanotherFunction();\n</code></pre>"
         },
         {
           "textRaw": "`util.getSystemErrorName(err)`",
@@ -1220,7 +1279,7 @@
           "desc": "<p>Returns <code>str</code> with any ANSI escape codes removed.</p>\n<pre><code class=\"language-js\">console.log(util.stripVTControlCharacters('\\u001B[4mvalue\\u001B[0m'));\n// Prints \"value\"\n</code></pre>"
         },
         {
-          "textRaw": "`util.styleText(format, text)`",
+          "textRaw": "`util.styleText(format, text[, options])`",
           "type": "method",
           "name": "styleText",
           "stability": 1,
@@ -1230,7 +1289,13 @@
               "v21.7.0",
               "v20.12.0"
             ],
-            "changes": []
+            "changes": [
+              {
+                "version": "v22.8.0",
+                "pr-url": "https://github.com/nodejs/node/pull/54389",
+                "description": "Respect isTTY and environment variables such as NO_COLORS, NODE_DISABLE_COLORS, and FORCE_COLOR."
+              }
+            ]
           },
           "signatures": [
             {
@@ -1246,11 +1311,32 @@
                   "name": "text",
                   "type": "string",
                   "desc": "The text to to be formatted."
+                },
+                {
+                  "textRaw": "`options` {Object}",
+                  "name": "options",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`validateStream` {boolean} When true, `stream` is checked to see if it can handle colors. **Default:** `true`.",
+                      "name": "validateStream",
+                      "type": "boolean",
+                      "default": "`true`",
+                      "desc": "When true, `stream` is checked to see if it can handle colors."
+                    },
+                    {
+                      "textRaw": "`stream` {Stream} A stream that will be validated if it can be colored. **Default:** `process.stdout`.",
+                      "name": "stream",
+                      "type": "Stream",
+                      "default": "`process.stdout`",
+                      "desc": "A stream that will be validated if it can be colored."
+                    }
+                  ]
                 }
               ]
             }
           ],
-          "desc": "<p>This function returns a formatted text considering the <code>format</code> passed.</p>\n<pre><code class=\"language-mjs\">import { styleText } from 'node:util';\nconst errorMessage = styleText('red', 'Error! Error!');\nconsole.log(errorMessage);\n</code></pre>\n<pre><code class=\"language-cjs\">const { styleText } = require('node:util');\nconst errorMessage = styleText('red', 'Error! Error!');\nconsole.log(errorMessage);\n</code></pre>\n<p><code>util.inspect.colors</code> also provides text formats such as <code>italic</code>, and\n<code>underline</code> and you can combine both:</p>\n<pre><code class=\"language-cjs\">console.log(\n  util.styleText(['underline', 'italic'], 'My italic underlined message'),\n);\n</code></pre>\n<p>When passing an array of formats, the order of the format applied\nis left to right so the following style might overwrite the previous one.</p>\n<pre><code class=\"language-cjs\">console.log(\n  util.styleText(['red', 'green'], 'text'), // green\n);\n</code></pre>\n<p>The full list of formats can be found in <a href=\"#modifiers\">modifiers</a>.</p>"
+          "desc": "<p>This function returns a formatted text considering the <code>format</code> passed\nfor printing in a terminal. It is aware of the terminal's capabilities\nand acts according to the configuration set via <code>NO_COLORS</code>,\n<code>NODE_DISABLE_COLORS</code> and <code>FORCE_COLOR</code> environment variables.</p>\n<pre><code class=\"language-mjs\">import { styleText } from 'node:util';\nimport { stderr } from 'node:process';\n\nconst successMessage = styleText('green', 'Success!');\nconsole.log(successMessage);\n\nconst errorMessage = styleText(\n  'red',\n  'Error! Error!',\n  // Validate if process.stderr has TTY\n  { stream: stderr },\n);\nconsole.error(successMessage);\n</code></pre>\n<pre><code class=\"language-cjs\">const { styleText } = require('node:util');\nconst { stderr } = require('node:process');\n\nconst successMessage = styleText('green', 'Success!');\nconsole.log(successMessage);\n\nconst errorMessage = styleText(\n  'red',\n  'Error! Error!',\n  // Validate if process.stderr has TTY\n  { stream: stderr },\n);\nconsole.error(successMessage);\n</code></pre>\n<p><code>util.inspect.colors</code> also provides text formats such as <code>italic</code>, and\n<code>underline</code> and you can combine both:</p>\n<pre><code class=\"language-cjs\">console.log(\n  util.styleText(['underline', 'italic'], 'My italic underlined message'),\n);\n</code></pre>\n<p>When passing an array of formats, the order of the format applied\nis left to right so the following style might overwrite the previous one.</p>\n<pre><code class=\"language-cjs\">console.log(\n  util.styleText(['red', 'green'], 'text'), // green\n);\n</code></pre>\n<p>The full list of formats can be found in <a href=\"#modifiers\">modifiers</a>.</p>"
         },
         {
           "textRaw": "`util.toUSVString(string)`",

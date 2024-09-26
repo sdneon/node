@@ -56,11 +56,12 @@ valid_mips_fpu = ('fp32', 'fp64', 'fpxx')
 valid_mips_float_abi = ('soft', 'hard')
 valid_intl_modes = ('none', 'small-icu', 'full-icu', 'system-icu')
 icu_versions = json.loads((tools_path / 'icu' / 'icu_versions.json').read_text(encoding='utf-8'))
-maglev_enabled_architectures = ('x64', 'arm', 'arm64')
 
+# builtins may be removed later if they have been disabled by options
 shareable_builtins = {'cjs_module_lexer/lexer': 'deps/cjs-module-lexer/lexer.js',
                      'cjs_module_lexer/dist/lexer': 'deps/cjs-module-lexer/dist/lexer.js',
-                     'undici/undici': 'deps/undici/undici.js'
+                     'undici/undici': 'deps/undici/undici.js',
+                     'amaro/dist/index': 'deps/amaro/dist/index.js'
 }
 
 # create option groups
@@ -765,6 +766,12 @@ http2_optgroup.add_argument('--debug-nghttp2',
     default=None,
     help='build nghttp2 with DEBUGBUILD (default is false)')
 
+parser.add_argument('--without-amaro',
+    action='store_true',
+    dest='without_amaro',
+    default=None,
+    help='do not install the bundled Amaro (TypeScript utils)')
+
 parser.add_argument('--without-npm',
     action='store_true',
     dest='without_npm',
@@ -928,13 +935,11 @@ parser.add_argument('--v8-enable-hugepage',
     help='Enable V8 transparent hugepage support. This feature is only '+
          'available on Linux platform.')
 
-maglev_enabled_by_default_help = f"(Maglev is enabled by default on {','.join(maglev_enabled_architectures)})"
-
-parser.add_argument('--v8-disable-maglev',
+parser.add_argument('--v8-enable-maglev',
     action='store_true',
-    dest='v8_disable_maglev',
+    dest='v8_enable_maglev',
     default=None,
-    help=f"Disable V8's Maglev compiler. {maglev_enabled_by_default_help}")
+    help='Enable V8 Maglev compiler. Not available on all platforms.')
 
 parser.add_argument('--v8-enable-short-builtin-calls',
     action='store_true',
@@ -1381,6 +1386,7 @@ def configure_node(o):
   o['variables']['node_prefix'] = options.prefix
   o['variables']['node_install_npm'] = b(not options.without_npm)
   o['variables']['node_install_corepack'] = b(not options.without_corepack)
+  o['variables']['node_use_amaro'] = b(not options.without_amaro)
   o['variables']['debug_node'] = b(options.debug_node)
   o['default_configuration'] = 'Debug' if options.debug else 'Release'
   o['variables']['error_on_warn'] = b(options.error_on_warn)
@@ -1430,7 +1436,9 @@ def configure_node(o):
     o['variables']['node_use_node_snapshot'] = b(
       not cross_compiling and not options.shared)
 
-  if options.without_node_code_cache or options.without_node_snapshot or options.node_builtin_modules_path:
+  # Do not use code cache when Node.js is built for collecting coverage of itself, this allows more
+  # precise coverage for the JS built-ins.
+  if options.without_node_code_cache or options.without_node_snapshot or options.node_builtin_modules_path or options.coverage:
     o['variables']['node_use_node_code_cache'] = 'false'
   else:
     # TODO(refack): fix this when implementing embedded code-cache when cross-compiling.
@@ -1630,15 +1638,13 @@ def configure_v8(o, configs):
   o['variables']['v8_enable_javascript_promise_hooks'] = 1
   o['variables']['v8_enable_lite_mode'] = 1 if options.v8_lite_mode else 0
   o['variables']['v8_enable_gdbjit'] = 1 if options.gdb else 0
-  o['variables']['v8_no_strict_aliasing'] = 1  # Work around compiler bugs.
   o['variables']['v8_optimized_debug'] = 0 if options.v8_non_optimized_debug else 1
   o['variables']['dcheck_always_on'] = 1 if options.v8_with_dchecks else 0
   o['variables']['v8_enable_object_print'] = 0 if options.v8_disable_object_print else 1
   o['variables']['v8_random_seed'] = 0  # Use a random seed for hash tables.
   o['variables']['v8_promise_internal_field_count'] = 1 # Add internal field to promises for async hooks.
   o['variables']['v8_use_siphash'] = 0 if options.without_siphash else 1
-  o['variables']['v8_enable_maglev'] = B(not options.v8_disable_maglev and
-                                         o['variables']['target_arch'] in maglev_enabled_architectures)
+  o['variables']['v8_enable_maglev'] = 1 if options.v8_enable_maglev else 0
   o['variables']['v8_enable_pointer_compression'] = 1 if options.enable_pointer_compression else 0
   o['variables']['v8_enable_sandbox'] = 1 if options.enable_pointer_compression else 0
   o['variables']['v8_enable_31bit_smis_on_64bit_arch'] = 1 if options.enable_pointer_compression else 0
@@ -1662,7 +1668,7 @@ def configure_v8(o, configs):
     o['variables']['v8_enable_short_builtin_calls'] = 1
   if options.v8_enable_snapshot_compression:
     o['variables']['v8_enable_snapshot_compression'] = 1
-  if options.v8_enable_object_print and options.v8_disable_object_print:
+  if all(opt in sys.argv for opt in ['--v8-enable-object-print', '--v8-disable-object-print']):
     raise Exception(
         'Only one of the --v8-enable-object-print or --v8-disable-object-print options '
         'can be specified at a time.')
@@ -2121,7 +2127,7 @@ def make_bin_override():
   if sys.platform == 'win32':
     raise Exception('make_bin_override should not be called on win32.')
   # If the system python is not the python we are running (which should be
-  # python 3), then create a directory with a symlink called `python` to our
+  # python 3.8+), then create a directory with a symlink called `python` to our
   # sys.executable. This directory will be prefixed to the PATH, so that
   # other tools that shell out to `python` will use the appropriate python
 
@@ -2196,6 +2202,10 @@ configure_intl(output)
 configure_static(output)
 configure_inspector(output)
 configure_section_file(output)
+
+# remove builtins that have been disabled
+if options.without_amaro:
+    del shareable_builtins['amaro/dist/index']
 
 # configure shareable builtins
 output['variables']['node_builtin_shareable_builtins'] = []

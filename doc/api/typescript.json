@@ -5,6 +5,17 @@
     {
       "textRaw": "Modules: TypeScript",
       "name": "modules:_typescript",
+      "meta": {
+        "changes": [
+          {
+            "version": "v22.7.0",
+            "pr-url": "https://github.com/nodejs/node/pull/54283",
+            "description": "Added `--experimental-transform-types` flag."
+          }
+        ]
+      },
+      "stability": 1,
+      "stabilityText": ".0 - Early development",
       "modules": [
         {
           "textRaw": "Enabling",
@@ -31,7 +42,7 @@
           },
           "stability": 1,
           "stabilityText": ".0 - Early development",
-          "desc": "<p>The flag <a href=\"cli.html#--experimental-strip-types\"><code>--experimental-strip-types</code></a> enables Node.js to run TypeScript\nfiles that contain only type annotations. Such files contain no TypeScript\nfeatures that require transformation, such as enums or namespaces. Node.js will\nreplace inline type annotations with whitespace, and no type checking is\nperformed. TypeScript features that depend on settings within <code>tsconfig.json</code>,\nsuch as paths or converting newer JavaScript syntax to older standards, are\nintentionally unsupported. To get fuller TypeScript support, including support\nfor enums and namespaces and paths, see <a href=\"#full-typescript-support\">Full TypeScript support</a>.</p>\n<p>The type stripping feature is designed to be lightweight.\nBy intentionally not supporting syntaxes that require JavaScript code\ngeneration, and by replacing inline types with whitespace, Node.js can run\nTypeScript code without the need for source maps.</p>",
+          "desc": "<p>The flag <a href=\"cli.html#--experimental-strip-types\"><code>--experimental-strip-types</code></a> enables Node.js to run TypeScript\nfiles. By default Node.js will execute only files that contain no\nTypeScript features that require transformation, such as enums or namespaces.\nNode.js will replace inline type annotations with whitespace,\nand no type checking is performed.\nTo enable the transformation of such features\nuse the flag <a href=\"cli.html#--experimental-transform-types\"><code>--experimental-transform-types</code></a>.\nTypeScript features that depend on settings within <code>tsconfig.json</code>,\nsuch as paths or converting newer JavaScript syntax to older standards, are\nintentionally unsupported. To get full TypeScript support, see <a href=\"#full-typescript-support\">Full TypeScript support</a>.</p>\n<p>The type stripping feature is designed to be lightweight.\nBy intentionally not supporting syntaxes that require JavaScript code\ngeneration, and by replacing inline types with whitespace, Node.js can run\nTypeScript code without the need for source maps.</p>",
           "modules": [
             {
               "textRaw": "Determining module system",
@@ -41,11 +52,11 @@
               "displayName": "Determining module system"
             },
             {
-              "textRaw": "Unsupported TypeScript features",
-              "name": "unsupported_typescript_features",
-              "desc": "<p>Since Node.js is only removing inline types, any TypeScript features that\ninvolve <em>replacing</em> TypeScript syntax with new JavaScript syntax will error.\nThis is by design. To run TypeScript with such features, see\n<a href=\"#full-typescript-support\">Full TypeScript support</a>.</p>\n<p>The most prominent unsupported features that require transformation are:</p>\n<ul>\n<li><code>Enum</code></li>\n<li><code>experimentalDecorators</code></li>\n<li><code>namespaces</code></li>\n<li>parameter properties</li>\n</ul>\n<p>In addition, Node.js does not read <code>tsconfig.json</code> files and does not support\nfeatures that depend on settings within <code>tsconfig.json</code>, such as paths or\nconverting newer JavaScript syntax into older standards.</p>",
+              "textRaw": "TypeScript features",
+              "name": "typescript_features",
+              "desc": "<p>Since Node.js is only removing inline types, any TypeScript features that\ninvolve <em>replacing</em> TypeScript syntax with new JavaScript syntax will error,\nunless the flag <a href=\"cli.html#--experimental-transform-types\"><code>--experimental-transform-types</code></a> is passed.</p>\n<p>The most prominent features that require transformation are:</p>\n<ul>\n<li><code>Enum</code></li>\n<li><code>namespaces</code></li>\n<li><code>legacy module</code></li>\n<li>parameter properties</li>\n</ul>\n<p>Since Decorators are currently a <a href=\"https://github.com/tc39/proposal-decorators\">TC39 Stage 3 proposal</a>\nand will soon be supported by the JavaScript engine,\nthey are not transformed and will result in a parser error.\nThis is a temporary limitation and will be resolved in the future.</p>\n<p>In addition, Node.js does not read <code>tsconfig.json</code> files and does not support\nfeatures that depend on settings within <code>tsconfig.json</code>, such as paths or\nconverting newer JavaScript syntax into older standards.</p>",
               "type": "module",
-              "displayName": "Unsupported TypeScript features"
+              "displayName": "TypeScript features"
             },
             {
               "textRaw": "Importing types without `type` keyword",
@@ -64,7 +75,7 @@
             {
               "textRaw": "Source maps",
               "name": "source_maps",
-              "desc": "<p>Since inline types are replaced by whitespace, source maps are unnecessary for\ncorrect line numbers in stack traces; and Node.js does not generate them. For\nsource maps support, see <a href=\"#full-typescript-support\">Full TypeScript support</a>.</p>",
+              "desc": "<p>Since inline types are replaced by whitespace, source maps are unnecessary for\ncorrect line numbers in stack traces; and Node.js does not generate them.\nWhen <a href=\"cli.html#--experimental-transform-types\"><code>--experimental-transform-types</code></a> is enabled, source-maps\nare enabled by default.</p>",
               "type": "module",
               "displayName": "Source maps"
             },
