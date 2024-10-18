@@ -14,7 +14,11 @@ TCP or [IPC][] servers ([`net.createServer()`][]) and clients
 
 It can be accessed using:
 
-```js
+```mjs
+import net from 'node:net';
+```
+
+```cjs
 const net = require('node:net');
 ```
 
@@ -37,11 +41,11 @@ sockets on other operating systems.
 [`socket.connect()`][] take a `path` parameter to identify IPC endpoints.
 
 On Unix, the local domain is also known as the Unix domain. The path is a
-file system pathname. It gets truncated to an OS-dependent length of
-`sizeof(sockaddr_un.sun_path) - 1`. Typical values are 107 bytes on Linux and
-103 bytes on macOS. If a Node.js API abstraction creates the Unix domain socket,
-it will unlink the Unix domain socket as well. For example,
-[`net.createServer()`][] may create a Unix domain socket and
+file system pathname. It will throw an error when the length of pathname is
+greater than the length of `sizeof(sockaddr_un.sun_path)`. Typical values are
+107 bytes on Linux and 103 bytes on macOS. If a Node.js API abstraction creates
+the Unix domain socket, it will unlink the Unix domain socket as well. For
+example, [`net.createServer()`][] may create a Unix domain socket and
 [`server.close()`][] will unlink it. But if a user creates the Unix domain
 socket outside of these abstractions, the user will need to remove it. The same
 applies when a Node.js API creates a Unix domain socket but the program then
@@ -658,6 +662,9 @@ changes:
   - version: v15.14.0
     pr-url: https://github.com/nodejs/node/pull/37735
     description: AbortSignal support was added.
+  - version: v12.10.0
+    pr-url: https://github.com/nodejs/node/pull/25436
+    description: Added `onread` option.
 -->
 
 * `options` {Object} Available options are:
@@ -986,9 +993,6 @@ changes:
     pr-url: https://github.com/nodejs/node/pull/41310
     description: The `noDelay`, `keepAlive`, and `keepAliveInitialDelay`
                  options are supported now.
-  - version: v12.10.0
-    pr-url: https://github.com/nodejs/node/pull/25436
-    description: Added `onread` option.
   - version: v6.0.0
     pr-url: https://github.com/nodejs/node/pull/6021
     description: The `hints` option defaults to `0` in all cases now.
@@ -1531,7 +1535,23 @@ Additional options:
 Following is an example of a client of the echo server described
 in the [`net.createServer()`][] section:
 
-```js
+```mjs
+import net from 'node:net';
+const client = net.createConnection({ port: 8124 }, () => {
+  // 'connect' listener.
+  console.log('connected to server!');
+  client.write('world!\r\n');
+});
+client.on('data', (data) => {
+  console.log(data.toString());
+  client.end();
+});
+client.on('end', () => {
+  console.log('disconnected from server');
+});
+```
+
+```cjs
 const net = require('node:net');
 const client = net.createConnection({ port: 8124 }, () => {
   // 'connect' listener.
@@ -1558,10 +1578,26 @@ option. In this case, the `onread` option will be only used to call
 `new net.Socket([options])` and the `port` option will be used to
 call `socket.connect(options[, connectListener])`.
 
-```js
+```mjs
+import net from 'node:net';
+import { Buffer } from 'node:buffer';
+net.createConnection({
+  port: 8124,
+  onread: {
+    // Reuses a 4KiB Buffer for every read from the socket.
+    buffer: Buffer.alloc(4 * 1024),
+    callback: function(nread, buf) {
+      // Received data is available in `buf` from 0 to `nread`.
+      console.log(buf.toString('utf8', 0, nread));
+    },
+  },
+});
+```
+
+```cjs
 const net = require('node:net');
 net.createConnection({
-  port: 80,
+  port: 8124,
   onread: {
     // Reuses a 4KiB Buffer for every read from the socket.
     buffer: Buffer.alloc(4 * 1024),
@@ -1684,7 +1720,26 @@ The server can be a TCP server or an [IPC][] server, depending on what it
 Here is an example of a TCP echo server which listens for connections
 on port 8124:
 
-```js
+```mjs
+import net from 'node:net';
+const server = net.createServer((c) => {
+  // 'connection' listener.
+  console.log('client connected');
+  c.on('end', () => {
+    console.log('client disconnected');
+  });
+  c.write('hello\r\n');
+  c.pipe(c);
+});
+server.on('error', (err) => {
+  throw err;
+});
+server.listen(8124, () => {
+  console.log('server bound');
+});
+```
+
+```cjs
 const net = require('node:net');
 const server = net.createServer((c) => {
   // 'connection' listener.
@@ -1743,7 +1798,9 @@ added: v19.4.0
 
 Sets the default value of the `autoSelectFamily` option of [`socket.connect(options)`][].
 
-* `value` {boolean} The new default value. The initial default value is `false`.
+* `value` {boolean} The new default value.
+  The initial default value is `true`, unless the command line option
+  `--no-network-family-autoselection` is provided.
 
 ## `net.getDefaultAutoSelectFamilyAttemptTimeout()`
 

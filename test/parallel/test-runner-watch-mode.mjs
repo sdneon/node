@@ -4,7 +4,8 @@ import { describe, it, beforeEach } from 'node:test';
 import { once } from 'node:events';
 import assert from 'node:assert';
 import { spawn } from 'node:child_process';
-import { writeFileSync, renameSync, unlinkSync, existsSync } from 'node:fs';
+import { writeFileSync, renameSync, unlinkSync } from 'node:fs';
+import { setTimeout } from 'node:timers/promises';
 import util from 'internal/util';
 import tmpdir from '../common/tmpdir.js';
 
@@ -42,11 +43,13 @@ async function testWatch({
   file,
   action = 'update',
   fileToCreate,
+  isolation,
 }) {
   const ran1 = util.createDeferredPromise();
   const ran2 = util.createDeferredPromise();
   const child = spawn(process.execPath,
                       ['--watch', '--test', '--test-reporter=spec',
+                       isolation ? `--experimental-test-isolation=${isolation}` : '',
                        file ? fixturePaths[file] : undefined].filter(Boolean),
                       { encoding: 'utf8', stdio: 'pipe', cwd: tmpdir.path });
   let stdout = '';
@@ -67,10 +70,10 @@ async function testWatch({
     currentRun = '';
     const content = fixtureContent[fileToUpdate];
     const path = fixturePaths[fileToUpdate];
-    const interval = setInterval(() => writeFileSync(path, content), common.platformTimeout(1000));
+    writeFileSync(path, content);
+    await setTimeout(common.platformTimeout(1000));
     await ran2.promise;
     runs.push(currentRun);
-    clearInterval(interval);
     child.kill();
     await once(child, 'exit');
 
@@ -90,10 +93,10 @@ async function testWatch({
     currentRun = '';
     const fileToRenamePath = tmpdir.resolve(fileToUpdate);
     const newFileNamePath = tmpdir.resolve(`test-renamed-${fileToUpdate}`);
-    const interval = setInterval(() => renameSync(fileToRenamePath, newFileNamePath), common.platformTimeout(1000));
+    renameSync(fileToRenamePath, newFileNamePath);
+    await setTimeout(common.platformTimeout(1000));
     await ran2.promise;
     runs.push(currentRun);
-    clearInterval(interval);
     child.kill();
     await once(child, 'exit');
 
@@ -112,16 +115,10 @@ async function testWatch({
     runs.push(currentRun);
     currentRun = '';
     const fileToDeletePath = tmpdir.resolve(fileToUpdate);
-    const interval = setInterval(() => {
-      if (existsSync(fileToDeletePath)) {
-        unlinkSync(fileToDeletePath);
-      } else {
-        ran2.resolve();
-      }
-    }, common.platformTimeout(1000));
-    await ran2.promise;
+    unlinkSync(fileToDeletePath);
+    await setTimeout(common.platformTimeout(2000));
+    ran2.resolve();
     runs.push(currentRun);
-    clearInterval(interval);
     child.kill();
     await once(child, 'exit');
 
@@ -137,16 +134,10 @@ async function testWatch({
     runs.push(currentRun);
     currentRun = '';
     const newFilePath = tmpdir.resolve(fileToCreate);
-    const interval = setInterval(
-      () => writeFileSync(
-        newFilePath,
-        'module.exports = {};'
-      ),
-      common.platformTimeout(1000)
-    );
+    writeFileSync(newFilePath, 'module.exports = {};');
+    await setTimeout(common.platformTimeout(1000));
     await ran2.promise;
     runs.push(currentRun);
-    clearInterval(interval);
     child.kill();
     await once(child, 'exit');
 
@@ -166,31 +157,39 @@ async function testWatch({
 
 describe('test runner watch mode', () => {
   beforeEach(refresh);
-  it('should run tests repeatedly', async () => {
-    await testWatch({ file: 'test.js', fileToUpdate: 'test.js' });
-  });
+  for (const isolation of ['none', 'process']) {
+    describe(`isolation: ${isolation}`, () => {
+      it('should run tests repeatedly', async () => {
+        await testWatch({ file: 'test.js', fileToUpdate: 'test.js', isolation });
+      });
 
-  it('should run tests with dependency repeatedly', async () => {
-    await testWatch({ file: 'test.js', fileToUpdate: 'dependency.js' });
-  });
+      it('should run tests with dependency repeatedly', async () => {
+        await testWatch({ file: 'test.js', fileToUpdate: 'dependency.js', isolation });
+      });
 
-  it('should run tests with ESM dependency', async () => {
-    await testWatch({ file: 'test.js', fileToUpdate: 'dependency.mjs' });
-  });
+      it('should run tests with ESM dependency', async () => {
+        await testWatch({ file: 'test.js', fileToUpdate: 'dependency.mjs', isolation });
+      });
 
-  it('should support running tests without a file', async () => {
-    await testWatch({ fileToUpdate: 'test.js' });
-  });
+      it('should support running tests without a file', async () => {
+        await testWatch({ fileToUpdate: 'test.js', isolation });
+      });
 
-  it('should support a watched test file rename', async () => {
-    await testWatch({ fileToUpdate: 'test.js', action: 'rename' });
-  });
+      it('should support a watched test file rename', async () => {
+        await testWatch({ fileToUpdate: 'test.js', action: 'rename', isolation });
+      });
 
-  it('should not throw when delete a watched test file', async () => {
-    await testWatch({ fileToUpdate: 'test.js', action: 'delete' });
-  });
+      it('should not throw when delete a watched test file', async () => {
+        await testWatch({ fileToUpdate: 'test.js', action: 'delete', isolation });
+      });
 
-  it('should run new tests when a new file is created in the watched directory', async () => {
-    await testWatch({ action: 'create', fileToCreate: 'new-test-file.test.js' });
-  });
+      it('should run new tests when a new file is created in the watched directory', {
+        todo: isolation === 'none' ?
+          'This test is failing when isolation is set to none and must be fixed' :
+          undefined,
+      }, async () => {
+        await testWatch({ action: 'create', fileToCreate: 'new-test-file.test.js', isolation });
+      });
+    });
+  }
 });

@@ -21,7 +21,7 @@
       },
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v22.9.0/lib/test.js\">lib/test.js</a></p>\n<p>The <code>node:test</code> module facilitates the creation of JavaScript tests.\nTo access it:</p>\n<pre><code class=\"language-mjs\">import test from 'node:test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('node:test');\n</code></pre>\n<p>This module is only available under the <code>node:</code> scheme. The following will not\nwork:</p>\n<pre><code class=\"language-mjs\">import test from 'test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('test');\n</code></pre>\n<p>Tests created via the <code>test</code> module consist of a single function that is\nprocessed in one of three ways:</p>\n<ol>\n<li>A synchronous function that is considered failing if it throws an exception,\nand is considered passing otherwise.</li>\n<li>A function that returns a <code>Promise</code> that is considered failing if the\n<code>Promise</code> rejects, and is considered passing if the <code>Promise</code> fulfills.</li>\n<li>A function that receives a callback function. If the callback receives any\ntruthy value as its first argument, the test is considered failing. If a\nfalsy value is passed as the first argument to the callback, the test is\nconsidered passing. If the test function receives a callback function and\nalso returns a <code>Promise</code>, the test will fail.</li>\n</ol>\n<p>The following example illustrates how tests are written using the\n<code>test</code> module.</p>\n<pre><code class=\"language-js\">test('synchronous passing test', (t) => {\n  // This test passes because it does not throw an exception.\n  assert.strictEqual(1, 1);\n});\n\ntest('synchronous failing test', (t) => {\n  // This test fails because it throws an exception.\n  assert.strictEqual(1, 2);\n});\n\ntest('asynchronous passing test', async (t) => {\n  // This test passes because the Promise returned by the async\n  // function is settled and not rejected.\n  assert.strictEqual(1, 1);\n});\n\ntest('asynchronous failing test', async (t) => {\n  // This test fails because the Promise returned by the async\n  // function is rejected.\n  assert.strictEqual(1, 2);\n});\n\ntest('failing test using Promises', (t) => {\n  // Promises can be used directly as well.\n  return new Promise((resolve, reject) => {\n    setImmediate(() => {\n      reject(new Error('this will cause the test to fail'));\n    });\n  });\n});\n\ntest('callback passing test', (t, done) => {\n  // done() is the callback function. When the setImmediate() runs, it invokes\n  // done() with no arguments.\n  setImmediate(done);\n});\n\ntest('callback failing test', (t, done) => {\n  // When the setImmediate() runs, done() is invoked with an Error object and\n  // the test fails.\n  setImmediate(() => {\n    done(new Error('callback failure'));\n  });\n});\n</code></pre>\n<p>If any tests fail, the process exit code is set to <code>1</code>.</p>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v23.0.0/lib/test.js\">lib/test.js</a></p>\n<p>The <code>node:test</code> module facilitates the creation of JavaScript tests.\nTo access it:</p>\n<pre><code class=\"language-mjs\">import test from 'node:test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('node:test');\n</code></pre>\n<p>This module is only available under the <code>node:</code> scheme. The following will not\nwork:</p>\n<pre><code class=\"language-mjs\">import test from 'test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('test');\n</code></pre>\n<p>Tests created via the <code>test</code> module consist of a single function that is\nprocessed in one of three ways:</p>\n<ol>\n<li>A synchronous function that is considered failing if it throws an exception,\nand is considered passing otherwise.</li>\n<li>A function that returns a <code>Promise</code> that is considered failing if the\n<code>Promise</code> rejects, and is considered passing if the <code>Promise</code> fulfills.</li>\n<li>A function that receives a callback function. If the callback receives any\ntruthy value as its first argument, the test is considered failing. If a\nfalsy value is passed as the first argument to the callback, the test is\nconsidered passing. If the test function receives a callback function and\nalso returns a <code>Promise</code>, the test will fail.</li>\n</ol>\n<p>The following example illustrates how tests are written using the\n<code>test</code> module.</p>\n<pre><code class=\"language-js\">test('synchronous passing test', (t) => {\n  // This test passes because it does not throw an exception.\n  assert.strictEqual(1, 1);\n});\n\ntest('synchronous failing test', (t) => {\n  // This test fails because it throws an exception.\n  assert.strictEqual(1, 2);\n});\n\ntest('asynchronous passing test', async (t) => {\n  // This test passes because the Promise returned by the async\n  // function is settled and not rejected.\n  assert.strictEqual(1, 1);\n});\n\ntest('asynchronous failing test', async (t) => {\n  // This test fails because the Promise returned by the async\n  // function is rejected.\n  assert.strictEqual(1, 2);\n});\n\ntest('failing test using Promises', (t) => {\n  // Promises can be used directly as well.\n  return new Promise((resolve, reject) => {\n    setImmediate(() => {\n      reject(new Error('this will cause the test to fail'));\n    });\n  });\n});\n\ntest('callback passing test', (t, done) => {\n  // done() is the callback function. When the setImmediate() runs, it invokes\n  // done() with no arguments.\n  setImmediate(done);\n});\n\ntest('callback failing test', (t, done) => {\n  // When the setImmediate() runs, done() is invoked with an Error object and\n  // the test fails.\n  setImmediate(() => {\n    done(new Error('callback failure'));\n  });\n});\n</code></pre>\n<p>If any tests fail, the process exit code is set to <code>1</code>.</p>",
       "modules": [
         {
           "textRaw": "Subtests",
@@ -91,7 +91,7 @@
         {
           "textRaw": "Running tests from the command line",
           "name": "running_tests_from_the_command_line",
-          "desc": "<p>The Node.js test runner can be invoked from the command line by passing the\n<a href=\"cli.html#--test\"><code>--test</code></a> flag:</p>\n<pre><code class=\"language-bash\">node --test\n</code></pre>\n<p>By default, Node.js will run all files matching these patterns:</p>\n<ul>\n<li><code>**/*.test.?(c|m)js</code></li>\n<li><code>**/*-test.?(c|m)js</code></li>\n<li><code>**/*_test.?(c|m)js</code></li>\n<li><code>**/test-*.?(c|m)js</code></li>\n<li><code>**/test.?(c|m)js</code></li>\n<li><code>**/test/**/*.?(c|m)js</code></li>\n</ul>\n<p>Alternatively, one or more glob patterns can be provided as the\nfinal argument(s) to the Node.js command, as shown below.\nGlob patterns follow the behavior of <a href=\"https://man7.org/linux/man-pages/man7/glob.7.html\"><code>glob(7)</code></a>.\nThe glob patterns should be enclosed in double quotes on the command line to\nprevent shell expansion, which can reduce portability across systems.</p>\n<pre><code class=\"language-bash\">node --test \"**/*.test.js\" \"**/*.spec.js\"\n</code></pre>\n<p>Matching files are executed as test files.\nMore information on the test file execution can be found\nin the <a href=\"#test-runner-execution-model\">test runner execution model</a> section.</p>",
+          "desc": "<p>The Node.js test runner can be invoked from the command line by passing the\n<a href=\"cli.html#--test\"><code>--test</code></a> flag:</p>\n<pre><code class=\"language-bash\">node --test\n</code></pre>\n<p>By default, Node.js will run all files matching these patterns:</p>\n<ul>\n<li><code>**/*.test.{cjs,mjs,js}</code></li>\n<li><code>**/*-test.{cjs,mjs,js}</code></li>\n<li><code>**/*_test.{cjs,mjs,js}</code></li>\n<li><code>**/test-*.{cjs,mjs,js}</code></li>\n<li><code>**/test.{cjs,mjs,js}</code></li>\n<li><code>**/test/**/*.{cjs,mjs,js}</code></li>\n</ul>\n<p>When <a href=\"cli.html#--experimental-strip-types\"><code>--experimental-strip-types</code></a> is supplied, the following\nadditional patterns are matched:</p>\n<ul>\n<li><code>**/*.test.{cts,mts,ts}</code></li>\n<li><code>**/*-test.{cts,mts,ts}</code></li>\n<li><code>**/*_test.{cts,mts,ts}</code></li>\n<li><code>**/test-*.{cts,mts,ts}</code></li>\n<li><code>**/test.{cts,mts,ts}</code></li>\n<li><code>**/test/**/*.{cts,mts,ts}</code></li>\n</ul>\n<p>Alternatively, one or more glob patterns can be provided as the\nfinal argument(s) to the Node.js command, as shown below.\nGlob patterns follow the behavior of <a href=\"https://man7.org/linux/man-pages/man7/glob.7.html\"><code>glob(7)</code></a>.\nThe glob patterns should be enclosed in double quotes on the command line to\nprevent shell expansion, which can reduce portability across systems.</p>\n<pre><code class=\"language-bash\">node --test \"**/*.test.js\" \"**/*.spec.js\"\n</code></pre>\n<p>Matching files are executed as test files.\nMore information on the test file execution can be found\nin the <a href=\"#test-runner-execution-model\">test runner execution model</a> section.</p>",
           "modules": [
             {
               "textRaw": "Test runner execution model",
@@ -109,7 +109,7 @@
           "name": "collecting_code_coverage",
           "stability": 1,
           "stabilityText": "Experimental",
-          "desc": "<p>When Node.js is started with the <a href=\"cli.html#--experimental-test-coverage\"><code>--experimental-test-coverage</code></a>\ncommand-line flag, code coverage is collected and statistics are reported once\nall tests have completed. If the <a href=\"cli.html#node_v8_coveragedir\"><code>NODE_V8_COVERAGE</code></a> environment variable is\nused to specify a code coverage directory, the generated V8 coverage files are\nwritten to that directory. Node.js core modules and files within\n<code>node_modules/</code> directories are, by default, not included in the coverage report.\nHowever, they can be explicity included via the <a href=\"cli.html#--test-coverage-include\"><code>--test-coverage-include</code></a> flag. If\ncoverage is enabled, the coverage report is sent to any <a href=\"#test-reporters\">test reporters</a> via\nthe <code>'test:coverage'</code> event.</p>\n<p>Coverage can be disabled on a series of lines using the following\ncomment syntax:</p>\n<pre><code class=\"language-js\">/* node:coverage disable */\nif (anAlwaysFalseCondition) {\n  // Code in this branch will never be executed, but the lines are ignored for\n  // coverage purposes. All lines following the 'disable' comment are ignored\n  // until a corresponding 'enable' comment is encountered.\n  console.log('this is never executed');\n}\n/* node:coverage enable */\n</code></pre>\n<p>Coverage can also be disabled for a specified number of lines. After the\nspecified number of lines, coverage will be automatically reenabled. If the\nnumber of lines is not explicitly provided, a single line is ignored.</p>\n<pre><code class=\"language-js\">/* node:coverage ignore next */\nif (anAlwaysFalseCondition) { console.log('this is never executed'); }\n\n/* node:coverage ignore next 3 */\nif (anAlwaysFalseCondition) {\n  console.log('this is never executed');\n}\n</code></pre>",
+          "desc": "<p>When Node.js is started with the <a href=\"cli.html#--experimental-test-coverage\"><code>--experimental-test-coverage</code></a>\ncommand-line flag, code coverage is collected and statistics are reported once\nall tests have completed. If the <a href=\"cli.html#node_v8_coveragedir\"><code>NODE_V8_COVERAGE</code></a> environment variable is\nused to specify a code coverage directory, the generated V8 coverage files are\nwritten to that directory. Node.js core modules and files within\n<code>node_modules/</code> directories are, by default, not included in the coverage report.\nHowever, they can be explicitly included via the <a href=\"cli.html#--test-coverage-include\"><code>--test-coverage-include</code></a> flag. If\ncoverage is enabled, the coverage report is sent to any <a href=\"#test-reporters\">test reporters</a> via\nthe <code>'test:coverage'</code> event.</p>\n<p>Coverage can be disabled on a series of lines using the following\ncomment syntax:</p>\n<pre><code class=\"language-js\">/* node:coverage disable */\nif (anAlwaysFalseCondition) {\n  // Code in this branch will never be executed, but the lines are ignored for\n  // coverage purposes. All lines following the 'disable' comment are ignored\n  // until a corresponding 'enable' comment is encountered.\n  console.log('this is never executed');\n}\n/* node:coverage enable */\n</code></pre>\n<p>Coverage can also be disabled for a specified number of lines. After the\nspecified number of lines, coverage will be automatically reenabled. If the\nnumber of lines is not explicitly provided, a single line is ignored.</p>\n<pre><code class=\"language-js\">/* node:coverage ignore next */\nif (anAlwaysFalseCondition) { console.log('this is never executed'); }\n\n/* node:coverage ignore next 3 */\nif (anAlwaysFalseCondition) {\n  console.log('this is never executed');\n}\n</code></pre>",
           "modules": [
             {
               "textRaw": "Coverage reporters",
@@ -173,7 +173,7 @@
               }
             ]
           },
-          "desc": "<p>The <code>node:test</code> module supports passing <a href=\"cli.html#--test-reporter\"><code>--test-reporter</code></a>\nflags for the test runner to use a specific reporter.</p>\n<p>The following built-reporters are supported:</p>\n<ul>\n<li>\n<p><code>tap</code>\nThe <code>tap</code> reporter outputs the test results in the <a href=\"https://testanything.org/\">TAP</a> format.</p>\n</li>\n<li>\n<p><code>spec</code>\nThe <code>spec</code> reporter outputs the test results in a human-readable format.</p>\n</li>\n<li>\n<p><code>dot</code>\nThe <code>dot</code> reporter outputs the test results in a compact format,\nwhere each passing test is represented by a <code>.</code>,\nand each failing test is represented by a <code>X</code>.</p>\n</li>\n<li>\n<p><code>junit</code>\nThe junit reporter outputs test results in a jUnit XML format</p>\n</li>\n<li>\n<p><code>lcov</code>\nThe <code>lcov</code> reporter outputs test coverage when used with the\n<a href=\"cli.html#--experimental-test-coverage\"><code>--experimental-test-coverage</code></a> flag.</p>\n</li>\n</ul>\n<p>When <code>stdout</code> is a <a href=\"tty.html\">TTY</a>, the <code>spec</code> reporter is used by default.\nOtherwise, the <code>tap</code> reporter is used by default.</p>\n<p>The exact output of these reporters is subject to change between versions of\nNode.js, and should not be relied on programmatically. If programmatic access\nto the test runner's output is required, use the events emitted by the\n<a href=\"test.html#class-testsstream\" class=\"type\">&lt;TestsStream&gt;</a>.</p>\n<p>The reporters are available via the <code>node:test/reporters</code> module:</p>\n<pre><code class=\"language-mjs\">import { tap, spec, dot, junit, lcov } from 'node:test/reporters';\n</code></pre>\n<pre><code class=\"language-cjs\">const { tap, spec, dot, junit, lcov } = require('node:test/reporters');\n</code></pre>",
+          "desc": "<p>The <code>node:test</code> module supports passing <a href=\"cli.html#--test-reporter\"><code>--test-reporter</code></a>\nflags for the test runner to use a specific reporter.</p>\n<p>The following built-reporters are supported:</p>\n<ul>\n<li>\n<p><code>spec</code>\nThe <code>spec</code> reporter outputs the test results in a human-readable format. This\nis the default reporter.</p>\n</li>\n<li>\n<p><code>tap</code>\nThe <code>tap</code> reporter outputs the test results in the <a href=\"https://testanything.org/\">TAP</a> format.</p>\n</li>\n<li>\n<p><code>dot</code>\nThe <code>dot</code> reporter outputs the test results in a compact format,\nwhere each passing test is represented by a <code>.</code>,\nand each failing test is represented by a <code>X</code>.</p>\n</li>\n<li>\n<p><code>junit</code>\nThe junit reporter outputs test results in a jUnit XML format</p>\n</li>\n<li>\n<p><code>lcov</code>\nThe <code>lcov</code> reporter outputs test coverage when used with the\n<a href=\"cli.html#--experimental-test-coverage\"><code>--experimental-test-coverage</code></a> flag.</p>\n</li>\n</ul>\n<p>The exact output of these reporters is subject to change between versions of\nNode.js, and should not be relied on programmatically. If programmatic access\nto the test runner's output is required, use the events emitted by the\n<a href=\"test.html#class-testsstream\" class=\"type\">&lt;TestsStream&gt;</a>.</p>\n<p>The reporters are available via the <code>node:test/reporters</code> module:</p>\n<pre><code class=\"language-mjs\">import { tap, spec, dot, junit, lcov } from 'node:test/reporters';\n</code></pre>\n<pre><code class=\"language-cjs\">const { tap, spec, dot, junit, lcov } = require('node:test/reporters');\n</code></pre>",
           "modules": [
             {
               "textRaw": "Custom reporters",
@@ -275,6 +275,16 @@
             ],
             "changes": [
               {
+                "version": "v23.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/54705",
+                "description": "Added the `cwd` option."
+              },
+              {
+                "version": "v23.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/53937",
+                "description": "Added coverage options."
+              },
+              {
                 "version": "v22.8.0",
                 "pr-url": "https://github.com/nodejs/node/pull/53927",
                 "description": "Added the `isolation` option."
@@ -285,7 +295,10 @@
                 "description": "Added the `globPatterns` option."
               },
               {
-                "version": "v22.0.0",
+                "version": [
+                  "v22.0.0",
+                  "v20.14.0"
+                ],
                 "pr-url": "https://github.com/nodejs/node/pull/52038",
                 "description": "Added the `forceExit` option."
               },
@@ -321,10 +334,18 @@
                       "desc": "If a number is provided, then that many test processes would run in parallel, where each process corresponds to one test file. If `true`, it would run `os.availableParallelism() - 1` test files in parallel. If `false`, it would only run one test file at a time."
                     },
                     {
-                      "textRaw": "`files`: {Array} An array containing the list of files to run. **Default** matching files from [test runner execution model][].",
+                      "textRaw": "`cwd`: {string} Specifies the current working directory to be used by the test runner. Serves as the base path for resolving files according to the [test runner execution model][]. **Default:** `process.cwd()`.",
+                      "name": "cwd",
+                      "type": "string",
+                      "default": "`process.cwd()`",
+                      "desc": "Specifies the current working directory to be used by the test runner. Serves as the base path for resolving files according to the [test runner execution model][]."
+                    },
+                    {
+                      "textRaw": "`files`: {Array} An array containing the list of files to run. **Default:** matching files from [test runner execution model][].",
                       "name": "files",
                       "type": "Array",
-                      "desc": "An array containing the list of files to run. **Default** matching files from [test runner execution model][]."
+                      "default": "matching files from [test runner execution model][]",
+                      "desc": "An array containing the list of files to run."
                     },
                     {
                       "textRaw": "`forceExit`: {boolean} Configures the test runner to exit the process once all known tests have finished executing even if the event loop would otherwise remain active. **Default:** `false`.",
@@ -366,6 +387,20 @@
                       "type": "Function",
                       "default": "`undefined`",
                       "desc": "A function that accepts the `TestsStream` instance and can be used to setup listeners before any tests are run."
+                    },
+                    {
+                      "textRaw": "`execArgv` {Array} An array of CLI flags to pass to the `node` executable when spawning the subprocesses. This option has no effect when `isolation` is `'none`'. **Default:** `[]`",
+                      "name": "execArgv",
+                      "type": "Array",
+                      "default": "`[]`",
+                      "desc": "An array of CLI flags to pass to the `node` executable when spawning the subprocesses. This option has no effect when `isolation` is `'none`'."
+                    },
+                    {
+                      "textRaw": "`argv` {Array} An array of CLI flags to pass to each test file when spawning the subprocesses. This option has no effect when `isolation` is `'none'`. **Default:** `[]`.",
+                      "name": "argv",
+                      "type": "Array",
+                      "default": "`[]`",
+                      "desc": "An array of CLI flags to pass to each test file when spawning the subprocesses. This option has no effect when `isolation` is `'none'`."
                     },
                     {
                       "textRaw": "`signal` {AbortSignal} Allows aborting an in-progress test execution.",
@@ -421,6 +456,48 @@
                           "desc": "is a positive integer that specifies the total number of shards to split the test files to. This option is _required_."
                         }
                       ]
+                    },
+                    {
+                      "textRaw": "`coverage` {boolean} enable [code coverage][] collection. **Default:** `false`.",
+                      "name": "coverage",
+                      "type": "boolean",
+                      "default": "`false`",
+                      "desc": "enable [code coverage][] collection."
+                    },
+                    {
+                      "textRaw": "`coverageExcludeGlobs` {string|Array} Excludes specific files from code coverage using a glob pattern, which can match both absolute and relative file paths. This property is only applicable when `coverage` was set to `true`. If both `coverageExcludeGlobs` and `coverageIncludeGlobs` are provided, files must meet **both** criteria to be included in the coverage report. **Default:** `undefined`.",
+                      "name": "coverageExcludeGlobs",
+                      "type": "string|Array",
+                      "default": "`undefined`",
+                      "desc": "Excludes specific files from code coverage using a glob pattern, which can match both absolute and relative file paths. This property is only applicable when `coverage` was set to `true`. If both `coverageExcludeGlobs` and `coverageIncludeGlobs` are provided, files must meet **both** criteria to be included in the coverage report."
+                    },
+                    {
+                      "textRaw": "`coverageIncludeGlobs` {string|Array} Includes specific files in code coverage using a glob pattern, which can match both absolute and relative file paths. This property is only applicable when `coverage` was set to `true`. If both `coverageExcludeGlobs` and `coverageIncludeGlobs` are provided, files must meet **both** criteria to be included in the coverage report. **Default:** `undefined`.",
+                      "name": "coverageIncludeGlobs",
+                      "type": "string|Array",
+                      "default": "`undefined`",
+                      "desc": "Includes specific files in code coverage using a glob pattern, which can match both absolute and relative file paths. This property is only applicable when `coverage` was set to `true`. If both `coverageExcludeGlobs` and `coverageIncludeGlobs` are provided, files must meet **both** criteria to be included in the coverage report."
+                    },
+                    {
+                      "textRaw": "`lineCoverage` {number} Require a minimum percent of covered lines. If code coverage does not reach the threshold specified, the process will exit with code `1`. **Default:** `0`.",
+                      "name": "lineCoverage",
+                      "type": "number",
+                      "default": "`0`",
+                      "desc": "Require a minimum percent of covered lines. If code coverage does not reach the threshold specified, the process will exit with code `1`."
+                    },
+                    {
+                      "textRaw": "`branchCoverage` {number} Require a minimum percent of covered branches. If code coverage does not reach the threshold specified, the process will exit with code `1`. **Default:** `0`.",
+                      "name": "branchCoverage",
+                      "type": "number",
+                      "default": "`0`",
+                      "desc": "Require a minimum percent of covered branches. If code coverage does not reach the threshold specified, the process will exit with code `1`."
+                    },
+                    {
+                      "textRaw": "`functionCoverage` {number} Require a minimum percent of covered functions. If code coverage does not reach the threshold specified, the process will exit with code `1`. **Default:** `0`.",
+                      "name": "functionCoverage",
+                      "type": "number",
+                      "default": "`0`",
+                      "desc": "Require a minimum percent of covered functions. If code coverage does not reach the threshold specified, the process will exit with code `1`."
                     }
                   ]
                 }
@@ -435,7 +512,8 @@
           "name": "suite",
           "meta": {
             "added": [
-              "v22.0.0"
+              "v22.0.0",
+              "v20.13.0"
             ],
             "changes": []
           },
@@ -479,7 +557,8 @@
           "name": "skip",
           "meta": {
             "added": [
-              "v22.0.0"
+              "v22.0.0",
+              "v20.13.0"
             ],
             "changes": []
           },
@@ -496,7 +575,8 @@
           "name": "todo",
           "meta": {
             "added": [
-              "v22.0.0"
+              "v22.0.0",
+              "v20.13.0"
             ],
             "changes": []
           },
@@ -513,7 +593,8 @@
           "name": "only",
           "meta": {
             "added": [
-              "v22.0.0"
+              "v22.0.0",
+              "v20.13.0"
             ],
             "changes": []
           },
@@ -1138,7 +1219,8 @@
           "name": "MockModuleContext",
           "meta": {
             "added": [
-              "v22.3.0"
+              "v22.3.0",
+              "v20.18.0"
             ],
             "changes": []
           },
@@ -1152,7 +1234,8 @@
               "name": "restore",
               "meta": {
                 "added": [
-                  "v22.3.0"
+                  "v22.3.0",
+                  "v20.18.0"
                 ],
                 "changes": []
               },
@@ -1329,7 +1412,8 @@
               "name": "module",
               "meta": {
                 "added": [
-                  "v22.3.0"
+                  "v22.3.0",
+                  "v20.18.0"
                 ],
                 "changes": []
               },
@@ -1380,7 +1464,7 @@
                   ]
                 }
               ],
-              "desc": "<p>This function is used to mock the exports of ECMAScript modules, CommonJS\nmodules, and Node.js builtin modules. Any references to the original module\nprior to mocking are not impacted. The following example demonstrates how a mock\nis created for a module.</p>\n<pre><code class=\"language-js\">test('mocks a builtin module in both module systems', async (t) => {\n  // Create a mock of 'node:readline' with a named export named 'fn', which\n  // does not exist in the original 'node:readline' module.\n  const mock = t.mock.module('node:readline', {\n    namedExports: { fn() { return 42; } },\n  });\n\n  let esmImpl = await import('node:readline');\n  let cjsImpl = require('node:readline');\n\n  // cursorTo() is an export of the original 'node:readline' module.\n  assert.strictEqual(esmImpl.cursorTo, undefined);\n  assert.strictEqual(cjsImpl.cursorTo, undefined);\n  assert.strictEqual(esmImpl.fn(), 42);\n  assert.strictEqual(cjsImpl.fn(), 42);\n\n  mock.restore();\n\n  // The mock is restored, so the original builtin module is returned.\n  esmImpl = await import('node:readline');\n  cjsImpl = require('node:readline');\n\n  assert.strictEqual(typeof esmImpl.cursorTo, 'function');\n  assert.strictEqual(typeof cjsImpl.cursorTo, 'function');\n  assert.strictEqual(esmImpl.fn, undefined);\n  assert.strictEqual(cjsImpl.fn, undefined);\n});\n</code></pre>"
+              "desc": "<p>This function is used to mock the exports of ECMAScript modules, CommonJS\nmodules, and Node.js builtin modules. Any references to the original module\nprior to mocking are not impacted. In order to enable module mocking, Node.js must\nbe started with the <a href=\"cli.html#--experimental-test-module-mocks\"><code>--experimental-test-module-mocks</code></a> command-line flag.</p>\n<p>The following example demonstrates how a mock is created for a module.</p>\n<pre><code class=\"language-js\">test('mocks a builtin module in both module systems', async (t) => {\n  // Create a mock of 'node:readline' with a named export named 'fn', which\n  // does not exist in the original 'node:readline' module.\n  const mock = t.mock.module('node:readline', {\n    namedExports: { fn() { return 42; } },\n  });\n\n  let esmImpl = await import('node:readline');\n  let cjsImpl = require('node:readline');\n\n  // cursorTo() is an export of the original 'node:readline' module.\n  assert.strictEqual(esmImpl.cursorTo, undefined);\n  assert.strictEqual(cjsImpl.cursorTo, undefined);\n  assert.strictEqual(esmImpl.fn(), 42);\n  assert.strictEqual(cjsImpl.fn(), 42);\n\n  mock.restore();\n\n  // The mock is restored, so the original builtin module is returned.\n  esmImpl = await import('node:readline');\n  cjsImpl = require('node:readline');\n\n  assert.strictEqual(typeof esmImpl.cursorTo, 'function');\n  assert.strictEqual(typeof cjsImpl.cursorTo, 'function');\n  assert.strictEqual(esmImpl.fn, undefined);\n  assert.strictEqual(cjsImpl.fn, undefined);\n});\n</code></pre>"
             },
             {
               "textRaw": "`mock.reset()`",
@@ -2433,6 +2517,95 @@
               "desc": "<p>Emitted when a running test writes to <code>stdout</code>.\nThis event is only emitted if <code>--test</code> flag is passed.\nThis event is not guaranteed to be emitted in the same order as the tests are\ndefined.</p>"
             },
             {
+              "textRaw": "Event: `'test:summary'`",
+              "type": "event",
+              "name": "test:summary",
+              "params": [
+                {
+                  "textRaw": "`data` {Object}",
+                  "name": "data",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`counts` {Object} An object containing the counts of various test results.",
+                      "name": "counts",
+                      "type": "Object",
+                      "desc": "An object containing the counts of various test results.",
+                      "options": [
+                        {
+                          "textRaw": "`cancelled` {number} The total number of cancelled tests.",
+                          "name": "cancelled",
+                          "type": "number",
+                          "desc": "The total number of cancelled tests."
+                        },
+                        {
+                          "textRaw": "`failed` {number} The total number of failed tests.",
+                          "name": "failed",
+                          "type": "number",
+                          "desc": "The total number of failed tests."
+                        },
+                        {
+                          "textRaw": "`passed` {number} The total number of passed tests.",
+                          "name": "passed",
+                          "type": "number",
+                          "desc": "The total number of passed tests."
+                        },
+                        {
+                          "textRaw": "`skipped` {number} The total number of skipped tests.",
+                          "name": "skipped",
+                          "type": "number",
+                          "desc": "The total number of skipped tests."
+                        },
+                        {
+                          "textRaw": "`suites` {number} The total number of suites run.",
+                          "name": "suites",
+                          "type": "number",
+                          "desc": "The total number of suites run."
+                        },
+                        {
+                          "textRaw": "`tests` {number} The total number of tests run, excluding suites.",
+                          "name": "tests",
+                          "type": "number",
+                          "desc": "The total number of tests run, excluding suites."
+                        },
+                        {
+                          "textRaw": "`todo` {number} The total number of TODO tests.",
+                          "name": "todo",
+                          "type": "number",
+                          "desc": "The total number of TODO tests."
+                        },
+                        {
+                          "textRaw": "`topLevel` {number} The total number of top level tests and suites.",
+                          "name": "topLevel",
+                          "type": "number",
+                          "desc": "The total number of top level tests and suites."
+                        }
+                      ]
+                    },
+                    {
+                      "textRaw": "`duration_ms` {number} The duration of the test run in milliseconds.",
+                      "name": "duration_ms",
+                      "type": "number",
+                      "desc": "The duration of the test run in milliseconds."
+                    },
+                    {
+                      "textRaw": "`file` {string|undefined} The path of the test file that generated the summary. If the summary corresponds to multiple files, this value is `undefined`.",
+                      "name": "file",
+                      "type": "string|undefined",
+                      "desc": "The path of the test file that generated the summary. If the summary corresponds to multiple files, this value is `undefined`."
+                    },
+                    {
+                      "textRaw": "`success` {boolean} Indicates whether or not the test run is considered successful or not. If any error condition occurs, such as a failing test or unmet coverage threshold, this value will be set to `false`.",
+                      "name": "success",
+                      "type": "boolean",
+                      "desc": "Indicates whether or not the test run is considered successful or not. If any error condition occurs, such as a failing test or unmet coverage threshold, this value will be set to `false`."
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>Emitted when a test run completes. This event contains metrics pertaining to\nthe completed test run, and is useful for determining if a test run passed or\nfailed. If process-level test isolation is used, a <code>'test:summary'</code> event is\ngenerated for each test file in addition to a final cumulative summary.</p>"
+            },
+            {
               "textRaw": "Event: `'test:watch:drained'`",
               "type": "event",
               "name": "test:watch:drained",
@@ -2682,7 +2855,8 @@
               "name": "plan",
               "meta": {
                 "added": [
-                  "v22.2.0"
+                  "v22.2.0",
+                  "v20.15.0"
                 ],
                 "changes": []
               },
@@ -2896,7 +3070,8 @@
               "name": "assert",
               "meta": {
                 "added": [
-                  "v22.2.0"
+                  "v22.2.0",
+                  "v20.15.0"
                 ],
                 "changes": []
               },
@@ -2950,7 +3125,8 @@
               "name": "filePath",
               "meta": {
                 "added": [
-                  "v22.6.0"
+                  "v22.6.0",
+                  "v20.16.0"
                 ],
                 "changes": []
               },

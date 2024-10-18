@@ -1577,7 +1577,9 @@ protocol.
 ### `tlsSocket.setKeyCert(context)`
 
 <!-- YAML
-added: v22.5.0
+added:
+  - v22.5.0
+  - v20.17.0
 -->
 
 * `context` {Object|tls.SecureContext} An object containing at least `key` and
@@ -1854,10 +1856,14 @@ argument.
 <!-- YAML
 added: v0.11.13
 changes:
-  - version: v22.9.0
+  - version:
+    - v22.9.0
+    - v20.18.0
     pr-url: https://github.com/nodejs/node/pull/54790
     description: The `allowPartialTrustChain` option has been added.
-  - version: v22.4.0
+  - version:
+    - v22.4.0
+    - v20.16.0
     pr-url: https://github.com/nodejs/node/pull/53329
     description: The `clientCertEngine`, `privateKeyEngine` and
                  `privateKeyIdentifier` options depend on custom engine
@@ -2120,7 +2126,9 @@ where `secureSocket` has the same API as `pair.cleartext`.
 <!-- YAML
 added: v0.3.2
 changes:
-  - version: v22.4.0
+  - version:
+    - v22.4.0
+    - v20.16.0
     pr-url: https://github.com/nodejs/node/pull/53329
     description: The `clientCertEngine` option depends on custom engine
                  support in OpenSSL which is deprecated in OpenSSL 3.
@@ -2204,7 +2212,7 @@ changes:
   * `pskIdentityHint` {string} optional hint to send to a client to help
     with selecting the identity during TLS-PSK negotiation. Will be ignored
     in TLS 1.3. Upon failing to set pskIdentityHint `'tlsClientError'` will be
-    emitted with `'ERR_TLS_PSK_SET_IDENTIY_HINT_FAILED'` code.
+    emitted with `'ERR_TLS_PSK_SET_IDENTITY_HINT_FAILED'` code.
   * ...: Any [`tls.createSecureContext()`][] option can be provided. For
     servers, the identity options (`pfx`, `key`/`cert`, or `pskCallback`)
     are usually required.

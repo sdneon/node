@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v22.9.0/lib/stream.js\">lib/stream.js</a></p>\n<p>A stream is an abstract interface for working with streaming data in Node.js.\nThe <code>node:stream</code> module provides an API for implementing the stream interface.</p>\n<p>There are many stream objects provided by Node.js. For instance, a\n<a href=\"http.html#class-httpincomingmessage\">request to an HTTP server</a> and <a href=\"process.html#processstdout\"><code>process.stdout</code></a>\nare both stream instances.</p>\n<p>Streams can be readable, writable, or both. All streams are instances of\n<a href=\"events.html#class-eventemitter\"><code>EventEmitter</code></a>.</p>\n<p>To access the <code>node:stream</code> module:</p>\n<pre><code class=\"language-js\">const stream = require('node:stream');\n</code></pre>\n<p>The <code>node:stream</code> module is useful for creating new types of stream instances.\nIt is usually not necessary to use the <code>node:stream</code> module to consume streams.</p>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v23.0.0/lib/stream.js\">lib/stream.js</a></p>\n<p>A stream is an abstract interface for working with streaming data in Node.js.\nThe <code>node:stream</code> module provides an API for implementing the stream interface.</p>\n<p>There are many stream objects provided by Node.js. For instance, a\n<a href=\"http.html#class-httpincomingmessage\">request to an HTTP server</a> and <a href=\"process.html#processstdout\"><code>process.stdout</code></a>\nare both stream instances.</p>\n<p>Streams can be readable, writable, or both. All streams are instances of\n<a href=\"events.html#class-eventemitter\"><code>EventEmitter</code></a>.</p>\n<p>To access the <code>node:stream</code> module:</p>\n<pre><code class=\"language-js\">const stream = require('node:stream');\n</code></pre>\n<p>The <code>node:stream</code> module is useful for creating new types of stream instances.\nIt is usually not necessary to use the <code>node:stream</code> module to consume streams.</p>",
       "modules": [
         {
           "textRaw": "Organization of this document",
@@ -270,6 +270,14 @@
                     ],
                     "pr-url": "https://github.com/nodejs/node/pull/46205",
                     "description": "Added support for `ReadableStream` and `WritableStream`."
+                  },
+                  {
+                    "version": [
+                      "v19.1.0",
+                      "v18.13.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/44862",
+                    "description": "The `cleanup` option was added."
                   }
                 ]
               },
@@ -309,16 +317,23 @@
                           "type": "boolean|undefined"
                         },
                         {
-                          "textRaw": "`signal`: {AbortSignal|undefined}",
+                          "textRaw": "`signal` {AbortSignal|undefined}",
                           "name": "signal",
                           "type": "AbortSignal|undefined"
+                        },
+                        {
+                          "textRaw": "`cleanup` {boolean|undefined} If `true`, removes the listeners registered by this function before the promise is fulfilled. **Default:** `false`.",
+                          "name": "cleanup",
+                          "type": "boolean|undefined",
+                          "default": "`false`",
+                          "desc": "If `true`, removes the listeners registered by this function before the promise is fulfilled."
                         }
                       ]
                     }
                   ]
                 }
               ],
-              "desc": "<pre><code class=\"language-cjs\">const { finished } = require('node:stream/promises');\nconst fs = require('node:fs');\n\nconst rs = fs.createReadStream('archive.tar');\n\nasync function run() {\n  await finished(rs);\n  console.log('Stream is done reading.');\n}\n\nrun().catch(console.error);\nrs.resume(); // Drain the stream.\n</code></pre>\n<pre><code class=\"language-mjs\">import { finished } from 'node:stream/promises';\nimport { createReadStream } from 'node:fs';\n\nconst rs = createReadStream('archive.tar');\n\nasync function run() {\n  await finished(rs);\n  console.log('Stream is done reading.');\n}\n\nrun().catch(console.error);\nrs.resume(); // Drain the stream.\n</code></pre>\n<p>The <code>finished</code> API also provides a <a href=\"#streamfinishedstream-options-callback\">callback version</a>.</p>"
+              "desc": "<pre><code class=\"language-cjs\">const { finished } = require('node:stream/promises');\nconst fs = require('node:fs');\n\nconst rs = fs.createReadStream('archive.tar');\n\nasync function run() {\n  await finished(rs);\n  console.log('Stream is done reading.');\n}\n\nrun().catch(console.error);\nrs.resume(); // Drain the stream.\n</code></pre>\n<pre><code class=\"language-mjs\">import { finished } from 'node:stream/promises';\nimport { createReadStream } from 'node:fs';\n\nconst rs = createReadStream('archive.tar');\n\nasync function run() {\n  await finished(rs);\n  console.log('Stream is done reading.');\n}\n\nrun().catch(console.error);\nrs.resume(); // Drain the stream.\n</code></pre>\n<p>The <code>finished</code> API also provides a <a href=\"#streamfinishedstream-options-callback\">callback version</a>.</p>\n<p><code>stream.finished()</code> leaves dangling event listeners (in particular\n<code>'error'</code>, <code>'end'</code>, <code>'finish'</code> and <code>'close'</code>) after the returned promise is\nresolved or rejected. The reason for this is so that unexpected <code>'error'</code>\nevents (due to incorrect stream implementations) do not cause unexpected\ncrashes. If this is unwanted behavior then <code>options.cleanup</code> should be set to\n<code>true</code>:</p>\n<pre><code class=\"language-js\">await finished(rs, { cleanup: true });\n</code></pre>"
             }
           ],
           "miscs": [
@@ -416,13 +431,6 @@
                       "name": "signal",
                       "type": "AbortSignal",
                       "desc": "allows aborting the wait for the stream finish. The underlying stream will _not_ be aborted if the signal is aborted. The callback will get called with an `AbortError`. All registered listeners added by this function will also be removed."
-                    },
-                    {
-                      "textRaw": "`cleanup` {boolean} remove all registered stream listeners. **Default:** `false`.",
-                      "name": "cleanup",
-                      "type": "boolean",
-                      "default": "`false`",
-                      "desc": "remove all registered stream listeners."
                     }
                   ]
                 },
@@ -1516,7 +1524,10 @@
                         ],
                         "changes": [
                           {
-                            "version": "v22.0.0",
+                            "version": [
+                              "v22.0.0",
+                              "v20.13.0"
+                            ],
                             "pr-url": "https://github.com/nodejs/node/pull/51866",
                             "description": "The `chunk` argument can now be a `TypedArray` or `DataView` instance."
                           },
@@ -1631,7 +1642,8 @@
                       "name": "[Symbol.asyncDispose]",
                       "meta": {
                         "added": [
-                          "v22.4.0"
+                          "v22.4.0",
+                          "v20.16.0"
                         ],
                         "changes": []
                       },
@@ -1654,7 +1666,10 @@
                         ],
                         "changes": [
                           {
-                            "version": "v22.0.0",
+                            "version": [
+                              "v22.0.0",
+                              "v20.13.0"
+                            ],
                             "pr-url": "https://github.com/nodejs/node/pull/51866",
                             "description": "The `chunk` argument can now be a `TypedArray` or `DataView` instance."
                           },
@@ -2270,7 +2285,10 @@
                         ],
                         "changes": [
                           {
-                            "version": "v22.0.0",
+                            "version": [
+                              "v22.0.0",
+                              "v20.13.0"
+                            ],
                             "pr-url": "https://github.com/nodejs/node/pull/51866",
                             "description": "The `chunk` argument can now be a `TypedArray` or `DataView` instance."
                           },
@@ -2716,7 +2734,7 @@
                           ]
                         }
                       ],
-                      "desc": "<p>This method allows iterating a stream. For each chunk in the stream the\n<code>fn</code> function will be called. If the <code>fn</code> function returns a promise - that\npromise will be <code>await</code>ed.</p>\n<p>This method is different from <code>for await...of</code> loops in that it can optionally\nprocess chunks concurrently. In addition, a <code>forEach</code> iteration can only be\nstopped by having passed a <code>signal</code> option and aborting the related\n<code>AbortController</code> while <code>for await...of</code> can be stopped with <code>break</code> or\n<code>return</code>. In either case the stream will be destroyed.</p>\n<p>This method is different from listening to the <a href=\"#event-data\"><code>'data'</code></a> event in that it\nuses the <a href=\"#class-streamreadable\"><code>readable</code></a> event in the underlying machinary and can limit the\nnumber of concurrent <code>fn</code> calls.</p>\n<pre><code class=\"language-mjs\">import { Readable } from 'node:stream';\nimport { Resolver } from 'node:dns/promises';\n\n// With a synchronous predicate.\nfor await (const chunk of Readable.from([1, 2, 3, 4]).filter((x) => x > 2)) {\n  console.log(chunk); // 3, 4\n}\n// With an asynchronous predicate, making at most 2 queries at a time.\nconst resolver = new Resolver();\nconst dnsResults = Readable.from([\n  'nodejs.org',\n  'openjsf.org',\n  'www.linuxfoundation.org',\n]).map(async (domain) => {\n  const { address } = await resolver.resolve4(domain, { ttl: true });\n  return address;\n}, { concurrency: 2 });\nawait dnsResults.forEach((result) => {\n  // Logs result, similar to `for await (const result of dnsResults)`\n  console.log(result);\n});\nconsole.log('done'); // Stream has finished\n</code></pre>"
+                      "desc": "<p>This method allows iterating a stream. For each chunk in the stream the\n<code>fn</code> function will be called. If the <code>fn</code> function returns a promise - that\npromise will be <code>await</code>ed.</p>\n<p>This method is different from <code>for await...of</code> loops in that it can optionally\nprocess chunks concurrently. In addition, a <code>forEach</code> iteration can only be\nstopped by having passed a <code>signal</code> option and aborting the related\n<code>AbortController</code> while <code>for await...of</code> can be stopped with <code>break</code> or\n<code>return</code>. In either case the stream will be destroyed.</p>\n<p>This method is different from listening to the <a href=\"#event-data\"><code>'data'</code></a> event in that it\nuses the <a href=\"#class-streamreadable\"><code>readable</code></a> event in the underlying machinery and can limit the\nnumber of concurrent <code>fn</code> calls.</p>\n<pre><code class=\"language-mjs\">import { Readable } from 'node:stream';\nimport { Resolver } from 'node:dns/promises';\n\n// With a synchronous predicate.\nfor await (const chunk of Readable.from([1, 2, 3, 4]).filter((x) => x > 2)) {\n  console.log(chunk); // 3, 4\n}\n// With an asynchronous predicate, making at most 2 queries at a time.\nconst resolver = new Resolver();\nconst dnsResults = Readable.from([\n  'nodejs.org',\n  'openjsf.org',\n  'www.linuxfoundation.org',\n]).map(async (domain) => {\n  const { address } = await resolver.resolve4(domain, { ttl: true });\n  return address;\n}, { concurrency: 2 });\nawait dnsResults.forEach((result) => {\n  // Logs result, similar to `for await (const result of dnsResults)`\n  console.log(result);\n});\nconsole.log('done'); // Stream has finished\n</code></pre>"
                     },
                     {
                       "textRaw": "`readable.toArray([options])`",
@@ -3474,7 +3492,8 @@
                   "name": "duplexPair",
                   "meta": {
                     "added": [
-                      "v22.6.0"
+                      "v22.6.0",
+                      "v20.17.0"
                     ],
                     "changes": []
                   },
@@ -3586,13 +3605,6 @@
                           "name": "signal",
                           "type": "AbortSignal",
                           "desc": "allows aborting the wait for the stream finish. The underlying stream will _not_ be aborted if the signal is aborted. The callback will get called with an `AbortError`. All registered listeners added by this function will also be removed."
-                        },
-                        {
-                          "textRaw": "`cleanup` {boolean} remove all registered stream listeners. **Default:** `false`.",
-                          "name": "cleanup",
-                          "type": "boolean",
-                          "default": "`false`",
-                          "desc": "remove all registered stream listeners."
                         }
                       ]
                     },
@@ -5009,7 +5021,10 @@
                   "meta": {
                     "changes": [
                       {
-                        "version": "v22.0.0",
+                        "version": [
+                          "v22.0.0",
+                          "v20.13.0"
+                        ],
                         "pr-url": "https://github.com/nodejs/node/pull/51866",
                         "description": "The `chunk` argument can now be a `TypedArray` or `DataView` instance."
                       },

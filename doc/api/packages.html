@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v22.9.0">
-  <title>Modules: Packages | Node.js v22.9.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v23.0.0">
+  <title>Modules: Packages | Node.js v23.0.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -111,7 +111,7 @@
     <div id="column1" data-id="packages" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v22.9.0 documentation</h1>
+          <h1>Node.js v23.0.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -126,7 +126,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v22.9.0</li>
+            <li class="pinned-header">Node.js v23.0.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -533,9 +533,8 @@ extensions (<code>.js</code>, <code>.json</code>, and finally <code>.node</code>
 <code>process.dlopen()</code>.</li>
 <li>It treats all files that lack <code>.json</code> or <code>.node</code> extensions as JavaScript
 text files.</li>
-<li>It can only be used to <a href="modules.html#loading-ecmascript-modules-using-require">load ECMASCript modules from CommonJS modules</a> if
-the module graph is synchronous (that contains no top-level <code>await</code>) when
-<code>--experimental-require-module</code> is enabled.
+<li>It can only be used to <a href="modules.html#loading-ecmascript-modules-using-require">load ECMAScript modules from CommonJS modules</a> if
+the module graph is synchronous (that contains no top-level <code>await</code>).
 When used to load a JavaScript text file that is not an ECMAScript module,
 the file will be loaded as a CommonJS module.</li>
 </ul>
@@ -902,9 +901,12 @@ target file. <em>Always mutually exclusive with <code>"require"</code>.</em></li
 <li><code>"require"</code> - matches when the package is loaded via <code>require()</code>. The
 referenced file should be loadable with <code>require()</code> although the condition
 matches regardless of the module format of the target file. Expected
-formats include CommonJS, JSON, native addons, and ES modules
-if <code>--experimental-require-module</code> is enabled. <em>Always mutually
+formats include CommonJS, JSON, native addons, and ES modules. <em>Always mutually
 exclusive with <code>"import"</code>.</em></li>
+<li><code>"module-sync"</code> - matches no matter the package is loaded via <code>import</code>,
+<code>import()</code> or <code>require()</code>. The format is expected to be ES modules that does
+not contain top-level await in its module graph - if it does,
+<code>ERR_REQUIRE_ASYNC_MODULE</code> will be thrown when the module is <code>require()</code>-ed.</li>
 <li><code>"default"</code> - the generic fallback that always matches. Can be a CommonJS
 or ES module file. <em>This condition should always come last.</em></li>
 </ul>
@@ -968,7 +970,7 @@ exports, while resolving the existing <code>"node"</code>, <code>"node-addons"</
 <code>"import"</code>, and <code>"require"</code> conditions as appropriate.</p>
 <p>Any number of custom conditions can be set with repeat flags.</p>
 <h4>Community Conditions Definitions<span><a class="mark" href="#community-conditions-definitions" id="community-conditions-definitions">#</a></span><a aria-hidden="true" class="legacy" id="packages_community_conditions_definitions"></a></h4>
-<p>Condition strings other than the <code>"import"</code>, <code>"require"</code>, <code>"node"</code>,
+<p>Condition strings other than the <code>"import"</code>, <code>"require"</code>, <code>"node"</code>, <code>"module-sync"</code>,
 <code>"node-addons"</code> and <code>"default"</code> conditions
 <a href="#conditional-exports">implemented in Node.js core</a> are ignored by default.</p>
 <p>Other platforms may implement other conditions and user conditions can be
@@ -1063,6 +1065,16 @@ code will also work:</p>
 <pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">node other.js</span>
 42</code> <button class="copy-button">copy</button></pre>
 </section><section><h3>Dual CommonJS/ES module packages<span><a class="mark" href="#dual-commonjses-module-packages" id="dual-commonjses-module-packages">#</a></span><a aria-hidden="true" class="legacy" id="packages_dual_commonjs_es_module_packages"></a></h3>
+<!-- This section should not be in the API documentation:
+
+1. It teaches opinionated practices that some consider dangerous, see
+   https://github.com/nodejs/node/issues/52174
+2. It will soon be obsolete when we unflag --experimental-require-module.
+3. It's difficult to understand a multi-file structure via long texts and snippets in
+   a markdown document.
+
+TODO(?): Move this section to its own repository with example folders.
+-->
 <p>Prior to the introduction of support for ES modules in Node.js, it was a common
 pattern for package authors to include both CommonJS and ES module JavaScript
 sources in their package, with <code>package.json</code> <a href="#main"><code>"main"</code></a> specifying the
@@ -1074,7 +1086,7 @@ ignores) the top-level <code>"module"</code> field.</p>
 <p>Node.js can now run ES module entry points, and a package can contain both
 CommonJS and ES module entry points (either via separate specifiers such as
 <code>'pkg'</code> and <code>'pkg/es-module'</code>, or both at the same specifier via <a href="#conditional-exports">Conditional
-exports</a>). Unlike in the scenario where <code>"module"</code> is only used by bundlers,
+exports</a>). Unlike in the scenario where top-level <code>"module"</code> field is only used by bundlers,
 or ES module files are transpiled into CommonJS on the fly before evaluation by
 Node.js, the files referenced by the ES module entry point are evaluated as ES
 modules.</p>

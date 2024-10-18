@@ -10,6 +10,11 @@ const skipForceColors =
   process.config.variables.icu_gyp_path !== 'tools/icu/icu-generic.gyp' ||
   process.config.variables.node_shared_openssl;
 
+const canColorize = process.stderr?.isTTY && (
+  typeof process.stderr?.getColorDepth === 'function' ?
+    process.stderr?.getColorDepth() > 2 : true);
+const skipCoverageColors = !canColorize;
+
 function replaceTestDuration(str) {
   return str
     .replaceAll(/duration_ms: [0-9.]+/g, 'duration_ms: *')
@@ -225,11 +230,20 @@ const tests = [
   } : false,
   {
     name: 'test-runner/output/test-diagnostic-warning-without-test-only-flag.js',
-    flags: ['--test-reporter=tap'],
+    flags: ['--test', '--test-reporter=tap'],
   },
+  process.features.inspector ? {
+    name: 'test-runner/output/coverage-width-40.mjs',
+    flags: ['--test-reporter=tap'],
+  } : false,
   process.features.inspector ? {
     name: 'test-runner/output/coverage-width-80.mjs',
     flags: ['--test-reporter=tap'],
+  } : false,
+  process.features.inspector && !skipCoverageColors ? {
+    name: 'test-runner/output/coverage-width-80-color.mjs',
+    transform: specTransform,
+    tty: true
   } : false,
   process.features.inspector ? {
     name: 'test-runner/output/coverage-width-100.mjs',
@@ -250,6 +264,11 @@ const tests = [
   process.features.inspector ? {
     name: 'test-runner/output/coverage-width-100-uncovered-lines.mjs',
     flags: ['--test-reporter=tap'],
+  } : false,
+  process.features.inspector && !skipCoverageColors ? {
+    name: 'test-runner/output/coverage-width-80-uncovered-lines-color.mjs',
+    transform: specTransform,
+    tty: true
   } : false,
   process.features.inspector ? {
     name: 'test-runner/output/coverage-width-150-uncovered-lines.mjs',

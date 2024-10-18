@@ -5,13 +5,13 @@ This is a *fun* mod of Node.JS that initially embedded a modified version of dco
 
 Thanks to the inspiration from dcodeIO et al =D
 
-## Version 22.9.0
-* Update to Node.JS 22.9.0 baseline, and TypeScript v5.6.2.
+## Version 23.0.0
+* Update to Node.JS 23.0.0 baseline, and TypeScript v5.6.3.
 
 It embeds:
 * DS v1.2.2.
 * CS v2.7.0.
-* TS v5.6.2.
+* TS v5.6.3.
 * Refer to prior readmes for old changes.
 
 Built with VS 2022 v17.9.3 (rollback'd), as v17.10.0 fails!
@@ -288,8 +288,10 @@ directory contains the latest Hydrogen (Node.js 18) release.
 
 <https://nodejs.org/download/nightly/>
 
-Each directory name and filename contains a date (in UTC) and the commit
-SHA at the HEAD of the release.
+Each directory and filename includes the version (e.g., `v22.0.0`),
+followed by the UTC date (e.g., `20240424` for April 24, 2024),
+and the short commit SHA of the HEAD of the release (e.g., `ddd0a9e494`).
+For instance, a full directory name might look like `v22.0.0-nightly20240424ddd0a9e494`.
 
 #### API documentation
 
@@ -489,6 +491,8 @@ For information about the governance of the Node.js project, see
 
 ### Collaborators
 
+* [abmusse](https://github.com/abmusse) -
+  **Abdirahim Musse** <<abdirahim.musse@ibm.com>>
 * [addaleax](https://github.com/addaleax) -
   **Anna Henningsen** <<anna@addaleax.net>> (she/her)
 * [aduh95](https://github.com/aduh95) -
@@ -565,8 +569,6 @@ For information about the governance of the Node.js project, see
   **James M Snell** <<jasnell@gmail.com>> (he/him)
 * [jkrems](https://github.com/jkrems) -
   **Jan Krems** <<jan.krems@gmail.com>> (he/him)
-* [joesepi](https://github.com/joesepi) -
-  **Joe Sepi** <<sepi@joesepi.com>> (he/him)
 * [joyeecheung](https://github.com/joyeecheung) -
   **Joyee Cheung** <<joyeec9h3@gmail.com>> (she/her)
 * [juanarbol](https://github.com/juanarbol) -
@@ -615,6 +617,8 @@ For information about the governance of the Node.js project, see
   **Filip Skokan** <<panva.ip@gmail.com>> (he/him)
 * [pimterry](https://github.com/pimterry) -
   **Tim Perry** <<pimterry@gmail.com>> (he/him)
+* [pmarchini](https://github.com/pmarchini)
+  **Pietro Marchini** <<pietro.marchini94@gmail.com>> (he/him)
 * [Qard](https://github.com/Qard) -
   **Stephen Belanger** <<admin@stephenbelanger.com>> (he/him)
 * [RafaelGSS](https://github.com/RafaelGSS) -
@@ -769,6 +773,8 @@ For information about the governance of the Node.js project, see
   **Yuval Brik** <<yuval@brik.org.il>>
 * [joaocgreis](https://github.com/joaocgreis) -
   **João Reis** <<reis@janeasystems.com>>
+* [joesepi](https://github.com/joesepi) -
+  **Joe Sepi** <<sepi@joesepi.com>> (he/him)
 * [joshgav](https://github.com/joshgav) -
   **Josh Gavant** <<josh.gavant@outlook.com>>
 * [julianduque](https://github.com/julianduque) -
@@ -969,6 +975,8 @@ responding to new issues.
 
 Primary GPG keys for Node.js Releasers (some Releasers sign with subkeys):
 
+* **Antoine du Hamel** <<duhamelantoine1995@gmail.com>>
+  `C0D6248439F1D5604AAFFB4021D900FFDB233756`
 * **Beth Griggs** <<bethanyngriggs@gmail.com>>
   `4ED778F539E3634C779C87C6D7062848A1AB005C`
 * **Bryan English** <<bryan@bryanenglish.com>>
@@ -994,6 +1002,7 @@ To import the full set of trusted release keys (including subkeys possibly used
 to sign releases):
 
 ```bash
+gpg --keyserver hkps://keys.openpgp.org --recv-keys C0D6248439F1D5604AAFFB4021D900FFDB233756 # Antoine du Hamel
 gpg --keyserver hkps://keys.openpgp.org --recv-keys 4ED778F539E3634C779C87C6D7062848A1AB005C # Beth Griggs
 gpg --keyserver hkps://keys.openpgp.org --recv-keys 141F07595B7B3FFE74309A937405533BE57C7D57 # Bryan English
 gpg --keyserver hkps://keys.openpgp.org --recv-keys 74F12602B6F1C4E913FAA37AD3A89613643B6201 # Danielle Adams

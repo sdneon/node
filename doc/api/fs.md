@@ -267,6 +267,7 @@ added: v16.11.0
   * `start` {integer}
   * `end` {integer} **Default:** `Infinity`
   * `highWaterMark` {integer} **Default:** `64 * 1024`
+  * `signal` {AbortSignal|undefined} **Default:** `undefined`
 * Returns: {fs.ReadStream}
 
 Unlike the 16 KiB default `highWaterMark` for a {stream.Readable}, the stream
@@ -1701,7 +1702,7 @@ changes:
 Creates a symbolic link.
 
 The `type` argument is only used on Windows platforms and can be one of `'dir'`,
-`'file'`, or `'junction'`. If the `type` argument is not a string, Node.js will
+`'file'`, or `'junction'`. If the `type` argument is `null`, Node.js will
 autodetect `target` type and use `'file'` or `'dir'`. If the `target` does not
 exist, `'file'` will be used. Windows junction points require the destination
 path to be absolute. When using `'junction'`, the `target` argument will
@@ -4499,7 +4500,7 @@ See the POSIX symlink(2) documentation for more details.
 
 The `type` argument is only available on Windows and ignored on other platforms.
 It can be set to `'dir'`, `'file'`, or `'junction'`. If the `type` argument is
-not a string, Node.js will autodetect `target` type and use `'file'` or `'dir'`.
+`null`, Node.js will autodetect `target` type and use `'file'` or `'dir'`.
 If the `target` does not exist, `'file'` will be used. Windows junction points
 require the destination path to be absolute. When using `'junction'`, the
 `target` argument will automatically be normalized to absolute path. Junction
@@ -6810,7 +6811,7 @@ added:
   - v18.20.0
 -->
 
-> Stability: 1 – Experimental
+> Stability: 1 - Experimental
 
 * {string}
 
@@ -6826,13 +6827,17 @@ deprecated:
   - v21.5.0
   - v20.12.0
   - v18.20.0
+changes:
+  - version: v23.0.0
+    pr-url: https://github.com/nodejs/node/pull/51050
+    description: Accessing this property emits a warning. It is now read-only.
 -->
 
 > Stability: 0 - Deprecated: Use [`dirent.parentPath`][] instead.
 
 * {string}
 
-Alias for `dirent.parentPath`.
+Alias for `dirent.parentPath`. Read-only.
 
 ### Class: `fs.FSWatcher`
 
@@ -7067,7 +7072,9 @@ i.e. before the `'ready'` event is emitted.
 <!-- YAML
 added: v0.1.21
 changes:
-  - version: v22.0.0
+  - version:
+    - v22.0.0
+    - v20.13.0
     pr-url: https://github.com/nodejs/node/pull/51879
     description: Public constructor is deprecated.
   - version: v8.1.0

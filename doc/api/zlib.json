@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v22.9.0/lib/zlib.js\">lib/zlib.js</a></p>\n<p>The <code>node:zlib</code> module provides compression functionality implemented using\nGzip, Deflate/Inflate, and Brotli.</p>\n<p>To access it:</p>\n<pre><code class=\"language-js\">const zlib = require('node:zlib');\n</code></pre>\n<p>Compression and decompression are built around the Node.js <a href=\"stream.html\">Streams API</a>.</p>\n<p>Compressing or decompressing a stream (such as a file) can be accomplished by\npiping the source stream through a <code>zlib</code> <code>Transform</code> stream into a destination\nstream:</p>\n<pre><code class=\"language-js\">const { createGzip } = require('node:zlib');\nconst { pipeline } = require('node:stream');\nconst {\n  createReadStream,\n  createWriteStream,\n} = require('node:fs');\n\nconst gzip = createGzip();\nconst source = createReadStream('input.txt');\nconst destination = createWriteStream('input.txt.gz');\n\npipeline(source, gzip, destination, (err) => {\n  if (err) {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  }\n});\n\n// Or, Promisified\n\nconst { promisify } = require('node:util');\nconst pipe = promisify(pipeline);\n\nasync function do_gzip(input, output) {\n  const gzip = createGzip();\n  const source = createReadStream(input);\n  const destination = createWriteStream(output);\n  await pipe(source, gzip, destination);\n}\n\ndo_gzip('input.txt', 'input.txt.gz')\n  .catch((err) => {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  });\n</code></pre>\n<p>It is also possible to compress or decompress data in a single step:</p>\n<pre><code class=\"language-js\">const { deflate, unzip } = require('node:zlib');\n\nconst input = '.................................';\ndeflate(input, (err, buffer) => {\n  if (err) {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  }\n  console.log(buffer.toString('base64'));\n});\n\nconst buffer = Buffer.from('eJzT0yMAAGTvBe8=', 'base64');\nunzip(buffer, (err, buffer) => {\n  if (err) {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  }\n  console.log(buffer.toString());\n});\n\n// Or, Promisified\n\nconst { promisify } = require('node:util');\nconst do_unzip = promisify(unzip);\n\ndo_unzip(buffer)\n  .then((buf) => console.log(buf.toString()))\n  .catch((err) => {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  });\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v23.0.0/lib/zlib.js\">lib/zlib.js</a></p>\n<p>The <code>node:zlib</code> module provides compression functionality implemented using\nGzip, Deflate/Inflate, and Brotli.</p>\n<p>To access it:</p>\n<pre><code class=\"language-js\">const zlib = require('node:zlib');\n</code></pre>\n<p>Compression and decompression are built around the Node.js <a href=\"stream.html\">Streams API</a>.</p>\n<p>Compressing or decompressing a stream (such as a file) can be accomplished by\npiping the source stream through a <code>zlib</code> <code>Transform</code> stream into a destination\nstream:</p>\n<pre><code class=\"language-js\">const { createGzip } = require('node:zlib');\nconst { pipeline } = require('node:stream');\nconst {\n  createReadStream,\n  createWriteStream,\n} = require('node:fs');\n\nconst gzip = createGzip();\nconst source = createReadStream('input.txt');\nconst destination = createWriteStream('input.txt.gz');\n\npipeline(source, gzip, destination, (err) => {\n  if (err) {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  }\n});\n\n// Or, Promisified\n\nconst { promisify } = require('node:util');\nconst pipe = promisify(pipeline);\n\nasync function do_gzip(input, output) {\n  const gzip = createGzip();\n  const source = createReadStream(input);\n  const destination = createWriteStream(output);\n  await pipe(source, gzip, destination);\n}\n\ndo_gzip('input.txt', 'input.txt.gz')\n  .catch((err) => {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  });\n</code></pre>\n<p>It is also possible to compress or decompress data in a single step:</p>\n<pre><code class=\"language-js\">const { deflate, unzip } = require('node:zlib');\n\nconst input = '.................................';\ndeflate(input, (err, buffer) => {\n  if (err) {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  }\n  console.log(buffer.toString('base64'));\n});\n\nconst buffer = Buffer.from('eJzT0yMAAGTvBe8=', 'base64');\nunzip(buffer, (err, buffer) => {\n  if (err) {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  }\n  console.log(buffer.toString());\n});\n\n// Or, Promisified\n\nconst { promisify } = require('node:util');\nconst do_unzip = promisify(unzip);\n\ndo_unzip(buffer)\n  .then((buf) => console.log(buf.toString()))\n  .catch((err) => {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  });\n</code></pre>",
       "modules": [
         {
           "textRaw": "Threadpool usage and performance considerations",
@@ -1112,23 +1112,6 @@
           "desc": "<p>Not exported by the <code>node:zlib</code> module. It is documented here because it is the\nbase class of the compressor/decompressor classes.</p>\n<p>This class inherits from <a href=\"stream.html#class-streamtransform\"><code>stream.Transform</code></a>, allowing <code>node:zlib</code> objects to\nbe used in pipes and similar stream operations.</p>",
           "properties": [
             {
-              "textRaw": "`bytesRead` {number}",
-              "type": "number",
-              "name": "bytesRead",
-              "meta": {
-                "added": [
-                  "v8.1.0"
-                ],
-                "deprecated": [
-                  "v10.0.0"
-                ],
-                "changes": []
-              },
-              "stability": 0,
-              "stabilityText": "Deprecated: Use [`zlib.bytesWritten`][] instead.",
-              "desc": "<p>Deprecated alias for <a href=\"#zlibbyteswritten\"><code>zlib.bytesWritten</code></a>. This original name was chosen\nbecause it also made sense to interpret the value as the number of bytes\nread by the engine, but is inconsistent with other streams in Node.js that\nexpose values under these names.</p>"
-            },
-            {
               "textRaw": "`bytesWritten` {number}",
               "type": "number",
               "name": "bytesWritten",
@@ -1148,7 +1131,8 @@
               "name": "crc32",
               "meta": {
                 "added": [
-                  "v22.2.0"
+                  "v22.2.0",
+                  "v20.15.0"
                 ],
                 "changes": []
               },

@@ -226,44 +226,6 @@ void Environment::WaitForInspectorFrontendByOptions() {
 }
 #endif  // HAVE_INSPECTOR
 
-#define ATOMIC_WAIT_EVENTS(V)                                               \
-  V(kStartWait,           "started")                                        \
-  V(kWokenUp,             "was woken up by another thread")                 \
-  V(kTimedOut,            "timed out")                                      \
-  V(kTerminatedExecution, "was stopped by terminated execution")            \
-  V(kAPIStopped,          "was stopped through the embedder API")           \
-  V(kNotEqual,            "did not wait because the values mismatched")     \
-
-static void AtomicsWaitCallback(Isolate::AtomicsWaitEvent event,
-                                Local<v8::SharedArrayBuffer> array_buffer,
-                                size_t offset_in_bytes, int64_t value,
-                                double timeout_in_ms,
-                                Isolate::AtomicsWaitWakeHandle* stop_handle,
-                                void* data) {
-  Environment* env = static_cast<Environment*>(data);
-
-  const char* message = "(unknown event)";
-  switch (event) {
-#define V(key, msg)                         \
-    case Isolate::AtomicsWaitEvent::key:    \
-      message = msg;                        \
-      break;
-    ATOMIC_WAIT_EVENTS(V)
-#undef V
-  }
-
-  fprintf(stderr,
-          "(node:%d) [Thread %" PRIu64 "] Atomics.wait(%p + %zx, %" PRId64
-          ", %.f) %s\n",
-          static_cast<int>(uv_os_getpid()),
-          env->thread_id(),
-          array_buffer->Data(),
-          offset_in_bytes,
-          value,
-          timeout_in_ms,
-          message);
-}
-
 void Environment::InitializeDiagnostics() {
   isolate_->GetHeapProfiler()->AddBuildEmbedderGraphCallback(
       Environment::BuildEmbedderGraph, this);
@@ -272,17 +234,6 @@ void Environment::InitializeDiagnostics() {
   }
   if (options_->trace_uncaught)
     isolate_->SetCaptureStackTraceForUncaughtExceptions(true);
-  if (options_->trace_atomics_wait) {
-    ProcessEmitDeprecationWarning(
-        Environment::GetCurrent(isolate_),
-        "The flag --trace-atomics-wait is deprecated.",
-        "DEP0165");
-    isolate_->SetAtomicsWaitCallback(AtomicsWaitCallback, this);
-    AddCleanupHook([](void* data) {
-      Environment* env = static_cast<Environment*>(data);
-      env->isolate()->SetAtomicsWaitCallback(nullptr, nullptr);
-    }, this);
-  }
   if (options_->trace_promises) {
     isolate_->SetPromiseHook(TracePromises);
   }
@@ -543,7 +494,7 @@ void ResetSignalHandlers() {
       continue;
     act.sa_handler = (nr == SIGPIPE || nr == SIGXFSZ) ? SIG_IGN : SIG_DFL;
     if (act.sa_handler == SIG_DFL) {
-      // The only bad handler value we can inhert from before exec is SIG_IGN
+      // The only bad handler value we can inherit from before exec is SIG_IGN
       // (any actual function pointer is reset to SIG_DFL during exec).
       // If that's the case, we want to reset it back to SIG_DFL.
       // However, it's also possible that an embeder (or an LD_PRELOAD-ed
@@ -802,9 +753,6 @@ static ExitCode ProcessGlobalArgsInternal(std::vector<std::string>* args,
                 "--no-harmony-import-attributes") == v8_args.end()) {
     v8_args.emplace_back("--harmony-import-attributes");
   }
-  // TODO(nicolo-ribaudo): remove this once V8 doesn't enable it by default
-  // anymore.
-  v8_args.emplace_back("--no-harmony-import-assertions");
 
   auto env_opts = per_process::cli_options->per_isolate->per_env;
   if (std::find(v8_args.begin(), v8_args.end(),
@@ -1070,14 +1018,6 @@ InitializeOncePerProcessInternal(const std::vector<std::string>& args,
   }
 
   if (!per_process::cli_options->run.empty()) {
-    // TODO(@anonrig): Handle NODE_NO_WARNINGS, NODE_REDIRECT_WARNINGS,
-    //  --disable-warning and --redirect-warnings.
-    if (per_process::cli_options->per_isolate->per_env->warnings) {
-      fprintf(stderr,
-              "ExperimentalWarning: Task runner is an experimental feature and "
-              "might change at any time\n\n");
-    }
-
     auto positional_args = task_runner::GetPositionalArgs(args);
     result->early_return_ = true;
     task_runner::RunTask(

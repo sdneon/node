@@ -22,6 +22,7 @@
 #include "node_contextify.h"
 
 #include "base_object-inl.h"
+#include "cppgc/allocation.h"
 #include "memory_tracker-inl.h"
 #include "module_wrap.h"
 #include "node_context_data.h"
@@ -55,7 +56,7 @@ using v8::Int32;
 using v8::Integer;
 using v8::Intercepted;
 using v8::Isolate;
-using v8::Just;
+using v8::JustVoid;
 using v8::KeyCollectionMode;
 using v8::Local;
 using v8::Maybe;
@@ -960,6 +961,12 @@ void ContextifyScript::RegisterExternalReferences(
   registry->Register(RunInContext);
 }
 
+ContextifyScript* ContextifyScript::New(Environment* env,
+                                        Local<Object> object) {
+  return cppgc::MakeGarbageCollected<ContextifyScript>(
+      env->isolate()->GetCppHeap()->GetAllocationHandle(), env, object);
+}
+
 void ContextifyScript::New(const FunctionCallbackInfo<Value>& args) {
   Environment* env = Environment::GetCurrent(args);
   Isolate* isolate = env->isolate();
@@ -1010,8 +1017,7 @@ void ContextifyScript::New(const FunctionCallbackInfo<Value>& args) {
     id_symbol = args[7].As<Symbol>();
   }
 
-  ContextifyScript* contextify_script =
-      new ContextifyScript(env, args.This());
+  ContextifyScript* contextify_script = New(env, args.This());
 
   if (*TRACE_EVENT_API_GET_CATEGORY_GROUP_ENABLED(
           TRACING_CATEGORY_NODE2(vm, script)) != 0) {
@@ -1069,9 +1075,7 @@ void ContextifyScript::New(const FunctionCallbackInfo<Value>& args) {
     return;
   }
 
-  contextify_script->script_.Reset(isolate, v8_script);
-  contextify_script->script_.SetWeak();
-  contextify_script->object()->SetInternalField(kUnboundScriptSlot, v8_script);
+  contextify_script->set_unbound_script(v8_script);
 
   std::unique_ptr<ScriptCompiler::CachedData> new_cached_data;
   if (produce_cached_data) {
@@ -1104,7 +1108,7 @@ void ContextifyScript::New(const FunctionCallbackInfo<Value>& args) {
   TRACE_EVENT_END0(TRACING_CATEGORY_NODE2(vm, script), "ContextifyScript::New");
 }
 
-Maybe<bool> StoreCodeCacheResult(
+Maybe<void> StoreCodeCacheResult(
     Environment* env,
     Local<Object> target,
     ScriptCompiler::CompileOptions compile_options,
@@ -1113,7 +1117,7 @@ Maybe<bool> StoreCodeCacheResult(
     std::unique_ptr<ScriptCompiler::CachedData> new_cached_data) {
   Local<Context> context;
   if (!target->GetCreationContext().ToLocal(&context)) {
-    return Nothing<bool>();
+    return Nothing<void>();
   }
   if (compile_options == ScriptCompiler::kConsumeCodeCache) {
     if (target
@@ -1122,7 +1126,7 @@ Maybe<bool> StoreCodeCacheResult(
                 env->cached_data_rejected_string(),
                 Boolean::New(env->isolate(), source.GetCachedData()->rejected))
             .IsNothing()) {
-      return Nothing<bool>();
+      return Nothing<void>();
     }
   }
   if (produce_cached_data) {
@@ -1134,7 +1138,7 @@ Maybe<bool> StoreCodeCacheResult(
                        new_cached_data->length);
       if (target->Set(context, env->cached_data_string(), buf.ToLocalChecked())
               .IsNothing()) {
-        return Nothing<bool>();
+        return Nothing<void>();
       }
     }
     if (target
@@ -1142,10 +1146,10 @@ Maybe<bool> StoreCodeCacheResult(
                   env->cached_data_produced_string(),
                   Boolean::New(env->isolate(), cached_data_produced))
             .IsNothing()) {
-      return Nothing<bool>();
+      return Nothing<void>();
     }
   }
-  return Just(true);
+  return JustVoid();
 }
 
 // TODO(RaisinTen): Reuse in ContextifyContext::CompileFunction().
@@ -1174,11 +1178,9 @@ void ContextifyScript::CreateCachedData(
     const FunctionCallbackInfo<Value>& args) {
   Environment* env = Environment::GetCurrent(args);
   ContextifyScript* wrapped_script;
-  ASSIGN_OR_RETURN_UNWRAP(&wrapped_script, args.This());
-  Local<UnboundScript> unbound_script =
-      PersistentToLocal::Default(env->isolate(), wrapped_script->script_);
+  ASSIGN_OR_RETURN_UNWRAP_CPPGC(&wrapped_script, args.This());
   std::unique_ptr<ScriptCompiler::CachedData> cached_data(
-      ScriptCompiler::CreateCodeCache(unbound_script));
+      ScriptCompiler::CreateCodeCache(wrapped_script->unbound_script()));
   if (!cached_data) {
     args.GetReturnValue().Set(Buffer::New(env, 0).ToLocalChecked());
   } else {
@@ -1192,9 +1194,8 @@ void ContextifyScript::CreateCachedData(
 
 void ContextifyScript::RunInContext(const FunctionCallbackInfo<Value>& args) {
   Environment* env = Environment::GetCurrent(args);
-
   ContextifyScript* wrapped_script;
-  ASSIGN_OR_RETURN_UNWRAP(&wrapped_script, args.This());
+  ASSIGN_OR_RETURN_UNWRAP_CPPGC(&wrapped_script, args.This());
 
   CHECK_EQ(args.Length(), 5);
   CHECK(args[0]->IsObject() || args[0]->IsNull());
@@ -1264,17 +1265,16 @@ bool ContextifyScript::EvalMachine(Local<Context> context,
 
   TryCatchScope try_catch(env);
   ContextifyScript* wrapped_script;
-  ASSIGN_OR_RETURN_UNWRAP(&wrapped_script, args.This(), false);
-  Local<UnboundScript> unbound_script =
-      PersistentToLocal::Default(env->isolate(), wrapped_script->script_);
-  Local<Script> script = unbound_script->BindToCurrentContext();
+  ASSIGN_OR_RETURN_UNWRAP_CPPGC(&wrapped_script, args.This(), false);
+  Local<Script> script =
+      wrapped_script->unbound_script()->BindToCurrentContext();
 
 #if HAVE_INSPECTOR
   if (break_on_first_line) {
-    if (UNLIKELY(!env->permission()->is_granted(
-            env,
-            permission::PermissionScope::kInspector,
-            "PauseOnNextJavascriptStatement"))) {
+    if (!env->permission()->is_granted(env,
+                                       permission::PermissionScope::kInspector,
+                                       "PauseOnNextJavascriptStatement"))
+        [[unlikely]] {
       node::permission::Permission::ThrowAccessDenied(
           env,
           permission::PermissionScope::kInspector,
@@ -1349,9 +1349,21 @@ bool ContextifyScript::EvalMachine(Local<Context> context,
   return true;
 }
 
-ContextifyScript::ContextifyScript(Environment* env, Local<Object> object)
-    : BaseObject(env, object) {
-  MakeWeak();
+Local<UnboundScript> ContextifyScript::unbound_script() const {
+  return script_.Get(env()->isolate());
+}
+
+void ContextifyScript::set_unbound_script(Local<UnboundScript> script) {
+  script_.Reset(env()->isolate(), script);
+}
+
+void ContextifyScript::Trace(cppgc::Visitor* visitor) const {
+  CppgcMixin::Trace(visitor);
+  visitor->Trace(script_);
+}
+
+ContextifyScript::ContextifyScript(Environment* env, Local<Object> object) {
+  CppgcMixin::Wrap(this, env, object);
 }
 
 ContextifyScript::~ContextifyScript() {}

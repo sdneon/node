@@ -374,9 +374,10 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
             &EnvironmentOptions::print_required_tla,
             kAllowedInEnvvar);
   AddOption("--experimental-require-module",
-            "Allow loading explicit ES Modules in require().",
+            "Allow loading synchronous ES Modules in require().",
             &EnvironmentOptions::require_module,
-            kAllowedInEnvvar);
+            kAllowedInEnvvar,
+            true);
   AddOption("--diagnostic-dir",
             "set dir for all output files"
             " (default: current working directory)",
@@ -406,22 +407,23 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
             "Source Map V3 support for stack traces",
             &EnvironmentOptions::enable_source_maps,
             kAllowedInEnvvar);
+  AddOption("--entry-url",
+            "Treat the entrypoint as a URL",
+            &EnvironmentOptions::entry_is_url,
+            kAllowedInEnvvar);
   AddOption("--experimental-abortcontroller", "", NoOp{}, kAllowedInEnvvar);
   AddOption("--experimental-eventsource",
             "experimental EventSource API",
             &EnvironmentOptions::experimental_eventsource,
             kAllowedInEnvvar,
             false);
-  AddOption("--experimental-fetch",
-            "experimental Fetch API",
-            &EnvironmentOptions::experimental_fetch,
-            kAllowedInEnvvar,
-            true);
+  AddOption("--experimental-fetch", "", NoOp{}, kAllowedInEnvvar);
   AddOption("--experimental-websocket",
             "experimental WebSocket API",
             &EnvironmentOptions::experimental_websocket,
             kAllowedInEnvvar,
             true);
+  AddOption("--experimental-global-customevent", "", NoOp{}, kAllowedInEnvvar);
   AddOption("--experimental-sqlite",
             "experimental node:sqlite module",
             &EnvironmentOptions::experimental_sqlite,
@@ -434,21 +436,12 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
             "file used to persist localStorage data",
             &EnvironmentOptions::localstorage_file,
             kAllowedInEnvvar);
-  AddOption("--experimental-global-customevent",
-            "expose experimental CustomEvent on the global scope",
-            &EnvironmentOptions::experimental_global_customevent,
-            kAllowedInEnvvar,
-            true);
   AddOption("--experimental-global-navigator",
             "expose experimental Navigator API on the global scope",
             &EnvironmentOptions::experimental_global_navigator,
             kAllowedInEnvvar,
             true);
-  AddOption("--experimental-global-webcrypto",
-            "expose experimental Web Crypto API on the global scope",
-            &EnvironmentOptions::experimental_global_web_crypto,
-            kAllowedInEnvvar,
-            true);
+  AddOption("--experimental-global-webcrypto", "", NoOp{}, kAllowedInEnvvar);
   AddOption("--experimental-json-modules", "", NoOp{}, kAllowedInEnvvar);
   AddOption("--experimental-loader",
             "use the specified module as a custom loader",
@@ -734,10 +727,6 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
             "throw an exception on deprecations",
             &EnvironmentOptions::throw_deprecation,
             kAllowedInEnvvar);
-  AddOption("--trace-atomics-wait",
-            "(deprecated) trace Atomics.wait() operations",
-            &EnvironmentOptions::trace_atomics_wait,
-            kAllowedInEnvvar);
   AddOption("--trace-deprecation",
             "show stack traces on deprecations",
             &EnvironmentOptions::trace_deprecation,
@@ -835,7 +824,6 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
             "Experimental type-stripping for TypeScript files.",
             &EnvironmentOptions::experimental_strip_types,
             kAllowedInEnvvar);
-  Implies("--experimental-strip-types", "--experimental-detect-module");
 
   AddOption("--experimental-transform-types",
             "enable transformation of TypeScript-only"
@@ -925,14 +913,12 @@ PerIsolateOptionsParser::PerIsolateOptionsParser(
       "--perf-basic-prof-only-functions", "", V8Option{}, kAllowedInEnvvar);
   AddOption("--perf-prof", "", V8Option{}, kAllowedInEnvvar);
   AddOption("--perf-prof-unwinding-info", "", V8Option{}, kAllowedInEnvvar);
-  AddOption("--stack-trace-limit", "", V8Option{}, kAllowedInEnvvar);
+  AddOption("--stack-trace-limit",
+            "",
+            &PerIsolateOptions::stack_trace_limit,
+            kAllowedInEnvvar);
   AddOption("--disallow-code-generation-from-strings",
             "disallow eval and friends",
-            V8Option{},
-            kAllowedInEnvvar);
-  AddOption("--huge-max-old-generation-size",
-            "increase default maximum heap size on machines with 16GB memory "
-            "or more",
             V8Option{},
             kAllowedInEnvvar);
   AddOption("--jitless",
@@ -1191,7 +1177,7 @@ inline uint16_t ParseAndValidatePort(const std::string_view port,
 
   if (r.ec == std::errc::result_out_of_range ||
       (result != 0 && result < 1024)) {
-    errors->push_back(" must be 0 or in range 1024 to 65535.");
+    errors->push_back("must be 0 or in range 1024 to 65535.");
   }
 
   return result;
@@ -1317,6 +1303,11 @@ void GetCLIOptionsValues(const FunctionCallbackInfo<Value>& args) {
         if (item.first == "--abort-on-uncaught-exception") {
           value = Boolean::New(isolate,
                                s.original_per_env->abort_on_uncaught_exception);
+        } else if (item.first == "--stack-trace-limit") {
+          value =
+              Number::New(isolate,
+                          static_cast<double>(
+                              *_ppop_instance.Lookup<int64_t>(field, opts)));
         } else {
           value = undefined_value;
         }

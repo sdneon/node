@@ -14,7 +14,7 @@
       },
       "stability": 1,
       "stabilityText": ".1 - Active development. Enable this API with the [`--experimental-sqlite`][] CLI flag.",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v22.9.0/lib/sqlite.js\">lib/sqlite.js</a></p>\n<p>The <code>node:sqlite</code> module facilitates working with SQLite databases.\nTo access it:</p>\n<pre><code class=\"language-mjs\">import sqlite from 'node:sqlite';\n</code></pre>\n<pre><code class=\"language-cjs\">const sqlite = require('node:sqlite');\n</code></pre>\n<p>This module is only available under the <code>node:</code> scheme. The following will not\nwork:</p>\n<pre><code class=\"language-mjs\">import sqlite from 'sqlite';\n</code></pre>\n<pre><code class=\"language-cjs\">const sqlite = require('sqlite');\n</code></pre>\n<p>The following example shows the basic usage of the <code>node:sqlite</code> module to open\nan in-memory database, write data to the database, and then read the data back.</p>\n<pre><code class=\"language-mjs\">import { DatabaseSync } from 'node:sqlite';\nconst database = new DatabaseSync(':memory:');\n\n// Execute SQL statements from strings.\ndatabase.exec(`\n  CREATE TABLE data(\n    key INTEGER PRIMARY KEY,\n    value TEXT\n  ) STRICT\n`);\n// Create a prepared statement to insert data into the database.\nconst insert = database.prepare('INSERT INTO data (key, value) VALUES (?, ?)');\n// Execute the prepared statement with bound values.\ninsert.run(1, 'hello');\ninsert.run(2, 'world');\n// Create a prepared statement to read data from the database.\nconst query = database.prepare('SELECT * FROM data ORDER BY key');\n// Execute the prepared statement and log the result set.\nconsole.log(query.all());\n// Prints: [ { key: 1, value: 'hello' }, { key: 2, value: 'world' } ]\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\nconst { DatabaseSync } = require('node:sqlite');\nconst database = new DatabaseSync(':memory:');\n\n// Execute SQL statements from strings.\ndatabase.exec(`\n  CREATE TABLE data(\n    key INTEGER PRIMARY KEY,\n    value TEXT\n  ) STRICT\n`);\n// Create a prepared statement to insert data into the database.\nconst insert = database.prepare('INSERT INTO data (key, value) VALUES (?, ?)');\n// Execute the prepared statement with bound values.\ninsert.run(1, 'hello');\ninsert.run(2, 'world');\n// Create a prepared statement to read data from the database.\nconst query = database.prepare('SELECT * FROM data ORDER BY key');\n// Execute the prepared statement and log the result set.\nconsole.log(query.all());\n// Prints: [ { key: 1, value: 'hello' }, { key: 2, value: 'world' } ]\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v23.0.0/lib/sqlite.js\">lib/sqlite.js</a></p>\n<p>The <code>node:sqlite</code> module facilitates working with SQLite databases.\nTo access it:</p>\n<pre><code class=\"language-mjs\">import sqlite from 'node:sqlite';\n</code></pre>\n<pre><code class=\"language-cjs\">const sqlite = require('node:sqlite');\n</code></pre>\n<p>This module is only available under the <code>node:</code> scheme. The following will not\nwork:</p>\n<pre><code class=\"language-mjs\">import sqlite from 'sqlite';\n</code></pre>\n<pre><code class=\"language-cjs\">const sqlite = require('sqlite');\n</code></pre>\n<p>The following example shows the basic usage of the <code>node:sqlite</code> module to open\nan in-memory database, write data to the database, and then read the data back.</p>\n<pre><code class=\"language-mjs\">import { DatabaseSync } from 'node:sqlite';\nconst database = new DatabaseSync(':memory:');\n\n// Execute SQL statements from strings.\ndatabase.exec(`\n  CREATE TABLE data(\n    key INTEGER PRIMARY KEY,\n    value TEXT\n  ) STRICT\n`);\n// Create a prepared statement to insert data into the database.\nconst insert = database.prepare('INSERT INTO data (key, value) VALUES (?, ?)');\n// Execute the prepared statement with bound values.\ninsert.run(1, 'hello');\ninsert.run(2, 'world');\n// Create a prepared statement to read data from the database.\nconst query = database.prepare('SELECT * FROM data ORDER BY key');\n// Execute the prepared statement and log the result set.\nconsole.log(query.all());\n// Prints: [ { key: 1, value: 'hello' }, { key: 2, value: 'world' } ]\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\nconst { DatabaseSync } = require('node:sqlite');\nconst database = new DatabaseSync(':memory:');\n\n// Execute SQL statements from strings.\ndatabase.exec(`\n  CREATE TABLE data(\n    key INTEGER PRIMARY KEY,\n    value TEXT\n  ) STRICT\n`);\n// Create a prepared statement to insert data into the database.\nconst insert = database.prepare('INSERT INTO data (key, value) VALUES (?, ?)');\n// Execute the prepared statement with bound values.\ninsert.run(1, 'hello');\ninsert.run(2, 'world');\n// Create a prepared statement to read data from the database.\nconst query = database.prepare('SELECT * FROM data ORDER BY key');\n// Execute the prepared statement and log the result set.\nconsole.log(query.all());\n// Prints: [ { key: 1, value: 'hello' }, { key: 2, value: 'world' } ]\n</code></pre>",
       "classes": [
         {
           "textRaw": "Class: `DatabaseSync`",
@@ -138,6 +138,20 @@
                       "type": "boolean",
                       "default": "`true`",
                       "desc": "If `true`, the database is opened by the constructor. When this value is `false`, the database must be opened via the `open()` method."
+                    },
+                    {
+                      "textRaw": "`enableForeignKeyConstraints` {boolean} If `true`, foreign key constraints are enabled. This is recommended but can be disabled for compatibility with legacy database schemas. The enforcement of foreign key constraints can be enabled and disabled after opening the database using [`PRAGMA foreign_keys`][]. **Default:** `true`.",
+                      "name": "enableForeignKeyConstraints",
+                      "type": "boolean",
+                      "default": "`true`",
+                      "desc": "If `true`, foreign key constraints are enabled. This is recommended but can be disabled for compatibility with legacy database schemas. The enforcement of foreign key constraints can be enabled and disabled after opening the database using [`PRAGMA foreign_keys`][]."
+                    },
+                    {
+                      "textRaw": "`enableDoubleQuotedStringLiterals` {boolean} If `true`, SQLite will accept [double-quoted string literals][]. This is not recommended but can be enabled for compatibility with legacy database schemas. **Default:** `false`.",
+                      "name": "enableDoubleQuotedStringLiterals",
+                      "type": "boolean",
+                      "default": "`false`",
+                      "desc": "If `true`, SQLite will accept [double-quoted string literals][]. This is not recommended but can be enabled for compatibility with legacy database schemas."
                     }
                   ]
                 }
@@ -193,29 +207,6 @@
                 }
               ],
               "desc": "<p>This method executes a prepared statement and returns all results as an array of\nobjects. If the prepared statement does not return any results, this method\nreturns an empty array. The prepared statement <a href=\"https://www.sqlite.org/c3ref/bind_blob.html\">parameters are bound</a> using\nthe values in <code>namedParameters</code> and <code>anonymousParameters</code>.</p>"
-            },
-            {
-              "textRaw": "`statement.expandedSQL()`",
-              "type": "method",
-              "name": "expandedSQL",
-              "meta": {
-                "added": [
-                  "v22.5.0"
-                ],
-                "changes": []
-              },
-              "signatures": [
-                {
-                  "return": {
-                    "textRaw": "Returns: {string} The source SQL expanded to include parameter values.",
-                    "name": "return",
-                    "type": "string",
-                    "desc": "The source SQL expanded to include parameter values."
-                  },
-                  "params": []
-                }
-              ],
-              "desc": "<p>This method returns the source SQL of the prepared statement with parameter\nplaceholders replaced by the values that were used during the most recent\nexecution of this prepared statement. This method is a wrapper around\n<a href=\"https://www.sqlite.org/c3ref/expanded_sql.html\"><code>sqlite3_expanded_sql()</code></a>.</p>"
             },
             {
               "textRaw": "`statement.get([namedParameters][, ...anonymousParameters])`",
@@ -349,10 +340,25 @@
                 }
               ],
               "desc": "<p>When reading from the database, SQLite <code>INTEGER</code>s are mapped to JavaScript\nnumbers by default. However, SQLite <code>INTEGER</code>s can store values larger than\nJavaScript numbers are capable of representing. In such cases, this method can\nbe used to read <code>INTEGER</code> data using JavaScript <code>BigInt</code>s. This method has no\nimpact on database write operations where numbers and <code>BigInt</code>s are both\nsupported at all times.</p>"
+            }
+          ],
+          "properties": [
+            {
+              "textRaw": "`expandedSQL` {string} The source SQL expanded to include parameter values.",
+              "type": "string",
+              "name": "expandedSQL",
+              "meta": {
+                "added": [
+                  "v22.5.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>The source SQL text of the prepared statement with parameter\nplaceholders replaced by the values that were used during the most recent\nexecution of this prepared statement. This property is a wrapper around\n<a href=\"https://www.sqlite.org/c3ref/expanded_sql.html\"><code>sqlite3_expanded_sql()</code></a>.</p>",
+              "shortDesc": "The source SQL expanded to include parameter values."
             },
             {
-              "textRaw": "`statement.sourceSQL()`",
-              "type": "method",
+              "textRaw": "`sourceSQL` {string} The source SQL used to create this prepared statement.",
+              "type": "string",
               "name": "sourceSQL",
               "meta": {
                 "added": [
@@ -360,18 +366,8 @@
                 ],
                 "changes": []
               },
-              "signatures": [
-                {
-                  "return": {
-                    "textRaw": "Returns: {string} The source SQL used to create this prepared statement.",
-                    "name": "return",
-                    "type": "string",
-                    "desc": "The source SQL used to create this prepared statement."
-                  },
-                  "params": []
-                }
-              ],
-              "desc": "<p>This method returns the source SQL of the prepared statement. This method is a\nwrapper around <a href=\"https://www.sqlite.org/c3ref/expanded_sql.html\"><code>sqlite3_sql()</code></a>.</p>"
+              "desc": "<p>The source SQL text of the prepared statement. This property is a\nwrapper around <a href=\"https://www.sqlite.org/c3ref/expanded_sql.html\"><code>sqlite3_sql()</code></a>.</p>",
+              "shortDesc": "The source SQL used to create this prepared statement."
             }
           ],
           "modules": [

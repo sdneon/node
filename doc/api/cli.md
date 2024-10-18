@@ -220,7 +220,7 @@ The initializer module also needs to be allowed. Consider the following example:
 ```console
 $ node --experimental-permission t.js
 node:internal/modules/cjs/loader:162
-  const result = internalModuleStat(filename);
+  const result = internalModuleStat(receiver, filename);
                  ^
 
 Error: Access to this API has been restricted
@@ -272,7 +272,9 @@ Relative paths are NOT supported through the CLI flag.
 ### `--allow-wasi`
 
 <!-- YAML
-added: v22.3.0
+added:
+- v22.3.0
+- v20.16.0
 -->
 
 > Stability: 1.1 - Active development
@@ -475,6 +477,7 @@ added:
 changes:
   - version:
     - v22.9.0
+    - v20.18.0
     pr-url: https://github.com/nodejs/node/pull/54209
     description: The flag is no longer experimental.
 -->
@@ -501,6 +504,7 @@ added: v12.0.0
 changes:
   - version:
     - v22.4.0
+    - v20.16.0
     pr-url: https://github.com/nodejs/node/pull/53343
     description: The `--cpu-prof` flags are now stable.
 -->
@@ -529,6 +533,7 @@ added: v12.0.0
 changes:
   - version:
     - v22.4.0
+    - v20.16.0
     pr-url: https://github.com/nodejs/node/pull/53343
     description: The `--cpu-prof` flags are now stable.
 -->
@@ -548,6 +553,7 @@ added: v12.2.0
 changes:
   - version:
     - v22.4.0
+    - v20.16.0
     pr-url: https://github.com/nodejs/node/pull/53343
     description: The `--cpu-prof` flags are now stable.
 -->
@@ -564,6 +570,7 @@ added: v12.0.0
 changes:
   - version:
     - v22.4.0
+    - v20.16.0
     pr-url: https://github.com/nodejs/node/pull/53343
     description: The `--cpu-prof` flags are now stable.
 -->
@@ -639,7 +646,9 @@ vm.measureMemory();
 ### `--disable-wasm-trap-handler`
 
 <!-- YAML
-added: v22.2.0
+added:
+- v22.2.0
+- v20.15.0
 -->
 
 By default, Node.js enables trap-handler-based WebAssembly bound
@@ -700,7 +709,9 @@ code from strings throw an exception instead. This does not affect the Node.js
 ### `--expose-gc`
 
 <!-- YAML
-added: v22.3.0
+added:
+  - v22.3.0
+  - v20.18.0
 -->
 
 > Stability: 1 - Experimental. This flag is inherited from V8 and is subject to
@@ -721,7 +732,9 @@ added:
   - v16.4.0
   - v14.18.0
 changes:
-  - version: v22.1.0
+  - version:
+    - v22.1.0
+    - v20.13.0
     pr-url: https://github.com/nodejs/node/pull/52492
     description: The `ipv6first` is supported now.
   - version: v17.0.0
@@ -795,6 +808,28 @@ when `Error.stack` is accessed. If you access `Error.stack` frequently
 in your application, take into account the performance implications
 of `--enable-source-maps`.
 
+### `--entry-url`
+
+<!-- YAML
+added:
+  - v23.0.0
+-->
+
+> Stability: 1 - Experimental
+
+When present, Node.js will interpret the entry point as a URL, rather than a
+path.
+
+Follows [ECMAScript module][] resolution rules.
+
+Any query parameter or hash in the URL will be accessible via [`import.meta.url`][].
+
+```bash
+node --entry-url 'file:///path/to/file.js?queryparams=work#and-hashes-too'
+node --entry-url --experimental-strip-types 'file.ts?query#hash'
+node --entry-url 'data:text/javascript,console.log("Hello")'
+```
+
 ### `--env-file=config`
 
 > Stability: 1.1 - Active development
@@ -861,6 +896,15 @@ export USERNAME="nodejs" # will result in `nodejs` as the value.
 
 If you want to load environment variables from a file that may not exist, you
 can use the [`--env-file-if-exists`][] flag instead.
+
+### `--env-file-if-exists=config`
+
+<!-- YAML
+added: v22.9.0
+-->
+
+Behavior is the same as [`--env-file`][], but an error is not thrown if the file
+does not exist.
 
 ### `-e`, `--eval "script"`
 
@@ -946,7 +990,9 @@ Implies `--experimental-strip-types` and `--enable-source-maps`.
 ### `--experimental-eventsource`
 
 <!-- YAML
-added: v22.3.0
+added:
+  - v22.3.0
+  - v20.18.0
 -->
 
 Enable exposition of [EventSource Web API][] on the global scope.
@@ -995,6 +1041,7 @@ Specify the `module` containing exported [module customization hooks][].
 <!-- YAML
 added:
   - v22.6.0
+  - v20.18.0
 -->
 
 > Stability: 1 - Experimental
@@ -1017,11 +1064,18 @@ following permissions are restricted:
 * Child Process - manageable through [`--allow-child-process`][] flag
 * Worker Threads - manageable through [`--allow-worker`][] flag
 * WASI - manageable through [`--allow-wasi`][] flag
+* Addons - manageable through [`--allow-addons`][] flag
 
 ### `--experimental-require-module`
 
 <!-- YAML
-added: v22.0.0
+added:
+  - v22.0.0
+  - v20.17.0
+changes:
+  - version: v23.0.0
+    pr-url: https://github.com/nodejs/node/pull/55085
+    description: This is now true by default.
 -->
 
 > Stability: 1.1 - Active Development
@@ -1107,7 +1161,9 @@ present. See the [test runner execution model][] section for more information.
 ### `--experimental-test-module-mocks`
 
 <!-- YAML
-added: v22.3.0
+added:
+  - v22.3.0
+  - v20.18.0
 -->
 
 > Stability: 1.0 - Early development
@@ -1224,6 +1280,7 @@ added: v12.4.0
 changes:
   - version:
     - v22.4.0
+    - v20.16.0
     pr-url: https://github.com/nodejs/node/pull/53343
     description: The `--heap-prof` flags are now stable.
 -->
@@ -1252,6 +1309,7 @@ added: v12.4.0
 changes:
   - version:
     - v22.4.0
+    - v20.16.0
     pr-url: https://github.com/nodejs/node/pull/53343
     description: The `--heap-prof` flags are now stable.
 -->
@@ -1271,6 +1329,7 @@ added: v12.4.0
 changes:
   - version:
     - v22.4.0
+    - v20.16.0
     pr-url: https://github.com/nodejs/node/pull/53343
     description: The `--heap-prof` flags are now stable.
 -->
@@ -1287,6 +1346,7 @@ added: v12.4.0
 changes:
   - version:
     - v22.4.0
+    - v20.16.0
     pr-url: https://github.com/nodejs/node/pull/53343
     description: The `--heap-prof` flags are now stable.
 -->
@@ -1514,7 +1574,9 @@ endpoint on `http://host:port/json/list`.
 ### `--inspect-wait[=[host:]port]`
 
 <!-- YAML
-added: v22.2.0
+added:
+  - v22.2.0
+  - v20.15.0
 -->
 
 Activate inspector on `host:port` and wait for debugger to be attached.
@@ -1580,7 +1642,9 @@ This option is a no-op. It is kept for compatibility.
 ### `--network-family-autoselection-attempt-timeout`
 
 <!-- YAML
-added: v22.1.0
+added:
+  - v22.1.0
+  - v20.13.0
 -->
 
 Sets the default value for the network family autoselection attempt timeout.
@@ -1606,14 +1670,6 @@ added: v0.8.0
 
 Silence deprecation warnings.
 
-### `--no-experimental-fetch`
-
-<!-- YAML
-added: v18.0.0
--->
-
-Disable exposition of [Fetch API][] on the global scope.
-
 ### `--no-experimental-detect-module`
 
 <!-- YAML
@@ -1629,14 +1685,6 @@ changes:
 
 Disable using [syntax detection][] to determine module type.
 
-### `--no-experimental-global-customevent`
-
-<!-- YAML
-added: v19.0.0
--->
-
-Disable exposition of [CustomEvent Web API][] on the global scope.
-
 ### `--no-experimental-global-navigator`
 
 <!-- YAML
@@ -1647,14 +1695,6 @@ added: v21.2.0
 
 Disable exposition of [Navigator API][] on the global scope.
 
-### `--no-experimental-global-webcrypto`
-
-<!-- YAML
-added: v19.0.0
--->
-
-Disable exposition of [Web Crypto API][] on the global scope.
-
 ### `--no-experimental-repl-await`
 
 <!-- YAML
@@ -1662,6 +1702,24 @@ added: v16.6.0
 -->
 
 Use this flag to disable top-level await in REPL.
+
+### `--no-experimental-require-module`
+
+<!-- YAML
+added:
+  - v22.0.0
+  - v20.17.0
+changes:
+  - version: v23.0.0
+    pr-url: https://github.com/nodejs/node/pull/55085
+    description: This is now false by default.
+-->
+
+> Stability: 1.1 - Active Development
+
+Disable support for loading a synchronous ES module graph in `require()`.
+
+See [Loading ECMAScript modules using `require()`][].
 
 ### `--no-experimental-websocket`
 
@@ -1770,15 +1828,6 @@ is being linked to Node.js. Sharing the OpenSSL configuration may have unwanted
 implications and it is recommended to use a configuration section specific to
 Node.js which is `nodejs_conf` and is default when this option is not used.
 
-### `--env-file-if-exists=config`
-
-<!-- YAML
-added: v22.9.0
--->
-
-Behavior is the same as [`--env-file`][], but an error is not thrown if the file
-does not exist.
-
 ### `--pending-deprecation`
 
 <!-- YAML
@@ -1874,12 +1923,12 @@ Identical to `-e` but prints the result.
 ### `--experimental-print-required-tla`
 
 <!-- YAML
-added: v22.0.0
+added:
+  - v22.0.0
+  - v20.17.0
 -->
 
-This flag is only useful when `--experimental-require-module` is enabled.
-
-If the ES module being `require()`'d contains top-level await, this flag
+If the ES module being `require()`'d contains top-level `await`, this flag
 allows Node.js to evaluate the module, try to locate the
 top-level awaits, and print their location to help users find them.
 
@@ -2055,7 +2104,9 @@ native stack and other runtime environment data.
 ### `--report-exclude-network`
 
 <!-- YAML
-added: v22.0.0
+added:
+  - v22.0.0
+  - v20.13.0
 -->
 
 Exclude `header.networkInterfaces` from the diagnostic report. By default
@@ -2097,7 +2148,7 @@ changes:
                  `PATH` environment variable accordingly.
 -->
 
-> Stability: 1.2 - Release candidate
+> Stability: 2 - Stable
 
 This runs a specified command from a package.json's `"scripts"` object.
 If a missing `"command"` is provided, it will list the available scripts.
@@ -2109,6 +2160,8 @@ file to run the command from.
 the current directory, to the `PATH` in order to execute the binaries from
 different folders where multiple `node_modules` directories are present, if
 `ancestor-folder/node_modules/.bin` is a directory.
+
+`--run` executes the command in the directory containing the related `package.json`.
 
 For example, the following command will run the `test` script of
 the `package.json` in the current folder:
@@ -2312,7 +2365,9 @@ the threshold specified, the process will exit with code `1`.
 ### `--test-force-exit`
 
 <!-- YAML
-added: v22.0.0
+added:
+  - v22.0.0
+  - v20.14.0
 -->
 
 Configures the test runner to exit the process once all known tests have
@@ -2540,39 +2595,6 @@ added: v12.0.0
 Set default [`tls.DEFAULT_MIN_VERSION`][] to 'TLSv1.3'. Use to disable support
 for TLSv1.2, which is not as secure as TLSv1.3.
 
-### `--trace-atomics-wait`
-
-<!-- YAML
-added: v14.3.0
-deprecated:
-  - v18.8.0
-  - v16.18.0
--->
-
-> Stability: 0 - Deprecated
-
-Print short summaries of calls to [`Atomics.wait()`][] to stderr.
-The output could look like this:
-
-```text
-(node:15701) [Thread 0] Atomics.wait(&lt;address> + 0, 1, inf) started
-(node:15701) [Thread 0] Atomics.wait(&lt;address> + 0, 1, inf) did not wait because the values mismatched
-(node:15701) [Thread 0] Atomics.wait(&lt;address> + 0, 0, 10) started
-(node:15701) [Thread 0] Atomics.wait(&lt;address> + 0, 0, 10) timed out
-(node:15701) [Thread 0] Atomics.wait(&lt;address> + 4, 0, inf) started
-(node:15701) [Thread 1] Atomics.wait(&lt;address> + 4, -1, inf) started
-(node:15701) [Thread 0] Atomics.wait(&lt;address> + 4, 0, inf) was woken up by another thread
-(node:15701) [Thread 1] Atomics.wait(&lt;address> + 4, -1, inf) was woken up by another thread
-```
-
-The fields here correspond to:
-
-* The thread id as given by [`worker_threads.threadId`][]
-* The base address of the `SharedArrayBuffer` in question, as well as the
-  byte offset corresponding to the index passed to `Atomics.wait()`
-* The expected value that was passed to `Atomics.wait()`
-* The timeout passed to `Atomics.wait`
-
 ### `--trace-deprecation`
 
 <!-- YAML
@@ -2783,7 +2805,9 @@ added:
   - v18.11.0
   - v16.19.0
 changes:
-  - version: v22.0.0
+  - version:
+    - v22.0.0
+    - v20.13.0
     pr-url: https://github.com/nodejs/node/pull/52074
     description: Watch mode is now stable.
   - version:
@@ -2816,7 +2840,9 @@ added:
   - v18.11.0
   - v16.19.0
 changes:
-  - version: v22.0.0
+  - version:
+    - v22.0.0
+    - v20.13.0
     pr-url: https://github.com/nodejs/node/pull/52074
     description: Watch mode is now stable.
 -->
@@ -3022,6 +3048,7 @@ one is included in the list below.
 * `--enable-fips`
 * `--enable-network-family-autoselection`
 * `--enable-source-maps`
+* `--entry-url`
 * `--experimental-abortcontroller`
 * `--experimental-async-context-frame`
 * `--experimental-default-type`
@@ -3066,10 +3093,7 @@ one is included in the list below.
 * `--network-family-autoselection-attempt-timeout`
 * `--no-addons`
 * `--no-deprecation`
-* `--no-experimental-fetch`
-* `--no-experimental-global-customevent`
 * `--no-experimental-global-navigator`
-* `--no-experimental-global-webcrypto`
 * `--no-experimental-repl-await`
 * `--no-experimental-websocket`
 * `--no-extra-info-on-fatal-exception`
@@ -3119,7 +3143,6 @@ one is included in the list below.
 * `--tls-min-v1.1`
 * `--tls-min-v1.2`
 * `--tls-min-v1.3`
-* `--trace-atomics-wait`
 * `--trace-deprecation`
 * `--trace-event-categories`
 * `--trace-event-file-pattern`
@@ -3151,7 +3174,6 @@ V8 options that are allowed are:
 * `--disallow-code-generation-from-strings`
 * `--enable-etw-stack-walking`
 * `--expose-gc`
-* `--huge-max-old-generation-size`
 * `--interpreted-frames-native-stack`
 * `--jitless`
 * `--max-old-space-size`
@@ -3233,6 +3255,7 @@ added:
 changes:
   - version:
      - v22.3.0
+     - v20.16.0
     pr-url: https://github.com/nodejs/node/pull/52905
     description:
       Remove the possibility to use this env var with
@@ -3484,8 +3507,6 @@ documented here:
 
 ### `--harmony-shadow-realm`
 
-### `--huge-max-old-generation-size`
-
 ### `--jitless`
 
 ### `--interpreted-frames-native-stack`
@@ -3563,12 +3584,10 @@ node --stack-trace-limit=12 -p -e "Error.stackTraceLimit" # prints 12
 [Chrome DevTools Protocol]: https://chromedevtools.github.io/devtools-protocol/
 [CommonJS]: modules.md
 [CommonJS module]: modules.md
-[CustomEvent Web API]: https://dom.spec.whatwg.org/#customevent
 [DEP0025 warning]: deprecations.md#dep0025-requirenodesys
 [ECMAScript module]: esm.md#modules-ecmascript-modules
 [EventSource Web API]: https://html.spec.whatwg.org/multipage/server-sent-events.html#server-sent-events
 [ExperimentalWarning: `vm.measureMemory` is an experimental feature]: vm.md#vmmeasurememoryoptions
-[Fetch API]: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API
 [File System Permissions]: permissions.md#file-system-permissions
 [Loading ECMAScript modules using `require()`]: modules.md#loading-ecmascript-modules-using-require
 [Module customization hooks]: module.md#customization-hooks
@@ -3585,8 +3604,8 @@ node --stack-trace-limit=12 -p -e "Error.stackTraceLimit" # prints 12
 [TypeScript type-stripping]: typescript.md#type-stripping
 [V8 Inspector integration for Node.js]: debugger.md#v8-inspector-integration-for-nodejs
 [V8 JavaScript code coverage]: https://v8project.blogspot.com/2017/12/javascript-code-coverage.html
-[Web Crypto API]: webcrypto.md
 [`"type"`]: packages.md#type
+[`--allow-addons`]: #--allow-addons
 [`--allow-child-process`]: #--allow-child-process
 [`--allow-fs-read`]: #--allow-fs-read
 [`--allow-fs-write`]: #--allow-fs-write
@@ -3609,7 +3628,6 @@ node --stack-trace-limit=12 -p -e "Error.stackTraceLimit" # prints 12
 [`--redirect-warnings`]: #--redirect-warningsfile
 [`--require`]: #-r---require-module
 [`AsyncLocalStorage`]: async_context.md#class-asynclocalstorage
-[`Atomics.wait()`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Atomics/wait
 [`Buffer`]: buffer.md#class-buffer
 [`CRYPTO_secure_malloc_init`]: https://www.openssl.org/docs/man3.0/man3/CRYPTO_secure_malloc_init.html
 [`NODE_OPTIONS`]: #node_optionsoptions
@@ -3621,6 +3639,7 @@ node --stack-trace-limit=12 -p -e "Error.stackTraceLimit" # prints 12
 [`dns.lookup()`]: dns.md#dnslookuphostname-options-callback
 [`dns.setDefaultResultOrder()`]: dns.md#dnssetdefaultresultorderorder
 [`dnsPromises.lookup()`]: dns.md#dnspromiseslookuphostname-options
+[`import.meta.url`]: esm.md#importmetaurl
 [`import` specifier]: esm.md#import-specifiers
 [`net.getDefaultAutoSelectFamilyAttemptTimeout()`]: net.md#netgetdefaultautoselectfamilyattempttimeout
 [`node:sqlite`]: sqlite.md
@@ -3631,7 +3650,6 @@ node --stack-trace-limit=12 -p -e "Error.stackTraceLimit" # prints 12
 [`tls.DEFAULT_MIN_VERSION`]: tls.md#tlsdefault_min_version
 [`unhandledRejection`]: process.md#event-unhandledrejection
 [`v8.startupSnapshot` API]: v8.md#startup-snapshot-api
-[`worker_threads.threadId`]: worker_threads.md#workerthreadid
 [collecting code coverage from tests]: test.md#collecting-code-coverage
 [conditional exports]: packages.md#conditional-exports
 [context-aware]: addons.md#context-aware-addons

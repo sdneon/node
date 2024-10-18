@@ -62,31 +62,6 @@ inline uv_loop_t* IsolateData::event_loop() const {
   return event_loop_;
 }
 
-inline void IsolateData::SetCppgcReference(v8::Isolate* isolate,
-                                           v8::Local<v8::Object> object,
-                                           void* wrappable) {
-  v8::CppHeap* heap = isolate->GetCppHeap();
-  CHECK_NOT_NULL(heap);
-  v8::WrapperDescriptor descriptor = heap->wrapper_descriptor();
-  uint16_t required_size = std::max(descriptor.wrappable_instance_index,
-                                    descriptor.wrappable_type_index);
-  CHECK_GT(object->InternalFieldCount(), required_size);
-
-  uint16_t* id_ptr = nullptr;
-  {
-    Mutex::ScopedLock lock(isolate_data_mutex_);
-    auto it =
-        wrapper_data_map_.find(descriptor.embedder_id_for_garbage_collected);
-    CHECK_NE(it, wrapper_data_map_.end());
-    id_ptr = &(it->second->cppgc_id);
-  }
-
-  object->SetAlignedPointerInInternalField(descriptor.wrappable_type_index,
-                                           id_ptr);
-  object->SetAlignedPointerInInternalField(descriptor.wrappable_instance_index,
-                                           wrappable);
-}
-
 inline uint16_t* IsolateData::embedder_id_for_cppgc() const {
   return &(wrapper_data_->cppgc_id);
 }
@@ -133,7 +108,7 @@ inline AliasedFloat64Array& AsyncHooks::async_ids_stack() {
 }
 
 v8::Local<v8::Array> AsyncHooks::js_execution_async_resources() {
-  if (UNLIKELY(js_execution_async_resources_.IsEmpty())) {
+  if (js_execution_async_resources_.IsEmpty()) [[unlikely]] {
     js_execution_async_resources_.Reset(
         env()->isolate(), v8::Array::New(env()->isolate()));
   }
@@ -210,13 +185,14 @@ inline bool TickInfo::has_rejection_to_warn() const {
 }
 
 inline Environment* Environment::GetCurrent(v8::Isolate* isolate) {
-  if (UNLIKELY(!isolate->InContext())) return nullptr;
+  if (!isolate->InContext()) [[unlikely]]
+    return nullptr;
   v8::HandleScope handle_scope(isolate);
   return GetCurrent(isolate->GetCurrentContext());
 }
 
 inline Environment* Environment::GetCurrent(v8::Local<v8::Context> context) {
-  if (UNLIKELY(!ContextEmbedderTag::IsNodeContext(context))) {
+  if (!ContextEmbedderTag::IsNodeContext(context)) [[unlikely]] {
     return nullptr;
   }
   return static_cast<Environment*>(
@@ -258,12 +234,6 @@ inline uv_check_t* Environment::immediate_check_handle() {
 
 inline uv_idle_t* Environment::immediate_idle_handle() {
   return &immediate_idle_handle_;
-}
-
-inline void Environment::RegisterHandleCleanup(uv_handle_t* handle,
-                                               HandleCleanupCb cb,
-                                               void* arg) {
-  handle_cleanup_queue_.push_back(HandleCleanup{handle, cb, arg});
 }
 
 template <typename T, typename OnCloseCallback>
@@ -462,6 +432,10 @@ inline double Environment::get_default_trigger_async_id() {
   if (default_trigger_async_id < 0)
     default_trigger_async_id = execution_async_id();
   return default_trigger_async_id;
+}
+
+inline int64_t Environment::stack_trace_limit() const {
+  return isolate_data_->options()->stack_trace_limit;
 }
 
 inline std::shared_ptr<EnvironmentOptions> Environment::options() {

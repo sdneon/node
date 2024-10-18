@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v22.9.0">
-  <title>Modules: ECMAScript modules | Node.js v22.9.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v23.0.0">
+  <title>Modules: ECMAScript modules | Node.js v23.0.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -111,7 +111,7 @@
     <div id="column1" data-id="esm" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v22.9.0 documentation</h1>
+          <h1>Node.js v23.0.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -126,7 +126,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v22.9.0</li>
+            <li class="pinned-header">Node.js v23.0.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -731,17 +731,38 @@ available, provided by static analysis as a convenience for better ecosystem
 compatibility.</p>
 <h4><code>require</code><span><a class="mark" href="#require" id="require">#</a></span><a aria-hidden="true" class="legacy" id="esm_require"></a></h4>
 <p>The CommonJS module <code>require</code> currently only supports loading synchronous ES
-modules when <code>--experimental-require-module</code> is enabled.</p>
+modules (that is, ES modules that do not use top-level <code>await</code>).</p>
 <p>See <a href="modules.html#loading-ecmascript-modules-using-require">Loading ECMAScript modules using <code>require()</code></a> for details.</p>
 <h4>CommonJS Namespaces<span><a class="mark" href="#commonjs-namespaces" id="commonjs-namespaces">#</a></span><a aria-hidden="true" class="legacy" id="esm_commonjs_namespaces"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v23.0.0</td>
+<td><p>Added <code>'module.exports'</code> export marker to CJS namespaces.</p></td></tr>
+<tr><td>v14.13.0</td>
+<td><p><span>Added in: v14.13.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
 <p>CommonJS modules consist of a <code>module.exports</code> object which can be of any type.</p>
+<p>To support this, when importing CommonJS from an ECMAScript module, a namespace
+wrapper for the CommonJS module is constructed, which always provides a
+<code>default</code> export key pointing to the CommonJS <code>module.exports</code> value.</p>
+<p>In addition, a heuristic static analysis is performed against the source text of
+the CommonJS module to get a best-effort static list of exports to provide on
+the namespace from values on <code>module.exports</code>. This is necessary since these
+namespaces must be constructed prior to the evaluation of the CJS module.</p>
+<p>These CommonJS namespace objects also provide the <code>default</code> export as a
+<code>'module.exports'</code> named export, in order to unambiguously indicate that their
+representation in CommonJS uses this value, and not the namespace value. This
+mirrors the semantics of the handling of the <code>'module.exports'</code> export name in
+<a href="modules.html#loading-ecmascript-modules-using-require"><code>require(esm)</code></a> interop support.</p>
 <p>When importing a CommonJS module, it can be reliably imported using the ES
 module default import or its corresponding sugar syntax:</p>
 <!-- eslint-disable no-duplicate-imports -->
 <pre><code class="language-js"><span class="hljs-keyword">import</span> { <span class="hljs-keyword">default</span> <span class="hljs-keyword">as</span> cjs } <span class="hljs-keyword">from</span> <span class="hljs-string">'cjs'</span>;
-
-<span class="hljs-comment">// The following import statement is "syntax sugar" (equivalent but sweeter)</span>
-<span class="hljs-comment">// for `{ default as cjsSugar }` in the above import statement:</span>
+<span class="hljs-comment">// identical to the above</span>
 <span class="hljs-keyword">import</span> cjsSugar <span class="hljs-keyword">from</span> <span class="hljs-string">'cjs'</span>;
 
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(cjs);
@@ -749,9 +770,6 @@ module default import or its corresponding sugar syntax:</p>
 <span class="hljs-comment">// Prints:</span>
 <span class="hljs-comment">//   &#x3C;module.exports></span>
 <span class="hljs-comment">//   true</span></code> <button class="copy-button">copy</button></pre>
-<p>The ECMAScript Module Namespace representation of a CommonJS module is always
-a namespace with a <code>default</code> export key pointing to the CommonJS
-<code>module.exports</code> value.</p>
 <p>This Module Namespace Exotic Object can be directly observed either when using
 <code>import * as m from 'cjs'</code> or a dynamic import:</p>
 <!-- eslint-skip -->
@@ -759,7 +777,7 @@ a namespace with a <code>default</code> export key pointing to the CommonJS
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(m);
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(m === <span class="hljs-keyword">await</span> <span class="hljs-keyword">import</span>(<span class="hljs-string">'cjs'</span>));
 <span class="hljs-comment">// Prints:</span>
-<span class="hljs-comment">//   [Module] { default: &#x3C;module.exports> }</span>
+<span class="hljs-comment">//   [Module] { default: &#x3C;module.exports>, 'module.exports': &#x3C;module.exports> }</span>
 <span class="hljs-comment">//   true</span></code> <button class="copy-button">copy</button></pre>
 <p>For better compatibility with existing usage in the JS ecosystem, Node.js
 in addition attempts to determine the CommonJS named exports of every imported
@@ -780,7 +798,12 @@ analysis process.</p>
 
 <span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> m <span class="hljs-keyword">from</span> <span class="hljs-string">'./cjs.cjs'</span>;
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(m);
-<span class="hljs-comment">// Prints: [Module] { default: { name: 'exported' }, name: 'exported' }</span></code> <button class="copy-button">copy</button></pre>
+<span class="hljs-comment">// Prints:</span>
+<span class="hljs-comment">//   [Module] {</span>
+<span class="hljs-comment">//     default: { name: 'exported' },</span>
+<span class="hljs-comment">//     'module.exports': { name: 'exported' },</span>
+<span class="hljs-comment">//     name: 'exported'</span>
+<span class="hljs-comment">//   }</span></code> <button class="copy-button">copy</button></pre>
 <p>As can be seen from the last example of the Module Namespace Exotic Object being
 logged, the <code>name</code> export is copied off of the <code>module.exports</code> object and set
 directly on the ES module namespace when the module is imported.</p>

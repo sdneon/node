@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v22.9.0">
-  <title>Net | Node.js v22.9.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v23.0.0">
+  <title>Net | Node.js v23.0.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -23,7 +23,7 @@
         document.documentElement.classList.add('dark-mode');
       }
   </script>
-  
+  <style>@media(max-width:478px){.with-32-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:694px){.with-59-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:518px){.with-37-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:542px){.with-40-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}</style>
 </head>
 <body class="alt apidoc" id="api-section-net">
   <div id="content" class="clearfix">
@@ -111,7 +111,7 @@
     <div id="column1" data-id="net" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v22.9.0 documentation</h1>
+          <h1>Node.js v23.0.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -126,7 +126,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v22.9.0</li>
+            <li class="pinned-header">Node.js v23.0.0</li>
             
     <li class="picker-header">
       <a href="#">
@@ -541,12 +541,13 @@
 
 <!--lint disable maximum-line-length-->
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v22.9.0/lib/net.js">lib/net.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v23.0.0/lib/net.js">lib/net.js</a></p>
 <p>The <code>node:net</code> module provides an asynchronous network API for creating stream-based
 TCP or <a href="#ipc-support">IPC</a> servers (<a href="#netcreateserveroptions-connectionlistener"><code>net.createServer()</code></a>) and clients
 (<a href="#netcreateconnection"><code>net.createConnection()</code></a>).</p>
 <p>It can be accessed using:</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> net = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:net'</span>);</code> <button class="copy-button">copy</button></pre>
+
+<pre class="with-32-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> net <span class="hljs-keyword">from</span> <span class="hljs-string">'node:net'</span>;</code><code class="language-js cjs"><span class="hljs-keyword">const</span> net = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:net'</span>);</code><button class="copy-button">copy</button></pre>
 <section><h3>IPC support<span><a class="mark" href="#ipc-support" id="ipc-support">#</a></span><a aria-hidden="true" class="legacy" id="net_ipc_support"></a></h3>
 <div class="api_metadata">
 <details class="changelog"><summary>History</summary>
@@ -563,11 +564,11 @@ sockets on other operating systems.</p>
 <p><a href="#netconnect"><code>net.connect()</code></a>, <a href="#netcreateconnection"><code>net.createConnection()</code></a>, <a href="#serverlisten"><code>server.listen()</code></a>, and
 <a href="#socketconnect"><code>socket.connect()</code></a> take a <code>path</code> parameter to identify IPC endpoints.</p>
 <p>On Unix, the local domain is also known as the Unix domain. The path is a
-file system pathname. It gets truncated to an OS-dependent length of
-<code>sizeof(sockaddr_un.sun_path) - 1</code>. Typical values are 107 bytes on Linux and
-103 bytes on macOS. If a Node.js API abstraction creates the Unix domain socket,
-it will unlink the Unix domain socket as well. For example,
-<a href="#netcreateserveroptions-connectionlistener"><code>net.createServer()</code></a> may create a Unix domain socket and
+file system pathname. It will throw an error when the length of pathname is
+greater than the length of <code>sizeof(sockaddr_un.sun_path)</code>. Typical values are
+107 bytes on Linux and 103 bytes on macOS. If a Node.js API abstraction creates
+the Unix domain socket, it will unlink the Unix domain socket as well. For
+example, <a href="#netcreateserveroptions-connectionlistener"><code>net.createServer()</code></a> may create a Unix domain socket and
 <a href="#serverclosecallback"><code>server.close()</code></a> will unlink it. But if a user creates the Unix domain
 socket outside of these abstractions, the user will need to remove it. The same
 applies when a Node.js API creates a Unix domain socket but the program then
@@ -1068,6 +1069,8 @@ it to interact with the client.</p>
 <tbody><tr><th>Version</th><th>Changes</th></tr>
 <tr><td>v15.14.0</td>
 <td><p>AbortSignal support was added.</p></td></tr>
+<tr><td>v12.10.0</td>
+<td><p>Added <code>onread</code> option.</p></td></tr>
 <tr><td>v0.3.4</td>
 <td><p><span>Added in: v0.3.4</span></p></td></tr>
 </tbody></table>
@@ -1333,8 +1336,6 @@ behavior.</p>
 <td><p>Added the <code>autoSelectFamily</code> option.</p></td></tr>
 <tr><td>v17.7.0, v16.15.0</td>
 <td><p>The <code>noDelay</code>, <code>keepAlive</code>, and <code>keepAliveInitialDelay</code> options are supported now.</p></td></tr>
-<tr><td>v12.10.0</td>
-<td><p>Added <code>onread</code> option.</p></td></tr>
 <tr><td>v6.0.0</td>
 <td><p>The <code>hints</code> option defaults to <code>0</code> in all cases now. Previously, in the absence of the <code>family</code> option it would default to <code>dns.ADDRCONFIG | dns.V4MAPPED</code>.</p></td></tr>
 <tr><td>v5.11.0</td>
@@ -1794,7 +1795,8 @@ it starts the connection.</li>
 </ul>
 <p>Following is an example of a client of the echo server described
 in the <a href="#netcreateserveroptions-connectionlistener"><code>net.createServer()</code></a> section:</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> net = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:net'</span>);
+
+<pre class="with-59-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> net <span class="hljs-keyword">from</span> <span class="hljs-string">'node:net'</span>;
 <span class="hljs-keyword">const</span> client = net.<span class="hljs-title function_">createConnection</span>({ <span class="hljs-attr">port</span>: <span class="hljs-number">8124</span> }, <span class="hljs-function">() =></span> {
   <span class="hljs-comment">// 'connect' listener.</span>
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'connected to server!'</span>);
@@ -1806,16 +1808,30 @@ client.<span class="hljs-title function_">on</span>(<span class="hljs-string">'d
 });
 client.<span class="hljs-title function_">on</span>(<span class="hljs-string">'end'</span>, <span class="hljs-function">() =></span> {
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'disconnected from server'</span>);
-});</code> <button class="copy-button">copy</button></pre>
+});</code><code class="language-js cjs"><span class="hljs-keyword">const</span> net = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:net'</span>);
+<span class="hljs-keyword">const</span> client = net.<span class="hljs-title function_">createConnection</span>({ <span class="hljs-attr">port</span>: <span class="hljs-number">8124</span> }, <span class="hljs-function">() =></span> {
+  <span class="hljs-comment">// 'connect' listener.</span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'connected to server!'</span>);
+  client.<span class="hljs-title function_">write</span>(<span class="hljs-string">'world!\r\n'</span>);
+});
+client.<span class="hljs-title function_">on</span>(<span class="hljs-string">'data'</span>, <span class="hljs-function">(<span class="hljs-params">data</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(data.<span class="hljs-title function_">toString</span>());
+  client.<span class="hljs-title function_">end</span>();
+});
+client.<span class="hljs-title function_">on</span>(<span class="hljs-string">'end'</span>, <span class="hljs-function">() =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'disconnected from server'</span>);
+});</code><button class="copy-button">copy</button></pre>
 <p>To connect on the socket <code>/tmp/echo.sock</code>:</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> client = net.<span class="hljs-title function_">createConnection</span>({ <span class="hljs-attr">path</span>: <span class="hljs-string">'/tmp/echo.sock'</span> });</code> <button class="copy-button">copy</button></pre>
 <p>Following is an example of a client using the <code>port</code> and <code>onread</code>
 option. In this case, the <code>onread</code> option will be only used to call
 <code>new net.Socket([options])</code> and the <code>port</code> option will be used to
 call <code>socket.connect(options[, connectListener])</code>.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> net = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:net'</span>);
+
+<pre class="with-37-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> net <span class="hljs-keyword">from</span> <span class="hljs-string">'node:net'</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Buffer</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:buffer'</span>;
 net.<span class="hljs-title function_">createConnection</span>({
-  <span class="hljs-attr">port</span>: <span class="hljs-number">80</span>,
+  <span class="hljs-attr">port</span>: <span class="hljs-number">8124</span>,
   <span class="hljs-attr">onread</span>: {
     <span class="hljs-comment">// Reuses a 4KiB Buffer for every read from the socket.</span>
     <span class="hljs-attr">buffer</span>: <span class="hljs-title class_">Buffer</span>.<span class="hljs-title function_">alloc</span>(<span class="hljs-number">4</span> * <span class="hljs-number">1024</span>),
@@ -1824,7 +1840,18 @@ net.<span class="hljs-title function_">createConnection</span>({
       <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(buf.<span class="hljs-title function_">toString</span>(<span class="hljs-string">'utf8'</span>, <span class="hljs-number">0</span>, nread));
     },
   },
-});</code> <button class="copy-button">copy</button></pre>
+});</code><code class="language-js cjs"><span class="hljs-keyword">const</span> net = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:net'</span>);
+net.<span class="hljs-title function_">createConnection</span>({
+  <span class="hljs-attr">port</span>: <span class="hljs-number">8124</span>,
+  <span class="hljs-attr">onread</span>: {
+    <span class="hljs-comment">// Reuses a 4KiB Buffer for every read from the socket.</span>
+    <span class="hljs-attr">buffer</span>: <span class="hljs-title class_">Buffer</span>.<span class="hljs-title function_">alloc</span>(<span class="hljs-number">4</span> * <span class="hljs-number">1024</span>),
+    <span class="hljs-attr">callback</span>: <span class="hljs-keyword">function</span>(<span class="hljs-params">nread, buf</span>) {
+      <span class="hljs-comment">// Received data is available in `buf` from 0 to `nread`.</span>
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(buf.<span class="hljs-title function_">toString</span>(<span class="hljs-string">'utf8'</span>, <span class="hljs-number">0</span>, nread));
+    },
+  },
+});</code><button class="copy-button">copy</button></pre>
 <h4><code>net.createConnection(path[, connectListener])</code><span><a class="mark" href="#netcreateconnectionpath-connectlistener" id="netcreateconnectionpath-connectlistener">#</a></span><a aria-hidden="true" class="legacy" id="net_net_createconnection_path_connectlistener"></a></h4>
 <div class="api_metadata">
 <span>Added in: v0.1.90</span>
@@ -1928,7 +1955,8 @@ read by the original process. To begin reading data from a paused socket, call
 <a href="#serverlisten"><code>listen()</code></a> to.</p>
 <p>Here is an example of a TCP echo server which listens for connections
 on port 8124:</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> net = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:net'</span>);
+
+<pre class="with-40-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> net <span class="hljs-keyword">from</span> <span class="hljs-string">'node:net'</span>;
 <span class="hljs-keyword">const</span> server = net.<span class="hljs-title function_">createServer</span>(<span class="hljs-function">(<span class="hljs-params">c</span>) =></span> {
   <span class="hljs-comment">// 'connection' listener.</span>
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'client connected'</span>);
@@ -1943,7 +1971,22 @@ server.<span class="hljs-title function_">on</span>(<span class="hljs-string">'e
 });
 server.<span class="hljs-title function_">listen</span>(<span class="hljs-number">8124</span>, <span class="hljs-function">() =></span> {
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'server bound'</span>);
-});</code> <button class="copy-button">copy</button></pre>
+});</code><code class="language-js cjs"><span class="hljs-keyword">const</span> net = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:net'</span>);
+<span class="hljs-keyword">const</span> server = net.<span class="hljs-title function_">createServer</span>(<span class="hljs-function">(<span class="hljs-params">c</span>) =></span> {
+  <span class="hljs-comment">// 'connection' listener.</span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'client connected'</span>);
+  c.<span class="hljs-title function_">on</span>(<span class="hljs-string">'end'</span>, <span class="hljs-function">() =></span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'client disconnected'</span>);
+  });
+  c.<span class="hljs-title function_">write</span>(<span class="hljs-string">'hello\r\n'</span>);
+  c.<span class="hljs-title function_">pipe</span>(c);
+});
+server.<span class="hljs-title function_">on</span>(<span class="hljs-string">'error'</span>, <span class="hljs-function">(<span class="hljs-params">err</span>) =></span> {
+  <span class="hljs-keyword">throw</span> err;
+});
+server.<span class="hljs-title function_">listen</span>(<span class="hljs-number">8124</span>, <span class="hljs-function">() =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'server bound'</span>);
+});</code><button class="copy-button">copy</button></pre>
 <p>Test this by using <code>telnet</code>:</p>
 <pre><code class="language-bash">telnet localhost 8124</code> <button class="copy-button">copy</button></pre>
 <p>To listen on the socket <code>/tmp/echo.sock</code>:</p>
@@ -1968,7 +2011,9 @@ The initial default value is <code>true</code>, unless the command line option
 </div>
 <p>Sets the default value of the <code>autoSelectFamily</code> option of <a href="#socketconnectoptions-connectlistener"><code>socket.connect(options)</code></a>.</p>
 <ul>
-<li><code>value</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> The new default value. The initial default value is <code>false</code>.</li>
+<li><code>value</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> The new default value.
+The initial default value is <code>true</code>, unless the command line option
+<code>--no-network-family-autoselection</code> is provided.</li>
 </ul>
 </section><section><h3><code>net.getDefaultAutoSelectFamilyAttemptTimeout()</code><span><a class="mark" href="#netgetdefaultautoselectfamilyattempttimeout" id="netgetdefaultautoselectfamilyattempttimeout">#</a></span><a aria-hidden="true" class="legacy" id="net_net_getdefaultautoselectfamilyattempttimeout"></a></h3>
 <div class="api_metadata">

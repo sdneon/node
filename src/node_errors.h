@@ -104,10 +104,11 @@ void OOMErrorHandler(const char* location, const v8::OOMDetails& details);
   V(ERR_SCRIPT_EXECUTION_TIMEOUT, Error)                                       \
   V(ERR_STRING_TOO_LONG, Error)                                                \
   V(ERR_TLS_INVALID_PROTOCOL_METHOD, TypeError)                                \
-  V(ERR_TLS_PSK_SET_IDENTIY_HINT_FAILED, Error)                                \
+  V(ERR_TLS_PSK_SET_IDENTITY_HINT_FAILED, Error)                               \
   V(ERR_VM_MODULE_CACHED_DATA_REJECTED, Error)                                 \
   V(ERR_VM_MODULE_LINK_FAILURE, Error)                                         \
   V(ERR_WASI_NOT_STARTED, Error)                                               \
+  V(ERR_ZLIB_INITIALIZATION_FAILED, Error)                                     \
   V(ERR_WORKER_INIT_FAILED, Error)                                             \
   V(ERR_PROTO_ACCESS, Error)
 
@@ -118,7 +119,11 @@ void OOMErrorHandler(const char* location, const v8::OOMDetails& details);
     std::string message = SPrintF(format, std::forward<Args>(args)...);        \
     v8::Local<v8::String> js_code = OneByteString(isolate, #code);             \
     v8::Local<v8::String> js_msg =                                             \
-        OneByteString(isolate, message.c_str(), message.length());             \
+        v8::String::NewFromUtf8(isolate,                                       \
+                                message.c_str(),                               \
+                                v8::NewStringType::kNormal,                    \
+                                message.length())                              \
+            .ToLocalChecked();                                                 \
     v8::Local<v8::Object> e = v8::Exception::type(js_msg)                      \
                                   ->ToObject(isolate->GetCurrentContext())     \
                                   .ToLocalChecked();                           \
@@ -202,7 +207,7 @@ ERRORS_WITH_CODE(V)
     "--experimental-print-required-tla.")                                      \
   V(ERR_SCRIPT_EXECUTION_INTERRUPTED,                                          \
     "Script execution was interrupted by `SIGINT`")                            \
-  V(ERR_TLS_PSK_SET_IDENTIY_HINT_FAILED, "Failed to set PSK identity hint")    \
+  V(ERR_TLS_PSK_SET_IDENTITY_HINT_FAILED, "Failed to set PSK identity hint")   \
   V(ERR_WASI_NOT_STARTED, "wasi.start() has not been called")                  \
   V(ERR_WORKER_INIT_FAILED, "Worker initialization failure")                   \
   V(ERR_PROTO_ACCESS,                                                          \

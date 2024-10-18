@@ -56,6 +56,7 @@ valid_mips_fpu = ('fp32', 'fp64', 'fpxx')
 valid_mips_float_abi = ('soft', 'hard')
 valid_intl_modes = ('none', 'small-icu', 'full-icu', 'system-icu')
 icu_versions = json.loads((tools_path / 'icu' / 'icu_versions.json').read_text(encoding='utf-8'))
+maglev_enabled_architectures = ('x64', 'arm', 'arm64')
 
 # builtins may be removed later if they have been disabled by options
 shareable_builtins = {'cjs_module_lexer/lexer': 'deps/cjs-module-lexer/lexer.js',
@@ -935,11 +936,13 @@ parser.add_argument('--v8-enable-hugepage',
     help='Enable V8 transparent hugepage support. This feature is only '+
          'available on Linux platform.')
 
-parser.add_argument('--v8-enable-maglev',
+maglev_enabled_by_default_help = f"(Maglev is enabled by default on {','.join(maglev_enabled_architectures)})"
+
+parser.add_argument('--v8-disable-maglev',
     action='store_true',
-    dest='v8_enable_maglev',
+    dest='v8_disable_maglev',
     default=None,
-    help='Enable V8 Maglev compiler. Not available on all platforms.')
+    help=f"Disable V8's Maglev compiler. {maglev_enabled_by_default_help}")
 
 parser.add_argument('--v8-enable-short-builtin-calls',
     action='store_true',
@@ -1177,8 +1180,8 @@ def check_compiler(o):
   print_verbose(f"Detected {'clang ' if is_clang else ''}C++ compiler (CXX={CXX}) version: {version_str}")
   if not ok:
     warn(f'failed to autodetect C++ compiler version (CXX={CXX})')
-  elif clang_version < (8, 0, 0) if is_clang else gcc_version < (10, 1, 0):
-    warn(f'C++ compiler (CXX={CXX}, {version_str}) too old, need g++ 10.1.0 or clang++ 8.0.0')
+  elif clang_version < (8, 0, 0) if is_clang else gcc_version < (12, 2, 0):
+    warn(f'C++ compiler (CXX={CXX}, {version_str}) too old, need g++ 12.2.0 or clang++ 8.0.0')
 
   ok, is_clang, clang_version, gcc_version = try_check_compiler(CC, 'c')
   version_str = ".".join(map(str, clang_version if is_clang else gcc_version))
@@ -1298,18 +1301,17 @@ def host_arch_cc():
 def host_arch_win():
   """Host architecture check using environ vars (better way to do this?)"""
 
-  observed_arch = os.environ.get('PROCESSOR_ARCHITECTURE', 'x86')
+  observed_arch = os.environ.get('PROCESSOR_ARCHITECTURE', 'AMD64')
   arch = os.environ.get('PROCESSOR_ARCHITEW6432', observed_arch)
 
   matchup = {
     'AMD64'  : 'x64',
-    'x86'    : 'ia32',
     'arm'    : 'arm',
     'mips'   : 'mips',
     'ARM64'  : 'arm64'
   }
 
-  return matchup.get(arch, 'ia32')
+  return matchup.get(arch, 'x64')
 
 def set_configuration_variable(configs, name, release=None, debug=None):
   configs['Release'][name] = release
@@ -1644,7 +1646,8 @@ def configure_v8(o, configs):
   o['variables']['v8_random_seed'] = 0  # Use a random seed for hash tables.
   o['variables']['v8_promise_internal_field_count'] = 1 # Add internal field to promises for async hooks.
   o['variables']['v8_use_siphash'] = 0 if options.without_siphash else 1
-  o['variables']['v8_enable_maglev'] = 1 if options.v8_enable_maglev else 0
+  o['variables']['v8_enable_maglev'] = B(not options.v8_disable_maglev and
+                                         o['variables']['target_arch'] in maglev_enabled_architectures)
   o['variables']['v8_enable_pointer_compression'] = 1 if options.enable_pointer_compression else 0
   o['variables']['v8_enable_sandbox'] = 1 if options.enable_pointer_compression else 0
   o['variables']['v8_enable_31bit_smis_on_64bit_arch'] = 1 if options.enable_pointer_compression else 0
@@ -2307,8 +2310,9 @@ else:
 
 if options.compile_commands_json:
   gyp_args += ['-f', 'compile_commands_json']
-  os.path.islink('./compile_commands.json') and os.unlink('./compile_commands.json')
-  os.symlink('./out/' + config['BUILDTYPE'] + '/compile_commands.json', './compile_commands.json')
+  if sys.platform != 'win32':
+    os.path.lexists('./compile_commands.json') and os.unlink('./compile_commands.json')
+    os.symlink('./out/' + config['BUILDTYPE'] + '/compile_commands.json', './compile_commands.json')
 
 # pass the leftover non-whitespace positional arguments to GYP
 gyp_args += [arg for arg in args if not str.isspace(arg)]
@@ -2318,4 +2322,7 @@ if warn.warned and not options.verbose:
 
 print_verbose("running: \n    " + " ".join(['python', 'tools/gyp_node.py'] + gyp_args))
 run_gyp(gyp_args)
+if options.compile_commands_json and sys.platform == 'win32':
+  os.path.isfile('./compile_commands.json') and os.unlink('./compile_commands.json')
+  shutil.copy2('./out/' + config['BUILDTYPE'] + '/compile_commands.json', './compile_commands.json')
 info('configure completed successfully')

@@ -202,6 +202,7 @@
       'src/compile_cache.h',
       'src/connect_wrap.h',
       'src/connection_wrap.h',
+      'src/cppgc_helpers.h',
       'src/dataqueue/queue.h',
       'src/debug_utils.h',
       'src/debug_utils-inl.h',
@@ -482,15 +483,6 @@
         '-Werror=undefined-inline',
         '-Werror=extra-semi',
       ],
-    },
-
-    # Relevant only for x86.
-    # Refs: https://github.com/nodejs/node/pull/25852
-    # Refs: https://docs.microsoft.com/en-us/cpp/build/reference/safeseh-image-has-safe-exception-handlers
-    'msvs_settings': {
-      'VCLinkerTool': {
-        'ImageHasSafeExceptionHandlers': 'false',
-      },
     },
 
     'conditions': [
@@ -875,7 +867,6 @@
         '<@(deps_files)',
         # node.gyp is added by default, common.gypi is added for change detection
         'common.gypi',
-        'common_node.gypi',
       ],
 
       'variables': {
@@ -1413,6 +1404,12 @@
         'tools/snapshot/node_mksnapshot.cc',
       ],
 
+      'msvs_settings': {
+        'VCLinkerTool': {
+          'EnableCOMDATFolding': '1', # /OPT:NOICF
+        },
+      },
+
       'conditions': [
         ['node_write_snapshot_as_array_literals=="true"', {
           'defines': [ 'NODE_MKSNAPSHOT_USE_ARRAY_LITERALS=1' ],
@@ -1471,7 +1468,6 @@
             '<@(library_files)',
             '<@(deps_files)',
             'common.gypi',
-            'common_node.gypi',
           ],
           'direct_dependent_settings': {
             'ldflags': [ '-Wl,-brtl' ],
