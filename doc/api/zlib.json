@@ -8,26 +8,26 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v23.0.0/lib/zlib.js\">lib/zlib.js</a></p>\n<p>The <code>node:zlib</code> module provides compression functionality implemented using\nGzip, Deflate/Inflate, and Brotli.</p>\n<p>To access it:</p>\n<pre><code class=\"language-js\">const zlib = require('node:zlib');\n</code></pre>\n<p>Compression and decompression are built around the Node.js <a href=\"stream.html\">Streams API</a>.</p>\n<p>Compressing or decompressing a stream (such as a file) can be accomplished by\npiping the source stream through a <code>zlib</code> <code>Transform</code> stream into a destination\nstream:</p>\n<pre><code class=\"language-js\">const { createGzip } = require('node:zlib');\nconst { pipeline } = require('node:stream');\nconst {\n  createReadStream,\n  createWriteStream,\n} = require('node:fs');\n\nconst gzip = createGzip();\nconst source = createReadStream('input.txt');\nconst destination = createWriteStream('input.txt.gz');\n\npipeline(source, gzip, destination, (err) => {\n  if (err) {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  }\n});\n\n// Or, Promisified\n\nconst { promisify } = require('node:util');\nconst pipe = promisify(pipeline);\n\nasync function do_gzip(input, output) {\n  const gzip = createGzip();\n  const source = createReadStream(input);\n  const destination = createWriteStream(output);\n  await pipe(source, gzip, destination);\n}\n\ndo_gzip('input.txt', 'input.txt.gz')\n  .catch((err) => {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  });\n</code></pre>\n<p>It is also possible to compress or decompress data in a single step:</p>\n<pre><code class=\"language-js\">const { deflate, unzip } = require('node:zlib');\n\nconst input = '.................................';\ndeflate(input, (err, buffer) => {\n  if (err) {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  }\n  console.log(buffer.toString('base64'));\n});\n\nconst buffer = Buffer.from('eJzT0yMAAGTvBe8=', 'base64');\nunzip(buffer, (err, buffer) => {\n  if (err) {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  }\n  console.log(buffer.toString());\n});\n\n// Or, Promisified\n\nconst { promisify } = require('node:util');\nconst do_unzip = promisify(unzip);\n\ndo_unzip(buffer)\n  .then((buf) => console.log(buf.toString()))\n  .catch((err) => {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  });\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v23.8.0/lib/zlib.js\">lib/zlib.js</a></p>\n<p>The <code>node:zlib</code> module provides compression functionality implemented using\nGzip, Deflate/Inflate, Brotli, and Zstd.</p>\n<p>To access it:</p>\n<pre><code class=\"language-mjs\">import os from 'node:zlib';\n</code></pre>\n<pre><code class=\"language-cjs\">const zlib = require('node:zlib');\n</code></pre>\n<p>Compression and decompression are built around the Node.js <a href=\"stream.html\">Streams API</a>.</p>\n<p>Compressing or decompressing a stream (such as a file) can be accomplished by\npiping the source stream through a <code>zlib</code> <code>Transform</code> stream into a destination\nstream:</p>\n<pre><code class=\"language-mjs\">import {\n  createReadStream,\n  createWriteStream,\n} from 'node:fs';\nimport process from 'node:process';\nimport { createGzip } from 'node:zlib';\nimport { pipeline } from 'node:stream';\n\nconst gzip = createGzip();\nconst source = createReadStream('input.txt');\nconst destination = createWriteStream('input.txt.gz');\n\npipeline(source, gzip, destination, (err) => {\n  if (err) {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  }\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  createReadStream,\n  createWriteStream,\n} = require('node:fs');\nconst process = require('node:process');\nconst { createGzip } = require('node:zlib');\nconst { pipeline } = require('node:stream');\n\nconst gzip = createGzip();\nconst source = createReadStream('input.txt');\nconst destination = createWriteStream('input.txt.gz');\n\npipeline(source, gzip, destination, (err) => {\n  if (err) {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  }\n});\n</code></pre>\n<p>Or, using the promise <code>pipeline</code> API:</p>\n<pre><code class=\"language-mjs\">import {\n  createReadStream,\n  createWriteStream,\n} from 'node:fs';\nimport process from 'node:process';\nimport { createGzip } from 'node:zlib';\nimport { pipeline } from 'node:stream/promises';\n\nasync function do_gzip(input, output) {\n  const gzip = createGzip();\n  const source = createReadStream(input);\n  const destination = createWriteStream(output);\n  await pipeline(source, gzip, destination);\n}\n\nawait do_gzip('input.txt', 'input.txt.gz');\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  createReadStream,\n  createWriteStream,\n} = require('node:fs');\nconst process = require('node:process');\nconst { createGzip } = require('node:zlib');\nconst { pipeline } = require('node:stream/promises');\n\nasync function do_gzip(input, output) {\n  const gzip = createGzip();\n  const source = createReadStream(input);\n  const destination = createWriteStream(output);\n  await pipeline(source, gzip, destination);\n}\n\ndo_gzip('input.txt', 'input.txt.gz')\n  .catch((err) => {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  });\n</code></pre>\n<p>It is also possible to compress or decompress data in a single step:</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\nimport { Buffer } from 'node:buffer';\nimport { deflate, unzip } from 'node:zlib';\n\nconst input = '.................................';\ndeflate(input, (err, buffer) => {\n  if (err) {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  }\n  console.log(buffer.toString('base64'));\n});\n\nconst buffer = Buffer.from('eJzT0yMAAGTvBe8=', 'base64');\nunzip(buffer, (err, buffer) => {\n  if (err) {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  }\n  console.log(buffer.toString());\n});\n\n// Or, Promisified\n\nimport { promisify } from 'node:util';\nconst do_unzip = promisify(unzip);\n\nconst unzippedBuffer = await do_unzip(buffer);\nconsole.log(unzippedBuffer.toString());\n</code></pre>\n<pre><code class=\"language-cjs\">const { deflate, unzip } = require('node:zlib');\n\nconst input = '.................................';\ndeflate(input, (err, buffer) => {\n  if (err) {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  }\n  console.log(buffer.toString('base64'));\n});\n\nconst buffer = Buffer.from('eJzT0yMAAGTvBe8=', 'base64');\nunzip(buffer, (err, buffer) => {\n  if (err) {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  }\n  console.log(buffer.toString());\n});\n\n// Or, Promisified\n\nconst { promisify } = require('node:util');\nconst do_unzip = promisify(unzip);\n\ndo_unzip(buffer)\n  .then((buf) => console.log(buf.toString()))\n  .catch((err) => {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  });\n</code></pre>",
       "modules": [
         {
           "textRaw": "Threadpool usage and performance considerations",
           "name": "threadpool_usage_and_performance_considerations",
-          "desc": "<p>All <code>zlib</code> APIs, except those that are explicitly synchronous, use the Node.js\ninternal threadpool. This can lead to surprising effects and performance\nlimitations in some applications.</p>\n<p>Creating and using a large number of zlib objects simultaneously can cause\nsignificant memory fragmentation.</p>\n<pre><code class=\"language-js\">const zlib = require('node:zlib');\n\nconst payload = Buffer.from('This is some data');\n\n// WARNING: DO NOT DO THIS!\nfor (let i = 0; i &#x3C; 30000; ++i) {\n  zlib.deflate(payload, (err, buffer) => {});\n}\n</code></pre>\n<p>In the preceding example, 30,000 deflate instances are created concurrently.\nBecause of how some operating systems handle memory allocation and\ndeallocation, this may lead to significant memory fragmentation.</p>\n<p>It is strongly recommended that the results of compression\noperations be cached to avoid duplication of effort.</p>",
+          "desc": "<p>All <code>zlib</code> APIs, except those that are explicitly synchronous, use the Node.js\ninternal threadpool. This can lead to surprising effects and performance\nlimitations in some applications.</p>\n<p>Creating and using a large number of zlib objects simultaneously can cause\nsignificant memory fragmentation.</p>\n<pre><code class=\"language-mjs\">import zlib from 'node:zlib';\nimport { Buffer } from 'node:buffer';\n\nconst payload = Buffer.from('This is some data');\n\n// WARNING: DO NOT DO THIS!\nfor (let i = 0; i &#x3C; 30000; ++i) {\n  zlib.deflate(payload, (err, buffer) => {});\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const zlib = require('node:zlib');\n\nconst payload = Buffer.from('This is some data');\n\n// WARNING: DO NOT DO THIS!\nfor (let i = 0; i &#x3C; 30000; ++i) {\n  zlib.deflate(payload, (err, buffer) => {});\n}\n</code></pre>\n<p>In the preceding example, 30,000 deflate instances are created concurrently.\nBecause of how some operating systems handle memory allocation and\ndeallocation, this may lead to significant memory fragmentation.</p>\n<p>It is strongly recommended that the results of compression\noperations be cached to avoid duplication of effort.</p>",
           "type": "module",
           "displayName": "Threadpool usage and performance considerations"
         },
         {
           "textRaw": "Compressing HTTP requests and responses",
           "name": "compressing_http_requests_and_responses",
-          "desc": "<p>The <code>node:zlib</code> module can be used to implement support for the <code>gzip</code>, <code>deflate</code>\nand <code>br</code> content-encoding mechanisms defined by\n<a href=\"https://tools.ietf.org/html/rfc7230#section-4.2\">HTTP</a>.</p>\n<p>The HTTP <a href=\"https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.3\"><code>Accept-Encoding</code></a> header is used within an HTTP request to identify\nthe compression encodings accepted by the client. The <a href=\"https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.11\"><code>Content-Encoding</code></a>\nheader is used to identify the compression encodings actually applied to a\nmessage.</p>\n<p>The examples given below are drastically simplified to show the basic concept.\nUsing <code>zlib</code> encoding can be expensive, and the results ought to be cached.\nSee <a href=\"#memory-usage-tuning\">Memory usage tuning</a> for more information on the speed/memory/compression\ntradeoffs involved in <code>zlib</code> usage.</p>\n<pre><code class=\"language-js\">// Client request example\nconst zlib = require('node:zlib');\nconst http = require('node:http');\nconst fs = require('node:fs');\nconst { pipeline } = require('node:stream');\n\nconst request = http.get({ host: 'example.com',\n                           path: '/',\n                           port: 80,\n                           headers: { 'Accept-Encoding': 'br,gzip,deflate' } });\nrequest.on('response', (response) => {\n  const output = fs.createWriteStream('example.com_index.html');\n\n  const onError = (err) => {\n    if (err) {\n      console.error('An error occurred:', err);\n      process.exitCode = 1;\n    }\n  };\n\n  switch (response.headers['content-encoding']) {\n    case 'br':\n      pipeline(response, zlib.createBrotliDecompress(), output, onError);\n      break;\n    // Or, just use zlib.createUnzip() to handle both of the following cases:\n    case 'gzip':\n      pipeline(response, zlib.createGunzip(), output, onError);\n      break;\n    case 'deflate':\n      pipeline(response, zlib.createInflate(), output, onError);\n      break;\n    default:\n      pipeline(response, output, onError);\n      break;\n  }\n});\n</code></pre>\n<pre><code class=\"language-js\">// server example\n// Running a gzip operation on every request is quite expensive.\n// It would be much more efficient to cache the compressed buffer.\nconst zlib = require('node:zlib');\nconst http = require('node:http');\nconst fs = require('node:fs');\nconst { pipeline } = require('node:stream');\n\nhttp.createServer((request, response) => {\n  const raw = fs.createReadStream('index.html');\n  // Store both a compressed and an uncompressed version of the resource.\n  response.setHeader('Vary', 'Accept-Encoding');\n  let acceptEncoding = request.headers['accept-encoding'];\n  if (!acceptEncoding) {\n    acceptEncoding = '';\n  }\n\n  const onError = (err) => {\n    if (err) {\n      // If an error occurs, there's not much we can do because\n      // the server has already sent the 200 response code and\n      // some amount of data has already been sent to the client.\n      // The best we can do is terminate the response immediately\n      // and log the error.\n      response.end();\n      console.error('An error occurred:', err);\n    }\n  };\n\n  // Note: This is not a conformant accept-encoding parser.\n  // See https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.3\n  if (/\\bdeflate\\b/.test(acceptEncoding)) {\n    response.writeHead(200, { 'Content-Encoding': 'deflate' });\n    pipeline(raw, zlib.createDeflate(), response, onError);\n  } else if (/\\bgzip\\b/.test(acceptEncoding)) {\n    response.writeHead(200, { 'Content-Encoding': 'gzip' });\n    pipeline(raw, zlib.createGzip(), response, onError);\n  } else if (/\\bbr\\b/.test(acceptEncoding)) {\n    response.writeHead(200, { 'Content-Encoding': 'br' });\n    pipeline(raw, zlib.createBrotliCompress(), response, onError);\n  } else {\n    response.writeHead(200, {});\n    pipeline(raw, response, onError);\n  }\n}).listen(1337);\n</code></pre>\n<p>By default, the <code>zlib</code> methods will throw an error when decompressing\ntruncated data. However, if it is known that the data is incomplete, or\nthe desire is to inspect only the beginning of a compressed file, it is\npossible to suppress the default error handling by changing the flushing\nmethod that is used to decompress the last chunk of input data:</p>\n<pre><code class=\"language-js\">// This is a truncated version of the buffer from the above examples\nconst buffer = Buffer.from('eJzT0yMA', 'base64');\n\nzlib.unzip(\n  buffer,\n  // For Brotli, the equivalent is zlib.constants.BROTLI_OPERATION_FLUSH.\n  { finishFlush: zlib.constants.Z_SYNC_FLUSH },\n  (err, buffer) => {\n    if (err) {\n      console.error('An error occurred:', err);\n      process.exitCode = 1;\n    }\n    console.log(buffer.toString());\n  });\n</code></pre>\n<p>This will not change the behavior in other error-throwing situations, e.g.\nwhen the input data has an invalid format. Using this method, it will not be\npossible to determine whether the input ended prematurely or lacks the\nintegrity checks, making it necessary to manually check that the\ndecompressed result is valid.</p>",
+          "desc": "<p>The <code>node:zlib</code> module can be used to implement support for the <code>gzip</code>, <code>deflate</code>,\n<code>br</code>, and <code>zstd</code> content-encoding mechanisms defined by\n<a href=\"https://tools.ietf.org/html/rfc7230#section-4.2\">HTTP</a>.</p>\n<p>The HTTP <a href=\"https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.3\"><code>Accept-Encoding</code></a> header is used within an HTTP request to identify\nthe compression encodings accepted by the client. The <a href=\"https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.11\"><code>Content-Encoding</code></a>\nheader is used to identify the compression encodings actually applied to a\nmessage.</p>\n<p>The examples given below are drastically simplified to show the basic concept.\nUsing <code>zlib</code> encoding can be expensive, and the results ought to be cached.\nSee <a href=\"#memory-usage-tuning\">Memory usage tuning</a> for more information on the speed/memory/compression\ntradeoffs involved in <code>zlib</code> usage.</p>\n<pre><code class=\"language-mjs\">// Client request example\nimport fs from 'node:fs';\nimport zlib from 'node:zlib';\nimport http from 'node:http';\nimport process from 'node:process';\nimport { pipeline } from 'node:stream';\n\nconst request = http.get({ host: 'example.com',\n                           path: '/',\n                           port: 80,\n                           headers: { 'Accept-Encoding': 'br,gzip,deflate' } });\nrequest.on('response', (response) => {\n  const output = fs.createWriteStream('example.com_index.html');\n\n  const onError = (err) => {\n    if (err) {\n      console.error('An error occurred:', err);\n      process.exitCode = 1;\n    }\n  };\n\n  switch (response.headers['content-encoding']) {\n    case 'br':\n      pipeline(response, zlib.createBrotliDecompress(), output, onError);\n      break;\n    // Or, just use zlib.createUnzip() to handle both of the following cases:\n    case 'gzip':\n      pipeline(response, zlib.createGunzip(), output, onError);\n      break;\n    case 'deflate':\n      pipeline(response, zlib.createInflate(), output, onError);\n      break;\n    default:\n      pipeline(response, output, onError);\n      break;\n  }\n});\n</code></pre>\n<pre><code class=\"language-cjs\">// Client request example\nconst zlib = require('node:zlib');\nconst http = require('node:http');\nconst fs = require('node:fs');\nconst { pipeline } = require('node:stream');\n\nconst request = http.get({ host: 'example.com',\n                           path: '/',\n                           port: 80,\n                           headers: { 'Accept-Encoding': 'br,gzip,deflate,zstd' } });\nrequest.on('response', (response) => {\n  const output = fs.createWriteStream('example.com_index.html');\n\n  const onError = (err) => {\n    if (err) {\n      console.error('An error occurred:', err);\n      process.exitCode = 1;\n    }\n  };\n\n  switch (response.headers['content-encoding']) {\n    case 'br':\n      pipeline(response, zlib.createBrotliDecompress(), output, onError);\n      break;\n    // Or, just use zlib.createUnzip() to handle both of the following cases:\n    case 'gzip':\n      pipeline(response, zlib.createGunzip(), output, onError);\n      break;\n    case 'deflate':\n      pipeline(response, zlib.createInflate(), output, onError);\n      break;\n    case 'zstd':\n      pipeline(response, zlib.createZstdDecompress(), output, onError);\n      break;\n    default:\n      pipeline(response, output, onError);\n      break;\n  }\n});\n</code></pre>\n<pre><code class=\"language-mjs\">// server example\n// Running a gzip operation on every request is quite expensive.\n// It would be much more efficient to cache the compressed buffer.\nimport zlib from 'node:zlib';\nimport http from 'node:http';\nimport fs from 'node:fs';\nimport { pipeline } from 'node:stream';\n\nhttp.createServer((request, response) => {\n  const raw = fs.createReadStream('index.html');\n  // Store both a compressed and an uncompressed version of the resource.\n  response.setHeader('Vary', 'Accept-Encoding');\n  const acceptEncoding = request.headers['accept-encoding'] || '';\n\n  const onError = (err) => {\n    if (err) {\n      // If an error occurs, there's not much we can do because\n      // the server has already sent the 200 response code and\n      // some amount of data has already been sent to the client.\n      // The best we can do is terminate the response immediately\n      // and log the error.\n      response.end();\n      console.error('An error occurred:', err);\n    }\n  };\n\n  // Note: This is not a conformant accept-encoding parser.\n  // See https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.3\n  if (/\\bdeflate\\b/.test(acceptEncoding)) {\n    response.writeHead(200, { 'Content-Encoding': 'deflate' });\n    pipeline(raw, zlib.createDeflate(), response, onError);\n  } else if (/\\bgzip\\b/.test(acceptEncoding)) {\n    response.writeHead(200, { 'Content-Encoding': 'gzip' });\n    pipeline(raw, zlib.createGzip(), response, onError);\n  } else if (/\\bbr\\b/.test(acceptEncoding)) {\n    response.writeHead(200, { 'Content-Encoding': 'br' });\n    pipeline(raw, zlib.createBrotliCompress(), response, onError);\n  } else {\n    response.writeHead(200, {});\n    pipeline(raw, response, onError);\n  }\n}).listen(1337);\n</code></pre>\n<pre><code class=\"language-cjs\">// server example\n// Running a gzip operation on every request is quite expensive.\n// It would be much more efficient to cache the compressed buffer.\nconst zlib = require('node:zlib');\nconst http = require('node:http');\nconst fs = require('node:fs');\nconst { pipeline } = require('node:stream');\n\nhttp.createServer((request, response) => {\n  const raw = fs.createReadStream('index.html');\n  // Store both a compressed and an uncompressed version of the resource.\n  response.setHeader('Vary', 'Accept-Encoding');\n  const acceptEncoding = request.headers['accept-encoding'] || '';\n\n  const onError = (err) => {\n    if (err) {\n      // If an error occurs, there's not much we can do because\n      // the server has already sent the 200 response code and\n      // some amount of data has already been sent to the client.\n      // The best we can do is terminate the response immediately\n      // and log the error.\n      response.end();\n      console.error('An error occurred:', err);\n    }\n  };\n\n  // Note: This is not a conformant accept-encoding parser.\n  // See https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.3\n  if (/\\bdeflate\\b/.test(acceptEncoding)) {\n    response.writeHead(200, { 'Content-Encoding': 'deflate' });\n    pipeline(raw, zlib.createDeflate(), response, onError);\n  } else if (/\\bgzip\\b/.test(acceptEncoding)) {\n    response.writeHead(200, { 'Content-Encoding': 'gzip' });\n    pipeline(raw, zlib.createGzip(), response, onError);\n  } else if (/\\bbr\\b/.test(acceptEncoding)) {\n    response.writeHead(200, { 'Content-Encoding': 'br' });\n    pipeline(raw, zlib.createBrotliCompress(), response, onError);\n  } else if (/\\bzstd\\b/.test(acceptEncoding)) {\n    response.writeHead(200, { 'Content-Encoding': 'zstd' });\n    pipeline(raw, zlib.createZstdCompress(), response, onError);\n  } else {\n    response.writeHead(200, {});\n    pipeline(raw, response, onError);\n  }\n}).listen(1337);\n</code></pre>\n<p>By default, the <code>zlib</code> methods will throw an error when decompressing\ntruncated data. However, if it is known that the data is incomplete, or\nthe desire is to inspect only the beginning of a compressed file, it is\npossible to suppress the default error handling by changing the flushing\nmethod that is used to decompress the last chunk of input data:</p>\n<pre><code class=\"language-js\">// This is a truncated version of the buffer from the above examples\nconst buffer = Buffer.from('eJzT0yMA', 'base64');\n\nzlib.unzip(\n  buffer,\n  // For Brotli, the equivalent is zlib.constants.BROTLI_OPERATION_FLUSH.\n  // For Zstd, the equivalent is zlib.constants.ZSTD_e_flush.\n  { finishFlush: zlib.constants.Z_SYNC_FLUSH },\n  (err, buffer) => {\n    if (err) {\n      console.error('An error occurred:', err);\n      process.exitCode = 1;\n    }\n    console.log(buffer.toString());\n  });\n</code></pre>\n<p>This will not change the behavior in other error-throwing situations, e.g.\nwhen the input data has an invalid format. Using this method, it will not be\npossible to determine whether the input ended prematurely or lacks the\nintegrity checks, making it necessary to manually check that the\ndecompressed result is valid.</p>",
           "type": "module",
           "displayName": "Compressing HTTP requests and responses"
         },
         {
           "textRaw": "Flushing",
           "name": "flushing",
-          "desc": "<p>Calling <a href=\"#zlibflushkind-callback\"><code>.flush()</code></a> on a compression stream will make <code>zlib</code> return as much\noutput as currently possible. This may come at the cost of degraded compression\nquality, but can be useful when data needs to be available as soon as possible.</p>\n<p>In the following example, <code>flush()</code> is used to write a compressed partial\nHTTP response to the client:</p>\n<pre><code class=\"language-js\">const zlib = require('node:zlib');\nconst http = require('node:http');\nconst { pipeline } = require('node:stream');\n\nhttp.createServer((request, response) => {\n  // For the sake of simplicity, the Accept-Encoding checks are omitted.\n  response.writeHead(200, { 'content-encoding': 'gzip' });\n  const output = zlib.createGzip();\n  let i;\n\n  pipeline(output, response, (err) => {\n    if (err) {\n      // If an error occurs, there's not much we can do because\n      // the server has already sent the 200 response code and\n      // some amount of data has already been sent to the client.\n      // The best we can do is terminate the response immediately\n      // and log the error.\n      clearInterval(i);\n      response.end();\n      console.error('An error occurred:', err);\n    }\n  });\n\n  i = setInterval(() => {\n    output.write(`The current time is ${Date()}\\n`, () => {\n      // The data has been passed to zlib, but the compression algorithm may\n      // have decided to buffer the data for more efficient compression.\n      // Calling .flush() will make the data available as soon as the client\n      // is ready to receive it.\n      output.flush();\n    });\n  }, 1000);\n}).listen(1337);\n</code></pre>",
+          "desc": "<p>Calling <a href=\"#zlibflushkind-callback\"><code>.flush()</code></a> on a compression stream will make <code>zlib</code> return as much\noutput as currently possible. This may come at the cost of degraded compression\nquality, but can be useful when data needs to be available as soon as possible.</p>\n<p>In the following example, <code>flush()</code> is used to write a compressed partial\nHTTP response to the client:</p>\n<pre><code class=\"language-mjs\">import zlib from 'node:zlib';\nimport http from 'node:http';\nimport { pipeline } from 'node:stream';\n\nhttp.createServer((request, response) => {\n  // For the sake of simplicity, the Accept-Encoding checks are omitted.\n  response.writeHead(200, { 'content-encoding': 'gzip' });\n  const output = zlib.createGzip();\n  let i;\n\n  pipeline(output, response, (err) => {\n    if (err) {\n      // If an error occurs, there's not much we can do because\n      // the server has already sent the 200 response code and\n      // some amount of data has already been sent to the client.\n      // The best we can do is terminate the response immediately\n      // and log the error.\n      clearInterval(i);\n      response.end();\n      console.error('An error occurred:', err);\n    }\n  });\n\n  i = setInterval(() => {\n    output.write(`The current time is ${Date()}\\n`, () => {\n      // The data has been passed to zlib, but the compression algorithm may\n      // have decided to buffer the data for more efficient compression.\n      // Calling .flush() will make the data available as soon as the client\n      // is ready to receive it.\n      output.flush();\n    });\n  }, 1000);\n}).listen(1337);\n</code></pre>\n<pre><code class=\"language-cjs\">const zlib = require('node:zlib');\nconst http = require('node:http');\nconst { pipeline } = require('node:stream');\n\nhttp.createServer((request, response) => {\n  // For the sake of simplicity, the Accept-Encoding checks are omitted.\n  response.writeHead(200, { 'content-encoding': 'gzip' });\n  const output = zlib.createGzip();\n  let i;\n\n  pipeline(output, response, (err) => {\n    if (err) {\n      // If an error occurs, there's not much we can do because\n      // the server has already sent the 200 response code and\n      // some amount of data has already been sent to the client.\n      // The best we can do is terminate the response immediately\n      // and log the error.\n      clearInterval(i);\n      response.end();\n      console.error('An error occurred:', err);\n    }\n  });\n\n  i = setInterval(() => {\n    output.write(`The current time is ${Date()}\\n`, () => {\n      // The data has been passed to zlib, but the compression algorithm may\n      // have decided to buffer the data for more efficient compression.\n      // Calling .flush() will make the data available as soon as the client\n      // is ready to receive it.\n      output.flush();\n    });\n  }, 1000);\n}).listen(1337);\n</code></pre>",
           "type": "module",
           "displayName": "Flushing"
         }
@@ -51,6 +51,15 @@
               "desc": "<p>There are equivalents to the zlib options for Brotli-based streams, although\nthese options have different ranges than the zlib ones:</p>\n<ul>\n<li>zlib's <code>level</code> option matches Brotli's <code>BROTLI_PARAM_QUALITY</code> option.</li>\n<li>zlib's <code>windowBits</code> option matches Brotli's <code>BROTLI_PARAM_LGWIN</code> option.</li>\n</ul>\n<p>See <a href=\"#brotli-constants\">below</a> for more details on Brotli-specific options.</p>",
               "type": "misc",
               "displayName": "For Brotli-based streams"
+            },
+            {
+              "textRaw": "For Zstd-based streams",
+              "name": "for_zstd-based_streams",
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "desc": "<p>There are equivalents to the zlib options for Zstd-based streams, although\nthese options have different ranges than the zlib ones:</p>\n<ul>\n<li>zlib's <code>level</code> option matches Zstd's <code>ZSTD_c_compressionLevel</code> option.</li>\n<li>zlib's <code>windowBits</code> option matches Zstd's <code>ZSTD_c_windowLog</code> option.</li>\n</ul>\n<p>See <a href=\"#zstd-constants\">below</a> for more details on Zstd-specific options.</p>",
+              "type": "misc",
+              "displayName": "For Zstd-based streams"
             }
           ]
         },
@@ -108,6 +117,59 @@
               ],
               "type": "misc",
               "displayName": "Brotli constants"
+            },
+            {
+              "textRaw": "Zstd constants",
+              "name": "zstd_constants",
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>There are several options and other constants available for Zstd-based\nstreams:</p>",
+              "modules": [
+                {
+                  "textRaw": "Flush operations",
+                  "name": "flush_operations",
+                  "stability": 1,
+                  "stabilityText": "Experimental",
+                  "desc": "<p>The following values are valid flush operations for Zstd-based streams:</p>\n<ul>\n<li><code>zlib.constants.ZSTD_e_continue</code> (default for all operations)</li>\n<li><code>zlib.constants.ZSTD_e_flush</code> (default when calling <code>.flush()</code>)</li>\n<li><code>zlib.constants.ZSTD_e_end</code> (default for the last chunk)</li>\n</ul>",
+                  "type": "module",
+                  "displayName": "Flush operations"
+                },
+                {
+                  "textRaw": "Compressor options",
+                  "name": "compressor_options",
+                  "stability": 1,
+                  "stabilityText": "Experimental",
+                  "desc": "<p>There are several options that can be set on Zstd encoders, affecting\ncompression efficiency and speed. Both the keys and the values can be accessed\nas properties of the <code>zlib.constants</code> object.</p>\n<p>The most important options are:</p>\n<ul>\n<li><code>ZSTD_c_compressionLevel</code>\n<ul>\n<li>Set compression parameters according to pre-defined cLevel table. Default\nlevel is ZSTD_CLEVEL_DEFAULT==3.</li>\n</ul>\n</li>\n</ul>",
+                  "type": "module",
+                  "displayName": "Compressor options"
+                },
+                {
+                  "textRaw": "Pledged Source Size",
+                  "name": "pledged_source_size",
+                  "stability": 1,
+                  "stabilityText": "Experimental",
+                  "desc": "<p>It's possible to specify the expected total size of the uncompressed input via\n<code>opts.pledgedSrcSize</code>. If the size doesn't match at the end of the input,\ncompression will fail with the code <code>ZSTD_error_srcSize_wrong</code>.</p>",
+                  "type": "module",
+                  "displayName": "Pledged Source Size"
+                },
+                {
+                  "textRaw": "Decompressor options",
+                  "name": "decompressor_options",
+                  "stability": 1,
+                  "stabilityText": "Experimental",
+                  "desc": "<p>These advanced options are available for controlling decompression:</p>\n<ul>\n<li><code>ZSTD_d_windowLogMax</code>\n<ul>\n<li>Select a size limit (in power of 2) beyond which the streaming API will\nrefuse to allocate memory buffer in order to protect the host from\nunreasonable memory requirements.</li>\n</ul>\n</li>\n</ul>",
+                  "type": "module",
+                  "displayName": "Decompressor options"
+                }
+              ],
+              "type": "misc",
+              "displayName": "Zstd constants"
             }
           ]
         },
@@ -169,10 +231,24 @@
           "desc": "<p>Each Brotli-based class takes an <code>options</code> object. All options are optional.</p>\n<ul>\n<li><code>flush</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;integer&gt;</a> <strong>Default:</strong> <code>zlib.constants.BROTLI_OPERATION_PROCESS</code></li>\n<li><code>finishFlush</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;integer&gt;</a> <strong>Default:</strong> <code>zlib.constants.BROTLI_OPERATION_FINISH</code></li>\n<li><code>chunkSize</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;integer&gt;</a> <strong>Default:</strong> <code>16 * 1024</code></li>\n<li><code>params</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a> Key-value object containing indexed <a href=\"#brotli-constants\">Brotli parameters</a>.</li>\n<li><code>maxOutputLength</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;integer&gt;</a> Limits output size when using\n<a href=\"#convenience-methods\">convenience methods</a>. <strong>Default:</strong> <a href=\"buffer.html#bufferkmaxlength\"><code>buffer.kMaxLength</code></a></li>\n</ul>\n<p>For example:</p>\n<pre><code class=\"language-js\">const stream = zlib.createBrotliCompress({\n  chunkSize: 32 * 1024,\n  params: {\n    [zlib.constants.BROTLI_PARAM_MODE]: zlib.constants.BROTLI_MODE_TEXT,\n    [zlib.constants.BROTLI_PARAM_QUALITY]: 4,\n    [zlib.constants.BROTLI_PARAM_SIZE_HINT]: fs.statSync(inputFile).size,\n  },\n});\n</code></pre>"
         },
         {
+          "textRaw": "Class: `ZstdOptions`",
+          "type": "misc",
+          "name": "ZstdOptions",
+          "stability": 1,
+          "stabilityText": "Experimental",
+          "meta": {
+            "added": [
+              "v23.8.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>Each Zstd-based class takes an <code>options</code> object. All options are optional.</p>\n<ul>\n<li><code>flush</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;integer&gt;</a> <strong>Default:</strong> <code>zlib.constants.ZSTD_e_continue</code></li>\n<li><code>finishFlush</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;integer&gt;</a> <strong>Default:</strong> <code>zlib.constants.ZSTD_e_end</code></li>\n<li><code>chunkSize</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;integer&gt;</a> <strong>Default:</strong> <code>16 * 1024</code></li>\n<li><code>params</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a> Key-value object containing indexed <a href=\"#zstd-constants\">Zstd parameters</a>.</li>\n<li><code>maxOutputLength</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;integer&gt;</a> Limits output size when using\n<a href=\"#convenience-methods\">convenience methods</a>. <strong>Default:</strong> <a href=\"buffer.html#bufferkmaxlength\"><code>buffer.kMaxLength</code></a></li>\n</ul>\n<p>For example:</p>\n<pre><code class=\"language-js\">const stream = zlib.createZstdCompress({\n  chunkSize: 32 * 1024,\n  params: {\n    [zlib.constants.ZSTD_c_compressionLevel]: 10,\n    [zlib.constants.ZSTD_c_checksumFlag]: 1,\n  },\n});\n</code></pre>"
+        },
+        {
           "textRaw": "Convenience methods",
           "name": "Convenience methods",
           "type": "misc",
-          "desc": "<p>All of these take a <a href=\"buffer.html#class-buffer\"><code>Buffer</code></a>, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\"><code>TypedArray</code></a>, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView\"><code>DataView</code></a>,\n<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer\"><code>ArrayBuffer</code></a> or string as the first argument, an optional second argument\nto supply options to the <code>zlib</code> classes and will call the supplied callback\nwith <code>callback(error, result)</code>.</p>\n<p>Every method has a <code>*Sync</code> counterpart, which accept the same arguments, but\nwithout a callback.</p>",
+          "desc": "<p>All of these take a <a href=\"buffer.html#class-buffer\" class=\"type\">&lt;Buffer&gt;</a>, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\" class=\"type\">&lt;TypedArray&gt;</a>, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView\" class=\"type\">&lt;DataView&gt;</a>, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer\" class=\"type\">&lt;ArrayBuffer&gt;</a>, or string\nas the first argument, an optional second argument\nto supply options to the <code>zlib</code> classes and will call the supplied callback\nwith <code>callback(error, result)</code>.</p>\n<p>Every method has a <code>*Sync</code> counterpart, which accept the same arguments, but\nwithout a callback.</p>",
           "methods": [
             {
               "textRaw": "`zlib.brotliCompress(buffer[, options], callback)`",
@@ -936,6 +1012,132 @@
                 }
               ],
               "desc": "<p>Decompress a chunk of data with <a href=\"#class-zlibunzip\"><code>Unzip</code></a>.</p>"
+            },
+            {
+              "textRaw": "`zlib.zstdCompress(buffer[, options], callback)`",
+              "type": "method",
+              "name": "zstdCompress",
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`buffer` {Buffer|TypedArray|DataView|ArrayBuffer|string}",
+                      "name": "buffer",
+                      "type": "Buffer|TypedArray|DataView|ArrayBuffer|string"
+                    },
+                    {
+                      "textRaw": "`options` {zstd options}",
+                      "name": "options",
+                      "type": "zstd options"
+                    },
+                    {
+                      "textRaw": "`callback` {Function}",
+                      "name": "callback",
+                      "type": "Function"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "textRaw": "`zlib.zstdCompressSync(buffer[, options])`",
+              "type": "method",
+              "name": "zstdCompressSync",
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`buffer` {Buffer|TypedArray|DataView|ArrayBuffer|string}",
+                      "name": "buffer",
+                      "type": "Buffer|TypedArray|DataView|ArrayBuffer|string"
+                    },
+                    {
+                      "textRaw": "`options` {zstd options}",
+                      "name": "options",
+                      "type": "zstd options"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>Compress a chunk of data with <a href=\"#class-zlibzstdcompress\"><code>ZstdCompress</code></a>.</p>"
+            },
+            {
+              "textRaw": "`zlib.zstdDecompress(buffer[, options], callback)`",
+              "type": "method",
+              "name": "zstdDecompress",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`buffer` {Buffer|TypedArray|DataView|ArrayBuffer|string}",
+                      "name": "buffer",
+                      "type": "Buffer|TypedArray|DataView|ArrayBuffer|string"
+                    },
+                    {
+                      "textRaw": "`options` {zstd options}",
+                      "name": "options",
+                      "type": "zstd options"
+                    },
+                    {
+                      "textRaw": "`callback` {Function}",
+                      "name": "callback",
+                      "type": "Function"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "textRaw": "`zlib.zstdDecompressSync(buffer[, options])`",
+              "type": "method",
+              "name": "zstdDecompressSync",
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`buffer` {Buffer|TypedArray|DataView|ArrayBuffer|string}",
+                      "name": "buffer",
+                      "type": "Buffer|TypedArray|DataView|ArrayBuffer|string"
+                    },
+                    {
+                      "textRaw": "`options` {zstd options}",
+                      "name": "options",
+                      "type": "zstd options"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>Decompress a chunk of data with <a href=\"#class-zlibzstddecompress\"><code>ZstdDecompress</code></a>.</p>"
             }
           ]
         }
@@ -1126,44 +1328,6 @@
           ],
           "methods": [
             {
-              "textRaw": "`zlib.crc32(data[, value])`",
-              "type": "method",
-              "name": "crc32",
-              "meta": {
-                "added": [
-                  "v22.2.0",
-                  "v20.15.0"
-                ],
-                "changes": []
-              },
-              "signatures": [
-                {
-                  "return": {
-                    "textRaw": "Returns: {integer} A 32-bit unsigned integer containing the checksum.",
-                    "name": "return",
-                    "type": "integer",
-                    "desc": "A 32-bit unsigned integer containing the checksum."
-                  },
-                  "params": [
-                    {
-                      "textRaw": "`data` {string|Buffer|TypedArray|DataView} When `data` is a string, it will be encoded as UTF-8 before being used for computation.",
-                      "name": "data",
-                      "type": "string|Buffer|TypedArray|DataView",
-                      "desc": "When `data` is a string, it will be encoded as UTF-8 before being used for computation."
-                    },
-                    {
-                      "textRaw": "`value` {integer} An optional starting value. It must be a 32-bit unsigned integer. **Default:** `0`",
-                      "name": "value",
-                      "type": "integer",
-                      "default": "`0`",
-                      "desc": "An optional starting value. It must be a 32-bit unsigned integer."
-                    }
-                  ]
-                }
-              ],
-              "desc": "<p>Computes a 32-bit <a href=\"https://en.wikipedia.org/wiki/Cyclic_redundancy_check\">Cyclic Redundancy Check</a> checksum of <code>data</code>. If\n<code>value</code> is specified, it is used as the starting value of the checksum,\notherwise, 0 is used as the starting value.</p>\n<p>The CRC algorithm is designed to compute checksums and to detect error\nin data transmission. It's not suitable for cryptographic authentication.</p>\n<p>To be consistent with other APIs, if the <code>data</code> is a string, it will\nbe encoded with UTF-8 before being used for computation. If users only\nuse Node.js to compute and match the checksums, this works well with\nother APIs that uses the UTF-8 encoding by default.</p>\n<p>Some third-party JavaScript libraries compute the checksum on a\nstring based on <code>str.charCodeAt()</code> so that it can be run in browsers.\nIf users want to match the checksum computed with this kind of library\nin the browser, it's better to use the same library in Node.js\nif it also runs in Node.js. If users have to use <code>zlib.crc32()</code> to\nmatch the checksum produced by such a third-party library:</p>\n<ol>\n<li>If the library accepts <code>Uint8Array</code> as input, use <code>TextEncoder</code>\nin the browser to encode the string into a <code>Uint8Array</code> with UTF-8\nencoding, and compute the checksum based on the UTF-8 encoded string\nin the browser.</li>\n<li>If the library only takes a string and compute the data based on\n<code>str.charCodeAt()</code>, on the Node.js side, convert the string into\na buffer using <code>Buffer.from(str, 'utf16le')</code>.</li>\n</ol>\n<pre><code class=\"language-mjs\">import zlib from 'node:zlib';\nimport { Buffer } from 'node:buffer';\n\nlet crc = zlib.crc32('hello');  // 907060870\ncrc = zlib.crc32('world', crc);  // 4192936109\n\ncrc = zlib.crc32(Buffer.from('hello', 'utf16le'));  // 1427272415\ncrc = zlib.crc32(Buffer.from('world', 'utf16le'), crc);  // 4150509955\n</code></pre>\n<pre><code class=\"language-cjs\">const zlib = require('node:zlib');\nconst { Buffer } = require('node:buffer');\n\nlet crc = zlib.crc32('hello');  // 907060870\ncrc = zlib.crc32('world', crc);  // 4192936109\n\ncrc = zlib.crc32(Buffer.from('hello', 'utf16le'));  // 1427272415\ncrc = zlib.crc32(Buffer.from('world', 'utf16le'), crc);  // 4150509955\n</code></pre>"
-            },
-            {
               "textRaw": "`zlib.close([callback])`",
               "type": "method",
               "name": "close",
@@ -1265,6 +1429,34 @@
               "desc": "<p>Reset the compressor/decompressor to factory defaults. Only applicable to\nthe inflate and deflate algorithms.</p>"
             }
           ]
+        },
+        {
+          "textRaw": "Class: `zlib.ZstdCompress`",
+          "type": "class",
+          "name": "zlib.ZstdCompress",
+          "stability": 1,
+          "stabilityText": "Experimental",
+          "meta": {
+            "added": [
+              "v23.8.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>Compress data using the Zstd algorithm.</p>"
+        },
+        {
+          "textRaw": "Class: `zlib.ZstdDecompress`",
+          "type": "class",
+          "name": "zlib.ZstdDecompress",
+          "stability": 1,
+          "stabilityText": "Experimental",
+          "meta": {
+            "added": [
+              "v23.8.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>Decompress data using the Zstd algorithm.</p>"
         }
       ],
       "properties": [
@@ -1281,6 +1473,44 @@
         }
       ],
       "methods": [
+        {
+          "textRaw": "`zlib.crc32(data[, value])`",
+          "type": "method",
+          "name": "crc32",
+          "meta": {
+            "added": [
+              "v22.2.0",
+              "v20.15.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "return": {
+                "textRaw": "Returns: {integer} A 32-bit unsigned integer containing the checksum.",
+                "name": "return",
+                "type": "integer",
+                "desc": "A 32-bit unsigned integer containing the checksum."
+              },
+              "params": [
+                {
+                  "textRaw": "`data` {string|Buffer|TypedArray|DataView} When `data` is a string, it will be encoded as UTF-8 before being used for computation.",
+                  "name": "data",
+                  "type": "string|Buffer|TypedArray|DataView",
+                  "desc": "When `data` is a string, it will be encoded as UTF-8 before being used for computation."
+                },
+                {
+                  "textRaw": "`value` {integer} An optional starting value. It must be a 32-bit unsigned integer. **Default:** `0`",
+                  "name": "value",
+                  "type": "integer",
+                  "default": "`0`",
+                  "desc": "An optional starting value. It must be a 32-bit unsigned integer."
+                }
+              ]
+            }
+          ],
+          "desc": "<p>Computes a 32-bit <a href=\"https://en.wikipedia.org/wiki/Cyclic_redundancy_check\">Cyclic Redundancy Check</a> checksum of <code>data</code>. If\n<code>value</code> is specified, it is used as the starting value of the checksum,\notherwise, 0 is used as the starting value.</p>\n<p>The CRC algorithm is designed to compute checksums and to detect error\nin data transmission. It's not suitable for cryptographic authentication.</p>\n<p>To be consistent with other APIs, if the <code>data</code> is a string, it will\nbe encoded with UTF-8 before being used for computation. If users only\nuse Node.js to compute and match the checksums, this works well with\nother APIs that uses the UTF-8 encoding by default.</p>\n<p>Some third-party JavaScript libraries compute the checksum on a\nstring based on <code>str.charCodeAt()</code> so that it can be run in browsers.\nIf users want to match the checksum computed with this kind of library\nin the browser, it's better to use the same library in Node.js\nif it also runs in Node.js. If users have to use <code>zlib.crc32()</code> to\nmatch the checksum produced by such a third-party library:</p>\n<ol>\n<li>If the library accepts <code>Uint8Array</code> as input, use <code>TextEncoder</code>\nin the browser to encode the string into a <code>Uint8Array</code> with UTF-8\nencoding, and compute the checksum based on the UTF-8 encoded string\nin the browser.</li>\n<li>If the library only takes a string and compute the data based on\n<code>str.charCodeAt()</code>, on the Node.js side, convert the string into\na buffer using <code>Buffer.from(str, 'utf16le')</code>.</li>\n</ol>\n<pre><code class=\"language-mjs\">import zlib from 'node:zlib';\nimport { Buffer } from 'node:buffer';\n\nlet crc = zlib.crc32('hello');  // 907060870\ncrc = zlib.crc32('world', crc);  // 4192936109\n\ncrc = zlib.crc32(Buffer.from('hello', 'utf16le'));  // 1427272415\ncrc = zlib.crc32(Buffer.from('world', 'utf16le'), crc);  // 4150509955\n</code></pre>\n<pre><code class=\"language-cjs\">const zlib = require('node:zlib');\nconst { Buffer } = require('node:buffer');\n\nlet crc = zlib.crc32('hello');  // 907060870\ncrc = zlib.crc32('world', crc);  // 4192936109\n\ncrc = zlib.crc32(Buffer.from('hello', 'utf16le'));  // 1427272415\ncrc = zlib.crc32(Buffer.from('world', 'utf16le'), crc);  // 4150509955\n</code></pre>"
+        },
         {
           "textRaw": "`zlib.createBrotliCompress([options])`",
           "type": "method",
@@ -1489,6 +1719,56 @@
             }
           ],
           "desc": "<p>Creates and returns a new <a href=\"#class-zlibunzip\"><code>Unzip</code></a> object.</p>"
+        },
+        {
+          "textRaw": "`zlib.createZstdCompress([options])`",
+          "type": "method",
+          "name": "createZstdCompress",
+          "stability": 1,
+          "stabilityText": "Experimental",
+          "meta": {
+            "added": [
+              "v23.8.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`options` {zstd options}",
+                  "name": "options",
+                  "type": "zstd options"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>Creates and returns a new <a href=\"#class-zlibzstdcompress\"><code>ZstdCompress</code></a> object.</p>"
+        },
+        {
+          "textRaw": "`zlib.createZstdDecompress([options])`",
+          "type": "method",
+          "name": "createZstdDecompress",
+          "stability": 1,
+          "stabilityText": "Experimental",
+          "meta": {
+            "added": [
+              "v23.8.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`options` {zstd options}",
+                  "name": "options",
+                  "type": "zstd options"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>Creates and returns a new <a href=\"#class-zlibzstddecompress\"><code>ZstdDecompress</code></a> object.</p>"
         },
         {
           "textRaw": "`zlib.brotliCompress(buffer[, options], callback)`",
@@ -2252,6 +2532,132 @@
             }
           ],
           "desc": "<p>Decompress a chunk of data with <a href=\"#class-zlibunzip\"><code>Unzip</code></a>.</p>"
+        },
+        {
+          "textRaw": "`zlib.zstdCompress(buffer[, options], callback)`",
+          "type": "method",
+          "name": "zstdCompress",
+          "stability": 1,
+          "stabilityText": "Experimental",
+          "meta": {
+            "added": [
+              "v23.8.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`buffer` {Buffer|TypedArray|DataView|ArrayBuffer|string}",
+                  "name": "buffer",
+                  "type": "Buffer|TypedArray|DataView|ArrayBuffer|string"
+                },
+                {
+                  "textRaw": "`options` {zstd options}",
+                  "name": "options",
+                  "type": "zstd options"
+                },
+                {
+                  "textRaw": "`callback` {Function}",
+                  "name": "callback",
+                  "type": "Function"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "textRaw": "`zlib.zstdCompressSync(buffer[, options])`",
+          "type": "method",
+          "name": "zstdCompressSync",
+          "stability": 1,
+          "stabilityText": "Experimental",
+          "meta": {
+            "added": [
+              "v23.8.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`buffer` {Buffer|TypedArray|DataView|ArrayBuffer|string}",
+                  "name": "buffer",
+                  "type": "Buffer|TypedArray|DataView|ArrayBuffer|string"
+                },
+                {
+                  "textRaw": "`options` {zstd options}",
+                  "name": "options",
+                  "type": "zstd options"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>Compress a chunk of data with <a href=\"#class-zlibzstdcompress\"><code>ZstdCompress</code></a>.</p>"
+        },
+        {
+          "textRaw": "`zlib.zstdDecompress(buffer[, options], callback)`",
+          "type": "method",
+          "name": "zstdDecompress",
+          "meta": {
+            "added": [
+              "v23.8.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`buffer` {Buffer|TypedArray|DataView|ArrayBuffer|string}",
+                  "name": "buffer",
+                  "type": "Buffer|TypedArray|DataView|ArrayBuffer|string"
+                },
+                {
+                  "textRaw": "`options` {zstd options}",
+                  "name": "options",
+                  "type": "zstd options"
+                },
+                {
+                  "textRaw": "`callback` {Function}",
+                  "name": "callback",
+                  "type": "Function"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "textRaw": "`zlib.zstdDecompressSync(buffer[, options])`",
+          "type": "method",
+          "name": "zstdDecompressSync",
+          "stability": 1,
+          "stabilityText": "Experimental",
+          "meta": {
+            "added": [
+              "v23.8.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`buffer` {Buffer|TypedArray|DataView|ArrayBuffer|string}",
+                  "name": "buffer",
+                  "type": "Buffer|TypedArray|DataView|ArrayBuffer|string"
+                },
+                {
+                  "textRaw": "`options` {zstd options}",
+                  "name": "options",
+                  "type": "zstd options"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>Decompress a chunk of data with <a href=\"#class-zlibzstddecompress\"><code>ZstdDecompress</code></a>.</p>"
         }
       ],
       "type": "module",

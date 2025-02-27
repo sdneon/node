@@ -1,0 +1,2394 @@
+{
+  "type": "module",
+  "source": "doc/api/quic.md",
+  "modules": [
+    {
+      "textRaw": "QUIC",
+      "name": "quic",
+      "introduced_in": "v23.8.0",
+      "meta": {
+        "added": [
+          "v23.8.0"
+        ],
+        "changes": []
+      },
+      "stability": 1,
+      "stabilityText": ".0 - Early development",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v23.8.0/lib/quic.js\">lib/quic.js</a></p>\n<p>The 'node:quic' module provides an implementation of the QUIC protocol.\nTo access it, start Node.js with the <code>--experimental-quic</code> option and:</p>\n<pre><code class=\"language-mjs\">import quic from 'node:quic';\n</code></pre>\n<pre><code class=\"language-cjs\">const quic = require('node:quic');\n</code></pre>\n<p>The module is only available under the <code>node:</code> scheme.</p>",
+      "methods": [
+        {
+          "textRaw": "`quic.connect(address[, options])`",
+          "type": "method",
+          "name": "connect",
+          "meta": {
+            "added": [
+              "v23.8.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "return": {
+                "textRaw": "Returns: {Promise} a promise for a {quic.QuicSession}",
+                "name": "return",
+                "type": "Promise",
+                "desc": "a promise for a {quic.QuicSession}"
+              },
+              "params": [
+                {
+                  "textRaw": "`address` {string|net.SocketAddress}",
+                  "name": "address",
+                  "type": "string|net.SocketAddress"
+                },
+                {
+                  "textRaw": "`options` {quic.SessionOptions}",
+                  "name": "options",
+                  "type": "quic.SessionOptions"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>Initiate a new client-side session.</p>\n<pre><code class=\"language-mjs\">import { connect } from 'node:quic';\nimport { Buffer } from 'node:buffer';\n\nconst enc = new TextEncoder();\nconst alpn = 'foo';\nconst client = await connect('123.123.123.123:8888', { alpn });\nawait client.createUnidirectionalStream({\n  body: enc.encode('hello world'),\n});\n</code></pre>\n<p>By default, every call to <code>connect(...)</code> will create a new local\n<code>QuicEndpoint</code> instance bound to a new random local IP port. To\nspecify the exact local address to use, or to multiplex multiple\nQUIC sessions over a single local port, pass the <code>endpoint</code> option\nwith either a <code>QuicEndpoint</code> or <code>EndpointOptions</code> as the argument.</p>\n<pre><code class=\"language-mjs\">import { QuicEndpoint, connect } from 'node:quic';\n\nconst endpoint = new QuicEndpoint({\n  address: '127.0.0.1:1234',\n});\n\nconst client = await connect('123.123.123.123:8888', { endpoint });\n</code></pre>"
+        },
+        {
+          "textRaw": "`quic.listen(onsession,[options])`",
+          "type": "method",
+          "name": "listen",
+          "meta": {
+            "added": [
+              "v23.8.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "return": {
+                "textRaw": "Returns: {Promise} a promise for a {quic.QuicEndpoint}",
+                "name": "return",
+                "type": "Promise",
+                "desc": "a promise for a {quic.QuicEndpoint}"
+              },
+              "params": [
+                {
+                  "textRaw": "`onsession` {quic.OnSessionCallback}",
+                  "name": "onsession",
+                  "type": "quic.OnSessionCallback"
+                },
+                {
+                  "textRaw": "`options` {quic.SessionOptions}",
+                  "name": "options",
+                  "type": "quic.SessionOptions"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>Configures the endpoint to listen as a server. When a new session is initiated by\na remote peer, the given <code>onsession</code> callback will be invoked with the created\nsession.</p>\n<pre><code class=\"language-mjs\">import { listen } from 'node:quic';\n\nconst endpoint = await listen((session) => {\n  // ... handle the session\n});\n\n// Closing the endpoint allows any sessions open when close is called\n// to complete naturally while preventing new sessions from being\n// initiated. Once all existing sessions have finished, the endpoint\n// will be destroyed. The call returns a promise that is resolved once\n// the endpoint is destroyed.\nawait endpoint.close();\n</code></pre>\n<p>By default, every call to <code>listen(...)</code> will create a new local\n<code>QuicEndpoint</code> instance bound to a new random local IP port. To\nspecify the exact local address to use, or to multiplex multiple\nQUIC sessions over a single local port, pass the <code>endpoint</code> option\nwith either a <code>QuicEndpoint</code> or <code>EndpointOptions</code> as the argument.</p>\n<p>At most, any single <code>QuicEndpoint</code> can only be configured to listen as\na server once.</p>"
+        }
+      ],
+      "classes": [
+        {
+          "textRaw": "Class: `QuicEndpoint`",
+          "type": "class",
+          "name": "QuicEndpoint",
+          "desc": "<p>A <code>QuicEndpoint</code> encapsulates the local UDP-port binding for QUIC. It can be\nused as both a client and a server.</p>",
+          "properties": [
+            {
+              "textRaw": "`address` {net.SocketAddress|undefined}",
+              "type": "net.SocketAddress|undefined",
+              "name": "address",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>The local UDP socket address to which the endpoint is bound, if any.</p>\n<p>If the endpoint is not currently bound then the value will be <code>undefined</code>. Read only.</p>"
+            },
+            {
+              "textRaw": "`busy` {boolean}",
+              "type": "boolean",
+              "name": "busy",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>When <code>endpoint.busy</code> is set to true, the endpoint will temporarily reject\nnew sessions from being created. Read/write.</p>\n<pre><code class=\"language-mjs\">// Mark the endpoint busy. New sessions will be prevented.\nendpoint.busy = true;\n\n// Mark the endpoint free. New session will be allowed.\nendpoint.busy = false;\n</code></pre>\n<p>The <code>busy</code> property is useful when the endpoint is under heavy load and needs to\ntemporarily reject new sessions while it catches up.</p>"
+            },
+            {
+              "textRaw": "`closed` {Promise}",
+              "type": "Promise",
+              "name": "closed",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>A promise that is fulfilled when the endpoint is destroyed. This will be the same promise that is\nreturned by the <code>endpoint.close()</code> function. Read only.</p>"
+            },
+            {
+              "textRaw": "`closing` {boolean}",
+              "type": "boolean",
+              "name": "closing",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>True if <code>endpoint.close()</code> has been called and closing the endpoint has not yet completed.\nRead only.</p>"
+            },
+            {
+              "textRaw": "`destroyed` {boolean}",
+              "type": "boolean",
+              "name": "destroyed",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>True if <code>endpoint.destroy()</code> has been called. Read only.</p>"
+            },
+            {
+              "textRaw": "`stats` {quic.QuicEndpoint.Stats}",
+              "type": "quic.QuicEndpoint.Stats",
+              "name": "stats",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>The statistics collected for an active session. Read only.</p>"
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`endpoint.close()`",
+              "type": "method",
+              "name": "close",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "return": {
+                    "textRaw": "Returns: {Promise}",
+                    "name": "return",
+                    "type": "Promise"
+                  },
+                  "params": []
+                }
+              ],
+              "desc": "<p>Gracefully close the endpoint. The endpoint will close and destroy itself when\nall currently open sessions close. Once called, new sessions will be rejected.</p>\n<p>Returns a promise that is fulfilled when the endpoint is destroyed.</p>"
+            },
+            {
+              "textRaw": "`endpoint.destroy([error])`",
+              "type": "method",
+              "name": "destroy",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`error` {any}",
+                      "name": "error",
+                      "type": "any"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>Forcefully closes the endpoint by forcing all open sessions to be immediately\nclosed.</p>"
+            },
+            {
+              "textRaw": "`endpoint[Symbol.asyncDispose]()`",
+              "type": "method",
+              "name": "[Symbol.asyncDispose]",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>Calls <code>endpoint.close()</code> and returns a promise that fulfills when the\nendpoint has closed.</p>"
+            }
+          ],
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`options` {quic.EndpointOptions}",
+                  "name": "options",
+                  "type": "quic.EndpointOptions"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "textRaw": "Class: `QuicEndpoint.Stats`",
+          "type": "class",
+          "name": "QuicEndpoint.Stats",
+          "meta": {
+            "added": [
+              "v23.8.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>A view of the collected statistics for an endpoint.</p>",
+          "properties": [
+            {
+              "textRaw": "`createdAt` {bigint} A timestamp indicating the moment the endpoint was created. Read only.",
+              "type": "bigint",
+              "name": "createdAt",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "A timestamp indicating the moment the endpoint was created. Read only."
+            },
+            {
+              "textRaw": "`destroyedAt` {bigint} A timestamp indicating the moment the endpoint was destroyed. Read only.",
+              "type": "bigint",
+              "name": "destroyedAt",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "A timestamp indicating the moment the endpoint was destroyed. Read only."
+            },
+            {
+              "textRaw": "`bytesReceived` {bigint} The total number of bytes received by this endpoint. Read only.",
+              "type": "bigint",
+              "name": "bytesReceived",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "The total number of bytes received by this endpoint. Read only."
+            },
+            {
+              "textRaw": "`bytesSent` {bigint} The total number of bytes sent by this endpoint. Read only.",
+              "type": "bigint",
+              "name": "bytesSent",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "The total number of bytes sent by this endpoint. Read only."
+            },
+            {
+              "textRaw": "`packetsReceived` {bigint} The total number of QUIC packets successfully received by this endpoint. Read only.",
+              "type": "bigint",
+              "name": "packetsReceived",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "The total number of QUIC packets successfully received by this endpoint. Read only."
+            },
+            {
+              "textRaw": "`packetsSent` {bigint} The total number of QUIC packets successfully sent by this endpoint. Read only.",
+              "type": "bigint",
+              "name": "packetsSent",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "The total number of QUIC packets successfully sent by this endpoint. Read only."
+            },
+            {
+              "textRaw": "`serverSessions` {bigint} The total number of peer-initiated sessions received by this endpoint. Read only.",
+              "type": "bigint",
+              "name": "serverSessions",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "The total number of peer-initiated sessions received by this endpoint. Read only."
+            },
+            {
+              "textRaw": "`clientSessions` {bigint} The total number of sessions initiated by this endpoint. Read only.",
+              "type": "bigint",
+              "name": "clientSessions",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "The total number of sessions initiated by this endpoint. Read only."
+            },
+            {
+              "textRaw": "`serverBusyCount` {bigint} The total number of times an initial packet was rejected due to the endpoint being marked busy. Read only.",
+              "type": "bigint",
+              "name": "serverBusyCount",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "The total number of times an initial packet was rejected due to the endpoint being marked busy. Read only."
+            },
+            {
+              "textRaw": "`retryCount` {bigint} The total number of QUIC retry attempts on this endpoint. Read only.",
+              "type": "bigint",
+              "name": "retryCount",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "The total number of QUIC retry attempts on this endpoint. Read only."
+            },
+            {
+              "textRaw": "`versionNegotiationCount` {bigint} The total number sessions rejected due to QUIC version mismatch. Read only.",
+              "type": "bigint",
+              "name": "versionNegotiationCount",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "The total number sessions rejected due to QUIC version mismatch. Read only."
+            },
+            {
+              "textRaw": "`statelessResetCount` {bigint} The total number of stateless resets handled by this endpoint. Read only.",
+              "type": "bigint",
+              "name": "statelessResetCount",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "The total number of stateless resets handled by this endpoint. Read only."
+            },
+            {
+              "textRaw": "`immediateCloseCount` {bigint} The total number of sessions that were closed before handshake completed. Read only.",
+              "type": "bigint",
+              "name": "immediateCloseCount",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "The total number of sessions that were closed before handshake completed. Read only."
+            }
+          ]
+        },
+        {
+          "textRaw": "Class: `QuicSession`",
+          "type": "class",
+          "name": "QuicSession",
+          "meta": {
+            "added": [
+              "v23.8.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>A <code>QuicSession</code> represents the local side of a QUIC connection.</p>",
+          "methods": [
+            {
+              "textRaw": "`session.close()`",
+              "type": "method",
+              "name": "close",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "return": {
+                    "textRaw": "Returns: {Promise}",
+                    "name": "return",
+                    "type": "Promise"
+                  },
+                  "params": []
+                }
+              ],
+              "desc": "<p>Initiate a graceful close of the session. Existing streams will be allowed\nto complete but no new streams will be opened. Once all streams have closed,\nthe session will be destroyed. The returned promise will be fulfilled once\nthe session has been destroyed.</p>"
+            },
+            {
+              "textRaw": "`session.destroy([error])`",
+              "type": "method",
+              "name": "destroy",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`error` {any}",
+                      "name": "error",
+                      "type": "any"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>Immediately destroy the session. All streams will be destroys and the\nsession will be closed.</p>"
+            },
+            {
+              "textRaw": "`session.createBidirectionalStream([options])`",
+              "type": "method",
+              "name": "createBidirectionalStream",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "return": {
+                    "textRaw": "Returns: {Promise} for a {quic.QuicStream}",
+                    "name": "return",
+                    "type": "Promise",
+                    "desc": "for a {quic.QuicStream}"
+                  },
+                  "params": [
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`body` {ArrayBuffer | ArrayBufferView | Blob}",
+                          "name": "body",
+                          "type": "ArrayBuffer | ArrayBufferView | Blob"
+                        },
+                        {
+                          "textRaw": "`sendOrder` {number}",
+                          "name": "sendOrder",
+                          "type": "number"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>Open a new bidirectional stream. If the <code>body</code> option is not specified,\nthe outgoing stream will be half-closed.</p>"
+            },
+            {
+              "textRaw": "`session.createUnidirectionalStream([options])`",
+              "type": "method",
+              "name": "createUnidirectionalStream",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "return": {
+                    "textRaw": "Returns: {Promise} for a {quic.QuicStream}",
+                    "name": "return",
+                    "type": "Promise",
+                    "desc": "for a {quic.QuicStream}"
+                  },
+                  "params": [
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`body` {ArrayBuffer | ArrayBufferView | Blob}",
+                          "name": "body",
+                          "type": "ArrayBuffer | ArrayBufferView | Blob"
+                        },
+                        {
+                          "textRaw": "`sendOrder` {number}",
+                          "name": "sendOrder",
+                          "type": "number"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>Open a new unidirectional stream. If the <code>body</code> option is not specified,\nthe outgoing stream will be closed.</p>"
+            },
+            {
+              "textRaw": "`session.sendDatagram(datagram)`",
+              "type": "method",
+              "name": "sendDatagram",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "return": {
+                    "textRaw": "Returns: {bigint}",
+                    "name": "return",
+                    "type": "bigint"
+                  },
+                  "params": [
+                    {
+                      "textRaw": "`datagram` {string|ArrayBufferView}",
+                      "name": "datagram",
+                      "type": "string|ArrayBufferView"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>Sends an unreliable datagram to the remote peer, returning the datagram ID.\nIf the datagram payload is specified as an <code>ArrayBufferView</code>, then ownership of\nthat view will be transfered to the underlying stream.</p>"
+            },
+            {
+              "textRaw": "`session.updateKey()`",
+              "type": "method",
+              "name": "updateKey",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>Initiate a key update for the session.</p>"
+            },
+            {
+              "textRaw": "`session[Symbol.asyncDispose]()`",
+              "type": "method",
+              "name": "[Symbol.asyncDispose]",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>Calls <code>session.close()</code> and returns a promise that fulfills when the\nsession has closed.</p>"
+            }
+          ],
+          "properties": [
+            {
+              "textRaw": "`closed` {Promise}",
+              "type": "Promise",
+              "name": "closed",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>A promise that is fulfilled once the session is destroyed.</p>"
+            },
+            {
+              "textRaw": "`destroyed` {boolean}",
+              "type": "boolean",
+              "name": "destroyed",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>True if <code>session.destroy()</code> has been called. Read only.</p>"
+            },
+            {
+              "textRaw": "`endpoint` {quic.QuicEndpoint}",
+              "type": "quic.QuicEndpoint",
+              "name": "endpoint",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>The endpoint that created this session. Read only.</p>"
+            },
+            {
+              "textRaw": "`onstream` {quic.OnStreamCallback}",
+              "type": "quic.OnStreamCallback",
+              "name": "onstream",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>The callback to invoke when a new stream is initiated by a remote peer. Read/write.</p>"
+            },
+            {
+              "textRaw": "`ondatagram` {quic.OnDatagramCallback}",
+              "type": "quic.OnDatagramCallback",
+              "name": "ondatagram",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>The callback to invoke when a new datagram is received from a remote peer. Read/write.</p>"
+            },
+            {
+              "textRaw": "`ondatagramstatus` {quic.OnDatagramStatusCallback}",
+              "type": "quic.OnDatagramStatusCallback",
+              "name": "ondatagramstatus",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>The callback to invoke when the status of a datagram is updated. Read/write.</p>"
+            },
+            {
+              "textRaw": "`onpathvalidation` {quic.OnPathValidationCallback}",
+              "type": "quic.OnPathValidationCallback",
+              "name": "onpathvalidation",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>The callback to invoke when the path validation is updated. Read/write.</p>"
+            },
+            {
+              "textRaw": "`onsessionticket` {quic.OnSessionTicketCallback}",
+              "type": "quic.OnSessionTicketCallback",
+              "name": "onsessionticket",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>The callback to invoke when a new session ticket is received. Read/write.</p>"
+            },
+            {
+              "textRaw": "`onversionnegotiation` {quic.OnVersionNegotiationCallback}",
+              "type": "quic.OnVersionNegotiationCallback",
+              "name": "onversionnegotiation",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>The callback to invoke when a version negotiation is initiated. Read/write.</p>"
+            },
+            {
+              "textRaw": "`onhandshake` {quic.OnHandshakeCallback}",
+              "type": "quic.OnHandshakeCallback",
+              "name": "onhandshake",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>The callback to invoke when the TLS handshake is completed. Read/write.</p>"
+            },
+            {
+              "textRaw": "`path` {Object|undefined}",
+              "type": "Object|undefined",
+              "name": "path",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "options": [
+                {
+                  "textRaw": "`local` {net.SocketAddress}",
+                  "name": "local",
+                  "type": "net.SocketAddress"
+                },
+                {
+                  "textRaw": "`remote` {net.SocketAddress}",
+                  "name": "remote",
+                  "type": "net.SocketAddress"
+                }
+              ],
+              "desc": "<p>The local and remote socket addresses associated with the session. Read only.</p>"
+            },
+            {
+              "textRaw": "`stats` {quic.QuicSession.Stats}",
+              "type": "quic.QuicSession.Stats",
+              "name": "stats",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>Return the current statistics for the session. Read only.</p>"
+            }
+          ]
+        },
+        {
+          "textRaw": "Class: `QuicSession.Stats`",
+          "type": "class",
+          "name": "QuicSession.Stats",
+          "meta": {
+            "added": [
+              "v23.8.0"
+            ],
+            "changes": []
+          },
+          "properties": [
+            {
+              "textRaw": "`createdAt` {bigint}",
+              "type": "bigint",
+              "name": "createdAt",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              }
+            },
+            {
+              "textRaw": "`closingAt` {bigint}",
+              "type": "bigint",
+              "name": "closingAt",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              }
+            },
+            {
+              "textRaw": "`handshakeCompletedAt` {bigint}",
+              "type": "bigint",
+              "name": "handshakeCompletedAt",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              }
+            },
+            {
+              "textRaw": "`handshakeConfirmedAt` {bigint}",
+              "type": "bigint",
+              "name": "handshakeConfirmedAt",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              }
+            },
+            {
+              "textRaw": "`bytesReceived` {bigint}",
+              "type": "bigint",
+              "name": "bytesReceived",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              }
+            },
+            {
+              "textRaw": "`bytesSent` {bigint}",
+              "type": "bigint",
+              "name": "bytesSent",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              }
+            },
+            {
+              "textRaw": "`bidiInStreamCount` {bigint}",
+              "type": "bigint",
+              "name": "bidiInStreamCount",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              }
+            },
+            {
+              "textRaw": "`bidiOutStreamCount` {bigint}",
+              "type": "bigint",
+              "name": "bidiOutStreamCount",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              }
+            },
+            {
+              "textRaw": "`uniInStreamCount` {bigint}",
+              "type": "bigint",
+              "name": "uniInStreamCount",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              }
+            },
+            {
+              "textRaw": "`uniOutStreamCount` {bigint}",
+              "type": "bigint",
+              "name": "uniOutStreamCount",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              }
+            },
+            {
+              "textRaw": "`maxBytesInFlights` {bigint}",
+              "type": "bigint",
+              "name": "maxBytesInFlights",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              }
+            },
+            {
+              "textRaw": "`bytesInFlight` {bigint}",
+              "type": "bigint",
+              "name": "bytesInFlight",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              }
+            },
+            {
+              "textRaw": "`blockCount` {bigint}",
+              "type": "bigint",
+              "name": "blockCount",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              }
+            },
+            {
+              "textRaw": "`cwnd` {bigint}",
+              "type": "bigint",
+              "name": "cwnd",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              }
+            },
+            {
+              "textRaw": "`latestRtt` {bigint}",
+              "type": "bigint",
+              "name": "latestRtt",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              }
+            },
+            {
+              "textRaw": "`minRtt` {bigint}",
+              "type": "bigint",
+              "name": "minRtt",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              }
+            },
+            {
+              "textRaw": "`rttVar` {bigint}",
+              "type": "bigint",
+              "name": "rttVar",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              }
+            },
+            {
+              "textRaw": "`smoothedRtt` {bigint}",
+              "type": "bigint",
+              "name": "smoothedRtt",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              }
+            },
+            {
+              "textRaw": "`ssthresh` {bigint}",
+              "type": "bigint",
+              "name": "ssthresh",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              }
+            },
+            {
+              "textRaw": "`datagramsReceived` {bigint}",
+              "type": "bigint",
+              "name": "datagramsReceived",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              }
+            },
+            {
+              "textRaw": "`datagramsSent` {bigint}",
+              "type": "bigint",
+              "name": "datagramsSent",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              }
+            },
+            {
+              "textRaw": "`datagramsAcknowledged` {bigint}",
+              "type": "bigint",
+              "name": "datagramsAcknowledged",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              }
+            },
+            {
+              "textRaw": "`datagramsLost` {bigint}",
+              "type": "bigint",
+              "name": "datagramsLost",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              }
+            }
+          ]
+        },
+        {
+          "textRaw": "Class: `QuicStream`",
+          "type": "class",
+          "name": "QuicStream",
+          "meta": {
+            "added": [
+              "v23.8.0"
+            ],
+            "changes": []
+          },
+          "properties": [
+            {
+              "textRaw": "`closed` {Promise}",
+              "type": "Promise",
+              "name": "closed",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>A promise that is fulfilled when the stream is fully closed.</p>"
+            },
+            {
+              "textRaw": "`destroyed` {boolean}",
+              "type": "boolean",
+              "name": "destroyed",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>True if <code>stream.destroy()</code> has been called.</p>"
+            },
+            {
+              "textRaw": "`direction` {string} One of either `'bidi'` or `'uni'`.",
+              "type": "string",
+              "name": "direction",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>The directionality of the stream. Read only.</p>",
+              "shortDesc": "One of either `'bidi'` or `'uni'`."
+            },
+            {
+              "textRaw": "`id` {bigint}",
+              "type": "bigint",
+              "name": "id",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>The stream ID. Read only.</p>"
+            },
+            {
+              "textRaw": "`onblocked` {quic.OnBlockedCallback}",
+              "type": "quic.OnBlockedCallback",
+              "name": "onblocked",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>The callback to invoke when the stream is blocked. Read/write.</p>"
+            },
+            {
+              "textRaw": "`onreset` {quic.OnStreamErrorCallback}",
+              "type": "quic.OnStreamErrorCallback",
+              "name": "onreset",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>The callback to invoke when the stream is reset. Read/write.</p>"
+            },
+            {
+              "textRaw": "`readable` {ReadableStream}",
+              "type": "ReadableStream",
+              "name": "readable",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              }
+            },
+            {
+              "textRaw": "`session` {quic.QuicSession}",
+              "type": "quic.QuicSession",
+              "name": "session",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>The session that created this stream. Read only.</p>"
+            },
+            {
+              "textRaw": "`stats` {quic.QuicStream.Stats}",
+              "type": "quic.QuicStream.Stats",
+              "name": "stats",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>The current statistics for the stream. Read only.</p>"
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`stream.destroy([error])`",
+              "type": "method",
+              "name": "destroy",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`error` {any}",
+                      "name": "error",
+                      "type": "any"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>Immediately and abruptly destroys the stream.</p>"
+            }
+          ]
+        },
+        {
+          "textRaw": "Class: `QuicStream.Stats`",
+          "type": "class",
+          "name": "QuicStream.Stats",
+          "meta": {
+            "added": [
+              "v23.8.0"
+            ],
+            "changes": []
+          },
+          "properties": [
+            {
+              "textRaw": "`ackedAt` {bigint}",
+              "type": "bigint",
+              "name": "ackedAt",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              }
+            },
+            {
+              "textRaw": "`bytesReceived` {bigint}",
+              "type": "bigint",
+              "name": "bytesReceived",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              }
+            },
+            {
+              "textRaw": "`bytesSent` {bigint}",
+              "type": "bigint",
+              "name": "bytesSent",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              }
+            },
+            {
+              "textRaw": "`createdAt` {bigint}",
+              "type": "bigint",
+              "name": "createdAt",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              }
+            },
+            {
+              "textRaw": "`destroyedAt` {bigint}",
+              "type": "bigint",
+              "name": "destroyedAt",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              }
+            },
+            {
+              "textRaw": "`finalSize` {bigint}",
+              "type": "bigint",
+              "name": "finalSize",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              }
+            },
+            {
+              "textRaw": "`isConnected` {bigint}",
+              "type": "bigint",
+              "name": "isConnected",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              }
+            },
+            {
+              "textRaw": "`maxOffset` {bigint}",
+              "type": "bigint",
+              "name": "maxOffset",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              }
+            },
+            {
+              "textRaw": "`maxOffsetAcknowledged` {bigint}",
+              "type": "bigint",
+              "name": "maxOffsetAcknowledged",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              }
+            },
+            {
+              "textRaw": "`maxOffsetReceived` {bigint}",
+              "type": "bigint",
+              "name": "maxOffsetReceived",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              }
+            },
+            {
+              "textRaw": "`openedAt` {bigint}",
+              "type": "bigint",
+              "name": "openedAt",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              }
+            },
+            {
+              "textRaw": "`receivedAt` {bigint}",
+              "type": "bigint",
+              "name": "receivedAt",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              }
+            }
+          ]
+        }
+      ],
+      "modules": [
+        {
+          "textRaw": "Types",
+          "name": "types",
+          "modules": [
+            {
+              "textRaw": "Type: `EndpointOptions`",
+              "name": "type:_`endpointoptions`",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<ul>\n<li><a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a></li>\n</ul>\n<p>The endpoint configuration options passed when constructing a new <code>QuicEndpoint</code> instance.</p>",
+              "properties": [
+                {
+                  "textRaw": "`address` {net.SocketAddress | string} The local UDP address and port the endpoint should bind to.",
+                  "type": "net.SocketAddress | string",
+                  "name": "address",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>If not specified the endpoint will bind to IPv4 <code>localhost</code> on a random port.</p>",
+                  "shortDesc": "The local UDP address and port the endpoint should bind to."
+                },
+                {
+                  "textRaw": "`addressLRUSize` {bigint|number}",
+                  "type": "bigint|number",
+                  "name": "addressLRUSize",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>The endpoint maintains an internal cache of validated socket addresses as a\nperformance optimization. This option sets the maximum number of addresses\nthat are cache. This is an advanced option that users typically won't have\nneed to specify.</p>"
+                },
+                {
+                  "textRaw": "`ipv6Only` {boolean}",
+                  "type": "boolean",
+                  "name": "ipv6Only",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>When <code>true</code>, indicates that the endpoint should bind only to IPv6 addresses.</p>"
+                },
+                {
+                  "textRaw": "`maxConnectionsPerHost` {bigint|number}",
+                  "type": "bigint|number",
+                  "name": "maxConnectionsPerHost",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>Specifies the maximum number of concurrent sessions allowed per remote peer address.</p>"
+                },
+                {
+                  "textRaw": "`maxConnectionsTotal` {bigint|number}",
+                  "type": "bigint|number",
+                  "name": "maxConnectionsTotal",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>Specifies the maximum total number of concurrent sessions.</p>"
+                },
+                {
+                  "textRaw": "`maxRetries` {bigint|number}",
+                  "type": "bigint|number",
+                  "name": "maxRetries",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>Specifies the maximum number of QUIC retry attempts allowed per remote peer address.</p>"
+                },
+                {
+                  "textRaw": "`maxStatelessResetsPerHost` {bigint|number}",
+                  "type": "bigint|number",
+                  "name": "maxStatelessResetsPerHost",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>Specifies the maximum number of stateless resets that are allowed per remote peer address.</p>"
+                },
+                {
+                  "textRaw": "`retryTokenExpiration` {bigint|number}",
+                  "type": "bigint|number",
+                  "name": "retryTokenExpiration",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>Specifies the length of time a QUIC retry token is considered valid.</p>"
+                },
+                {
+                  "textRaw": "`resetTokenSecret` {ArrayBufferView}",
+                  "type": "ArrayBufferView",
+                  "name": "resetTokenSecret",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>Specifies the 16-byte secret used to generate QUIC retry tokens.</p>"
+                },
+                {
+                  "textRaw": "`tokenExpiration` {bigint|number}",
+                  "type": "bigint|number",
+                  "name": "tokenExpiration",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>Specifies the length of time a QUIC token is considered valid.</p>"
+                },
+                {
+                  "textRaw": "`tokenSecret` {ArrayBufferView}",
+                  "type": "ArrayBufferView",
+                  "name": "tokenSecret",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>Specifies the 16-byte secret used to generate QUIC tokens.</p>"
+                },
+                {
+                  "textRaw": "`udpReceiveBufferSize` {number}",
+                  "type": "number",
+                  "name": "udpReceiveBufferSize",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  }
+                },
+                {
+                  "textRaw": "`udpSendBufferSize` {number}",
+                  "type": "number",
+                  "name": "udpSendBufferSize",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  }
+                },
+                {
+                  "textRaw": "`udpTTL` {number}",
+                  "type": "number",
+                  "name": "udpTTL",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  }
+                },
+                {
+                  "textRaw": "`validateAddress` {boolean}",
+                  "type": "boolean",
+                  "name": "validateAddress",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>When <code>true</code>, requires that the endpoint validate peer addresses using retry packets\nwhile establishing a new connection.</p>"
+                }
+              ],
+              "type": "module",
+              "displayName": "Type: `EndpointOptions`"
+            },
+            {
+              "textRaw": "Type: `SessionOptions`",
+              "name": "type:_`sessionoptions`",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "properties": [
+                {
+                  "textRaw": "`alpn` {string}",
+                  "type": "string",
+                  "name": "alpn",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>The ALPN protocol identifier.</p>"
+                },
+                {
+                  "textRaw": "`ca` {ArrayBuffer|ArrayBufferView|ArrayBuffer\\[]|ArrayBufferView\\[]}",
+                  "type": "ArrayBuffer|ArrayBufferView|ArrayBuffer\\[]|ArrayBufferView\\[]",
+                  "name": "ca",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>The CA certificates to use for sessions.</p>"
+                },
+                {
+                  "textRaw": "`cc` {string}",
+                  "type": "string",
+                  "name": "cc",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>Specifies the congestion control algorithm that will be used\n. Must be set to one of either <code>'reno'</code>, <code>'cubic'</code>, or <code>'bbr'</code>.</p>\n<p>This is an advanced option that users typically won't have need to specify.</p>"
+                },
+                {
+                  "textRaw": "`certs` {ArrayBuffer|ArrayBufferView|ArrayBuffer\\[]|ArrayBufferView\\[]}",
+                  "type": "ArrayBuffer|ArrayBufferView|ArrayBuffer\\[]|ArrayBufferView\\[]",
+                  "name": "certs",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>The TLS certificates to use for sessions.</p>"
+                },
+                {
+                  "textRaw": "`ciphers` {string}",
+                  "type": "string",
+                  "name": "ciphers",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>The list of supported TLS 1.3 cipher algorithms.</p>"
+                },
+                {
+                  "textRaw": "`crl` {ArrayBuffer|ArrayBufferView|ArrayBuffer\\[]|ArrayBufferView\\[]}",
+                  "type": "ArrayBuffer|ArrayBufferView|ArrayBuffer\\[]|ArrayBufferView\\[]",
+                  "name": "crl",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>The CRL to use for sessions.</p>"
+                },
+                {
+                  "textRaw": "`groups` {string}",
+                  "type": "string",
+                  "name": "groups",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>The list of support TLS 1.3 cipher groups.</p>"
+                },
+                {
+                  "textRaw": "`keylog` {boolean}",
+                  "type": "boolean",
+                  "name": "keylog",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>True to enable TLS keylogging output.</p>"
+                },
+                {
+                  "textRaw": "`keys` {KeyObject|CryptoKey|KeyObject\\[]|CryptoKey\\[]}",
+                  "type": "KeyObject|CryptoKey|KeyObject\\[]|CryptoKey\\[]",
+                  "name": "keys",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>The TLS crypto keys to use for sessions.</p>"
+                },
+                {
+                  "textRaw": "`maxPayloadSize` {bigint|number}",
+                  "type": "bigint|number",
+                  "name": "maxPayloadSize",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>Specifies the maximum UDP packet payload size.</p>"
+                },
+                {
+                  "textRaw": "`maxStreamWindow` {bigint|number}",
+                  "type": "bigint|number",
+                  "name": "maxStreamWindow",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>Specifies the maximum stream flow-control window size.</p>"
+                },
+                {
+                  "textRaw": "`maxWindow` {bigint|number}",
+                  "type": "bigint|number",
+                  "name": "maxWindow",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>Specifies the maxumum session flow-control window size.</p>"
+                },
+                {
+                  "textRaw": "`minVersion` {number}",
+                  "type": "number",
+                  "name": "minVersion",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>The minimum QUIC version number to allow. This is an advanced option that users\ntypically won't have need to specify.</p>"
+                },
+                {
+                  "textRaw": "`preferredAddressPolicy` {string} One of `'use'`, `'ignore'`, or `'default'`.",
+                  "type": "string",
+                  "name": "preferredAddressPolicy",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>When the remote peer advertises a preferred address, this option specifies whether\nto use it or ignore it.</p>",
+                  "shortDesc": "One of `'use'`, `'ignore'`, or `'default'`."
+                },
+                {
+                  "textRaw": "`qlog` {boolean}",
+                  "type": "boolean",
+                  "name": "qlog",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>True if qlog output should be enabled.</p>"
+                },
+                {
+                  "textRaw": "`sessionTicket` {ArrayBufferView} A session ticket to use for 0RTT session resumption.",
+                  "type": "ArrayBufferView",
+                  "name": "sessionTicket",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "A session ticket to use for 0RTT session resumption."
+                },
+                {
+                  "textRaw": "`handshakeTimeout` {bigint|number}",
+                  "type": "bigint|number",
+                  "name": "handshakeTimeout",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>Specifies the maximum number of milliseconds a TLS handshake is permitted to take\nto complete before timing out.</p>"
+                },
+                {
+                  "textRaw": "`sni` {string}",
+                  "type": "string",
+                  "name": "sni",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>The peer server name to target.</p>"
+                },
+                {
+                  "textRaw": "`tlsTrace` {boolean}",
+                  "type": "boolean",
+                  "name": "tlsTrace",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>True to enable TLS tracing output.</p>"
+                },
+                {
+                  "textRaw": "`transportParams` {quic.TransportParams}",
+                  "type": "quic.TransportParams",
+                  "name": "transportParams",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>The QUIC transport parameters to use for the session.</p>"
+                },
+                {
+                  "textRaw": "`unacknowledgedPacketThreshold` {bigint|number}",
+                  "type": "bigint|number",
+                  "name": "unacknowledgedPacketThreshold",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>Specifies the maximum number of unacknowledged packets a session should allow.</p>"
+                },
+                {
+                  "textRaw": "`verifyClient` {boolean}",
+                  "type": "boolean",
+                  "name": "verifyClient",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>True to require verification of TLS client certificate.</p>"
+                },
+                {
+                  "textRaw": "`verifyPrivateKey` {boolean}",
+                  "type": "boolean",
+                  "name": "verifyPrivateKey",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>True to require private key verification.</p>"
+                },
+                {
+                  "textRaw": "`version` {number}",
+                  "type": "number",
+                  "name": "version",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>The QUIC version number to use. This is an advanced option that users typically\nwon't have need to specify.</p>"
+                }
+              ],
+              "type": "module",
+              "displayName": "Type: `SessionOptions`"
+            },
+            {
+              "textRaw": "Type: `TransportParams`",
+              "name": "type:_`transportparams`",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "properties": [
+                {
+                  "textRaw": "`preferredAddressIpv4` {net.SocketAddress} The preferred IPv4 address to advertise.",
+                  "type": "net.SocketAddress",
+                  "name": "preferredAddressIpv4",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "The preferred IPv4 address to advertise."
+                },
+                {
+                  "textRaw": "`preferredAddressIpv6` {net.SocketAddress} The preferred IPv6 address to advertise.",
+                  "type": "net.SocketAddress",
+                  "name": "preferredAddressIpv6",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "The preferred IPv6 address to advertise."
+                },
+                {
+                  "textRaw": "`initialMaxStreamDataBidiLocal` {bigint|number}",
+                  "type": "bigint|number",
+                  "name": "initialMaxStreamDataBidiLocal",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  }
+                },
+                {
+                  "textRaw": "`initialMaxStreamDataBidiRemote` {bigint|number}",
+                  "type": "bigint|number",
+                  "name": "initialMaxStreamDataBidiRemote",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  }
+                },
+                {
+                  "textRaw": "`initialMaxStreamDataUni` {bigint|number}",
+                  "type": "bigint|number",
+                  "name": "initialMaxStreamDataUni",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  }
+                },
+                {
+                  "textRaw": "`initialMaxData` {bigint|number}",
+                  "type": "bigint|number",
+                  "name": "initialMaxData",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  }
+                },
+                {
+                  "textRaw": "`initialMaxStreamsBidi` {bigint|number}",
+                  "type": "bigint|number",
+                  "name": "initialMaxStreamsBidi",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  }
+                },
+                {
+                  "textRaw": "`initialMaxStreamsUni` {bigint|number}",
+                  "type": "bigint|number",
+                  "name": "initialMaxStreamsUni",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  }
+                },
+                {
+                  "textRaw": "`maxIdleTimeout` {bigint|number}",
+                  "type": "bigint|number",
+                  "name": "maxIdleTimeout",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  }
+                },
+                {
+                  "textRaw": "`activeConnectionIDLimit` {bigint|number}",
+                  "type": "bigint|number",
+                  "name": "activeConnectionIDLimit",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  }
+                },
+                {
+                  "textRaw": "`ackDelayExponent` {bigint|number}",
+                  "type": "bigint|number",
+                  "name": "ackDelayExponent",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  }
+                },
+                {
+                  "textRaw": "`maxAckDelay` {bigint|number}",
+                  "type": "bigint|number",
+                  "name": "maxAckDelay",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  }
+                },
+                {
+                  "textRaw": "`maxDatagramFrameSize` {bigint|number}",
+                  "type": "bigint|number",
+                  "name": "maxDatagramFrameSize",
+                  "meta": {
+                    "added": [
+                      "v23.8.0"
+                    ],
+                    "changes": []
+                  }
+                }
+              ],
+              "type": "module",
+              "displayName": "Type: `TransportParams`"
+            }
+          ],
+          "type": "module",
+          "displayName": "Types"
+        },
+        {
+          "textRaw": "Callbacks",
+          "name": "callbacks",
+          "modules": [
+            {
+              "textRaw": "Callback: `OnSessionCallback`",
+              "name": "callback:_`onsessioncallback`",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<ul>\n<li><code>this</code> <a href=\"quic.html#class-quicendpoint\" class=\"type\">&lt;quic.QuicEndpoint&gt;</a></li>\n<li><code>session</code> <a href=\"quic.html#class-quicsession\" class=\"type\">&lt;quic.QuicSession&gt;</a></li>\n</ul>\n<p>The callback function that is invoked when a new session is initiated by a remote peer.</p>",
+              "type": "module",
+              "displayName": "Callback: `OnSessionCallback`"
+            },
+            {
+              "textRaw": "Callback: `OnStreamCallback`",
+              "name": "callback:_`onstreamcallback`",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<ul>\n<li><code>this</code> <a href=\"quic.html#class-quicsession\" class=\"type\">&lt;quic.QuicSession&gt;</a></li>\n<li><code>stream</code> <a href=\"quic.html#class-quicstream\" class=\"type\">&lt;quic.QuicStream&gt;</a></li>\n</ul>",
+              "type": "module",
+              "displayName": "Callback: `OnStreamCallback`"
+            },
+            {
+              "textRaw": "Callback: `OnDatagramCallback`",
+              "name": "callback:_`ondatagramcallback`",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<ul>\n<li><code>this</code> <a href=\"quic.html#class-quicsession\" class=\"type\">&lt;quic.QuicSession&gt;</a></li>\n<li><code>datagram</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array\" class=\"type\">&lt;Uint8Array&gt;</a></li>\n<li><code>early</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type\" class=\"type\">&lt;boolean&gt;</a></li>\n</ul>",
+              "type": "module",
+              "displayName": "Callback: `OnDatagramCallback`"
+            },
+            {
+              "textRaw": "Callback: `OnDatagramStatusCallback`",
+              "name": "callback:_`ondatagramstatuscallback`",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<ul>\n<li><code>this</code> <a href=\"quic.html#class-quicsession\" class=\"type\">&lt;quic.QuicSession&gt;</a></li>\n<li><code>id</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt\" class=\"type\">&lt;bigint&gt;</a></li>\n<li><code>status</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> One of either <code>'lost'</code> or <code>'acknowledged'</code>.</li>\n</ul>",
+              "type": "module",
+              "displayName": "Callback: `OnDatagramStatusCallback`"
+            },
+            {
+              "textRaw": "Callback: `OnPathValidationCallback`",
+              "name": "callback:_`onpathvalidationcallback`",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<ul>\n<li><code>this</code> <a href=\"quic.html#class-quicsession\" class=\"type\">&lt;quic.QuicSession&gt;</a></li>\n<li><code>result</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> One of either <code>'success'</code>, <code>'failure'</code>, or <code>'aborted'</code>.</li>\n<li><code>newLocalAddress</code> <a href=\"net.html#class-netsocketaddress\" class=\"type\">&lt;net.SocketAddress&gt;</a></li>\n<li><code>newRemoteAddress</code> <a href=\"net.html#class-netsocketaddress\" class=\"type\">&lt;net.SocketAddress&gt;</a></li>\n<li><code>oldLocalAddress</code> <a href=\"net.html#class-netsocketaddress\" class=\"type\">&lt;net.SocketAddress&gt;</a></li>\n<li><code>oldRemoteAddress</code> <a href=\"net.html#class-netsocketaddress\" class=\"type\">&lt;net.SocketAddress&gt;</a></li>\n<li><code>preferredAddress</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type\" class=\"type\">&lt;boolean&gt;</a></li>\n</ul>",
+              "type": "module",
+              "displayName": "Callback: `OnPathValidationCallback`"
+            },
+            {
+              "textRaw": "Callback: `OnSessionTicketCallback`",
+              "name": "callback:_`onsessionticketcallback`",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<ul>\n<li><code>this</code> <a href=\"quic.html#class-quicsession\" class=\"type\">&lt;quic.QuicSession&gt;</a></li>\n<li><code>ticket</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a></li>\n</ul>",
+              "type": "module",
+              "displayName": "Callback: `OnSessionTicketCallback`"
+            },
+            {
+              "textRaw": "Callback: `OnVersionNegotiationCallback`",
+              "name": "callback:_`onversionnegotiationcallback`",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<ul>\n<li><code>this</code> <a href=\"quic.html#class-quicsession\" class=\"type\">&lt;quic.QuicSession&gt;</a></li>\n<li><code>version</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a></li>\n<li><code>requestedVersions</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number[]&gt;</a></li>\n<li><code>supportedVersions</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number[]&gt;</a></li>\n</ul>",
+              "type": "module",
+              "displayName": "Callback: `OnVersionNegotiationCallback`"
+            },
+            {
+              "textRaw": "Callback: `OnHandshakeCallback`",
+              "name": "callback:_`onhandshakecallback`",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<ul>\n<li><code>this</code> <a href=\"quic.html#class-quicsession\" class=\"type\">&lt;quic.QuicSession&gt;</a></li>\n<li><code>sni</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a></li>\n<li><code>alpn</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a></li>\n<li><code>cipher</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a></li>\n<li><code>cipherVersion</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a></li>\n<li><code>validationErrorReason</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a></li>\n<li><code>validationErrorCode</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a></li>\n<li><code>earlyDataAccepted</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type\" class=\"type\">&lt;boolean&gt;</a></li>\n</ul>",
+              "type": "module",
+              "displayName": "Callback: `OnHandshakeCallback`"
+            },
+            {
+              "textRaw": "Callback: `OnBlockedCallback`",
+              "name": "callback:_`onblockedcallback`",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<ul>\n<li><code>this</code> <a href=\"quic.html#class-quicstream\" class=\"type\">&lt;quic.QuicStream&gt;</a></li>\n</ul>",
+              "type": "module",
+              "displayName": "Callback: `OnBlockedCallback`"
+            },
+            {
+              "textRaw": "Callback: `OnStreamErrorCallback`",
+              "name": "callback:_`onstreamerrorcallback`",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<ul>\n<li><code>this</code> <a href=\"quic.html#class-quicstream\" class=\"type\">&lt;quic.QuicStream&gt;</a></li>\n<li><code>error</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types\" class=\"type\">&lt;any&gt;</a></li>\n</ul>",
+              "type": "module",
+              "displayName": "Callback: `OnStreamErrorCallback`"
+            }
+          ],
+          "type": "module",
+          "displayName": "Callbacks"
+        },
+        {
+          "textRaw": "Diagnostic Channels",
+          "name": "diagnostic_channels",
+          "modules": [
+            {
+              "textRaw": "Channel: `quic.endpoint.created`",
+              "name": "channel:_`quic.endpoint.created`",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<ul>\n<li><code>endpoint</code> <a href=\"quic.html#class-quicendpoint\" class=\"type\">&lt;quic.QuicEndpoint&gt;</a></li>\n<li><code>config</code> <a href=\"quic.html#type-endpointoptions\" class=\"type\">&lt;quic.EndpointOptions&gt;</a></li>\n</ul>",
+              "type": "module",
+              "displayName": "Channel: `quic.endpoint.created`"
+            },
+            {
+              "textRaw": "Channel: `quic.endpoint.listen`",
+              "name": "channel:_`quic.endpoint.listen`",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<ul>\n<li><code>endpoint</code> <a href=\"quic.html#class-quicendpoint\" class=\"type\">&lt;quic.QuicEndpoint&gt;</a></li>\n<li><code>optoins</code> <a href=\"quic.html#type-sessionoptions\" class=\"type\">&lt;quic.SessionOptions&gt;</a></li>\n</ul>",
+              "type": "module",
+              "displayName": "Channel: `quic.endpoint.listen`"
+            },
+            {
+              "textRaw": "Channel: `quic.endpoint.closing`",
+              "name": "channel:_`quic.endpoint.closing`",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<ul>\n<li><code>endpoint</code> <a href=\"quic.html#class-quicendpoint\" class=\"type\">&lt;quic.QuicEndpoint&gt;</a></li>\n<li><code>hasPendingError</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type\" class=\"type\">&lt;boolean&gt;</a></li>\n</ul>",
+              "type": "module",
+              "displayName": "Channel: `quic.endpoint.closing`"
+            },
+            {
+              "textRaw": "Channel: `quic.endpoint.closed`",
+              "name": "channel:_`quic.endpoint.closed`",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<ul>\n<li><code>endpoint</code> <a href=\"quic.html#class-quicendpoint\" class=\"type\">&lt;quic.QuicEndpoint&gt;</a></li>\n</ul>",
+              "type": "module",
+              "displayName": "Channel: `quic.endpoint.closed`"
+            },
+            {
+              "textRaw": "Channel: `quic.endpoint.error`",
+              "name": "channel:_`quic.endpoint.error`",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<ul>\n<li><code>endpoint</code> <a href=\"quic.html#class-quicendpoint\" class=\"type\">&lt;quic.QuicEndpoint&gt;</a></li>\n<li><code>error</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types\" class=\"type\">&lt;any&gt;</a></li>\n</ul>",
+              "type": "module",
+              "displayName": "Channel: `quic.endpoint.error`"
+            },
+            {
+              "textRaw": "Channel: `quic.endpoint.busy.change`",
+              "name": "channel:_`quic.endpoint.busy.change`",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<ul>\n<li><code>endpoint</code> <a href=\"quic.html#class-quicendpoint\" class=\"type\">&lt;quic.QuicEndpoint&gt;</a></li>\n<li><code>busy</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type\" class=\"type\">&lt;boolean&gt;</a></li>\n</ul>",
+              "type": "module",
+              "displayName": "Channel: `quic.endpoint.busy.change`"
+            },
+            {
+              "textRaw": "Channel: `quic.session.created.client`",
+              "name": "channel:_`quic.session.created.client`",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "type": "module",
+              "displayName": "Channel: `quic.session.created.client`"
+            },
+            {
+              "textRaw": "Channel: `quic.session.created.server`",
+              "name": "channel:_`quic.session.created.server`",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "type": "module",
+              "displayName": "Channel: `quic.session.created.server`"
+            },
+            {
+              "textRaw": "Channel: `quic.session.open.stream`",
+              "name": "channel:_`quic.session.open.stream`",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "type": "module",
+              "displayName": "Channel: `quic.session.open.stream`"
+            },
+            {
+              "textRaw": "Channel: `quic.session.received.stream`",
+              "name": "channel:_`quic.session.received.stream`",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "type": "module",
+              "displayName": "Channel: `quic.session.received.stream`"
+            },
+            {
+              "textRaw": "Channel: `quic.session.send.datagram`",
+              "name": "channel:_`quic.session.send.datagram`",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "type": "module",
+              "displayName": "Channel: `quic.session.send.datagram`"
+            },
+            {
+              "textRaw": "Channel: `quic.session.update.key`",
+              "name": "channel:_`quic.session.update.key`",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "type": "module",
+              "displayName": "Channel: `quic.session.update.key`"
+            },
+            {
+              "textRaw": "Channel: `quic.session.closing`",
+              "name": "channel:_`quic.session.closing`",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "type": "module",
+              "displayName": "Channel: `quic.session.closing`"
+            },
+            {
+              "textRaw": "Channel: `quic.session.closed`",
+              "name": "channel:_`quic.session.closed`",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "type": "module",
+              "displayName": "Channel: `quic.session.closed`"
+            },
+            {
+              "textRaw": "Channel: `quic.session.receive.datagram`",
+              "name": "channel:_`quic.session.receive.datagram`",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "type": "module",
+              "displayName": "Channel: `quic.session.receive.datagram`"
+            },
+            {
+              "textRaw": "Channel: `quic.session.receive.datagram.status`",
+              "name": "channel:_`quic.session.receive.datagram.status`",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "type": "module",
+              "displayName": "Channel: `quic.session.receive.datagram.status`"
+            },
+            {
+              "textRaw": "Channel: `quic.session.path.validation`",
+              "name": "channel:_`quic.session.path.validation`",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "type": "module",
+              "displayName": "Channel: `quic.session.path.validation`"
+            },
+            {
+              "textRaw": "Channel: `quic.session.ticket`",
+              "name": "channel:_`quic.session.ticket`",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "type": "module",
+              "displayName": "Channel: `quic.session.ticket`"
+            },
+            {
+              "textRaw": "Channel: `quic.session.version.negotiation`",
+              "name": "channel:_`quic.session.version.negotiation`",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "type": "module",
+              "displayName": "Channel: `quic.session.version.negotiation`"
+            },
+            {
+              "textRaw": "Channel: `quic.session.handshake`",
+              "name": "channel:_`quic.session.handshake`",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "type": "module",
+              "displayName": "Channel: `quic.session.handshake`"
+            }
+          ],
+          "type": "module",
+          "displayName": "Diagnostic Channels"
+        }
+      ],
+      "type": "module",
+      "displayName": "QUIC"
+    }
+  ]
+}

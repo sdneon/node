@@ -270,9 +270,6 @@ added: v16.11.0
   * `signal` {AbortSignal|undefined} **Default:** `undefined`
 * Returns: {fs.ReadStream}
 
-Unlike the 16 KiB default `highWaterMark` for a {stream.Readable}, the stream
-returned by this method has a default `highWaterMark` of 64 KiB.
-
 `options` can include `start` and `end` values to read a range of bytes from
 the file instead of the entire file. Both `start` and `end` are inclusive and
 start counting at 0, allowed values are in the
@@ -480,11 +477,14 @@ Reads data from the file and stores that in the given buffer.
 If the file is not modified concurrently, the end-of-file is reached when the
 number of bytes read is zero.
 
-#### `filehandle.readableWebStream([options])`
+#### `filehandle.readableWebStream()`
 
 <!-- YAML
 added: v17.0.0
 changes:
+  - version: v23.8.0
+    pr-url: https://github.com/nodejs/node/pull/55461
+    description: Removed option to create a 'bytes' stream. Streams are now always 'bytes' streams.
   - version:
     - v20.0.0
     - v18.17.0
@@ -494,13 +494,10 @@ changes:
 
 > Stability: 1 - Experimental
 
-* `options` {Object}
-  * `type` {string|undefined} Whether to open a normal or a `'bytes'` stream.
-    **Default:** `undefined`
-
 * Returns: {ReadableStream}
 
-Returns a `ReadableStream` that may be used to read the files data.
+Returns a byte-oriented `ReadableStream` that may be used to read the file's
+contents.
 
 An error will be thrown if this method is called more than once or is called
 after the `FileHandle` is closed or closing.
@@ -1077,6 +1074,9 @@ behavior is similar to `cp dir1/ dir2/`.
 <!-- YAML
 added: v22.0.0
 changes:
+  - version: v23.7.0
+    pr-url: https://github.com/nodejs/node/pull/56489
+    description: Add support for `exclude` option to accept glob patterns.
   - version: v22.2.0
     pr-url: https://github.com/nodejs/node/pull/52837
     description: Add support for `withFileTypes` as an option.
@@ -1087,7 +1087,8 @@ changes:
 * `pattern` {string|string\[]}
 * `options` {Object}
   * `cwd` {string} current working directory. **Default:** `process.cwd()`
-  * `exclude` {Function} Function to filter out files/directories. Return
+  * `exclude` {Function|string\[]} Function to filter out files/directories or a
+    list of glob patterns to be excluded. If a function is provided, return
     `true` to exclude the item, `false` to include it. **Default:** `undefined`.
   * `withFileTypes` {boolean} `true` if the glob should return paths as Dirents,
     `false` otherwise. **Default:** `false`.
@@ -2551,9 +2552,6 @@ changes:
   * `signal` {AbortSignal|null} **Default:** `null`
 * Returns: {fs.ReadStream}
 
-Unlike the 16 KiB default `highWaterMark` for a {stream.Readable}, the stream
-returned by this method has a default `highWaterMark` of 64 KiB.
-
 `options` can include `start` and `end` values to read a range of bytes from
 the file instead of the entire file. Both `start` and `end` are inclusive and
 start counting at 0, allowed values are in the
@@ -3126,6 +3124,9 @@ descriptor. See [`fs.utimes()`][].
 <!-- YAML
 added: v22.0.0
 changes:
+  - version: v23.7.0
+    pr-url: https://github.com/nodejs/node/pull/56489
+    description: Add support for `exclude` option to accept glob patterns.
   - version: v22.2.0
     pr-url: https://github.com/nodejs/node/pull/52837
     description: Add support for `withFileTypes` as an option.
@@ -3137,7 +3138,8 @@ changes:
 
 * `options` {Object}
   * `cwd` {string} current working directory. **Default:** `process.cwd()`
-  * `exclude` {Function} Function to filter out files/directories. Return
+  * `exclude` {Function|string\[]} Function to filter out files/directories or a
+    list of glob patterns to be excluded. If a function is provided, return
     `true` to exclude the item, `false` to include it. **Default:** `undefined`.
   * `withFileTypes` {boolean} `true` if the glob should return paths as Dirents,
     `false` otherwise. **Default:** `false`.
@@ -5662,6 +5664,9 @@ Synchronous version of [`fs.futimes()`][]. Returns `undefined`.
 <!-- YAML
 added: v22.0.0
 changes:
+  - version: v23.7.0
+    pr-url: https://github.com/nodejs/node/pull/56489
+    description: Add support for `exclude` option to accept glob patterns.
   - version: v22.2.0
     pr-url: https://github.com/nodejs/node/pull/52837
     description: Add support for `withFileTypes` as an option.
@@ -5672,7 +5677,8 @@ changes:
 * `pattern` {string|string\[]}
 * `options` {Object}
   * `cwd` {string} current working directory. **Default:** `process.cwd()`
-  * `exclude` {Function} Function to filter out files/directories. Return
+  * `exclude` {Function|string\[]} Function to filter out files/directories or a
+    list of glob patterns to be excluded. If a function is provided, return
     `true` to exclude the item, `false` to include it. **Default:** `undefined`.
   * `withFileTypes` {boolean} `true` if the glob should return paths as Dirents,
     `false` otherwise. **Default:** `false`.
@@ -6828,6 +6834,9 @@ deprecated:
   - v20.12.0
   - v18.20.0
 changes:
+  - version: v23.2.0
+    pr-url: https://github.com/nodejs/node/pull/55547
+    description: The property is no longer read-only.
   - version: v23.0.0
     pr-url: https://github.com/nodejs/node/pull/51050
     description: Accessing this property emits a warning. It is now read-only.
@@ -6837,7 +6846,7 @@ changes:
 
 * {string}
 
-Alias for `dirent.parentPath`. Read-only.
+Alias for `dirent.parentPath`.
 
 ### Class: `fs.FSWatcher`
 

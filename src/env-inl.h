@@ -44,16 +44,6 @@
 
 namespace node {
 
-NoArrayBufferZeroFillScope::NoArrayBufferZeroFillScope(
-    IsolateData* isolate_data)
-    : node_allocator_(isolate_data->node_allocator()) {
-  if (node_allocator_ != nullptr) node_allocator_->zero_fill_field()[0] = 0;
-}
-
-NoArrayBufferZeroFillScope::~NoArrayBufferZeroFillScope() {
-  if (node_allocator_ != nullptr) node_allocator_->zero_fill_field()[0] = 1;
-}
-
 inline v8::Isolate* IsolateData::isolate() const {
   return isolate_;
 }
@@ -666,7 +656,8 @@ inline bool Environment::no_global_search_paths() const {
 }
 
 inline bool Environment::should_start_debug_signal_handler() const {
-  return (flags_ & EnvironmentFlags::kNoStartDebugSignalHandler) == 0;
+  return ((flags_ & EnvironmentFlags::kNoStartDebugSignalHandler) == 0) &&
+         !options_->disable_sigusr1;
 }
 
 inline bool Environment::no_browser_globals() const {
@@ -888,6 +879,10 @@ inline void Environment::set_heap_snapshot_near_heap_limit(uint32_t limit) {
 
 inline bool Environment::is_in_heapsnapshot_heap_limit_callback() const {
   return is_in_heapsnapshot_heap_limit_callback_;
+}
+
+inline bool Environment::report_exclude_env() const {
+  return options_->report_exclude_env;
 }
 
 inline void Environment::AddHeapSnapshotNearHeapLimitCallback() {

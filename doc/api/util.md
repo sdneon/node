@@ -364,31 +364,45 @@ util.formatWithOptions({ colors: true }, 'See object %O', { foo: 42 });
 // when printed to a terminal.
 ```
 
-## `util.getCallSite(frames)`
+## `util.getCallSites(frameCountOrOptions, [options])`
 
 > Stability: 1.1 - Active development
 
 <!-- YAML
 added: v22.9.0
+changes:
+  - version: v23.7.0
+    pr-url: https://github.com/nodejs/node/pull/56584
+    description: Property `column` is deprecated in favor of `columnNumber`.
+  - version: v23.7.0
+    pr-url: https://github.com/nodejs/node/pull/56551
+    description: Property `CallSite.scriptId` is exposed.
+  - version: v23.3.0
+    pr-url: https://github.com/nodejs/node/pull/55626
+    description: The API is renamed from `util.getCallSite` to `util.getCallSites()`.
 -->
 
-* `frames` {number} Number of frames returned in the stacktrace.
+* `frameCount` {number} Optional number of frames to capture as call site objects.
   **Default:** `10`. Allowable range is between 1 and 200.
-* Returns: {Object\[]} An array of stacktrace objects
-  * `functionName` {string} Returns the name of the function associated with this stack frame.
+* `options` {Object} Optional
+  * `sourceMap` {boolean} Reconstruct the original location in the stacktrace from the source-map.
+    Enabled by default with the flag `--enable-source-maps`.
+* Returns: {Object\[]} An array of call site objects
+  * `functionName` {string} Returns the name of the function associated with this call site.
   * `scriptName` {string} Returns the name of the resource that contains the script for the
-    function for this StackFrame.
-  * `lineNumber` {number} Returns the number, 1-based, of the line for the associate function call.
-  * `column` {number} Returns the 1-based column offset on the line for the associated function call.
+    function for this call site.
+  * `scriptId` {string} Returns the unique id of the script, as in Chrome DevTools protocol [`Runtime.ScriptId`][].
+  * `lineNumber` {number} Returns the JavaScript script line number (1-based).
+  * `columnNumber` {number} Returns the JavaScript script column number (1-based).
 
-Returns an array of stacktrace objects containing the stack of
+Returns an array of call site objects containing the stack of
 the caller function.
 
 ```js
 const util = require('node:util');
 
 function exampleFunction() {
-  const callSites = util.getCallSite();
+  const callSites = util.getCallSites();
 
   console.log('Call Sites:');
   callSites.forEach((callSite, index) => {
@@ -396,7 +410,7 @@ function exampleFunction() {
     console.log(`Function Name: ${callSite.functionName}`);
     console.log(`Script Name: ${callSite.scriptName}`);
     console.log(`Line Number: ${callSite.lineNumber}`);
-    console.log(`Column Number: ${callSite.column}`);
+    console.log(`Column Number: ${callSite.columnNumber}`);
   });
   // CallSite 1:
   // Function Name: exampleFunction
@@ -419,6 +433,33 @@ function anotherFunction() {
 }
 
 anotherFunction();
+```
+
+It is possible to reconstruct the original locations by setting the option `sourceMap` to `true`.
+If the source map is not available, the original location will be the same as the current location.
+When the `--enable-source-maps` flag is enabled, for example when using `--experimental-transform-types`,
+`sourceMap` will be true by default.
+
+```ts
+import util from 'node:util';
+
+interface Foo {
+  foo: string;
+}
+
+const callSites = util.getCallSites({ sourceMap: true });
+
+// With sourceMap:
+// Function Name: ''
+// Script Name: example.js
+// Line Number: 7
+// Column Number: 26
+
+// Without sourceMap:
+// Function Name: ''
+// Script Name: example.js
+// Line Number: 2
+// Column Number: 26
 ```
 
 ## `util.getSystemErrorName(err)`
@@ -460,6 +501,26 @@ fs.access('file/that/does/not/exist', (err) => {
   const errorMap = util.getSystemErrorMap();
   const name = errorMap.get(err.errno);
   console.error(name);  // ENOENT
+});
+```
+
+## `util.getSystemErrorMessage(err)`
+
+<!-- YAML
+added: v23.1.0
+-->
+
+* `err` {number}
+* Returns: {string}
+
+Returns the string message for a numeric error code that comes from a Node.js
+API.
+The mapping between error codes and string messages is platform-dependent.
+
+```js
+fs.access('file/that/does/not/exist', (err) => {
+  const name = util.getSystemErrorMessage(err.errno);
+  console.error(name);  // No such file or directory
 });
 ```
 
@@ -630,8 +691,8 @@ changes:
 * `object` {any} Any JavaScript primitive or `Object`.
 * `options` {Object}
   * `showHidden` {boolean} If `true`, `object`'s non-enumerable symbols and
-    properties are included in the formatted result. [`WeakMap`][] and
-    [`WeakSet`][] entries are also included as well as user defined prototype
+    properties are included in the formatted result. {WeakMap} and
+    {WeakSet} entries are also included as well as user defined prototype
     properties (excluding method properties). **Default:** `false`.
   * `depth` {number} Specifies the number of times to recurse while formatting
     `object`. This is useful for inspecting large objects. To recurse up to
@@ -646,8 +707,7 @@ changes:
   * `showProxy` {boolean} If `true`, `Proxy` inspection includes
     the [`target` and `handler`][] objects. **Default:** `false`.
   * `maxArrayLength` {integer} Specifies the maximum number of `Array`,
-    [`TypedArray`][], [`Map`][], [`Set`][], [`WeakMap`][],
-    and [`WeakSet`][] elements to include when formatting.
+    {TypedArray}, {Map}, {WeakMap}, and {WeakSet} elements to include when formatting.
     Set to `null` or `Infinity` to show all elements. Set to `0` or
     negative to show no elements. **Default:** `100`.
   * `maxStringLength` {integer} Specifies the maximum number of characters to
@@ -778,10 +838,10 @@ console.log(util.inspect(o, { compact: false, depth: 5, breakLength: 80 }));
 // single line.
 ```
 
-The `showHidden` option allows [`WeakMap`][] and [`WeakSet`][] entries to be
+The `showHidden` option allows {WeakMap} and {WeakSet} entries to be
 inspected. If there are more entries than `maxArrayLength`, there is no
 guarantee which entries are displayed. That means retrieving the same
-[`WeakSet`][] entries twice may result in different output. Furthermore, entries
+{WeakSet} entries twice may result in different output. Furthermore, entries
 with no remaining strong references may be garbage collected at any time.
 
 ```js
@@ -1481,9 +1541,10 @@ changes:
       times. If `true`, all values will be collected in an array. If
       `false`, values for the option are last-wins. **Default:** `false`.
     * `short` {string} A single character alias for the option.
-    * `default` {string | boolean | string\[] | boolean\[]} The default option
-      value when it is not set by args. It must be of the same type as the
-      `type` property. When `multiple` is `true`, it must be an array.
+    * `default` {string | boolean | string\[] | boolean\[]} The default value to
+      be used if (and only if) the option does not appear in the arguments to be
+      parsed. It must be of the same type as the `type` property. When `multiple`
+      is `true`, it must be an array.
   * `strict` {boolean} Should an error be thrown when unknown arguments
     are encountered, or when arguments are passed that do not match the
     `type` configured in `options`.
@@ -1861,13 +1922,16 @@ console.log(util.stripVTControlCharacters('\u001B[4mvalue\u001B[0m'));
 
 ## `util.styleText(format, text[, options])`
 
-> Stability: 1.1 - Active development
+> Stability: 2 - Stable.
 
 <!-- YAML
 added:
   - v21.7.0
   - v20.12.0
 changes:
+  - version: v23.5.0
+    pr-url: https://github.com/nodejs/node/pull/56265
+    description: styleText is now stable.
   - version:
     - v22.8.0
     - v20.18.0
@@ -1901,7 +1965,7 @@ const errorMessage = styleText(
   // Validate if process.stderr has TTY
   { stream: stderr },
 );
-console.error(successMessage);
+console.error(errorMessage);
 ```
 
 ```cjs
@@ -1917,7 +1981,7 @@ const errorMessage = styleText(
   // Validate if process.stderr has TTY
   { stream: stderr },
 );
-console.error(successMessage);
+console.error(errorMessage);
 ```
 
 `util.inspect.colors` also provides text formats such as `italic`, and
@@ -1944,6 +2008,10 @@ The full list of formats can be found in [modifiers][].
 
 <!-- YAML
 added: v8.3.0
+changes:
+  - version: v11.0.0
+    pr-url: https://github.com/nodejs/node/pull/22281
+    description: The class is now available on the global object.
 -->
 
 An implementation of the [WHATWG Encoding Standard][] `TextDecoder` API.
@@ -2021,14 +2089,6 @@ The `'iso-8859-16'` encoding listed in the [WHATWG Encoding Standard][]
 is not supported.
 
 ### `new TextDecoder([encoding[, options]])`
-
-<!-- YAML
-added: v8.3.0
-changes:
-  - version: v11.0.0
-    pr-url: https://github.com/nodejs/node/pull/22281
-    description: The class is now available on the global object.
--->
 
 * `encoding` {string} Identifies the `encoding` that this `TextDecoder` instance
   supports. **Default:** `'utf-8'`.
@@ -2112,6 +2172,10 @@ encoded bytes.
 
 ### `textEncoder.encodeInto(src, dest)`
 
+<!-- YAML
+added: v12.11.0
+-->
+
 * `src` {string} The text to encode.
 * `dest` {Uint8Array} The array to hold the encode result.
 * Returns: {Object}
@@ -2190,39 +2254,55 @@ added:
 > Stability: 1 - Experimental
 
 * `signal` {AbortSignal}
-* `resource` {Object} Any non-null entity, reference to which is held weakly.
+* `resource` {Object} Any non-null object tied to the abortable operation and held weakly.
+  If `resource` is garbage collected before the `signal` aborts, the promise remains pending,
+  allowing Node.js to stop tracking it.
+  This helps prevent memory leaks in long-running or non-cancelable operations.
 * Returns: {Promise}
 
-Listens to abort event on the provided `signal` and
-returns a promise that is fulfilled when the `signal` is
-aborted. If the passed `resource` is garbage collected before the `signal` is
-aborted, the returned promise shall remain pending indefinitely.
+Listens to abort event on the provided `signal` and returns a promise that resolves when the `signal` is aborted.
+If `resource` is provided, it weakly references the operation's associated object,
+so if `resource` is garbage collected before the `signal` aborts,
+then returned promise shall remain pending.
+This prevents memory leaks in long-running or non-cancelable operations.
 
 ```cjs
 const { aborted } = require('node:util');
 
+// Obtain an object with an abortable signal, like a custom resource or operation.
 const dependent = obtainSomethingAbortable();
 
+// Pass `dependent` as the resource, indicating the promise should only resolve
+// if `dependent` is still in memory when the signal is aborted.
 aborted(dependent.signal, dependent).then(() => {
-  // Do something when dependent is aborted.
+
+  // This code runs when `dependent` is aborted.
+  console.log('Dependent resource was aborted.');
 });
 
+// Simulate an event that triggers the abort.
 dependent.on('event', () => {
-  dependent.abort();
+  dependent.abort(); // This will cause the `aborted` promise to resolve.
 });
 ```
 
 ```mjs
 import { aborted } from 'node:util';
 
+// Obtain an object with an abortable signal, like a custom resource or operation.
 const dependent = obtainSomethingAbortable();
 
+// Pass `dependent` as the resource, indicating the promise should only resolve
+// if `dependent` is still in memory when the signal is aborted.
 aborted(dependent.signal, dependent).then(() => {
-  // Do something when dependent is aborted.
+
+  // This code runs when `dependent` is aborted.
+  console.log('Dependent resource was aborted.');
 });
 
+// Simulate an event that triggers the abort.
 dependent.on('event', () => {
-  dependent.abort();
+  dependent.abort(); // This will cause the `aborted` promise to resolve.
 });
 ```
 
@@ -2256,8 +2336,8 @@ added: v10.0.0
 * `value` {any}
 * Returns: {boolean}
 
-Returns `true` if the value is a built-in [`ArrayBuffer`][] or
-[`SharedArrayBuffer`][] instance.
+Returns `true` if the value is a built-in {ArrayBuffer} or
+{SharedArrayBuffer} instance.
 
 See also [`util.types.isArrayBuffer()`][] and
 [`util.types.isSharedArrayBuffer()`][].
@@ -2276,8 +2356,8 @@ added: v10.0.0
 * `value` {any}
 * Returns: {boolean}
 
-Returns `true` if the value is an instance of one of the [`ArrayBuffer`][]
-views, such as typed array objects or [`DataView`][]. Equivalent to
+Returns `true` if the value is an instance of one of the {ArrayBuffer}
+views, such as typed array objects or {DataView}. Equivalent to
 [`ArrayBuffer.isView()`][].
 
 ```js
@@ -2315,8 +2395,8 @@ added: v10.0.0
 * `value` {any}
 * Returns: {boolean}
 
-Returns `true` if the value is a built-in [`ArrayBuffer`][] instance.
-This does _not_ include [`SharedArrayBuffer`][] instances. Usually, it is
+Returns `true` if the value is a built-in {ArrayBuffer} instance.
+This does _not_ include {SharedArrayBuffer} instances. Usually, it is
 desirable to test for both; See [`util.types.isAnyArrayBuffer()`][] for that.
 
 ```js
@@ -2357,6 +2437,24 @@ Returns `true` if the value is a `BigInt64Array` instance.
 ```js
 util.types.isBigInt64Array(new BigInt64Array());   // Returns true
 util.types.isBigInt64Array(new BigUint64Array());  // Returns false
+```
+
+### `util.types.isBigIntObject(value)`
+
+<!-- YAML
+added: v10.4.0
+-->
+
+* `value` {any}
+* Returns: {boolean}
+
+Returns `true` if the value is a BigInt object, e.g. created
+by `Object(BigInt(123))`.
+
+```js
+util.types.isBigIntObject(Object(BigInt(123)));   // Returns true
+util.types.isBigIntObject(BigInt(123));   // Returns false
+util.types.isBigIntObject(123);  // Returns false
 ```
 
 ### `util.types.isBigUint64Array(value)`
@@ -2438,7 +2536,7 @@ added: v10.0.0
 * `value` {any}
 * Returns: {boolean}
 
-Returns `true` if the value is a built-in [`DataView`][] instance.
+Returns `true` if the value is a built-in {DataView} instance.
 
 ```js
 const ab = new ArrayBuffer(20);
@@ -2457,7 +2555,7 @@ added: v10.0.0
 * `value` {any}
 * Returns: {boolean}
 
-Returns `true` if the value is a built-in [`Date`][] instance.
+Returns `true` if the value is a built-in {Date} instance.
 
 ```js
 util.types.isDate(new Date());  // Returns true
@@ -2518,7 +2616,7 @@ added: v10.0.0
 * `value` {any}
 * Returns: {boolean}
 
-Returns `true` if the value is a built-in [`Float32Array`][] instance.
+Returns `true` if the value is a built-in {Float32Array} instance.
 
 ```js
 util.types.isFloat32Array(new ArrayBuffer());  // Returns false
@@ -2535,7 +2633,7 @@ added: v10.0.0
 * `value` {any}
 * Returns: {boolean}
 
-Returns `true` if the value is a built-in [`Float64Array`][] instance.
+Returns `true` if the value is a built-in {Float64Array} instance.
 
 ```js
 util.types.isFloat64Array(new ArrayBuffer());  // Returns false
@@ -2592,7 +2690,7 @@ added: v10.0.0
 * `value` {any}
 * Returns: {boolean}
 
-Returns `true` if the value is a built-in [`Int8Array`][] instance.
+Returns `true` if the value is a built-in {Int8Array} instance.
 
 ```js
 util.types.isInt8Array(new ArrayBuffer());  // Returns false
@@ -2609,7 +2707,7 @@ added: v10.0.0
 * `value` {any}
 * Returns: {boolean}
 
-Returns `true` if the value is a built-in [`Int16Array`][] instance.
+Returns `true` if the value is a built-in {Int16Array} instance.
 
 ```js
 util.types.isInt16Array(new ArrayBuffer());  // Returns false
@@ -2626,7 +2724,7 @@ added: v10.0.0
 * `value` {any}
 * Returns: {boolean}
 
-Returns `true` if the value is a built-in [`Int32Array`][] instance.
+Returns `true` if the value is a built-in {Int32Array} instance.
 
 ```js
 util.types.isInt32Array(new ArrayBuffer());  // Returns false
@@ -2654,7 +2752,7 @@ added: v10.0.0
 * `value` {any}
 * Returns: {boolean}
 
-Returns `true` if the value is a built-in [`Map`][] instance.
+Returns `true` if the value is a built-in {Map} instance.
 
 ```js
 util.types.isMap(new Map());  // Returns true
@@ -2670,7 +2768,7 @@ added: v10.0.0
 * Returns: {boolean}
 
 Returns `true` if the value is an iterator returned for a built-in
-[`Map`][] instance.
+{Map} instance.
 
 ```js
 const map = new Map();
@@ -2771,7 +2869,7 @@ added: v10.0.0
 * `value` {any}
 * Returns: {boolean}
 
-Returns `true` if the value is a built-in [`Promise`][].
+Returns `true` if the value is a built-in {Promise}.
 
 ```js
 util.types.isPromise(Promise.resolve(42));  // Returns true
@@ -2786,7 +2884,7 @@ added: v10.0.0
 * `value` {any}
 * Returns: {boolean}
 
-Returns `true` if the value is a [`Proxy`][] instance.
+Returns `true` if the value is a {Proxy} instance.
 
 ```js
 const target = {};
@@ -2820,7 +2918,7 @@ added: v10.0.0
 * `value` {any}
 * Returns: {boolean}
 
-Returns `true` if the value is a built-in [`Set`][] instance.
+Returns `true` if the value is a built-in {Set} instance.
 
 ```js
 util.types.isSet(new Set());  // Returns true
@@ -2836,7 +2934,7 @@ added: v10.0.0
 * Returns: {boolean}
 
 Returns `true` if the value is an iterator returned for a built-in
-[`Set`][] instance.
+{Set} instance.
 
 ```js
 const set = new Set();
@@ -2855,8 +2953,8 @@ added: v10.0.0
 * `value` {any}
 * Returns: {boolean}
 
-Returns `true` if the value is a built-in [`SharedArrayBuffer`][] instance.
-This does _not_ include [`ArrayBuffer`][] instances. Usually, it is
+Returns `true` if the value is a built-in {SharedArrayBuffer} instance.
+This does _not_ include {ArrayBuffer} instances. Usually, it is
 desirable to test for both; See [`util.types.isAnyArrayBuffer()`][] for that.
 
 ```js
@@ -2908,7 +3006,7 @@ added: v10.0.0
 * `value` {any}
 * Returns: {boolean}
 
-Returns `true` if the value is a built-in [`TypedArray`][] instance.
+Returns `true` if the value is a built-in {TypedArray} instance.
 
 ```js
 util.types.isTypedArray(new ArrayBuffer());  // Returns false
@@ -2927,7 +3025,7 @@ added: v10.0.0
 * `value` {any}
 * Returns: {boolean}
 
-Returns `true` if the value is a built-in [`Uint8Array`][] instance.
+Returns `true` if the value is a built-in {Uint8Array} instance.
 
 ```js
 util.types.isUint8Array(new ArrayBuffer());  // Returns false
@@ -2944,7 +3042,7 @@ added: v10.0.0
 * `value` {any}
 * Returns: {boolean}
 
-Returns `true` if the value is a built-in [`Uint8ClampedArray`][] instance.
+Returns `true` if the value is a built-in {Uint8ClampedArray} instance.
 
 ```js
 util.types.isUint8ClampedArray(new ArrayBuffer());  // Returns false
@@ -2961,7 +3059,7 @@ added: v10.0.0
 * `value` {any}
 * Returns: {boolean}
 
-Returns `true` if the value is a built-in [`Uint16Array`][] instance.
+Returns `true` if the value is a built-in {Uint16Array} instance.
 
 ```js
 util.types.isUint16Array(new ArrayBuffer());  // Returns false
@@ -2978,7 +3076,7 @@ added: v10.0.0
 * `value` {any}
 * Returns: {boolean}
 
-Returns `true` if the value is a built-in [`Uint32Array`][] instance.
+Returns `true` if the value is a built-in {Uint32Array} instance.
 
 ```js
 util.types.isUint32Array(new ArrayBuffer());  // Returns false
@@ -2995,7 +3093,7 @@ added: v10.0.0
 * `value` {any}
 * Returns: {boolean}
 
-Returns `true` if the value is a built-in [`WeakMap`][] instance.
+Returns `true` if the value is a built-in {WeakMap} instance.
 
 ```js
 util.types.isWeakMap(new WeakMap());  // Returns true
@@ -3010,7 +3108,7 @@ added: v10.0.0
 * `value` {any}
 * Returns: {boolean}
 
-Returns `true` if the value is a built-in [`WeakSet`][] instance.
+Returns `true` if the value is a built-in {WeakSet} instance.
 
 ```js
 util.types.isWeakSet(new WeakSet());  // Returns true
@@ -3077,30 +3175,11 @@ util.isArray({});
 [`'warning'`]: process.md#event-warning
 [`Array.isArray()`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray
 [`ArrayBuffer.isView()`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer/isView
-[`ArrayBuffer`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer
-[`DataView`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView
-[`Date`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date
-[`Float32Array`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array
-[`Float64Array`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float64Array
-[`Int16Array`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int16Array
-[`Int32Array`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int32Array
-[`Int8Array`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int8Array
 [`JSON.stringify()`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify
 [`MIMEparams`]: #class-utilmimeparams
-[`Map`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map
 [`Object.assign()`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
 [`Object.freeze()`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze
-[`Promise`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise
-[`Proxy`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy
-[`Set`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set
-[`SharedArrayBuffer`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer
-[`TypedArray`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray
-[`Uint16Array`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint16Array
-[`Uint32Array`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint32Array
-[`Uint8Array`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array
-[`Uint8ClampedArray`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8ClampedArray
-[`WeakMap`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap
-[`WeakSet`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet
+[`Runtime.ScriptId`]: https://chromedevtools.github.io/devtools-protocol/1-3/Runtime/#type-ScriptId
 [`assert.deepStrictEqual()`]: assert.md#assertdeepstrictequalactual-expected-message
 [`console.error()`]: console.md#consoleerrordata-args
 [`mime.toString()`]: #mimetostring

@@ -247,7 +247,7 @@ static void ParseEnv(const FunctionCallbackInfo<Value>& args) {
   args.GetReturnValue().Set(dotenv.ToObject(env));
 }
 
-static void GetCallSite(const FunctionCallbackInfo<Value>& args) {
+static void GetCallSites(const FunctionCallbackInfo<Value>& args) {
   Environment* env = Environment::GetCurrent(args);
   Isolate* isolate = env->isolate();
 
@@ -275,16 +275,24 @@ static void GetCallSite(const FunctionCallbackInfo<Value>& args) {
       script_name = v8::String::Empty(isolate);
     }
 
+    std::string script_id = std::to_string(stack_frame->GetScriptId());
+
     Local<Name> names[] = {
         env->function_name_string(),
+        env->script_id_string(),
         env->script_name_string(),
         env->line_number_string(),
+        env->column_number_string(),
+        // TODO(legendecas): deprecate CallSite.column.
         env->column_string(),
     };
     Local<Value> values[] = {
         function_name,
+        OneByteString(isolate, script_id),
         script_name,
         Integer::NewFromUnsigned(isolate, stack_frame->GetLineNumber()),
+        Integer::NewFromUnsigned(isolate, stack_frame->GetColumn()),
+        // TODO(legendecas): deprecate CallSite.column.
         Integer::NewFromUnsigned(isolate, stack_frame->GetColumn()),
     };
     Local<Object> obj = Object::New(
@@ -345,7 +353,7 @@ void RegisterExternalReferences(ExternalReferenceRegistry* registry) {
   registry->Register(GetProxyDetails);
   registry->Register(GetCallerLocation);
   registry->Register(PreviewEntries);
-  registry->Register(GetCallSite);
+  registry->Register(GetCallSites);
   registry->Register(GetOwnNonIndexProperties);
   registry->Register(GetConstructorName);
   registry->Register(GetExternalValue);
@@ -451,7 +459,7 @@ void Initialize(Local<Object> target,
   SetMethodNoSideEffect(
       context, target, "getConstructorName", GetConstructorName);
   SetMethodNoSideEffect(context, target, "getExternalValue", GetExternalValue);
-  SetMethodNoSideEffect(context, target, "getCallSite", GetCallSite);
+  SetMethodNoSideEffect(context, target, "getCallSites", GetCallSites);
   SetMethod(context, target, "sleep", Sleep);
   SetMethod(context, target, "parseEnv", ParseEnv);
 

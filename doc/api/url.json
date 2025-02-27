@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v23.0.0/lib/url.js\">lib/url.js</a></p>\n<p>The <code>node:url</code> module provides utilities for URL resolution and parsing. It can\nbe accessed using:</p>\n<pre><code class=\"language-mjs\">import url from 'node:url';\n</code></pre>\n<pre><code class=\"language-cjs\">const url = require('node:url');\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v23.8.0/lib/url.js\">lib/url.js</a></p>\n<p>The <code>node:url</code> module provides utilities for URL resolution and parsing. It can\nbe accessed using:</p>\n<pre><code class=\"language-mjs\">import url from 'node:url';\n</code></pre>\n<pre><code class=\"language-cjs\">const url = require('node:url');\n</code></pre>",
       "modules": [
         {
           "textRaw": "URL strings and URL objects",
@@ -179,6 +179,13 @@
                   "textRaw": "`url.toJSON()`",
                   "type": "method",
                   "name": "toJSON",
+                  "meta": {
+                    "added": [
+                      "v7.7.0",
+                      "v6.13.0"
+                    ],
+                    "changes": []
+                  },
                   "signatures": [
                     {
                       "return": {
@@ -336,6 +343,122 @@
                     }
                   ],
                   "desc": "<p>Creates a new <code>URL</code> object by parsing the <code>input</code> relative to the <code>base</code>. If\n<code>base</code> is passed as a string, it will be parsed equivalent to <code>new URL(base)</code>.</p>\n<pre><code class=\"language-js\">const myURL = new URL('/foo', 'https://example.org/');\n// https://example.org/foo\n</code></pre>\n<p>The URL constructor is accessible as a property on the global object.\nIt can also be imported from the built-in url module:</p>\n<pre><code class=\"language-mjs\">import { URL } from 'node:url';\nconsole.log(URL === globalThis.URL); // Prints 'true'.\n</code></pre>\n<pre><code class=\"language-cjs\">console.log(URL === require('node:url').URL); // Prints 'true'.\n</code></pre>\n<p>A <code>TypeError</code> will be thrown if the <code>input</code> or <code>base</code> are not valid URLs. Note\nthat an effort will be made to coerce the given values into strings. For\ninstance:</p>\n<pre><code class=\"language-js\">const myURL = new URL({ toString: () => 'https://example.org/' });\n// https://example.org/\n</code></pre>\n<p>Unicode characters appearing within the host name of <code>input</code> will be\nautomatically converted to ASCII using the <a href=\"https://tools.ietf.org/html/rfc5891#section-4.4\">Punycode</a> algorithm.</p>\n<pre><code class=\"language-js\">const myURL = new URL('https://測試');\n// https://xn--g6w251d/\n</code></pre>\n<p>In cases where it is not known in advance if <code>input</code> is an absolute URL\nand a <code>base</code> is provided, it is advised to validate that the <code>origin</code> of\nthe <code>URL</code> object is what is expected.</p>\n<pre><code class=\"language-js\">let myURL = new URL('http://Example.com/', 'https://example.org/');\n// http://example.com/\n\nmyURL = new URL('https://Example.com/', 'https://example.org/');\n// https://example.com/\n\nmyURL = new URL('foo://Example.com/', 'https://example.org/');\n// foo://Example.com/\n\nmyURL = new URL('http:Example.com/', 'https://example.org/');\n// http://example.com/\n\nmyURL = new URL('https:Example.com/', 'https://example.org/');\n// https://example.org/Example.com/\n\nmyURL = new URL('foo:Example.com/', 'https://example.org/');\n// foo:Example.com/\n</code></pre>"
+                }
+              ]
+            },
+            {
+              "textRaw": "Class: `URLPattern`",
+              "type": "class",
+              "name": "URLPattern",
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>The <code>URLPattern</code> API provides an interface to match URLs or parts of URLs\nagainst a pattern.</p>\n<pre><code class=\"language-js\">const myPattern = new URLPattern('https://nodejs.org/docs/latest/api/*.html');\nconsole.log(myPattern.exec('https://nodejs.org/docs/latest/api/dns.html'));\n// Prints:\n// {\n//  \"hash\": { \"groups\": {  \"0\": \"\" },  \"input\": \"\" },\n//  \"hostname\": { \"groups\": {}, \"input\": \"nodejs.org\" },\n//  \"inputs\": [\n//    \"https://nodejs.org/docs/latest/api/dns.html\"\n//  ],\n//  \"password\": { \"groups\": { \"0\": \"\" }, \"input\": \"\" },\n//  \"pathname\": { \"groups\": { \"0\": \"dns\" }, \"input\": \"/docs/latest/api/dns.html\" },\n//  \"port\": { \"groups\": {}, \"input\": \"\" },\n//  \"protocol\": { \"groups\": {}, \"input\": \"https\" },\n//  \"search\": { \"groups\": { \"0\": \"\" }, \"input\": \"\" },\n//  \"username\": { \"groups\": { \"0\": \"\" }, \"input\": \"\" }\n// }\n\nconsole.log(myPattern.test('https://nodejs.org/docs/latest/api/dns.html'));\n// Prints: true\n</code></pre>",
+              "methods": [
+                {
+                  "textRaw": "`urlPattern.exec(input[, baseURL])`",
+                  "type": "method",
+                  "name": "exec",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`input` {string | Object} A URL or URL parts",
+                          "name": "input",
+                          "type": "string | Object",
+                          "desc": "A URL or URL parts"
+                        },
+                        {
+                          "textRaw": "`baseURL` {string | undefined} A base URL string",
+                          "name": "baseURL",
+                          "type": "string | undefined",
+                          "desc": "A base URL string"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>Input can be a string or an object providing the individual URL parts. The\nobject members can be any of <code>protocol</code>, <code>username</code>, <code>password</code>, <code>hostname</code>,\n<code>port</code>, <code>pathname</code>, <code>search</code>, <code>hash</code> or <code>baseURL</code>.</p>\n<p>If <code>baseURL</code> is not specified, it will default to <code>undefined</code>.</p>\n<p>Returns an object with an <code>inputs</code> key containing the array of arguments\npassed into the function and keys of the URL components which contains the\nmatched input and matched groups.</p>\n<pre><code class=\"language-js\">const myPattern = new URLPattern('https://nodejs.org/docs/latest/api/*.html');\nconsole.log(myPattern.exec('https://nodejs.org/docs/latest/api/dns.html'));\n// Prints:\n// {\n//  \"hash\": { \"groups\": {  \"0\": \"\" },  \"input\": \"\" },\n//  \"hostname\": { \"groups\": {}, \"input\": \"nodejs.org\" },\n//  \"inputs\": [\n//    \"https://nodejs.org/docs/latest/api/dns.html\"\n//  ],\n//  \"password\": { \"groups\": { \"0\": \"\" }, \"input\": \"\" },\n//  \"pathname\": { \"groups\": { \"0\": \"dns\" }, \"input\": \"/docs/latest/api/dns.html\" },\n//  \"port\": { \"groups\": {}, \"input\": \"\" },\n//  \"protocol\": { \"groups\": {}, \"input\": \"https\" },\n//  \"search\": { \"groups\": { \"0\": \"\" }, \"input\": \"\" },\n//  \"username\": { \"groups\": { \"0\": \"\" }, \"input\": \"\" }\n// }\n</code></pre>"
+                },
+                {
+                  "textRaw": "`urlPattern.test(input[, baseURL])`",
+                  "type": "method",
+                  "name": "test",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`input` {string | Object} A URL or URL parts",
+                          "name": "input",
+                          "type": "string | Object",
+                          "desc": "A URL or URL parts"
+                        },
+                        {
+                          "textRaw": "`baseURL` {string | undefined} A base URL string",
+                          "name": "baseURL",
+                          "type": "string | undefined",
+                          "desc": "A base URL string"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>Input can be a string or an object providing the individual URL parts. The\nobject members can be any of <code>protocol</code>, <code>username</code>, <code>password</code>, <code>hostname</code>,\n<code>port</code>, <code>pathname</code>, <code>search</code>, <code>hash</code> or <code>baseURL</code>.</p>\n<p>If <code>baseURL</code> is not specified, it will default to <code>undefined</code>.</p>\n<p>Returns a boolean indicating if the input matches the current pattern.</p>\n<pre><code class=\"language-js\">const myPattern = new URLPattern('https://nodejs.org/docs/latest/api/*.html');\nconsole.log(myPattern.test('https://nodejs.org/docs/latest/api/dns.html'));\n// Prints: true\n</code></pre>"
+                }
+              ],
+              "signatures": [
+                {
+                  "params": [],
+                  "desc": "<p>Instantiate a new empty <code>URLPattern</code> object.</p>"
+                },
+                {
+                  "params": [
+                    {
+                      "textRaw": "`string` {string} A URL string",
+                      "name": "string",
+                      "type": "string",
+                      "desc": "A URL string"
+                    },
+                    {
+                      "textRaw": "`baseURL` {string | undefined} A base URL string",
+                      "name": "baseURL",
+                      "type": "string | undefined",
+                      "desc": "A base URL string"
+                    },
+                    {
+                      "textRaw": "`options` {Object} Options",
+                      "name": "options",
+                      "type": "Object",
+                      "desc": "Options"
+                    }
+                  ],
+                  "desc": "<p>Parse the <code>string</code> as a URL, and use it to instantiate a new\n<code>URLPattern</code> object.</p>\n<p>If <code>baseURL</code> is not specified, it defaults to <code>undefined</code>.</p>\n<p>An option can have <code>ignoreCase</code> boolean attribute which enables\ncase-insensitive matching if set to true.</p>\n<p>The constructor can throw a <code>TypeError</code> to indicate parsing failure.</p>"
+                },
+                {
+                  "params": [
+                    {
+                      "textRaw": "`obj` {Object} An input pattern",
+                      "name": "obj",
+                      "type": "Object",
+                      "desc": "An input pattern"
+                    },
+                    {
+                      "textRaw": "`baseURL` {string | undefined} A base URL string",
+                      "name": "baseURL",
+                      "type": "string | undefined",
+                      "desc": "A base URL string"
+                    },
+                    {
+                      "textRaw": "`options` {Object} Options",
+                      "name": "options",
+                      "type": "Object",
+                      "desc": "Options"
+                    }
+                  ],
+                  "desc": "<p>Parse the <code>Object</code> as an input pattern, and use it to instantiate a new\n<code>URLPattern</code> object. The object members can be any of <code>protocol</code>, <code>username</code>,\n<code>password</code>, <code>hostname</code>, <code>port</code>, <code>pathname</code>, <code>search</code>, <code>hash</code> or <code>baseURL</code>.</p>\n<p>If <code>baseURL</code> is not specified, it defaults to <code>undefined</code>.</p>\n<p>An option can have <code>ignoreCase</code> boolean attribute which enables\ncase-insensitive matching if set to true.</p>\n<p>The constructor can throw a <code>TypeError</code> to indicate parsing failure.</p>"
                 }
               ]
             },
@@ -702,7 +825,7 @@
                       "desc": "An iterable object whose elements are key-value pairs"
                     }
                   ],
-                  "desc": "<p>Instantiate a new <code>URLSearchParams</code> object with an iterable map in a way that\nis similar to <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map\"><code>Map</code></a>'s constructor. <code>iterable</code> can be an <code>Array</code> or any\niterable object. That means <code>iterable</code> can be another <code>URLSearchParams</code>, in\nwhich case the constructor will simply create a clone of the provided\n<code>URLSearchParams</code>. Elements of <code>iterable</code> are key-value pairs, and can\nthemselves be any iterable object.</p>\n<p>Duplicate keys are allowed.</p>\n<pre><code class=\"language-js\">let params;\n\n// Using an array\nparams = new URLSearchParams([\n  ['user', 'abc'],\n  ['query', 'first'],\n  ['query', 'second'],\n]);\nconsole.log(params.toString());\n// Prints 'user=abc&#x26;query=first&#x26;query=second'\n\n// Using a Map object\nconst map = new Map();\nmap.set('user', 'abc');\nmap.set('query', 'xyz');\nparams = new URLSearchParams(map);\nconsole.log(params.toString());\n// Prints 'user=abc&#x26;query=xyz'\n\n// Using a generator function\nfunction* getQueryPairs() {\n  yield ['user', 'abc'];\n  yield ['query', 'first'];\n  yield ['query', 'second'];\n}\nparams = new URLSearchParams(getQueryPairs());\nconsole.log(params.toString());\n// Prints 'user=abc&#x26;query=first&#x26;query=second'\n\n// Each key-value pair must have exactly two elements\nnew URLSearchParams([\n  ['user', 'abc', 'error'],\n]);\n// Throws TypeError [ERR_INVALID_TUPLE]:\n//        Each query pair must be an iterable [name, value] tuple\n</code></pre>"
+                  "desc": "<p>Instantiate a new <code>URLSearchParams</code> object with an iterable map in a way that\nis similar to <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map\" class=\"type\">&lt;Map&gt;</a>'s constructor. <code>iterable</code> can be an <code>Array</code> or any\niterable object. That means <code>iterable</code> can be another <code>URLSearchParams</code>, in\nwhich case the constructor will simply create a clone of the provided\n<code>URLSearchParams</code>. Elements of <code>iterable</code> are key-value pairs, and can\nthemselves be any iterable object.</p>\n<p>Duplicate keys are allowed.</p>\n<pre><code class=\"language-js\">let params;\n\n// Using an array\nparams = new URLSearchParams([\n  ['user', 'abc'],\n  ['query', 'first'],\n  ['query', 'second'],\n]);\nconsole.log(params.toString());\n// Prints 'user=abc&#x26;query=first&#x26;query=second'\n\n// Using a Map object\nconst map = new Map();\nmap.set('user', 'abc');\nmap.set('query', 'xyz');\nparams = new URLSearchParams(map);\nconsole.log(params.toString());\n// Prints 'user=abc&#x26;query=xyz'\n\n// Using a generator function\nfunction* getQueryPairs() {\n  yield ['user', 'abc'];\n  yield ['query', 'first'];\n  yield ['query', 'second'];\n}\nparams = new URLSearchParams(getQueryPairs());\nconsole.log(params.toString());\n// Prints 'user=abc&#x26;query=first&#x26;query=second'\n\n// Each key-value pair must have exactly two elements\nnew URLSearchParams([\n  ['user', 'abc', 'error'],\n]);\n// Throws TypeError [ERR_INVALID_TUPLE]:\n//        Each query pair must be an iterable [name, value] tuple\n</code></pre>"
                 }
               ]
             }

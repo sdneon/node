@@ -35,6 +35,7 @@ The current security stewards are documented in the main Node.js
 | NodeSource   | Rafael          | 2024-Apr-03  |
 | NodeSource   | Rafael          | 2024-Apr-10  |
 | NodeSource   | Rafael          | 2024-Jul-08  |
+| NodeSource   | Rafael          | 2025-Jan-21  |
 | Datadog      | Bryan           |              |
 | IBM          | Joe             |              |
 | Platformatic | Matteo          |              |
@@ -65,6 +66,8 @@ The current security stewards are documented in the main Node.js
 * [ ] 4\. **Requesting CVEs:**
   * Request CVEs for the reports with `git node security --request-cve`.
   * Make sure to have a green CI before requesting a CVE.
+  * Check if there is a need to issue a CVE for any version that became
+    EOL after the last security release through [this issue](https://github.com/nodejs/security-wg/issues/1419).
 
 * [ ] 5\. **Choosing or Updating Release Date:**
   * Get agreement on the planned date for the release.
@@ -153,14 +156,10 @@ security announcements for more information.
 
 ## Post-Release
 
-* [ ] 1\. **Merge the Next Security Release PR:**
-  * This involves moving the `vulnerabilities.json` file from
-    `security-release/next-security-release` to the `security-release/YYYY-MM-DD`
-    folder and merging the PR.
-
-* [ ] 2\. **Cleanup:**
+* [ ] 1\. **Cleanup:**
   * [ ] `git node security --cleanup`. This command will:
-  * Close PRs and backports.
+  * Update next-security-release folder
+  * Close all PRs and backports labeled with `Security Release`.
   * Close HackerOne reports:
     * Close Resolved
     * Request Disclosure

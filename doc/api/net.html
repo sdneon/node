@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v23.0.0">
-  <title>Net | Node.js v23.0.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v23.8.0">
+  <title>Net | Node.js v23.8.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -26,6 +26,7 @@
   <style>@media(max-width:478px){.with-32-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:694px){.with-59-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:518px){.with-37-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:542px){.with-40-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}</style>
 </head>
 <body class="alt apidoc" id="api-section-net">
+  <a href="#apicontent" class="skip-to-content">Skip to content</a>
   <div id="content" class="clearfix">
     <div role="navigation" id="column2" class="interior">
       <div id="intro" class="interior">
@@ -79,6 +80,7 @@
 <li><a href="process.html" class="nav-process">Process</a></li>
 <li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
 <li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="quic.html" class="nav-quic">QUIC</a></li>
 <li><a href="readline.html" class="nav-readline">Readline</a></li>
 <li><a href="repl.html" class="nav-repl">REPL</a></li>
 <li><a href="report.html" class="nav-report">Report</a></li>
@@ -111,7 +113,7 @@
     <div id="column1" data-id="net" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v23.0.0 documentation</h1>
+          <h1>Node.js v23.8.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -126,15 +128,15 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v23.0.0</li>
+            <li class="pinned-header">Node.js v23.8.0</li>
             
     <li class="picker-header">
-      <a href="#">
+      <a href="#toc-picker" aria-controls="toc-picker">
         <span class="picker-arrow"></span>
         Table of contents
       </a>
 
-      <div class="picker"><div class="toc"><ul>
+      <div class="picker" tabindex="-1"><div class="toc"><ul id="toc-picker">
 <li><span class="stability_2"><a href="#net">Net</a></span>
 <ul>
 <li><a href="#ipc-support">IPC support</a>
@@ -149,6 +151,7 @@
 <li><a href="#blocklistaddsubnetnet-prefix-type"><code>blockList.addSubnet(net, prefix[, type])</code></a></li>
 <li><a href="#blocklistcheckaddress-type"><code>blockList.check(address[, type])</code></a></li>
 <li><a href="#blocklistrules"><code>blockList.rules</code></a></li>
+<li><a href="#blocklistisblocklistvalue"><code>BlockList.isBlockList(value)</code></a></li>
 </ul>
 </li>
 <li><a href="#class-netsocketaddress">Class: <code>net.SocketAddress</code></a>
@@ -158,6 +161,7 @@
 <li><a href="#socketaddressfamily"><code>socketaddress.family</code></a></li>
 <li><a href="#socketaddressflowlabel"><code>socketaddress.flowlabel</code></a></li>
 <li><a href="#socketaddressport"><code>socketaddress.port</code></a></li>
+<li><a href="#socketaddressparseinput"><code>SocketAddress.parse(input)</code></a></li>
 </ul>
 </li>
 <li><a href="#class-netserver">Class: <code>net.Server</code></a>
@@ -182,6 +186,7 @@
 </li>
 <li><a href="#serverlistening"><code>server.listening</code></a></li>
 <li><a href="#servermaxconnections"><code>server.maxConnections</code></a></li>
+<li><a href="#serverdropmaxconnection"><code>server.dropMaxConnection</code></a></li>
 <li><a href="#serverref"><code>server.ref()</code></a></li>
 <li><a href="#serverunref"><code>server.unref()</code></a></li>
 </ul>
@@ -268,12 +273,12 @@
   
             
     <li class="picker-header">
-      <a href="#">
+      <a href="#gtoc-picker" aria-controls="gtoc-picker">
         <span class="picker-arrow"></span>
         Index
       </a>
 
-      <div class="picker"><ul>
+      <div class="picker" tabindex="-1" id="gtoc-picker"><ul>
 <li><a href="documentation.html" class="nav-documentation">About this documentation</a></li>
 <li><a href="synopsis.html" class="nav-synopsis">Usage and example</a></li>
 
@@ -324,6 +329,7 @@
 <li><a href="process.html" class="nav-process">Process</a></li>
 <li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
 <li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="quic.html" class="nav-quic">QUIC</a></li>
 <li><a href="readline.html" class="nav-readline">Readline</a></li>
 <li><a href="repl.html" class="nav-repl">REPL</a></li>
 <li><a href="report.html" class="nav-report">Report</a></li>
@@ -355,11 +361,12 @@
   
             
     <li class="picker-header">
-      <a href="#">
+      <a href="#alt-docs" aria-controls="alt-docs">
         <span class="picker-arrow"></span>
         Other versions
       </a>
-      <div class="picker"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v22.x/api/net.html">22.x</a></li>
+      <div class="picker" tabindex="-1"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v23.x/api/net.html">23.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v22.x/api/net.html">22.x <b>LTS</b></a></li>
 <li><a href="https://nodejs.org/docs/latest-v21.x/api/net.html">21.x</a></li>
 <li><a href="https://nodejs.org/docs/latest-v20.x/api/net.html">20.x <b>LTS</b></a></li>
 <li><a href="https://nodejs.org/docs/latest-v19.x/api/net.html">19.x</a></li>
@@ -383,13 +390,13 @@
     </li>
   
             <li class="picker-header">
-              <a href="#">
+              <a href="#options-picker" aria-controls="options-picker">
                 <span class="picker-arrow"></span>
                 Options
               </a>
         
-              <div class="picker">
-                <ul>
+              <div class="picker" tabindex="-1">
+                <ul id="options-picker">
                   <li>
                     <a href="all.html">View on single page</a>
                   </li>
@@ -420,6 +427,7 @@
 <li><a href="#blocklistaddsubnetnet-prefix-type"><code>blockList.addSubnet(net, prefix[, type])</code></a></li>
 <li><a href="#blocklistcheckaddress-type"><code>blockList.check(address[, type])</code></a></li>
 <li><a href="#blocklistrules"><code>blockList.rules</code></a></li>
+<li><a href="#blocklistisblocklistvalue"><code>BlockList.isBlockList(value)</code></a></li>
 </ul>
 </li>
 <li><a href="#class-netsocketaddress">Class: <code>net.SocketAddress</code></a>
@@ -429,6 +437,7 @@
 <li><a href="#socketaddressfamily"><code>socketaddress.family</code></a></li>
 <li><a href="#socketaddressflowlabel"><code>socketaddress.flowlabel</code></a></li>
 <li><a href="#socketaddressport"><code>socketaddress.port</code></a></li>
+<li><a href="#socketaddressparseinput"><code>SocketAddress.parse(input)</code></a></li>
 </ul>
 </li>
 <li><a href="#class-netserver">Class: <code>net.Server</code></a>
@@ -453,6 +462,7 @@
 </li>
 <li><a href="#serverlistening"><code>server.listening</code></a></li>
 <li><a href="#servermaxconnections"><code>server.maxConnections</code></a></li>
+<li><a href="#serverdropmaxconnection"><code>server.dropMaxConnection</code></a></li>
 <li><a href="#serverref"><code>server.ref()</code></a></li>
 <li><a href="#serverunref"><code>server.unref()</code></a></li>
 </ul>
@@ -541,7 +551,7 @@
 
 <!--lint disable maximum-line-length-->
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v23.0.0/lib/net.js">lib/net.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v23.8.0/lib/net.js">lib/net.js</a></p>
 <p>The <code>node:net</code> module provides an asynchronous network API for creating stream-based
 TCP or <a href="#ipc-support">IPC</a> servers (<a href="#netcreateserveroptions-connectionlistener"><code>net.createServer()</code></a>) and clients
 (<a href="#netcreateconnection"><code>net.createConnection()</code></a>).</p>
@@ -659,6 +669,14 @@ blockList.<span class="hljs-title function_">addSubnet</span>(<span class="hljs-
 <li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a></li>
 </ul>
 <p>The list of rules added to the blocklist.</p>
+<h4><code>BlockList.isBlockList(value)</code><span><a class="mark" href="#blocklistisblocklistvalue" id="blocklistisblocklistvalue">#</a></span><a aria-hidden="true" class="legacy" id="net_blocklist_isblocklist_value"></a></h4>
+<div class="api_metadata">
+<span>Added in: v23.4.0</span>
+</div>
+<ul>
+<li><code>value</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> Any JS value</li>
+<li>Returns <code>true</code> if the <code>value</code> is a <code>net.BlockList</code>.</li>
+</ul>
 </section><section><h3>Class: <code>net.SocketAddress</code><span><a class="mark" href="#class-netsocketaddress" id="class-netsocketaddress">#</a></span><a aria-hidden="true" class="legacy" id="net_class_net_socketaddress"></a></h3>
 <div class="api_metadata">
 <span>Added in: v15.14.0, v14.18.0</span>
@@ -707,6 +725,16 @@ blockList.<span class="hljs-title function_">addSubnet</span>(<span class="hljs-
 </div>
 <ul>
 <li>Type <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<h4><code>SocketAddress.parse(input)</code><span><a class="mark" href="#socketaddressparseinput" id="socketaddressparseinput">#</a></span><a aria-hidden="true" class="legacy" id="net_socketaddress_parse_input"></a></h4>
+<div class="api_metadata">
+<span>Added in: v23.4.0</span>
+</div>
+<ul>
+<li><code>input</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> An input string containing an IP address and optional port,
+e.g. <code>123.1.2.3:1234</code> or <code>[1::1]:1234</code>.</li>
+<li>Returns: <a href="net.html#class-netsocketaddress" class="type">&#x3C;net.SocketAddress></a> Returns a <code>SocketAddress</code> if parsing was successful.
+Otherwise returns <code>undefined</code>.</li>
 </ul>
 </section><section><h3>Class: <code>net.Server</code><span><a class="mark" href="#class-netserver" id="class-netserver">#</a></span><a aria-hidden="true" class="legacy" id="net_class_net_server"></a></h3>
 <div class="api_metadata">
@@ -901,6 +929,8 @@ valid file descriptor.</p>
 <details class="changelog"><summary>History</summary>
 <table>
 <tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v23.1.0</td>
+<td><p>The <code>reusePort</code> option is supported.</p></td></tr>
 <tr><td>v15.6.0</td>
 <td><p>AbortSignal support was added.</p></td></tr>
 <tr><td>v11.4.0</td>
@@ -920,6 +950,11 @@ functions.</li>
 <li><code>ipv6Only</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> For TCP servers, setting <code>ipv6Only</code> to <code>true</code> will
 disable dual-stack support, i.e., binding to host <code>::</code> won't make
 <code>0.0.0.0</code> be bound. <strong>Default:</strong> <code>false</code>.</li>
+<li><code>reusePort</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> For TCP servers, setting <code>reusePort</code> to <code>true</code> allows
+multiple sockets on the same host to bind to the same port. Incoming connections
+are distributed by the operating system to listening sockets. This option is
+available only on some platforms, such as Linux 3.9+, DragonFlyBSD 3.6+, FreeBSD 12.0+,
+Solaris 11.4, and AIX 7.2.5+. <strong>Default:</strong> <code>false</code>.</li>
 <li><code>path</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> Will be ignored if <code>port</code> is specified. See
 <a href="#identifying-paths-for-ipc-connections">Identifying paths for IPC connections</a>.</li>
 <li><code>port</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
@@ -1021,10 +1056,25 @@ may cause the <code>net.Server</code> to also listen on the <a href="https://en.
 <ul>
 <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a></li>
 </ul>
-<p>Set this property to reject connections when the server's connection count gets
-high.</p>
+<p>When the number of connections reaches the <code>server.maxConnections</code> threshold:</p>
+<ol>
+<li>
+<p>If the process is not running in cluster mode, Node.js will close the connection.</p>
+</li>
+<li>
+<p>If the process is running in cluster mode, Node.js will, by default, route the connection to another worker process. To close the connection instead, set [<code>server.dropMaxConnection</code>][] to <code>true</code>.</p>
+</li>
+</ol>
 <p>It is not recommended to use this option once a socket has been sent to a child
 with <a href="child_process.html#child_processforkmodulepath-args-options"><code>child_process.fork()</code></a>.</p>
+<h4><code>server.dropMaxConnection</code><span><a class="mark" href="#serverdropmaxconnection" id="serverdropmaxconnection">#</a></span><a aria-hidden="true" class="legacy" id="net_server_dropmaxconnection"></a></h4>
+<div class="api_metadata">
+<span>Added in: v23.1.0</span>
+</div>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+</ul>
+<p>Set this property to <code>true</code> to begin closing connections once the number of connections reaches the [<code>server.maxConnections</code>][] threshold. This setting is only effective in cluster mode.</p>
 <h4><code>server.ref()</code><span><a class="mark" href="#serverref" id="serverref">#</a></span><a aria-hidden="true" class="legacy" id="net_server_ref"></a></h4>
 <div class="api_metadata">
 <span>Added in: v0.9.1</span>
@@ -1390,6 +1440,8 @@ initial delay before the first keepalive probe is sent on an idle socket.
 <li><code>noDelay</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> If set to <code>true</code>, it disables the use of Nagle's algorithm
 immediately after the socket is established. <strong>Default:</strong> <code>false</code>.</li>
 <li><code>port</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> Required. Port the socket should connect to.</li>
+<li><code>blockList</code> <a href="net.html#class-netblocklist" class="type">&#x3C;net.BlockList></a> <code>blockList</code> can be used for disabling outbound
+access to specific IP addresses, IP ranges, or IP subnets.</li>
 </ul>
 <p>For <a href="#ipc-support">IPC</a> connections, available <code>options</code> are:</p>
 <ul>
@@ -1928,6 +1980,11 @@ algorithm immediately after a new incoming connection is received.
 <strong>Default:</strong> <code>false</code>.</li>
 <li><code>pauseOnConnect</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> Indicates whether the socket should be
 paused on incoming connections. <strong>Default:</strong> <code>false</code>.</li>
+<li><code>blockList</code> <a href="net.html#class-netblocklist" class="type">&#x3C;net.BlockList></a> <code>blockList</code> can be used for disabling inbound
+access to specific IP addresses, IP ranges, or IP subnets. This does not
+work if the server is behind a reverse proxy, NAT, etc. because the address
+checked against the block list is the address of the proxy, or the one
+specified by the NAT.</li>
 </ul>
 </li>
 <li>

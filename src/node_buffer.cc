@@ -58,6 +58,7 @@ namespace Buffer {
 using v8::ArrayBuffer;
 using v8::ArrayBufferView;
 using v8::BackingStore;
+using v8::BackingStoreInitializationMode;
 using v8::Context;
 using v8::EscapableHandleScope;
 using v8::FastApiTypedArray;
@@ -279,7 +280,7 @@ MaybeLocal<Uint8Array> New(Environment* env,
   CHECK(!env->buffer_prototype_object().IsEmpty());
   Local<Uint8Array> ui = Uint8Array::New(ab, byte_offset, length);
   Maybe<bool> mb =
-      ui->SetPrototype(env->context(), env->buffer_prototype_object());
+      ui->SetPrototypeV2(env->context(), env->buffer_prototype_object());
   if (mb.IsNothing())
     return MaybeLocal<Uint8Array>();
   return ui;
@@ -372,9 +373,8 @@ MaybeLocal<Object> New(Environment* env, size_t length) {
 
   Local<ArrayBuffer> ab;
   {
-    NoArrayBufferZeroFillScope no_zero_fill_scope(env->isolate_data());
-    std::unique_ptr<BackingStore> bs =
-        ArrayBuffer::NewBackingStore(isolate, length);
+    std::unique_ptr<BackingStore> bs = ArrayBuffer::NewBackingStore(
+        isolate, length, BackingStoreInitializationMode::kUninitialized);
 
     CHECK(bs);
 
@@ -413,18 +413,14 @@ MaybeLocal<Object> Copy(Environment* env, const char* data, size_t length) {
     return Local<Object>();
   }
 
-  Local<ArrayBuffer> ab;
-  {
-    NoArrayBufferZeroFillScope no_zero_fill_scope(env->isolate_data());
-    std::unique_ptr<BackingStore> bs =
-        ArrayBuffer::NewBackingStore(isolate, length);
+  std::unique_ptr<BackingStore> bs = ArrayBuffer::NewBackingStore(
+      isolate, length, BackingStoreInitializationMode::kUninitialized);
 
-    CHECK(bs);
+  CHECK(bs);
 
-    memcpy(bs->Data(), data, length);
+  memcpy(bs->Data(), data, length);
 
-    ab = ArrayBuffer::New(isolate, std::move(bs));
-  }
+  Local<ArrayBuffer> ab = ArrayBuffer::New(isolate, std::move(bs));
 
   MaybeLocal<Object> obj =
       New(env, ab, 0, ab->ByteLength())
@@ -966,8 +962,9 @@ void IndexOfString(const FunctionCallbackInfo<Value>& args) {
 
   if (enc == UCS2) {
     String::Value needle_value(isolate, needle);
-    if (*needle_value == nullptr)
+    if (*needle_value == nullptr) {
       return args.GetReturnValue().Set(-1);
+    }
 
     if (haystack_length < 2 || needle_value.length() < 1) {
       return args.GetReturnValue().Set(-1);

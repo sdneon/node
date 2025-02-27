@@ -6,7 +6,7 @@
       "textRaw": "Net",
       "name": "net",
       "introduced_in": "v0.10.0",
-      "desc": "<!--lint disable maximum-line-length-->\n<blockquote>\n<p>Stability: 2 - Stable</p>\n</blockquote>\n<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v23.0.0/lib/net.js\">lib/net.js</a></p>\n<p>The <code>node:net</code> module provides an asynchronous network API for creating stream-based\nTCP or <a href=\"#ipc-support\">IPC</a> servers (<a href=\"#netcreateserveroptions-connectionlistener\"><code>net.createServer()</code></a>) and clients\n(<a href=\"#netcreateconnection\"><code>net.createConnection()</code></a>).</p>\n<p>It can be accessed using:</p>\n<pre><code class=\"language-mjs\">import net from 'node:net';\n</code></pre>\n<pre><code class=\"language-cjs\">const net = require('node:net');\n</code></pre>",
+      "desc": "<!--lint disable maximum-line-length-->\n<blockquote>\n<p>Stability: 2 - Stable</p>\n</blockquote>\n<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v23.8.0/lib/net.js\">lib/net.js</a></p>\n<p>The <code>node:net</code> module provides an asynchronous network API for creating stream-based\nTCP or <a href=\"#ipc-support\">IPC</a> servers (<a href=\"#netcreateserveroptions-connectionlistener\"><code>net.createServer()</code></a>) and clients\n(<a href=\"#netcreateconnection\"><code>net.createConnection()</code></a>).</p>\n<p>It can be accessed using:</p>\n<pre><code class=\"language-mjs\">import net from 'node:net';\n</code></pre>\n<pre><code class=\"language-cjs\">const net = require('node:net');\n</code></pre>",
       "modules": [
         {
           "textRaw": "IPC support",
@@ -192,6 +192,34 @@
                 }
               ],
               "desc": "<p>Returns <code>true</code> if the given IP address matches any of the rules added to the\n<code>BlockList</code>.</p>\n<pre><code class=\"language-js\">const blockList = new net.BlockList();\nblockList.addAddress('123.123.123.123');\nblockList.addRange('10.0.0.1', '10.0.0.10');\nblockList.addSubnet('8592:757c:efae:4e45::', 64, 'ipv6');\n\nconsole.log(blockList.check('123.123.123.123'));  // Prints: true\nconsole.log(blockList.check('10.0.0.3'));  // Prints: true\nconsole.log(blockList.check('222.111.111.222'));  // Prints: false\n\n// IPv6 notation for IPv4 addresses works:\nconsole.log(blockList.check('::ffff:7b7b:7b7b', 'ipv6')); // Prints: true\nconsole.log(blockList.check('::ffff:123.123.123.123', 'ipv6')); // Prints: true\n</code></pre>"
+            },
+            {
+              "textRaw": "`BlockList.isBlockList(value)`",
+              "type": "method",
+              "name": "isBlockList",
+              "meta": {
+                "added": [
+                  "v23.4.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "return": {
+                    "textRaw": "Returns `true` if the `value` is a `net.BlockList`.",
+                    "name": "return",
+                    "desc": "`true` if the `value` is a `net.BlockList`."
+                  },
+                  "params": [
+                    {
+                      "textRaw": "`value` {any} Any JS value",
+                      "name": "value",
+                      "type": "any",
+                      "desc": "Any JS value"
+                    }
+                  ]
+                }
+              ]
             }
           ],
           "properties": [
@@ -271,6 +299,37 @@
                 ],
                 "changes": []
               }
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`SocketAddress.parse(input)`",
+              "type": "method",
+              "name": "parse",
+              "meta": {
+                "added": [
+                  "v23.4.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "return": {
+                    "textRaw": "Returns: {net.SocketAddress} Returns a `SocketAddress` if parsing was successful. Otherwise returns `undefined`.",
+                    "name": "return",
+                    "type": "net.SocketAddress",
+                    "desc": "Returns a `SocketAddress` if parsing was successful. Otherwise returns `undefined`."
+                  },
+                  "params": [
+                    {
+                      "textRaw": "`input` {string} An input string containing an IP address and optional port, e.g. `123.1.2.3:1234` or `[1::1]:1234`.",
+                      "name": "input",
+                      "type": "string",
+                      "desc": "An input string containing an IP address and optional port, e.g. `123.1.2.3:1234` or `[1::1]:1234`."
+                    }
+                  ]
+                }
+              ]
             }
           ],
           "signatures": [
@@ -572,6 +631,11 @@
                     ],
                     "changes": [
                       {
+                        "version": "v23.1.0",
+                        "pr-url": "https://github.com/nodejs/node/pull/55408",
+                        "description": "The `reusePort` option is supported."
+                      },
+                      {
                         "version": "v15.6.0",
                         "pr-url": "https://github.com/nodejs/node/pull/36623",
                         "description": "AbortSignal support was added."
@@ -620,6 +684,13 @@
                               "type": "boolean",
                               "default": "`false`",
                               "desc": "For TCP servers, setting `ipv6Only` to `true` will disable dual-stack support, i.e., binding to host `::` won't make `0.0.0.0` be bound."
+                            },
+                            {
+                              "textRaw": "`reusePort` {boolean} For TCP servers, setting `reusePort` to `true` allows multiple sockets on the same host to bind to the same port. Incoming connections are distributed by the operating system to listening sockets. This option is available only on some platforms, such as Linux 3.9+, DragonFlyBSD 3.6+, FreeBSD 12.0+, Solaris 11.4, and AIX 7.2.5+. **Default:** `false`.",
+                              "name": "reusePort",
+                              "type": "boolean",
+                              "default": "`false`",
+                              "desc": "For TCP servers, setting `reusePort` to `true` allows multiple sockets on the same host to bind to the same port. Incoming connections are distributed by the operating system to listening sockets. This option is available only on some platforms, such as Linux 3.9+, DragonFlyBSD 3.6+, FreeBSD 12.0+, Solaris 11.4, and AIX 7.2.5+."
                             },
                             {
                               "textRaw": "`path` {string} Will be ignored if `port` is specified. See [Identifying paths for IPC connections][].",
@@ -827,7 +898,19 @@
                   }
                 ]
               },
-              "desc": "<p>Set this property to reject connections when the server's connection count gets\nhigh.</p>\n<p>It is not recommended to use this option once a socket has been sent to a child\nwith <a href=\"child_process.html#child_processforkmodulepath-args-options\"><code>child_process.fork()</code></a>.</p>"
+              "desc": "<p>When the number of connections reaches the <code>server.maxConnections</code> threshold:</p>\n<ol>\n<li>\n<p>If the process is not running in cluster mode, Node.js will close the connection.</p>\n</li>\n<li>\n<p>If the process is running in cluster mode, Node.js will, by default, route the connection to another worker process. To close the connection instead, set [<code>server.dropMaxConnection</code>][] to <code>true</code>.</p>\n</li>\n</ol>\n<p>It is not recommended to use this option once a socket has been sent to a child\nwith <a href=\"child_process.html#child_processforkmodulepath-args-options\"><code>child_process.fork()</code></a>.</p>"
+            },
+            {
+              "textRaw": "`dropMaxConnection` {boolean}",
+              "type": "boolean",
+              "name": "dropMaxConnection",
+              "meta": {
+                "added": [
+                  "v23.1.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>Set this property to <code>true</code> to begin closing connections once the number of connections reaches the [<code>server.maxConnections</code>][] threshold. This setting is only effective in cluster mode.</p>"
             }
           ],
           "signatures": [
@@ -1231,7 +1314,7 @@
                       ]
                     }
                   ],
-                  "desc": "<p>Initiate a connection on a given socket. Normally this method is not needed,\nthe socket should be created and opened with <a href=\"#netcreateconnection\"><code>net.createConnection()</code></a>. Use\nthis only when implementing a custom Socket.</p>\n<p>For TCP connections, available <code>options</code> are:</p>\n<ul>\n<li><code>autoSelectFamily</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type\" class=\"type\">&lt;boolean&gt;</a>: If set to <code>true</code>, it enables a family\nautodetection algorithm that loosely implements section 5 of <a href=\"https://www.rfc-editor.org/rfc/rfc8305.txt\">RFC 8305</a>. The\n<code>all</code> option passed to lookup is set to <code>true</code> and the sockets attempts to\nconnect to all obtained IPv6 and IPv4 addresses, in sequence, until a\nconnection is established. The first returned AAAA address is tried first,\nthen the first returned A address, then the second returned AAAA address and\nso on. Each connection attempt (but the last one) is given the amount of time\nspecified by the <code>autoSelectFamilyAttemptTimeout</code> option before timing out and\ntrying the next address. Ignored if the <code>family</code> option is not <code>0</code> or if\n<code>localAddress</code> is set. Connection errors are not emitted if at least one\nconnection succeeds. If all connections attempts fails, a single\n<code>AggregateError</code> with all failed attempts is emitted. <strong>Default:</strong>\n<a href=\"#netgetdefaultautoselectfamily\"><code>net.getDefaultAutoSelectFamily()</code></a>.</li>\n<li><code>autoSelectFamilyAttemptTimeout</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a>: The amount of time in milliseconds\nto wait for a connection attempt to finish before trying the next address when\nusing the <code>autoSelectFamily</code> option. If set to a positive integer less than\n<code>10</code>, then the value <code>10</code> will be used instead. <strong>Default:</strong>\n<a href=\"#netgetdefaultautoselectfamilyattempttimeout\"><code>net.getDefaultAutoSelectFamilyAttemptTimeout()</code></a>.</li>\n<li><code>family</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a>: Version of IP stack. Must be <code>4</code>, <code>6</code>, or <code>0</code>. The value\n<code>0</code> indicates that both IPv4 and IPv6 addresses are allowed. <strong>Default:</strong> <code>0</code>.</li>\n<li><code>hints</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> Optional <a href=\"dns.html#supported-getaddrinfo-flags\"><code>dns.lookup()</code> hints</a>.</li>\n<li><code>host</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> Host the socket should connect to. <strong>Default:</strong> <code>'localhost'</code>.</li>\n<li><code>keepAlive</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type\" class=\"type\">&lt;boolean&gt;</a> If set to <code>true</code>, it enables keep-alive functionality on\nthe socket immediately after the connection is established, similarly on what\nis done in <a href=\"#socketsetkeepaliveenable-initialdelay\"><code>socket.setKeepAlive()</code></a>. <strong>Default:</strong> <code>false</code>.</li>\n<li><code>keepAliveInitialDelay</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> If set to a positive number, it sets the\ninitial delay before the first keepalive probe is sent on an idle socket.\n<strong>Default:</strong> <code>0</code>.</li>\n<li><code>localAddress</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> Local address the socket should connect from.</li>\n<li><code>localPort</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> Local port the socket should connect from.</li>\n<li><code>lookup</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function\" class=\"type\">&lt;Function&gt;</a> Custom lookup function. <strong>Default:</strong> <a href=\"dns.html#dnslookuphostname-options-callback\"><code>dns.lookup()</code></a>.</li>\n<li><code>noDelay</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type\" class=\"type\">&lt;boolean&gt;</a> If set to <code>true</code>, it disables the use of Nagle's algorithm\nimmediately after the socket is established. <strong>Default:</strong> <code>false</code>.</li>\n<li><code>port</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> Required. Port the socket should connect to.</li>\n</ul>\n<p>For <a href=\"#ipc-support\">IPC</a> connections, available <code>options</code> are:</p>\n<ul>\n<li><code>path</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> Required. Path the client should connect to.\nSee <a href=\"#identifying-paths-for-ipc-connections\">Identifying paths for IPC connections</a>. If provided, the TCP-specific\noptions above are ignored.</li>\n</ul>"
+                  "desc": "<p>Initiate a connection on a given socket. Normally this method is not needed,\nthe socket should be created and opened with <a href=\"#netcreateconnection\"><code>net.createConnection()</code></a>. Use\nthis only when implementing a custom Socket.</p>\n<p>For TCP connections, available <code>options</code> are:</p>\n<ul>\n<li><code>autoSelectFamily</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type\" class=\"type\">&lt;boolean&gt;</a>: If set to <code>true</code>, it enables a family\nautodetection algorithm that loosely implements section 5 of <a href=\"https://www.rfc-editor.org/rfc/rfc8305.txt\">RFC 8305</a>. The\n<code>all</code> option passed to lookup is set to <code>true</code> and the sockets attempts to\nconnect to all obtained IPv6 and IPv4 addresses, in sequence, until a\nconnection is established. The first returned AAAA address is tried first,\nthen the first returned A address, then the second returned AAAA address and\nso on. Each connection attempt (but the last one) is given the amount of time\nspecified by the <code>autoSelectFamilyAttemptTimeout</code> option before timing out and\ntrying the next address. Ignored if the <code>family</code> option is not <code>0</code> or if\n<code>localAddress</code> is set. Connection errors are not emitted if at least one\nconnection succeeds. If all connections attempts fails, a single\n<code>AggregateError</code> with all failed attempts is emitted. <strong>Default:</strong>\n<a href=\"#netgetdefaultautoselectfamily\"><code>net.getDefaultAutoSelectFamily()</code></a>.</li>\n<li><code>autoSelectFamilyAttemptTimeout</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a>: The amount of time in milliseconds\nto wait for a connection attempt to finish before trying the next address when\nusing the <code>autoSelectFamily</code> option. If set to a positive integer less than\n<code>10</code>, then the value <code>10</code> will be used instead. <strong>Default:</strong>\n<a href=\"#netgetdefaultautoselectfamilyattempttimeout\"><code>net.getDefaultAutoSelectFamilyAttemptTimeout()</code></a>.</li>\n<li><code>family</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a>: Version of IP stack. Must be <code>4</code>, <code>6</code>, or <code>0</code>. The value\n<code>0</code> indicates that both IPv4 and IPv6 addresses are allowed. <strong>Default:</strong> <code>0</code>.</li>\n<li><code>hints</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> Optional <a href=\"dns.html#supported-getaddrinfo-flags\"><code>dns.lookup()</code> hints</a>.</li>\n<li><code>host</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> Host the socket should connect to. <strong>Default:</strong> <code>'localhost'</code>.</li>\n<li><code>keepAlive</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type\" class=\"type\">&lt;boolean&gt;</a> If set to <code>true</code>, it enables keep-alive functionality on\nthe socket immediately after the connection is established, similarly on what\nis done in <a href=\"#socketsetkeepaliveenable-initialdelay\"><code>socket.setKeepAlive()</code></a>. <strong>Default:</strong> <code>false</code>.</li>\n<li><code>keepAliveInitialDelay</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> If set to a positive number, it sets the\ninitial delay before the first keepalive probe is sent on an idle socket.\n<strong>Default:</strong> <code>0</code>.</li>\n<li><code>localAddress</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> Local address the socket should connect from.</li>\n<li><code>localPort</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> Local port the socket should connect from.</li>\n<li><code>lookup</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function\" class=\"type\">&lt;Function&gt;</a> Custom lookup function. <strong>Default:</strong> <a href=\"dns.html#dnslookuphostname-options-callback\"><code>dns.lookup()</code></a>.</li>\n<li><code>noDelay</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type\" class=\"type\">&lt;boolean&gt;</a> If set to <code>true</code>, it disables the use of Nagle's algorithm\nimmediately after the socket is established. <strong>Default:</strong> <code>false</code>.</li>\n<li><code>port</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> Required. Port the socket should connect to.</li>\n<li><code>blockList</code> <a href=\"net.html#class-netblocklist\" class=\"type\">&lt;net.BlockList&gt;</a> <code>blockList</code> can be used for disabling outbound\naccess to specific IP addresses, IP ranges, or IP subnets.</li>\n</ul>\n<p>For <a href=\"#ipc-support\">IPC</a> connections, available <code>options</code> are:</p>\n<ul>\n<li><code>path</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> Required. Path the client should connect to.\nSee <a href=\"#identifying-paths-for-ipc-connections\">Identifying paths for IPC connections</a>. If provided, the TCP-specific\noptions above are ignored.</li>\n</ul>"
                 },
                 {
                   "textRaw": "`socket.connect(path[, connectListener])`",
@@ -2269,6 +2352,12 @@
                       "type": "boolean",
                       "default": "`false`",
                       "desc": "Indicates whether the socket should be paused on incoming connections."
+                    },
+                    {
+                      "textRaw": "`blockList` {net.BlockList} `blockList` can be used for disabling inbound access to specific IP addresses, IP ranges, or IP subnets. This does not work if the server is behind a reverse proxy, NAT, etc. because the address checked against the block list is the address of the proxy, or the one specified by the NAT.",
+                      "name": "blockList",
+                      "type": "net.BlockList",
+                      "desc": "`blockList` can be used for disabling inbound access to specific IP addresses, IP ranges, or IP subnets. This does not work if the server is behind a reverse proxy, NAT, etc. because the address checked against the block list is the address of the proxy, or the one specified by the NAT."
                     }
                   ]
                 },

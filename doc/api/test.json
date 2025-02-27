@@ -21,7 +21,7 @@
       },
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v23.0.0/lib/test.js\">lib/test.js</a></p>\n<p>The <code>node:test</code> module facilitates the creation of JavaScript tests.\nTo access it:</p>\n<pre><code class=\"language-mjs\">import test from 'node:test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('node:test');\n</code></pre>\n<p>This module is only available under the <code>node:</code> scheme. The following will not\nwork:</p>\n<pre><code class=\"language-mjs\">import test from 'test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('test');\n</code></pre>\n<p>Tests created via the <code>test</code> module consist of a single function that is\nprocessed in one of three ways:</p>\n<ol>\n<li>A synchronous function that is considered failing if it throws an exception,\nand is considered passing otherwise.</li>\n<li>A function that returns a <code>Promise</code> that is considered failing if the\n<code>Promise</code> rejects, and is considered passing if the <code>Promise</code> fulfills.</li>\n<li>A function that receives a callback function. If the callback receives any\ntruthy value as its first argument, the test is considered failing. If a\nfalsy value is passed as the first argument to the callback, the test is\nconsidered passing. If the test function receives a callback function and\nalso returns a <code>Promise</code>, the test will fail.</li>\n</ol>\n<p>The following example illustrates how tests are written using the\n<code>test</code> module.</p>\n<pre><code class=\"language-js\">test('synchronous passing test', (t) => {\n  // This test passes because it does not throw an exception.\n  assert.strictEqual(1, 1);\n});\n\ntest('synchronous failing test', (t) => {\n  // This test fails because it throws an exception.\n  assert.strictEqual(1, 2);\n});\n\ntest('asynchronous passing test', async (t) => {\n  // This test passes because the Promise returned by the async\n  // function is settled and not rejected.\n  assert.strictEqual(1, 1);\n});\n\ntest('asynchronous failing test', async (t) => {\n  // This test fails because the Promise returned by the async\n  // function is rejected.\n  assert.strictEqual(1, 2);\n});\n\ntest('failing test using Promises', (t) => {\n  // Promises can be used directly as well.\n  return new Promise((resolve, reject) => {\n    setImmediate(() => {\n      reject(new Error('this will cause the test to fail'));\n    });\n  });\n});\n\ntest('callback passing test', (t, done) => {\n  // done() is the callback function. When the setImmediate() runs, it invokes\n  // done() with no arguments.\n  setImmediate(done);\n});\n\ntest('callback failing test', (t, done) => {\n  // When the setImmediate() runs, done() is invoked with an Error object and\n  // the test fails.\n  setImmediate(() => {\n    done(new Error('callback failure'));\n  });\n});\n</code></pre>\n<p>If any tests fail, the process exit code is set to <code>1</code>.</p>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v23.8.0/lib/test.js\">lib/test.js</a></p>\n<p>The <code>node:test</code> module facilitates the creation of JavaScript tests.\nTo access it:</p>\n<pre><code class=\"language-mjs\">import test from 'node:test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('node:test');\n</code></pre>\n<p>This module is only available under the <code>node:</code> scheme.</p>\n<p>Tests created via the <code>test</code> module consist of a single function that is\nprocessed in one of three ways:</p>\n<ol>\n<li>A synchronous function that is considered failing if it throws an exception,\nand is considered passing otherwise.</li>\n<li>A function that returns a <code>Promise</code> that is considered failing if the\n<code>Promise</code> rejects, and is considered passing if the <code>Promise</code> fulfills.</li>\n<li>A function that receives a callback function. If the callback receives any\ntruthy value as its first argument, the test is considered failing. If a\nfalsy value is passed as the first argument to the callback, the test is\nconsidered passing. If the test function receives a callback function and\nalso returns a <code>Promise</code>, the test will fail.</li>\n</ol>\n<p>The following example illustrates how tests are written using the\n<code>test</code> module.</p>\n<pre><code class=\"language-js\">test('synchronous passing test', (t) => {\n  // This test passes because it does not throw an exception.\n  assert.strictEqual(1, 1);\n});\n\ntest('synchronous failing test', (t) => {\n  // This test fails because it throws an exception.\n  assert.strictEqual(1, 2);\n});\n\ntest('asynchronous passing test', async (t) => {\n  // This test passes because the Promise returned by the async\n  // function is settled and not rejected.\n  assert.strictEqual(1, 1);\n});\n\ntest('asynchronous failing test', async (t) => {\n  // This test fails because the Promise returned by the async\n  // function is rejected.\n  assert.strictEqual(1, 2);\n});\n\ntest('failing test using Promises', (t) => {\n  // Promises can be used directly as well.\n  return new Promise((resolve, reject) => {\n    setImmediate(() => {\n      reject(new Error('this will cause the test to fail'));\n    });\n  });\n});\n\ntest('callback passing test', (t, done) => {\n  // done() is the callback function. When the setImmediate() runs, it invokes\n  // done() with no arguments.\n  setImmediate(done);\n});\n\ntest('callback failing test', (t, done) => {\n  // When the setImmediate() runs, done() is invoked with an Error object and\n  // the test fails.\n  setImmediate(() => {\n    done(new Error('callback failure'));\n  });\n});\n</code></pre>\n<p>If any tests fail, the process exit code is set to <code>1</code>.</p>",
       "modules": [
         {
           "textRaw": "Subtests",
@@ -91,7 +91,7 @@
         {
           "textRaw": "Running tests from the command line",
           "name": "running_tests_from_the_command_line",
-          "desc": "<p>The Node.js test runner can be invoked from the command line by passing the\n<a href=\"cli.html#--test\"><code>--test</code></a> flag:</p>\n<pre><code class=\"language-bash\">node --test\n</code></pre>\n<p>By default, Node.js will run all files matching these patterns:</p>\n<ul>\n<li><code>**/*.test.{cjs,mjs,js}</code></li>\n<li><code>**/*-test.{cjs,mjs,js}</code></li>\n<li><code>**/*_test.{cjs,mjs,js}</code></li>\n<li><code>**/test-*.{cjs,mjs,js}</code></li>\n<li><code>**/test.{cjs,mjs,js}</code></li>\n<li><code>**/test/**/*.{cjs,mjs,js}</code></li>\n</ul>\n<p>When <a href=\"cli.html#--experimental-strip-types\"><code>--experimental-strip-types</code></a> is supplied, the following\nadditional patterns are matched:</p>\n<ul>\n<li><code>**/*.test.{cts,mts,ts}</code></li>\n<li><code>**/*-test.{cts,mts,ts}</code></li>\n<li><code>**/*_test.{cts,mts,ts}</code></li>\n<li><code>**/test-*.{cts,mts,ts}</code></li>\n<li><code>**/test.{cts,mts,ts}</code></li>\n<li><code>**/test/**/*.{cts,mts,ts}</code></li>\n</ul>\n<p>Alternatively, one or more glob patterns can be provided as the\nfinal argument(s) to the Node.js command, as shown below.\nGlob patterns follow the behavior of <a href=\"https://man7.org/linux/man-pages/man7/glob.7.html\"><code>glob(7)</code></a>.\nThe glob patterns should be enclosed in double quotes on the command line to\nprevent shell expansion, which can reduce portability across systems.</p>\n<pre><code class=\"language-bash\">node --test \"**/*.test.js\" \"**/*.spec.js\"\n</code></pre>\n<p>Matching files are executed as test files.\nMore information on the test file execution can be found\nin the <a href=\"#test-runner-execution-model\">test runner execution model</a> section.</p>",
+          "desc": "<p>The Node.js test runner can be invoked from the command line by passing the\n<a href=\"cli.html#--test\"><code>--test</code></a> flag:</p>\n<pre><code class=\"language-bash\">node --test\n</code></pre>\n<p>By default, Node.js will run all files matching these patterns:</p>\n<ul>\n<li><code>**/*.test.{cjs,mjs,js}</code></li>\n<li><code>**/*-test.{cjs,mjs,js}</code></li>\n<li><code>**/*_test.{cjs,mjs,js}</code></li>\n<li><code>**/test-*.{cjs,mjs,js}</code></li>\n<li><code>**/test.{cjs,mjs,js}</code></li>\n<li><code>**/test/**/*.{cjs,mjs,js}</code></li>\n</ul>\n<p>Unless <a href=\"cli.html#--no-experimental-strip-types\"><code>--no-experimental-strip-types</code></a> is supplied, the following\nadditional patterns are also matched:</p>\n<ul>\n<li><code>**/*.test.{cts,mts,ts}</code></li>\n<li><code>**/*-test.{cts,mts,ts}</code></li>\n<li><code>**/*_test.{cts,mts,ts}</code></li>\n<li><code>**/test-*.{cts,mts,ts}</code></li>\n<li><code>**/test.{cts,mts,ts}</code></li>\n<li><code>**/test/**/*.{cts,mts,ts}</code></li>\n</ul>\n<p>Alternatively, one or more glob patterns can be provided as the\nfinal argument(s) to the Node.js command, as shown below.\nGlob patterns follow the behavior of <a href=\"https://man7.org/linux/man-pages/man7/glob.7.html\"><code>glob(7)</code></a>.\nThe glob patterns should be enclosed in double quotes on the command line to\nprevent shell expansion, which can reduce portability across systems.</p>\n<pre><code class=\"language-bash\">node --test \"**/*.test.js\" \"**/*.spec.js\"\n</code></pre>\n<p>Matching files are executed as test files.\nMore information on the test file execution can be found\nin the <a href=\"#test-runner-execution-model\">test runner execution model</a> section.</p>",
           "modules": [
             {
               "textRaw": "Test runner execution model",
@@ -109,7 +109,7 @@
           "name": "collecting_code_coverage",
           "stability": 1,
           "stabilityText": "Experimental",
-          "desc": "<p>When Node.js is started with the <a href=\"cli.html#--experimental-test-coverage\"><code>--experimental-test-coverage</code></a>\ncommand-line flag, code coverage is collected and statistics are reported once\nall tests have completed. If the <a href=\"cli.html#node_v8_coveragedir\"><code>NODE_V8_COVERAGE</code></a> environment variable is\nused to specify a code coverage directory, the generated V8 coverage files are\nwritten to that directory. Node.js core modules and files within\n<code>node_modules/</code> directories are, by default, not included in the coverage report.\nHowever, they can be explicitly included via the <a href=\"cli.html#--test-coverage-include\"><code>--test-coverage-include</code></a> flag. If\ncoverage is enabled, the coverage report is sent to any <a href=\"#test-reporters\">test reporters</a> via\nthe <code>'test:coverage'</code> event.</p>\n<p>Coverage can be disabled on a series of lines using the following\ncomment syntax:</p>\n<pre><code class=\"language-js\">/* node:coverage disable */\nif (anAlwaysFalseCondition) {\n  // Code in this branch will never be executed, but the lines are ignored for\n  // coverage purposes. All lines following the 'disable' comment are ignored\n  // until a corresponding 'enable' comment is encountered.\n  console.log('this is never executed');\n}\n/* node:coverage enable */\n</code></pre>\n<p>Coverage can also be disabled for a specified number of lines. After the\nspecified number of lines, coverage will be automatically reenabled. If the\nnumber of lines is not explicitly provided, a single line is ignored.</p>\n<pre><code class=\"language-js\">/* node:coverage ignore next */\nif (anAlwaysFalseCondition) { console.log('this is never executed'); }\n\n/* node:coverage ignore next 3 */\nif (anAlwaysFalseCondition) {\n  console.log('this is never executed');\n}\n</code></pre>",
+          "desc": "<p>When Node.js is started with the <a href=\"cli.html#--experimental-test-coverage\"><code>--experimental-test-coverage</code></a>\ncommand-line flag, code coverage is collected and statistics are reported once\nall tests have completed. If the <a href=\"cli.html#node_v8_coveragedir\"><code>NODE_V8_COVERAGE</code></a> environment variable is\nused to specify a code coverage directory, the generated V8 coverage files are\nwritten to that directory. Node.js core modules and files within\n<code>node_modules/</code> directories are, by default, not included in the coverage report.\nHowever, they can be explicitly included via the <a href=\"cli.html#--test-coverage-include\"><code>--test-coverage-include</code></a> flag.\nBy default all the matching test files are excluded from the coverage report.\nExclusions can be overridden by using the <a href=\"cli.html#--test-coverage-exclude\"><code>--test-coverage-exclude</code></a> flag.\nIf coverage is enabled, the coverage report is sent to any <a href=\"#test-reporters\">test reporters</a> via\nthe <code>'test:coverage'</code> event.</p>\n<p>Coverage can be disabled on a series of lines using the following\ncomment syntax:</p>\n<pre><code class=\"language-js\">/* node:coverage disable */\nif (anAlwaysFalseCondition) {\n  // Code in this branch will never be executed, but the lines are ignored for\n  // coverage purposes. All lines following the 'disable' comment are ignored\n  // until a corresponding 'enable' comment is encountered.\n  console.log('this is never executed');\n}\n/* node:coverage enable */\n</code></pre>\n<p>Coverage can also be disabled for a specified number of lines. After the\nspecified number of lines, coverage will be automatically reenabled. If the\nnumber of lines is not explicitly provided, a single line is ignored.</p>\n<pre><code class=\"language-js\">/* node:coverage ignore next */\nif (anAlwaysFalseCondition) { console.log('this is never executed'); }\n\n/* node:coverage ignore next 3 */\nif (anAlwaysFalseCondition) {\n  console.log('this is never executed');\n}\n</code></pre>",
           "modules": [
             {
               "textRaw": "Coverage reporters",
@@ -148,9 +148,19 @@
         {
           "textRaw": "Snapshot testing",
           "name": "snapshot_testing",
-          "stability": 1,
-          "stabilityText": ".0 - Early development",
-          "desc": "<p>Snapshot tests allow arbitrary values to be serialized into string values and\ncompared against a set of known good values. The known good values are known as\nsnapshots, and are stored in a snapshot file. Snapshot files are managed by the\ntest runner, but are designed to be human readable to aid in debugging. Best\npractice is for snapshot files to be checked into source control along with your\ntest files. In order to enable snapshot testing, Node.js must be started with\nthe <a href=\"cli.html#--experimental-test-snapshots\"><code>--experimental-test-snapshots</code></a> command-line flag.</p>\n<p>Snapshot files are generated by starting Node.js with the\n<a href=\"cli.html#--test-update-snapshots\"><code>--test-update-snapshots</code></a> command-line flag. A separate snapshot file is\ngenerated for each test file. By default, the snapshot file has the same name\nas the test file with a <code>.snapshot</code> file extension. This behavior can be\nconfigured using the <code>snapshot.setResolveSnapshotPath()</code> function. Each\nsnapshot assertion corresponds to an export in the snapshot file.</p>\n<p>An example snapshot test is shown below. The first time this test is executed,\nit will fail because the corresponding snapshot file does not exist.</p>\n<pre><code class=\"language-js\">// test.js\nsuite('suite of snapshot tests', () => {\n  test('snapshot test', (t) => {\n    t.assert.snapshot({ value1: 1, value2: 2 });\n    t.assert.snapshot(5);\n  });\n});\n</code></pre>\n<p>Generate the snapshot file by running the test file with\n<code>--test-update-snapshots</code>. The test should pass, and a file named\n<code>test.js.snapshot</code> is created in the same directory as the test file. The\ncontents of the snapshot file are shown below. Each snapshot is identified by\nthe full name of test and a counter to differentiate between snapshots in the\nsame test.</p>\n<pre><code class=\"language-js\">exports[`suite of snapshot tests > snapshot test 1`] = `\n{\n  \"value1\": 1,\n  \"value2\": 2\n}\n`;\n\nexports[`suite of snapshot tests > snapshot test 2`] = `\n5\n`;\n</code></pre>\n<p>Once the snapshot file is created, run the tests again without the\n<code>--test-update-snapshots</code> flag. The tests should pass now.</p>",
+          "meta": {
+            "added": [
+              "v22.3.0"
+            ],
+            "changes": [
+              {
+                "version": "v23.4.0",
+                "pr-url": "https://github.com/nodejs/node/pull/55897",
+                "description": "Snapsnot testing is no longer experimental."
+              }
+            ]
+          },
+          "desc": "<p>Snapshot tests allow arbitrary values to be serialized into string values and\ncompared against a set of known good values. The known good values are known as\nsnapshots, and are stored in a snapshot file. Snapshot files are managed by the\ntest runner, but are designed to be human readable to aid in debugging. Best\npractice is for snapshot files to be checked into source control along with your\ntest files.</p>\n<p>Snapshot files are generated by starting Node.js with the\n<a href=\"cli.html#--test-update-snapshots\"><code>--test-update-snapshots</code></a> command-line flag. A separate snapshot file is\ngenerated for each test file. By default, the snapshot file has the same name\nas the test file with a <code>.snapshot</code> file extension. This behavior can be\nconfigured using the <code>snapshot.setResolveSnapshotPath()</code> function. Each\nsnapshot assertion corresponds to an export in the snapshot file.</p>\n<p>An example snapshot test is shown below. The first time this test is executed,\nit will fail because the corresponding snapshot file does not exist.</p>\n<pre><code class=\"language-js\">// test.js\nsuite('suite of snapshot tests', () => {\n  test('snapshot test', (t) => {\n    t.assert.snapshot({ value1: 1, value2: 2 });\n    t.assert.snapshot(5);\n  });\n});\n</code></pre>\n<p>Generate the snapshot file by running the test file with\n<code>--test-update-snapshots</code>. The test should pass, and a file named\n<code>test.js.snapshot</code> is created in the same directory as the test file. The\ncontents of the snapshot file are shown below. Each snapshot is identified by\nthe full name of test and a counter to differentiate between snapshots in the\nsame test.</p>\n<pre><code class=\"language-js\">exports[`suite of snapshot tests > snapshot test 1`] = `\n{\n  \"value1\": 1,\n  \"value2\": 2\n}\n`;\n\nexports[`suite of snapshot tests > snapshot test 2`] = `\n5\n`;\n</code></pre>\n<p>Once the snapshot file is created, run the tests again without the\n<code>--test-update-snapshots</code> flag. The tests should pass now.</p>",
           "type": "module",
           "displayName": "Snapshot testing"
         },
@@ -194,6 +204,38 @@
           "displayName": "Test reporters"
         },
         {
+          "textRaw": "`assert`",
+          "name": "`assert`",
+          "meta": {
+            "added": [
+              "v23.7.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>An object whose methods are used to configure available assertions on the\n<code>TestContext</code> objects in the current process. The methods from <code>node:assert</code>\nand snapshot testing functions are available by default.</p>\n<p>It is possible to apply the same configuration to all files by placing common\nconfiguration code in a module\npreloaded with <code>--require</code> or <code>--import</code>.</p>",
+          "methods": [
+            {
+              "textRaw": "`assert.register(name, fn)`",
+              "type": "method",
+              "name": "register",
+              "meta": {
+                "added": [
+                  "v23.7.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>Defines a new assertion function with the provided name and function. If an\nassertion already exists with the same name, it is overwritten.</p>"
+            }
+          ],
+          "type": "module",
+          "displayName": "`assert`"
+        },
+        {
           "textRaw": "`snapshot`",
           "name": "`snapshot`",
           "meta": {
@@ -202,8 +244,6 @@
             ],
             "changes": []
           },
-          "stability": 1,
-          "stabilityText": ".0 - Early development",
           "desc": "<p>An object whose methods are used to configure default snapshot settings in the\ncurrent process. It is possible to apply the same configuration to all files by\nplacing common configuration code in a module preloaded with <code>--require</code> or\n<code>--import</code>.</p>",
           "methods": [
             {
@@ -216,8 +256,6 @@
                 ],
                 "changes": []
               },
-              "stability": 1,
-              "stabilityText": ".0 - Early development",
               "signatures": [
                 {
                   "params": [
@@ -242,8 +280,6 @@
                 ],
                 "changes": []
               },
-              "stability": 1,
-              "stabilityText": ".0 - Early development",
               "signatures": [
                 {
                   "params": [
@@ -1531,10 +1567,16 @@
               "v20.4.0",
               "v18.19.0"
             ],
-            "changes": []
+            "changes": [
+              {
+                "version": "v23.1.0",
+                "pr-url": "https://github.com/nodejs/node/pull/55398",
+                "description": "The Mock Timers is now stable."
+              }
+            ]
           },
-          "stability": 1,
-          "stabilityText": "Experimental",
+          "stability": 2,
+          "stabilityText": "Stable",
           "desc": "<p>Mocking timers is a technique commonly used in software testing to simulate and\ncontrol the behavior of timers, such as <code>setInterval</code> and <code>setTimeout</code>,\nwithout actually waiting for the specified time intervals.</p>\n<p>MockTimers is also able to mock the <code>Date</code> object.</p>\n<p>The <a href=\"#class-mocktracker\"><code>MockTracker</code></a> provides a top-level <code>timers</code> export\nwhich is a <code>MockTimers</code> instance.</p>",
           "methods": [
             {
@@ -2096,6 +2138,12 @@
                       "name": "nesting",
                       "type": "number",
                       "desc": "The nesting level of the test."
+                    },
+                    {
+                      "textRaw": "`type` {string} The test type. Either `'suite'` or `'test'`.",
+                      "name": "type",
+                      "type": "string",
+                      "desc": "The test type. Either `'suite'` or `'test'`."
                     }
                   ]
                 }
@@ -2186,6 +2234,12 @@
                       "name": "nesting",
                       "type": "number",
                       "desc": "The nesting level of the test."
+                    },
+                    {
+                      "textRaw": "`type` {string} The test type. Either `'suite'` or `'test'`.",
+                      "name": "type",
+                      "type": "string",
+                      "desc": "The test type. Either `'suite'` or `'test'`."
                     }
                   ]
                 }
@@ -2858,10 +2912,14 @@
                   "v22.2.0",
                   "v20.15.0"
                 ],
-                "changes": []
+                "changes": [
+                  {
+                    "version": "v23.4.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/55895",
+                    "description": "This function is no longer experimental."
+                  }
+                ]
               },
-              "stability": 1,
-              "stabilityText": "Experimental",
               "signatures": [
                 {
                   "params": [
@@ -3062,6 +3120,58 @@
                 }
               ],
               "desc": "<p>This function is used to create subtests under the current test. This function\nbehaves in the same fashion as the top level <a href=\"#testname-options-fn\"><code>test()</code></a> function.</p>\n<pre><code class=\"language-js\">test('top level test', async (t) => {\n  await t.test(\n    'This is a subtest',\n    { only: false, skip: false, concurrency: 1, todo: false, plan: 1 },\n    (t) => {\n      t.assert.ok('some relevant assertion here');\n    },\n  );\n});\n</code></pre>"
+            },
+            {
+              "textRaw": "`context.waitFor(condition[, options])`",
+              "type": "method",
+              "name": "waitFor",
+              "meta": {
+                "added": [
+                  "v23.7.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "return": {
+                    "textRaw": "Returns: {Promise} Fulfilled with the value returned by `condition`.",
+                    "name": "return",
+                    "type": "Promise",
+                    "desc": "Fulfilled with the value returned by `condition`."
+                  },
+                  "params": [
+                    {
+                      "textRaw": "`condition` {Function|AsyncFunction} An assertion function that is invoked periodically until it completes successfully or the defined polling timeout elapses. Successful completion is defined as not throwing or rejecting. This function does not accept any arguments, and is allowed to return any value.",
+                      "name": "condition",
+                      "type": "Function|AsyncFunction",
+                      "desc": "An assertion function that is invoked periodically until it completes successfully or the defined polling timeout elapses. Successful completion is defined as not throwing or rejecting. This function does not accept any arguments, and is allowed to return any value."
+                    },
+                    {
+                      "textRaw": "`options` {Object} An optional configuration object for the polling operation. The following properties are supported:",
+                      "name": "options",
+                      "type": "Object",
+                      "desc": "An optional configuration object for the polling operation. The following properties are supported:",
+                      "options": [
+                        {
+                          "textRaw": "`interval` {number} The number of milliseconds to wait after an unsuccessful invocation of `condition` before trying again. **Default:** `50`.",
+                          "name": "interval",
+                          "type": "number",
+                          "default": "`50`",
+                          "desc": "The number of milliseconds to wait after an unsuccessful invocation of `condition` before trying again."
+                        },
+                        {
+                          "textRaw": "`timeout` {number} The poll timeout in milliseconds. If `condition` has not succeeded by the time this elapses, an error occurs. **Default:** `1000`.",
+                          "name": "timeout",
+                          "type": "number",
+                          "default": "`1000`",
+                          "desc": "The poll timeout in milliseconds. If `condition` has not succeeded by the time this elapses, an error occurs."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>This method polls a <code>condition</code> function until that function either returns\nsuccessfully or the operation times out.</p>"
             }
           ],
           "properties": [
@@ -3078,6 +3188,51 @@
               "desc": "<p>An object containing assertion methods bound to <code>context</code>. The top-level\nfunctions from the <code>node:assert</code> module are exposed here for the purpose of\ncreating test plans.</p>\n<pre><code class=\"language-js\">test('test', (t) => {\n  t.plan(1);\n  t.assert.strictEqual(true, true);\n});\n</code></pre>",
               "methods": [
                 {
+                  "textRaw": "`context.assert.fileSnapshot(value, path[, options])`",
+                  "type": "method",
+                  "name": "fileSnapshot",
+                  "meta": {
+                    "added": [
+                      "v23.7.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`value` {any} A value to serialize to a string. If Node.js was started with the [`--test-update-snapshots`][] flag, the serialized value is written to `path`. Otherwise, the serialized value is compared to the contents of the existing snapshot file.",
+                          "name": "value",
+                          "type": "any",
+                          "desc": "A value to serialize to a string. If Node.js was started with the [`--test-update-snapshots`][] flag, the serialized value is written to `path`. Otherwise, the serialized value is compared to the contents of the existing snapshot file."
+                        },
+                        {
+                          "textRaw": "`path` {string} The file where the serialized `value` is written.",
+                          "name": "path",
+                          "type": "string",
+                          "desc": "The file where the serialized `value` is written."
+                        },
+                        {
+                          "textRaw": "`options` {Object} Optional configuration options. The following properties are supported:",
+                          "name": "options",
+                          "type": "Object",
+                          "desc": "Optional configuration options. The following properties are supported:",
+                          "options": [
+                            {
+                              "textRaw": "`serializers` {Array} An array of synchronous functions used to serialize `value` into a string. `value` is passed as the only argument to the first serializer function. The return value of each serializer is passed as input to the next serializer. Once all serializers have run, the resulting value is coerced to a string. **Default:** If no serializers are provided, the test runner's default serializers are used.",
+                              "name": "serializers",
+                              "type": "Array",
+                              "default": "If no serializers are provided, the test runner's default serializers are used",
+                              "desc": "An array of synchronous functions used to serialize `value` into a string. `value` is passed as the only argument to the first serializer function. The return value of each serializer is passed as input to the next serializer. Once all serializers have run, the resulting value is coerced to a string."
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>This function serializes <code>value</code> and writes it to the file specified by <code>path</code>.</p>\n<pre><code class=\"language-js\">test('snapshot test with default serialization', (t) => {\n  t.assert.fileSnapshot({ value1: 1, value2: 2 }, './snapshots/snapshot.json');\n});\n</code></pre>\n<p>This function differs from <code>context.assert.snapshot()</code> in the following ways:</p>\n<ul>\n<li>The snapshot file path is explicitly provided by the user.</li>\n<li>Each snapshot file is limited to a single snapshot value.</li>\n<li>No additional escaping is performed by the test runner.</li>\n</ul>\n<p>These differences allow snapshot files to better support features such as syntax\nhighlighting.</p>"
+                },
+                {
                   "textRaw": "`context.assert.snapshot(value[, options])`",
                   "type": "method",
                   "name": "snapshot",
@@ -3087,8 +3242,6 @@
                     ],
                     "changes": []
                   },
-                  "stability": 1,
-                  "stabilityText": ".0 - Early development",
                   "signatures": [
                     {
                       "params": [
@@ -3116,7 +3269,7 @@
                       ]
                     }
                   ],
-                  "desc": "<p>This function implements assertions for snapshot testing.</p>\n<pre><code class=\"language-js\">test('snapshot test with default serialization', (t) => {\n  t.assert.snapshot({ value1: 1, value2: 2 });\n});\n\ntest('snapshot test with custom serialization', (t) => {\n  t.assert.snapshot({ value3: 3, value4: 4 }, {\n    serializers: [(value) => JSON.stringify(value)]\n  });\n});\n</code></pre>"
+                  "desc": "<p>This function implements assertions for snapshot testing.</p>\n<pre><code class=\"language-js\">test('snapshot test with default serialization', (t) => {\n  t.assert.snapshot({ value1: 1, value2: 2 });\n});\n\ntest('snapshot test with custom serialization', (t) => {\n  t.assert.snapshot({ value3: 3, value4: 4 }, {\n    serializers: [(value) => JSON.stringify(value)],\n  });\n});\n</code></pre>"
                 }
               ]
             },

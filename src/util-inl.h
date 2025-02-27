@@ -27,6 +27,7 @@
 #include <cmath>
 #include <cstring>
 #include <locale>
+#include <ranges>
 #include <regex>  // NOLINT(build/c++11)
 #include "node_revert.h"
 #include "util.h"
@@ -178,6 +179,11 @@ inline v8::Local<v8::String> OneByteString(v8::Isolate* isolate,
   return v8::String::NewFromOneByte(
              isolate, data, v8::NewStringType::kNormal, length)
       .ToLocalChecked();
+}
+
+inline v8::Local<v8::String> OneByteString(v8::Isolate* isolate,
+                                           std::string_view str) {
+  return OneByteString(isolate, str.data(), str.size());
 }
 
 char ToLower(char c) {
@@ -374,6 +380,25 @@ v8::MaybeLocal<v8::Value> ToV8Value(v8::Local<v8::Context> context,
   return set_js;
 }
 
+template <typename T, std::size_t U>
+v8::MaybeLocal<v8::Value> ToV8Value(v8::Local<v8::Context> context,
+                                    const std::ranges::elements_view<T, U>& vec,
+                                    v8::Isolate* isolate) {
+  if (isolate == nullptr) isolate = context->GetIsolate();
+  v8::EscapableHandleScope handle_scope(isolate);
+
+  MaybeStackBuffer<v8::Local<v8::Value>, 128> arr(vec.size());
+  arr.SetLength(vec.size());
+  auto it = vec.begin();
+  for (size_t i = 0; i < vec.size(); ++i) {
+    if (!ToV8Value(context, *it, isolate).ToLocal(&arr[i]))
+      return v8::MaybeLocal<v8::Value>();
+    std::advance(it, 1);
+  }
+
+  return handle_scope.Escape(v8::Array::New(isolate, arr.out(), arr.length()));
+}
+
 template <typename T, typename U>
 v8::MaybeLocal<v8::Value> ToV8Value(v8::Local<v8::Context> context,
                                     const std::unordered_map<T, U>& map,
@@ -540,26 +565,38 @@ constexpr std::string_view FastStringKey::as_string_view() const {
 // Inline so the compiler can fully optimize it away on Unix platforms.
 bool IsWindowsBatchFile(const char* filename) {
 #ifdef _WIN32
-  static constexpr bool kIsWindows = true;
-#else
-  static constexpr bool kIsWindows = false;
-#endif  // _WIN32
-  if (kIsWindows) {
-    std::string file_with_extension = filename;
-    // Regex to match the last extension part after the last dot, ignoring
-    // trailing spaces and dots
-    std::regex extension_regex(R"(\.([a-zA-Z0-9]+)\s*[\.\s]*$)");
-    std::smatch match;
-    std::string extension;
+  std::string file_with_extension = filename;
+  // Regex to match the last extension part after the last dot, ignoring
+  // trailing spaces and dots
+  std::regex extension_regex(R"(\.([a-zA-Z0-9]+)\s*[\.\s]*$)");
+  std::smatch match;
+  std::string extension;
 
-    if (std::regex_search(file_with_extension, match, extension_regex)) {
-      extension = ToLower(match[1].str());
-    }
-
-    return !extension.empty() && (extension == "cmd" || extension == "bat");
+  if (std::regex_search(file_with_extension, match, extension_regex)) {
+    extension = ToLower(match[1].str());
   }
+
+  return !extension.empty() && (extension == "cmd" || extension == "bat");
+#else
   return false;
+#endif  // _WIN32
 }
+
+#ifdef _WIN32
+inline std::wstring ConvertToWideString(const std::string& str,
+                                        UINT code_page) {
+  int size_needed = MultiByteToWideChar(
+      code_page, 0, &str[0], static_cast<int>(str.size()), nullptr, 0);
+  std::wstring wstrTo(size_needed, 0);
+  MultiByteToWideChar(code_page,
+                      0,
+                      &str[0],
+                      static_cast<int>(str.size()),
+                      &wstrTo[0],
+                      size_needed);
+  return wstrTo;
+}
+#endif  // _WIN32
 
 }  // namespace node
 

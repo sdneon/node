@@ -29,8 +29,9 @@ std::unique_ptr<Network::Response> createResponse(
       .build();
 }
 
-NetworkAgent::NetworkAgent(NetworkInspector* inspector)
-    : inspector_(inspector) {
+NetworkAgent::NetworkAgent(NetworkInspector* inspector,
+                           v8_inspector::V8Inspector* v8_inspector)
+    : inspector_(inspector), v8_inspector_(v8_inspector) {
   event_notifier_map_["requestWillBeSent"] = &NetworkAgent::requestWillBeSent;
   event_notifier_map_["responseReceived"] = &NetworkAgent::responseReceived;
   event_notifier_map_["loadingFailed"] = &NetworkAgent::loadingFailed;
@@ -53,12 +54,12 @@ void NetworkAgent::Wire(UberDispatcher* dispatcher) {
 
 DispatchResponse NetworkAgent::enable() {
   inspector_->Enable();
-  return DispatchResponse::OK();
+  return DispatchResponse::Success();
 }
 
 DispatchResponse NetworkAgent::disable() {
   inspector_->Disable();
-  return DispatchResponse::OK();
+  return DispatchResponse::Success();
 }
 
 void NetworkAgent::requestWillBeSent(
@@ -75,15 +76,25 @@ void NetworkAgent::requestWillBeSent(
   String method;
   request->getString("method", &method);
 
+  std::unique_ptr<Network::Initiator> initiator =
+      Network::Initiator::create()
+          .setType(Network::Initiator::TypeEnum::Script)
+          .setStack(
+              v8_inspector_->captureStackTrace(true)->buildInspectorObject(0))
+          .build();
+
   ErrorSupport errors;
+  errors.Push();
+  errors.SetName("headers");
   auto headers =
       Network::Headers::fromValue(request->getObject("headers"), &errors);
-  if (errors.hasErrors()) {
+  if (!errors.Errors().empty()) {
     headers = std::make_unique<Network::Headers>(DictionaryValue::create());
   }
 
   frontend_->requestWillBeSent(request_id,
                                createRequest(url, method, std::move(headers)),
+                               std::move(initiator),
                                timestamp,
                                wall_time);
 }
@@ -105,9 +116,11 @@ void NetworkAgent::responseReceived(
   response->getString("statusText", &statusText);
 
   ErrorSupport errors;
+  errors.Push();
+  errors.SetName("headers");
   auto headers =
       Network::Headers::fromValue(response->getObject("headers"), &errors);
-  if (errors.hasErrors()) {
+  if (!errors.Errors().empty()) {
     headers = std::make_unique<Network::Headers>(DictionaryValue::create());
   }
 

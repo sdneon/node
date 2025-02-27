@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v23.0.0/lib/util.js\">lib/util.js</a></p>\n<p>The <code>node:util</code> module supports the needs of Node.js internal APIs. Many of the\nutilities are useful for application and module developers as well. To access\nit:</p>\n<pre><code class=\"language-js\">const util = require('node:util');\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v23.8.0/lib/util.js\">lib/util.js</a></p>\n<p>The <code>node:util</code> module supports the needs of Node.js internal APIs. Many of the\nutilities are useful for application and module developers as well. To access\nit:</p>\n<pre><code class=\"language-js\">const util = require('node:util');\n</code></pre>",
       "methods": [
         {
           "textRaw": "`util.callbackify(original)`",
@@ -250,63 +250,99 @@
           "desc": "<p>This function is identical to <a href=\"#utilformatformat-args\"><code>util.format()</code></a>, except in that it takes\nan <code>inspectOptions</code> argument which specifies options that are passed along to\n<a href=\"#utilinspectobject-options\"><code>util.inspect()</code></a>.</p>\n<pre><code class=\"language-js\">util.formatWithOptions({ colors: true }, 'See object %O', { foo: 42 });\n// Returns 'See object { foo: 42 }', where `42` is colored as a number\n// when printed to a terminal.\n</code></pre>"
         },
         {
-          "textRaw": "`util.getCallSite(frames)`",
+          "textRaw": "`util.getCallSites(frameCountOrOptions, [options])`",
           "type": "method",
-          "name": "getCallSite",
+          "name": "getCallSites",
           "stability": 1,
           "stabilityText": ".1 - Active development",
           "meta": {
             "added": [
               "v22.9.0"
             ],
-            "changes": []
+            "changes": [
+              {
+                "version": "v23.7.0",
+                "pr-url": "https://github.com/nodejs/node/pull/56584",
+                "description": "Property `column` is deprecated in favor of `columnNumber`."
+              },
+              {
+                "version": "v23.7.0",
+                "pr-url": "https://github.com/nodejs/node/pull/56551",
+                "description": "Property `CallSite.scriptId` is exposed."
+              },
+              {
+                "version": "v23.3.0",
+                "pr-url": "https://github.com/nodejs/node/pull/55626",
+                "description": "The API is renamed from `util.getCallSite` to `util.getCallSites()`."
+              }
+            ]
           },
           "signatures": [
             {
               "return": {
-                "textRaw": "Returns: {Object\\[]} An array of stacktrace objects",
+                "textRaw": "Returns: {Object\\[]} An array of call site objects",
                 "name": "return",
                 "type": "Object\\[]",
-                "desc": "An array of stacktrace objects",
+                "desc": "An array of call site objects",
                 "options": [
                   {
-                    "textRaw": "`functionName` {string} Returns the name of the function associated with this stack frame.",
+                    "textRaw": "`functionName` {string} Returns the name of the function associated with this call site.",
                     "name": "functionName",
                     "type": "string",
-                    "desc": "Returns the name of the function associated with this stack frame."
+                    "desc": "Returns the name of the function associated with this call site."
                   },
                   {
-                    "textRaw": "`scriptName` {string} Returns the name of the resource that contains the script for the function for this StackFrame.",
+                    "textRaw": "`scriptName` {string} Returns the name of the resource that contains the script for the function for this call site.",
                     "name": "scriptName",
                     "type": "string",
-                    "desc": "Returns the name of the resource that contains the script for the function for this StackFrame."
+                    "desc": "Returns the name of the resource that contains the script for the function for this call site."
                   },
                   {
-                    "textRaw": "`lineNumber` {number} Returns the number, 1-based, of the line for the associate function call.",
+                    "textRaw": "`scriptId` {string} Returns the unique id of the script, as in Chrome DevTools protocol [`Runtime.ScriptId`][].",
+                    "name": "scriptId",
+                    "type": "string",
+                    "desc": "Returns the unique id of the script, as in Chrome DevTools protocol [`Runtime.ScriptId`][]."
+                  },
+                  {
+                    "textRaw": "`lineNumber` {number} Returns the JavaScript script line number (1-based).",
                     "name": "lineNumber",
                     "type": "number",
-                    "desc": "Returns the number, 1-based, of the line for the associate function call."
+                    "desc": "Returns the JavaScript script line number (1-based)."
                   },
                   {
-                    "textRaw": "`column` {number} Returns the 1-based column offset on the line for the associated function call.",
-                    "name": "column",
+                    "textRaw": "`columnNumber` {number} Returns the JavaScript script column number (1-based).",
+                    "name": "columnNumber",
                     "type": "number",
-                    "desc": "Returns the 1-based column offset on the line for the associated function call."
+                    "desc": "Returns the JavaScript script column number (1-based)."
                   }
                 ]
               },
               "params": [
                 {
-                  "textRaw": "`frames` {number} Number of frames returned in the stacktrace. **Default:** `10`. Allowable range is between 1 and 200.",
-                  "name": "frames",
+                  "textRaw": "`frameCount` {number} Optional number of frames to capture as call site objects. **Default:** `10`. Allowable range is between 1 and 200.",
+                  "name": "frameCount",
                   "type": "number",
                   "default": "`10`. Allowable range is between 1 and 200",
-                  "desc": "Number of frames returned in the stacktrace."
+                  "desc": "Optional number of frames to capture as call site objects."
+                },
+                {
+                  "textRaw": "`options` {Object} Optional",
+                  "name": "options",
+                  "type": "Object",
+                  "desc": "Optional",
+                  "options": [
+                    {
+                      "textRaw": "`sourceMap` {boolean} Reconstruct the original location in the stacktrace from the source-map. Enabled by default with the flag `--enable-source-maps`.",
+                      "name": "sourceMap",
+                      "type": "boolean",
+                      "desc": "Reconstruct the original location in the stacktrace from the source-map. Enabled by default with the flag `--enable-source-maps`."
+                    }
+                  ]
                 }
               ]
             }
           ],
-          "desc": "<p>Returns an array of stacktrace objects containing the stack of\nthe caller function.</p>\n<pre><code class=\"language-js\">const util = require('node:util');\n\nfunction exampleFunction() {\n  const callSites = util.getCallSite();\n\n  console.log('Call Sites:');\n  callSites.forEach((callSite, index) => {\n    console.log(`CallSite ${index + 1}:`);\n    console.log(`Function Name: ${callSite.functionName}`);\n    console.log(`Script Name: ${callSite.scriptName}`);\n    console.log(`Line Number: ${callSite.lineNumber}`);\n    console.log(`Column Number: ${callSite.column}`);\n  });\n  // CallSite 1:\n  // Function Name: exampleFunction\n  // Script Name: /home/example.js\n  // Line Number: 5\n  // Column Number: 26\n\n  // CallSite 2:\n  // Function Name: anotherFunction\n  // Script Name: /home/example.js\n  // Line Number: 22\n  // Column Number: 3\n\n  // ...\n}\n\n// A function to simulate another stack layer\nfunction anotherFunction() {\n  exampleFunction();\n}\n\nanotherFunction();\n</code></pre>"
+          "desc": "<p>Returns an array of call site objects containing the stack of\nthe caller function.</p>\n<pre><code class=\"language-js\">const util = require('node:util');\n\nfunction exampleFunction() {\n  const callSites = util.getCallSites();\n\n  console.log('Call Sites:');\n  callSites.forEach((callSite, index) => {\n    console.log(`CallSite ${index + 1}:`);\n    console.log(`Function Name: ${callSite.functionName}`);\n    console.log(`Script Name: ${callSite.scriptName}`);\n    console.log(`Line Number: ${callSite.lineNumber}`);\n    console.log(`Column Number: ${callSite.columnNumber}`);\n  });\n  // CallSite 1:\n  // Function Name: exampleFunction\n  // Script Name: /home/example.js\n  // Line Number: 5\n  // Column Number: 26\n\n  // CallSite 2:\n  // Function Name: anotherFunction\n  // Script Name: /home/example.js\n  // Line Number: 22\n  // Column Number: 3\n\n  // ...\n}\n\n// A function to simulate another stack layer\nfunction anotherFunction() {\n  exampleFunction();\n}\n\nanotherFunction();\n</code></pre>\n<p>It is possible to reconstruct the original locations by setting the option <code>sourceMap</code> to <code>true</code>.\nIf the source map is not available, the original location will be the same as the current location.\nWhen the <code>--enable-source-maps</code> flag is enabled, for example when using <code>--experimental-transform-types</code>,\n<code>sourceMap</code> will be true by default.</p>\n<pre><code class=\"language-ts\">import util from 'node:util';\n\ninterface Foo {\n  foo: string;\n}\n\nconst callSites = util.getCallSites({ sourceMap: true });\n\n// With sourceMap:\n// Function Name: ''\n// Script Name: example.js\n// Line Number: 7\n// Column Number: 26\n\n// Without sourceMap:\n// Function Name: ''\n// Script Name: example.js\n// Line Number: 2\n// Column Number: 26\n</code></pre>"
         },
         {
           "textRaw": "`util.getSystemErrorName(err)`",
@@ -358,6 +394,34 @@
             }
           ],
           "desc": "<p>Returns a Map of all system error codes available from the Node.js API.\nThe mapping between error codes and error names is platform-dependent.\nSee <a href=\"errors.html#common-system-errors\">Common System Errors</a> for the names of common errors.</p>\n<pre><code class=\"language-js\">fs.access('file/that/does/not/exist', (err) => {\n  const errorMap = util.getSystemErrorMap();\n  const name = errorMap.get(err.errno);\n  console.error(name);  // ENOENT\n});\n</code></pre>"
+        },
+        {
+          "textRaw": "`util.getSystemErrorMessage(err)`",
+          "type": "method",
+          "name": "getSystemErrorMessage",
+          "meta": {
+            "added": [
+              "v23.1.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "return": {
+                "textRaw": "Returns: {string}",
+                "name": "return",
+                "type": "string"
+              },
+              "params": [
+                {
+                  "textRaw": "`err` {number}",
+                  "name": "err",
+                  "type": "number"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>Returns the string message for a numeric error code that comes from a Node.js\nAPI.\nThe mapping between error codes and string messages is platform-dependent.</p>\n<pre><code class=\"language-js\">fs.access('file/that/does/not/exist', (err) => {\n  const name = util.getSystemErrorMessage(err.errno);\n  console.error(name);  // No such file or directory\n});\n</code></pre>"
         },
         {
           "textRaw": "`util.inherits(constructor, superConstructor)`",
@@ -549,11 +613,11 @@
                   "type": "Object",
                   "options": [
                     {
-                      "textRaw": "`showHidden` {boolean} If `true`, `object`'s non-enumerable symbols and properties are included in the formatted result. [`WeakMap`][] and [`WeakSet`][] entries are also included as well as user defined prototype properties (excluding method properties). **Default:** `false`.",
+                      "textRaw": "`showHidden` {boolean} If `true`, `object`'s non-enumerable symbols and properties are included in the formatted result. {WeakMap} and {WeakSet} entries are also included as well as user defined prototype properties (excluding method properties). **Default:** `false`.",
                       "name": "showHidden",
                       "type": "boolean",
                       "default": "`false`",
-                      "desc": "If `true`, `object`'s non-enumerable symbols and properties are included in the formatted result. [`WeakMap`][] and [`WeakSet`][] entries are also included as well as user defined prototype properties (excluding method properties)."
+                      "desc": "If `true`, `object`'s non-enumerable symbols and properties are included in the formatted result. {WeakMap} and {WeakSet} entries are also included as well as user defined prototype properties (excluding method properties)."
                     },
                     {
                       "textRaw": "`depth` {number} Specifies the number of times to recurse while formatting `object`. This is useful for inspecting large objects. To recurse up to the maximum call stack size pass `Infinity` or `null`. **Default:** `2`.",
@@ -584,11 +648,11 @@
                       "desc": "If `true`, `Proxy` inspection includes the [`target` and `handler`][] objects."
                     },
                     {
-                      "textRaw": "`maxArrayLength` {integer} Specifies the maximum number of `Array`, [`TypedArray`][], [`Map`][], [`Set`][], [`WeakMap`][], and [`WeakSet`][] elements to include when formatting. Set to `null` or `Infinity` to show all elements. Set to `0` or negative to show no elements. **Default:** `100`.",
+                      "textRaw": "`maxArrayLength` {integer} Specifies the maximum number of `Array`, {TypedArray}, {Map}, {WeakMap}, and {WeakSet} elements to include when formatting. Set to `null` or `Infinity` to show all elements. Set to `0` or negative to show no elements. **Default:** `100`.",
                       "name": "maxArrayLength",
                       "type": "integer",
                       "default": "`100`",
-                      "desc": "Specifies the maximum number of `Array`, [`TypedArray`][], [`Map`][], [`Set`][], [`WeakMap`][], and [`WeakSet`][] elements to include when formatting. Set to `null` or `Infinity` to show all elements. Set to `0` or negative to show no elements."
+                      "desc": "Specifies the maximum number of `Array`, {TypedArray}, {Map}, {WeakMap}, and {WeakSet} elements to include when formatting. Set to `null` or `Infinity` to show all elements. Set to `0` or negative to show no elements."
                     },
                     {
                       "textRaw": "`maxStringLength` {integer} Specifies the maximum number of characters to include when formatting. Set to `null` or `Infinity` to show all elements. Set to `0` or negative to show no characters. **Default:** `10000`.",
@@ -636,7 +700,7 @@
               ]
             }
           ],
-          "desc": "<p>The <code>util.inspect()</code> method returns a string representation of <code>object</code> that is\nintended for debugging. The output of <code>util.inspect</code> may change at any time\nand should not be depended upon programmatically. Additional <code>options</code> may be\npassed that alter the result.\n<code>util.inspect()</code> will use the constructor's name and/or <code>@@toStringTag</code> to make\nan identifiable tag for an inspected value.</p>\n<pre><code class=\"language-js\">class Foo {\n  get [Symbol.toStringTag]() {\n    return 'bar';\n  }\n}\n\nclass Bar {}\n\nconst baz = Object.create(null, { [Symbol.toStringTag]: { value: 'foo' } });\n\nutil.inspect(new Foo()); // 'Foo [bar] {}'\nutil.inspect(new Bar()); // 'Bar {}'\nutil.inspect(baz);       // '[foo] {}'\n</code></pre>\n<p>Circular references point to their anchor by using a reference index:</p>\n<pre><code class=\"language-js\">const { inspect } = require('node:util');\n\nconst obj = {};\nobj.a = [obj];\nobj.b = {};\nobj.b.inner = obj.b;\nobj.b.obj = obj;\n\nconsole.log(inspect(obj));\n// &#x3C;ref *1> {\n//   a: [ [Circular *1] ],\n//   b: &#x3C;ref *2> { inner: [Circular *2], obj: [Circular *1] }\n// }\n</code></pre>\n<p>The following example inspects all properties of the <code>util</code> object:</p>\n<pre><code class=\"language-js\">const util = require('node:util');\n\nconsole.log(util.inspect(util, { showHidden: true, depth: null }));\n</code></pre>\n<p>The following example highlights the effect of the <code>compact</code> option:</p>\n<pre><code class=\"language-js\">const util = require('node:util');\n\nconst o = {\n  a: [1, 2, [[\n    'Lorem ipsum dolor sit amet,\\nconsectetur adipiscing elit, sed do ' +\n      'eiusmod \\ntempor incididunt ut labore et dolore magna aliqua.',\n    'test',\n    'foo']], 4],\n  b: new Map([['za', 1], ['zb', 'test']]),\n};\nconsole.log(util.inspect(o, { compact: true, depth: 5, breakLength: 80 }));\n\n// { a:\n//   [ 1,\n//     2,\n//     [ [ 'Lorem ipsum dolor sit amet,\\nconsectetur [...]', // A long line\n//           'test',\n//           'foo' ] ],\n//     4 ],\n//   b: Map(2) { 'za' => 1, 'zb' => 'test' } }\n\n// Setting `compact` to false or an integer creates more reader friendly output.\nconsole.log(util.inspect(o, { compact: false, depth: 5, breakLength: 80 }));\n\n// {\n//   a: [\n//     1,\n//     2,\n//     [\n//       [\n//         'Lorem ipsum dolor sit amet,\\n' +\n//           'consectetur adipiscing elit, sed do eiusmod \\n' +\n//           'tempor incididunt ut labore et dolore magna aliqua.',\n//         'test',\n//         'foo'\n//       ]\n//     ],\n//     4\n//   ],\n//   b: Map(2) {\n//     'za' => 1,\n//     'zb' => 'test'\n//   }\n// }\n\n// Setting `breakLength` to e.g. 150 will print the \"Lorem ipsum\" text in a\n// single line.\n</code></pre>\n<p>The <code>showHidden</code> option allows <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap\"><code>WeakMap</code></a> and <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet\"><code>WeakSet</code></a> entries to be\ninspected. If there are more entries than <code>maxArrayLength</code>, there is no\nguarantee which entries are displayed. That means retrieving the same\n<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet\"><code>WeakSet</code></a> entries twice may result in different output. Furthermore, entries\nwith no remaining strong references may be garbage collected at any time.</p>\n<pre><code class=\"language-js\">const { inspect } = require('node:util');\n\nconst obj = { a: 1 };\nconst obj2 = { b: 2 };\nconst weakSet = new WeakSet([obj, obj2]);\n\nconsole.log(inspect(weakSet, { showHidden: true }));\n// WeakSet { { a: 1 }, { b: 2 } }\n</code></pre>\n<p>The <code>sorted</code> option ensures that an object's property insertion order does not\nimpact the result of <code>util.inspect()</code>.</p>\n<pre><code class=\"language-js\">const { inspect } = require('node:util');\nconst assert = require('node:assert');\n\nconst o1 = {\n  b: [2, 3, 1],\n  a: '`a` comes before `b`',\n  c: new Set([2, 3, 1]),\n};\nconsole.log(inspect(o1, { sorted: true }));\n// { a: '`a` comes before `b`', b: [ 2, 3, 1 ], c: Set(3) { 1, 2, 3 } }\nconsole.log(inspect(o1, { sorted: (a, b) => b.localeCompare(a) }));\n// { c: Set(3) { 3, 2, 1 }, b: [ 2, 3, 1 ], a: '`a` comes before `b`' }\n\nconst o2 = {\n  c: new Set([2, 1, 3]),\n  a: '`a` comes before `b`',\n  b: [2, 3, 1],\n};\nassert.strict.equal(\n  inspect(o1, { sorted: true }),\n  inspect(o2, { sorted: true }),\n);\n</code></pre>\n<p>The <code>numericSeparator</code> option adds an underscore every three digits to all\nnumbers.</p>\n<pre><code class=\"language-js\">const { inspect } = require('node:util');\n\nconst thousand = 1_000;\nconst million = 1_000_000;\nconst bigNumber = 123_456_789n;\nconst bigDecimal = 1_234.123_45;\n\nconsole.log(inspect(thousand, { numericSeparator: true }));\n// 1_000\nconsole.log(inspect(million, { numericSeparator: true }));\n// 1_000_000\nconsole.log(inspect(bigNumber, { numericSeparator: true }));\n// 123_456_789n\nconsole.log(inspect(bigDecimal, { numericSeparator: true }));\n// 1_234.123_45\n</code></pre>\n<p><code>util.inspect()</code> is a synchronous method intended for debugging. Its maximum\noutput length is approximately 128 MiB. Inputs that result in longer output will\nbe truncated.</p>"
+          "desc": "<p>The <code>util.inspect()</code> method returns a string representation of <code>object</code> that is\nintended for debugging. The output of <code>util.inspect</code> may change at any time\nand should not be depended upon programmatically. Additional <code>options</code> may be\npassed that alter the result.\n<code>util.inspect()</code> will use the constructor's name and/or <code>@@toStringTag</code> to make\nan identifiable tag for an inspected value.</p>\n<pre><code class=\"language-js\">class Foo {\n  get [Symbol.toStringTag]() {\n    return 'bar';\n  }\n}\n\nclass Bar {}\n\nconst baz = Object.create(null, { [Symbol.toStringTag]: { value: 'foo' } });\n\nutil.inspect(new Foo()); // 'Foo [bar] {}'\nutil.inspect(new Bar()); // 'Bar {}'\nutil.inspect(baz);       // '[foo] {}'\n</code></pre>\n<p>Circular references point to their anchor by using a reference index:</p>\n<pre><code class=\"language-js\">const { inspect } = require('node:util');\n\nconst obj = {};\nobj.a = [obj];\nobj.b = {};\nobj.b.inner = obj.b;\nobj.b.obj = obj;\n\nconsole.log(inspect(obj));\n// &#x3C;ref *1> {\n//   a: [ [Circular *1] ],\n//   b: &#x3C;ref *2> { inner: [Circular *2], obj: [Circular *1] }\n// }\n</code></pre>\n<p>The following example inspects all properties of the <code>util</code> object:</p>\n<pre><code class=\"language-js\">const util = require('node:util');\n\nconsole.log(util.inspect(util, { showHidden: true, depth: null }));\n</code></pre>\n<p>The following example highlights the effect of the <code>compact</code> option:</p>\n<pre><code class=\"language-js\">const util = require('node:util');\n\nconst o = {\n  a: [1, 2, [[\n    'Lorem ipsum dolor sit amet,\\nconsectetur adipiscing elit, sed do ' +\n      'eiusmod \\ntempor incididunt ut labore et dolore magna aliqua.',\n    'test',\n    'foo']], 4],\n  b: new Map([['za', 1], ['zb', 'test']]),\n};\nconsole.log(util.inspect(o, { compact: true, depth: 5, breakLength: 80 }));\n\n// { a:\n//   [ 1,\n//     2,\n//     [ [ 'Lorem ipsum dolor sit amet,\\nconsectetur [...]', // A long line\n//           'test',\n//           'foo' ] ],\n//     4 ],\n//   b: Map(2) { 'za' => 1, 'zb' => 'test' } }\n\n// Setting `compact` to false or an integer creates more reader friendly output.\nconsole.log(util.inspect(o, { compact: false, depth: 5, breakLength: 80 }));\n\n// {\n//   a: [\n//     1,\n//     2,\n//     [\n//       [\n//         'Lorem ipsum dolor sit amet,\\n' +\n//           'consectetur adipiscing elit, sed do eiusmod \\n' +\n//           'tempor incididunt ut labore et dolore magna aliqua.',\n//         'test',\n//         'foo'\n//       ]\n//     ],\n//     4\n//   ],\n//   b: Map(2) {\n//     'za' => 1,\n//     'zb' => 'test'\n//   }\n// }\n\n// Setting `breakLength` to e.g. 150 will print the \"Lorem ipsum\" text in a\n// single line.\n</code></pre>\n<p>The <code>showHidden</code> option allows <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap\" class=\"type\">&lt;WeakMap&gt;</a> and <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet\" class=\"type\">&lt;WeakSet&gt;</a> entries to be\ninspected. If there are more entries than <code>maxArrayLength</code>, there is no\nguarantee which entries are displayed. That means retrieving the same\n<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet\" class=\"type\">&lt;WeakSet&gt;</a> entries twice may result in different output. Furthermore, entries\nwith no remaining strong references may be garbage collected at any time.</p>\n<pre><code class=\"language-js\">const { inspect } = require('node:util');\n\nconst obj = { a: 1 };\nconst obj2 = { b: 2 };\nconst weakSet = new WeakSet([obj, obj2]);\n\nconsole.log(inspect(weakSet, { showHidden: true }));\n// WeakSet { { a: 1 }, { b: 2 } }\n</code></pre>\n<p>The <code>sorted</code> option ensures that an object's property insertion order does not\nimpact the result of <code>util.inspect()</code>.</p>\n<pre><code class=\"language-js\">const { inspect } = require('node:util');\nconst assert = require('node:assert');\n\nconst o1 = {\n  b: [2, 3, 1],\n  a: '`a` comes before `b`',\n  c: new Set([2, 3, 1]),\n};\nconsole.log(inspect(o1, { sorted: true }));\n// { a: '`a` comes before `b`', b: [ 2, 3, 1 ], c: Set(3) { 1, 2, 3 } }\nconsole.log(inspect(o1, { sorted: (a, b) => b.localeCompare(a) }));\n// { c: Set(3) { 3, 2, 1 }, b: [ 2, 3, 1 ], a: '`a` comes before `b`' }\n\nconst o2 = {\n  c: new Set([2, 1, 3]),\n  a: '`a` comes before `b`',\n  b: [2, 3, 1],\n};\nassert.strict.equal(\n  inspect(o1, { sorted: true }),\n  inspect(o2, { sorted: true }),\n);\n</code></pre>\n<p>The <code>numericSeparator</code> option adds an underscore every three digits to all\nnumbers.</p>\n<pre><code class=\"language-js\">const { inspect } = require('node:util');\n\nconst thousand = 1_000;\nconst million = 1_000_000;\nconst bigNumber = 123_456_789n;\nconst bigDecimal = 1_234.123_45;\n\nconsole.log(inspect(thousand, { numericSeparator: true }));\n// 1_000\nconsole.log(inspect(million, { numericSeparator: true }));\n// 1_000_000\nconsole.log(inspect(bigNumber, { numericSeparator: true }));\n// 123_456_789n\nconsole.log(inspect(bigDecimal, { numericSeparator: true }));\n// 1_234.123_45\n</code></pre>\n<p><code>util.inspect()</code> is a synchronous method intended for debugging. Its maximum\noutput length is approximately 128 MiB. Inputs that result in longer output will\nbe truncated.</p>"
         },
         {
           "textRaw": "`util.inspect(object[, showHidden[, depth[, colors]]])`",
@@ -792,11 +856,11 @@
                   "type": "Object",
                   "options": [
                     {
-                      "textRaw": "`showHidden` {boolean} If `true`, `object`'s non-enumerable symbols and properties are included in the formatted result. [`WeakMap`][] and [`WeakSet`][] entries are also included as well as user defined prototype properties (excluding method properties). **Default:** `false`.",
+                      "textRaw": "`showHidden` {boolean} If `true`, `object`'s non-enumerable symbols and properties are included in the formatted result. {WeakMap} and {WeakSet} entries are also included as well as user defined prototype properties (excluding method properties). **Default:** `false`.",
                       "name": "showHidden",
                       "type": "boolean",
                       "default": "`false`",
-                      "desc": "If `true`, `object`'s non-enumerable symbols and properties are included in the formatted result. [`WeakMap`][] and [`WeakSet`][] entries are also included as well as user defined prototype properties (excluding method properties)."
+                      "desc": "If `true`, `object`'s non-enumerable symbols and properties are included in the formatted result. {WeakMap} and {WeakSet} entries are also included as well as user defined prototype properties (excluding method properties)."
                     },
                     {
                       "textRaw": "`depth` {number} Specifies the number of times to recurse while formatting `object`. This is useful for inspecting large objects. To recurse up to the maximum call stack size pass `Infinity` or `null`. **Default:** `2`.",
@@ -827,11 +891,11 @@
                       "desc": "If `true`, `Proxy` inspection includes the [`target` and `handler`][] objects."
                     },
                     {
-                      "textRaw": "`maxArrayLength` {integer} Specifies the maximum number of `Array`, [`TypedArray`][], [`Map`][], [`Set`][], [`WeakMap`][], and [`WeakSet`][] elements to include when formatting. Set to `null` or `Infinity` to show all elements. Set to `0` or negative to show no elements. **Default:** `100`.",
+                      "textRaw": "`maxArrayLength` {integer} Specifies the maximum number of `Array`, {TypedArray}, {Map}, {WeakMap}, and {WeakSet} elements to include when formatting. Set to `null` or `Infinity` to show all elements. Set to `0` or negative to show no elements. **Default:** `100`.",
                       "name": "maxArrayLength",
                       "type": "integer",
                       "default": "`100`",
-                      "desc": "Specifies the maximum number of `Array`, [`TypedArray`][], [`Map`][], [`Set`][], [`WeakMap`][], and [`WeakSet`][] elements to include when formatting. Set to `null` or `Infinity` to show all elements. Set to `0` or negative to show no elements."
+                      "desc": "Specifies the maximum number of `Array`, {TypedArray}, {Map}, {WeakMap}, and {WeakSet} elements to include when formatting. Set to `null` or `Infinity` to show all elements. Set to `0` or negative to show no elements."
                     },
                     {
                       "textRaw": "`maxStringLength` {integer} Specifies the maximum number of characters to include when formatting. Set to `null` or `Infinity` to show all elements. Set to `0` or negative to show no characters. **Default:** `10000`.",
@@ -879,7 +943,7 @@
               ]
             }
           ],
-          "desc": "<p>The <code>util.inspect()</code> method returns a string representation of <code>object</code> that is\nintended for debugging. The output of <code>util.inspect</code> may change at any time\nand should not be depended upon programmatically. Additional <code>options</code> may be\npassed that alter the result.\n<code>util.inspect()</code> will use the constructor's name and/or <code>@@toStringTag</code> to make\nan identifiable tag for an inspected value.</p>\n<pre><code class=\"language-js\">class Foo {\n  get [Symbol.toStringTag]() {\n    return 'bar';\n  }\n}\n\nclass Bar {}\n\nconst baz = Object.create(null, { [Symbol.toStringTag]: { value: 'foo' } });\n\nutil.inspect(new Foo()); // 'Foo [bar] {}'\nutil.inspect(new Bar()); // 'Bar {}'\nutil.inspect(baz);       // '[foo] {}'\n</code></pre>\n<p>Circular references point to their anchor by using a reference index:</p>\n<pre><code class=\"language-js\">const { inspect } = require('node:util');\n\nconst obj = {};\nobj.a = [obj];\nobj.b = {};\nobj.b.inner = obj.b;\nobj.b.obj = obj;\n\nconsole.log(inspect(obj));\n// &#x3C;ref *1> {\n//   a: [ [Circular *1] ],\n//   b: &#x3C;ref *2> { inner: [Circular *2], obj: [Circular *1] }\n// }\n</code></pre>\n<p>The following example inspects all properties of the <code>util</code> object:</p>\n<pre><code class=\"language-js\">const util = require('node:util');\n\nconsole.log(util.inspect(util, { showHidden: true, depth: null }));\n</code></pre>\n<p>The following example highlights the effect of the <code>compact</code> option:</p>\n<pre><code class=\"language-js\">const util = require('node:util');\n\nconst o = {\n  a: [1, 2, [[\n    'Lorem ipsum dolor sit amet,\\nconsectetur adipiscing elit, sed do ' +\n      'eiusmod \\ntempor incididunt ut labore et dolore magna aliqua.',\n    'test',\n    'foo']], 4],\n  b: new Map([['za', 1], ['zb', 'test']]),\n};\nconsole.log(util.inspect(o, { compact: true, depth: 5, breakLength: 80 }));\n\n// { a:\n//   [ 1,\n//     2,\n//     [ [ 'Lorem ipsum dolor sit amet,\\nconsectetur [...]', // A long line\n//           'test',\n//           'foo' ] ],\n//     4 ],\n//   b: Map(2) { 'za' => 1, 'zb' => 'test' } }\n\n// Setting `compact` to false or an integer creates more reader friendly output.\nconsole.log(util.inspect(o, { compact: false, depth: 5, breakLength: 80 }));\n\n// {\n//   a: [\n//     1,\n//     2,\n//     [\n//       [\n//         'Lorem ipsum dolor sit amet,\\n' +\n//           'consectetur adipiscing elit, sed do eiusmod \\n' +\n//           'tempor incididunt ut labore et dolore magna aliqua.',\n//         'test',\n//         'foo'\n//       ]\n//     ],\n//     4\n//   ],\n//   b: Map(2) {\n//     'za' => 1,\n//     'zb' => 'test'\n//   }\n// }\n\n// Setting `breakLength` to e.g. 150 will print the \"Lorem ipsum\" text in a\n// single line.\n</code></pre>\n<p>The <code>showHidden</code> option allows <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap\"><code>WeakMap</code></a> and <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet\"><code>WeakSet</code></a> entries to be\ninspected. If there are more entries than <code>maxArrayLength</code>, there is no\nguarantee which entries are displayed. That means retrieving the same\n<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet\"><code>WeakSet</code></a> entries twice may result in different output. Furthermore, entries\nwith no remaining strong references may be garbage collected at any time.</p>\n<pre><code class=\"language-js\">const { inspect } = require('node:util');\n\nconst obj = { a: 1 };\nconst obj2 = { b: 2 };\nconst weakSet = new WeakSet([obj, obj2]);\n\nconsole.log(inspect(weakSet, { showHidden: true }));\n// WeakSet { { a: 1 }, { b: 2 } }\n</code></pre>\n<p>The <code>sorted</code> option ensures that an object's property insertion order does not\nimpact the result of <code>util.inspect()</code>.</p>\n<pre><code class=\"language-js\">const { inspect } = require('node:util');\nconst assert = require('node:assert');\n\nconst o1 = {\n  b: [2, 3, 1],\n  a: '`a` comes before `b`',\n  c: new Set([2, 3, 1]),\n};\nconsole.log(inspect(o1, { sorted: true }));\n// { a: '`a` comes before `b`', b: [ 2, 3, 1 ], c: Set(3) { 1, 2, 3 } }\nconsole.log(inspect(o1, { sorted: (a, b) => b.localeCompare(a) }));\n// { c: Set(3) { 3, 2, 1 }, b: [ 2, 3, 1 ], a: '`a` comes before `b`' }\n\nconst o2 = {\n  c: new Set([2, 1, 3]),\n  a: '`a` comes before `b`',\n  b: [2, 3, 1],\n};\nassert.strict.equal(\n  inspect(o1, { sorted: true }),\n  inspect(o2, { sorted: true }),\n);\n</code></pre>\n<p>The <code>numericSeparator</code> option adds an underscore every three digits to all\nnumbers.</p>\n<pre><code class=\"language-js\">const { inspect } = require('node:util');\n\nconst thousand = 1_000;\nconst million = 1_000_000;\nconst bigNumber = 123_456_789n;\nconst bigDecimal = 1_234.123_45;\n\nconsole.log(inspect(thousand, { numericSeparator: true }));\n// 1_000\nconsole.log(inspect(million, { numericSeparator: true }));\n// 1_000_000\nconsole.log(inspect(bigNumber, { numericSeparator: true }));\n// 123_456_789n\nconsole.log(inspect(bigDecimal, { numericSeparator: true }));\n// 1_234.123_45\n</code></pre>\n<p><code>util.inspect()</code> is a synchronous method intended for debugging. Its maximum\noutput length is approximately 128 MiB. Inputs that result in longer output will\nbe truncated.</p>",
+          "desc": "<p>The <code>util.inspect()</code> method returns a string representation of <code>object</code> that is\nintended for debugging. The output of <code>util.inspect</code> may change at any time\nand should not be depended upon programmatically. Additional <code>options</code> may be\npassed that alter the result.\n<code>util.inspect()</code> will use the constructor's name and/or <code>@@toStringTag</code> to make\nan identifiable tag for an inspected value.</p>\n<pre><code class=\"language-js\">class Foo {\n  get [Symbol.toStringTag]() {\n    return 'bar';\n  }\n}\n\nclass Bar {}\n\nconst baz = Object.create(null, { [Symbol.toStringTag]: { value: 'foo' } });\n\nutil.inspect(new Foo()); // 'Foo [bar] {}'\nutil.inspect(new Bar()); // 'Bar {}'\nutil.inspect(baz);       // '[foo] {}'\n</code></pre>\n<p>Circular references point to their anchor by using a reference index:</p>\n<pre><code class=\"language-js\">const { inspect } = require('node:util');\n\nconst obj = {};\nobj.a = [obj];\nobj.b = {};\nobj.b.inner = obj.b;\nobj.b.obj = obj;\n\nconsole.log(inspect(obj));\n// &#x3C;ref *1> {\n//   a: [ [Circular *1] ],\n//   b: &#x3C;ref *2> { inner: [Circular *2], obj: [Circular *1] }\n// }\n</code></pre>\n<p>The following example inspects all properties of the <code>util</code> object:</p>\n<pre><code class=\"language-js\">const util = require('node:util');\n\nconsole.log(util.inspect(util, { showHidden: true, depth: null }));\n</code></pre>\n<p>The following example highlights the effect of the <code>compact</code> option:</p>\n<pre><code class=\"language-js\">const util = require('node:util');\n\nconst o = {\n  a: [1, 2, [[\n    'Lorem ipsum dolor sit amet,\\nconsectetur adipiscing elit, sed do ' +\n      'eiusmod \\ntempor incididunt ut labore et dolore magna aliqua.',\n    'test',\n    'foo']], 4],\n  b: new Map([['za', 1], ['zb', 'test']]),\n};\nconsole.log(util.inspect(o, { compact: true, depth: 5, breakLength: 80 }));\n\n// { a:\n//   [ 1,\n//     2,\n//     [ [ 'Lorem ipsum dolor sit amet,\\nconsectetur [...]', // A long line\n//           'test',\n//           'foo' ] ],\n//     4 ],\n//   b: Map(2) { 'za' => 1, 'zb' => 'test' } }\n\n// Setting `compact` to false or an integer creates more reader friendly output.\nconsole.log(util.inspect(o, { compact: false, depth: 5, breakLength: 80 }));\n\n// {\n//   a: [\n//     1,\n//     2,\n//     [\n//       [\n//         'Lorem ipsum dolor sit amet,\\n' +\n//           'consectetur adipiscing elit, sed do eiusmod \\n' +\n//           'tempor incididunt ut labore et dolore magna aliqua.',\n//         'test',\n//         'foo'\n//       ]\n//     ],\n//     4\n//   ],\n//   b: Map(2) {\n//     'za' => 1,\n//     'zb' => 'test'\n//   }\n// }\n\n// Setting `breakLength` to e.g. 150 will print the \"Lorem ipsum\" text in a\n// single line.\n</code></pre>\n<p>The <code>showHidden</code> option allows <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap\" class=\"type\">&lt;WeakMap&gt;</a> and <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet\" class=\"type\">&lt;WeakSet&gt;</a> entries to be\ninspected. If there are more entries than <code>maxArrayLength</code>, there is no\nguarantee which entries are displayed. That means retrieving the same\n<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet\" class=\"type\">&lt;WeakSet&gt;</a> entries twice may result in different output. Furthermore, entries\nwith no remaining strong references may be garbage collected at any time.</p>\n<pre><code class=\"language-js\">const { inspect } = require('node:util');\n\nconst obj = { a: 1 };\nconst obj2 = { b: 2 };\nconst weakSet = new WeakSet([obj, obj2]);\n\nconsole.log(inspect(weakSet, { showHidden: true }));\n// WeakSet { { a: 1 }, { b: 2 } }\n</code></pre>\n<p>The <code>sorted</code> option ensures that an object's property insertion order does not\nimpact the result of <code>util.inspect()</code>.</p>\n<pre><code class=\"language-js\">const { inspect } = require('node:util');\nconst assert = require('node:assert');\n\nconst o1 = {\n  b: [2, 3, 1],\n  a: '`a` comes before `b`',\n  c: new Set([2, 3, 1]),\n};\nconsole.log(inspect(o1, { sorted: true }));\n// { a: '`a` comes before `b`', b: [ 2, 3, 1 ], c: Set(3) { 1, 2, 3 } }\nconsole.log(inspect(o1, { sorted: (a, b) => b.localeCompare(a) }));\n// { c: Set(3) { 3, 2, 1 }, b: [ 2, 3, 1 ], a: '`a` comes before `b`' }\n\nconst o2 = {\n  c: new Set([2, 1, 3]),\n  a: '`a` comes before `b`',\n  b: [2, 3, 1],\n};\nassert.strict.equal(\n  inspect(o1, { sorted: true }),\n  inspect(o2, { sorted: true }),\n);\n</code></pre>\n<p>The <code>numericSeparator</code> option adds an underscore every three digits to all\nnumbers.</p>\n<pre><code class=\"language-js\">const { inspect } = require('node:util');\n\nconst thousand = 1_000;\nconst million = 1_000_000;\nconst bigNumber = 123_456_789n;\nconst bigDecimal = 1_234.123_45;\n\nconsole.log(inspect(thousand, { numericSeparator: true }));\n// 1_000\nconsole.log(inspect(million, { numericSeparator: true }));\n// 1_000_000\nconsole.log(inspect(bigNumber, { numericSeparator: true }));\n// 123_456_789n\nconsole.log(inspect(bigDecimal, { numericSeparator: true }));\n// 1_234.123_45\n</code></pre>\n<p><code>util.inspect()</code> is a synchronous method intended for debugging. Its maximum\noutput length is approximately 128 MiB. Inputs that result in longer output will\nbe truncated.</p>",
           "miscs": [
             {
               "textRaw": "Customizing `util.inspect` colors",
@@ -1109,10 +1173,10 @@
                           "desc": "A single character alias for the option."
                         },
                         {
-                          "textRaw": "`default` {string | boolean | string\\[] | boolean\\[]} The default option value when it is not set by args. It must be of the same type as the `type` property. When `multiple` is `true`, it must be an array.",
+                          "textRaw": "`default` {string | boolean | string\\[] | boolean\\[]} The default value to be used if (and only if) the option does not appear in the arguments to be parsed. It must be of the same type as the `type` property. When `multiple` is `true`, it must be an array.",
                           "name": "default",
                           "type": "string | boolean | string\\[] | boolean\\[]",
-                          "desc": "The default option value when it is not set by args. It must be of the same type as the `type` property. When `multiple` is `true`, it must be an array."
+                          "desc": "The default value to be used if (and only if) the option does not appear in the arguments to be parsed. It must be of the same type as the `type` property. When `multiple` is `true`, it must be an array."
                         }
                       ]
                     },
@@ -1285,14 +1349,19 @@
           "textRaw": "`util.styleText(format, text[, options])`",
           "type": "method",
           "name": "styleText",
-          "stability": 1,
-          "stabilityText": ".1 - Active development",
+          "stability": 2,
+          "stabilityText": "Stable.",
           "meta": {
             "added": [
               "v21.7.0",
               "v20.12.0"
             ],
             "changes": [
+              {
+                "version": "v23.5.0",
+                "pr-url": "https://github.com/nodejs/node/pull/56265",
+                "description": "styleText is now stable."
+              },
               {
                 "version": [
                   "v22.8.0",
@@ -1342,7 +1411,7 @@
               ]
             }
           ],
-          "desc": "<p>This function returns a formatted text considering the <code>format</code> passed\nfor printing in a terminal. It is aware of the terminal's capabilities\nand acts according to the configuration set via <code>NO_COLORS</code>,\n<code>NODE_DISABLE_COLORS</code> and <code>FORCE_COLOR</code> environment variables.</p>\n<pre><code class=\"language-mjs\">import { styleText } from 'node:util';\nimport { stderr } from 'node:process';\n\nconst successMessage = styleText('green', 'Success!');\nconsole.log(successMessage);\n\nconst errorMessage = styleText(\n  'red',\n  'Error! Error!',\n  // Validate if process.stderr has TTY\n  { stream: stderr },\n);\nconsole.error(successMessage);\n</code></pre>\n<pre><code class=\"language-cjs\">const { styleText } = require('node:util');\nconst { stderr } = require('node:process');\n\nconst successMessage = styleText('green', 'Success!');\nconsole.log(successMessage);\n\nconst errorMessage = styleText(\n  'red',\n  'Error! Error!',\n  // Validate if process.stderr has TTY\n  { stream: stderr },\n);\nconsole.error(successMessage);\n</code></pre>\n<p><code>util.inspect.colors</code> also provides text formats such as <code>italic</code>, and\n<code>underline</code> and you can combine both:</p>\n<pre><code class=\"language-cjs\">console.log(\n  util.styleText(['underline', 'italic'], 'My italic underlined message'),\n);\n</code></pre>\n<p>When passing an array of formats, the order of the format applied\nis left to right so the following style might overwrite the previous one.</p>\n<pre><code class=\"language-cjs\">console.log(\n  util.styleText(['red', 'green'], 'text'), // green\n);\n</code></pre>\n<p>The full list of formats can be found in <a href=\"#modifiers\">modifiers</a>.</p>"
+          "desc": "<p>This function returns a formatted text considering the <code>format</code> passed\nfor printing in a terminal. It is aware of the terminal's capabilities\nand acts according to the configuration set via <code>NO_COLORS</code>,\n<code>NODE_DISABLE_COLORS</code> and <code>FORCE_COLOR</code> environment variables.</p>\n<pre><code class=\"language-mjs\">import { styleText } from 'node:util';\nimport { stderr } from 'node:process';\n\nconst successMessage = styleText('green', 'Success!');\nconsole.log(successMessage);\n\nconst errorMessage = styleText(\n  'red',\n  'Error! Error!',\n  // Validate if process.stderr has TTY\n  { stream: stderr },\n);\nconsole.error(errorMessage);\n</code></pre>\n<pre><code class=\"language-cjs\">const { styleText } = require('node:util');\nconst { stderr } = require('node:process');\n\nconst successMessage = styleText('green', 'Success!');\nconsole.log(successMessage);\n\nconst errorMessage = styleText(\n  'red',\n  'Error! Error!',\n  // Validate if process.stderr has TTY\n  { stream: stderr },\n);\nconsole.error(errorMessage);\n</code></pre>\n<p><code>util.inspect.colors</code> also provides text formats such as <code>italic</code>, and\n<code>underline</code> and you can combine both:</p>\n<pre><code class=\"language-cjs\">console.log(\n  util.styleText(['underline', 'italic'], 'My italic underlined message'),\n);\n</code></pre>\n<p>When passing an array of formats, the order of the format applied\nis left to right so the following style might overwrite the previous one.</p>\n<pre><code class=\"language-cjs\">console.log(\n  util.styleText(['red', 'green'], 'text'), // green\n);\n</code></pre>\n<p>The full list of formats can be found in <a href=\"#modifiers\">modifiers</a>.</p>"
         },
         {
           "textRaw": "`util.toUSVString(string)`",
@@ -1444,15 +1513,15 @@
                   "type": "AbortSignal"
                 },
                 {
-                  "textRaw": "`resource` {Object} Any non-null entity, reference to which is held weakly.",
+                  "textRaw": "`resource` {Object} Any non-null object tied to the abortable operation and held weakly. If `resource` is garbage collected before the `signal` aborts, the promise remains pending, allowing Node.js to stop tracking it. This helps prevent memory leaks in long-running or non-cancelable operations.",
                   "name": "resource",
                   "type": "Object",
-                  "desc": "Any non-null entity, reference to which is held weakly."
+                  "desc": "Any non-null object tied to the abortable operation and held weakly. If `resource` is garbage collected before the `signal` aborts, the promise remains pending, allowing Node.js to stop tracking it. This helps prevent memory leaks in long-running or non-cancelable operations."
                 }
               ]
             }
           ],
-          "desc": "<p>Listens to abort event on the provided <code>signal</code> and\nreturns a promise that is fulfilled when the <code>signal</code> is\naborted. If the passed <code>resource</code> is garbage collected before the <code>signal</code> is\naborted, the returned promise shall remain pending indefinitely.</p>\n<pre><code class=\"language-cjs\">const { aborted } = require('node:util');\n\nconst dependent = obtainSomethingAbortable();\n\naborted(dependent.signal, dependent).then(() => {\n  // Do something when dependent is aborted.\n});\n\ndependent.on('event', () => {\n  dependent.abort();\n});\n</code></pre>\n<pre><code class=\"language-mjs\">import { aborted } from 'node:util';\n\nconst dependent = obtainSomethingAbortable();\n\naborted(dependent.signal, dependent).then(() => {\n  // Do something when dependent is aborted.\n});\n\ndependent.on('event', () => {\n  dependent.abort();\n});\n</code></pre>"
+          "desc": "<p>Listens to abort event on the provided <code>signal</code> and returns a promise that resolves when the <code>signal</code> is aborted.\nIf <code>resource</code> is provided, it weakly references the operation's associated object,\nso if <code>resource</code> is garbage collected before the <code>signal</code> aborts,\nthen returned promise shall remain pending.\nThis prevents memory leaks in long-running or non-cancelable operations.</p>\n<pre><code class=\"language-cjs\">const { aborted } = require('node:util');\n\n// Obtain an object with an abortable signal, like a custom resource or operation.\nconst dependent = obtainSomethingAbortable();\n\n// Pass `dependent` as the resource, indicating the promise should only resolve\n// if `dependent` is still in memory when the signal is aborted.\naborted(dependent.signal, dependent).then(() => {\n\n  // This code runs when `dependent` is aborted.\n  console.log('Dependent resource was aborted.');\n});\n\n// Simulate an event that triggers the abort.\ndependent.on('event', () => {\n  dependent.abort(); // This will cause the `aborted` promise to resolve.\n});\n</code></pre>\n<pre><code class=\"language-mjs\">import { aborted } from 'node:util';\n\n// Obtain an object with an abortable signal, like a custom resource or operation.\nconst dependent = obtainSomethingAbortable();\n\n// Pass `dependent` as the resource, indicating the promise should only resolve\n// if `dependent` is still in memory when the signal is aborted.\naborted(dependent.signal, dependent).then(() => {\n\n  // This code runs when `dependent` is aborted.\n  console.log('Dependent resource was aborted.');\n});\n\n// Simulate an event that triggers the abort.\ndependent.on('event', () => {\n  dependent.abort(); // This will cause the `aborted` promise to resolve.\n});\n</code></pre>"
         }
       ],
       "classes": [
@@ -1714,7 +1783,13 @@
             "added": [
               "v8.3.0"
             ],
-            "changes": []
+            "changes": [
+              {
+                "version": "v11.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/22281",
+                "description": "The class is now available on the global object."
+              }
+            ]
           },
           "desc": "<p>An implementation of the <a href=\"https://encoding.spec.whatwg.org/\">WHATWG Encoding Standard</a> <code>TextDecoder</code> API.</p>\n<pre><code class=\"language-js\">const decoder = new TextDecoder();\nconst u8arr = new Uint8Array([72, 101, 108, 108, 111]);\nconsole.log(decoder.decode(u8arr)); // Hello\n</code></pre>",
           "modules": [
@@ -1890,6 +1965,12 @@
               "textRaw": "`textEncoder.encodeInto(src, dest)`",
               "type": "method",
               "name": "encodeInto",
+              "meta": {
+                "added": [
+                  "v12.11.0"
+                ],
+                "changes": []
+              },
               "signatures": [
                 {
                   "return": {
@@ -1984,7 +2065,7 @@
                   ]
                 }
               ],
-              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer\"><code>ArrayBuffer</code></a> or\n<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer\"><code>SharedArrayBuffer</code></a> instance.</p>\n<p>See also <a href=\"#utiltypesisarraybuffervalue\"><code>util.types.isArrayBuffer()</code></a> and\n<a href=\"#utiltypesissharedarraybuffervalue\"><code>util.types.isSharedArrayBuffer()</code></a>.</p>\n<pre><code class=\"language-js\">util.types.isAnyArrayBuffer(new ArrayBuffer());  // Returns true\nutil.types.isAnyArrayBuffer(new SharedArrayBuffer());  // Returns true\n</code></pre>"
+              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer\" class=\"type\">&lt;ArrayBuffer&gt;</a> or\n<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer\" class=\"type\">&lt;SharedArrayBuffer&gt;</a> instance.</p>\n<p>See also <a href=\"#utiltypesisarraybuffervalue\"><code>util.types.isArrayBuffer()</code></a> and\n<a href=\"#utiltypesissharedarraybuffervalue\"><code>util.types.isSharedArrayBuffer()</code></a>.</p>\n<pre><code class=\"language-js\">util.types.isAnyArrayBuffer(new ArrayBuffer());  // Returns true\nutil.types.isAnyArrayBuffer(new SharedArrayBuffer());  // Returns true\n</code></pre>"
             },
             {
               "textRaw": "`util.types.isArrayBufferView(value)`",
@@ -2012,7 +2093,7 @@
                   ]
                 }
               ],
-              "desc": "<p>Returns <code>true</code> if the value is an instance of one of the <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer\"><code>ArrayBuffer</code></a>\nviews, such as typed array objects or <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView\"><code>DataView</code></a>. Equivalent to\n<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer/isView\"><code>ArrayBuffer.isView()</code></a>.</p>\n<pre><code class=\"language-js\">util.types.isArrayBufferView(new Int8Array());  // true\nutil.types.isArrayBufferView(Buffer.from('hello world')); // true\nutil.types.isArrayBufferView(new DataView(new ArrayBuffer(16)));  // true\nutil.types.isArrayBufferView(new ArrayBuffer());  // false\n</code></pre>"
+              "desc": "<p>Returns <code>true</code> if the value is an instance of one of the <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer\" class=\"type\">&lt;ArrayBuffer&gt;</a>\nviews, such as typed array objects or <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView\" class=\"type\">&lt;DataView&gt;</a>. Equivalent to\n<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer/isView\"><code>ArrayBuffer.isView()</code></a>.</p>\n<pre><code class=\"language-js\">util.types.isArrayBufferView(new Int8Array());  // true\nutil.types.isArrayBufferView(Buffer.from('hello world')); // true\nutil.types.isArrayBufferView(new DataView(new ArrayBuffer(16)));  // true\nutil.types.isArrayBufferView(new ArrayBuffer());  // false\n</code></pre>"
             },
             {
               "textRaw": "`util.types.isArgumentsObject(value)`",
@@ -2068,7 +2149,7 @@
                   ]
                 }
               ],
-              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer\"><code>ArrayBuffer</code></a> instance.\nThis does <em>not</em> include <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer\"><code>SharedArrayBuffer</code></a> instances. Usually, it is\ndesirable to test for both; See <a href=\"#utiltypesisanyarraybuffervalue\"><code>util.types.isAnyArrayBuffer()</code></a> for that.</p>\n<pre><code class=\"language-js\">util.types.isArrayBuffer(new ArrayBuffer());  // Returns true\nutil.types.isArrayBuffer(new SharedArrayBuffer());  // Returns false\n</code></pre>"
+              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer\" class=\"type\">&lt;ArrayBuffer&gt;</a> instance.\nThis does <em>not</em> include <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer\" class=\"type\">&lt;SharedArrayBuffer&gt;</a> instances. Usually, it is\ndesirable to test for both; See <a href=\"#utiltypesisanyarraybuffervalue\"><code>util.types.isAnyArrayBuffer()</code></a> for that.</p>\n<pre><code class=\"language-js\">util.types.isArrayBuffer(new ArrayBuffer());  // Returns true\nutil.types.isArrayBuffer(new SharedArrayBuffer());  // Returns false\n</code></pre>"
             },
             {
               "textRaw": "`util.types.isAsyncFunction(value)`",
@@ -2125,6 +2206,34 @@
                 }
               ],
               "desc": "<p>Returns <code>true</code> if the value is a <code>BigInt64Array</code> instance.</p>\n<pre><code class=\"language-js\">util.types.isBigInt64Array(new BigInt64Array());   // Returns true\nutil.types.isBigInt64Array(new BigUint64Array());  // Returns false\n</code></pre>"
+            },
+            {
+              "textRaw": "`util.types.isBigIntObject(value)`",
+              "type": "method",
+              "name": "isBigIntObject",
+              "meta": {
+                "added": [
+                  "v10.4.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "return": {
+                    "textRaw": "Returns: {boolean}",
+                    "name": "return",
+                    "type": "boolean"
+                  },
+                  "params": [
+                    {
+                      "textRaw": "`value` {any}",
+                      "name": "value",
+                      "type": "any"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>Returns <code>true</code> if the value is a BigInt object, e.g. created\nby <code>Object(BigInt(123))</code>.</p>\n<pre><code class=\"language-js\">util.types.isBigIntObject(Object(BigInt(123)));   // Returns true\nutil.types.isBigIntObject(BigInt(123));   // Returns false\nutil.types.isBigIntObject(123);  // Returns false\n</code></pre>"
             },
             {
               "textRaw": "`util.types.isBigUint64Array(value)`",
@@ -2264,7 +2373,7 @@
                   ]
                 }
               ],
-              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView\"><code>DataView</code></a> instance.</p>\n<pre><code class=\"language-js\">const ab = new ArrayBuffer(20);\nutil.types.isDataView(new DataView(ab));  // Returns true\nutil.types.isDataView(new Float64Array());  // Returns false\n</code></pre>\n<p>See also <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer/isView\"><code>ArrayBuffer.isView()</code></a>.</p>"
+              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView\" class=\"type\">&lt;DataView&gt;</a> instance.</p>\n<pre><code class=\"language-js\">const ab = new ArrayBuffer(20);\nutil.types.isDataView(new DataView(ab));  // Returns true\nutil.types.isDataView(new Float64Array());  // Returns false\n</code></pre>\n<p>See also <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer/isView\"><code>ArrayBuffer.isView()</code></a>.</p>"
             },
             {
               "textRaw": "`util.types.isDate(value)`",
@@ -2292,7 +2401,7 @@
                   ]
                 }
               ],
-              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date\"><code>Date</code></a> instance.</p>\n<pre><code class=\"language-js\">util.types.isDate(new Date());  // Returns true\n</code></pre>"
+              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date\" class=\"type\">&lt;Date&gt;</a> instance.</p>\n<pre><code class=\"language-js\">util.types.isDate(new Date());  // Returns true\n</code></pre>"
             },
             {
               "textRaw": "`util.types.isExternal(value)`",
@@ -2348,7 +2457,7 @@
                   ]
                 }
               ],
-              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array\"><code>Float32Array</code></a> instance.</p>\n<pre><code class=\"language-js\">util.types.isFloat32Array(new ArrayBuffer());  // Returns false\nutil.types.isFloat32Array(new Float32Array());  // Returns true\nutil.types.isFloat32Array(new Float64Array());  // Returns false\n</code></pre>"
+              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array\" class=\"type\">&lt;Float32Array&gt;</a> instance.</p>\n<pre><code class=\"language-js\">util.types.isFloat32Array(new ArrayBuffer());  // Returns false\nutil.types.isFloat32Array(new Float32Array());  // Returns true\nutil.types.isFloat32Array(new Float64Array());  // Returns false\n</code></pre>"
             },
             {
               "textRaw": "`util.types.isFloat64Array(value)`",
@@ -2376,7 +2485,7 @@
                   ]
                 }
               ],
-              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float64Array\"><code>Float64Array</code></a> instance.</p>\n<pre><code class=\"language-js\">util.types.isFloat64Array(new ArrayBuffer());  // Returns false\nutil.types.isFloat64Array(new Uint8Array());  // Returns false\nutil.types.isFloat64Array(new Float64Array());  // Returns true\n</code></pre>"
+              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float64Array\" class=\"type\">&lt;Float64Array&gt;</a> instance.</p>\n<pre><code class=\"language-js\">util.types.isFloat64Array(new ArrayBuffer());  // Returns false\nutil.types.isFloat64Array(new Uint8Array());  // Returns false\nutil.types.isFloat64Array(new Float64Array());  // Returns true\n</code></pre>"
             },
             {
               "textRaw": "`util.types.isGeneratorFunction(value)`",
@@ -2460,7 +2569,7 @@
                   ]
                 }
               ],
-              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int8Array\"><code>Int8Array</code></a> instance.</p>\n<pre><code class=\"language-js\">util.types.isInt8Array(new ArrayBuffer());  // Returns false\nutil.types.isInt8Array(new Int8Array());  // Returns true\nutil.types.isInt8Array(new Float64Array());  // Returns false\n</code></pre>"
+              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int8Array\" class=\"type\">&lt;Int8Array&gt;</a> instance.</p>\n<pre><code class=\"language-js\">util.types.isInt8Array(new ArrayBuffer());  // Returns false\nutil.types.isInt8Array(new Int8Array());  // Returns true\nutil.types.isInt8Array(new Float64Array());  // Returns false\n</code></pre>"
             },
             {
               "textRaw": "`util.types.isInt16Array(value)`",
@@ -2488,7 +2597,7 @@
                   ]
                 }
               ],
-              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int16Array\"><code>Int16Array</code></a> instance.</p>\n<pre><code class=\"language-js\">util.types.isInt16Array(new ArrayBuffer());  // Returns false\nutil.types.isInt16Array(new Int16Array());  // Returns true\nutil.types.isInt16Array(new Float64Array());  // Returns false\n</code></pre>"
+              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int16Array\" class=\"type\">&lt;Int16Array&gt;</a> instance.</p>\n<pre><code class=\"language-js\">util.types.isInt16Array(new ArrayBuffer());  // Returns false\nutil.types.isInt16Array(new Int16Array());  // Returns true\nutil.types.isInt16Array(new Float64Array());  // Returns false\n</code></pre>"
             },
             {
               "textRaw": "`util.types.isInt32Array(value)`",
@@ -2516,7 +2625,7 @@
                   ]
                 }
               ],
-              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int32Array\"><code>Int32Array</code></a> instance.</p>\n<pre><code class=\"language-js\">util.types.isInt32Array(new ArrayBuffer());  // Returns false\nutil.types.isInt32Array(new Int32Array());  // Returns true\nutil.types.isInt32Array(new Float64Array());  // Returns false\n</code></pre>"
+              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int32Array\" class=\"type\">&lt;Int32Array&gt;</a> instance.</p>\n<pre><code class=\"language-js\">util.types.isInt32Array(new ArrayBuffer());  // Returns false\nutil.types.isInt32Array(new Int32Array());  // Returns true\nutil.types.isInt32Array(new Float64Array());  // Returns false\n</code></pre>"
             },
             {
               "textRaw": "`util.types.isKeyObject(value)`",
@@ -2572,7 +2681,7 @@
                   ]
                 }
               ],
-              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map\"><code>Map</code></a> instance.</p>\n<pre><code class=\"language-js\">util.types.isMap(new Map());  // Returns true\n</code></pre>"
+              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map\" class=\"type\">&lt;Map&gt;</a> instance.</p>\n<pre><code class=\"language-js\">util.types.isMap(new Map());  // Returns true\n</code></pre>"
             },
             {
               "textRaw": "`util.types.isMapIterator(value)`",
@@ -2600,7 +2709,7 @@
                   ]
                 }
               ],
-              "desc": "<p>Returns <code>true</code> if the value is an iterator returned for a built-in\n<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map\"><code>Map</code></a> instance.</p>\n<pre><code class=\"language-js\">const map = new Map();\nutil.types.isMapIterator(map.keys());  // Returns true\nutil.types.isMapIterator(map.values());  // Returns true\nutil.types.isMapIterator(map.entries());  // Returns true\nutil.types.isMapIterator(map[Symbol.iterator]());  // Returns true\n</code></pre>"
+              "desc": "<p>Returns <code>true</code> if the value is an iterator returned for a built-in\n<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map\" class=\"type\">&lt;Map&gt;</a> instance.</p>\n<pre><code class=\"language-js\">const map = new Map();\nutil.types.isMapIterator(map.keys());  // Returns true\nutil.types.isMapIterator(map.values());  // Returns true\nutil.types.isMapIterator(map.entries());  // Returns true\nutil.types.isMapIterator(map[Symbol.iterator]());  // Returns true\n</code></pre>"
             },
             {
               "textRaw": "`util.types.isModuleNamespaceObject(value)`",
@@ -2712,7 +2821,7 @@
                   ]
                 }
               ],
-              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise\"><code>Promise</code></a>.</p>\n<pre><code class=\"language-js\">util.types.isPromise(Promise.resolve(42));  // Returns true\n</code></pre>"
+              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise\" class=\"type\">&lt;Promise&gt;</a>.</p>\n<pre><code class=\"language-js\">util.types.isPromise(Promise.resolve(42));  // Returns true\n</code></pre>"
             },
             {
               "textRaw": "`util.types.isProxy(value)`",
@@ -2740,7 +2849,7 @@
                   ]
                 }
               ],
-              "desc": "<p>Returns <code>true</code> if the value is a <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy\"><code>Proxy</code></a> instance.</p>\n<pre><code class=\"language-js\">const target = {};\nconst proxy = new Proxy(target, {});\nutil.types.isProxy(target);  // Returns false\nutil.types.isProxy(proxy);  // Returns true\n</code></pre>"
+              "desc": "<p>Returns <code>true</code> if the value is a <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy\" class=\"type\">&lt;Proxy&gt;</a> instance.</p>\n<pre><code class=\"language-js\">const target = {};\nconst proxy = new Proxy(target, {});\nutil.types.isProxy(target);  // Returns false\nutil.types.isProxy(proxy);  // Returns true\n</code></pre>"
             },
             {
               "textRaw": "`util.types.isRegExp(value)`",
@@ -2796,7 +2905,7 @@
                   ]
                 }
               ],
-              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set\"><code>Set</code></a> instance.</p>\n<pre><code class=\"language-js\">util.types.isSet(new Set());  // Returns true\n</code></pre>"
+              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set\" class=\"type\">&lt;Set&gt;</a> instance.</p>\n<pre><code class=\"language-js\">util.types.isSet(new Set());  // Returns true\n</code></pre>"
             },
             {
               "textRaw": "`util.types.isSetIterator(value)`",
@@ -2824,7 +2933,7 @@
                   ]
                 }
               ],
-              "desc": "<p>Returns <code>true</code> if the value is an iterator returned for a built-in\n<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set\"><code>Set</code></a> instance.</p>\n<pre><code class=\"language-js\">const set = new Set();\nutil.types.isSetIterator(set.keys());  // Returns true\nutil.types.isSetIterator(set.values());  // Returns true\nutil.types.isSetIterator(set.entries());  // Returns true\nutil.types.isSetIterator(set[Symbol.iterator]());  // Returns true\n</code></pre>"
+              "desc": "<p>Returns <code>true</code> if the value is an iterator returned for a built-in\n<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set\" class=\"type\">&lt;Set&gt;</a> instance.</p>\n<pre><code class=\"language-js\">const set = new Set();\nutil.types.isSetIterator(set.keys());  // Returns true\nutil.types.isSetIterator(set.values());  // Returns true\nutil.types.isSetIterator(set.entries());  // Returns true\nutil.types.isSetIterator(set[Symbol.iterator]());  // Returns true\n</code></pre>"
             },
             {
               "textRaw": "`util.types.isSharedArrayBuffer(value)`",
@@ -2852,7 +2961,7 @@
                   ]
                 }
               ],
-              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer\"><code>SharedArrayBuffer</code></a> instance.\nThis does <em>not</em> include <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer\"><code>ArrayBuffer</code></a> instances. Usually, it is\ndesirable to test for both; See <a href=\"#utiltypesisanyarraybuffervalue\"><code>util.types.isAnyArrayBuffer()</code></a> for that.</p>\n<pre><code class=\"language-js\">util.types.isSharedArrayBuffer(new ArrayBuffer());  // Returns false\nutil.types.isSharedArrayBuffer(new SharedArrayBuffer());  // Returns true\n</code></pre>"
+              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer\" class=\"type\">&lt;SharedArrayBuffer&gt;</a> instance.\nThis does <em>not</em> include <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer\" class=\"type\">&lt;ArrayBuffer&gt;</a> instances. Usually, it is\ndesirable to test for both; See <a href=\"#utiltypesisanyarraybuffervalue\"><code>util.types.isAnyArrayBuffer()</code></a> for that.</p>\n<pre><code class=\"language-js\">util.types.isSharedArrayBuffer(new ArrayBuffer());  // Returns false\nutil.types.isSharedArrayBuffer(new SharedArrayBuffer());  // Returns true\n</code></pre>"
             },
             {
               "textRaw": "`util.types.isStringObject(value)`",
@@ -2936,7 +3045,7 @@
                   ]
                 }
               ],
-              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\"><code>TypedArray</code></a> instance.</p>\n<pre><code class=\"language-js\">util.types.isTypedArray(new ArrayBuffer());  // Returns false\nutil.types.isTypedArray(new Uint8Array());  // Returns true\nutil.types.isTypedArray(new Float64Array());  // Returns true\n</code></pre>\n<p>See also <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer/isView\"><code>ArrayBuffer.isView()</code></a>.</p>"
+              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\" class=\"type\">&lt;TypedArray&gt;</a> instance.</p>\n<pre><code class=\"language-js\">util.types.isTypedArray(new ArrayBuffer());  // Returns false\nutil.types.isTypedArray(new Uint8Array());  // Returns true\nutil.types.isTypedArray(new Float64Array());  // Returns true\n</code></pre>\n<p>See also <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer/isView\"><code>ArrayBuffer.isView()</code></a>.</p>"
             },
             {
               "textRaw": "`util.types.isUint8Array(value)`",
@@ -2964,7 +3073,7 @@
                   ]
                 }
               ],
-              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array\"><code>Uint8Array</code></a> instance.</p>\n<pre><code class=\"language-js\">util.types.isUint8Array(new ArrayBuffer());  // Returns false\nutil.types.isUint8Array(new Uint8Array());  // Returns true\nutil.types.isUint8Array(new Float64Array());  // Returns false\n</code></pre>"
+              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array\" class=\"type\">&lt;Uint8Array&gt;</a> instance.</p>\n<pre><code class=\"language-js\">util.types.isUint8Array(new ArrayBuffer());  // Returns false\nutil.types.isUint8Array(new Uint8Array());  // Returns true\nutil.types.isUint8Array(new Float64Array());  // Returns false\n</code></pre>"
             },
             {
               "textRaw": "`util.types.isUint8ClampedArray(value)`",
@@ -2992,7 +3101,7 @@
                   ]
                 }
               ],
-              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8ClampedArray\"><code>Uint8ClampedArray</code></a> instance.</p>\n<pre><code class=\"language-js\">util.types.isUint8ClampedArray(new ArrayBuffer());  // Returns false\nutil.types.isUint8ClampedArray(new Uint8ClampedArray());  // Returns true\nutil.types.isUint8ClampedArray(new Float64Array());  // Returns false\n</code></pre>"
+              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8ClampedArray\" class=\"type\">&lt;Uint8ClampedArray&gt;</a> instance.</p>\n<pre><code class=\"language-js\">util.types.isUint8ClampedArray(new ArrayBuffer());  // Returns false\nutil.types.isUint8ClampedArray(new Uint8ClampedArray());  // Returns true\nutil.types.isUint8ClampedArray(new Float64Array());  // Returns false\n</code></pre>"
             },
             {
               "textRaw": "`util.types.isUint16Array(value)`",
@@ -3020,7 +3129,7 @@
                   ]
                 }
               ],
-              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint16Array\"><code>Uint16Array</code></a> instance.</p>\n<pre><code class=\"language-js\">util.types.isUint16Array(new ArrayBuffer());  // Returns false\nutil.types.isUint16Array(new Uint16Array());  // Returns true\nutil.types.isUint16Array(new Float64Array());  // Returns false\n</code></pre>"
+              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint16Array\" class=\"type\">&lt;Uint16Array&gt;</a> instance.</p>\n<pre><code class=\"language-js\">util.types.isUint16Array(new ArrayBuffer());  // Returns false\nutil.types.isUint16Array(new Uint16Array());  // Returns true\nutil.types.isUint16Array(new Float64Array());  // Returns false\n</code></pre>"
             },
             {
               "textRaw": "`util.types.isUint32Array(value)`",
@@ -3048,7 +3157,7 @@
                   ]
                 }
               ],
-              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint32Array\"><code>Uint32Array</code></a> instance.</p>\n<pre><code class=\"language-js\">util.types.isUint32Array(new ArrayBuffer());  // Returns false\nutil.types.isUint32Array(new Uint32Array());  // Returns true\nutil.types.isUint32Array(new Float64Array());  // Returns false\n</code></pre>"
+              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint32Array\" class=\"type\">&lt;Uint32Array&gt;</a> instance.</p>\n<pre><code class=\"language-js\">util.types.isUint32Array(new ArrayBuffer());  // Returns false\nutil.types.isUint32Array(new Uint32Array());  // Returns true\nutil.types.isUint32Array(new Float64Array());  // Returns false\n</code></pre>"
             },
             {
               "textRaw": "`util.types.isWeakMap(value)`",
@@ -3076,7 +3185,7 @@
                   ]
                 }
               ],
-              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap\"><code>WeakMap</code></a> instance.</p>\n<pre><code class=\"language-js\">util.types.isWeakMap(new WeakMap());  // Returns true\n</code></pre>"
+              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap\" class=\"type\">&lt;WeakMap&gt;</a> instance.</p>\n<pre><code class=\"language-js\">util.types.isWeakMap(new WeakMap());  // Returns true\n</code></pre>"
             },
             {
               "textRaw": "`util.types.isWeakSet(value)`",
@@ -3104,7 +3213,7 @@
                   ]
                 }
               ],
-              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet\"><code>WeakSet</code></a> instance.</p>\n<pre><code class=\"language-js\">util.types.isWeakSet(new WeakSet());  // Returns true\n</code></pre>"
+              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet\" class=\"type\">&lt;WeakSet&gt;</a> instance.</p>\n<pre><code class=\"language-js\">util.types.isWeakSet(new WeakSet());  // Returns true\n</code></pre>"
             }
           ]
         }
