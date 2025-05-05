@@ -98,7 +98,6 @@ a command-line flag. Experimental features may also emit a [warning][].
 | [Performance measurement APIs](perf_hooks.html) | (2) Stable |
 | [Punycode](punycode.html) | (0) Deprecated |
 | [Query string](querystring.html) | (2) Stable |
-| [QUIC](quic.html) | (1) .0 - Early development |
 | [Readline](readline.html) | (2) Stable |
 | [REPL](repl.html) | (2) Stable |
 | [Single executable applications](single-executable-applications.html) | (1) .1 - Active development |

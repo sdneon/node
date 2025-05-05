@@ -7,7 +7,7 @@
       "name": "Process",
       "introduced_in": "v0.10.0",
       "type": "global",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v23.8.0/lib/process.js\">lib/process.js</a></p>\n<p>The <code>process</code> object provides information about, and control over, the current\nNode.js process.</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\n</code></pre>\n<pre><code class=\"language-cjs\">const process = require('node:process');\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v23.11.0/lib/process.js\">lib/process.js</a></p>\n<p>The <code>process</code> object provides information about, and control over, the current\nNode.js process.</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\n</code></pre>\n<pre><code class=\"language-cjs\">const process = require('node:process');\n</code></pre>",
       "modules": [
         {
           "textRaw": "Process events",
@@ -1011,7 +1011,7 @@
               "params": []
             }
           ],
-          "desc": "<p>The <code>process.getuid()</code> method returns the numeric user identity of the process.\n(See <a href=\"http://man7.org/linux/man-pages/man2/getuid.2.html\"><code>getuid(2)</code></a>.)</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\n\nif (process.getuid) {\n  console.log(`Current uid: ${process.getuid()}`);\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const process = require('node:process');\n\nif (process.getuid) {\n  console.log(`Current uid: ${process.getuid()}`);\n}\n</code></pre>\n<p>This function is only available on POSIX platforms (i.e. not Windows or\nAndroid).</p>"
+          "desc": "<p>The <code>process.getuid()</code> method returns the numeric user identity of the process.\n(See <a href=\"http://man7.org/linux/man-pages/man2/getuid.2.html\"><code>getuid(2)</code></a>.)</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\n\nif (process.getuid) {\n  console.log(`Current uid: ${process.getuid()}`);\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const process = require('node:process');\n\nif (process.getuid) {\n  console.log(`Current uid: ${process.getuid()}`);\n}\n</code></pre>\n<p>This function not available on Windows.</p>"
         },
         {
           "textRaw": "`process.hasUncaughtExceptionCaptureCallback()`",
@@ -1347,6 +1347,45 @@
             }
           ],
           "desc": "<p>An object is \"refable\" if it implements the Node.js \"Refable protocol\".\nSpecifically, this means that the object implements the <code>Symbol.for('nodejs.ref')</code>\nand <code>Symbol.for('nodejs.unref')</code> methods. \"Ref'd\" objects will keep the Node.js\nevent loop alive, while \"unref'd\" objects will not. Historically, this was\nimplemented by using <code>ref()</code> and <code>unref()</code> methods directly on the objects.\nThis pattern, however, is being deprecated in favor of the \"Refable protocol\"\nin order to better support Web Platform API types whose APIs cannot be modified\nto add <code>ref()</code> and <code>unref()</code> methods but still need to support that behavior.</p>"
+        },
+        {
+          "textRaw": "`process.execve(file[, args[, env]])`",
+          "type": "method",
+          "name": "execve",
+          "meta": {
+            "added": [
+              "v23.11.0"
+            ],
+            "changes": []
+          },
+          "stability": 1,
+          "stabilityText": "Experimental",
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`file` {string} The name or path of the executable file to run.",
+                  "name": "file",
+                  "type": "string",
+                  "desc": "The name or path of the executable file to run."
+                },
+                {
+                  "textRaw": "`args` {string\\[]} List of string arguments. No argument can contain a null-byte (`\\u0000`).",
+                  "name": "args",
+                  "type": "string\\[]",
+                  "desc": "List of string arguments. No argument can contain a null-byte (`\\u0000`)."
+                },
+                {
+                  "textRaw": "`env` {Object} Environment key-value pairs. No key or value can contain a null-byte (`\\u0000`). **Default:** `process.env`.",
+                  "name": "env",
+                  "type": "Object",
+                  "default": "`process.env`",
+                  "desc": "Environment key-value pairs. No key or value can contain a null-byte (`\\u0000`)."
+                }
+              ]
+            }
+          ],
+          "desc": "<p>Replaces the current process with a new process.</p>\n<p>This is achieved by using the <code>execve</code> POSIX function and therefore no memory or other\nresources from the current process are preserved, except for the standard input,\nstandard output and standard error file descriptor.</p>\n<p>All other resources are discarded by the system when the processes are swapped, without triggering\nany exit or close events and without running any cleanup handler.</p>\n<p>This function will never return, unless an error occurred.</p>\n<p>This function is only available on POSIX platforms (i.e. not Windows or Android).</p>"
         },
         {
           "textRaw": "`process.resourceUsage()`",
@@ -1690,6 +1729,47 @@
           "desc": "<p>The <code>process.setUncaughtExceptionCaptureCallback()</code> function sets a function\nthat will be invoked when an uncaught exception occurs, which will receive the\nexception value itself as its first argument.</p>\n<p>If such a function is set, the <a href=\"#event-uncaughtexception\"><code>'uncaughtException'</code></a> event will\nnot be emitted. If <code>--abort-on-uncaught-exception</code> was passed from the\ncommand line or set through <a href=\"v8.html#v8setflagsfromstringflags\"><code>v8.setFlagsFromString()</code></a>, the process will\nnot abort. Actions configured to take place on exceptions such as report\ngenerations will be affected too</p>\n<p>To unset the capture function,\n<code>process.setUncaughtExceptionCaptureCallback(null)</code> may be used. Calling this\nmethod with a non-<code>null</code> argument while another capture function is set will\nthrow an error.</p>\n<p>Using this function is mutually exclusive with using the deprecated\n<a href=\"domain.html\"><code>domain</code></a> built-in module.</p>"
         },
         {
+          "textRaw": "`process.threadCpuUsage([previousValue])`",
+          "type": "method",
+          "name": "threadCpuUsage",
+          "meta": {
+            "added": [
+              "v23.9.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "return": {
+                "textRaw": "Returns: {Object}",
+                "name": "return",
+                "type": "Object",
+                "options": [
+                  {
+                    "textRaw": "`user` {integer}",
+                    "name": "user",
+                    "type": "integer"
+                  },
+                  {
+                    "textRaw": "`system` {integer}",
+                    "name": "system",
+                    "type": "integer"
+                  }
+                ]
+              },
+              "params": [
+                {
+                  "textRaw": "`previousValue` {Object} A previous return value from calling `process.threadCpuUsage()`",
+                  "name": "previousValue",
+                  "type": "Object",
+                  "desc": "A previous return value from calling `process.threadCpuUsage()`"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>The <code>process.threadCpuUsage()</code> method returns the user and system CPU time usage of\nthe current worker thread, in an object with properties <code>user</code> and <code>system</code>, whose\nvalues are microsecond values (millionth of a second).</p>\n<p>The result of a previous call to <code>process.threadCpuUsage()</code> can be passed as the\nargument to the function, to get a diff reading.</p>"
+        },
+        {
           "textRaw": "`process.umask()`",
           "type": "method",
           "name": "umask",
@@ -2003,7 +2083,7 @@
             ]
           },
           "default": "`undefined`",
-          "desc": "<p>A number which will be the process exit code, when the process either\nexits gracefully, or is exited via <a href=\"#processexitcode\"><code>process.exit()</code></a> without specifying\na code.</p>\n<p>Specifying a code to <a href=\"#processexitcode\"><code>process.exit(code)</code></a> will override any\nprevious setting of <code>process.exitCode</code>.</p>",
+          "desc": "<p>A number which will be the process exit code, when the process either\nexits gracefully, or is exited via <a href=\"#processexitcode\"><code>process.exit()</code></a> without specifying\na code.</p>\n<p>The value of <code>process.exitCode</code> can be updated by either assigning a value to\n<code>process.exitCode</code> or by passing an argument to <a href=\"#processexitcode\"><code>process.exit()</code></a>:</p>\n<pre><code class=\"language-console\">$ node -e 'process.exitCode = 9'; echo $?\n9\n$ node -e 'process.exit(42)'; echo $?\n42\n$ node -e 'process.exitCode = 9; process.exit(42)'; echo $?\n42\n</code></pre>\n<p>The value can also be set implicitly by Node.js when unrecoverable errors occur (e.g.\nsuch as the encountering of an unsettled top-level await). However explicit\nmanipulations of the exit code always take precedence over implicit ones:</p>\n<pre><code class=\"language-console\">$ node --input-type=module -e 'await new Promise(() => {})'; echo $?\n13\n$ node --input-type=module -e 'process.exitCode = 9; await new Promise(() => {})'; echo $?\n9\n</code></pre>",
           "shortDesc": "The exit code. For string type, only integer strings (e.g.,'1') are allowed."
         },
         {

@@ -14,7 +14,7 @@
       },
       "stability": 1,
       "stabilityText": ".1 - Active development.",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v23.8.0/lib/sqlite.js\">lib/sqlite.js</a></p>\n<p>The <code>node:sqlite</code> module facilitates working with SQLite databases.\nTo access it:</p>\n<pre><code class=\"language-mjs\">import sqlite from 'node:sqlite';\n</code></pre>\n<pre><code class=\"language-cjs\">const sqlite = require('node:sqlite');\n</code></pre>\n<p>This module is only available under the <code>node:</code> scheme.</p>\n<p>The following example shows the basic usage of the <code>node:sqlite</code> module to open\nan in-memory database, write data to the database, and then read the data back.</p>\n<pre><code class=\"language-mjs\">import { DatabaseSync } from 'node:sqlite';\nconst database = new DatabaseSync(':memory:');\n\n// Execute SQL statements from strings.\ndatabase.exec(`\n  CREATE TABLE data(\n    key INTEGER PRIMARY KEY,\n    value TEXT\n  ) STRICT\n`);\n// Create a prepared statement to insert data into the database.\nconst insert = database.prepare('INSERT INTO data (key, value) VALUES (?, ?)');\n// Execute the prepared statement with bound values.\ninsert.run(1, 'hello');\ninsert.run(2, 'world');\n// Create a prepared statement to read data from the database.\nconst query = database.prepare('SELECT * FROM data ORDER BY key');\n// Execute the prepared statement and log the result set.\nconsole.log(query.all());\n// Prints: [ { key: 1, value: 'hello' }, { key: 2, value: 'world' } ]\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\nconst { DatabaseSync } = require('node:sqlite');\nconst database = new DatabaseSync(':memory:');\n\n// Execute SQL statements from strings.\ndatabase.exec(`\n  CREATE TABLE data(\n    key INTEGER PRIMARY KEY,\n    value TEXT\n  ) STRICT\n`);\n// Create a prepared statement to insert data into the database.\nconst insert = database.prepare('INSERT INTO data (key, value) VALUES (?, ?)');\n// Execute the prepared statement with bound values.\ninsert.run(1, 'hello');\ninsert.run(2, 'world');\n// Create a prepared statement to read data from the database.\nconst query = database.prepare('SELECT * FROM data ORDER BY key');\n// Execute the prepared statement and log the result set.\nconsole.log(query.all());\n// Prints: [ { key: 1, value: 'hello' }, { key: 2, value: 'world' } ]\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v23.11.0/lib/sqlite.js\">lib/sqlite.js</a></p>\n<p>The <code>node:sqlite</code> module facilitates working with SQLite databases.\nTo access it:</p>\n<pre><code class=\"language-mjs\">import sqlite from 'node:sqlite';\n</code></pre>\n<pre><code class=\"language-cjs\">const sqlite = require('node:sqlite');\n</code></pre>\n<p>This module is only available under the <code>node:</code> scheme.</p>\n<p>The following example shows the basic usage of the <code>node:sqlite</code> module to open\nan in-memory database, write data to the database, and then read the data back.</p>\n<pre><code class=\"language-mjs\">import { DatabaseSync } from 'node:sqlite';\nconst database = new DatabaseSync(':memory:');\n\n// Execute SQL statements from strings.\ndatabase.exec(`\n  CREATE TABLE data(\n    key INTEGER PRIMARY KEY,\n    value TEXT\n  ) STRICT\n`);\n// Create a prepared statement to insert data into the database.\nconst insert = database.prepare('INSERT INTO data (key, value) VALUES (?, ?)');\n// Execute the prepared statement with bound values.\ninsert.run(1, 'hello');\ninsert.run(2, 'world');\n// Create a prepared statement to read data from the database.\nconst query = database.prepare('SELECT * FROM data ORDER BY key');\n// Execute the prepared statement and log the result set.\nconsole.log(query.all());\n// Prints: [ { key: 1, value: 'hello' }, { key: 2, value: 'world' } ]\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\nconst { DatabaseSync } = require('node:sqlite');\nconst database = new DatabaseSync(':memory:');\n\n// Execute SQL statements from strings.\ndatabase.exec(`\n  CREATE TABLE data(\n    key INTEGER PRIMARY KEY,\n    value TEXT\n  ) STRICT\n`);\n// Create a prepared statement to insert data into the database.\nconst insert = database.prepare('INSERT INTO data (key, value) VALUES (?, ?)');\n// Execute the prepared statement with bound values.\ninsert.run(1, 'hello');\ninsert.run(2, 'world');\n// Create a prepared statement to read data from the database.\nconst query = database.prepare('SELECT * FROM data ORDER BY key');\n// Execute the prepared statement and log the result set.\nconsole.log(query.all());\n// Prints: [ { key: 1, value: 'hello' }, { key: 2, value: 'world' } ]\n</code></pre>",
       "classes": [
         {
           "textRaw": "Class: `DatabaseSync`",
@@ -24,7 +24,13 @@
             "added": [
               "v22.5.0"
             ],
-            "changes": []
+            "changes": [
+              {
+                "version": "v23.10.0",
+                "pr-url": "https://github.com/nodejs/node/pull/56991",
+                "description": "The `path` argument now supports Buffer and URL objects."
+              }
+            ]
           },
           "desc": "<p>This class represents a single <a href=\"https://www.sqlite.org/c3ref/sqlite3.html\">connection</a> to a SQLite database. All APIs\nexposed by this class execute synchronously.</p>",
           "methods": [
@@ -198,7 +204,7 @@
                   "params": []
                 }
               ],
-              "desc": "<p>Opens the database specified in the <code>location</code> argument of the <code>DatabaseSync</code>\nconstructor. This method should only be used when the database is not opened via\nthe constructor. An exception is thrown if the database is already open.</p>"
+              "desc": "<p>Opens the database specified in the <code>path</code> argument of the <code>DatabaseSync</code>\nconstructor. This method should only be used when the database is not opened via\nthe constructor. An exception is thrown if the database is already open.</p>"
             },
             {
               "textRaw": "`database.prepare(sql)`",
@@ -287,10 +293,10 @@
               "signatures": [
                 {
                   "return": {
-                    "textRaw": "Returns: {boolean} Whether the changeset was applied succesfully without being aborted.",
+                    "textRaw": "Returns: {boolean} Whether the changeset was applied successfully without being aborted.",
                     "name": "return",
                     "type": "boolean",
-                    "desc": "Whether the changeset was applied succesfully without being aborted."
+                    "desc": "Whether the changeset was applied successfully without being aborted."
                   },
                   "params": [
                     {
@@ -350,16 +356,49 @@
                 }
               ],
               "desc": "<p>An exception is thrown if the database is not\nopen. This method is a wrapper around <a href=\"https://www.sqlite.org/session/sqlite3changeset_apply.html\"><code>sqlite3changeset_apply()</code></a>.</p>\n<pre><code class=\"language-js\">const sourceDb = new DatabaseSync(':memory:');\nconst targetDb = new DatabaseSync(':memory:');\n\nsourceDb.exec('CREATE TABLE data(key INTEGER PRIMARY KEY, value TEXT)');\ntargetDb.exec('CREATE TABLE data(key INTEGER PRIMARY KEY, value TEXT)');\n\nconst session = sourceDb.createSession();\n\nconst insert = sourceDb.prepare('INSERT INTO data (key, value) VALUES (?, ?)');\ninsert.run(1, 'hello');\ninsert.run(2, 'world');\n\nconst changeset = session.changeset();\ntargetDb.applyChangeset(changeset);\n// Now that the changeset has been applied, targetDb contains the same data as sourceDb.\n</code></pre>"
+            },
+            {
+              "textRaw": "`database[Symbol.dispose]()`",
+              "type": "method",
+              "name": "[Symbol.dispose]",
+              "meta": {
+                "added": [
+                  "v23.11.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>Closes the database connection. If the database connection is already closed\nthen this is a no-op.</p>"
+            }
+          ],
+          "properties": [
+            {
+              "textRaw": "`isOpen` {boolean} Whether the database is currently open or not.",
+              "type": "boolean",
+              "name": "isOpen",
+              "meta": {
+                "added": [
+                  "v23.11.0"
+                ],
+                "changes": []
+              },
+              "desc": "Whether the database is currently open or not."
             }
           ],
           "signatures": [
             {
               "params": [
                 {
-                  "textRaw": "`location` {string} The location of the database. A SQLite database can be stored in a file or completely [in memory][]. To use a file-backed database, the location should be a file path. To use an in-memory database, the location should be the special name `':memory:'`.",
-                  "name": "location",
-                  "type": "string",
-                  "desc": "The location of the database. A SQLite database can be stored in a file or completely [in memory][]. To use a file-backed database, the location should be a file path. To use an in-memory database, the location should be the special name `':memory:'`."
+                  "textRaw": "`path` {string | Buffer | URL} The path of the database. A SQLite database can be stored in a file or completely [in memory][]. To use a file-backed database, the path should be a file path. To use an in-memory database, the path should be the special name `':memory:'`.",
+                  "name": "path",
+                  "type": "string | Buffer | URL",
+                  "desc": "The path of the database. A SQLite database can be stored in a file or completely [in memory][]. To use a file-backed database, the path should be a file path. To use an in-memory database, the path should be the special name `':memory:'`."
                 },
                 {
                   "textRaw": "`options` {Object} Configuration options for the database connection. The following options are supported:",
@@ -532,6 +571,61 @@
               "desc": "<p>This method executes a prepared statement and returns all results as an array of\nobjects. If the prepared statement does not return any results, this method\nreturns an empty array. The prepared statement <a href=\"https://www.sqlite.org/c3ref/bind_blob.html\">parameters are bound</a> using\nthe values in <code>namedParameters</code> and <code>anonymousParameters</code>.</p>"
             },
             {
+              "textRaw": "`statement.columns()`",
+              "type": "method",
+              "name": "columns",
+              "meta": {
+                "added": [
+                  "v23.11.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "return": {
+                    "textRaw": "Returns: {Array} An array of objects. Each object corresponds to a column in the prepared statement, and contains the following properties:",
+                    "name": "return",
+                    "type": "Array",
+                    "desc": "An array of objects. Each object corresponds to a column in the prepared statement, and contains the following properties:",
+                    "options": [
+                      {
+                        "textRaw": "`column`: {string|null} The unaliased name of the column in the origin table, or `null` if the column is the result of an expression or subquery. This property is the result of [`sqlite3_column_origin_name()`][].",
+                        "name": "column",
+                        "type": "string|null",
+                        "desc": "The unaliased name of the column in the origin table, or `null` if the column is the result of an expression or subquery. This property is the result of [`sqlite3_column_origin_name()`][]."
+                      },
+                      {
+                        "textRaw": "`database`: {string|null} The unaliased name of the origin database, or `null` if the column is the result of an expression or subquery. This property is the result of [`sqlite3_column_database_name()`][].",
+                        "name": "database",
+                        "type": "string|null",
+                        "desc": "The unaliased name of the origin database, or `null` if the column is the result of an expression or subquery. This property is the result of [`sqlite3_column_database_name()`][]."
+                      },
+                      {
+                        "textRaw": "`name`: {string} The name assigned to the column in the result set of a `SELECT` statement. This property is the result of [`sqlite3_column_name()`][].",
+                        "name": "name",
+                        "type": "string",
+                        "desc": "The name assigned to the column in the result set of a `SELECT` statement. This property is the result of [`sqlite3_column_name()`][]."
+                      },
+                      {
+                        "textRaw": "`table`: {string|null} The unaliased name of the origin table, or `null` if the column is the result of an expression or subquery. This property is the result of [`sqlite3_column_table_name()`][].",
+                        "name": "table",
+                        "type": "string|null",
+                        "desc": "The unaliased name of the origin table, or `null` if the column is the result of an expression or subquery. This property is the result of [`sqlite3_column_table_name()`][]."
+                      },
+                      {
+                        "textRaw": "`type`: {string|null} The declared data type of the column, or `null` if the column is the result of an expression or subquery. This property is the result of [`sqlite3_column_decltype()`][].",
+                        "name": "type",
+                        "type": "string|null",
+                        "desc": "The declared data type of the column, or `null` if the column is the result of an expression or subquery. This property is the result of [`sqlite3_column_decltype()`][]."
+                      }
+                    ]
+                  },
+                  "params": []
+                }
+              ],
+              "desc": "<p>This method is used to retrieve information about the columns returned by the\nprepared statement.</p>"
+            },
+            {
               "textRaw": "`statement.get([namedParameters][, ...anonymousParameters])`",
               "type": "method",
               "name": "get",
@@ -695,6 +789,30 @@
               "desc": "<p>The names of SQLite parameters begin with a prefix character. By default,\n<code>node:sqlite</code> requires that this prefix character is present when binding\nparameters. However, with the exception of dollar sign character, these\nprefix characters also require extra quoting when used in object keys.</p>\n<p>To improve ergonomics, this method can be used to also allow bare named\nparameters, which do not require the prefix character in JavaScript code. There\nare several caveats to be aware of when enabling bare named parameters:</p>\n<ul>\n<li>The prefix character is still required in SQL.</li>\n<li>The prefix character is still allowed in JavaScript. In fact, prefixed names\nwill have slightly better binding performance.</li>\n<li>Using ambiguous named parameters, such as <code>$k</code> and <code>@k</code>, in the same prepared\nstatement will result in an exception as it cannot be determined how to bind\na bare name.</li>\n</ul>"
             },
             {
+              "textRaw": "`statement.setAllowUnknownNamedParameters(enabled)`",
+              "type": "method",
+              "name": "setAllowUnknownNamedParameters",
+              "meta": {
+                "added": [
+                  "v23.11.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`enabled` {boolean} Enables or disables support for unknown named parameters.",
+                      "name": "enabled",
+                      "type": "boolean",
+                      "desc": "Enables or disables support for unknown named parameters."
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>By default, if an unknown name is encountered while binding parameters, an\nexception is thrown. This method allows unknown named parameters to be ignored.</p>"
+            },
+            {
               "textRaw": "`statement.setReadBigInts(enabled)`",
               "type": "method",
               "name": "setReadBigInts",
@@ -760,14 +878,20 @@
       ],
       "methods": [
         {
-          "textRaw": "`sqlite.backup(sourceDb, destination[, options])`",
+          "textRaw": "`sqlite.backup(sourceDb, path[, options])`",
           "type": "method",
           "name": "backup",
           "meta": {
             "added": [
               "v23.8.0"
             ],
-            "changes": []
+            "changes": [
+              {
+                "version": "v23.10.0",
+                "pr-url": "https://github.com/nodejs/node/pull/56991",
+                "description": "The `path` argument now supports Buffer and URL objects."
+              }
+            ]
           },
           "signatures": [
             {
@@ -785,9 +909,9 @@
                   "desc": "The database to backup. The source database must be open."
                 },
                 {
-                  "textRaw": "`destination` {string} The path where the backup will be created. If the file already exists, the contents will be overwritten.",
-                  "name": "destination",
-                  "type": "string",
+                  "textRaw": "`path` {string | Buffer | URL} The path where the backup will be created. If the file already exists, the contents will be overwritten.",
+                  "name": "path",
+                  "type": "string | Buffer | URL",
                   "desc": "The path where the backup will be created. If the file already exists, the contents will be overwritten."
                 },
                 {

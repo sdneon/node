@@ -5,17 +5,17 @@ This is a *fun* mod of Node.JS that initially embedded a modified version of dco
 
 Thanks to the inspiration from dcodeIO et al =D
 
-## Version 23.8.0
-* Update to Node.JS 23.8.0 baseline, and TypeScript v5.7.3.
-* `--experimental-strip-types` is disabled (in favour of full TS transpiler), although Node.JS 23.6.0 enables it by default.
+## Version 23.11.0
+* Update to Node.JS 23.11.0 baseline, and TypeScript 5.8.3.
+* Experimental: switch modes between REPL and run main module/script.
 
 It embeds:
 * DS v1.2.2.
 * CS v2.7.0.
-* TS v5.7.3.
-* Refer to prior readmes for old changes.
+* TS v5.8.3.
 
-Built with VS 2022 v17.9.3 (rollback'd), as v17.10.0 fails!
+Refer to prior readmes for old changes.
+* `--experimental-strip-types` is disabled (in favour of full TS transpiler), although Node.JS 23.6.0 enables it by default.
 
 ## Usage
 The mod thus allows Node.JS+ to run .ds, .cs and .ts scripts directly for D Script, CoffeeScript and TypeScript directly. D being just a simple moniker for preprocessor sprinkled scripts.
@@ -194,6 +194,33 @@ const turf = require('@turf/turf'),
     ...
     { convert } = require('geo-coordinates-parser');
 ```
+
+## Switching Modes
+Usually when Node.JS launches, it gets locked into one of many modes, such as SEA, REPL or simple running a main script specified. From Node.JS 23.11.0+, these are added for switching to either REPL or run main script modes:
+
+* process.`runRepl()`: Switch to REPL mode.
+  *  E.g.:
+  ```javascript
+  ...
+  console.log('End of main script, switching to REPL...');
+  process.runRepl();
+  ```
+* process.`runMain(scriptPath, ...argv)`: Switch to 'run main module' mode.
+  *  Inputs:
+     * scriptPath: path to main script to run. It will be purged (if it exists; i.e. was loaded before) from require.cache and re-run.
+     * argv: optional input argument strings.
+  *  E.g.:
+  ```
+  > process.runMain('./mainScript.js', 'argument 1', 'argument 2');
+  ```
+
+* Dev Notes:
+  * The different modes are script in `lib/internal/main/*.js`.
+    * Some codes in them have to be skipped to avoid crashing. For example, prepareMainThreadExecution() & markBootstrapComplete().
+    * For REPL, `internal/repl` is modded to have a "Don't Exit" flag when closing REPL. The corresponding `process.closeRepl()` method added let's us to know if REPL mode is active, and is used to close the REPL without exiting Node.JS.
+  * Tested OK switching back and forth between runRepl & runMain.
+    * As noted, main module/script has to be purged from require.cache so as to let it be re-loaded and run again.
+
 
 ## Build Info
 From Node.JS 22.x, VS2022 is needed; as VS2019 fails to compile some template syntax in V8 codes.
@@ -390,6 +417,8 @@ For information about the governance of the Node.js project, see
   **Michael Dawson** <<midawson@redhat.com>> (he/him)
 * [RafaelGSS](https://github.com/RafaelGSS) -
   **Rafael Gonzaga** <<rafael.nunu@hotmail.com>> (he/him)
+* [RaisinTen](https://github.com/RaisinTen) -
+  **Darshan Sen** <<raisinten@gmail.com>> (he/him)
 * [richardlau](https://github.com/richardlau) -
   **Richard Lau** <<rlau@redhat.com>>
 * [ronag](https://github.com/ronag) -
@@ -468,8 +497,6 @@ For information about the governance of the Node.js project, see
   **Alexis Campailla** <<orangemocha@nodejs.org>>
 * [piscisaureus](https://github.com/piscisaureus) -
   **Bert Belder** <<bertbelder@gmail.com>>
-* [RaisinTen](https://github.com/RaisinTen) -
-  **Darshan Sen** <<raisinten@gmail.com>> (he/him)
 * [rvagg](https://github.com/rvagg) -
   **Rod Vagg** <<r@va.gg>>
 * [sam-github](https://github.com/sam-github) -
@@ -543,6 +570,8 @@ For information about the governance of the Node.js project, see
   **Gerhard Stöbich** <<deb2001-github@yahoo.de>> (he/they)
 * [gabrielschulhof](https://github.com/gabrielschulhof) -
   **Gabriel Schulhof** <<gabrielschulhof@gmail.com>>
+* [geeksilva97](https://github.com/geeksilva97) -
+  **Edy Silva** <<edigleyssonsilva@gmail.com>> (he/him)
 * [gengjiawen](https://github.com/gengjiawen) -
   **Jiawen Geng** <<technicalcute@gmail.com>>
 * [GeoffreyBooth](https://github.com/GeoffreyBooth) -
@@ -566,7 +595,7 @@ For information about the governance of the Node.js project, see
 * [jazelly](https://github.com/jazelly) -
   **Jason Zhang** <<xzha4350@gmail.com>> (he/him)
 * [jkrems](https://github.com/jkrems) -
-  **Jan Krems** <<jan.krems@gmail.com>> (he/him)
+  **Jan Martin** <<jan.krems@gmail.com>> (he/him)
 * [joyeecheung](https://github.com/joyeecheung) -
   **Joyee Cheung** <<joyeec9h3@gmail.com>> (she/her)
 * [juanarbol](https://github.com/juanarbol) -
@@ -609,8 +638,6 @@ For information about the governance of the Node.js project, see
   **Moshe Atlow** <<moshe@atlow.co.il>> (he/him)
 * [MrJithil](https://github.com/MrJithil) -
   **Jithil P Ponnan** <<jithil@outlook.com>> (he/him)
-* [ovflowd](https://github.com/ovflowd) -
-  **Claudio Wunder** <<cwunder@gnome.org>> (he/they)
 * [panva](https://github.com/panva) -
   **Filip Skokan** <<panva.ip@gmail.com>> (he/him)
 * [pimterry](https://github.com/pimterry) -
@@ -621,6 +648,8 @@ For information about the governance of the Node.js project, see
   **Stephen Belanger** <<admin@stephenbelanger.com>> (he/him)
 * [RafaelGSS](https://github.com/RafaelGSS) -
   **Rafael Gonzaga** <<rafael.nunu@hotmail.com>> (he/him)
+* [RaisinTen](https://github.com/RaisinTen) -
+  **Darshan Sen** <<raisinten@gmail.com>> (he/him) - [Support me](https://github.com/sponsors/RaisinTen)
 * [richardlau](https://github.com/richardlau) -
   **Richard Lau** <<rlau@redhat.com>>
 * [rluvaton](https://github.com/rluvaton) -
@@ -833,6 +862,8 @@ For information about the governance of the Node.js project, see
   **Alexis Campailla** <<orangemocha@nodejs.org>>
 * [othiym23](https://github.com/othiym23) -
   **Forrest L Norvell** <<ogd@aoaioxxysz.net>> (they/them/themself)
+* [ovflowd](https://github.com/ovflowd) -
+  **Claudio Wunder** <<cwunder@gnome.org>> (he/they)
 * [oyyd](https://github.com/oyyd) -
   **Ouyang Yadong** <<oyydoibh@gmail.com>> (he/him)
 * [petkaantonov](https://github.com/petkaantonov) -
@@ -851,8 +882,6 @@ For information about the governance of the Node.js project, see
   **Peter Marshall** <<petermarshall@chromium.org>> (he/him)
 * [puzpuzpuz](https://github.com/puzpuzpuz) -
   **Andrey Pechkurov** <<apechkurov@gmail.com>> (he/him)
-* [RaisinTen](https://github.com/RaisinTen) -
-  **Darshan Sen** <<raisinten@gmail.com>> (he/him)
 * [refack](https://github.com/refack) -
   **Refael Ackermann (רפאל פלחי)** <<refack@gmail.com>> (he/him/הוא/אתה)
 * [rexagod](https://github.com/rexagod) -
@@ -939,10 +968,14 @@ maintaining the Node.js project.
 
 ### Triagers
 
+* [1ilsang](https://github.com/1ilsang) -
+  **Sangchul Lee** <<1ilsang.dev@gmail.com>> (he/him)
 * [atlowChemi](https://github.com/atlowChemi) -
   **Chemi Atlow** <<chemi@atlow.co.il>> (he/him)
 * [Ayase-252](https://github.com/Ayase-252) -
   **Qingyu Deng** <<i@ayase-lab.com>>
+* [bjohansebas](https://github.com/bjohansebas) -
+  **Sebastian Beltran** <<bjohansebas@gmail.com>>
 * [bmuenzenmeyer](https://github.com/bmuenzenmeyer) -
   **Brian Muenzenmeyer** <<brian.muenzenmeyer@gmail.com>> (he/him)
 * [CanadaHonk](https://github.com/CanadaHonk) -
@@ -953,6 +986,8 @@ maintaining the Node.js project.
   **Feng Yu** <<F3n67u@outlook.com>> (he/him)
 * [gireeshpunathil](https://github.com/gireeshpunathil) -
   **Gireesh Punathil** <<gpunathi@in.ibm.com>> (he/him)
+* [gurgunday](https://github.com/gurgunday) -
+  **Gürgün Dayıoğlu** <<hey@gurgun.day>>
 * [iam-frankqiu](https://github.com/iam-frankqiu) -
   **Frank Qiu** <<iam.frankqiu@gmail.com>> (he/him)
 * [KevinEady](https://github.com/KevinEady) -
@@ -961,10 +996,10 @@ maintaining the Node.js project.
   **Akhil Marsonya** <<akhil.marsonya27@gmail.com>> (he/him)
 * [meixg](https://github.com/meixg) -
   **Xuguang Mei** <<meixuguang@gmail.com>> (he/him)
-* [mertcanaltin](https://github.com/mertcanaltin) -
-  **Mert Can Altin** <<mertgold60@gmail.com>>
 * [preveen-stack](https://github.com/preveen-stack) -
   **Preveen Padmanabhan** <<wide4head@gmail.com>> (he/him)
+* [RaisinTen](https://github.com/RaisinTen) -
+  **Darshan Sen** <<raisinten@gmail.com>> (he/him)
 * [VoltrexKeyva](https://github.com/VoltrexKeyva) -
   **Mohammed Keyvanzadeh** <<mohammadkeyvanzade94@gmail.com>> (he/him)
 

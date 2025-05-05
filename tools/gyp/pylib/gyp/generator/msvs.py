@@ -974,6 +974,8 @@ def _GetGuidOfProject(proj_path, spec):
   """
     # Pluck out the default configuration.
     default_config = _GetDefaultConfiguration(spec)
+    relative_path = get_relative_path(proj_path, os.getcwd())
+    # print("proj rel path: " + relative_path)
     # Decide the guid of the project.
     guid = default_config.get("msvs_guid")
     if guid:
@@ -983,7 +985,9 @@ def _GetGuidOfProject(proj_path, spec):
                 % (guid, VALID_MSVS_GUID_CHARS.pattern)
             )
         guid = "{%s}" % guid
-    guid = guid or MSVSNew.MakeGuid(proj_path)
+    # SD: Use relative path for consistent GUID gen
+    guid = guid or MSVSNew.MakeGuid(relative_path)
+    print("guid: " + guid + " for " + relative_path)
     return guid
 
 
@@ -1380,9 +1384,14 @@ def _GetDefines(config):
   Returns:
     The list of preprocessor definitions.
   """
+    # SD: eliminate SSL path
+    pattern = r"=\"[^\"]+\\SSL\""
+    pattern2 = r"MODULESDIR=\"[^$]+\$\("
     defines = []
     for d in config.get("defines", []):
         fd = "=".join([str(dpart) for dpart in d]) if isinstance(d, list) else str(d)
+        fd = re.sub(pattern, '="NUL"', fd)
+        fd = re.sub(pattern2, 'MODULESDIR="$(', fd)
         defines.append(fd)
     return defines
 
@@ -1889,6 +1898,22 @@ def _GetPathOfProject(qualified_target, spec, options, msvs_version):
         )
     return proj_path, fix_prefix
 
+def get_relative_path(path, start_folder):
+    """
+    Returns the relative path of a given path from a start folder.
+
+    Args:
+        path: The path to convert to relative.
+        start_folder: The folder to use as the starting point for the relative path.
+
+    Returns:
+        The relative path, or the original path if it's not within the start folder.
+    """
+    try:
+        relative_path = os.path.relpath(path, start_folder)
+        return relative_path
+    except ValueError:
+        return path
 
 def _GetPlatformOverridesOfProject(spec):
     # Prepare a dict indicating which project configurations are used for which
@@ -3967,6 +3992,11 @@ def _AddMSBuildAction(
     outputs = ";".join(outputs_array)
     sources_handled_by_action.add(primary_input)
     action_spec = ["CustomBuild", {"Include": primary_input}]
+    
+    # SD: eliminate python path
+    pattern = r"\"[^\"]+\\python\""
+    command = re.sub(pattern, "python", command)
+
     action_spec.extend(
         # TODO(jeanluc) 'Document' for all or just if as_sources?
         [

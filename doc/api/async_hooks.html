@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v23.8.0">
-  <title>Async hooks | Node.js v23.8.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v23.11.0">
+  <title>Async hooks | Node.js v23.11.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -51,7 +51,6 @@
 <li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
 <li><a href="cli.html" class="nav-cli">Command-line options</a></li>
 <li><a href="console.html" class="nav-console">Console</a></li>
-<li><a href="corepack.html" class="nav-corepack">Corepack</a></li>
 <li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
 <li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
 <li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
@@ -113,7 +112,7 @@
     <div id="column1" data-id="async_hooks" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v23.8.0 documentation</h1>
+          <h1>Node.js v23.11.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -128,7 +127,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v23.8.0</li>
+            <li class="pinned-header">Node.js v23.11.0</li>
             
     <li class="picker-header">
       <a href="#toc-picker" aria-controls="toc-picker">
@@ -214,7 +213,6 @@
 <li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
 <li><a href="cli.html" class="nav-cli">Command-line options</a></li>
 <li><a href="console.html" class="nav-console">Console</a></li>
-<li><a href="corepack.html" class="nav-corepack">Corepack</a></li>
 <li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
 <li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
 <li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
@@ -381,7 +379,7 @@ tracking need solved by <a href="async_context.html#class-asynclocalstorage"><co
 provided by <a href="diagnostics_channel.html">Diagnostics Channel</a>, please open an issue at
 <a href="https://github.com/nodejs/node/issues">https://github.com/nodejs/node/issues</a> describing your use case so we can
 create a more purpose-focused API.</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v23.8.0/lib/async_hooks.js">lib/async_hooks.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v23.11.0/lib/async_hooks.js">lib/async_hooks.js</a></p>
 <p>We strongly discourage the use of the <code>async_hooks</code> API.
 Other APIs that can cover most of its use cases include:</p>
 <ul>
@@ -544,6 +542,7 @@ specifics of all functions that can be passed to <code>callbacks</code> is in th
 <p>Because promises are asynchronous resources whose lifecycle is tracked
 via the async hooks mechanism, the <code>init()</code>, <code>before()</code>, <code>after()</code>, and
 <code>destroy()</code> callbacks <em>must not</em> be async functions that return promises.</p>
+<div>
 <h4>Error handling<span><a class="mark" href="#error-handling" id="error-handling">#</a></span><a aria-hidden="true" class="legacy" id="async_hooks_error_handling"></a></h4>
 <p>If any <code>AsyncHook</code> callbacks throw, the application will print the stack trace
 and exit. The exit path does follow that of an uncaught exception, but
@@ -558,6 +557,7 @@ bring down the process quickly in order to prevent an unintentional abort in the
 future. This is subject to change in the future if a comprehensive analysis is
 performed to ensure an exception can follow the normal control flow without
 unintentional side effects.</p>
+</div><div>
 <h4>Printing in <code>AsyncHook</code> callbacks<span><a class="mark" href="#printing-in-asynchook-callbacks" id="printing-in-asynchook-callbacks">#</a></span><a aria-hidden="true" class="legacy" id="async_hooks_printing_in_asynchook_callbacks"></a></h4>
 <p>Because printing to the console is an asynchronous operation, <code>console.log()</code>
 will cause <code>AsyncHook</code> callbacks to be called. Using <code>console.log()</code> or
@@ -585,9 +585,11 @@ track of what caused the asynchronous operation using the information
 provided by <code>AsyncHook</code> itself. The logging should then be skipped when
 it was the logging itself that caused the <code>AsyncHook</code> callback to be called. By
 doing this, the otherwise infinite recursion is broken.</p>
+</div>
 </section><section><h3>Class: <code>AsyncHook</code><span><a class="mark" href="#class-asynchook" id="class-asynchook">#</a></span><a aria-hidden="true" class="legacy" id="async_hooks_class_asynchook"></a></h3>
 <p>The class <code>AsyncHook</code> exposes an interface for tracking lifetime events
 of asynchronous operations.</p>
+<div>
 <h4><code>asyncHook.enable()</code><span><a class="mark" href="#asynchookenable" id="asynchookenable">#</a></span><a aria-hidden="true" class="legacy" id="async_hooks_asynchook_enable"></a></h4>
 <ul>
 <li>Returns: <a href="async_hooks.html#async_hookscreatehookcallbacks" class="type">&#x3C;AsyncHook></a> A reference to <code>asyncHook</code>.</li>
@@ -602,6 +604,7 @@ should be enabled immediately after creation, the following pattern can be used.
 <span class="hljs-keyword">const</span> hook = <span class="hljs-title function_">createHook</span>(callbacks).<span class="hljs-title function_">enable</span>();</code><code class="language-js cjs"><span class="hljs-keyword">const</span> async_hooks = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:async_hooks'</span>);
 
 <span class="hljs-keyword">const</span> hook = async_hooks.<span class="hljs-title function_">createHook</span>(callbacks).<span class="hljs-title function_">enable</span>();</code><button class="copy-button">copy</button></pre>
+</div><div>
 <h4><code>asyncHook.disable()</code><span><a class="mark" href="#asynchookdisable" id="asynchookdisable">#</a></span><a aria-hidden="true" class="legacy" id="async_hooks_asynchook_disable"></a></h4>
 <ul>
 <li>Returns: <a href="async_hooks.html#async_hookscreatehookcallbacks" class="type">&#x3C;AsyncHook></a> A reference to <code>asyncHook</code>.</li>
@@ -610,10 +613,12 @@ should be enabled immediately after creation, the following pattern can be used.
 <code>AsyncHook</code> callbacks to be executed. Once a hook has been disabled it will not
 be called again until enabled.</p>
 <p>For API consistency <code>disable()</code> also returns the <code>AsyncHook</code> instance.</p>
+</div><div>
 <h4>Hook callbacks<span><a class="mark" href="#hook-callbacks" id="hook-callbacks">#</a></span><a aria-hidden="true" class="legacy" id="async_hooks_hook_callbacks"></a></h4>
 <p>Key events in the lifetime of asynchronous events have been categorized into
 four areas: instantiation, before/after the callback is called, and when the
 instance is destroyed.</p>
+<div>
 <h5><code>init(asyncId, type, triggerAsyncId, resource)</code><span><a class="mark" href="#initasyncid-type-triggerasyncid-resource" id="initasyncid-type-triggerasyncid-resource">#</a></span><a aria-hidden="true" class="legacy" id="async_hooks_init_asyncid_type_triggerasyncid_resource"></a></h5>
 <ul>
 <li><code>asyncId</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> A unique ID for the async resource.</li>
@@ -640,6 +645,7 @@ this.</p>
 <span class="hljs-built_in">clearTimeout</span>(<span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =></span> {}, <span class="hljs-number">10</span>));</code><button class="copy-button">copy</button></pre>
 <p>Every new resource is assigned an ID that is unique within the scope of the
 current Node.js instance.</p>
+<div>
 <h6><code>type</code><span><a class="mark" href="#type" id="type">#</a></span><a aria-hidden="true" class="legacy" id="async_hooks_type"></a></h6>
 <p>The <code>type</code> is a string identifying the type of resource that caused
 <code>init</code> to be called. Generally, it will correspond to the name of the
@@ -657,6 +663,7 @@ instances and asynchronous work scheduled by them.</p>
 <p>It is possible to have type name collisions. Embedders are encouraged to use
 unique prefixes, such as the npm package name, to prevent collisions when
 listening to the hooks.</p>
+</div><div>
 <h6><code>triggerAsyncId</code><span><a class="mark" href="#triggerasyncid" id="triggerasyncid">#</a></span><a aria-hidden="true" class="legacy" id="async_hooks_triggerasyncid"></a></h6>
 <p><code>triggerAsyncId</code> is the <code>asyncId</code> of the resource that caused (or "triggered")
 the new resource to initialize and that caused <code>init</code> to call. This is different
@@ -704,6 +711,7 @@ that it is being executed from C++ with no JavaScript stack above it.) With only
 that information, it would be impossible to link resources together in
 terms of what caused them to be created, so <code>triggerAsyncId</code> is given the task
 of propagating what resource is responsible for the new resource's existence.</p>
+</div><div>
 <h6><code>resource</code><span><a class="mark" href="#resource" id="resource">#</a></span><a aria-hidden="true" class="legacy" id="async_hooks_resource"></a></h6>
 <p><code>resource</code> is an object that represents the actual async resource that has
 been initialized. The API to access the object may be specified by the
@@ -711,6 +719,7 @@ creator of the resource. Resources created by Node.js itself are internal
 and may change at any time. Therefore no API is specified for these.</p>
 <p>In some cases the resource object is reused for performance reasons, it is
 thus not safe to use it as a key in a <code>WeakMap</code> or add properties to it.</p>
+</div><div>
 <h6>Asynchronous context example<span><a class="mark" href="#asynchronous-context-example" id="asynchronous-context-example">#</a></span><a aria-hidden="true" class="legacy" id="async_hooks_asynchronous_context_example"></a></h6>
 <p>The context tracking use case is covered by the stable API <a href="async_context.html#class-asynclocalstorage"><code>AsyncLocalStorage</code></a>.
 This example only illustrates async hooks operation but <a href="async_context.html#class-asynclocalstorage"><code>AsyncLocalStorage</code></a>
@@ -837,6 +846,7 @@ TCPSERVERWRAP(5)
      |
      ˅
   Timeout(7)</code> <button class="copy-button">copy</button></pre>
+</div></div><div>
 <h5><code>before(asyncId)</code><span><a class="mark" href="#beforeasyncid" id="beforeasyncid">#</a></span><a aria-hidden="true" class="legacy" id="async_hooks_before_asyncid"></a></h5>
 <ul>
 <li><code>asyncId</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
@@ -852,6 +862,7 @@ or, for example, if no connections are received by a TCP server. Persistent
 asynchronous resources like a TCP server will typically call the <code>before</code>
 callback multiple times, while other operations like <code>fs.open()</code> will call
 it only once.</p>
+</div><div>
 <h5><code>after(asyncId)</code><span><a class="mark" href="#afterasyncid" id="afterasyncid">#</a></span><a aria-hidden="true" class="legacy" id="async_hooks_after_asyncid"></a></h5>
 <ul>
 <li><code>asyncId</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
@@ -860,6 +871,7 @@ it only once.</p>
 <p>If an uncaught exception occurs during execution of the callback, then <code>after</code>
 will run <em>after</em> the <code>'uncaughtException'</code> event is emitted or a <code>domain</code>'s
 handler runs.</p>
+</div><div>
 <h5><code>destroy(asyncId)</code><span><a class="mark" href="#destroyasyncid" id="destroyasyncid">#</a></span><a aria-hidden="true" class="legacy" id="async_hooks_destroy_asyncid"></a></h5>
 <ul>
 <li><code>asyncId</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
@@ -872,6 +884,7 @@ will never be called, causing a memory leak in the application. If the resource
 does not depend on garbage collection, then this will not be an issue.</p>
 <p>Using the destroy hook results in additional overhead because it enables
 tracking of <code>Promise</code> instances via the garbage collector.</p>
+</div><div>
 <h5><code>promiseResolve(asyncId)</code><span><a class="mark" href="#promiseresolveasyncid" id="promiseresolveasyncid">#</a></span><a aria-hidden="true" class="legacy" id="async_hooks_promiseresolve_asyncid"></a></h5>
 <div class="api_metadata">
 <span>Added in: v8.6.0</span>
@@ -892,6 +905,7 @@ init for PROMISE with id 6, trigger id: 5  # the Promise returned by then()
   before 6               # the then() callback is entered
   promise resolve 6      # the then() callback resolves the promise by returning
   after 6</code> <button class="copy-button">copy</button></pre>
+</div></div><div>
 <h4><code>async_hooks.executionAsyncResource()</code><span><a class="mark" href="#async_hooksexecutionasyncresource" id="async_hooksexecutionasyncresource">#</a></span><a aria-hidden="true" class="legacy" id="async_hooks_async_hooks_executionasyncresource"></a></h4>
 <div class="api_metadata">
 <span>Added in: v13.9.0, v12.17.0</span>
@@ -968,6 +982,7 @@ use of a tracking <code>Map</code> to store the metadata:</p>
     res.<span class="hljs-title function_">end</span>(<span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(<span class="hljs-title function_">executionAsyncResource</span>()[sym]));
   }, <span class="hljs-number">100</span>);
 }).<span class="hljs-title function_">listen</span>(<span class="hljs-number">3000</span>);</code><button class="copy-button">copy</button></pre>
+</div><div>
 <h4><code>async_hooks.executionAsyncId()</code><span><a class="mark" href="#async_hooksexecutionasyncid" id="async_hooksexecutionasyncid">#</a></span><a aria-hidden="true" class="legacy" id="async_hooks_async_hooks_executionasyncid"></a></h4>
 <div class="api_metadata">
 <details class="changelog"><summary>History</summary>
@@ -1014,6 +1029,7 @@ causality (which is covered by <code>triggerAsyncId()</code>):</p>
 });</code> <button class="copy-button">copy</button></pre>
 <p>Promise contexts may not get precise <code>executionAsyncIds</code> by default.
 See the section on <a href="#promise-execution-tracking">promise execution tracking</a>.</p>
+</div><div>
 <h4><code>async_hooks.triggerAsyncId()</code><span><a class="mark" href="#async_hookstriggerasyncid" id="async_hookstriggerasyncid">#</a></span><a aria-hidden="true" class="legacy" id="async_hooks_async_hooks_triggerasyncid"></a></h4>
 <ul>
 <li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The ID of the resource responsible for calling the callback
@@ -1033,6 +1049,7 @@ that is currently being executed.</li>
 });</code> <button class="copy-button">copy</button></pre>
 <p>Promise contexts may not get valid <code>triggerAsyncId</code>s by default. See
 the section on <a href="#promise-execution-tracking">promise execution tracking</a>.</p>
+</div><div>
 <h4><code>async_hooks.asyncWrapProviders</code><span><a class="mark" href="#async_hooksasyncwrapproviders" id="async_hooksasyncwrapproviders">#</a></span><a aria-hidden="true" class="legacy" id="async_hooks_async_hooks_asyncwrapproviders"></a></h4>
 <div class="api_metadata">
 <span>Added in: v17.2.0, v16.14.0</span>
@@ -1043,6 +1060,7 @@ This map contains all the event types that might be emitted by the <code>async_h
 </ul>
 <p>This feature suppresses the deprecated usage of <code>process.binding('async_wrap').Providers</code>.
 See: <a href="deprecations.html#dep0111-processbinding">DEP0111</a></p>
+</div>
 </section><section><h3>Promise execution tracking<span><a class="mark" href="#promise-execution-tracking" id="promise-execution-tracking">#</a></span><a aria-hidden="true" class="legacy" id="async_hooks_promise_execution_tracking"></a></h3>
 <p>By default, promise executions are not assigned <code>asyncId</code>s due to the relatively
 expensive nature of the <a href="https://docs.google.com/document/d/1rda3yKGHimKIhg5YeoAmCOtyURgsbTH_qaYR79FELlk/edit">promise introspection API</a> provided by
@@ -1098,8 +1116,10 @@ see the details of the V8 <a href="https://docs.google.com/document/d/1rda3yKGHi
 <p>Library developers that handle their own asynchronous resources performing tasks
 like I/O, connection pooling, or managing callback queues may use the
 <code>AsyncResource</code> JavaScript API so that all the appropriate callbacks are called.</p>
+<div>
 <h4>Class: <code>AsyncResource</code><span><a class="mark" href="#class-asyncresource" id="class-asyncresource">#</a></span><a aria-hidden="true" class="legacy" id="async_hooks_class_asyncresource"></a></h4>
 <p>The documentation for this class has moved <a href="async_context.html#class-asyncresource"><code>AsyncResource</code></a>.</p>
+</div>
 </section><section><h3>Class: <code>AsyncLocalStorage</code><span><a class="mark" href="#class-asynclocalstorage" id="class-asynclocalstorage">#</a></span><a aria-hidden="true" class="legacy" id="async_hooks_class_asynclocalstorage"></a></h3>
 <p>The documentation for this class has moved <a href="async_context.html#class-asynclocalstorage"><code>AsyncLocalStorage</code></a>.</p></section>
         <!-- API END -->

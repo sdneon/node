@@ -1098,7 +1098,7 @@ added:
 -->
 
 * `view` {TypedArray} The {TypedArray} to copy.
-* `offset` {integer} The starting offset within `view`. **Default:**: `0`.
+* `offset` {integer} The starting offset within `view`. **Default:** `0`.
 * `length` {integer} The number of elements from `view` to copy.
   **Default:** `view.length - offset`.
 * Returns: {Buffer}
@@ -5355,8 +5355,6 @@ instance.
 <!-- YAML
 deprecated: v6.0.0
 -->
-
-> Stability: 0 - Deprecated: Use [`Buffer.allocUnsafeSlow()`][] instead.
 
 * `size` {integer} The desired length of the new `SlowBuffer`.
 

@@ -8,7 +8,7 @@
       "introduced_in": "v0.1.21",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v23.8.0/lib/assert.js\">lib/assert.js</a></p>\n<p>The <code>node:assert</code> module provides a set of assertion functions for verifying\ninvariants.</p>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v23.11.0/lib/assert.js\">lib/assert.js</a></p>\n<p>The <code>node:assert</code> module provides a set of assertion functions for verifying\ninvariants.</p>",
       "modules": [
         {
           "textRaw": "Strict assertion mode",
@@ -612,6 +612,11 @@
           },
           "signatures": [
             {
+              "return": {
+                "textRaw": "Returns: {Promise}",
+                "name": "return",
+                "type": "Promise"
+              },
               "params": [
                 {
                   "textRaw": "`asyncFn` {Function|Promise}",
@@ -1166,6 +1171,11 @@
           },
           "signatures": [
             {
+              "return": {
+                "textRaw": "Returns: {Promise}",
+                "name": "return",
+                "type": "Promise"
+              },
               "params": [
                 {
                   "textRaw": "`asyncFn` {Function|Promise}",
@@ -1286,7 +1296,7 @@
             "changes": []
           },
           "stability": 1,
-          "stabilityText": ".0 - Early development",
+          "stabilityText": ".2 - Release candidate",
           "signatures": [
             {
               "params": [
@@ -1308,7 +1318,16 @@
               ]
             }
           ],
-          "desc": "<p><a href=\"#assertpartialdeepstrictequalactual-expected-message\"><code>assert.partialDeepStrictEqual()</code></a> Asserts the equivalence between the <code>actual</code> and <code>expected</code> parameters through a\ndeep comparison, ensuring that all properties in the <code>expected</code> parameter are\npresent in the <code>actual</code> parameter with equivalent values, not allowing type coercion.\nThe main difference with <a href=\"#assertdeepstrictequalactual-expected-message\"><code>assert.deepStrictEqual()</code></a> is that <a href=\"#assertpartialdeepstrictequalactual-expected-message\"><code>assert.partialDeepStrictEqual()</code></a> does not require\nall properties in the <code>actual</code> parameter to be present in the <code>expected</code> parameter.\nThis method should always pass the same test cases as <a href=\"#assertdeepstrictequalactual-expected-message\"><code>assert.deepStrictEqual()</code></a>, behaving as a super set of it.</p>\n<pre><code class=\"language-mjs\">import assert from 'node:assert';\n\nassert.partialDeepStrictEqual({ a: 1, b: 2 }, { a: 1, b: 2 });\n// OK\n\nassert.partialDeepStrictEqual({ a: { b: { c: 1 } } }, { a: { b: { c: 1 } } });\n// OK\n\nassert.partialDeepStrictEqual({ a: 1, b: 2, c: 3 }, { a: 1, b: 2 });\n// OK\n\nassert.partialDeepStrictEqual(new Set(['value1', 'value2']), new Set(['value1', 'value2']));\n// OK\n\nassert.partialDeepStrictEqual(new Map([['key1', 'value1']]), new Map([['key1', 'value1']]));\n// OK\n\nassert.partialDeepStrictEqual(new Uint8Array([1, 2, 3]), new Uint8Array([1, 2, 3]));\n// OK\n\nassert.partialDeepStrictEqual(/abc/, /abc/);\n// OK\n\nassert.partialDeepStrictEqual([{ a: 5 }, { b: 5 }], [{ a: 5 }]);\n// OK\n\nassert.partialDeepStrictEqual(new Set([{ a: 1 }, { b: 1 }]), new Set([{ a: 1 }]));\n// OK\n\nassert.partialDeepStrictEqual(new Date(0), new Date(0));\n// OK\n\nassert.partialDeepStrictEqual({ a: 1 }, { a: 1, b: 2 });\n// AssertionError\n\nassert.partialDeepStrictEqual({ a: 1, b: '2' }, { a: 1, b: 2 });\n// AssertionError\n\nassert.partialDeepStrictEqual({ a: { b: 2 } }, { a: { b: '2' } });\n// AssertionError\n</code></pre>\n<pre><code class=\"language-cjs\">const assert = require('node:assert');\n\nassert.partialDeepStrictEqual({ a: 1, b: 2 }, { a: 1, b: 2 });\n// OK\n\nassert.partialDeepStrictEqual({ a: { b: { c: 1 } } }, { a: { b: { c: 1 } } });\n// OK\n\nassert.partialDeepStrictEqual({ a: 1, b: 2, c: 3 }, { a: 1, b: 2 });\n// OK\n\nassert.partialDeepStrictEqual([{ a: 5 }, { b: 5 }], [{ a: 5 }]);\n// OK\n\nassert.partialDeepStrictEqual(new Set([{ a: 1 }, { b: 1 }]), new Set([{ a: 1 }]));\n// OK\n\nassert.partialDeepStrictEqual({ a: 1 }, { a: 1, b: 2 });\n// AssertionError\n\nassert.partialDeepStrictEqual({ a: 1, b: '2' }, { a: 1, b: 2 });\n// AssertionError\n\nassert.partialDeepStrictEqual({ a: { b: 2 } }, { a: { b: '2' } });\n// AssertionError\n</code></pre>"
+          "desc": "<p>Tests for partial deep equality between the <code>actual</code> and <code>expected</code> parameters.\n\"Deep\" equality means that the enumerable \"own\" properties of child objects\nare recursively evaluated also by the following rules. \"Partial\" equality means\nthat only properties that exist on the <code>expected</code> parameter are going to be\ncompared.</p>\n<p>This method always passes the same test cases as <a href=\"#assertdeepstrictequalactual-expected-message\"><code>assert.deepStrictEqual()</code></a>,\nbehaving as a super set of it.</p>",
+          "modules": [
+            {
+              "textRaw": "Comparison details",
+              "name": "comparison_details",
+              "desc": "<ul>\n<li>Primitive values are compared using <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is\"><code>Object.is()</code></a>.</li>\n<li><a href=\"https://tc39.github.io/ecma262/#sec-object.prototype.tostring\">Type tags</a> of objects should be the same.</li>\n<li><a href=\"https://tc39.github.io/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots\"><code>[[Prototype]]</code></a> of objects are not compared.</li>\n<li>Only <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Enumerability_and_ownership_of_properties\">enumerable \"own\" properties</a> are considered.</li>\n<li><a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error\" class=\"type\">&lt;Error&gt;</a> names, messages, causes, and errors are always compared,\neven if these are not enumerable properties.\n<code>errors</code> is also compared.</li>\n<li>Enumerable own <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol\" class=\"type\">&lt;Symbol&gt;</a> properties are compared as well.</li>\n<li><a href=\"https://developer.mozilla.org/en-US/docs/Glossary/Primitive#Primitive_wrapper_objects_in_JavaScript\">Object wrappers</a> are compared both as objects and unwrapped values.</li>\n<li><code>Object</code> properties are compared unordered.</li>\n<li><a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map\" class=\"type\">&lt;Map&gt;</a> keys and <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set\" class=\"type\">&lt;Set&gt;</a> items are compared unordered.</li>\n<li>Recursion stops when both sides differ or both sides encounter a circular\nreference.</li>\n<li><a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap\" class=\"type\">&lt;WeakMap&gt;</a> and <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet\" class=\"type\">&lt;WeakSet&gt;</a> instances are <strong>not</strong> compared structurally.\nThey are only equal if they reference the same object. Any comparison between\ndifferent <code>WeakMap</code> or <code>WeakSet</code> instances will result in inequality,\neven if they contain the same entries.</li>\n<li><a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp\" class=\"type\">&lt;RegExp&gt;</a> lastIndex, flags, and source are always compared, even if these\nare not enumerable properties.</li>\n<li>Holes in sparse arrays are ignored.</li>\n</ul>\n<pre><code class=\"language-mjs\">import assert from 'node:assert';\n\nassert.partialDeepStrictEqual(\n  { a: { b: { c: 1 } } },\n  { a: { b: { c: 1 } } },\n);\n// OK\n\nassert.partialDeepStrictEqual(\n  { a: 1, b: 2, c: 3 },\n  { b: 2 },\n);\n// OK\n\nassert.partialDeepStrictEqual(\n  [1, 2, 3, 4, 5, 6, 7, 8, 9],\n  [4, 5, 8],\n);\n// OK\n\nassert.partialDeepStrictEqual(\n  new Set([{ a: 1 }, { b: 1 }]),\n  new Set([{ a: 1 }]),\n);\n// OK\n\nassert.partialDeepStrictEqual(\n  new Map([['key1', 'value1'], ['key2', 'value2']]),\n  new Map([['key2', 'value2']]),\n);\n// OK\n\nassert.partialDeepStrictEqual(123n, 123n);\n// OK\n\nassert.partialDeepStrictEqual(\n  [1, 2, 3, 4, 5, 6, 7, 8, 9],\n  [5, 4, 8],\n);\n// AssertionError\n\nassert.partialDeepStrictEqual(\n  { a: 1 },\n  { a: 1, b: 2 },\n);\n// AssertionError\n\nassert.partialDeepStrictEqual(\n  { a: { b: 2 } },\n  { a: { b: '2' } },\n);\n// AssertionError\n</code></pre>\n<pre><code class=\"language-cjs\">const assert = require('node:assert');\n\nassert.partialDeepStrictEqual(\n  { a: { b: { c: 1 } } },\n  { a: { b: { c: 1 } } },\n);\n// OK\n\nassert.partialDeepStrictEqual(\n  { a: 1, b: 2, c: 3 },\n  { b: 2 },\n);\n// OK\n\nassert.partialDeepStrictEqual(\n  [1, 2, 3, 4, 5, 6, 7, 8, 9],\n  [4, 5, 8],\n);\n// OK\n\nassert.partialDeepStrictEqual(\n  new Set([{ a: 1 }, { b: 1 }]),\n  new Set([{ a: 1 }]),\n);\n// OK\n\nassert.partialDeepStrictEqual(\n  new Map([['key1', 'value1'], ['key2', 'value2']]),\n  new Map([['key2', 'value2']]),\n);\n// OK\n\nassert.partialDeepStrictEqual(123n, 123n);\n// OK\n\nassert.partialDeepStrictEqual(\n  [1, 2, 3, 4, 5, 6, 7, 8, 9],\n  [5, 4, 8],\n);\n// AssertionError\n\nassert.partialDeepStrictEqual(\n  { a: 1 },\n  { a: 1, b: 2 },\n);\n// AssertionError\n\nassert.partialDeepStrictEqual(\n  { a: { b: 2 } },\n  { a: { b: '2' } },\n);\n// AssertionError\n</code></pre>",
+              "type": "module",
+              "displayName": "Comparison details"
+            }
+          ]
         }
       ],
       "type": "module",

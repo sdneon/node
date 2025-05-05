@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v23.8.0">
-  <title>V8 | Node.js v23.8.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v23.11.0">
+  <title>V8 | Node.js v23.11.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -51,7 +51,6 @@
 <li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
 <li><a href="cli.html" class="nav-cli">Command-line options</a></li>
 <li><a href="console.html" class="nav-console">Console</a></li>
-<li><a href="corepack.html" class="nav-corepack">Corepack</a></li>
 <li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
 <li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
 <li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
@@ -113,7 +112,7 @@
     <div id="column1" data-id="v8" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v23.8.0 documentation</h1>
+          <h1>Node.js v23.11.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -128,7 +127,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v23.8.0</li>
+            <li class="pinned-header">Node.js v23.11.0</li>
             
     <li class="picker-header">
       <a href="#toc-picker" aria-controls="toc-picker">
@@ -144,6 +143,7 @@
 <li><a href="#v8getheapsnapshotoptions"><code>v8.getHeapSnapshot([options])</code></a></li>
 <li><a href="#v8getheapspacestatistics"><code>v8.getHeapSpaceStatistics()</code></a></li>
 <li><a href="#v8getheapstatistics"><code>v8.getHeapStatistics()</code></a></li>
+<li><a href="#v8getcppheapstatisticsdetaillevel"><code>v8.getCppHeapStatistics([detailLevel])</code></a></li>
 <li><span class="stability_1"><a href="#v8queryobjectsctor-options"><code>v8.queryObjects(ctor[, options])</code></a></span></li>
 <li><a href="#v8setflagsfromstringflags"><code>v8.setFlagsFromString(flags)</code></a></li>
 <li><a href="#v8stopcoverage"><code>v8.stopCoverage()</code></a></li>
@@ -221,6 +221,7 @@
 <li><a href="#profilerstop"><code>profiler.stop()</code></a></li>
 </ul>
 </li>
+<li><a href="#v8isstringonebyterepresentationcontent"><code>v8.isStringOneByteRepresentation(content)</code></a></li>
 </ul>
 </li>
 </ul></div></div>
@@ -255,7 +256,6 @@
 <li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
 <li><a href="cli.html" class="nav-cli">Command-line options</a></li>
 <li><a href="console.html" class="nav-console">Console</a></li>
-<li><a href="corepack.html" class="nav-corepack">Corepack</a></li>
 <li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
 <li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
 <li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
@@ -373,6 +373,7 @@
 <li><a href="#v8getheapsnapshotoptions"><code>v8.getHeapSnapshot([options])</code></a></li>
 <li><a href="#v8getheapspacestatistics"><code>v8.getHeapSpaceStatistics()</code></a></li>
 <li><a href="#v8getheapstatistics"><code>v8.getHeapStatistics()</code></a></li>
+<li><a href="#v8getcppheapstatisticsdetaillevel"><code>v8.getCppHeapStatistics([detailLevel])</code></a></li>
 <li><span class="stability_1"><a href="#v8queryobjectsctor-options"><code>v8.queryObjects(ctor[, options])</code></a></span></li>
 <li><a href="#v8setflagsfromstringflags"><code>v8.setFlagsFromString(flags)</code></a></li>
 <li><a href="#v8stopcoverage"><code>v8.stopCoverage()</code></a></li>
@@ -450,6 +451,7 @@
 <li><a href="#profilerstop"><code>profiler.stop()</code></a></li>
 </ul>
 </li>
+<li><a href="#v8isstringonebyterepresentationcontent"><code>v8.isStringOneByteRepresentation(content)</code></a></li>
 </ul>
 </li>
 </ul></details>
@@ -457,7 +459,7 @@
       <div role="main" id="apicontent">
         <h2>V8<span><a class="mark" href="#v8" id="v8">#</a></span><a aria-hidden="true" class="legacy" id="v8_v8"></a></h2>
 
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v23.8.0/lib/v8.js">lib/v8.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v23.11.0/lib/v8.js">lib/v8.js</a></p>
 <p>The <code>node:v8</code> module exposes APIs that are specific to the version of <a href="https://developers.google.com/v8/">V8</a>
 built into the Node.js binary. It can be accessed using:</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> v8 = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:v8'</span>);</code> <button class="copy-button">copy</button></pre>
@@ -695,6 +697,87 @@ buffers and external strings.</p>
   <span class="hljs-attr">used_global_handles_size</span>: <span class="hljs-number">3296</span>,
   <span class="hljs-attr">external_memory</span>: <span class="hljs-number">318824</span>
 }</code> <button class="copy-button">copy</button></pre>
+</section><section><h3><code>v8.getCppHeapStatistics([detailLevel])</code><span><a class="mark" href="#v8getcppheapstatisticsdetaillevel" id="v8getcppheapstatisticsdetaillevel">#</a></span><a aria-hidden="true" class="legacy" id="v8_v8_getcppheapstatistics_detaillevel"></a></h3>
+<p>Retrieves <a href="https://v8docs.nodesource.com/node-22.4/d9/dc4/classv8_1_1_cpp_heap.html">CppHeap</a> statistics regarding memory consumption and
+utilization using the V8 <a href="https://v8docs.nodesource.com/node-22.4/d9/dc4/classv8_1_1_cpp_heap.html#a3a5d09567758e608fffde50eeabc2feb"><code>CollectStatistics()</code></a> function which
+may change from one V8 version to the
+next.</p>
+<ul>
+<li><code>detailLevel</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a>:  <strong>Default:</strong> <code>'detailed'</code>.
+Specifies the level of detail in the returned statistics.
+Accepted values are:
+<ul>
+<li><code>'brief'</code>:  Brief statistics contain only the top-level
+allocated and used
+memory statistics for the entire heap.</li>
+<li><code>'detailed'</code>: Detailed statistics also contain a break
+down per space and page, as well as freelist statistics
+and object type histograms.</li>
+</ul>
+</li>
+</ul>
+<p>It returns an object with a structure similar to the
+<a href="https://v8docs.nodesource.com/node-22.4/d7/d51/heap-statistics_8h_source.html"><code>cppgc::HeapStatistics</code></a> object. See the <a href="https://v8docs.nodesource.com/node-22.4/df/d2f/structcppgc_1_1_heap_statistics.html">V8 documentation</a>
+for more information about the properties of the object.</p>
+<pre><code class="language-js"><span class="hljs-comment">// Detailed</span>
+({
+  <span class="hljs-attr">committed_size_bytes</span>: <span class="hljs-number">131072</span>,
+  <span class="hljs-attr">resident_size_bytes</span>: <span class="hljs-number">131072</span>,
+  <span class="hljs-attr">used_size_bytes</span>: <span class="hljs-number">152</span>,
+  <span class="hljs-attr">space_statistics</span>: [
+    {
+      <span class="hljs-attr">name</span>: <span class="hljs-string">'NormalPageSpace0'</span>,
+      <span class="hljs-attr">committed_size_bytes</span>: <span class="hljs-number">0</span>,
+      <span class="hljs-attr">resident_size_bytes</span>: <span class="hljs-number">0</span>,
+      <span class="hljs-attr">used_size_bytes</span>: <span class="hljs-number">0</span>,
+      <span class="hljs-attr">page_stats</span>: [{}],
+      <span class="hljs-attr">free_list_stats</span>: {},
+    },
+    {
+      <span class="hljs-attr">name</span>: <span class="hljs-string">'NormalPageSpace1'</span>,
+      <span class="hljs-attr">committed_size_bytes</span>: <span class="hljs-number">131072</span>,
+      <span class="hljs-attr">resident_size_bytes</span>: <span class="hljs-number">131072</span>,
+      <span class="hljs-attr">used_size_bytes</span>: <span class="hljs-number">152</span>,
+      <span class="hljs-attr">page_stats</span>: [{}],
+      <span class="hljs-attr">free_list_stats</span>: {},
+    },
+    {
+      <span class="hljs-attr">name</span>: <span class="hljs-string">'NormalPageSpace2'</span>,
+      <span class="hljs-attr">committed_size_bytes</span>: <span class="hljs-number">0</span>,
+      <span class="hljs-attr">resident_size_bytes</span>: <span class="hljs-number">0</span>,
+      <span class="hljs-attr">used_size_bytes</span>: <span class="hljs-number">0</span>,
+      <span class="hljs-attr">page_stats</span>: [{}],
+      <span class="hljs-attr">free_list_stats</span>: {},
+    },
+    {
+      <span class="hljs-attr">name</span>: <span class="hljs-string">'NormalPageSpace3'</span>,
+      <span class="hljs-attr">committed_size_bytes</span>: <span class="hljs-number">0</span>,
+      <span class="hljs-attr">resident_size_bytes</span>: <span class="hljs-number">0</span>,
+      <span class="hljs-attr">used_size_bytes</span>: <span class="hljs-number">0</span>,
+      <span class="hljs-attr">page_stats</span>: [{}],
+      <span class="hljs-attr">free_list_stats</span>: {},
+    },
+    {
+      <span class="hljs-attr">name</span>: <span class="hljs-string">'LargePageSpace'</span>,
+      <span class="hljs-attr">committed_size_bytes</span>: <span class="hljs-number">0</span>,
+      <span class="hljs-attr">resident_size_bytes</span>: <span class="hljs-number">0</span>,
+      <span class="hljs-attr">used_size_bytes</span>: <span class="hljs-number">0</span>,
+      <span class="hljs-attr">page_stats</span>: [{}],
+      <span class="hljs-attr">free_list_stats</span>: {},
+    },
+  ],
+  <span class="hljs-attr">type_names</span>: [],
+  <span class="hljs-attr">detail_level</span>: <span class="hljs-string">'detailed'</span>,
+});</code> <button class="copy-button">copy</button></pre>
+<pre><code class="language-js"><span class="hljs-comment">// Brief</span>
+({
+  <span class="hljs-attr">committed_size_bytes</span>: <span class="hljs-number">131072</span>,
+  <span class="hljs-attr">resident_size_bytes</span>: <span class="hljs-number">131072</span>,
+  <span class="hljs-attr">used_size_bytes</span>: <span class="hljs-number">128864</span>,
+  <span class="hljs-attr">space_statistics</span>: [],
+  <span class="hljs-attr">type_names</span>: [],
+  <span class="hljs-attr">detail_level</span>: <span class="hljs-string">'brief'</span>,
+});</code> <button class="copy-button">copy</button></pre>
 </section><section><h3><code>v8.queryObjects(ctor[, options])</code><span><a class="mark" href="#v8queryobjectsctor-options" id="v8queryobjectsctor-options">#</a></span><a aria-hidden="true" class="legacy" id="v8_v8_queryobjects_ctor_options"></a></h3>
 <div class="api_metadata">
 <span>Added in: v22.0.0, v20.13.0</span>
@@ -895,6 +978,7 @@ integer. See <a href="cli.html#--heapsnapshot-near-heap-limitmax_count"><code>--
 that is compatible with the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm">HTML structured clone algorithm</a>.</p>
 <p>The format is backward-compatible (i.e. safe to store to disk).
 Equal JavaScript values may result in different serialized output.</p>
+<div>
 <h4><code>v8.serialize(value)</code><span><a class="mark" href="#v8serializevalue" id="v8serializevalue">#</a></span><a aria-hidden="true" class="legacy" id="v8_v8_serialize_value"></a></h4>
 <div class="api_metadata">
 <span>Added in: v8.0.0</span>
@@ -907,6 +991,7 @@ Equal JavaScript values may result in different serialized output.</p>
 <p><a href="errors.html#err_buffer_too_large"><code>ERR_BUFFER_TOO_LARGE</code></a> will be thrown when trying to
 serialize a huge object which requires buffer
 larger than <a href="buffer.html#bufferconstantsmax_length"><code>buffer.constants.MAX_LENGTH</code></a>.</p>
+</div><div>
 <h4><code>v8.deserialize(buffer)</code><span><a class="mark" href="#v8deserializebuffer" id="v8deserializebuffer">#</a></span><a aria-hidden="true" class="legacy" id="v8_v8_deserialize_buffer"></a></h4>
 <div class="api_metadata">
 <span>Added in: v8.0.0</span>
@@ -916,14 +1001,18 @@ larger than <a href="buffer.html#bufferconstantsmax_length"><code>buffer.constan
 </ul>
 <p>Uses a <a href="#class-v8defaultdeserializer"><code>DefaultDeserializer</code></a> with default options to read a JS value
 from a buffer.</p>
+</div><div>
 <h4>Class: <code>v8.Serializer</code><span><a class="mark" href="#class-v8serializer" id="class-v8serializer">#</a></span><a aria-hidden="true" class="legacy" id="v8_class_v8_serializer"></a></h4>
 <div class="api_metadata">
 <span>Added in: v8.0.0</span>
 </div>
+<div>
 <h5><code>new Serializer()</code><span><a class="mark" href="#new-serializer" id="new-serializer">#</a></span><a aria-hidden="true" class="legacy" id="v8_new_serializer"></a></h5>
 <p>Creates a new <code>Serializer</code> object.</p>
+</div><div>
 <h5><code>serializer.writeHeader()</code><span><a class="mark" href="#serializerwriteheader" id="serializerwriteheader">#</a></span><a aria-hidden="true" class="legacy" id="v8_serializer_writeheader"></a></h5>
 <p>Writes out a header, which includes the serialization format version.</p>
+</div><div>
 <h5><code>serializer.writeValue(value)</code><span><a class="mark" href="#serializerwritevaluevalue" id="serializerwritevaluevalue">#</a></span><a aria-hidden="true" class="legacy" id="v8_serializer_writevalue_value"></a></h5>
 <ul>
 <li><code>value</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a></li>
@@ -931,6 +1020,7 @@ from a buffer.</p>
 <p>Serializes a JavaScript value and adds the serialized representation to the
 internal buffer.</p>
 <p>This throws an error if <code>value</code> cannot be serialized.</p>
+</div><div>
 <h5><code>serializer.releaseBuffer()</code><span><a class="mark" href="#serializerreleasebuffer" id="serializerreleasebuffer">#</a></span><a aria-hidden="true" class="legacy" id="v8_serializer_releasebuffer"></a></h5>
 <ul>
 <li>Returns: <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a></li>
@@ -938,6 +1028,7 @@ internal buffer.</p>
 <p>Returns the stored internal buffer. This serializer should not be used once
 the buffer is released. Calling this method results in undefined behavior
 if a previous write has failed.</p>
+</div><div>
 <h5><code>serializer.transferArrayBuffer(id, arrayBuffer)</code><span><a class="mark" href="#serializertransferarraybufferid-arraybuffer" id="serializertransferarraybufferid-arraybuffer">#</a></span><a aria-hidden="true" class="legacy" id="v8_serializer_transferarraybuffer_id_arraybuffer"></a></h5>
 <ul>
 <li><code>id</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a> A 32-bit unsigned integer.</li>
@@ -946,12 +1037,14 @@ if a previous write has failed.</p>
 <p>Marks an <code>ArrayBuffer</code> as having its contents transferred out of band.
 Pass the corresponding <code>ArrayBuffer</code> in the deserializing context to
 <a href="#deserializertransferarraybufferid-arraybuffer"><code>deserializer.transferArrayBuffer()</code></a>.</p>
+</div><div>
 <h5><code>serializer.writeUint32(value)</code><span><a class="mark" href="#serializerwriteuint32value" id="serializerwriteuint32value">#</a></span><a aria-hidden="true" class="legacy" id="v8_serializer_writeuint32_value"></a></h5>
 <ul>
 <li><code>value</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a></li>
 </ul>
 <p>Write a raw 32-bit unsigned integer.
 For use inside of a custom <a href="#serializer_writehostobjectobject"><code>serializer._writeHostObject()</code></a>.</p>
+</div><div>
 <h5><code>serializer.writeUint64(hi, lo)</code><span><a class="mark" href="#serializerwriteuint64hi-lo" id="serializerwriteuint64hi-lo">#</a></span><a aria-hidden="true" class="legacy" id="v8_serializer_writeuint64_hi_lo"></a></h5>
 <ul>
 <li><code>hi</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a></li>
@@ -959,12 +1052,14 @@ For use inside of a custom <a href="#serializer_writehostobjectobject"><code>ser
 </ul>
 <p>Write a raw 64-bit unsigned integer, split into high and low 32-bit parts.
 For use inside of a custom <a href="#serializer_writehostobjectobject"><code>serializer._writeHostObject()</code></a>.</p>
+</div><div>
 <h5><code>serializer.writeDouble(value)</code><span><a class="mark" href="#serializerwritedoublevalue" id="serializerwritedoublevalue">#</a></span><a aria-hidden="true" class="legacy" id="v8_serializer_writedouble_value"></a></h5>
 <ul>
 <li><code>value</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
 </ul>
 <p>Write a JS <code>number</code> value.
 For use inside of a custom <a href="#serializer_writehostobjectobject"><code>serializer._writeHostObject()</code></a>.</p>
+</div><div>
 <h5><code>serializer.writeRawBytes(buffer)</code><span><a class="mark" href="#serializerwriterawbytesbuffer" id="serializerwriterawbytesbuffer">#</a></span><a aria-hidden="true" class="legacy" id="v8_serializer_writerawbytes_buffer"></a></h5>
 <ul>
 <li><code>buffer</code> <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray" class="type">&#x3C;TypedArray></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView" class="type">&#x3C;DataView></a></li>
@@ -972,6 +1067,7 @@ For use inside of a custom <a href="#serializer_writehostobjectobject"><code>ser
 <p>Write raw bytes into the serializer's internal buffer. The deserializer
 will require a way to compute the length of the buffer.
 For use inside of a custom <a href="#serializer_writehostobjectobject"><code>serializer._writeHostObject()</code></a>.</p>
+</div><div>
 <h5><code>serializer._writeHostObject(object)</code><span><a class="mark" href="#serializer_writehostobjectobject" id="serializer_writehostobjectobject">#</a></span><a aria-hidden="true" class="legacy" id="v8_serializer_writehostobject_object"></a></h5>
 <ul>
 <li><code>object</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
@@ -981,6 +1077,7 @@ by native C++ bindings. If it is not possible to serialize <code>object</code>, 
 exception should be thrown.</p>
 <p>This method is not present on the <code>Serializer</code> class itself but can be provided
 by subclasses.</p>
+</div><div>
 <h5><code>serializer._getDataCloneError(message)</code><span><a class="mark" href="#serializer_getdatacloneerrormessage" id="serializer_getdatacloneerrormessage">#</a></span><a aria-hidden="true" class="legacy" id="v8_serializer_getdatacloneerror_message"></a></h5>
 <ul>
 <li><code>message</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
@@ -989,6 +1086,7 @@ by subclasses.</p>
 object can not be cloned.</p>
 <p>This method defaults to the <a href="errors.html#class-error"><code>Error</code></a> constructor and can be overridden on
 subclasses.</p>
+</div><div>
 <h5><code>serializer._getSharedArrayBufferId(sharedArrayBuffer)</code><span><a class="mark" href="#serializer_getsharedarraybufferidsharedarraybuffer" id="serializer_getsharedarraybufferidsharedarraybuffer">#</a></span><a aria-hidden="true" class="legacy" id="v8_serializer_getsharedarraybufferid_sharedarraybuffer"></a></h5>
 <ul>
 <li><code>sharedArrayBuffer</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer" class="type">&#x3C;SharedArrayBuffer></a></li>
@@ -1001,28 +1099,34 @@ serialized. When deserializing, this ID will be passed to
 <p>If the object cannot be serialized, an exception should be thrown.</p>
 <p>This method is not present on the <code>Serializer</code> class itself but can be provided
 by subclasses.</p>
+</div><div>
 <h5><code>serializer._setTreatArrayBufferViewsAsHostObjects(flag)</code><span><a class="mark" href="#serializer_settreatarraybufferviewsashostobjectsflag" id="serializer_settreatarraybufferviewsashostobjectsflag">#</a></span><a aria-hidden="true" class="legacy" id="v8_serializer_settreatarraybufferviewsashostobjects_flag"></a></h5>
 <ul>
 <li><code>flag</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> <strong>Default:</strong> <code>false</code></li>
 </ul>
 <p>Indicate whether to treat <code>TypedArray</code> and <code>DataView</code> objects as
 host objects, i.e. pass them to <a href="#serializer_writehostobjectobject"><code>serializer._writeHostObject()</code></a>.</p>
+</div></div><div>
 <h4>Class: <code>v8.Deserializer</code><span><a class="mark" href="#class-v8deserializer" id="class-v8deserializer">#</a></span><a aria-hidden="true" class="legacy" id="v8_class_v8_deserializer"></a></h4>
 <div class="api_metadata">
 <span>Added in: v8.0.0</span>
 </div>
+<div>
 <h5><code>new Deserializer(buffer)</code><span><a class="mark" href="#new-deserializerbuffer" id="new-deserializerbuffer">#</a></span><a aria-hidden="true" class="legacy" id="v8_new_deserializer_buffer"></a></h5>
 <ul>
 <li><code>buffer</code> <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray" class="type">&#x3C;TypedArray></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView" class="type">&#x3C;DataView></a> A buffer returned by
 <a href="#serializerreleasebuffer"><code>serializer.releaseBuffer()</code></a>.</li>
 </ul>
 <p>Creates a new <code>Deserializer</code> object.</p>
+</div><div>
 <h5><code>deserializer.readHeader()</code><span><a class="mark" href="#deserializerreadheader" id="deserializerreadheader">#</a></span><a aria-hidden="true" class="legacy" id="v8_deserializer_readheader"></a></h5>
 <p>Reads and validates a header (including the format version).
 May, for example, reject an invalid or unsupported wire format. In that case,
 an <code>Error</code> is thrown.</p>
+</div><div>
 <h5><code>deserializer.readValue()</code><span><a class="mark" href="#deserializerreadvalue" id="deserializerreadvalue">#</a></span><a aria-hidden="true" class="legacy" id="v8_deserializer_readvalue"></a></h5>
 <p>Deserializes a JavaScript value from the buffer and returns it.</p>
+</div><div>
 <h5><code>deserializer.transferArrayBuffer(id, arrayBuffer)</code><span><a class="mark" href="#deserializertransferarraybufferid-arraybuffer" id="deserializertransferarraybufferid-arraybuffer">#</a></span><a aria-hidden="true" class="legacy" id="v8_deserializer_transferarraybuffer_id_arraybuffer"></a></h5>
 <ul>
 <li><code>id</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a> A 32-bit unsigned integer.</li>
@@ -1032,6 +1136,7 @@ an <code>Error</code> is thrown.</p>
 Pass the corresponding <code>ArrayBuffer</code> in the serializing context to
 <a href="#serializertransferarraybufferid-arraybuffer"><code>serializer.transferArrayBuffer()</code></a> (or return the <code>id</code> from
 <a href="#serializer_getsharedarraybufferidsharedarraybuffer"><code>serializer._getSharedArrayBufferId()</code></a> in the case of <code>SharedArrayBuffer</code>s).</p>
+</div><div>
 <h5><code>deserializer.getWireFormatVersion()</code><span><a class="mark" href="#deserializergetwireformatversion" id="deserializergetwireformatversion">#</a></span><a aria-hidden="true" class="legacy" id="v8_deserializer_getwireformatversion"></a></h5>
 <ul>
 <li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a></li>
@@ -1039,12 +1144,14 @@ Pass the corresponding <code>ArrayBuffer</code> in the serializing context to
 <p>Reads the underlying wire format version. Likely mostly to be useful to
 legacy code reading old wire format versions. May not be called before
 <code>.readHeader()</code>.</p>
+</div><div>
 <h5><code>deserializer.readUint32()</code><span><a class="mark" href="#deserializerreaduint32" id="deserializerreaduint32">#</a></span><a aria-hidden="true" class="legacy" id="v8_deserializer_readuint32"></a></h5>
 <ul>
 <li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a></li>
 </ul>
 <p>Read a raw 32-bit unsigned integer and return it.
 For use inside of a custom <a href="#deserializer_readhostobject"><code>deserializer._readHostObject()</code></a>.</p>
+</div><div>
 <h5><code>deserializer.readUint64()</code><span><a class="mark" href="#deserializerreaduint64" id="deserializerreaduint64">#</a></span><a aria-hidden="true" class="legacy" id="v8_deserializer_readuint64"></a></h5>
 <ul>
 <li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer[]></a></li>
@@ -1052,12 +1159,14 @@ For use inside of a custom <a href="#deserializer_readhostobject"><code>deserial
 <p>Read a raw 64-bit unsigned integer and return it as an array <code>[hi, lo]</code>
 with two 32-bit unsigned integer entries.
 For use inside of a custom <a href="#deserializer_readhostobject"><code>deserializer._readHostObject()</code></a>.</p>
+</div><div>
 <h5><code>deserializer.readDouble()</code><span><a class="mark" href="#deserializerreaddouble" id="deserializerreaddouble">#</a></span><a aria-hidden="true" class="legacy" id="v8_deserializer_readdouble"></a></h5>
 <ul>
 <li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
 </ul>
 <p>Read a JS <code>number</code> value.
 For use inside of a custom <a href="#deserializer_readhostobject"><code>deserializer._readHostObject()</code></a>.</p>
+</div><div>
 <h5><code>deserializer.readRawBytes(length)</code><span><a class="mark" href="#deserializerreadrawbyteslength" id="deserializerreadrawbyteslength">#</a></span><a aria-hidden="true" class="legacy" id="v8_deserializer_readrawbytes_length"></a></h5>
 <ul>
 <li><code>length</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a></li>
@@ -1067,12 +1176,14 @@ For use inside of a custom <a href="#deserializer_readhostobject"><code>deserial
 must correspond to the length of the buffer that was passed to
 <a href="#serializerwriterawbytesbuffer"><code>serializer.writeRawBytes()</code></a>.
 For use inside of a custom <a href="#deserializer_readhostobject"><code>deserializer._readHostObject()</code></a>.</p>
+</div><div>
 <h5><code>deserializer._readHostObject()</code><span><a class="mark" href="#deserializer_readhostobject" id="deserializer_readhostobject">#</a></span><a aria-hidden="true" class="legacy" id="v8_deserializer_readhostobject"></a></h5>
 <p>This method is called to read some kind of host object, i.e. an object that is
 created by native C++ bindings. If it is not possible to deserialize the data,
 a suitable exception should be thrown.</p>
 <p>This method is not present on the <code>Deserializer</code> class itself but can be
 provided by subclasses.</p>
+</div></div><div>
 <h4>Class: <code>v8.DefaultSerializer</code><span><a class="mark" href="#class-v8defaultserializer" id="class-v8defaultserializer">#</a></span><a aria-hidden="true" class="legacy" id="v8_class_v8_defaultserializer"></a></h4>
 <div class="api_metadata">
 <span>Added in: v8.0.0</span>
@@ -1080,12 +1191,14 @@ provided by subclasses.</p>
 <p>A subclass of <a href="#class-v8serializer"><code>Serializer</code></a> that serializes <code>TypedArray</code>
 (in particular <a href="buffer.html"><code>Buffer</code></a>) and <code>DataView</code> objects as host objects, and only
 stores the part of their underlying <code>ArrayBuffer</code>s that they are referring to.</p>
+</div><div>
 <h4>Class: <code>v8.DefaultDeserializer</code><span><a class="mark" href="#class-v8defaultdeserializer" id="class-v8defaultdeserializer">#</a></span><a aria-hidden="true" class="legacy" id="v8_class_v8_defaultdeserializer"></a></h4>
 <div class="api_metadata">
 <span>Added in: v8.0.0</span>
 </div>
 <p>A subclass of <a href="#class-v8deserializer"><code>Deserializer</code></a> corresponding to the format written by
 <a href="#class-v8defaultserializer"><code>DefaultSerializer</code></a>.</p>
+</div>
 </section><section><h3>Promise hooks<span><a class="mark" href="#promise-hooks" id="promise-hooks">#</a></span><a aria-hidden="true" class="legacy" id="v8_promise_hooks"></a></h3>
 <p>The <code>promiseHooks</code> interface can be used to track promise lifecycle events.
 To track <em>all</em> async activity, see <a href="async_hooks.html"><code>async_hooks</code></a> which internally uses this
@@ -1143,6 +1256,7 @@ async resources. For request context management, see <a href="async_context.html
 <span class="hljs-title function_">stopWatchingBefores</span>();
 <span class="hljs-title function_">stopWatchingAfters</span>();
 <span class="hljs-title function_">stopHookSet</span>();</code> <button class="copy-button">copy</button></pre>
+<div>
 <h4><code>promiseHooks.onInit(init)</code><span><a class="mark" href="#promisehooksoninitinit" id="promisehooksoninitinit">#</a></span><a aria-hidden="true" class="legacy" id="v8_promisehooks_oninit_init"></a></h4>
 <div class="api_metadata">
 <span>Added in: v17.1.0, v16.14.0</span>
@@ -1159,6 +1273,7 @@ throw as it would produce an infinite microtask loop.</strong></p>
 <span class="hljs-keyword">const</span> stop = promiseHooks.<span class="hljs-title function_">onInit</span>(<span class="hljs-function">(<span class="hljs-params">promise, parent</span>) =></span> {});</code><code class="language-js cjs"><span class="hljs-keyword">const</span> { promiseHooks } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:v8'</span>);
 
 <span class="hljs-keyword">const</span> stop = promiseHooks.<span class="hljs-title function_">onInit</span>(<span class="hljs-function">(<span class="hljs-params">promise, parent</span>) =></span> {});</code><button class="copy-button">copy</button></pre>
+</div><div>
 <h4><code>promiseHooks.onSettled(settled)</code><span><a class="mark" href="#promisehooksonsettledsettled" id="promisehooksonsettledsettled">#</a></span><a aria-hidden="true" class="legacy" id="v8_promisehooks_onsettled_settled"></a></h4>
 <div class="api_metadata">
 <span>Added in: v17.1.0, v16.14.0</span>
@@ -1176,6 +1291,7 @@ throw as it would produce an infinite microtask loop.</strong></p>
 <span class="hljs-keyword">const</span> stop = promiseHooks.<span class="hljs-title function_">onSettled</span>(<span class="hljs-function">(<span class="hljs-params">promise</span>) =></span> {});</code><code class="language-js cjs"><span class="hljs-keyword">const</span> { promiseHooks } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:v8'</span>);
 
 <span class="hljs-keyword">const</span> stop = promiseHooks.<span class="hljs-title function_">onSettled</span>(<span class="hljs-function">(<span class="hljs-params">promise</span>) =></span> {});</code><button class="copy-button">copy</button></pre>
+</div><div>
 <h4><code>promiseHooks.onBefore(before)</code><span><a class="mark" href="#promisehooksonbeforebefore" id="promisehooksonbeforebefore">#</a></span><a aria-hidden="true" class="legacy" id="v8_promisehooks_onbefore_before"></a></h4>
 <div class="api_metadata">
 <span>Added in: v17.1.0, v16.14.0</span>
@@ -1193,6 +1309,7 @@ throw as it would produce an infinite microtask loop.</strong></p>
 <span class="hljs-keyword">const</span> stop = promiseHooks.<span class="hljs-title function_">onBefore</span>(<span class="hljs-function">(<span class="hljs-params">promise</span>) =></span> {});</code><code class="language-js cjs"><span class="hljs-keyword">const</span> { promiseHooks } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:v8'</span>);
 
 <span class="hljs-keyword">const</span> stop = promiseHooks.<span class="hljs-title function_">onBefore</span>(<span class="hljs-function">(<span class="hljs-params">promise</span>) =></span> {});</code><button class="copy-button">copy</button></pre>
+</div><div>
 <h4><code>promiseHooks.onAfter(after)</code><span><a class="mark" href="#promisehooksonafterafter" id="promisehooksonafterafter">#</a></span><a aria-hidden="true" class="legacy" id="v8_promisehooks_onafter_after"></a></h4>
 <div class="api_metadata">
 <span>Added in: v17.1.0, v16.14.0</span>
@@ -1210,6 +1327,7 @@ throw as it would produce an infinite microtask loop.</strong></p>
 <span class="hljs-keyword">const</span> stop = promiseHooks.<span class="hljs-title function_">onAfter</span>(<span class="hljs-function">(<span class="hljs-params">promise</span>) =></span> {});</code><code class="language-js cjs"><span class="hljs-keyword">const</span> { promiseHooks } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:v8'</span>);
 
 <span class="hljs-keyword">const</span> stop = promiseHooks.<span class="hljs-title function_">onAfter</span>(<span class="hljs-function">(<span class="hljs-params">promise</span>) =></span> {});</code><button class="copy-button">copy</button></pre>
+</div><div>
 <h4><code>promiseHooks.createHook(callbacks)</code><span><a class="mark" href="#promisehookscreatehookcallbacks" id="promisehookscreatehookcallbacks">#</a></span><a aria-hidden="true" class="legacy" id="v8_promisehooks_createhook_callbacks"></a></h4>
 <div class="api_metadata">
 <span>Added in: v17.1.0, v16.14.0</span>
@@ -1244,6 +1362,7 @@ specifics of all functions that can be passed to <code>callbacks</code> is in th
 <span class="hljs-keyword">const</span> stopAll = promiseHooks.<span class="hljs-title function_">createHook</span>({
   <span class="hljs-title function_">init</span>(<span class="hljs-params">promise, parent</span>) {},
 });</code><button class="copy-button">copy</button></pre>
+</div><div>
 <h4>Hook callbacks<span><a class="mark" href="#hook-callbacks" id="hook-callbacks">#</a></span><a aria-hidden="true" class="legacy" id="v8_hook_callbacks"></a></h4>
 <p>Key events in the lifetime of a promise have been categorized into four areas:
 creation of a promise, before/after a continuation handler is called or around
@@ -1262,6 +1381,7 @@ promises which would produce an infinite loop.</p>
 <p>While this API is used to feed promise events into <a href="async_hooks.html"><code>async_hooks</code></a>, the
 ordering between the two is undefined. Both APIs are multi-tenant
 and therefore could produce events in any order relative to each other.</p>
+<div>
 <h5><code>init(promise, parent)</code><span><a class="mark" href="#initpromise-parent" id="initpromise-parent">#</a></span><a aria-hidden="true" class="legacy" id="v8_init_promise_parent"></a></h5>
 <ul>
 <li><code>promise</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" class="type">&#x3C;Promise></a> The promise being created.</li>
@@ -1270,6 +1390,7 @@ and therefore could produce events in any order relative to each other.</p>
 <p>Called when a promise is constructed. This <em>does not</em> mean that corresponding
 <code>before</code>/<code>after</code> events will occur, only that the possibility exists. This will
 happen if a promise is created without ever getting a continuation.</p>
+</div><div>
 <h5><code>before(promise)</code><span><a class="mark" href="#beforepromise" id="beforepromise">#</a></span><a aria-hidden="true" class="legacy" id="v8_before_promise"></a></h5>
 <ul>
 <li><code>promise</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" class="type">&#x3C;Promise></a></li>
@@ -1280,6 +1401,7 @@ happen if a promise is created without ever getting a continuation.</p>
 will typically be called 0 times if no continuation was ever made for the
 promise. The <code>before</code> callback may be called many times in the case where
 many continuations have been made from the same promise.</p>
+</div><div>
 <h5><code>after(promise)</code><span><a class="mark" href="#afterpromise" id="afterpromise">#</a></span><a aria-hidden="true" class="legacy" id="v8_after_promise"></a></h5>
 <ul>
 <li><code>promise</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" class="type">&#x3C;Promise></a></li>
@@ -1287,12 +1409,14 @@ many continuations have been made from the same promise.</p>
 <p>Called immediately after a promise continuation executes. This may be after a
 <code>then()</code>, <code>catch()</code>, or <code>finally()</code> handler or before an <code>await</code> after another
 <code>await</code>.</p>
+</div><div>
 <h5><code>settled(promise)</code><span><a class="mark" href="#settledpromise" id="settledpromise">#</a></span><a aria-hidden="true" class="legacy" id="v8_settled_promise"></a></h5>
 <ul>
 <li><code>promise</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" class="type">&#x3C;Promise></a></li>
 </ul>
 <p>Called when the promise receives a resolution or rejection value. This may
 occur synchronously in the case of <code>Promise.resolve()</code> or <code>Promise.reject()</code>.</p>
+</div></div>
 </section><section><h3>Startup Snapshot API<span><a class="mark" href="#startup-snapshot-api" id="startup-snapshot-api">#</a></span><a aria-hidden="true" class="legacy" id="v8_startup_snapshot_api"></a></h3>
 <div class="api_metadata">
 <span>Added in: v18.6.0, v16.17.0</span>
@@ -1369,6 +1493,7 @@ the launched process:</p>
 <p>Currently the application deserialized from a user-land snapshot cannot
 be snapshotted again, so these APIs are only available to applications
 that are not deserialized from a user-land snapshot.</p>
+<div>
 <h4><code>v8.startupSnapshot.addSerializeCallback(callback[, data])</code><span><a class="mark" href="#v8startupsnapshotaddserializecallbackcallback-data" id="v8startupsnapshotaddserializecallbackcallback-data">#</a></span><a aria-hidden="true" class="legacy" id="v8_v8_startupsnapshot_addserializecallback_callback_data"></a></h4>
 <div class="api_metadata">
 <span>Added in: v18.6.0, v16.17.0</span>
@@ -1383,6 +1508,7 @@ get serialized into a snapshot and exit. This can be used to release
 resources that should not or cannot be serialized or to convert user data
 into a form more suitable for serialization.</p>
 <p>Callbacks are run in the order in which they are added.</p>
+</div><div>
 <h4><code>v8.startupSnapshot.addDeserializeCallback(callback[, data])</code><span><a class="mark" href="#v8startupsnapshotadddeserializecallbackcallback-data" id="v8startupsnapshotadddeserializecallbackcallback-data">#</a></span><a aria-hidden="true" class="legacy" id="v8_v8_startupsnapshot_adddeserializecallback_callback_data"></a></h4>
 <div class="api_metadata">
 <span>Added in: v18.6.0, v16.17.0</span>
@@ -1399,6 +1525,7 @@ serialized into the snapshot, they can be used to re-initialize the state
 of the application or to re-acquire resources that the application needs
 when the application is restarted from the snapshot.</p>
 <p>Callbacks are run in the order in which they are added.</p>
+</div><div>
 <h4><code>v8.startupSnapshot.setDeserializeMainFunction(callback[, data])</code><span><a class="mark" href="#v8startupsnapshotsetdeserializemainfunctioncallback-data" id="v8startupsnapshotsetdeserializemainfunctioncallback-data">#</a></span><a aria-hidden="true" class="legacy" id="v8_v8_startupsnapshot_setdeserializemainfunction_callback_data"></a></h4>
 <div class="api_metadata">
 <span>Added in: v18.6.0, v16.17.0</span>
@@ -1415,6 +1542,7 @@ script. If called, the deserialized application no longer needs an additional
 entry point script to start up and will simply invoke the callback along with
 the deserialized data (if provided), otherwise an entry point script still
 needs to be provided to the deserialized application.</p>
+</div><div>
 <h4><code>v8.startupSnapshot.isBuildingSnapshot()</code><span><a class="mark" href="#v8startupsnapshotisbuildingsnapshot" id="v8startupsnapshotisbuildingsnapshot">#</a></span><a aria-hidden="true" class="legacy" id="v8_v8_startupsnapshot_isbuildingsnapshot"></a></h4>
 <div class="api_metadata">
 <span>Added in: v18.6.0, v16.17.0</span>
@@ -1423,21 +1551,25 @@ needs to be provided to the deserialized application.</p>
 <li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
 </ul>
 <p>Returns true if the Node.js instance is run to build a snapshot.</p>
+</div>
 </section><section><h3>Class: <code>v8.GCProfiler</code><span><a class="mark" href="#class-v8gcprofiler" id="class-v8gcprofiler">#</a></span><a aria-hidden="true" class="legacy" id="v8_class_v8_gcprofiler"></a></h3>
 <div class="api_metadata">
 <span>Added in: v19.6.0, v18.15.0</span>
 </div>
 <p>This API collects GC data in current thread.</p>
+<div>
 <h4><code>new v8.GCProfiler()</code><span><a class="mark" href="#new-v8gcprofiler" id="new-v8gcprofiler">#</a></span><a aria-hidden="true" class="legacy" id="v8_new_v8_gcprofiler"></a></h4>
 <div class="api_metadata">
 <span>Added in: v19.6.0, v18.15.0</span>
 </div>
 <p>Create a new instance of the <code>v8.GCProfiler</code> class.</p>
+</div><div>
 <h4><code>profiler.start()</code><span><a class="mark" href="#profilerstart" id="profilerstart">#</a></span><a aria-hidden="true" class="legacy" id="v8_profiler_start"></a></h4>
 <div class="api_metadata">
 <span>Added in: v19.6.0, v18.15.0</span>
 </div>
 <p>Start collecting GC data.</p>
+</div><div>
 <h4><code>profiler.stop()</code><span><a class="mark" href="#profilerstop" id="profilerstop">#</a></span><a aria-hidden="true" class="legacy" id="v8_profiler_stop"></a></h4>
 <div class="api_metadata">
 <span>Added in: v19.6.0, v18.15.0</span>
@@ -1509,7 +1641,41 @@ is as follows.</p>
 profiler.<span class="hljs-title function_">start</span>();
 <span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =></span> {
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(profiler.<span class="hljs-title function_">stop</span>());
-}, <span class="hljs-number">1000</span>);</code> <button class="copy-button">copy</button></pre></section>
+}, <span class="hljs-number">1000</span>);</code> <button class="copy-button">copy</button></pre>
+</div>
+</section><section><h3><code>v8.isStringOneByteRepresentation(content)</code><span><a class="mark" href="#v8isstringonebyterepresentationcontent" id="v8isstringonebyterepresentationcontent">#</a></span><a aria-hidden="true" class="legacy" id="v8_v8_isstringonebyterepresentation_content"></a></h3>
+<div class="api_metadata">
+<span>Added in: v23.10.0</span>
+</div>
+<ul>
+<li><code>content</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+</ul>
+<p>V8 only supports <code>Latin-1/ISO-8859-1</code> and <code>UTF16</code> as the underlying representation of a string.
+If the <code>content</code> uses <code>Latin-1/ISO-8859-1</code> as the underlying representation, this function will return true;
+otherwise, it returns false.</p>
+<p>If this method returns false, that does not mean that the string contains some characters not in <code>Latin-1/ISO-8859-1</code>.
+Sometimes a <code>Latin-1</code> string may also be represented as <code>UTF16</code>.</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> { isStringOneByteRepresentation } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:v8'</span>);
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Encoding</span> = {
+  <span class="hljs-attr">latin1</span>: <span class="hljs-number">1</span>,
+  <span class="hljs-attr">utf16le</span>: <span class="hljs-number">2</span>,
+};
+<span class="hljs-keyword">const</span> buffer = <span class="hljs-title class_">Buffer</span>.<span class="hljs-title function_">alloc</span>(<span class="hljs-number">100</span>);
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">writeString</span>(<span class="hljs-params">input</span>) {
+  <span class="hljs-keyword">if</span> (<span class="hljs-title function_">isStringOneByteRepresentation</span>(input)) {
+    buffer.<span class="hljs-title function_">writeUint8</span>(<span class="hljs-title class_">Encoding</span>.<span class="hljs-property">latin1</span>);
+    buffer.<span class="hljs-title function_">writeUint32LE</span>(input.<span class="hljs-property">length</span>, <span class="hljs-number">1</span>);
+    buffer.<span class="hljs-title function_">write</span>(input, <span class="hljs-number">5</span>, <span class="hljs-string">'latin1'</span>);
+  } <span class="hljs-keyword">else</span> {
+    buffer.<span class="hljs-title function_">writeUint8</span>(<span class="hljs-title class_">Encoding</span>.<span class="hljs-property">utf16le</span>);
+    buffer.<span class="hljs-title function_">writeUint32LE</span>(input.<span class="hljs-property">length</span> * <span class="hljs-number">2</span>, <span class="hljs-number">1</span>);
+    buffer.<span class="hljs-title function_">write</span>(input, <span class="hljs-number">5</span>, <span class="hljs-string">'utf16le'</span>);
+  }
+}
+<span class="hljs-title function_">writeString</span>(<span class="hljs-string">'hello'</span>);
+<span class="hljs-title function_">writeString</span>(<span class="hljs-string">'你好'</span>);</code> <button class="copy-button">copy</button></pre></section>
         <!-- API END -->
       </div>
     </div>

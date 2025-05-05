@@ -8,7 +8,7 @@
       "introduced_in": "v0.3.6",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v23.8.0/lib/crypto.js\">lib/crypto.js</a></p>\n<p>The <code>node:crypto</code> module provides cryptographic functionality that includes a\nset of wrappers for OpenSSL's hash, HMAC, cipher, decipher, sign, and verify\nfunctions.</p>\n<pre><code class=\"language-mjs\">const { createHmac } = await import('node:crypto');\n\nconst secret = 'abcdefg';\nconst hash = createHmac('sha256', secret)\n               .update('I love cupcakes')\n               .digest('hex');\nconsole.log(hash);\n// Prints:\n//   c0fa1bc00531bd78ef38c628449c5102aeabd49b5dc3a2a516ea6ea959d6658e\n</code></pre>\n<pre><code class=\"language-cjs\">const { createHmac } = require('node:crypto');\n\nconst secret = 'abcdefg';\nconst hash = createHmac('sha256', secret)\n               .update('I love cupcakes')\n               .digest('hex');\nconsole.log(hash);\n// Prints:\n//   c0fa1bc00531bd78ef38c628449c5102aeabd49b5dc3a2a516ea6ea959d6658e\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v23.11.0/lib/crypto.js\">lib/crypto.js</a></p>\n<p>The <code>node:crypto</code> module provides cryptographic functionality that includes a\nset of wrappers for OpenSSL's hash, HMAC, cipher, decipher, sign, and verify\nfunctions.</p>\n<pre><code class=\"language-mjs\">const { createHmac } = await import('node:crypto');\n\nconst secret = 'abcdefg';\nconst hash = createHmac('sha256', secret)\n               .update('I love cupcakes')\n               .digest('hex');\nconsole.log(hash);\n// Prints:\n//   c0fa1bc00531bd78ef38c628449c5102aeabd49b5dc3a2a516ea6ea959d6658e\n</code></pre>\n<pre><code class=\"language-cjs\">const { createHmac } = require('node:crypto');\n\nconst secret = 'abcdefg';\nconst hash = createHmac('sha256', secret)\n               .update('I love cupcakes')\n               .digest('hex');\nconsole.log(hash);\n// Prints:\n//   c0fa1bc00531bd78ef38c628449c5102aeabd49b5dc3a2a516ea6ea959d6658e\n</code></pre>",
       "modules": [
         {
           "textRaw": "Determining if crypto support is unavailable",
@@ -728,7 +728,7 @@
               "desc": "<p>Creates and returns a <code>Verify</code> object that uses the given algorithm.\nUse <a href=\"#cryptogethashes\"><code>crypto.getHashes()</code></a> to obtain an array of names of the available\nsigning algorithms. Optional <code>options</code> argument controls the\n<code>stream.Writable</code> behavior.</p>\n<p>In some cases, a <code>Verify</code> instance can be created using the name of a signature\nalgorithm, such as <code>'RSA-SHA256'</code>, instead of a digest algorithm. This will use\nthe corresponding digest algorithm. This does not work for all signature\nalgorithms, such as <code>'ecdsa-with-SHA256'</code>, so it is best to always use digest\nalgorithm names.</p>"
             },
             {
-              "textRaw": "`crypto.diffieHellman(options)`",
+              "textRaw": "`crypto.diffieHellman(options[, callback])`",
               "type": "method",
               "name": "diffieHellman",
               "meta": {
@@ -736,14 +736,21 @@
                   "v13.9.0",
                   "v12.17.0"
                 ],
-                "changes": []
+                "changes": [
+                  {
+                    "version": "v23.11.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/57274",
+                    "description": "Optional callback argument added."
+                  }
+                ]
               },
               "signatures": [
                 {
                   "return": {
-                    "textRaw": "Returns: {Buffer}",
+                    "textRaw": "Returns: {Buffer} if the `callback` function is not provided.",
                     "name": "return",
-                    "type": "Buffer"
+                    "type": "Buffer",
+                    "desc": "if the `callback` function is not provided."
                   },
                   "params": [
                     {
@@ -762,11 +769,28 @@
                           "type": "KeyObject"
                         }
                       ]
+                    },
+                    {
+                      "textRaw": "`callback` {Function}",
+                      "name": "callback",
+                      "type": "Function",
+                      "options": [
+                        {
+                          "textRaw": "`err` {Error}",
+                          "name": "err",
+                          "type": "Error"
+                        },
+                        {
+                          "textRaw": "`secret` {Buffer}",
+                          "name": "secret",
+                          "type": "Buffer"
+                        }
+                      ]
                     }
                   ]
                 }
               ],
-              "desc": "<p>Computes the Diffie-Hellman secret based on a <code>privateKey</code> and a <code>publicKey</code>.\nBoth keys must have the same <code>asymmetricKeyType</code>, which must be one of <code>'dh'</code>\n(for Diffie-Hellman), <code>'ec'</code>, <code>'x448'</code>, or <code>'x25519'</code> (for ECDH).</p>"
+              "desc": "<p>Computes the Diffie-Hellman secret based on a <code>privateKey</code> and a <code>publicKey</code>.\nBoth keys must have the same <code>asymmetricKeyType</code>, which must be one of <code>'dh'</code>\n(for Diffie-Hellman), <code>'ec'</code>, <code>'x448'</code>, or <code>'x25519'</code> (for ECDH).</p>\n<p>If the <code>callback</code> function is provided this function uses libuv's threadpool.</p>"
             },
             {
               "textRaw": "`crypto.generateKey(type, options, callback)`",
