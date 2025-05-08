@@ -92,7 +92,7 @@ a command-line flag. Experimental features may also emit a [warning][].
 | [Inspector](inspector.html) | (2) Stable |
 | [Modules: `node:module` API](module.html) | (1) .2 - Release candidate (asynchronous version) Stability: 1.1 - Active development (synchronous version) |
 | [Modules: CommonJS modules](modules.html) | (2) Stable |
-| [Modules: TypeScript](typescript.html) | (1) .1 - Active development |
+| [Modules: TypeScript](typescript.html) | (1) .2 - Release candidate |
 | [OS](os.html) | (2) Stable |
 | [Path](path.html) | (2) Stable |
 | [Performance measurement APIs](perf_hooks.html) | (2) Stable |

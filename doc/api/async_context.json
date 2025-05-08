@@ -8,7 +8,7 @@
       "introduced_in": "v16.4.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v23.11.0/lib/async_hooks.js\">lib/async_hooks.js</a></p>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.0.0/lib/async_hooks.js\">lib/async_hooks.js</a></p>",
       "modules": [
         {
           "textRaw": "Introduction",
@@ -36,7 +36,7 @@
               }
             ]
           },
-          "desc": "<p>This class creates stores that stay coherent through asynchronous operations.</p>\n<p>While you can create your own implementation on top of the <code>node:async_hooks</code>\nmodule, <code>AsyncLocalStorage</code> should be preferred as it is a performant and memory\nsafe implementation that involves significant optimizations that are non-obvious\nto implement.</p>\n<p>The following example uses <code>AsyncLocalStorage</code> to build a simple logger\nthat assigns IDs to incoming HTTP requests and includes them in messages\nlogged within each request.</p>\n<pre><code class=\"language-mjs\">import http from 'node:http';\nimport { AsyncLocalStorage } from 'node:async_hooks';\n\nconst asyncLocalStorage = new AsyncLocalStorage();\n\nfunction logWithId(msg) {\n  const id = asyncLocalStorage.getStore();\n  console.log(`${id !== undefined ? id : '-'}:`, msg);\n}\n\nlet idSeq = 0;\nhttp.createServer((req, res) => {\n  asyncLocalStorage.run(idSeq++, () => {\n    logWithId('start');\n    // Imagine any chain of async operations here\n    setImmediate(() => {\n      logWithId('finish');\n      res.end();\n    });\n  });\n}).listen(8080);\n\nhttp.get('http://localhost:8080');\nhttp.get('http://localhost:8080');\n// Prints:\n//   0: start\n//   1: start\n//   0: finish\n//   1: finish\n</code></pre>\n<pre><code class=\"language-cjs\">const http = require('node:http');\nconst { AsyncLocalStorage } = require('node:async_hooks');\n\nconst asyncLocalStorage = new AsyncLocalStorage();\n\nfunction logWithId(msg) {\n  const id = asyncLocalStorage.getStore();\n  console.log(`${id !== undefined ? id : '-'}:`, msg);\n}\n\nlet idSeq = 0;\nhttp.createServer((req, res) => {\n  asyncLocalStorage.run(idSeq++, () => {\n    logWithId('start');\n    // Imagine any chain of async operations here\n    setImmediate(() => {\n      logWithId('finish');\n      res.end();\n    });\n  });\n}).listen(8080);\n\nhttp.get('http://localhost:8080');\nhttp.get('http://localhost:8080');\n// Prints:\n//   0: start\n//   1: start\n//   0: finish\n//   1: finish\n</code></pre>\n<p>Each instance of <code>AsyncLocalStorage</code> maintains an independent storage context.\nMultiple instances can safely exist simultaneously without risk of interfering\nwith each other's data.</p>",
+          "desc": "<p>This class creates stores that stay coherent through asynchronous operations.</p>\n<p>While you can create your own implementation on top of the <code>node:async_hooks</code>\nmodule, <code>AsyncLocalStorage</code> should be preferred as it is a performant and memory\nsafe implementation that involves significant optimizations that are non-obvious\nto implement.</p>\n<p>The following example uses <code>AsyncLocalStorage</code> to build a simple logger\nthat assigns IDs to incoming HTTP requests and includes them in messages\nlogged within each request.</p>\n<pre><code class=\"language-mjs\">import http from 'node:http';\nimport { AsyncLocalStorage } from 'node:async_hooks';\n\nconst asyncLocalStorage = new AsyncLocalStorage();\n\nfunction logWithId(msg) {\n  const id = asyncLocalStorage.getStore();\n  console.log(`${id !== undefined ? id : '-'}:`, msg);\n}\n\nlet idSeq = 0;\nhttp.createServer((req, res) => {\n  asyncLocalStorage.run(idSeq++, () => {\n    logWithId('start');\n    // Imagine any chain of async operations here\n    setImmediate(() => {\n      logWithId('finish');\n      res.end();\n    });\n  });\n}).listen(8080);\n\nhttp.get('http://localhost:8080');\nhttp.get('http://localhost:8080');\n// Prints:\n//   0: start\n//   0: finish\n//   1: start\n//   1: finish\n</code></pre>\n<pre><code class=\"language-cjs\">const http = require('node:http');\nconst { AsyncLocalStorage } = require('node:async_hooks');\n\nconst asyncLocalStorage = new AsyncLocalStorage();\n\nfunction logWithId(msg) {\n  const id = asyncLocalStorage.getStore();\n  console.log(`${id !== undefined ? id : '-'}:`, msg);\n}\n\nlet idSeq = 0;\nhttp.createServer((req, res) => {\n  asyncLocalStorage.run(idSeq++, () => {\n    logWithId('start');\n    // Imagine any chain of async operations here\n    setImmediate(() => {\n      logWithId('finish');\n      res.end();\n    });\n  });\n}).listen(8080);\n\nhttp.get('http://localhost:8080');\nhttp.get('http://localhost:8080');\n// Prints:\n//   0: start\n//   0: finish\n//   1: start\n//   1: finish\n</code></pre>\n<p>Each instance of <code>AsyncLocalStorage</code> maintains an independent storage context.\nMultiple instances can safely exist simultaneously without risk of interfering\nwith each other's data.</p>",
           "classMethods": [
             {
               "textRaw": "Static method: `AsyncLocalStorage.bind(fn)`",
@@ -49,7 +49,10 @@
                 ],
                 "changes": [
                   {
-                    "version": "v23.11.0",
+                    "version": [
+                      "v23.11.0",
+                      "v22.15.0"
+                    ],
                     "pr-url": "https://github.com/nodejs/node/pull/57510",
                     "description": "Marking the API stable."
                   }
@@ -86,7 +89,10 @@
                 ],
                 "changes": [
                   {
-                    "version": "v23.11.0",
+                    "version": [
+                      "v23.11.0",
+                      "v22.15.0"
+                    ],
                     "pr-url": "https://github.com/nodejs/node/pull/57510",
                     "description": "Marking the API stable."
                   }
@@ -242,6 +248,20 @@
               "desc": "<p>Runs a function synchronously outside of a context and returns its\nreturn value. The store is not accessible within the callback function or\nthe asynchronous operations created within the callback. Any <code>getStore()</code>\ncall done within the callback function will always return <code>undefined</code>.</p>\n<p>The optional <code>args</code> are passed to the callback function.</p>\n<p>If the callback function throws an error, the error is thrown by <code>exit()</code> too.\nThe stacktrace is not impacted by this call and the context is re-entered.</p>\n<p>Example:</p>\n<pre><code class=\"language-js\">// Within a call to run\ntry {\n  asyncLocalStorage.getStore(); // Returns the store object or value\n  asyncLocalStorage.exit(() => {\n    asyncLocalStorage.getStore(); // Returns undefined\n    throw new Error();\n  });\n} catch (e) {\n  asyncLocalStorage.getStore(); // Returns the same object or value\n  // The error will be caught here\n}\n</code></pre>"
             }
           ],
+          "properties": [
+            {
+              "textRaw": "`name` {string}",
+              "type": "string",
+              "name": "name",
+              "meta": {
+                "added": [
+                  "v24.0.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>The name of the <code>AsyncLocalStorage</code> instance if provided.</p>"
+            }
+          ],
           "modules": [
             {
               "textRaw": "Usage with `async/await`",
@@ -260,7 +280,27 @@
           ],
           "signatures": [
             {
-              "params": [],
+              "params": [
+                {
+                  "textRaw": "`options` {Object}",
+                  "name": "options",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`defaultValue` {any} The default value to be used when no store is provided.",
+                      "name": "defaultValue",
+                      "type": "any",
+                      "desc": "The default value to be used when no store is provided."
+                    },
+                    {
+                      "textRaw": "`name` {string} A name for the `AsyncLocalStorage` value.",
+                      "name": "name",
+                      "type": "string",
+                      "desc": "A name for the `AsyncLocalStorage` value."
+                    }
+                  ]
+                }
+              ],
               "desc": "<p>Creates a new instance of <code>AsyncLocalStorage</code>. Store is only provided within a\n<code>run()</code> call or after an <code>enterWith()</code> call.</p>"
             }
           ]

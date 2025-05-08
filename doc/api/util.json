@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v23.11.0/lib/util.js\">lib/util.js</a></p>\n<p>The <code>node:util</code> module supports the needs of Node.js internal APIs. Many of the\nutilities are useful for application and module developers as well. To access\nit:</p>\n<pre><code class=\"language-mjs\">import util from 'node:util';\n</code></pre>\n<pre><code class=\"language-cjs\">const util = require('node:util');\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.0.0/lib/util.js\">lib/util.js</a></p>\n<p>The <code>node:util</code> module supports the needs of Node.js internal APIs. Many of the\nutilities are useful for application and module developers as well. To access\nit:</p>\n<pre><code class=\"language-mjs\">import util from 'node:util';\n</code></pre>\n<pre><code class=\"language-cjs\">const util = require('node:util');\n</code></pre>",
       "methods": [
         {
           "textRaw": "`util.callbackify(original)`",
@@ -162,7 +162,8 @@
           "name": "diff",
           "meta": {
             "added": [
-              "v23.11.0"
+              "v23.11.0",
+              "v22.15.0"
             ],
             "changes": []
           },
@@ -284,7 +285,7 @@
               ]
             }
           ],
-          "desc": "<p>The <code>util.format()</code> method returns a formatted string using the first argument\nas a <code>printf</code>-like format string which can contain zero or more format\nspecifiers. Each specifier is replaced with the converted value from the\ncorresponding argument. Supported specifiers are:</p>\n<ul>\n<li><code>%s</code>: <code>String</code> will be used to convert all values except <code>BigInt</code>, <code>Object</code>\nand <code>-0</code>. <code>BigInt</code> values will be represented with an <code>n</code> and Objects that\nhave no user defined <code>toString</code> function are inspected using <code>util.inspect()</code>\nwith options <code>{ depth: 0, colors: false, compact: 3 }</code>.</li>\n<li><code>%d</code>: <code>Number</code> will be used to convert all values except <code>BigInt</code> and\n<code>Symbol</code>.</li>\n<li><code>%i</code>: <code>parseInt(value, 10)</code> is used for all values except <code>BigInt</code> and\n<code>Symbol</code>.</li>\n<li><code>%f</code>: <code>parseFloat(value)</code> is used for all values expect <code>Symbol</code>.</li>\n<li><code>%j</code>: JSON. Replaced with the string <code>'[Circular]'</code> if the argument contains\ncircular references.</li>\n<li><code>%o</code>: <code>Object</code>. A string representation of an object with generic JavaScript\nobject formatting. Similar to <code>util.inspect()</code> with options\n<code>{ showHidden: true, showProxy: true }</code>. This will show the full object\nincluding non-enumerable properties and proxies.</li>\n<li><code>%O</code>: <code>Object</code>. A string representation of an object with generic JavaScript\nobject formatting. Similar to <code>util.inspect()</code> without options. This will show\nthe full object not including non-enumerable properties and proxies.</li>\n<li><code>%c</code>: <code>CSS</code>. This specifier is ignored and will skip any CSS passed in.</li>\n<li><code>%%</code>: single percent sign (<code>'%'</code>). This does not consume an argument.</li>\n<li>Returns: <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> The formatted string</li>\n</ul>\n<p>If a specifier does not have a corresponding argument, it is not replaced:</p>\n<pre><code class=\"language-js\">util.format('%s:%s', 'foo');\n// Returns: 'foo:%s'\n</code></pre>\n<p>Values that are not part of the format string are formatted using\n<code>util.inspect()</code> if their type is not <code>string</code>.</p>\n<p>If there are more arguments passed to the <code>util.format()</code> method than the\nnumber of specifiers, the extra arguments are concatenated to the returned\nstring, separated by spaces:</p>\n<pre><code class=\"language-js\">util.format('%s:%s', 'foo', 'bar', 'baz');\n// Returns: 'foo:bar baz'\n</code></pre>\n<p>If the first argument does not contain a valid format specifier, <code>util.format()</code>\nreturns a string that is the concatenation of all arguments separated by spaces:</p>\n<pre><code class=\"language-js\">util.format(1, 2, 3);\n// Returns: '1 2 3'\n</code></pre>\n<p>If only one argument is passed to <code>util.format()</code>, it is returned as it is\nwithout any formatting:</p>\n<pre><code class=\"language-js\">util.format('%% %s');\n// Returns: '%% %s'\n</code></pre>\n<p><code>util.format()</code> is a synchronous method that is intended as a debugging tool.\nSome input values can have a significant performance overhead that can block the\nevent loop. Use this function with care and never in a hot code path.</p>"
+          "desc": "<p>The <code>util.format()</code> method returns a formatted string using the first argument\nas a <code>printf</code>-like format string which can contain zero or more format\nspecifiers. Each specifier is replaced with the converted value from the\ncorresponding argument. Supported specifiers are:</p>\n<ul>\n<li><code>%s</code>: <code>String</code> will be used to convert all values except <code>BigInt</code>, <code>Object</code>\nand <code>-0</code>. <code>BigInt</code> values will be represented with an <code>n</code> and Objects that\nhave neither a user defined <code>toString</code> function nor <code>Symbol.toPrimitive</code> function are inspected using <code>util.inspect()</code>\nwith options <code>{ depth: 0, colors: false, compact: 3 }</code>.</li>\n<li><code>%d</code>: <code>Number</code> will be used to convert all values except <code>BigInt</code> and\n<code>Symbol</code>.</li>\n<li><code>%i</code>: <code>parseInt(value, 10)</code> is used for all values except <code>BigInt</code> and\n<code>Symbol</code>.</li>\n<li><code>%f</code>: <code>parseFloat(value)</code> is used for all values expect <code>Symbol</code>.</li>\n<li><code>%j</code>: JSON. Replaced with the string <code>'[Circular]'</code> if the argument contains\ncircular references.</li>\n<li><code>%o</code>: <code>Object</code>. A string representation of an object with generic JavaScript\nobject formatting. Similar to <code>util.inspect()</code> with options\n<code>{ showHidden: true, showProxy: true }</code>. This will show the full object\nincluding non-enumerable properties and proxies.</li>\n<li><code>%O</code>: <code>Object</code>. A string representation of an object with generic JavaScript\nobject formatting. Similar to <code>util.inspect()</code> without options. This will show\nthe full object not including non-enumerable properties and proxies.</li>\n<li><code>%c</code>: <code>CSS</code>. This specifier is ignored and will skip any CSS passed in.</li>\n<li><code>%%</code>: single percent sign (<code>'%'</code>). This does not consume an argument.</li>\n<li>Returns: <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> The formatted string</li>\n</ul>\n<p>If a specifier does not have a corresponding argument, it is not replaced:</p>\n<pre><code class=\"language-js\">util.format('%s:%s', 'foo');\n// Returns: 'foo:%s'\n</code></pre>\n<p>Values that are not part of the format string are formatted using\n<code>util.inspect()</code> if their type is not <code>string</code>.</p>\n<p>If there are more arguments passed to the <code>util.format()</code> method than the\nnumber of specifiers, the extra arguments are concatenated to the returned\nstring, separated by spaces:</p>\n<pre><code class=\"language-js\">util.format('%s:%s', 'foo', 'bar', 'baz');\n// Returns: 'foo:bar baz'\n</code></pre>\n<p>If the first argument does not contain a valid format specifier, <code>util.format()</code>\nreturns a string that is the concatenation of all arguments separated by spaces:</p>\n<pre><code class=\"language-js\">util.format(1, 2, 3);\n// Returns: '1 2 3'\n</code></pre>\n<p>If only one argument is passed to <code>util.format()</code>, it is returned as it is\nwithout any formatting:</p>\n<pre><code class=\"language-js\">util.format('%% %s');\n// Returns: '%% %s'\n</code></pre>\n<p><code>util.format()</code> is a synchronous method that is intended as a debugging tool.\nSome input values can have a significant performance overhead that can block the\nevent loop. Use this function with care and never in a hot code path.</p>"
         },
         {
           "textRaw": "`util.formatWithOptions(inspectOptions, format[, ...args])`",
@@ -324,17 +325,26 @@
             ],
             "changes": [
               {
-                "version": "v23.7.0",
+                "version": [
+                  "v23.7.0",
+                  "v22.14.0"
+                ],
                 "pr-url": "https://github.com/nodejs/node/pull/56584",
                 "description": "Property `column` is deprecated in favor of `columnNumber`."
               },
               {
-                "version": "v23.7.0",
+                "version": [
+                  "v23.7.0",
+                  "v22.14.0"
+                ],
                 "pr-url": "https://github.com/nodejs/node/pull/56551",
                 "description": "Property `CallSite.scriptId` is exposed."
               },
               {
-                "version": "v23.3.0",
+                "version": [
+                  "v23.3.0",
+                  "v22.12.0"
+                ],
                 "pr-url": "https://github.com/nodejs/node/pull/55626",
                 "description": "The API is renamed from `util.getCallSite` to `util.getCallSites()`."
               }
@@ -466,7 +476,8 @@
           "name": "getSystemErrorMessage",
           "meta": {
             "added": [
-              "v23.1.0"
+              "v23.1.0",
+              "v22.12.0"
             ],
             "changes": []
           },
@@ -1421,7 +1432,10 @@
             ],
             "changes": [
               {
-                "version": "v23.5.0",
+                "version": [
+                  "v23.5.0",
+                  "v22.13.0"
+                ],
                 "pr-url": "https://github.com/nodejs/node/pull/56265",
                 "description": "styleText is now stable."
               },
@@ -1431,7 +1445,7 @@
                   "v20.18.0"
                 ],
                 "pr-url": "https://github.com/nodejs/node/pull/54389",
-                "description": "Respect isTTY and environment variables such as NO_COLORS, NODE_DISABLE_COLORS, and FORCE_COLOR."
+                "description": "Respect isTTY and environment variables such as NO_COLOR, NODE_DISABLE_COLORS, and FORCE_COLOR."
               }
             ]
           },
@@ -1474,7 +1488,7 @@
               ]
             }
           ],
-          "desc": "<p>This function returns a formatted text considering the <code>format</code> passed\nfor printing in a terminal. It is aware of the terminal's capabilities\nand acts according to the configuration set via <code>NO_COLORS</code>,\n<code>NODE_DISABLE_COLORS</code> and <code>FORCE_COLOR</code> environment variables.</p>\n<pre><code class=\"language-mjs\">import { styleText } from 'node:util';\nimport { stderr } from 'node:process';\n\nconst successMessage = styleText('green', 'Success!');\nconsole.log(successMessage);\n\nconst errorMessage = styleText(\n  'red',\n  'Error! Error!',\n  // Validate if process.stderr has TTY\n  { stream: stderr },\n);\nconsole.error(errorMessage);\n</code></pre>\n<pre><code class=\"language-cjs\">const { styleText } = require('node:util');\nconst { stderr } = require('node:process');\n\nconst successMessage = styleText('green', 'Success!');\nconsole.log(successMessage);\n\nconst errorMessage = styleText(\n  'red',\n  'Error! Error!',\n  // Validate if process.stderr has TTY\n  { stream: stderr },\n);\nconsole.error(errorMessage);\n</code></pre>\n<p><code>util.inspect.colors</code> also provides text formats such as <code>italic</code>, and\n<code>underline</code> and you can combine both:</p>\n<pre><code class=\"language-cjs\">console.log(\n  util.styleText(['underline', 'italic'], 'My italic underlined message'),\n);\n</code></pre>\n<p>When passing an array of formats, the order of the format applied\nis left to right so the following style might overwrite the previous one.</p>\n<pre><code class=\"language-cjs\">console.log(\n  util.styleText(['red', 'green'], 'text'), // green\n);\n</code></pre>\n<p>The full list of formats can be found in <a href=\"#modifiers\">modifiers</a>.</p>"
+          "desc": "<p>This function returns a formatted text considering the <code>format</code> passed\nfor printing in a terminal. It is aware of the terminal's capabilities\nand acts according to the configuration set via <code>NO_COLOR</code>,\n<code>NODE_DISABLE_COLORS</code> and <code>FORCE_COLOR</code> environment variables.</p>\n<pre><code class=\"language-mjs\">import { styleText } from 'node:util';\nimport { stderr } from 'node:process';\n\nconst successMessage = styleText('green', 'Success!');\nconsole.log(successMessage);\n\nconst errorMessage = styleText(\n  'red',\n  'Error! Error!',\n  // Validate if process.stderr has TTY\n  { stream: stderr },\n);\nconsole.error(errorMessage);\n</code></pre>\n<pre><code class=\"language-cjs\">const { styleText } = require('node:util');\nconst { stderr } = require('node:process');\n\nconst successMessage = styleText('green', 'Success!');\nconsole.log(successMessage);\n\nconst errorMessage = styleText(\n  'red',\n  'Error! Error!',\n  // Validate if process.stderr has TTY\n  { stream: stderr },\n);\nconsole.error(errorMessage);\n</code></pre>\n<p><code>util.inspect.colors</code> also provides text formats such as <code>italic</code>, and\n<code>underline</code> and you can combine both:</p>\n<pre><code class=\"language-cjs\">console.log(\n  util.styleText(['underline', 'italic'], 'My italic underlined message'),\n);\n</code></pre>\n<p>When passing an array of formats, the order of the format applied\nis left to right so the following style might overwrite the previous one.</p>\n<pre><code class=\"language-cjs\">console.log(\n  util.styleText(['red', 'green'], 'text'), // green\n);\n</code></pre>\n<p>The full list of formats can be found in <a href=\"#modifiers\">modifiers</a>.</p>"
         },
         {
           "textRaw": "`util.toUSVString(string)`",
@@ -1510,7 +1524,10 @@
             ],
             "changes": [
               {
-                "version": "v23.11.0",
+                "version": [
+                  "v23.11.0",
+                  "v22.15.0"
+                ],
                 "pr-url": "https://github.com/nodejs/node/pull/57510",
                 "description": "Marking the API stable."
               }
@@ -1533,7 +1550,10 @@
             ],
             "changes": [
               {
-                "version": "v23.11.0",
+                "version": [
+                  "v23.11.0",
+                  "v22.15.0"
+                ],
                 "pr-url": "https://github.com/nodejs/node/pull/57510",
                 "description": "Marking the API stable."
               }
@@ -1566,10 +1586,14 @@
               "v19.7.0",
               "v18.16.0"
             ],
-            "changes": []
+            "changes": [
+              {
+                "version": "v24.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/57765",
+                "description": "Change stability index for this feature from Experimental to Stable."
+              }
+            ]
           },
-          "stability": 1,
-          "stabilityText": "Experimental",
           "signatures": [
             {
               "return": {
@@ -1607,7 +1631,10 @@
             ],
             "changes": [
               {
-                "version": "v23.11.0",
+                "version": [
+                  "v23.11.0",
+                  "v22.15.0"
+                ],
                 "pr-url": "https://github.com/nodejs/node/pull/57510",
                 "description": "Marking the API stable."
               }
@@ -2505,6 +2532,34 @@
                 }
               ],
               "desc": "<p>Returns <code>true</code> if the value is a native <code>External</code> value.</p>\n<p>A native <code>External</code> value is a special type of object that contains a\nraw C++ pointer (<code>void*</code>) for access from native code, and has no other\nproperties. Such objects are created either by Node.js internals or native\naddons. In JavaScript, they are <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze\">frozen</a> objects with a\n<code>null</code> prototype.</p>\n<pre><code class=\"language-c\">#include &#x3C;js_native_api.h>\n#include &#x3C;stdlib.h>\nnapi_value result;\nstatic napi_value MyNapi(napi_env env, napi_callback_info info) {\n  int* raw = (int*) malloc(1024);\n  napi_status status = napi_create_external(env, (void*) raw, NULL, NULL, &#x26;result);\n  if (status != napi_ok) {\n    napi_throw_error(env, NULL, \"napi_create_external failed\");\n    return NULL;\n  }\n  return result;\n}\n...\nDECLARE_NAPI_PROPERTY(\"myNapi\", MyNapi)\n...\n</code></pre>\n<pre><code class=\"language-mjs\">import native from 'napi_addon.node';\nimport { types } from 'node:util';\n\nconst data = native.myNapi();\ntypes.isExternal(data); // returns true\ntypes.isExternal(0); // returns false\ntypes.isExternal(new String('foo')); // returns false\n</code></pre>\n<pre><code class=\"language-cjs\">const native = require('napi_addon.node');\nconst { types } = require('node:util');\n\nconst data = native.myNapi();\ntypes.isExternal(data); // returns true\ntypes.isExternal(0); // returns false\ntypes.isExternal(new String('foo')); // returns false\n</code></pre>\n<p>For further information on <code>napi_create_external</code>, refer to\n<a href=\"n-api.html#napi_create_external\"><code>napi_create_external()</code></a>.</p>"
+            },
+            {
+              "textRaw": "`util.types.isFloat16Array(value)`",
+              "type": "method",
+              "name": "isFloat16Array",
+              "meta": {
+                "added": [
+                  "v24.0.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "return": {
+                    "textRaw": "Returns: {boolean}",
+                    "name": "return",
+                    "type": "boolean"
+                  },
+                  "params": [
+                    {
+                      "textRaw": "`value` {any}",
+                      "name": "value",
+                      "type": "any"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>Returns <code>true</code> if the value is a built-in <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float16Array\" class=\"type\">&lt;Float16Array&gt;</a> instance.</p>\n<pre><code class=\"language-js\">util.types.isFloat16Array(new ArrayBuffer());  // Returns false\nutil.types.isFloat16Array(new Float16Array());  // Returns true\nutil.types.isFloat16Array(new Float32Array());  // Returns false\n</code></pre>"
             },
             {
               "textRaw": "`util.types.isFloat32Array(value)`",

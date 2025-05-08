@@ -275,7 +275,9 @@ from being emitted by the `InterfaceConstructor` instance.
 ### `rl[Symbol.dispose]()`
 
 <!-- YAML
-added: v23.10.0
+added:
+  - v23.10.0
+  - v22.15.0
 -->
 
 Alias for `rl.close()`.
@@ -500,9 +502,11 @@ line prompts are included in the calculations.
 
 <!-- YAML
 added: v17.0.0
+changes:
+  - version: v24.0.0
+    pr-url: https://github.com/nodejs/node/pull/57513
+    description: Marking the API stable.
 -->
-
-> Stability: 1 - Experimental
 
 ### Class: `readlinePromises.Interface`
 

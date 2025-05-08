@@ -487,7 +487,6 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
             &EnvironmentOptions::permission,
             kAllowedInEnvvar,
             false);
-  AddAlias("--experimental-permission", "--permission");
   AddOption("--allow-fs-read",
             "allow permissions to read the filesystem",
             &EnvironmentOptions::allow_fs_read,
@@ -526,10 +525,11 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
   AddOption(
       "--experimental-wasi-unstable-preview1", "", NoOp{}, kAllowedInEnvvar);
   AddOption("--expose-gc", "expose gc extension", V8Option{}, kAllowedInEnvvar);
-  AddOption("--experimental-async-context-frame",
+  AddOption("--async-context-frame",
             "Improve AsyncLocalStorage performance with AsyncContextFrame",
             &EnvironmentOptions::async_context_frame,
-            kAllowedInEnvvar);
+            kAllowedInEnvvar,
+            true);
   AddOption("--expose-internals", "", &EnvironmentOptions::expose_internals);
   AddOption("--frozen-intrinsics",
             "experimental frozen intrinsics support",
@@ -760,6 +760,10 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
   AddOption("--test-coverage-exclude",
             "exclude files from coverage report that match this glob pattern",
             &EnvironmentOptions::coverage_exclude_pattern,
+            kAllowedInEnvvar);
+  AddOption("--test-global-setup",
+            "specifies the path to the global setup file",
+            &EnvironmentOptions::test_global_setup_path,
             kAllowedInEnvvar);
   AddOption("--test-udp-no-try-send", "",  // For testing only.
             &EnvironmentOptions::test_udp_no_try_send);
@@ -1056,8 +1060,7 @@ PerProcessOptionsParser::PerProcessOptionsParser(
             &PerProcessOptions::v8_thread_pool_size,
             kAllowedInEnvvar);
   AddOption("--zero-fill-buffers",
-            "automatically zero-fill all newly allocated Buffer and "
-            "SlowBuffer instances",
+            "automatically zero-fill all newly allocated Buffer instances",
             &PerProcessOptions::zero_fill_all_buffers,
             kAllowedInEnvvar);
   AddOption("--debug-arraybuffer-allocations",

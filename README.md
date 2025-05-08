@@ -5,9 +5,8 @@ This is a *fun* mod of Node.JS that initially embedded a modified version of dco
 
 Thanks to the inspiration from dcodeIO et al =D
 
-## Version 23.11.0
-* Update to Node.JS 23.11.0 baseline, and TypeScript 5.8.3.
-* Experimental: switch modes between REPL and run main module/script.
+## Version 24.0.0
+* Update to Node.JS 24.0.0 baseline.
 
 It embeds:
 * DS v1.2.2.
@@ -218,7 +217,7 @@ Usually when Node.JS launches, it gets locked into one of many modes, such as SE
   * The different modes are script in `lib/internal/main/*.js`.
     * Some codes in them have to be skipped to avoid crashing. For example, prepareMainThreadExecution() & markBootstrapComplete().
     * For REPL, `internal/repl` is modded to have a "Don't Exit" flag when closing REPL. The corresponding `process.closeRepl()` method added let's us to know if REPL mode is active, and is used to close the REPL without exiting Node.JS.
-  * Tested OK switching back and forth between runRepl & runMain.
+  * Tested OK switching back and forth between runRepl & runMain, and from SEA mode.
     * As noted, main module/script has to be purged from require.cache so as to let it be re-loaded and run again.
 
 
@@ -552,6 +551,8 @@ For information about the governance of the Node.js project, see
   **Kohei Ueno** <<kohei.ueno119@gmail.com>> (he/him)
 * [daeyeon](https://github.com/daeyeon) -
   **Daeyeon Jeong** <<daeyeon.dev@gmail.com>> (he/him)
+* [dario-piotrowicz](https://github.com/dario-piotrowicz) -
+  **Dario Piotrowicz** <<dario.piotrowicz@gmail.com>> (he/him)
 * [debadree25](https://github.com/debadree25) -
   **Debadree Chatterjee** <<debadree333@gmail.com>> (he/him)
 * [deokjinkim](https://github.com/deokjinkim) -

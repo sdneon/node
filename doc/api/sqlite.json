@@ -14,7 +14,7 @@
       },
       "stability": 1,
       "stabilityText": ".1 - Active development.",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v23.11.0/lib/sqlite.js\">lib/sqlite.js</a></p>\n<p>The <code>node:sqlite</code> module facilitates working with SQLite databases.\nTo access it:</p>\n<pre><code class=\"language-mjs\">import sqlite from 'node:sqlite';\n</code></pre>\n<pre><code class=\"language-cjs\">const sqlite = require('node:sqlite');\n</code></pre>\n<p>This module is only available under the <code>node:</code> scheme.</p>\n<p>The following example shows the basic usage of the <code>node:sqlite</code> module to open\nan in-memory database, write data to the database, and then read the data back.</p>\n<pre><code class=\"language-mjs\">import { DatabaseSync } from 'node:sqlite';\nconst database = new DatabaseSync(':memory:');\n\n// Execute SQL statements from strings.\ndatabase.exec(`\n  CREATE TABLE data(\n    key INTEGER PRIMARY KEY,\n    value TEXT\n  ) STRICT\n`);\n// Create a prepared statement to insert data into the database.\nconst insert = database.prepare('INSERT INTO data (key, value) VALUES (?, ?)');\n// Execute the prepared statement with bound values.\ninsert.run(1, 'hello');\ninsert.run(2, 'world');\n// Create a prepared statement to read data from the database.\nconst query = database.prepare('SELECT * FROM data ORDER BY key');\n// Execute the prepared statement and log the result set.\nconsole.log(query.all());\n// Prints: [ { key: 1, value: 'hello' }, { key: 2, value: 'world' } ]\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\nconst { DatabaseSync } = require('node:sqlite');\nconst database = new DatabaseSync(':memory:');\n\n// Execute SQL statements from strings.\ndatabase.exec(`\n  CREATE TABLE data(\n    key INTEGER PRIMARY KEY,\n    value TEXT\n  ) STRICT\n`);\n// Create a prepared statement to insert data into the database.\nconst insert = database.prepare('INSERT INTO data (key, value) VALUES (?, ?)');\n// Execute the prepared statement with bound values.\ninsert.run(1, 'hello');\ninsert.run(2, 'world');\n// Create a prepared statement to read data from the database.\nconst query = database.prepare('SELECT * FROM data ORDER BY key');\n// Execute the prepared statement and log the result set.\nconsole.log(query.all());\n// Prints: [ { key: 1, value: 'hello' }, { key: 2, value: 'world' } ]\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.0.0/lib/sqlite.js\">lib/sqlite.js</a></p>\n<p>The <code>node:sqlite</code> module facilitates working with SQLite databases.\nTo access it:</p>\n<pre><code class=\"language-mjs\">import sqlite from 'node:sqlite';\n</code></pre>\n<pre><code class=\"language-cjs\">const sqlite = require('node:sqlite');\n</code></pre>\n<p>This module is only available under the <code>node:</code> scheme.</p>\n<p>The following example shows the basic usage of the <code>node:sqlite</code> module to open\nan in-memory database, write data to the database, and then read the data back.</p>\n<pre><code class=\"language-mjs\">import { DatabaseSync } from 'node:sqlite';\nconst database = new DatabaseSync(':memory:');\n\n// Execute SQL statements from strings.\ndatabase.exec(`\n  CREATE TABLE data(\n    key INTEGER PRIMARY KEY,\n    value TEXT\n  ) STRICT\n`);\n// Create a prepared statement to insert data into the database.\nconst insert = database.prepare('INSERT INTO data (key, value) VALUES (?, ?)');\n// Execute the prepared statement with bound values.\ninsert.run(1, 'hello');\ninsert.run(2, 'world');\n// Create a prepared statement to read data from the database.\nconst query = database.prepare('SELECT * FROM data ORDER BY key');\n// Execute the prepared statement and log the result set.\nconsole.log(query.all());\n// Prints: [ { key: 1, value: 'hello' }, { key: 2, value: 'world' } ]\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\nconst { DatabaseSync } = require('node:sqlite');\nconst database = new DatabaseSync(':memory:');\n\n// Execute SQL statements from strings.\ndatabase.exec(`\n  CREATE TABLE data(\n    key INTEGER PRIMARY KEY,\n    value TEXT\n  ) STRICT\n`);\n// Create a prepared statement to insert data into the database.\nconst insert = database.prepare('INSERT INTO data (key, value) VALUES (?, ?)');\n// Execute the prepared statement with bound values.\ninsert.run(1, 'hello');\ninsert.run(2, 'world');\n// Create a prepared statement to read data from the database.\nconst query = database.prepare('SELECT * FROM data ORDER BY key');\n// Execute the prepared statement and log the result set.\nconsole.log(query.all());\n// Prints: [ { key: 1, value: 'hello' }, { key: 2, value: 'world' } ]\n</code></pre>",
       "classes": [
         {
           "textRaw": "Class: `DatabaseSync`",
@@ -26,7 +26,15 @@
             ],
             "changes": [
               {
-                "version": "v23.10.0",
+                "version": "v24.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/57752",
+                "description": "Add `timeout` option."
+              },
+              {
+                "version": [
+                  "v23.10.0",
+                  "v22.15.0"
+                ],
                 "pr-url": "https://github.com/nodejs/node/pull/56991",
                 "description": "The `path` argument now supports Buffer and URL objects."
               }
@@ -34,6 +42,23 @@
           },
           "desc": "<p>This class represents a single <a href=\"https://www.sqlite.org/c3ref/sqlite3.html\">connection</a> to a SQLite database. All APIs\nexposed by this class execute synchronously.</p>",
           "methods": [
+            {
+              "textRaw": "`database.aggregate(name, options)`",
+              "type": "method",
+              "name": "aggregate",
+              "meta": {
+                "added": [
+                  "v24.0.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>Registers a new aggregate function with the SQLite database. This method is a wrapper around\n<a href=\"https://www.sqlite.org/c3ref/create_function.html\"><code>sqlite3_create_window_function()</code></a>.</p>\n<ul>\n<li><code>name</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> The name of the SQLite function to create.</li>\n<li><code>options</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a> Function configuration settings.\n<ul>\n<li><code>deterministic</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type\" class=\"type\">&lt;boolean&gt;</a> If <code>true</code>, the <a href=\"https://www.sqlite.org/c3ref/c_deterministic.html\"><code>SQLITE_DETERMINISTIC</code></a> flag is\nset on the created function. <strong>Default:</strong> <code>false</code>.</li>\n<li><code>directOnly</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type\" class=\"type\">&lt;boolean&gt;</a> If <code>true</code>, the <a href=\"https://www.sqlite.org/c3ref/c_deterministic.html\"><code>SQLITE_DIRECTONLY</code></a> flag is set on\nthe created function. <strong>Default:</strong> <code>false</code>.</li>\n<li><code>useBigIntArguments</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type\" class=\"type\">&lt;boolean&gt;</a> If <code>true</code>, integer arguments to <code>options.step</code> and <code>options.inverse</code>\nare converted to <code>BigInt</code>s. If <code>false</code>, integer arguments are passed as\nJavaScript numbers. <strong>Default:</strong> <code>false</code>.</li>\n<li><code>varargs</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type\" class=\"type\">&lt;boolean&gt;</a> If <code>true</code>, <code>options.step</code> and <code>options.inverse</code> may be invoked with any number of\narguments (between zero and <a href=\"https://www.sqlite.org/limits.html#max_function_arg\"><code>SQLITE_MAX_FUNCTION_ARG</code></a>). If <code>false</code>,\n<code>inverse</code> and <code>step</code> must be invoked with exactly <code>length</code> arguments.\n<strong>Default:</strong> <code>false</code>.</li>\n<li><code>start</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type\" class=\"type\">&lt;null&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array\" class=\"type\">&lt;Array&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function\" class=\"type\">&lt;Function&gt;</a> The identity\nvalue for the aggregation function. This value is used when the aggregation\nfunction is initialized. When a <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function\" class=\"type\">&lt;Function&gt;</a> is passed the identity will be its return value.</li>\n<li><code>step</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function\" class=\"type\">&lt;Function&gt;</a> The function to call for each row in the aggregation. The\nfunction receives the current state and the row value. The return value of\nthis function should be the new state.</li>\n<li><code>result</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function\" class=\"type\">&lt;Function&gt;</a> The function to call to get the result of the\naggregation. The function receives the final state and should return the\nresult of the aggregation.</li>\n<li><code>inverse</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function\" class=\"type\">&lt;Function&gt;</a> When this function is provided, the <code>aggregate</code> method will work as a window function.\nThe function receives the current state and the dropped row value. The return value of this function should be the\nnew state.</li>\n</ul>\n</li>\n</ul>\n<p>When used as a window function, the <code>result</code> function will be called multiple times.</p>\n<pre><code class=\"language-cjs\">const { DatabaseSync } = require('node:sqlite');\n\nconst db = new DatabaseSync(':memory:');\ndb.exec(`\n  CREATE TABLE t3(x, y);\n  INSERT INTO t3 VALUES ('a', 4),\n                        ('b', 5),\n                        ('c', 3),\n                        ('d', 8),\n                        ('e', 1);\n`);\n\ndb.aggregate('sumint', {\n  start: 0,\n  step: (acc, value) => acc + value,\n});\n\ndb.prepare('SELECT sumint(y) as total FROM t3').get(); // { total: 21 }\n</code></pre>\n<pre><code class=\"language-mjs\">import { DatabaseSync } from 'node:sqlite';\n\nconst db = new DatabaseSync(':memory:');\ndb.exec(`\n  CREATE TABLE t3(x, y);\n  INSERT INTO t3 VALUES ('a', 4),\n                        ('b', 5),\n                        ('c', 3),\n                        ('d', 8),\n                        ('e', 1);\n`);\n\ndb.aggregate('sumint', {\n  start: 0,\n  step: (acc, value) => acc + value,\n});\n\ndb.prepare('SELECT sumint(y) as total FROM t3').get(); // { total: 21 }\n</code></pre>"
+            },
             {
               "textRaw": "`database.close()`",
               "type": "method",
@@ -57,7 +82,8 @@
               "name": "loadExtension",
               "meta": {
                 "added": [
-                  "v23.5.0"
+                  "v23.5.0",
+                  "v22.13.0"
                 ],
                 "changes": []
               },
@@ -81,7 +107,8 @@
               "name": "enableLoadExtension",
               "meta": {
                 "added": [
-                  "v23.5.0"
+                  "v23.5.0",
+                  "v22.13.0"
                 ],
                 "changes": []
               },
@@ -98,6 +125,37 @@
                 }
               ],
               "desc": "<p>Enables or disables the <code>loadExtension</code> SQL function, and the <code>loadExtension()</code>\nmethod. When <code>allowExtension</code> is <code>false</code> when constructing, you cannot enable\nloading extensions for security reasons.</p>"
+            },
+            {
+              "textRaw": "`database.location([dbName])`",
+              "type": "method",
+              "name": "location",
+              "meta": {
+                "added": [
+                  "v24.0.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "return": {
+                    "textRaw": "Returns: {string | null} The location of the database file. When using an in-memory database, this method returns null.",
+                    "name": "return",
+                    "type": "string | null",
+                    "desc": "The location of the database file. When using an in-memory database, this method returns null."
+                  },
+                  "params": [
+                    {
+                      "textRaw": "`dbName` {string} Name of the database. This can be `'main'` (the default primary database) or any other database that has been added with [`ATTACH DATABASE`][] **Default:** `'main'`.",
+                      "name": "dbName",
+                      "type": "string",
+                      "default": "`'main'`",
+                      "desc": "Name of the database. This can be `'main'` (the default primary database) or any other database that has been added with [`ATTACH DATABASE`][]"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>This method is a wrapper around <a href=\"https://sqlite.org/c3ref/db_filename.html\"><code>sqlite3_db_filename()</code></a></p>"
             },
             {
               "textRaw": "`database.exec(sql)`",
@@ -129,7 +187,8 @@
               "name": "function",
               "meta": {
                 "added": [
-                  "v23.5.0"
+                  "v23.5.0",
+                  "v22.13.0"
                 ],
                 "changes": []
               },
@@ -242,7 +301,8 @@
               "name": "createSession",
               "meta": {
                 "added": [
-                  "v23.3.0"
+                  "v23.3.0",
+                  "v22.12.0"
                 ],
                 "changes": []
               },
@@ -286,7 +346,8 @@
               "name": "applyChangeset",
               "meta": {
                 "added": [
-                  "v23.3.0"
+                  "v23.3.0",
+                  "v22.12.0"
                 ],
                 "changes": []
               },
@@ -363,7 +424,8 @@
               "name": "[Symbol.dispose]",
               "meta": {
                 "added": [
-                  "v23.11.0"
+                  "v23.11.0",
+                  "v22.15.0"
                 ],
                 "changes": []
               },
@@ -384,11 +446,24 @@
               "name": "isOpen",
               "meta": {
                 "added": [
-                  "v23.11.0"
+                  "v23.11.0",
+                  "v22.15.0"
                 ],
                 "changes": []
               },
               "desc": "Whether the database is currently open or not."
+            },
+            {
+              "textRaw": "`isTransaction` {boolean} Whether the database is currently within a transaction. This method is a wrapper around [`sqlite3_get_autocommit()`][].",
+              "type": "boolean",
+              "name": "isTransaction",
+              "meta": {
+                "added": [
+                  "v24.0.0"
+                ],
+                "changes": []
+              },
+              "desc": "Whether the database is currently within a transaction. This method is a wrapper around [`sqlite3_get_autocommit()`][]."
             }
           ],
           "signatures": [
@@ -440,6 +515,13 @@
                       "type": "boolean",
                       "default": "`false`",
                       "desc": "If `true`, the `loadExtension` SQL function and the `loadExtension()` method are enabled. You can call `enableLoadExtension(false)` later to disable this feature."
+                    },
+                    {
+                      "textRaw": "`timeout` {number} The [busy timeout][] in milliseconds. This is the maximum amount of time that SQLite will wait for a database lock to be released before returning an error. **Default:** `0`.",
+                      "name": "timeout",
+                      "type": "number",
+                      "default": "`0`",
+                      "desc": "The [busy timeout][] in milliseconds. This is the maximum amount of time that SQLite will wait for a database lock to be released before returning an error."
                     }
                   ]
                 }
@@ -454,7 +536,8 @@
           "name": "Session",
           "meta": {
             "added": [
-              "v23.3.0"
+              "v23.3.0",
+              "v22.12.0"
             ],
             "changes": []
           },
@@ -465,7 +548,8 @@
               "name": "changeset",
               "meta": {
                 "added": [
-                  "v23.3.0"
+                  "v23.3.0",
+                  "v22.12.0"
                 ],
                 "changes": []
               },
@@ -488,7 +572,8 @@
               "name": "patchset",
               "meta": {
                 "added": [
-                  "v23.3.0"
+                  "v23.3.0",
+                  "v22.12.0"
                 ],
                 "changes": []
               },
@@ -538,7 +623,10 @@
                 ],
                 "changes": [
                   {
-                    "version": "v23.7.0",
+                    "version": [
+                      "v23.7.0",
+                      "v22.14.0"
+                    ],
                     "pr-url": "https://github.com/nodejs/node/pull/56385",
                     "description": "Add support for `DataView` and typed array objects for `anonymousParameters`."
                   }
@@ -635,7 +723,10 @@
                 ],
                 "changes": [
                   {
-                    "version": "v23.7.0",
+                    "version": [
+                      "v23.7.0",
+                      "v22.14.0"
+                    ],
                     "pr-url": "https://github.com/nodejs/node/pull/56385",
                     "description": "Add support for `DataView` and typed array objects for `anonymousParameters`."
                   }
@@ -673,11 +764,15 @@
               "name": "iterate",
               "meta": {
                 "added": [
-                  "v23.4.0"
+                  "v23.4.0",
+                  "v22.13.0"
                 ],
                 "changes": [
                   {
-                    "version": "v23.7.0",
+                    "version": [
+                      "v23.7.0",
+                      "v22.14.0"
+                    ],
                     "pr-url": "https://github.com/nodejs/node/pull/56385",
                     "description": "Add support for `DataView` and typed array objects for `anonymousParameters`."
                   }
@@ -719,7 +814,10 @@
                 ],
                 "changes": [
                   {
-                    "version": "v23.7.0",
+                    "version": [
+                      "v23.7.0",
+                      "v22.14.0"
+                    ],
                     "pr-url": "https://github.com/nodejs/node/pull/56385",
                     "description": "Add support for `DataView` and typed array objects for `anonymousParameters`."
                   }
@@ -794,7 +892,8 @@
               "name": "setAllowUnknownNamedParameters",
               "meta": {
                 "added": [
-                  "v23.11.0"
+                  "v23.11.0",
+                  "v22.15.0"
                 ],
                 "changes": []
               },
@@ -962,7 +1061,8 @@
           "name": "constants",
           "meta": {
             "added": [
-              "v23.5.0"
+              "v23.5.0",
+              "v22.13.0"
             ],
             "changes": []
           },

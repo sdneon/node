@@ -119,6 +119,8 @@
 #include <unistd.h>        // STDIN_FILENO, STDERR_FILENO
 #endif
 
+#include "absl/synchronization/mutex.h"
+
 // ========== global C++ headers ==========
 
 #include <cerrno>
@@ -781,6 +783,10 @@ static ExitCode ProcessGlobalArgsInternal(std::vector<std::string>* args,
     env_opts->abort_on_uncaught_exception = true;
   }
 
+  if (env_opts->experimental_wasm_modules) {
+    v8_args.emplace_back("--js-source-phase-imports");
+  }
+
 #ifdef __POSIX__
   // Block SIGPROF signals when sleeping in epoll_wait/kevent/etc.  Avoids the
   // performance penalty of frequent EINTR wakeups when the profiler is running.
@@ -849,6 +855,11 @@ static ExitCode InitializeNodeWithArgsInternal(
   // Hence do not freeze flags when initializing V8. In a browser setting, this
   // is security relevant, for Node it's less important.
   V8::SetFlagsFromString("--no-freeze-flags-after-init");
+
+  // These features are completed and enabled by default in Chrome, but not
+  // in V8.
+  V8::SetFlagsFromString("--js-explicit-resource-management");
+  V8::SetFlagsFromString("--js-float16array");
 
 #if defined(NODE_V8_OPTIONS)
   // Should come before the call to V8::SetFlagsFromCommandLine()
@@ -1216,16 +1227,21 @@ InitializeOncePerProcessInternal(const std::vector<std::string>& args,
     result->platform_ = per_process::v8_platform.Platform();
   }
 
-  if (!(flags & ProcessInitializationFlags::kNoInitializeV8)) {
-    V8::Initialize();
-  }
-
   if (!(flags & ProcessInitializationFlags::kNoInitializeCppgc)) {
     v8::PageAllocator* allocator = nullptr;
     if (result->platform_ != nullptr) {
       allocator = result->platform_->GetPageAllocator();
     }
     cppgc::InitializeProcess(allocator);
+  }
+
+  if (!(flags & ProcessInitializationFlags::kNoInitializeV8)) {
+    V8::Initialize();
+
+    // Disable absl deadlock detection in V8 as it reports false-positive cases.
+    // TODO(legendecas): Replace this global disablement with case suppressions.
+    // https://github.com/nodejs/node-v8/issues/301
+    absl::SetMutexDeadlockDetectionMode(absl::OnDeadlockCycle::kIgnore);
   }
 
 #if NODE_USE_V8_WASM_TRAP_HANDLER

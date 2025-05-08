@@ -33,7 +33,9 @@ If you find a potential security vulnerability, please refer to our
 <!-- YAML
 added: v20.0.0
 changes:
-  - version: v23.5.0
+  - version:
+    - v23.5.0
+    - v22.13.0
     pr-url: https://github.com/nodejs/node/pull/56201
     description: This feature is no longer experimental.
 -->

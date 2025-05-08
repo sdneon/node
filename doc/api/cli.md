@@ -33,7 +33,8 @@ If a file is found, its path will be passed to the
 
 * The program was started with a command-line flag that forces the entry
   point to be loaded with ECMAScript module loader, such as `--import`.
-* The file has an `.mjs` extension.
+* The file has an `.mjs` or `.wasm` (with `--experimental-wasm-modules`)
+  extension.
 * The file does not have a `.cjs` extension, and the nearest parent
   `package.json` file contains a top-level [`"type"`][] field with a value of
   `"module"`.
@@ -193,7 +194,9 @@ process.
 <!-- YAML
 added: v20.0.0
 changes:
-  - version: v23.5.0
+  - version:
+    - v23.5.0
+    - v22.13.0
     pr-url: https://github.com/nodejs/node/pull/56201
     description: Permission Model and --allow-fs flags are stable.
   - version: v20.7.0
@@ -236,7 +239,9 @@ node --permission --allow-fs-read=/path/to/index.js index.js
 <!-- YAML
 added: v20.0.0
 changes:
-  - version: v23.5.0
+  - version:
+    - v23.5.0
+    - v22.13.0
     pr-url: https://github.com/nodejs/node/pull/56201
     description: Permission Model and --allow-fs flags are stable.
   - version: v20.7.0
@@ -573,7 +578,9 @@ property throw an exception with the code `ERR_PROTO_ACCESS`.
 ### `--disable-sigusr1`
 
 <!-- YAML
-added: v23.7.0
+added:
+  - v23.7.0
+  - v22.14.0
 -->
 
 > Stability: 1.2 - Release candidate
@@ -773,6 +780,7 @@ of `--enable-source-maps`.
 <!-- YAML
 added:
   - v23.0.0
+  - v22.10.0
 -->
 
 > Stability: 1 - Experimental
@@ -901,21 +909,6 @@ added: v23.6.0
 
 Enable experimental import support for `.node` addons.
 
-### `--experimental-async-context-frame`
-
-<!-- YAML
-added: v22.7.0
--->
-
-> Stability: 1 - Experimental
-
-Enables the use of [`AsyncLocalStorage`][] backed by `AsyncContextFrame` rather
-than the default implementation which relies on async\_hooks. This new model is
-implemented very differently and so could have differences in how context data
-flows within the application. As such, it is presently recommended to be sure
-your application behaviour is unaffected by this change before using it in
-production.
-
 ### `--experimental-config-file=config`
 
 <!-- YAML
@@ -1026,7 +1019,10 @@ Previously gated the entire `import.meta.resolve` feature.
 <!-- YAML
 added: v8.8.0
 changes:
-  - version: v23.6.1
+  - version:
+    - v23.6.1
+    - v22.13.1
+    - v20.18.2
     pr-url: https://github.com/nodejs-private/node-private/pull/629
     description: Using this feature with the permission model enabled requires
                  passing `--allow-worker`.
@@ -1076,7 +1072,10 @@ added:
   - v22.0.0
   - v20.17.0
 changes:
-  - version: v23.0.0
+  - version:
+    - v23.0.0
+    - v22.12.0
+    - v20.19.0
     pr-url: https://github.com/nodejs/node/pull/55085
     description: This is now true by default.
 -->
@@ -1135,7 +1134,10 @@ added:
   - v22.3.0
   - v20.18.0
 changes:
-  - version: v23.6.1
+  - version:
+    - v23.6.1
+    - v22.13.1
+    - v20.18.2
     pr-url: https://github.com/nodejs-private/node-private/pull/629
     description: Using this feature with the permission model enabled requires
                  passing `--allow-worker`.
@@ -1153,7 +1155,7 @@ This feature requires `--allow-worker` if used with the [Permission Model][].
 added: v22.7.0
 -->
 
-> Stability: 1.1 - Active development
+> Stability: 1.2 - Release candidate
 
 Enables the transformation of TypeScript-only syntax into JavaScript code.
 Implies `--enable-source-maps`.
@@ -1668,6 +1670,17 @@ Disable the `node-addons` exports condition as well as disable loading
 native addons. When `--no-addons` is specified, calling `process.dlopen` or
 requiring a native C++ addon will fail and throw an exception.
 
+### `--no-async-context-frame`
+
+<!-- YAML
+added: v24.0.0
+-->
+
+Disables the use of [`AsyncLocalStorage`][] backed by `AsyncContextFrame` and
+uses the prior implementation which relied on async\_hooks. The previous model
+is retained for compatibility with Electron and for cases where the context
+flow may differ. However, if a difference in flow is found please report it.
+
 ### `--no-deprecation`
 
 <!-- YAML
@@ -1685,6 +1698,7 @@ added:
 changes:
   - version:
     - v22.7.0
+    - v20.19.0
     pr-url: https://github.com/nodejs/node/pull/53619
     description: Syntax detection is enabled by default.
 -->
@@ -1716,7 +1730,10 @@ added:
   - v22.0.0
   - v20.17.0
 changes:
-  - version: v23.0.0
+  - version:
+    - v23.0.0
+    - v22.12.0
+    - v20.19.0
     pr-url: https://github.com/nodejs/node/pull/55085
     description: This is now false by default.
 -->
@@ -1732,7 +1749,9 @@ See [Loading ECMAScript modules using `require()`][].
 <!-- YAML
 added: v22.5.0
 changes:
-  - version: v23.4.0
+  - version:
+    - v23.4.0
+    - v22.13.0
     pr-url: https://github.com/nodejs/node/pull/55890
     description: SQLite is unflagged but still experimental.
 -->
@@ -1749,7 +1768,7 @@ changes:
     description: Type stripping is enabled by default.
 -->
 
-> Stability: 1.1 - Active development
+> Stability: 1.2 - Release candidate
 
 Disable experimental type-stripping for TypeScript files.
 For more information, see the [TypeScript type-stripping][] documentation.
@@ -1881,7 +1900,9 @@ developers may leverage to detect deprecated API usage.
 <!-- YAML
 added: v20.0.0
 changes:
-  - version: v23.5.0
+  - version:
+    - v23.5.0
+    - v22.13.0
     pr-url: https://github.com/nodejs/node/pull/56201
     description: Permission Model is now stable.
 -->
@@ -2037,7 +2058,9 @@ Location at which the report will be generated.
 ### `--report-exclude-env`
 
 <!-- YAML
-added: v23.3.0
+added:
+  - v23.3.0
+  - v22.13.0
 -->
 
 When `--report-exclude-env` is passed the diagnostic report generated will not
@@ -2429,6 +2452,19 @@ added:
 Configures the test runner to exit the process once all known tests have
 finished executing even if the event loop would otherwise remain active.
 
+### `--test-global-setup=module`
+
+<!-- YAML
+added: v24.0.0
+-->
+
+> Stability: 1.0 - Early development
+
+Specify a module that will be evaluated before all tests are executed and
+can be used to setup global state or fixtures for tests.
+
+See the documentation on [global setup and teardown][] for more details.
+
 ### `--test-isolation=mode`
 
 <!-- YAML
@@ -2561,7 +2597,9 @@ subtests inherit this value from their parent. The default value is `Infinity`.
 <!-- YAML
 added: v22.3.0
 changes:
-  - version: v23.4.0
+  - version:
+    - v23.4.0
+    - v22.13.0
     pr-url: https://github.com/nodejs/node/pull/55897
     description: Snapsnot testing is no longer experimental.
 -->
@@ -2679,7 +2717,9 @@ Print stack traces for deprecations.
 ### `--trace-env`
 
 <!-- YAML
-added: v23.4.0
+added:
+  - v23.4.0
+  - v22.13.0
 -->
 
 Print information about any access to environment variables done in the current Node.js
@@ -2702,7 +2742,9 @@ To print the stack trace of the access, use `--trace-env-js-stack` and/or
 ### `--trace-env-js-stack`
 
 <!-- YAML
-added: v23.4.0
+added:
+  - v23.4.0
+  - v22.13.0
 -->
 
 In addition to what `--trace-env` does, this prints the JavaScript stack trace of the access.
@@ -2710,7 +2752,9 @@ In addition to what `--trace-env` does, this prints the JavaScript stack trace o
 ### `--trace-env-native-stack`
 
 <!-- YAML
-added: v23.4.0
+added:
+  - v23.4.0
+  - v22.13.0
 -->
 
 In addition to what `--trace-env` does, this prints the native stack trace of the access.
@@ -2757,6 +2801,8 @@ i.e. invoking `process.exit()`.
 <!-- YAML
 added:
  - v23.5.0
+ - v22.13.0
+ - v20.19.0
 -->
 
 Prints information about usage of [Loading ECMAScript modules using `require()`][].
@@ -3065,8 +3111,7 @@ node --watch --watch-preserve-output test.js
 added: v6.0.0
 -->
 
-Automatically zero-fills all newly allocated [`Buffer`][] and [`SlowBuffer`][]
-instances.
+Automatically zero-fills all newly allocated [`Buffer`][] instances.
 
 ## Environment variables
 
@@ -3232,14 +3277,12 @@ one is included in the list below.
 * `--entry-url`
 * `--experimental-abortcontroller`
 * `--experimental-addon-modules`
-* `--experimental-async-context-frame`
 * `--experimental-detect-module`
 * `--experimental-eventsource`
 * `--experimental-import-meta-resolve`
 * `--experimental-json-modules`
 * `--experimental-loader`
 * `--experimental-modules`
-* `--experimental-permission`
 * `--experimental-print-required-tla`
 * `--experimental-require-module`
 * `--experimental-shadow-realm`
@@ -3276,6 +3319,7 @@ one is included in the list below.
 * `--napi-modules`
 * `--network-family-autoselection-attempt-timeout`
 * `--no-addons`
+* `--no-async-context-frame`
 * `--no-deprecation`
 * `--no-experimental-global-navigator`
 * `--no-experimental-repl-await`
@@ -3315,6 +3359,7 @@ one is included in the list below.
 * `--test-coverage-functions`
 * `--test-coverage-include`
 * `--test-coverage-lines`
+* `--test-global-setup`
 * `--test-isolation`
 * `--test-name-pattern`
 * `--test-only`
@@ -3490,6 +3535,21 @@ Node.js makes no guarantees about the reporter format used or its stability.
 If `value` equals `'0'`, certificate validation is disabled for TLS connections.
 This makes TLS, and HTTPS by extension, insecure. The use of this environment
 variable is strongly discouraged.
+
+### `NODE_USE_ENV_PROXY=1`
+
+<!-- YAML
+added: v24.0.0
+-->
+
+> Stability: 1.1 - Active Development
+
+When enabled, Node.js parses the `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY`
+environment variables during startup, and tunnels requests over the
+specified proxy.
+
+This currently only affects requests sent over `fetch()`. Support for other
+built-in `http` and `https` methods is under way.
 
 ### `NODE_V8_COVERAGE=dir`
 
@@ -3826,7 +3886,6 @@ node --stack-trace-limit=12 -p -e "Error.stackTraceLimit" # prints 12
 [`ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX`]: errors.md#err_unsupported_typescript_syntax
 [`NODE_OPTIONS`]: #node_optionsoptions
 [`NO_COLOR`]: https://no-color.org
-[`SlowBuffer`]: buffer.md#class-slowbuffer
 [`Web Storage`]: https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API
 [`WebSocket`]: https://developer.mozilla.org/en-US/docs/Web/API/WebSocket
 [`YoungGenerationSizeFromSemiSpaceSize`]: https://chromium.googlesource.com/v8/v8.git/+/refs/tags/10.3.129/src/heap/heap.cc#328
@@ -3851,6 +3910,7 @@ node --stack-trace-limit=12 -p -e "Error.stackTraceLimit" # prints 12
 [emit_warning]: process.md#processemitwarningwarning-options
 [environment_variables]: #environment-variables
 [filtering tests by name]: test.md#filtering-tests-by-name
+[global setup and teardown]: test.md#global-setup-and-teardown
 [jitless]: https://v8.dev/blog/jitless
 [libuv threadpool documentation]: https://docs.libuv.org/en/latest/threadpool.html
 [module compile cache]: module.md#module-compile-cache

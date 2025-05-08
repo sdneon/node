@@ -2,7 +2,9 @@
 
 <!-- YAML
 changes:
-  - version: v23.5.0
+  - version:
+    - v23.5.0
+    - v22.13.0
     pr-url: https://github.com/nodejs/node/pull/56142
     description: Algorithms `Ed25519` and `X25519` are now stable.
   - version:
@@ -578,6 +580,7 @@ changes:
   - version:
     - v22.5.0
     - v20.17.0
+    - v18.20.5
     pr-url: https://github.com/nodejs/node/pull/53601
     description: The length parameter is now optional for `'ECDH'`, `'X25519'`,
                  and `'X448'`.

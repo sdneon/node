@@ -19,7 +19,7 @@ const jsGlobalTypes = [
   'TypeError', 'URIError', 'WeakMap', 'WeakSet',
 
   'TypedArray',
-  'Float32Array', 'Float64Array',
+  'Float16Array', 'Float32Array', 'Float64Array',
   'Int8Array', 'Int16Array', 'Int32Array',
   'Uint8Array', 'Uint8ClampedArray', 'Uint16Array', 'Uint32Array',
 ];
@@ -75,8 +75,8 @@ const customTypesMap = {
 
   'cluster.Worker': 'cluster.html#class-worker',
 
-  'Cipher': 'crypto.html#class-cipher',
-  'Decipher': 'crypto.html#class-decipher',
+  'Cipheriv': 'crypto.html#class-cipheriv',
+  'Decipheriv': 'crypto.html#class-decipheriv',
   'DiffieHellman': 'crypto.html#class-diffiehellman',
   'DiffieHellmanGroup': 'crypto.html#class-diffiehellmangroup',
   'ECDH': 'crypto.html#class-ecdh',

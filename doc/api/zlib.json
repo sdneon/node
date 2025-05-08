@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v23.11.0/lib/zlib.js\">lib/zlib.js</a></p>\n<p>The <code>node:zlib</code> module provides compression functionality implemented using\nGzip, Deflate/Inflate, Brotli, and Zstd.</p>\n<p>To access it:</p>\n<pre><code class=\"language-mjs\">import os from 'node:zlib';\n</code></pre>\n<pre><code class=\"language-cjs\">const zlib = require('node:zlib');\n</code></pre>\n<p>Compression and decompression are built around the Node.js <a href=\"stream.html\">Streams API</a>.</p>\n<p>Compressing or decompressing a stream (such as a file) can be accomplished by\npiping the source stream through a <code>zlib</code> <code>Transform</code> stream into a destination\nstream:</p>\n<pre><code class=\"language-mjs\">import {\n  createReadStream,\n  createWriteStream,\n} from 'node:fs';\nimport process from 'node:process';\nimport { createGzip } from 'node:zlib';\nimport { pipeline } from 'node:stream';\n\nconst gzip = createGzip();\nconst source = createReadStream('input.txt');\nconst destination = createWriteStream('input.txt.gz');\n\npipeline(source, gzip, destination, (err) => {\n  if (err) {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  }\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  createReadStream,\n  createWriteStream,\n} = require('node:fs');\nconst process = require('node:process');\nconst { createGzip } = require('node:zlib');\nconst { pipeline } = require('node:stream');\n\nconst gzip = createGzip();\nconst source = createReadStream('input.txt');\nconst destination = createWriteStream('input.txt.gz');\n\npipeline(source, gzip, destination, (err) => {\n  if (err) {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  }\n});\n</code></pre>\n<p>Or, using the promise <code>pipeline</code> API:</p>\n<pre><code class=\"language-mjs\">import {\n  createReadStream,\n  createWriteStream,\n} from 'node:fs';\nimport process from 'node:process';\nimport { createGzip } from 'node:zlib';\nimport { pipeline } from 'node:stream/promises';\n\nasync function do_gzip(input, output) {\n  const gzip = createGzip();\n  const source = createReadStream(input);\n  const destination = createWriteStream(output);\n  await pipeline(source, gzip, destination);\n}\n\nawait do_gzip('input.txt', 'input.txt.gz');\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  createReadStream,\n  createWriteStream,\n} = require('node:fs');\nconst process = require('node:process');\nconst { createGzip } = require('node:zlib');\nconst { pipeline } = require('node:stream/promises');\n\nasync function do_gzip(input, output) {\n  const gzip = createGzip();\n  const source = createReadStream(input);\n  const destination = createWriteStream(output);\n  await pipeline(source, gzip, destination);\n}\n\ndo_gzip('input.txt', 'input.txt.gz')\n  .catch((err) => {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  });\n</code></pre>\n<p>It is also possible to compress or decompress data in a single step:</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\nimport { Buffer } from 'node:buffer';\nimport { deflate, unzip } from 'node:zlib';\n\nconst input = '.................................';\ndeflate(input, (err, buffer) => {\n  if (err) {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  }\n  console.log(buffer.toString('base64'));\n});\n\nconst buffer = Buffer.from('eJzT0yMAAGTvBe8=', 'base64');\nunzip(buffer, (err, buffer) => {\n  if (err) {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  }\n  console.log(buffer.toString());\n});\n\n// Or, Promisified\n\nimport { promisify } from 'node:util';\nconst do_unzip = promisify(unzip);\n\nconst unzippedBuffer = await do_unzip(buffer);\nconsole.log(unzippedBuffer.toString());\n</code></pre>\n<pre><code class=\"language-cjs\">const { deflate, unzip } = require('node:zlib');\n\nconst input = '.................................';\ndeflate(input, (err, buffer) => {\n  if (err) {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  }\n  console.log(buffer.toString('base64'));\n});\n\nconst buffer = Buffer.from('eJzT0yMAAGTvBe8=', 'base64');\nunzip(buffer, (err, buffer) => {\n  if (err) {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  }\n  console.log(buffer.toString());\n});\n\n// Or, Promisified\n\nconst { promisify } = require('node:util');\nconst do_unzip = promisify(unzip);\n\ndo_unzip(buffer)\n  .then((buf) => console.log(buf.toString()))\n  .catch((err) => {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  });\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.0.0/lib/zlib.js\">lib/zlib.js</a></p>\n<p>The <code>node:zlib</code> module provides compression functionality implemented using\nGzip, Deflate/Inflate, Brotli, and Zstd.</p>\n<p>To access it:</p>\n<pre><code class=\"language-mjs\">import os from 'node:zlib';\n</code></pre>\n<pre><code class=\"language-cjs\">const zlib = require('node:zlib');\n</code></pre>\n<p>Compression and decompression are built around the Node.js <a href=\"stream.html\">Streams API</a>.</p>\n<p>Compressing or decompressing a stream (such as a file) can be accomplished by\npiping the source stream through a <code>zlib</code> <code>Transform</code> stream into a destination\nstream:</p>\n<pre><code class=\"language-mjs\">import {\n  createReadStream,\n  createWriteStream,\n} from 'node:fs';\nimport process from 'node:process';\nimport { createGzip } from 'node:zlib';\nimport { pipeline } from 'node:stream';\n\nconst gzip = createGzip();\nconst source = createReadStream('input.txt');\nconst destination = createWriteStream('input.txt.gz');\n\npipeline(source, gzip, destination, (err) => {\n  if (err) {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  }\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  createReadStream,\n  createWriteStream,\n} = require('node:fs');\nconst process = require('node:process');\nconst { createGzip } = require('node:zlib');\nconst { pipeline } = require('node:stream');\n\nconst gzip = createGzip();\nconst source = createReadStream('input.txt');\nconst destination = createWriteStream('input.txt.gz');\n\npipeline(source, gzip, destination, (err) => {\n  if (err) {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  }\n});\n</code></pre>\n<p>Or, using the promise <code>pipeline</code> API:</p>\n<pre><code class=\"language-mjs\">import {\n  createReadStream,\n  createWriteStream,\n} from 'node:fs';\nimport process from 'node:process';\nimport { createGzip } from 'node:zlib';\nimport { pipeline } from 'node:stream/promises';\n\nasync function do_gzip(input, output) {\n  const gzip = createGzip();\n  const source = createReadStream(input);\n  const destination = createWriteStream(output);\n  await pipeline(source, gzip, destination);\n}\n\nawait do_gzip('input.txt', 'input.txt.gz');\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  createReadStream,\n  createWriteStream,\n} = require('node:fs');\nconst process = require('node:process');\nconst { createGzip } = require('node:zlib');\nconst { pipeline } = require('node:stream/promises');\n\nasync function do_gzip(input, output) {\n  const gzip = createGzip();\n  const source = createReadStream(input);\n  const destination = createWriteStream(output);\n  await pipeline(source, gzip, destination);\n}\n\ndo_gzip('input.txt', 'input.txt.gz')\n  .catch((err) => {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  });\n</code></pre>\n<p>It is also possible to compress or decompress data in a single step:</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\nimport { Buffer } from 'node:buffer';\nimport { deflate, unzip } from 'node:zlib';\n\nconst input = '.................................';\ndeflate(input, (err, buffer) => {\n  if (err) {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  }\n  console.log(buffer.toString('base64'));\n});\n\nconst buffer = Buffer.from('eJzT0yMAAGTvBe8=', 'base64');\nunzip(buffer, (err, buffer) => {\n  if (err) {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  }\n  console.log(buffer.toString());\n});\n\n// Or, Promisified\n\nimport { promisify } from 'node:util';\nconst do_unzip = promisify(unzip);\n\nconst unzippedBuffer = await do_unzip(buffer);\nconsole.log(unzippedBuffer.toString());\n</code></pre>\n<pre><code class=\"language-cjs\">const { deflate, unzip } = require('node:zlib');\n\nconst input = '.................................';\ndeflate(input, (err, buffer) => {\n  if (err) {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  }\n  console.log(buffer.toString('base64'));\n});\n\nconst buffer = Buffer.from('eJzT0yMAAGTvBe8=', 'base64');\nunzip(buffer, (err, buffer) => {\n  if (err) {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  }\n  console.log(buffer.toString());\n});\n\n// Or, Promisified\n\nconst { promisify } = require('node:util');\nconst do_unzip = promisify(unzip);\n\ndo_unzip(buffer)\n  .then((buf) => console.log(buf.toString()))\n  .catch((err) => {\n    console.error('An error occurred:', err);\n    process.exitCode = 1;\n  });\n</code></pre>",
       "modules": [
         {
           "textRaw": "Threadpool usage and performance considerations",
@@ -125,7 +125,8 @@
               "stabilityText": "Experimental",
               "meta": {
                 "added": [
-                  "v23.8.0"
+                  "v23.8.0",
+                  "v22.15.0"
                 ],
                 "changes": []
               },
@@ -230,7 +231,8 @@
           "stabilityText": "Experimental",
           "meta": {
             "added": [
-              "v23.8.0"
+              "v23.8.0",
+              "v22.15.0"
             ],
             "changes": []
           },
@@ -1013,7 +1015,8 @@
               "stabilityText": "Experimental",
               "meta": {
                 "added": [
-                  "v23.8.0"
+                  "v23.8.0",
+                  "v22.15.0"
                 ],
                 "changes": []
               },
@@ -1047,7 +1050,8 @@
               "stabilityText": "Experimental",
               "meta": {
                 "added": [
-                  "v23.8.0"
+                  "v23.8.0",
+                  "v22.15.0"
                 ],
                 "changes": []
               },
@@ -1075,7 +1079,8 @@
               "name": "zstdDecompress",
               "meta": {
                 "added": [
-                  "v23.8.0"
+                  "v23.8.0",
+                  "v22.15.0"
                 ],
                 "changes": []
               },
@@ -1109,7 +1114,8 @@
               "stabilityText": "Experimental",
               "meta": {
                 "added": [
-                  "v23.8.0"
+                  "v23.8.0",
+                  "v22.15.0"
                 ],
                 "changes": []
               },
@@ -1430,7 +1436,8 @@
           "stabilityText": "Experimental",
           "meta": {
             "added": [
-              "v23.8.0"
+              "v23.8.0",
+              "v22.15.0"
             ],
             "changes": []
           },
@@ -1444,7 +1451,8 @@
           "stabilityText": "Experimental",
           "meta": {
             "added": [
-              "v23.8.0"
+              "v23.8.0",
+              "v22.15.0"
             ],
             "changes": []
           },
@@ -1720,7 +1728,8 @@
           "stabilityText": "Experimental",
           "meta": {
             "added": [
-              "v23.8.0"
+              "v23.8.0",
+              "v22.15.0"
             ],
             "changes": []
           },
@@ -1745,7 +1754,8 @@
           "stabilityText": "Experimental",
           "meta": {
             "added": [
-              "v23.8.0"
+              "v23.8.0",
+              "v22.15.0"
             ],
             "changes": []
           },
@@ -2533,7 +2543,8 @@
           "stabilityText": "Experimental",
           "meta": {
             "added": [
-              "v23.8.0"
+              "v23.8.0",
+              "v22.15.0"
             ],
             "changes": []
           },
@@ -2567,7 +2578,8 @@
           "stabilityText": "Experimental",
           "meta": {
             "added": [
-              "v23.8.0"
+              "v23.8.0",
+              "v22.15.0"
             ],
             "changes": []
           },
@@ -2595,7 +2607,8 @@
           "name": "zstdDecompress",
           "meta": {
             "added": [
-              "v23.8.0"
+              "v23.8.0",
+              "v22.15.0"
             ],
             "changes": []
           },
@@ -2629,7 +2642,8 @@
           "stabilityText": "Experimental",
           "meta": {
             "added": [
-              "v23.8.0"
+              "v23.8.0",
+              "v22.15.0"
             ],
             "changes": []
           },
