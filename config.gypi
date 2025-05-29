@@ -432,6 +432,7 @@
                  'node_use_node_code_cache': 'true',
                  'node_use_node_snapshot': 'true',
                  'node_use_openssl': 'true',
+                 'node_use_sqlite': 'true',
                  'node_use_v8_platform': 'true',
                  'node_with_ltcg': 'true',
                  'node_without_node_options': 'false',
