@@ -309,6 +309,13 @@ void ModuleWrap::New(const FunctionCallbackInfo<Value>& args) {
       }
 
       if (that->Set(context,
+                    realm->env()->source_url_string(),
+                    module->GetUnboundModuleScript()->GetSourceURL())
+              .IsNothing()) {
+        return;
+      }
+
+      if (that->Set(context,
                     realm->env()->source_map_url_string(),
                     module->GetUnboundModuleScript()->GetSourceMappingURL())
               .IsNothing()) {
@@ -776,11 +783,10 @@ void ModuleWrap::GetNamespaceSync(const FunctionCallbackInfo<Value>& args) {
       return realm->env()->ThrowError(
           "Cannot get namespace, module has not been instantiated");
     case Module::Status::kInstantiated:
+    case Module::Status::kEvaluating:
     case Module::Status::kEvaluated:
     case Module::Status::kErrored:
       break;
-    case Module::Status::kEvaluating:
-      UNREACHABLE();
   }
 
   if (module->IsGraphAsync()) {
@@ -1020,16 +1026,23 @@ static MaybeLocal<Promise> ImportModuleDynamicallyWithPhase(
   };
 
   Local<Value> result;
-  if (import_callback->Call(
-        context,
-        Undefined(isolate),
-        arraysize(import_args),
-        import_args).ToLocal(&result)) {
-    CHECK(result->IsPromise());
-    return handle_scope.Escape(result.As<Promise>());
+  if (!import_callback
+           ->Call(
+               context, Undefined(isolate), arraysize(import_args), import_args)
+           .ToLocal(&result)) {
+    return {};
   }
 
-  return MaybeLocal<Promise>();
+  // Wrap the returned value in a promise created in the referrer context to
+  // avoid dynamic scopes.
+  Local<Promise::Resolver> resolver;
+  if (!Promise::Resolver::New(context).ToLocal(&resolver)) {
+    return {};
+  }
+  if (resolver->Resolve(context, result).IsNothing()) {
+    return {};
+  }
+  return handle_scope.Escape(resolver->GetPromise());
 }
 
 static MaybeLocal<Promise> ImportModuleDynamically(
@@ -1058,10 +1071,8 @@ void ModuleWrap::SetImportModuleDynamicallyCallback(
   realm->set_host_import_module_dynamically_callback(import_callback);
 
   isolate->SetHostImportModuleDynamicallyCallback(ImportModuleDynamically);
-  // TODO(guybedford): Enable this once
-  //                   https://github.com/nodejs/node/pull/56842 lands.
-  // isolate->SetHostImportModuleWithPhaseDynamicallyCallback(
-  //     ImportModuleDynamicallyWithPhase);
+  isolate->SetHostImportModuleWithPhaseDynamicallyCallback(
+      ImportModuleDynamicallyWithPhase);
 }
 
 void ModuleWrap::HostInitializeImportMetaObjectCallback(

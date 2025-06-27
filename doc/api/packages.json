@@ -220,6 +220,29 @@
                   "desc": "<p>Package authors should provide either extensioned (<code>import 'pkg/subpath.js'</code>) or\nextensionless (<code>import 'pkg/subpath'</code>) subpaths in their exports. This ensures\nthat there is only one subpath for each exported module so that all dependents\nimport the same consistent specifier, keeping the package contract clear for\nconsumers and simplifying package subpath completions.</p>\n<p>Traditionally, packages tended to use the extensionless style, which has the\nbenefits of readability and of masking the true path of the file within the\npackage.</p>\n<p>With <a href=\"https://github.com/WICG/import-maps\">import maps</a> now providing a standard for package resolution in browsers\nand other JavaScript runtimes, using the extensionless style can result in\nbloated import map definitions. Explicit file extensions can avoid this issue by\nenabling the import map to utilize a <a href=\"https://github.com/WICG/import-maps#packages-via-trailing-slashes\">packages folder mapping</a> to map multiple\nsubpaths where possible instead of a separate map entry per package subpath\nexport. This also mirrors the requirement of using <a href=\"esm.html#mandatory-file-extensions\">the full specifier path</a>\nin relative and absolute import specifiers.</p>",
                   "type": "module",
                   "displayName": "Extensions in subpaths"
+                },
+                {
+                  "textRaw": "Path Rules and Validation for Export Targets",
+                  "name": "path_rules_and_validation_for_export_targets",
+                  "desc": "<p>When defining paths as targets in the <a href=\"#exports\"><code>\"exports\"</code></a> field, Node.js enforces\nseveral rules to ensure security, predictability, and proper encapsulation.\nUnderstanding these rules is crucial for authors publishing packages.</p>",
+                  "modules": [
+                    {
+                      "textRaw": "Targets must be relative URLs",
+                      "name": "targets_must_be_relative_urls",
+                      "desc": "<p>All target paths in the <a href=\"#exports\"><code>\"exports\"</code></a> map (the values associated with export\nkeys) must be relative URL strings starting with <code>./</code>.</p>\n<pre><code class=\"language-json\">// package.json\n{\n  \"name\": \"my-package\",\n  \"exports\": {\n    \".\": \"./dist/main.js\",          // Correct\n    \"./feature\": \"./lib/feature.js\", // Correct\n    // \"./origin-relative\": \"/dist/main.js\", // Incorrect: Must start with ./\n    // \"./absolute\": \"file:///dev/null\", // Incorrect: Must start with ./\n    // \"./outside\": \"../common/util.js\" // Incorrect: Must start with ./\n  }\n}\n</code></pre>\n<p>Reasons for this behavior include:</p>\n<ul>\n<li><strong>Security:</strong> Prevents exporting arbitrary files from outside the\npackage's own directory.</li>\n<li><strong>Encapsulation:</strong> Ensures all exported paths are resolved relative to\nthe package root, making the package self-contained.</li>\n</ul>",
+                      "type": "module",
+                      "displayName": "Targets must be relative URLs"
+                    },
+                    {
+                      "textRaw": "No path traversal or invalid segments",
+                      "name": "no_path_traversal_or_invalid_segments",
+                      "desc": "<p>Export targets must not resolve to a location outside the package's root\ndirectory. Additionally, path segments like <code>.</code> (single dot), <code>..</code> (double dot),\nor <code>node_modules</code> (and their URL-encoded equivalents) are generally disallowed\nwithin the <code>target</code> string after the initial <code>./</code> and in any <code>subpath</code> part\nsubstituted into a target pattern.</p>\n<pre><code class=\"language-json\">// package.json\n{\n  \"name\": \"my-package\",\n  \"exports\": {\n    // \".\": \"./dist/../../elsewhere/file.js\", // Invalid: path traversal\n    // \".\": \"././dist/main.js\",             // Invalid: contains \".\" segment\n    // \".\": \"./dist/../dist/main.js\",       // Invalid: contains \"..\" segment\n    // \"./utils/./helper.js\": \"./utils/helper.js\" // Key has invalid segment\n  }\n}\n</code></pre>",
+                      "type": "module",
+                      "displayName": "No path traversal or invalid segments"
+                    }
+                  ],
+                  "type": "module",
+                  "displayName": "Path Rules and Validation for Export Targets"
                 }
               ],
               "type": "module",

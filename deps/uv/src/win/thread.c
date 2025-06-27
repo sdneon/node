@@ -57,6 +57,9 @@ STATIC_ASSERT(sizeof(uv_thread_t) <= sizeof(void*));
 
 static uv_key_t uv__current_thread_key;
 static uv_once_t uv__current_thread_init_guard = UV_ONCE_INIT;
+static uv_once_t uv__thread_name_once = UV_ONCE_INIT;
+HRESULT (WINAPI *pGetThreadDescription)(HANDLE, PWSTR*);
+HRESULT (WINAPI *pSetThreadDescription)(HANDLE, PCWSTR);
 
 
 static void uv__init_current_thread_key(void) {
@@ -278,12 +281,27 @@ int uv_thread_equal(const uv_thread_t* t1, const uv_thread_t* t2) {
 }
 
 
+static void uv__thread_name_init_once(void) {
+  HMODULE m;
+
+  m = GetModuleHandleA("api-ms-win-core-processthreads-l1-1-3.dll");
+  if (m != NULL) {
+    pGetThreadDescription = (void*) GetProcAddress(m, "GetThreadDescription");
+    pSetThreadDescription = (void*) GetProcAddress(m, "SetThreadDescription");
+  }
+}
+
+
 int uv_thread_setname(const char* name) {
-#if WINVER >= 0x0603  // >= Windows 8.1
   HRESULT hr;
   WCHAR* namew;
   int err;
   char namebuf[UV_PTHREAD_MAX_NAMELEN_NP];
+
+  uv_once(&uv__thread_name_once, uv__thread_name_init_once);
+
+  if (pSetThreadDescription == NULL)
+    return UV_ENOSYS;
 
   if (name == NULL)
     return UV_EINVAL;
@@ -296,38 +314,48 @@ int uv_thread_setname(const char* name) {
   if (err)
     return err;
 
-  hr = SetThreadDescription(GetCurrentThread(), namew);
+  hr = pSetThreadDescription(GetCurrentThread(), namew);
   uv__free(namew);
   if (FAILED(hr))
     return uv_translate_sys_error(HRESULT_CODE(hr));
-#endif
+
   return 0;
 }
 
 
 int uv_thread_getname(uv_thread_t* tid, char* name, size_t size) {
+  HRESULT hr;
+  WCHAR* namew;
+  char* thread_name;
+  size_t buf_size;
+  int r;
+  DWORD exit_code;
+
+  uv_once(&uv__thread_name_once, uv__thread_name_init_once);
+
+  if (pGetThreadDescription == NULL)
+    return UV_ENOSYS;
+
   if (name == NULL || size == 0)
     return UV_EINVAL;
 
   if (tid == NULL || *tid == NULL)
     return UV_EINVAL;
 
-  DWORD exit_code;
   /* Check if the thread handle is valid */
   if (!GetExitCodeThread(*tid, &exit_code) || exit_code != STILL_ACTIVE)
     return UV_ENOENT;
 
 #if WINVER >= 0x0603  // >= Windows 8.1
-
-  HRESULT hr = GetThreadDescription(*tid, &namew);
+  namew = NULL;
+  thread_name = NULL;
+  hr = pGetThreadDescription(*tid, &namew);
   if (FAILED(hr))
     return uv_translate_sys_error(HRESULT_CODE(hr));
 
-  WCHAR* namew = NULL;
-  size_t buf_size = size;
-  int r = uv__copy_utf16_to_utf8(namew, -1, name, &buf_size);
+  buf_size = size;
+  r = uv__copy_utf16_to_utf8(namew, -1, name, &buf_size);
   if (r == UV_ENOBUFS) {
-    char* thread_name = NULL;
     r = uv__convert_utf16_to_utf8(namew, wcslen(namew), &thread_name);
     if (r == 0) {
       uv__strscpy(name, thread_name, size);

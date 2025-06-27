@@ -5,8 +5,8 @@ This is a *fun* mod of Node.JS that initially embedded a modified version of dco
 
 Thanks to the inspiration from dcodeIO et al =D
 
-## Version 24.1.0
-* Update to Node.JS 24.1.0 baseline.
+## Version 24.3.0
+* Update to Node.JS 24.3.0 baseline.
 
 It embeds:
 * DS v1.2.2.
@@ -414,6 +414,8 @@ For information about the governance of the Node.js project, see
   **Matteo Collina** <<matteo.collina@gmail.com>> (he/him)
 * [mhdawson](https://github.com/mhdawson) -
   **Michael Dawson** <<midawson@redhat.com>> (he/him)
+* [panva](https://github.com/panva) -
+  **Filip Skokan** <<panva.ip@gmail.com>> (he/him)
 * [RafaelGSS](https://github.com/RafaelGSS) -
   **Rafael Gonzaga** <<rafael.nunu@hotmail.com>> (he/him)
 * [RaisinTen](https://github.com/RaisinTen) -
@@ -587,6 +589,8 @@ For information about the governance of the Node.js project, see
   **Harshitha K P** <<harshitha014@gmail.com>> (she/her)
 * [himself65](https://github.com/himself65) -
   **Zeyu "Alex" Yang** <<himself65@outlook.com>> (he/him)
+* [islandryu](https://github.com/islandryu) -
+  **Ryuhei Shima** <<shimaryuhei@gmail.com>> (he/him)
 * [jakecastelli](https://github.com/jakecastelli) -
   **Jake Yuesong Li** <<jake.yuesong@gmail.com>> (he/him)
 * [JakobJingleheimer](https://github.com/JakobJingleheimer) -
@@ -635,14 +639,12 @@ For information about the governance of the Node.js project, see
   **Xuguang Mei** <<meixuguang@gmail.com>> (he/him)
 * [mhdawson](https://github.com/mhdawson) -
   **Michael Dawson** <<midawson@redhat.com>> (he/him)
-* [mildsunrise](https://github.com/mildsunrise) -
-  **Alba Mendez** <<me@alba.sh>> (she/her)
 * [MoLow](https://github.com/MoLow) -
   **Moshe Atlow** <<moshe@atlow.co.il>> (he/him)
 * [MrJithil](https://github.com/MrJithil) -
   **Jithil P Ponnan** <<jithil@outlook.com>> (he/him)
 * [panva](https://github.com/panva) -
-  **Filip Skokan** <<panva.ip@gmail.com>> (he/him)
+  **Filip Skokan** <<panva.ip@gmail.com>> (he/him) - [Support me](https://github.com/sponsors/panva)
 * [pimterry](https://github.com/pimterry) -
   **Tim Perry** <<pimterry@gmail.com>> (he/him)
 * [pmarchini](https://github.com/pmarchini) -
@@ -845,6 +847,8 @@ For information about the governance of the Node.js project, see
   **Mikeal Rogers** <<mikeal.rogers@gmail.com>>
 * [miladfarca](https://github.com/miladfarca) -
   **Milad Fa** <<mfarazma@redhat.com>> (he/him)
+* [mildsunrise](https://github.com/mildsunrise) -
+  **Alba Mendez** <<me@alba.sh>> (she/her)
 * [misterdjules](https://github.com/misterdjules) -
   **Julien Gilli** <<jgilli@netflix.com>>
 * [mmarchini](https://github.com/mmarchini) -

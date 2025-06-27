@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v24.1.0">
-  <title>Modules: Packages | Node.js v24.1.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v24.3.0">
+  <title>Modules: Packages | Node.js v24.3.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -111,7 +111,7 @@
     <div id="column1" data-id="packages" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v24.1.0 documentation</h1>
+          <h1>Node.js v24.3.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -126,7 +126,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v24.1.0</li>
+            <li class="pinned-header">Node.js v24.3.0</li>
             
     <li class="picker-header">
       <a href="#toc-picker" aria-controls="toc-picker">
@@ -141,7 +141,7 @@
 <li><a href="#determining-module-system">Determining module system</a>
 <ul>
 <li><a href="#introduction_1">Introduction</a></li>
-<li><span class="stability_1"><a href="#syntax-detection">Syntax detection</a></span></li>
+<li><span class="stability_1.2"><a href="#syntax-detection">Syntax detection</a></span></li>
 <li><a href="#modules-loaders">Modules loaders</a></li>
 <li><a href="#packagejson-and-file-extensions"><code>package.json</code> and file extensions</a></li>
 <li><a href="#--input-type-flag"><code>--input-type</code> flag</a></li>
@@ -153,6 +153,12 @@
 <li><a href="#subpath-exports">Subpath exports</a>
 <ul>
 <li><a href="#extensions-in-subpaths">Extensions in subpaths</a></li>
+<li><a href="#path-rules-and-validation-for-export-targets">Path Rules and Validation for Export Targets</a>
+<ul>
+<li><a href="#targets-must-be-relative-urls">Targets must be relative URLs</a></li>
+<li><a href="#no-path-traversal-or-invalid-segments">No path traversal or invalid segments</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#exports-sugar">Exports sugar</a></li>
@@ -317,7 +323,7 @@
 <li><a href="#determining-module-system">Determining module system</a>
 <ul>
 <li><a href="#introduction_1">Introduction</a></li>
-<li><span class="stability_1"><a href="#syntax-detection">Syntax detection</a></span></li>
+<li><span class="stability_1.2"><a href="#syntax-detection">Syntax detection</a></span></li>
 <li><a href="#modules-loaders">Modules loaders</a></li>
 <li><a href="#packagejson-and-file-extensions"><code>package.json</code> and file extensions</a></li>
 <li><a href="#--input-type-flag"><code>--input-type</code> flag</a></li>
@@ -329,6 +335,12 @@
 <li><a href="#subpath-exports">Subpath exports</a>
 <ul>
 <li><a href="#extensions-in-subpaths">Extensions in subpaths</a></li>
+<li><a href="#path-rules-and-validation-for-export-targets">Path Rules and Validation for Export Targets</a>
+<ul>
+<li><a href="#targets-must-be-relative-urls">Targets must be relative URLs</a></li>
+<li><a href="#no-path-traversal-or-invalid-segments">No path traversal or invalid segments</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#exports-sugar">Exports sugar</a></li>
@@ -460,7 +472,7 @@ should be interpreted.</p>
 </tbody></table>
 </details>
 </div>
-<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a>.2 - Release candidate</div><p></p>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1.2</a> - Release candidate</div><p></p>
 <p>Node.js will inspect the source code of ambiguous input to determine whether it
 contains ES module syntax; if such syntax is detected, the input will be treated
 as an ES module.</p>
@@ -713,7 +725,51 @@ enabling the import map to utilize a <a href="https://github.com/WICG/import-map
 subpaths where possible instead of a separate map entry per package subpath
 export. This also mirrors the requirement of using <a href="esm.html#mandatory-file-extensions">the full specifier path</a>
 in relative and absolute import specifiers.</p>
-</div></div><div>
+</div><div>
+<h5>Path Rules and Validation for Export Targets<span><a class="mark" href="#path-rules-and-validation-for-export-targets" id="path-rules-and-validation-for-export-targets">#</a></span><a aria-hidden="true" class="legacy" id="packages_path_rules_and_validation_for_export_targets"></a></h5>
+<p>When defining paths as targets in the <a href="#exports"><code>"exports"</code></a> field, Node.js enforces
+several rules to ensure security, predictability, and proper encapsulation.
+Understanding these rules is crucial for authors publishing packages.</p>
+<div>
+<h6>Targets must be relative URLs<span><a class="mark" href="#targets-must-be-relative-urls" id="targets-must-be-relative-urls">#</a></span><a aria-hidden="true" class="legacy" id="packages_targets_must_be_relative_urls"></a></h6>
+<p>All target paths in the <a href="#exports"><code>"exports"</code></a> map (the values associated with export
+keys) must be relative URL strings starting with <code>./</code>.</p>
+<pre><code class="language-json"><span class="hljs-comment">// package.json</span>
+<span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"name"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"my-package"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"exports"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"."</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./dist/main.js"</span><span class="hljs-punctuation">,</span>          <span class="hljs-comment">// Correct</span>
+    <span class="hljs-attr">"./feature"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./lib/feature.js"</span><span class="hljs-punctuation">,</span> <span class="hljs-comment">// Correct</span>
+    <span class="hljs-comment">// "./origin-relative": "/dist/main.js", // Incorrect: Must start with ./</span>
+    <span class="hljs-comment">// "./absolute": "file:///dev/null", // Incorrect: Must start with ./</span>
+    <span class="hljs-comment">// "./outside": "../common/util.js" // Incorrect: Must start with ./</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
+<p>Reasons for this behavior include:</p>
+<ul>
+<li><strong>Security:</strong> Prevents exporting arbitrary files from outside the
+package's own directory.</li>
+<li><strong>Encapsulation:</strong> Ensures all exported paths are resolved relative to
+the package root, making the package self-contained.</li>
+</ul>
+</div><div>
+<h6>No path traversal or invalid segments<span><a class="mark" href="#no-path-traversal-or-invalid-segments" id="no-path-traversal-or-invalid-segments">#</a></span><a aria-hidden="true" class="legacy" id="packages_no_path_traversal_or_invalid_segments"></a></h6>
+<p>Export targets must not resolve to a location outside the package's root
+directory. Additionally, path segments like <code>.</code> (single dot), <code>..</code> (double dot),
+or <code>node_modules</code> (and their URL-encoded equivalents) are generally disallowed
+within the <code>target</code> string after the initial <code>./</code> and in any <code>subpath</code> part
+substituted into a target pattern.</p>
+<pre><code class="language-json"><span class="hljs-comment">// package.json</span>
+<span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"name"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"my-package"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"exports"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-comment">// ".": "./dist/../../elsewhere/file.js", // Invalid: path traversal</span>
+    <span class="hljs-comment">// ".": "././dist/main.js",             // Invalid: contains "." segment</span>
+    <span class="hljs-comment">// ".": "./dist/../dist/main.js",       // Invalid: contains ".." segment</span>
+    <span class="hljs-comment">// "./utils/./helper.js": "./utils/helper.js" // Key has invalid segment</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
+</div></div></div><div>
 <h4>Exports sugar<span><a class="mark" href="#exports-sugar" id="exports-sugar">#</a></span><a aria-hidden="true" class="legacy" id="packages_exports_sugar"></a></h4>
 <div class="api_metadata">
 <span>Added in: v12.11.0</span>

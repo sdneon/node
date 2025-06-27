@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v24.1.0">
-  <title>Crypto | Node.js v24.1.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v24.3.0">
+  <title>Crypto | Node.js v24.3.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -111,7 +111,7 @@
     <div id="column1" data-id="crypto" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v24.1.0 documentation</h1>
+          <h1>Node.js v24.3.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -126,7 +126,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v24.1.0</li>
+            <li class="pinned-header">Node.js v24.3.0</li>
             
     <li class="picker-header">
       <a href="#toc-picker" aria-controls="toc-picker">
@@ -297,7 +297,7 @@
 <li><a href="#cryptogetfips"><code>crypto.getFips()</code></a></li>
 <li><a href="#cryptogethashes"><code>crypto.getHashes()</code></a></li>
 <li><a href="#cryptogetrandomvaluestypedarray"><code>crypto.getRandomValues(typedArray)</code></a></li>
-<li><span class="stability_1"><a href="#cryptohashalgorithm-data-outputencoding"><code>crypto.hash(algorithm, data[, outputEncoding])</code></a></span></li>
+<li><span class="stability_1.2"><a href="#cryptohashalgorithm-data-outputencoding"><code>crypto.hash(algorithm, data[, outputEncoding])</code></a></span></li>
 <li><a href="#cryptohkdfdigest-ikm-salt-info-keylen-callback"><code>crypto.hkdf(digest, ikm, salt, info, keylen, callback)</code></a></li>
 <li><a href="#cryptohkdfsyncdigest-ikm-salt-info-keylen"><code>crypto.hkdfSync(digest, ikm, salt, info, keylen)</code></a></li>
 <li><a href="#cryptopbkdf2password-salt-iterations-keylen-digest-callback"><code>crypto.pbkdf2(password, salt, iterations, keylen, digest, callback)</code></a></li>
@@ -648,7 +648,7 @@
 <li><a href="#cryptogetfips"><code>crypto.getFips()</code></a></li>
 <li><a href="#cryptogethashes"><code>crypto.getHashes()</code></a></li>
 <li><a href="#cryptogetrandomvaluestypedarray"><code>crypto.getRandomValues(typedArray)</code></a></li>
-<li><span class="stability_1"><a href="#cryptohashalgorithm-data-outputencoding"><code>crypto.hash(algorithm, data[, outputEncoding])</code></a></span></li>
+<li><span class="stability_1.2"><a href="#cryptohashalgorithm-data-outputencoding"><code>crypto.hash(algorithm, data[, outputEncoding])</code></a></span></li>
 <li><a href="#cryptohkdfdigest-ikm-salt-info-keylen-callback"><code>crypto.hkdf(digest, ikm, salt, info, keylen, callback)</code></a></li>
 <li><a href="#cryptohkdfsyncdigest-ikm-salt-info-keylen"><code>crypto.hkdfSync(digest, ikm, salt, info, keylen)</code></a></li>
 <li><a href="#cryptopbkdf2password-salt-iterations-keylen-digest-callback"><code>crypto.pbkdf2(password, salt, iterations, keylen, digest, callback)</code></a></li>
@@ -699,7 +699,7 @@
         <h2>Crypto<span><a class="mark" href="#crypto" id="crypto">#</a></span><a aria-hidden="true" class="legacy" id="crypto_crypto"></a></h2>
 
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v24.1.0/lib/crypto.js">lib/crypto.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v24.3.0/lib/crypto.js">lib/crypto.js</a></p>
 <p>The <code>node:crypto</code> module provides cryptographic functionality that includes a
 set of wrappers for OpenSSL's hash, HMAC, cipher, decipher, sign, and verify
 functions.</p>
@@ -3059,7 +3059,18 @@ well as the subject field of the certificate are ignored.</p>
 <li><code>otherCert</code> <a href="crypto.html#class-x509certificate" class="type">&#x3C;X509Certificate></a></li>
 <li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
 </ul>
-<p>Checks whether this certificate was issued by the given <code>otherCert</code>.</p>
+<p>Checks whether this certificate was potentially issued by the given <code>otherCert</code>
+by comparing the certificate metadata.</p>
+<p>This is useful for pruning a list of possible issuer certificates which have been
+selected using a more rudimentary filtering routine, i.e. just based on subject
+and issuer names.</p>
+<p>Finally, to verify that this certificate's signature was produced by a private key
+corresponding to <code>otherCert</code>'s public key use <a href="#x509verifypublickey"><code>x509.verify(publicKey)</code></a>
+with <code>otherCert</code>'s public key represented as a <a href="#class-keyobject"><code>KeyObject</code></a>
+like so</p>
+<pre><code class="language-js"><span class="hljs-keyword">if</span> (!x509.<span class="hljs-title function_">verify</span>(otherCert.<span class="hljs-property">publicKey</span>)) {
+  <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">'otherCert did not issue x509'</span>);
+}</code> <button class="copy-button">copy</button></pre>
 </div><div>
 <h4><code>x509.checkPrivateKey(privateKey)</code><span><a class="mark" href="#x509checkprivatekeyprivatekey" id="x509checkprivatekeyprivatekey">#</a></span><a aria-hidden="true" class="legacy" id="crypto_x509_checkprivatekey_privatekey"></a></h4>
 <div class="api_metadata">
@@ -4474,7 +4485,7 @@ web-compatible code use <a href="webcrypto.html#cryptogetrandomvaluestypedarray"
 <div class="api_metadata">
 <span>Added in: v21.7.0, v20.12.0</span>
 </div>
-<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a>.2 - Release candidate</div><p></p>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1.2</a> - Release candidate</div><p></p>
 <ul>
 <li><code>algorithm</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a></li>
 <li><code>data</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray" class="type">&#x3C;TypedArray></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView" class="type">&#x3C;DataView></a> When <code>data</code> is a

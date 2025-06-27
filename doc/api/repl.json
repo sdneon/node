@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.1.0/lib/repl.js\">lib/repl.js</a></p>\n<p>The <code>node:repl</code> module provides a Read-Eval-Print-Loop (REPL) implementation\nthat is available both as a standalone program or includible in other\napplications. It can be accessed using:</p>\n<pre><code class=\"language-mjs\">import repl from 'node:repl';\n</code></pre>\n<pre><code class=\"language-cjs\">const repl = require('node:repl');\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.3.0/lib/repl.js\">lib/repl.js</a></p>\n<p>The <code>node:repl</code> module provides a Read-Eval-Print-Loop (REPL) implementation\nthat is available both as a standalone program or includible in other\napplications. It can be accessed using:</p>\n<pre><code class=\"language-mjs\">import repl from 'node:repl';\n</code></pre>\n<pre><code class=\"language-cjs\">const repl = require('node:repl');\n</code></pre>",
       "modules": [
         {
           "textRaw": "Design and features",
@@ -298,29 +298,75 @@
               "desc": "<p>The <code>replServer.clearBufferedCommand()</code> method clears any command that has been\nbuffered but not yet executed. This method is primarily intended to be\ncalled from within the action function for commands registered using the\n<code>replServer.defineCommand()</code> method.</p>"
             },
             {
-              "textRaw": "`replServer.setupHistory(historyPath, callback)`",
+              "textRaw": "`replServer.setupHistory(historyConfig, callback)`",
               "type": "method",
               "name": "setupHistory",
               "meta": {
                 "added": [
                   "v11.10.0"
                 ],
-                "changes": []
+                "changes": [
+                  {
+                    "version": "v24.2.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/58225",
+                    "description": "Updated the `historyConfig` parameter to accept an object with `filePath`, `size`, `removeHistoryDuplicates` and `onHistoryFileLoaded` properties."
+                  }
+                ]
               },
               "signatures": [
                 {
                   "params": [
                     {
-                      "textRaw": "`historyPath` {string} the path to the history file",
-                      "name": "historyPath",
-                      "type": "string",
-                      "desc": "the path to the history file"
+                      "textRaw": "`historyConfig` {Object|string} the path to the history file If it is a string, it is the path to the history file. If it is an object, it can have the following properties:",
+                      "name": "historyConfig",
+                      "type": "Object|string",
+                      "desc": "the path to the history file If it is a string, it is the path to the history file. If it is an object, it can have the following properties:",
+                      "options": [
+                        {
+                          "textRaw": "`filePath` {string} the path to the history file",
+                          "name": "filePath",
+                          "type": "string",
+                          "desc": "the path to the history file"
+                        },
+                        {
+                          "textRaw": "`size` {number} Maximum number of history lines retained. To disable the history set this value to `0`. This option makes sense only if `terminal` is set to `true` by the user or by an internal `output` check, otherwise the history caching mechanism is not initialized at all. **Default:** `30`.",
+                          "name": "size",
+                          "type": "number",
+                          "default": "`30`",
+                          "desc": "Maximum number of history lines retained. To disable the history set this value to `0`. This option makes sense only if `terminal` is set to `true` by the user or by an internal `output` check, otherwise the history caching mechanism is not initialized at all."
+                        },
+                        {
+                          "textRaw": "`removeHistoryDuplicates` {boolean} If `true`, when a new input line added to the history list duplicates an older one, this removes the older line from the list. **Default:** `false`.",
+                          "name": "removeHistoryDuplicates",
+                          "type": "boolean",
+                          "default": "`false`",
+                          "desc": "If `true`, when a new input line added to the history list duplicates an older one, this removes the older line from the list."
+                        },
+                        {
+                          "textRaw": "`onHistoryFileLoaded` {Function} called when history writes are ready or upon error",
+                          "name": "onHistoryFileLoaded",
+                          "type": "Function",
+                          "desc": "called when history writes are ready or upon error",
+                          "options": [
+                            {
+                              "textRaw": "`err` {Error}",
+                              "name": "err",
+                              "type": "Error"
+                            },
+                            {
+                              "textRaw": "`repl` {repl.REPLServer}",
+                              "name": "repl",
+                              "type": "repl.REPLServer"
+                            }
+                          ]
+                        }
+                      ]
                     },
                     {
-                      "textRaw": "`callback` {Function} called when history writes are ready or upon error",
+                      "textRaw": "`callback` {Function} called when history writes are ready or upon error (Optional if provided as `onHistoryFileLoaded` in `historyConfig`)",
                       "name": "callback",
                       "type": "Function",
-                      "desc": "called when history writes are ready or upon error",
+                      "desc": "called when history writes are ready or upon error (Optional if provided as `onHistoryFileLoaded` in `historyConfig`)",
                       "options": [
                         {
                           "textRaw": "`err` {Error}",

@@ -7,7 +7,7 @@
       "name": "Process",
       "introduced_in": "v0.10.0",
       "type": "global",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.1.0/lib/process.js\">lib/process.js</a></p>\n<p>The <code>process</code> object provides information about, and control over, the current\nNode.js process.</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\n</code></pre>\n<pre><code class=\"language-cjs\">const process = require('node:process');\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.3.0/lib/process.js\">lib/process.js</a></p>\n<p>The <code>process</code> object provides information about, and control over, the current\nNode.js process.</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\n</code></pre>\n<pre><code class=\"language-cjs\">const process = require('node:process');\n</code></pre>",
       "modules": [
         {
           "textRaw": "Process events",
@@ -394,6 +394,35 @@
           "desc": "<p>The <code>process.abort()</code> method causes the Node.js process to exit immediately and\ngenerate a core file.</p>\n<p>This feature is not available in <a href=\"worker_threads.html#class-worker\"><code>Worker</code></a> threads.</p>"
         },
         {
+          "textRaw": "`process.availableMemory()`",
+          "type": "method",
+          "name": "availableMemory",
+          "meta": {
+            "added": [
+              "v22.0.0",
+              "v20.13.0"
+            ],
+            "changes": [
+              {
+                "version": "v24.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/57765",
+                "description": "Change stability index for this feature from Experimental to Stable."
+              }
+            ]
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "{number}",
+                  "type": "number"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>Gets the amount of free memory that is still available to the process\n(in bytes).</p>\n<p>See <a href=\"https://docs.libuv.org/en/v1.x/misc.html#c.uv_get_available_memory\"><code>uv_get_available_memory</code></a> for more\ninformation.</p>"
+        },
+        {
           "textRaw": "`process.chdir(directory)`",
           "type": "method",
           "name": "chdir",
@@ -452,35 +481,6 @@
             }
           ],
           "desc": "<p>Gets the amount of memory available to the process (in bytes) based on\nlimits imposed by the OS. If there is no such constraint, or the constraint\nis unknown, <code>0</code> is returned.</p>\n<p>See <a href=\"https://docs.libuv.org/en/v1.x/misc.html#c.uv_get_constrained_memory\"><code>uv_get_constrained_memory</code></a> for more\ninformation.</p>"
-        },
-        {
-          "textRaw": "`process.availableMemory()`",
-          "type": "method",
-          "name": "availableMemory",
-          "meta": {
-            "added": [
-              "v22.0.0",
-              "v20.13.0"
-            ],
-            "changes": [
-              {
-                "version": "v24.0.0",
-                "pr-url": "https://github.com/nodejs/node/pull/57765",
-                "description": "Change stability index for this feature from Experimental to Stable."
-              }
-            ]
-          },
-          "signatures": [
-            {
-              "params": [
-                {
-                  "textRaw": "{number}",
-                  "type": "number"
-                }
-              ]
-            }
-          ],
-          "desc": "<p>Gets the amount of free memory that is still available to the process\n(in bytes).</p>\n<p>See <a href=\"https://docs.libuv.org/en/v1.x/misc.html#c.uv_get_available_memory\"><code>uv_get_available_memory</code></a> for more\ninformation.</p>"
         },
         {
           "textRaw": "`process.cpuUsage([previousValue])`",
@@ -711,6 +711,46 @@
               "displayName": "Avoiding duplicate warnings"
             }
           ]
+        },
+        {
+          "textRaw": "`process.execve(file[, args[, env]])`",
+          "type": "method",
+          "name": "execve",
+          "meta": {
+            "added": [
+              "v23.11.0",
+              "v22.15.0"
+            ],
+            "changes": []
+          },
+          "stability": 1,
+          "stabilityText": "Experimental",
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`file` {string} The name or path of the executable file to run.",
+                  "name": "file",
+                  "type": "string",
+                  "desc": "The name or path of the executable file to run."
+                },
+                {
+                  "textRaw": "`args` {string\\[]} List of string arguments. No argument can contain a null-byte (`\\u0000`).",
+                  "name": "args",
+                  "type": "string\\[]",
+                  "desc": "List of string arguments. No argument can contain a null-byte (`\\u0000`)."
+                },
+                {
+                  "textRaw": "`env` {Object} Environment key-value pairs. No key or value can contain a null-byte (`\\u0000`). **Default:** `process.env`.",
+                  "name": "env",
+                  "type": "Object",
+                  "default": "`process.env`",
+                  "desc": "Environment key-value pairs. No key or value can contain a null-byte (`\\u0000`)."
+                }
+              ]
+            }
+          ],
+          "desc": "<p>Replaces the current process with a new process.</p>\n<p>This is achieved by using the <code>execve</code> POSIX function and therefore no memory or other\nresources from the current process are preserved, except for the standard input,\nstandard output and standard error file descriptor.</p>\n<p>All other resources are discarded by the system when the processes are swapped, without triggering\nany exit or close events and without running any cleanup handler.</p>\n<p>This function will never return, unless an error occurred.</p>\n<p>This function is not available on Windows or IBM i.</p>"
         },
         {
           "textRaw": "`process.exit([code])`",
@@ -1362,46 +1402,6 @@
           "desc": "<p>An object is \"refable\" if it implements the Node.js \"Refable protocol\".\nSpecifically, this means that the object implements the <code>Symbol.for('nodejs.ref')</code>\nand <code>Symbol.for('nodejs.unref')</code> methods. \"Ref'd\" objects will keep the Node.js\nevent loop alive, while \"unref'd\" objects will not. Historically, this was\nimplemented by using <code>ref()</code> and <code>unref()</code> methods directly on the objects.\nThis pattern, however, is being deprecated in favor of the \"Refable protocol\"\nin order to better support Web Platform API types whose APIs cannot be modified\nto add <code>ref()</code> and <code>unref()</code> methods but still need to support that behavior.</p>"
         },
         {
-          "textRaw": "`process.execve(file[, args[, env]])`",
-          "type": "method",
-          "name": "execve",
-          "meta": {
-            "added": [
-              "v23.11.0",
-              "v22.15.0"
-            ],
-            "changes": []
-          },
-          "stability": 1,
-          "stabilityText": "Experimental",
-          "signatures": [
-            {
-              "params": [
-                {
-                  "textRaw": "`file` {string} The name or path of the executable file to run.",
-                  "name": "file",
-                  "type": "string",
-                  "desc": "The name or path of the executable file to run."
-                },
-                {
-                  "textRaw": "`args` {string\\[]} List of string arguments. No argument can contain a null-byte (`\\u0000`).",
-                  "name": "args",
-                  "type": "string\\[]",
-                  "desc": "List of string arguments. No argument can contain a null-byte (`\\u0000`)."
-                },
-                {
-                  "textRaw": "`env` {Object} Environment key-value pairs. No key or value can contain a null-byte (`\\u0000`). **Default:** `process.env`.",
-                  "name": "env",
-                  "type": "Object",
-                  "default": "`process.env`",
-                  "desc": "Environment key-value pairs. No key or value can contain a null-byte (`\\u0000`)."
-                }
-              ]
-            }
-          ],
-          "desc": "<p>Replaces the current process with a new process.</p>\n<p>This is achieved by using the <code>execve</code> POSIX function and therefore no memory or other\nresources from the current process are preserved, except for the standard input,\nstandard output and standard error file descriptor.</p>\n<p>All other resources are discarded by the system when the processes are swapped, without triggering\nany exit or close events and without running any cleanup handler.</p>\n<p>This function will never return, unless an error occurred.</p>\n<p>This function is not available on Windows or IBM i.</p>"
-        },
-        {
           "textRaw": "`process.resourceUsage()`",
           "type": "method",
           "name": "resourceUsage",
@@ -1717,7 +1717,7 @@
               ]
             }
           ],
-          "desc": "<p>This function enables or disables the <a href=\"https://sourcemaps.info/spec.html\">Source Map v3</a> support for\nstack traces.</p>\n<p>It provides same features as launching Node.js process with commandline options\n<code>--enable-source-maps</code>.</p>\n<p>Only source maps in JavaScript files that are loaded after source maps has been\nenabled will be parsed and loaded.</p>\n<p>This implies calling <code>module.setSourceMapsSupport()</code> with an option\n<code>{ nodeModules: true, generatedCode: true }</code>.</p>"
+          "desc": "<p>This function enables or disables the <a href=\"https://tc39.es/ecma426/\">Source Map</a> support for\nstack traces.</p>\n<p>It provides same features as launching Node.js process with commandline options\n<code>--enable-source-maps</code>.</p>\n<p>Only source maps in JavaScript files that are loaded after source maps has been\nenabled will be parsed and loaded.</p>\n<p>This implies calling <code>module.setSourceMapsSupport()</code> with an option\n<code>{ nodeModules: true, generatedCode: true }</code>.</p>"
         },
         {
           "textRaw": "`process.setUncaughtExceptionCaptureCallback(fn)`",
@@ -2673,7 +2673,7 @@
           },
           "stability": 1,
           "stabilityText": "Experimental: Use [`module.getSourceMapsSupport()`][] instead.",
-          "desc": "<p>The <code>process.sourceMapsEnabled</code> property returns whether the\n<a href=\"https://sourcemaps.info/spec.html\">Source Map v3</a> support for stack traces is enabled.</p>"
+          "desc": "<p>The <code>process.sourceMapsEnabled</code> property returns whether the\n<a href=\"https://tc39.es/ecma426/\">Source Map</a> support for stack traces is enabled.</p>"
         },
         {
           "textRaw": "`stderr` {Stream}",

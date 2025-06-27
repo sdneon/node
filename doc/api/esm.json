@@ -164,6 +164,21 @@
           "name": "url",
           "desc": "<p>This is defined exactly the same as it is in browsers providing the URL of the\ncurrent module file.</p>\n<p>This enables useful patterns such as relative file loading:</p>\n<pre><code class=\"language-js\">import { readFileSync } from 'node:fs';\nconst buffer = readFileSync(new URL('./data.proto', import.meta.url));\n</code></pre>",
           "shortDesc": "The absolute `file:` URL of the module."
+        },
+        {
+          "textRaw": "`main` {boolean} `true` when the current module is the entry point of the current process; `false` otherwise.",
+          "type": "boolean",
+          "name": "main",
+          "meta": {
+            "added": [
+              "v24.2.0"
+            ],
+            "changes": []
+          },
+          "stability": 1,
+          "stabilityText": ".0 - Early development",
+          "desc": "<p>Equivalent to <code>require.main === module</code> in CommonJS.</p>\n<p>Analogous to Python's <code>__name__ == \"__main__\"</code>.</p>\n<pre><code class=\"language-js\">export function foo() {\n  return 'Hello, world';\n}\n\nfunction main() {\n  const message = foo();\n  console.log(message);\n}\n\nif (import.meta.main) main();\n// `foo` can be imported from another module without possible side-effects from `main`\n</code></pre>",
+          "shortDesc": "`true` when the current module is the entry point of the current process; `false` otherwise."
         }
       ],
       "methods": [
@@ -547,6 +562,13 @@
                   "displayName": "No Addon Loading"
                 },
                 {
+                  "textRaw": "No `require.main`",
+                  "name": "no_`require.main`",
+                  "desc": "<p>To replace <code>require.main === module</code>, there is the <a href=\"#importmetamain\"><code>import.meta.main</code></a> API.</p>",
+                  "type": "module",
+                  "displayName": "No `require.main`"
+                },
+                {
                   "textRaw": "No `require.resolve`",
                   "name": "no_`require.resolve`",
                   "desc": "<p>Relative resolution can be handled via <code>new URL('./local', import.meta.url)</code>.</p>\n<p>For a complete <code>require.resolve</code> replacement, there is the\n<a href=\"#importmetaresolvespecifier\">import.meta.resolve</a> API.</p>\n<p>Alternatively <code>module.createRequire()</code> can be used.</p>",
@@ -619,7 +641,7 @@
                 ],
                 "changes": []
               },
-              "desc": "<p>The <a href=\"https://github.com/tc39/proposal-source-phase-imports\">Source Phase Imports</a> proposal allows the <code>import source</code> keyword\ncombination to import a <code>WebAssembly.Module</code> object directly, instead of getting\na module instance already instantiated with its dependencies.</p>\n<p>This is useful when needing custom instantiations for Wasm, while still\nresolving and loading it through the ES module integration.</p>\n<p>For example, to create multiple instances of a module, or to pass custom imports\ninto a new instance of <code>library.wasm</code>:</p>\n<pre><code class=\"language-js\">import source libraryModule from './library.wasm';\n\nconst instance1 = await WebAssembly.instantiate(libraryModule, {\n  custom: import1,\n});\n\nconst instance2 = await WebAssembly.instantiate(libraryModule, {\n  custom: import2,\n});\n</code></pre>\n<p><i id=\"esm_experimental_top_level_await\"></i></p>",
+              "desc": "<p>The <a href=\"https://github.com/tc39/proposal-source-phase-imports\">Source Phase Imports</a> proposal allows the <code>import source</code> keyword\ncombination to import a <code>WebAssembly.Module</code> object directly, instead of getting\na module instance already instantiated with its dependencies.</p>\n<p>This is useful when needing custom instantiations for Wasm, while still\nresolving and loading it through the ES module integration.</p>\n<p>For example, to create multiple instances of a module, or to pass custom imports\ninto a new instance of <code>library.wasm</code>:</p>\n<pre><code class=\"language-js\">import source libraryModule from './library.wasm';\n\nconst instance1 = await WebAssembly.instantiate(libraryModule, importObject1);\n\nconst instance2 = await WebAssembly.instantiate(libraryModule, importObject2);\n</code></pre>\n<p>In addition to the static source phase, there is also a dynamic variant of the\nsource phase via the <code>import.source</code> dynamic phase import syntax:</p>\n<pre><code class=\"language-js\">const dynamicLibrary = await import.source('./library.wasm');\n\nconst instance = await WebAssembly.instantiate(dynamicLibrary, importObject);\n</code></pre>\n<p><i id=\"esm_experimental_top_level_await\"></i></p>",
               "type": "module",
               "displayName": "Wasm Source Phase Imports"
             }
@@ -737,6 +759,21 @@
               "name": "url",
               "desc": "<p>This is defined exactly the same as it is in browsers providing the URL of the\ncurrent module file.</p>\n<p>This enables useful patterns such as relative file loading:</p>\n<pre><code class=\"language-js\">import { readFileSync } from 'node:fs';\nconst buffer = readFileSync(new URL('./data.proto', import.meta.url));\n</code></pre>",
               "shortDesc": "The absolute `file:` URL of the module."
+            },
+            {
+              "textRaw": "`main` {boolean} `true` when the current module is the entry point of the current process; `false` otherwise.",
+              "type": "boolean",
+              "name": "main",
+              "meta": {
+                "added": [
+                  "v24.2.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": ".0 - Early development",
+              "desc": "<p>Equivalent to <code>require.main === module</code> in CommonJS.</p>\n<p>Analogous to Python's <code>__name__ == \"__main__\"</code>.</p>\n<pre><code class=\"language-js\">export function foo() {\n  return 'Hello, world';\n}\n\nfunction main() {\n  const message = foo();\n  console.log(message);\n}\n\nif (import.meta.main) main();\n// `foo` can be imported from another module without possible side-effects from `main`\n</code></pre>",
+              "shortDesc": "`true` when the current module is the entry point of the current process; `false` otherwise."
             }
           ],
           "methods": [
