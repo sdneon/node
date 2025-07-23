@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v24.3.0">
-  <title>VM (executing JavaScript) | Node.js v24.3.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v24.4.1">
+  <title>VM (executing JavaScript) | Node.js v24.4.1 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -111,7 +111,7 @@
     <div id="column1" data-id="vm" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v24.3.0 documentation</h1>
+          <h1>Node.js v24.4.1 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -126,7 +126,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v24.3.0</li>
+            <li class="pinned-header">Node.js v24.4.1</li>
             
     <li class="picker-header">
       <a href="#toc-picker" aria-controls="toc-picker">
@@ -150,7 +150,6 @@
 </li>
 <li><span class="stability_1"><a href="#class-vmmodule">Class: <code>vm.Module</code></a></span>
 <ul>
-<li><a href="#moduledependencyspecifiers"><code>module.dependencySpecifiers</code></a></li>
 <li><a href="#moduleerror"><code>module.error</code></a></li>
 <li><a href="#moduleevaluateoptions"><code>module.evaluate([options])</code></a></li>
 <li><a href="#moduleidentifier"><code>module.identifier</code></a></li>
@@ -163,6 +162,8 @@
 <ul>
 <li><a href="#new-vmsourcetextmodulecode-options"><code>new vm.SourceTextModule(code[, options])</code></a></li>
 <li><a href="#sourcetextmodulecreatecacheddata"><code>sourceTextModule.createCachedData()</code></a></li>
+<li><span class="stability_0"><a href="#sourcetextmoduledependencyspecifiers"><code>sourceTextModule.dependencySpecifiers</code></a></span></li>
+<li><a href="#sourcetextmodulemodulerequests"><code>sourceTextModule.moduleRequests</code></a></li>
 </ul>
 </li>
 <li><span class="stability_1"><a href="#class-vmsyntheticmodule">Class: <code>vm.SyntheticModule</code></a></span>
@@ -171,6 +172,7 @@
 <li><a href="#syntheticmodulesetexportname-value"><code>syntheticModule.setExport(name, value)</code></a></li>
 </ul>
 </li>
+<li><a href="#type-modulerequest">Type: <code>ModuleRequest</code></a></li>
 <li><a href="#vmcompilefunctioncode-params-options"><code>vm.compileFunction(code[, params[, options]])</code></a></li>
 <li><a href="#vmconstants"><code>vm.constants</code></a>
 <ul>
@@ -358,7 +360,6 @@
 </li>
 <li><span class="stability_1"><a href="#class-vmmodule">Class: <code>vm.Module</code></a></span>
 <ul>
-<li><a href="#moduledependencyspecifiers"><code>module.dependencySpecifiers</code></a></li>
 <li><a href="#moduleerror"><code>module.error</code></a></li>
 <li><a href="#moduleevaluateoptions"><code>module.evaluate([options])</code></a></li>
 <li><a href="#moduleidentifier"><code>module.identifier</code></a></li>
@@ -371,6 +372,8 @@
 <ul>
 <li><a href="#new-vmsourcetextmodulecode-options"><code>new vm.SourceTextModule(code[, options])</code></a></li>
 <li><a href="#sourcetextmodulecreatecacheddata"><code>sourceTextModule.createCachedData()</code></a></li>
+<li><span class="stability_0"><a href="#sourcetextmoduledependencyspecifiers"><code>sourceTextModule.dependencySpecifiers</code></a></span></li>
+<li><a href="#sourcetextmodulemodulerequests"><code>sourceTextModule.moduleRequests</code></a></li>
 </ul>
 </li>
 <li><span class="stability_1"><a href="#class-vmsyntheticmodule">Class: <code>vm.SyntheticModule</code></a></span>
@@ -379,6 +382,7 @@
 <li><a href="#syntheticmodulesetexportname-value"><code>syntheticModule.setExport(name, value)</code></a></li>
 </ul>
 </li>
+<li><a href="#type-modulerequest">Type: <code>ModuleRequest</code></a></li>
 <li><a href="#vmcompilefunctioncode-params-options"><code>vm.compileFunction(code[, params[, options]])</code></a></li>
 <li><a href="#vmconstants"><code>vm.constants</code></a>
 <ul>
@@ -414,7 +418,7 @@
 
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
 
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v24.3.0/lib/vm.js">lib/vm.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v24.4.1/lib/vm.js">lib/vm.js</a></p>
 <p>The <code>node:vm</code> module enables compiling and running code within V8 Virtual
 Machine contexts.</p>
 <p><strong class="critical">The <code>node:vm</code> module is not a security
@@ -788,7 +792,7 @@ function myFunc() {}
 flag enabled.</p>
 <p>The <code>vm.Module</code> class provides a low-level interface for using
 ECMAScript modules in VM contexts. It is the counterpart of the <code>vm.Script</code>
-class that closely mirrors <a href="https://262.ecma-international.org/14.0/#sec-abstract-module-records">Module Record</a>s as defined in the ECMAScript
+class that closely mirrors <a href="https://tc39.es/ecma262/#sec-abstract-module-records">Module Record</a>s as defined in the ECMAScript
 specification.</p>
 <p>Unlike <code>vm.Script</code> however, every <code>vm.Module</code> object is bound to a context from
 its creation. Operations on <code>vm.Module</code> objects are intrinsically asynchronous,
@@ -939,15 +943,6 @@ support is planned.</p>
   <span class="hljs-keyword">await</span> bar.<span class="hljs-title function_">evaluate</span>();
 })();</code><button class="copy-button">copy</button></pre>
 <div>
-<h4><code>module.dependencySpecifiers</code><span><a class="mark" href="#moduledependencyspecifiers" id="moduledependencyspecifiers">#</a></span><a aria-hidden="true" class="legacy" id="vm_module_dependencyspecifiers"></a></h4>
-<ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a></li>
-</ul>
-<p>The specifiers of all dependencies of this module. The returned array is frozen
-to disallow any changes to it.</p>
-<p>Corresponds to the <code>[[RequestedModules]]</code> field of <a href="https://tc39.es/ecma262/#sec-cyclic-module-records">Cyclic Module Record</a>s in
-the ECMAScript specification.</p>
-</div><div>
 <h4><code>module.error</code><span><a class="mark" href="#moduleerror" id="moduleerror">#</a></span><a aria-hidden="true" class="legacy" id="vm_module_error"></a></h4>
 <ul>
 <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a></li>
@@ -1242,6 +1237,71 @@ code cache serializes the metadata that V8 currently knows about the
 
 <span class="hljs-comment">// Create a new module using the cached data. The code must be the same.</span>
 <span class="hljs-keyword">const</span> module2 = <span class="hljs-keyword">new</span> vm.<span class="hljs-title class_">SourceTextModule</span>(<span class="hljs-string">'const a = 1;'</span>, { cachedData });</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>sourceTextModule.dependencySpecifiers</code><span><a class="mark" href="#sourcetextmoduledependencyspecifiers" id="sourcetextmoduledependencyspecifiers">#</a></span><a aria-hidden="true" class="legacy" id="vm_sourcetextmodule_dependencyspecifiers"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v24.4.0</td>
+<td><p>This is deprecated in favour of <code>sourceTextModule.moduleRequests</code>.</p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p></p><div class="api_stability api_stability_0"><a href="documentation.html#stability-index">Stability: 0</a> - Deprecated: Use <a href="#sourcetextmodulemodulerequests"><code>sourceTextModule.moduleRequests</code></a> instead.</div><p></p>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a></li>
+</ul>
+<p>The specifiers of all dependencies of this module. The returned array is frozen
+to disallow any changes to it.</p>
+<p>Corresponds to the <code>[[RequestedModules]]</code> field of <a href="https://tc39.es/ecma262/#sec-cyclic-module-records">Cyclic Module Record</a>s in
+the ECMAScript specification.</p>
+</div><div>
+<h4><code>sourceTextModule.moduleRequests</code><span><a class="mark" href="#sourcetextmodulemodulerequests" id="sourcetextmodulemodulerequests">#</a></span><a aria-hidden="true" class="legacy" id="vm_sourcetextmodule_modulerequests"></a></h4>
+<div class="api_metadata">
+<span>Added in: v24.4.0</span>
+</div>
+<ul>
+<li><a href="vm.html#type-modulerequest" class="type">&#x3C;ModuleRequest[]></a> Dependencies of this module.</li>
+</ul>
+<p>The requested import dependencies of this module. The returned array is frozen
+to disallow any changes to it.</p>
+<p>For example, given a source text:</p>
+<!-- eslint-disable no-duplicate-imports -->
+<pre><code class="language-js mjs"><span class="hljs-keyword">import</span> foo <span class="hljs-keyword">from</span> <span class="hljs-string">'foo'</span>;
+<span class="hljs-keyword">import</span> fooAlias <span class="hljs-keyword">from</span> <span class="hljs-string">'foo'</span>;
+<span class="hljs-keyword">import</span> bar <span class="hljs-keyword">from</span> <span class="hljs-string">'./bar.js'</span>;
+<span class="hljs-keyword">import</span> withAttrs <span class="hljs-keyword">from</span> <span class="hljs-string">'../with-attrs.ts'</span> <span class="hljs-keyword">with</span> { <span class="hljs-attr">arbitraryAttr</span>: <span class="hljs-string">'attr-val'</span> };
+<span class="hljs-keyword">import</span> source <span class="hljs-title class_">Module</span> <span class="hljs-keyword">from</span> <span class="hljs-string">'wasm-mod.wasm'</span>;</code> <button class="copy-button">copy</button></pre>
+<!-- eslint-enable no-duplicate-imports -->
+<p>The value of the <code>sourceTextModule.moduleRequests</code> will be:</p>
+<pre><code class="language-js">[
+  {
+    <span class="hljs-attr">specifier</span>: <span class="hljs-string">'foo'</span>,
+    <span class="hljs-attr">attributes</span>: {},
+    <span class="hljs-attr">phase</span>: <span class="hljs-string">'evaluation'</span>,
+  },
+  {
+    <span class="hljs-attr">specifier</span>: <span class="hljs-string">'foo'</span>,
+    <span class="hljs-attr">attributes</span>: {},
+    <span class="hljs-attr">phase</span>: <span class="hljs-string">'evaluation'</span>,
+  },
+  {
+    <span class="hljs-attr">specifier</span>: <span class="hljs-string">'./bar.js'</span>,
+    <span class="hljs-attr">attributes</span>: {},
+    <span class="hljs-attr">phase</span>: <span class="hljs-string">'evaluation'</span>,
+  },
+  {
+    <span class="hljs-attr">specifier</span>: <span class="hljs-string">'../with-attrs.ts'</span>,
+    <span class="hljs-attr">attributes</span>: { <span class="hljs-attr">arbitraryAttr</span>: <span class="hljs-string">'attr-val'</span> },
+    <span class="hljs-attr">phase</span>: <span class="hljs-string">'evaluation'</span>,
+  },
+  {
+    <span class="hljs-attr">specifier</span>: <span class="hljs-string">'wasm-mod.wasm'</span>,
+    <span class="hljs-attr">attributes</span>: {},
+    <span class="hljs-attr">phase</span>: <span class="hljs-string">'source'</span>,
+  },
+];</code> <button class="copy-button">copy</button></pre>
 </div>
 </section><section><h3>Class: <code>vm.SyntheticModule</code><span><a class="mark" href="#class-vmsyntheticmodule" id="class-vmsyntheticmodule">#</a></span><a aria-hidden="true" class="legacy" id="vm_class_vm_syntheticmodule"></a></h3>
 <div class="api_metadata">
@@ -1253,7 +1313,7 @@ flag enabled.</p>
 <ul>
 <li>Extends: <a href="vm.html#class-vmmodule" class="type">&#x3C;vm.Module></a></li>
 </ul>
-<p>The <code>vm.SyntheticModule</code> class provides the <a href="https://heycam.github.io/webidl/#synthetic-module-records">Synthetic Module Record</a> as
+<p>The <code>vm.SyntheticModule</code> class provides the <a href="https://tc39.es/ecma262/#sec-synthetic-module-records">Synthetic Module Record</a> as
 defined in the WebIDL specification. The purpose of synthetic modules is to
 provide a generic interface for exposing non-JavaScript sources to ECMAScript
 module graphs.</p>
@@ -1321,6 +1381,22 @@ assert.<span class="hljs-title function_">strictEqual</span>(m.<span class="hljs
   assert.<span class="hljs-title function_">strictEqual</span>(m.<span class="hljs-property">namespace</span>.<span class="hljs-property">x</span>, <span class="hljs-number">1</span>);
 })();</code><button class="copy-button">copy</button></pre>
 </div>
+</section><section><h3>Type: <code>ModuleRequest</code><span><a class="mark" href="#type-modulerequest" id="type-modulerequest">#</a></span><a aria-hidden="true" class="legacy" id="vm_type_modulerequest"></a></h3>
+<div class="api_metadata">
+<span>Added in: v24.4.0</span>
+</div>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>specifier</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> The specifier of the requested module.</li>
+<li><code>attributes</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> The <code>"with"</code> value passed to the
+<a href="https://tc39.es/ecma262/#prod-WithClause">WithClause</a> in a <a href="https://tc39.es/ecma262/#prod-ImportDeclaration">ImportDeclaration</a>, or an empty object if no value was
+provided.</li>
+<li><code>phase</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> The phase of the requested module (<code>"source"</code> or <code>"evaluation"</code>).</li>
+</ul>
+</li>
+</ul>
+<p>A <code>ModuleRequest</code> represents the request to import a module with given import attributes and phase.</p>
 </section><section><h3><code>vm.compileFunction(code[, params[, options]])</code><span><a class="mark" href="#vmcompilefunctioncode-params-options" id="vmcompilefunctioncode-params-options">#</a></span><a aria-hidden="true" class="legacy" id="vm_vm_compilefunction_code_params_options"></a></h3>
 <div class="api_metadata">
 <details class="changelog"><summary>History</summary>
@@ -1466,7 +1542,7 @@ object</a> and return a reference to it so that it can be used in
 calls to <a href="#vmrunincontextcode-contextifiedobject-options"><code>vm.runInContext()</code></a> or <a href="#scriptrunincontextcontextifiedobject-options"><code>script.runInContext()</code></a>. Inside such
 scripts, the global object will be wrapped by the <code>contextObject</code>, retaining all of its
 existing properties but also having the built-in objects and functions any
-standard <a href="https://es5.github.io/#x15.1">global object</a> has. Outside of scripts run by the vm module, global
+standard <a href="https://tc39.es/ecma262/#sec-global-object">global object</a> has. Outside of scripts run by the vm module, global
 variables will remain unchanged.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> vm = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:vm'</span>);
 
@@ -1829,9 +1905,9 @@ the JavaScript <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`evalResult: '<span class="hljs-subst">${evalResult}</span>', localVar: '<span class="hljs-subst">${localVar}</span>'`</span>);
 <span class="hljs-comment">// Prints: evalResult: 'eval', localVar: 'eval'</span></code> <button class="copy-button">copy</button></pre>
 <p>Because <code>vm.runInThisContext()</code> does not have access to the local scope,
-<code>localVar</code> is unchanged. In contrast, <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval"><code>eval()</code></a> <em>does</em> have access to the
-local scope, so the value <code>localVar</code> is changed. In this way
-<code>vm.runInThisContext()</code> is much like an <a href="https://es5.github.io/#x10.4.2">indirect <code>eval()</code> call</a>, e.g.
+<code>localVar</code> is unchanged. In contrast, a direct <code>eval()</code> call <em>does</em> have access
+to the local scope, so the value <code>localVar</code> is changed. In this way
+<code>vm.runInThisContext()</code> is much like an <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval#direct_and_indirect_eval">indirect <code>eval()</code> call</a>, e.g.
 <code>(0,eval)('code')</code>.</p>
 </section><section><h3>Example: Running an HTTP server within a VM<span><a class="mark" href="#example-running-an-http-server-within-a-vm" id="example-running-an-http-server-within-a-vm">#</a></span><a aria-hidden="true" class="legacy" id="vm_example_running_an_http_server_within_a_vm"></a></h3>
 <p>When using either <a href="#scriptruninthiscontextoptions"><code>script.runInThisContext()</code></a> or

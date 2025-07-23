@@ -14,7 +14,7 @@
       },
       "stability": 1,
       "stabilityText": ".1 - Active development.",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.3.0/lib/sqlite.js\">lib/sqlite.js</a></p>\n<p>The <code>node:sqlite</code> module facilitates working with SQLite databases.\nTo access it:</p>\n<pre><code class=\"language-mjs\">import sqlite from 'node:sqlite';\n</code></pre>\n<pre><code class=\"language-cjs\">const sqlite = require('node:sqlite');\n</code></pre>\n<p>This module is only available under the <code>node:</code> scheme.</p>\n<p>The following example shows the basic usage of the <code>node:sqlite</code> module to open\nan in-memory database, write data to the database, and then read the data back.</p>\n<pre><code class=\"language-mjs\">import { DatabaseSync } from 'node:sqlite';\nconst database = new DatabaseSync(':memory:');\n\n// Execute SQL statements from strings.\ndatabase.exec(`\n  CREATE TABLE data(\n    key INTEGER PRIMARY KEY,\n    value TEXT\n  ) STRICT\n`);\n// Create a prepared statement to insert data into the database.\nconst insert = database.prepare('INSERT INTO data (key, value) VALUES (?, ?)');\n// Execute the prepared statement with bound values.\ninsert.run(1, 'hello');\ninsert.run(2, 'world');\n// Create a prepared statement to read data from the database.\nconst query = database.prepare('SELECT * FROM data ORDER BY key');\n// Execute the prepared statement and log the result set.\nconsole.log(query.all());\n// Prints: [ { key: 1, value: 'hello' }, { key: 2, value: 'world' } ]\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\nconst { DatabaseSync } = require('node:sqlite');\nconst database = new DatabaseSync(':memory:');\n\n// Execute SQL statements from strings.\ndatabase.exec(`\n  CREATE TABLE data(\n    key INTEGER PRIMARY KEY,\n    value TEXT\n  ) STRICT\n`);\n// Create a prepared statement to insert data into the database.\nconst insert = database.prepare('INSERT INTO data (key, value) VALUES (?, ?)');\n// Execute the prepared statement with bound values.\ninsert.run(1, 'hello');\ninsert.run(2, 'world');\n// Create a prepared statement to read data from the database.\nconst query = database.prepare('SELECT * FROM data ORDER BY key');\n// Execute the prepared statement and log the result set.\nconsole.log(query.all());\n// Prints: [ { key: 1, value: 'hello' }, { key: 2, value: 'world' } ]\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.4.1/lib/sqlite.js\">lib/sqlite.js</a></p>\n<p>The <code>node:sqlite</code> module facilitates working with SQLite databases.\nTo access it:</p>\n<pre><code class=\"language-mjs\">import sqlite from 'node:sqlite';\n</code></pre>\n<pre><code class=\"language-cjs\">const sqlite = require('node:sqlite');\n</code></pre>\n<p>This module is only available under the <code>node:</code> scheme.</p>\n<p>The following example shows the basic usage of the <code>node:sqlite</code> module to open\nan in-memory database, write data to the database, and then read the data back.</p>\n<pre><code class=\"language-mjs\">import { DatabaseSync } from 'node:sqlite';\nconst database = new DatabaseSync(':memory:');\n\n// Execute SQL statements from strings.\ndatabase.exec(`\n  CREATE TABLE data(\n    key INTEGER PRIMARY KEY,\n    value TEXT\n  ) STRICT\n`);\n// Create a prepared statement to insert data into the database.\nconst insert = database.prepare('INSERT INTO data (key, value) VALUES (?, ?)');\n// Execute the prepared statement with bound values.\ninsert.run(1, 'hello');\ninsert.run(2, 'world');\n// Create a prepared statement to read data from the database.\nconst query = database.prepare('SELECT * FROM data ORDER BY key');\n// Execute the prepared statement and log the result set.\nconsole.log(query.all());\n// Prints: [ { key: 1, value: 'hello' }, { key: 2, value: 'world' } ]\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\nconst { DatabaseSync } = require('node:sqlite');\nconst database = new DatabaseSync(':memory:');\n\n// Execute SQL statements from strings.\ndatabase.exec(`\n  CREATE TABLE data(\n    key INTEGER PRIMARY KEY,\n    value TEXT\n  ) STRICT\n`);\n// Create a prepared statement to insert data into the database.\nconst insert = database.prepare('INSERT INTO data (key, value) VALUES (?, ?)');\n// Execute the prepared statement with bound values.\ninsert.run(1, 'hello');\ninsert.run(2, 'world');\n// Create a prepared statement to read data from the database.\nconst query = database.prepare('SELECT * FROM data ORDER BY key');\n// Execute the prepared statement and log the result set.\nconsole.log(query.all());\n// Prints: [ { key: 1, value: 'hello' }, { key: 2, value: 'world' } ]\n</code></pre>",
       "classes": [
         {
           "textRaw": "Class: `DatabaseSync`",
@@ -526,6 +526,34 @@
                       "type": "number",
                       "default": "`0`",
                       "desc": "The [busy timeout][] in milliseconds. This is the maximum amount of time that SQLite will wait for a database lock to be released before returning an error."
+                    },
+                    {
+                      "textRaw": "`readBigInts` {boolean} If `true`, integer fields are read as JavaScript `BigInt` values. If `false`, integer fields are read as JavaScript numbers. **Default:** `false`.",
+                      "name": "readBigInts",
+                      "type": "boolean",
+                      "default": "`false`",
+                      "desc": "If `true`, integer fields are read as JavaScript `BigInt` values. If `false`, integer fields are read as JavaScript numbers."
+                    },
+                    {
+                      "textRaw": "`returnArrays` {boolean} If `true`, query results are returned as arrays instead of objects. **Default:** `false`.",
+                      "name": "returnArrays",
+                      "type": "boolean",
+                      "default": "`false`",
+                      "desc": "If `true`, query results are returned as arrays instead of objects."
+                    },
+                    {
+                      "textRaw": "`allowBareNamedParameters` {boolean} If `true`, allows binding named parameters without the prefix character (e.g., `foo` instead of `:foo`). **Default:** `true`.",
+                      "name": "allowBareNamedParameters",
+                      "type": "boolean",
+                      "default": "`true`",
+                      "desc": "If `true`, allows binding named parameters without the prefix character (e.g., `foo` instead of `:foo`)."
+                    },
+                    {
+                      "textRaw": "`allowUnknownNamedParameters` {boolean} If `true`, unknown named parameters are ignored when binding. If `false`, an exception is thrown for unknown named parameters. **Default:** `false`.",
+                      "name": "allowUnknownNamedParameters",
+                      "type": "boolean",
+                      "default": "`false`",
+                      "desc": "If `true`, unknown named parameters are ignored when binding. If `false`, an exception is thrown for unknown named parameters."
                     }
                   ]
                 }

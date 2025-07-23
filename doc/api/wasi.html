@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v24.3.0">
-  <title>WebAssembly System Interface (WASI) | Node.js v24.3.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v24.4.1">
+  <title>WebAssembly System Interface (WASI) | Node.js v24.4.1 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -111,7 +111,7 @@
     <div id="column1" data-id="wasi" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v24.3.0 documentation</h1>
+          <h1>Node.js v24.4.1 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -126,7 +126,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v24.3.0</li>
+            <li class="pinned-header">Node.js v24.4.1</li>
             
     <li class="picker-header">
       <a href="#toc-picker" aria-controls="toc-picker">
@@ -144,6 +144,7 @@
 <li><a href="#wasigetimportobject"><code>wasi.getImportObject()</code></a></li>
 <li><a href="#wasistartinstance"><code>wasi.start(instance)</code></a></li>
 <li><a href="#wasiinitializeinstance"><code>wasi.initialize(instance)</code></a></li>
+<li><a href="#wasifinalizebindingsinstance-options"><code>wasi.finalizeBindings(instance[, options])</code></a></li>
 <li><a href="#wasiwasiimport"><code>wasi.wasiImport</code></a></li>
 </ul>
 </li>
@@ -292,6 +293,7 @@
 <li><a href="#wasigetimportobject"><code>wasi.getImportObject()</code></a></li>
 <li><a href="#wasistartinstance"><code>wasi.start(instance)</code></a></li>
 <li><a href="#wasiinitializeinstance"><code>wasi.initialize(instance)</code></a></li>
+<li><a href="#wasifinalizebindingsinstance-options"><code>wasi.finalizeBindings(instance[, options])</code></a></li>
 <li><a href="#wasiwasiimport"><code>wasi.wasiImport</code></a></li>
 </ul>
 </li>
@@ -307,7 +309,7 @@
 comprehensive file system security properties provided by some WASI runtimes.
 Full support for secure file system sandboxing may or may not be implemented in
 future. In the mean time, do not rely on it to run untrusted code. </strong></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v24.3.0/lib/wasi.js">lib/wasi.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v24.4.1/lib/wasi.js">lib/wasi.js</a></p>
 <p>The WASI API provides an implementation of the <a href="https://wasi.dev/">WebAssembly System Interface</a>
 specification. WASI gives WebAssembly applications access to the underlying
 operating system via a collection of POSIX-like functions.</p>
@@ -498,6 +500,28 @@ export, then an exception is thrown.</p>
 <p><code>initialize()</code> requires that <code>instance</code> exports a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Memory"><code>WebAssembly.Memory</code></a> named
 <code>memory</code>. If <code>instance</code> does not have a <code>memory</code> export an exception is thrown.</p>
 <p>If <code>initialize()</code> is called more than once, an exception is thrown.</p>
+</div><div>
+<h4><code>wasi.finalizeBindings(instance[, options])</code><span><a class="mark" href="#wasifinalizebindingsinstance-options" id="wasifinalizebindingsinstance-options">#</a></span><a aria-hidden="true" class="legacy" id="wasi_wasi_finalizebindings_instance_options"></a></h4>
+<div class="api_metadata">
+<span>Added in: v24.4.0</span>
+</div>
+<ul>
+<li><code>instance</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Instance" class="type">&#x3C;WebAssembly.Instance></a></li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>memory</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Memory" class="type">&#x3C;WebAssembly.Memory></a> <strong>Default:</strong> <code>instance.exports.memory</code>.</li>
+</ul>
+</li>
+</ul>
+<p>Set up WASI host bindings to <code>instance</code> without calling <code>initialize()</code>
+or <code>start()</code>. This method is useful when the WASI module is instantiated in
+child threads for sharing the memory across threads.</p>
+<p><code>finalizeBindings()</code> requires that either <code>instance</code> exports a
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Memory"><code>WebAssembly.Memory</code></a> named <code>memory</code> or user specify a
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Memory"><code>WebAssembly.Memory</code></a> object in <code>options.memory</code>. If the <code>memory</code> is invalid
+an exception is thrown.</p>
+<p><code>start()</code> and <code>initialize()</code> will call <code>finalizeBindings()</code> internally.
+If <code>finalizeBindings()</code> is called more than once, an exception is thrown.</p>
 </div><div>
 <h4><code>wasi.wasiImport</code><span><a class="mark" href="#wasiwasiimport" id="wasiwasiimport">#</a></span><a aria-hidden="true" class="legacy" id="wasi_wasi_wasiimport"></a></h4>
 <div class="api_metadata">
