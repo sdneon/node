@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.4.1/lib/vm.js\">lib/vm.js</a></p>\n<p>The <code>node:vm</code> module enables compiling and running code within V8 Virtual\nMachine contexts.</p>\n<p><strong class=\"critical\">The <code>node:vm</code> module is not a security\nmechanism. Do not use it to run untrusted code.</strong></p>\n<p>JavaScript code can be compiled and run immediately or\ncompiled, saved, and run later.</p>\n<p>A common use case is to run the code in a different V8 Context. This means\ninvoked code has a different global object than the invoking code.</p>\n<p>One can provide the context by <a href=\"#what-does-it-mean-to-contextify-an-object\"><em>contextifying</em></a> an\nobject. The invoked code treats any property in the context like a\nglobal variable. Any changes to global variables caused by the invoked\ncode are reflected in the context object.</p>\n<pre><code class=\"language-js\">const vm = require('node:vm');\n\nconst x = 1;\n\nconst context = { x: 2 };\nvm.createContext(context); // Contextify the object.\n\nconst code = 'x += 40; var y = 17;';\n// `x` and `y` are global variables in the context.\n// Initially, x has the value 2 because that is the value of context.x.\nvm.runInContext(code, context);\n\nconsole.log(context.x); // 42\nconsole.log(context.y); // 17\n\nconsole.log(x); // 1; y is not defined.\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.6.0/lib/vm.js\">lib/vm.js</a></p>\n<p>The <code>node:vm</code> module enables compiling and running code within V8 Virtual\nMachine contexts.</p>\n<p><strong class=\"critical\">The <code>node:vm</code> module is not a security\nmechanism. Do not use it to run untrusted code.</strong></p>\n<p>JavaScript code can be compiled and run immediately or\ncompiled, saved, and run later.</p>\n<p>A common use case is to run the code in a different V8 Context. This means\ninvoked code has a different global object than the invoking code.</p>\n<p>One can provide the context by <a href=\"#what-does-it-mean-to-contextify-an-object\"><em>contextifying</em></a> an\nobject. The invoked code treats any property in the context like a\nglobal variable. Any changes to global variables caused by the invoked\ncode are reflected in the context object.</p>\n<pre><code class=\"language-js\">const vm = require('node:vm');\n\nconst x = 1;\n\nconst context = { x: 2 };\nvm.createContext(context); // Contextify the object.\n\nconst code = 'x += 40; var y = 17;';\n// `x` and `y` are global variables in the context.\n// Initially, x has the value 2 because that is the value of context.x.\nvm.runInContext(code, context);\n\nconsole.log(context.x); // 42\nconsole.log(context.y); // 17\n\nconsole.log(x); // 1; y is not defined.\n</code></pre>",
       "classes": [
         {
           "textRaw": "Class: `vm.Script`",
@@ -23,9 +23,9 @@
           "desc": "<p>Instances of the <code>vm.Script</code> class contain precompiled scripts that can be\nexecuted in specific contexts.</p>",
           "properties": [
             {
-              "textRaw": "`cachedDataRejected` {boolean|undefined}",
+              "textRaw": "`cachedDataRejected` Type: {boolean|undefined}",
               "type": "boolean|undefined",
-              "name": "cachedDataRejected",
+              "name": "Type",
               "meta": {
                 "added": [
                   "v5.7.0"
@@ -35,9 +35,9 @@
               "desc": "<p>When <code>cachedData</code> is supplied to create the <code>vm.Script</code>, this value will be set\nto either <code>true</code> or <code>false</code> depending on acceptance of the data by V8.\nOtherwise the value is <code>undefined</code>.</p>"
             },
             {
-              "textRaw": "`sourceMapURL` {string|undefined}",
+              "textRaw": "`sourceMapURL` Type: {string|undefined}",
               "type": "string|undefined",
-              "name": "sourceMapURL",
+              "name": "Type",
               "meta": {
                 "added": [
                   "v19.1.0",
@@ -391,27 +391,27 @@
           "desc": "<p>This feature is only available with the <code>--experimental-vm-modules</code> command\nflag enabled.</p>\n<p>The <code>vm.Module</code> class provides a low-level interface for using\nECMAScript modules in VM contexts. It is the counterpart of the <code>vm.Script</code>\nclass that closely mirrors <a href=\"https://tc39.es/ecma262/#sec-abstract-module-records\">Module Record</a>s as defined in the ECMAScript\nspecification.</p>\n<p>Unlike <code>vm.Script</code> however, every <code>vm.Module</code> object is bound to a context from\nits creation. Operations on <code>vm.Module</code> objects are intrinsically asynchronous,\nin contrast with the synchronous nature of <code>vm.Script</code> objects. The use of\n'async' functions can help with manipulating <code>vm.Module</code> objects.</p>\n<p>Using a <code>vm.Module</code> object requires three distinct steps: creation/parsing,\nlinking, and evaluation. These three steps are illustrated in the following\nexample.</p>\n<p>This implementation lies at a lower level than the <a href=\"esm.html#modules-ecmascript-modules\">ECMAScript Module\nloader</a>. There is also no way to interact with the Loader yet, though\nsupport is planned.</p>\n<pre><code class=\"language-mjs\">import vm from 'node:vm';\n\nconst contextifiedObject = vm.createContext({\n  secret: 42,\n  print: console.log,\n});\n\n// Step 1\n//\n// Create a Module by constructing a new `vm.SourceTextModule` object. This\n// parses the provided source text, throwing a `SyntaxError` if anything goes\n// wrong. By default, a Module is created in the top context. But here, we\n// specify `contextifiedObject` as the context this Module belongs to.\n//\n// Here, we attempt to obtain the default export from the module \"foo\", and\n// put it into local binding \"secret\".\n\nconst bar = new vm.SourceTextModule(`\n  import s from 'foo';\n  s;\n  print(s);\n`, { context: contextifiedObject });\n\n// Step 2\n//\n// \"Link\" the imported dependencies of this Module to it.\n//\n// The provided linking callback (the \"linker\") accepts two arguments: the\n// parent module (`bar` in this case) and the string that is the specifier of\n// the imported module. The callback is expected to return a Module that\n// corresponds to the provided specifier, with certain requirements documented\n// in `module.link()`.\n//\n// If linking has not started for the returned Module, the same linker\n// callback will be called on the returned Module.\n//\n// Even top-level Modules without dependencies must be explicitly linked. The\n// callback provided would never be called, however.\n//\n// The link() method returns a Promise that will be resolved when all the\n// Promises returned by the linker resolve.\n//\n// Note: This is a contrived example in that the linker function creates a new\n// \"foo\" module every time it is called. In a full-fledged module system, a\n// cache would probably be used to avoid duplicated modules.\n\nasync function linker(specifier, referencingModule) {\n  if (specifier === 'foo') {\n    return new vm.SourceTextModule(`\n      // The \"secret\" variable refers to the global variable we added to\n      // \"contextifiedObject\" when creating the context.\n      export default secret;\n    `, { context: referencingModule.context });\n\n    // Using `contextifiedObject` instead of `referencingModule.context`\n    // here would work as well.\n  }\n  throw new Error(`Unable to resolve dependency: ${specifier}`);\n}\nawait bar.link(linker);\n\n// Step 3\n//\n// Evaluate the Module. The evaluate() method returns a promise which will\n// resolve after the module has finished evaluating.\n\n// Prints 42.\nawait bar.evaluate();\n</code></pre>\n<pre><code class=\"language-cjs\">const vm = require('node:vm');\n\nconst contextifiedObject = vm.createContext({\n  secret: 42,\n  print: console.log,\n});\n\n(async () => {\n  // Step 1\n  //\n  // Create a Module by constructing a new `vm.SourceTextModule` object. This\n  // parses the provided source text, throwing a `SyntaxError` if anything goes\n  // wrong. By default, a Module is created in the top context. But here, we\n  // specify `contextifiedObject` as the context this Module belongs to.\n  //\n  // Here, we attempt to obtain the default export from the module \"foo\", and\n  // put it into local binding \"secret\".\n\n  const bar = new vm.SourceTextModule(`\n    import s from 'foo';\n    s;\n    print(s);\n  `, { context: contextifiedObject });\n\n  // Step 2\n  //\n  // \"Link\" the imported dependencies of this Module to it.\n  //\n  // The provided linking callback (the \"linker\") accepts two arguments: the\n  // parent module (`bar` in this case) and the string that is the specifier of\n  // the imported module. The callback is expected to return a Module that\n  // corresponds to the provided specifier, with certain requirements documented\n  // in `module.link()`.\n  //\n  // If linking has not started for the returned Module, the same linker\n  // callback will be called on the returned Module.\n  //\n  // Even top-level Modules without dependencies must be explicitly linked. The\n  // callback provided would never be called, however.\n  //\n  // The link() method returns a Promise that will be resolved when all the\n  // Promises returned by the linker resolve.\n  //\n  // Note: This is a contrived example in that the linker function creates a new\n  // \"foo\" module every time it is called. In a full-fledged module system, a\n  // cache would probably be used to avoid duplicated modules.\n\n  async function linker(specifier, referencingModule) {\n    if (specifier === 'foo') {\n      return new vm.SourceTextModule(`\n        // The \"secret\" variable refers to the global variable we added to\n        // \"contextifiedObject\" when creating the context.\n        export default secret;\n      `, { context: referencingModule.context });\n\n      // Using `contextifiedObject` instead of `referencingModule.context`\n      // here would work as well.\n    }\n    throw new Error(`Unable to resolve dependency: ${specifier}`);\n  }\n  await bar.link(linker);\n\n  // Step 3\n  //\n  // Evaluate the Module. The evaluate() method returns a promise which will\n  // resolve after the module has finished evaluating.\n\n  // Prints 42.\n  await bar.evaluate();\n})();\n</code></pre>",
           "properties": [
             {
-              "textRaw": "`error` {any}",
+              "textRaw": "`error` Type: {any}",
               "type": "any",
-              "name": "error",
+              "name": "Type",
               "desc": "<p>If the <code>module.status</code> is <code>'errored'</code>, this property contains the exception\nthrown by the module during evaluation. If the status is anything else,\naccessing this property will result in a thrown exception.</p>\n<p>The value <code>undefined</code> cannot be used for cases where there is not a thrown\nexception due to possible ambiguity with <code>throw undefined;</code>.</p>\n<p>Corresponds to the <code>[[EvaluationError]]</code> field of <a href=\"https://tc39.es/ecma262/#sec-cyclic-module-records\">Cyclic Module Record</a>s\nin the ECMAScript specification.</p>"
             },
             {
-              "textRaw": "`identifier` {string}",
+              "textRaw": "`identifier` Type: {string}",
               "type": "string",
-              "name": "identifier",
+              "name": "Type",
               "desc": "<p>The identifier of the current module, as set in the constructor.</p>"
             },
             {
-              "textRaw": "`namespace` {Object}",
+              "textRaw": "`namespace` Type: {Object}",
               "type": "Object",
-              "name": "namespace",
+              "name": "Type",
               "desc": "<p>The namespace object of the module. This is only available after linking\n(<code>module.link()</code>) has completed.</p>\n<p>Corresponds to the <a href=\"https://tc39.es/ecma262/#sec-getmodulenamespace\">GetModuleNamespace</a> abstract operation in the ECMAScript\nspecification.</p>"
             },
             {
-              "textRaw": "`status` {string}",
+              "textRaw": "`status` Type: {string}",
               "type": "string",
-              "name": "status",
+              "name": "Type",
               "desc": "<p>The current status of the module. Will be one of:</p>\n<ul>\n<li>\n<p><code>'unlinked'</code>: <code>module.link()</code> has not yet been called.</p>\n</li>\n<li>\n<p><code>'linking'</code>: <code>module.link()</code> has been called, but not all Promises returned\nby the linker function have been resolved yet.</p>\n</li>\n<li>\n<p><code>'linked'</code>: The module has been linked successfully, and all of its\ndependencies are linked, but <code>module.evaluate()</code> has not yet been called.</p>\n</li>\n<li>\n<p><code>'evaluating'</code>: The module is being evaluated through a <code>module.evaluate()</code> on\nitself or a parent module.</p>\n</li>\n<li>\n<p><code>'evaluated'</code>: The module has been successfully evaluated.</p>\n</li>\n<li>\n<p><code>'errored'</code>: The module has been evaluated, but an exception was thrown.</p>\n</li>\n</ul>\n<p>Other than <code>'errored'</code>, this status string corresponds to the specification's\n<a href=\"https://tc39.es/ecma262/#sec-cyclic-module-records\">Cyclic Module Record</a>'s <code>[[Status]]</code> field. <code>'errored'</code> corresponds to\n<code>'evaluated'</code> in the specification, but with <code>[[EvaluationError]]</code> set to a\nvalue that is not <code>undefined</code>.</p>"
             }
           ],
@@ -569,9 +569,9 @@
           ],
           "properties": [
             {
-              "textRaw": "`dependencySpecifiers` {string\\[]}",
+              "textRaw": "`dependencySpecifiers` Type: {string\\[]}",
               "type": "string\\[]",
-              "name": "dependencySpecifiers",
+              "name": "Type",
               "meta": {
                 "changes": [
                   {
@@ -586,9 +586,9 @@
               "desc": "<p>The specifiers of all dependencies of this module. The returned array is frozen\nto disallow any changes to it.</p>\n<p>Corresponds to the <code>[[RequestedModules]]</code> field of <a href=\"https://tc39.es/ecma262/#sec-cyclic-module-records\">Cyclic Module Record</a>s in\nthe ECMAScript specification.</p>"
             },
             {
-              "textRaw": "`moduleRequests` {ModuleRequest\\[]} Dependencies of this module.",
+              "textRaw": "`moduleRequests` Type: {ModuleRequest\\[]} Dependencies of this module.",
               "type": "ModuleRequest\\[]",
-              "name": "moduleRequests",
+              "name": "Type",
               "meta": {
                 "added": [
                   "v24.4.0"
@@ -773,7 +773,7 @@
             ],
             "changes": []
           },
-          "desc": "<ul>\n<li><a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a>\n<ul>\n<li><code>specifier</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> The specifier of the requested module.</li>\n<li><code>attributes</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a> The <code>\"with\"</code> value passed to the\n<a href=\"https://tc39.es/ecma262/#prod-WithClause\">WithClause</a> in a <a href=\"https://tc39.es/ecma262/#prod-ImportDeclaration\">ImportDeclaration</a>, or an empty object if no value was\nprovided.</li>\n<li><code>phase</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> The phase of the requested module (<code>\"source\"</code> or <code>\"evaluation\"</code>).</li>\n</ul>\n</li>\n</ul>\n<p>A <code>ModuleRequest</code> represents the request to import a module with given import attributes and phase.</p>",
+          "desc": "<ul>\n<li>Type: <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a>\n<ul>\n<li><code>specifier</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> The specifier of the requested module.</li>\n<li><code>attributes</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a> The <code>\"with\"</code> value passed to the\n<a href=\"https://tc39.es/ecma262/#prod-WithClause\">WithClause</a> in a <a href=\"https://tc39.es/ecma262/#prod-ImportDeclaration\">ImportDeclaration</a>, or an empty object if no value was\nprovided.</li>\n<li><code>phase</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> The phase of the requested module (<code>\"source\"</code> or <code>\"evaluation\"</code>).</li>\n</ul>\n</li>\n</ul>\n<p>A <code>ModuleRequest</code> represents the request to import a module with given import attributes and phase.</p>",
           "type": "module",
           "displayName": "Type: `ModuleRequest`"
         },
@@ -1543,9 +1543,9 @@
       ],
       "properties": [
         {
-          "textRaw": "`constants` {Object}",
+          "textRaw": "`constants` Type: {Object}",
           "type": "Object",
-          "name": "constants",
+          "name": "Type",
           "meta": {
             "added": [
               "v21.7.0",

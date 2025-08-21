@@ -7,7 +7,7 @@
       "name": "Process",
       "introduced_in": "v0.10.0",
       "type": "global",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.4.1/lib/process.js\">lib/process.js</a></p>\n<p>The <code>process</code> object provides information about, and control over, the current\nNode.js process.</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\n</code></pre>\n<pre><code class=\"language-cjs\">const process = require('node:process');\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.6.0/lib/process.js\">lib/process.js</a></p>\n<p>The <code>process</code> object provides information about, and control over, the current\nNode.js process.</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\n</code></pre>\n<pre><code class=\"language-cjs\">const process = require('node:process');\n</code></pre>",
       "modules": [
         {
           "textRaw": "Process events",
@@ -414,7 +414,8 @@
             {
               "params": [
                 {
-                  "textRaw": "{number}",
+                  "textRaw": "Type: {number}",
+                  "name": "Type",
                   "type": "number"
                 }
               ]
@@ -474,7 +475,8 @@
             {
               "params": [
                 {
-                  "textRaw": "{number}",
+                  "textRaw": "Type: {number}",
+                  "name": "Type",
                   "type": "number"
                 }
               ]
@@ -1290,7 +1292,16 @@
               "params": []
             }
           ],
-          "desc": "<p>Returns an object describing the memory usage of the Node.js process measured in\nbytes.</p>\n<pre><code class=\"language-mjs\">import { memoryUsage } from 'node:process';\n\nconsole.log(memoryUsage());\n// Prints:\n// {\n//  rss: 4935680,\n//  heapTotal: 1826816,\n//  heapUsed: 650472,\n//  external: 49879,\n//  arrayBuffers: 9386\n// }\n</code></pre>\n<pre><code class=\"language-cjs\">const { memoryUsage } = require('node:process');\n\nconsole.log(memoryUsage());\n// Prints:\n// {\n//  rss: 4935680,\n//  heapTotal: 1826816,\n//  heapUsed: 650472,\n//  external: 49879,\n//  arrayBuffers: 9386\n// }\n</code></pre>\n<ul>\n<li><code>heapTotal</code> and <code>heapUsed</code> refer to V8's memory usage.</li>\n<li><code>external</code> refers to the memory usage of C++ objects bound to JavaScript\nobjects managed by V8.</li>\n<li><code>rss</code>, Resident Set Size, is the amount of space occupied in the main\nmemory device (that is a subset of the total allocated memory) for the\nprocess, including all C++ and JavaScript objects and code.</li>\n<li><code>arrayBuffers</code> refers to memory allocated for <code>ArrayBuffer</code>s and\n<code>SharedArrayBuffer</code>s, including all Node.js <a href=\"buffer.html\"><code>Buffer</code></a>s.\nThis is also included in the <code>external</code> value. When Node.js is used as an\nembedded library, this value may be <code>0</code> because allocations for <code>ArrayBuffer</code>s\nmay not be tracked in that case.</li>\n</ul>\n<p>When using <a href=\"worker_threads.html#class-worker\"><code>Worker</code></a> threads, <code>rss</code> will be a value that is valid for the\nentire process, while the other fields will only refer to the current thread.</p>\n<p>The <code>process.memoryUsage()</code> method iterates over each page to gather\ninformation about memory usage which might be slow depending on the\nprogram memory allocations.</p>"
+          "desc": "<p>Returns an object describing the memory usage of the Node.js process measured in\nbytes.</p>\n<pre><code class=\"language-mjs\">import { memoryUsage } from 'node:process';\n\nconsole.log(memoryUsage());\n// Prints:\n// {\n//  rss: 4935680,\n//  heapTotal: 1826816,\n//  heapUsed: 650472,\n//  external: 49879,\n//  arrayBuffers: 9386\n// }\n</code></pre>\n<pre><code class=\"language-cjs\">const { memoryUsage } = require('node:process');\n\nconsole.log(memoryUsage());\n// Prints:\n// {\n//  rss: 4935680,\n//  heapTotal: 1826816,\n//  heapUsed: 650472,\n//  external: 49879,\n//  arrayBuffers: 9386\n// }\n</code></pre>\n<ul>\n<li><code>heapTotal</code> and <code>heapUsed</code> refer to V8's memory usage.</li>\n<li><code>external</code> refers to the memory usage of C++ objects bound to JavaScript\nobjects managed by V8.</li>\n<li><code>rss</code>, Resident Set Size, is the amount of space occupied in the main\nmemory device (that is a subset of the total allocated memory) for the\nprocess, including all C++ and JavaScript objects and code.</li>\n<li><code>arrayBuffers</code> refers to memory allocated for <code>ArrayBuffer</code>s and\n<code>SharedArrayBuffer</code>s, including all Node.js <a href=\"buffer.html\"><code>Buffer</code></a>s.\nThis is also included in the <code>external</code> value. When Node.js is used as an\nembedded library, this value may be <code>0</code> because allocations for <code>ArrayBuffer</code>s\nmay not be tracked in that case.</li>\n</ul>\n<p>When using <a href=\"worker_threads.html#class-worker\"><code>Worker</code></a> threads, <code>rss</code> will be a value that is valid for the\nentire process, while the other fields will only refer to the current thread.</p>\n<p>The <code>process.memoryUsage()</code> method iterates over each page to gather\ninformation about memory usage which might be slow depending on the\nprogram memory allocations.</p>",
+          "modules": [
+            {
+              "textRaw": "A note on process memoryUsage",
+              "name": "a_note_on_process_memoryusage",
+              "desc": "<p>On Linux or other systems where glibc is commonly used, an application may have sustained\n<code>rss</code> growth despite stable <code>heapTotal</code> due to fragmentation caused by the glibc <code>malloc</code>\nimplementation. See <a href=\"https://github.com/nodejs/node/issues/21973\">nodejs/node#21973</a> on how to switch to an alternative <code>malloc</code>\nimplementation to address the performance issue.</p>",
+              "type": "module",
+              "displayName": "A note on process memoryUsage"
+            }
+          ]
         },
         {
           "textRaw": "`process.memoryUsage.rss()`",
@@ -1886,9 +1897,9 @@
       ],
       "properties": [
         {
-          "textRaw": "`allowedNodeEnvironmentFlags` {Set}",
+          "textRaw": "`allowedNodeEnvironmentFlags` Type: {Set}",
           "type": "Set",
-          "name": "allowedNodeEnvironmentFlags",
+          "name": "Type",
           "meta": {
             "added": [
               "v10.10.0"
@@ -1898,9 +1909,9 @@
           "desc": "<p>The <code>process.allowedNodeEnvironmentFlags</code> property is a special,\nread-only <code>Set</code> of flags allowable within the <a href=\"cli.html#node_optionsoptions\"><code>NODE_OPTIONS</code></a>\nenvironment variable.</p>\n<p><code>process.allowedNodeEnvironmentFlags</code> extends <code>Set</code>, but overrides\n<code>Set.prototype.has</code> to recognize several different possible flag\nrepresentations. <code>process.allowedNodeEnvironmentFlags.has()</code> will\nreturn <code>true</code> in the following cases:</p>\n<ul>\n<li>Flags may omit leading single (<code>-</code>) or double (<code>--</code>) dashes; e.g.,\n<code>inspect-brk</code> for <code>--inspect-brk</code>, or <code>r</code> for <code>-r</code>.</li>\n<li>Flags passed through to V8 (as listed in <code>--v8-options</code>) may replace\none or more <em>non-leading</em> dashes for an underscore, or vice-versa;\ne.g., <code>--perf_basic_prof</code>, <code>--perf-basic-prof</code>, <code>--perf_basic-prof</code>,\netc.</li>\n<li>Flags may contain one or more equals (<code>=</code>) characters; all\ncharacters after and including the first equals will be ignored;\ne.g., <code>--stack-trace-limit=100</code>.</li>\n<li>Flags <em>must</em> be allowable within <a href=\"cli.html#node_optionsoptions\"><code>NODE_OPTIONS</code></a>.</li>\n</ul>\n<p>When iterating over <code>process.allowedNodeEnvironmentFlags</code>, flags will\nappear only <em>once</em>; each will begin with one or more dashes. Flags\npassed through to V8 will contain underscores instead of non-leading\ndashes:</p>\n<pre><code class=\"language-mjs\">import { allowedNodeEnvironmentFlags } from 'node:process';\n\nallowedNodeEnvironmentFlags.forEach((flag) => {\n  // -r\n  // --inspect-brk\n  // --abort_on_uncaught_exception\n  // ...\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const { allowedNodeEnvironmentFlags } = require('node:process');\n\nallowedNodeEnvironmentFlags.forEach((flag) => {\n  // -r\n  // --inspect-brk\n  // --abort_on_uncaught_exception\n  // ...\n});\n</code></pre>\n<p>The methods <code>add()</code>, <code>clear()</code>, and <code>delete()</code> of\n<code>process.allowedNodeEnvironmentFlags</code> do nothing, and will fail\nsilently.</p>\n<p>If Node.js was compiled <em>without</em> <a href=\"cli.html#node_optionsoptions\"><code>NODE_OPTIONS</code></a> support (shown in\n<a href=\"#processconfig\"><code>process.config</code></a>), <code>process.allowedNodeEnvironmentFlags</code> will\ncontain what <em>would have</em> been allowable.</p>"
         },
         {
-          "textRaw": "`arch` {string}",
+          "textRaw": "`arch` Type: {string}",
           "type": "string",
-          "name": "arch",
+          "name": "Type",
           "meta": {
             "added": [
               "v0.5.0"
@@ -1910,9 +1921,9 @@
           "desc": "<p>The operating system CPU architecture for which the Node.js binary was compiled.\nPossible values are: <code>'arm'</code>, <code>'arm64'</code>, <code>'ia32'</code>, <code>'loong64'</code>, <code>'mips'</code>,\n<code>'mipsel'</code>, <code>'ppc64'</code>, <code>'riscv64'</code>, <code>'s390'</code>, <code>'s390x'</code>, and <code>'x64'</code>.</p>\n<pre><code class=\"language-mjs\">import { arch } from 'node:process';\n\nconsole.log(`This processor architecture is ${arch}`);\n</code></pre>\n<pre><code class=\"language-cjs\">const { arch } = require('node:process');\n\nconsole.log(`This processor architecture is ${arch}`);\n</code></pre>"
         },
         {
-          "textRaw": "`argv` {string\\[]}",
+          "textRaw": "`argv` Type: {string\\[]}",
           "type": "string\\[]",
-          "name": "argv",
+          "name": "Type",
           "meta": {
             "added": [
               "v0.1.27"
@@ -1922,9 +1933,9 @@
           "desc": "<p>The <code>process.argv</code> property returns an array containing the command-line\narguments passed when the Node.js process was launched. The first element will\nbe <a href=\"#processexecpath\"><code>process.execPath</code></a>. See <code>process.argv0</code> if access to the original value\nof <code>argv[0]</code> is needed. The second element will be the path to the JavaScript\nfile being executed. The remaining elements will be any additional command-line\narguments.</p>\n<p>For example, assuming the following script for <code>process-args.js</code>:</p>\n<pre><code class=\"language-mjs\">import { argv } from 'node:process';\n\n// print process.argv\nargv.forEach((val, index) => {\n  console.log(`${index}: ${val}`);\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const { argv } = require('node:process');\n\n// print process.argv\nargv.forEach((val, index) => {\n  console.log(`${index}: ${val}`);\n});\n</code></pre>\n<p>Launching the Node.js process as:</p>\n<pre><code class=\"language-bash\">node process-args.js one two=three four\n</code></pre>\n<p>Would generate the output:</p>\n<pre><code class=\"language-text\">0: /usr/local/bin/node\n1: /Users/mjr/work/node/process-args.js\n2: one\n3: two=three\n4: four\n</code></pre>"
         },
         {
-          "textRaw": "`argv0` {string}",
+          "textRaw": "`argv0` Type: {string}",
           "type": "string",
-          "name": "argv0",
+          "name": "Type",
           "meta": {
             "added": [
               "v6.4.0"
@@ -1934,9 +1945,9 @@
           "desc": "<p>The <code>process.argv0</code> property stores a read-only copy of the original value of\n<code>argv[0]</code> passed when Node.js starts.</p>\n<pre><code class=\"language-console\">$ bash -c 'exec -a customArgv0 ./node'\n> process.argv[0]\n'/Volumes/code/external/node/out/Release/node'\n> process.argv0\n'customArgv0'\n</code></pre>"
         },
         {
-          "textRaw": "`channel` {Object}",
+          "textRaw": "`channel` Type: {Object}",
           "type": "Object",
-          "name": "channel",
+          "name": "Type",
           "meta": {
             "added": [
               "v7.1.0"
@@ -1988,9 +1999,9 @@
           ]
         },
         {
-          "textRaw": "`config` {Object}",
+          "textRaw": "`config` Type: {Object}",
           "type": "Object",
-          "name": "config",
+          "name": "Type",
           "meta": {
             "added": [
               "v0.7.7"
@@ -2011,9 +2022,9 @@
           "desc": "<p>The <code>process.config</code> property returns a frozen <code>Object</code> containing the\nJavaScript representation of the configure options used to compile the current\nNode.js executable. This is the same as the <code>config.gypi</code> file that was produced\nwhen running the <code>./configure</code> script.</p>\n<p>An example of the possible output looks like:</p>\n<!-- eslint-skip -->\n<pre><code class=\"language-js\">{\n  target_defaults:\n   { cflags: [],\n     default_configuration: 'Release',\n     defines: [],\n     include_dirs: [],\n     libraries: [] },\n  variables:\n   {\n     host_arch: 'x64',\n     napi_build_version: 5,\n     node_install_npm: 'true',\n     node_prefix: '',\n     node_shared_cares: 'false',\n     node_shared_http_parser: 'false',\n     node_shared_libuv: 'false',\n     node_shared_zlib: 'false',\n     node_use_openssl: 'true',\n     node_shared_openssl: 'false',\n     target_arch: 'x64',\n     v8_use_snapshot: 1\n   }\n}\n</code></pre>"
         },
         {
-          "textRaw": "`connected` {boolean}",
+          "textRaw": "`connected` Type: {boolean}",
           "type": "boolean",
-          "name": "connected",
+          "name": "Type",
           "meta": {
             "added": [
               "v0.7.2"
@@ -2023,9 +2034,9 @@
           "desc": "<p>If the Node.js process is spawned with an IPC channel (see the <a href=\"child_process.html\">Child Process</a>\nand <a href=\"cluster.html\">Cluster</a> documentation), the <code>process.connected</code> property will return\n<code>true</code> so long as the IPC channel is connected and will return <code>false</code> after\n<code>process.disconnect()</code> is called.</p>\n<p>Once <code>process.connected</code> is <code>false</code>, it is no longer possible to send messages\nover the IPC channel using <code>process.send()</code>.</p>"
         },
         {
-          "textRaw": "`debugPort` {number}",
+          "textRaw": "`debugPort` Type: {number}",
           "type": "number",
-          "name": "debugPort",
+          "name": "Type",
           "meta": {
             "added": [
               "v0.7.2"
@@ -2035,9 +2046,9 @@
           "desc": "<p>The port used by the Node.js debugger when enabled.</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\n\nprocess.debugPort = 5858;\n</code></pre>\n<pre><code class=\"language-cjs\">const process = require('node:process');\n\nprocess.debugPort = 5858;\n</code></pre>"
         },
         {
-          "textRaw": "`env` {Object}",
+          "textRaw": "`env` Type: {Object}",
           "type": "Object",
-          "name": "env",
+          "name": "Type",
           "meta": {
             "added": [
               "v0.1.27"
@@ -2058,9 +2069,9 @@
           "desc": "<p>The <code>process.env</code> property returns an object containing the user environment.\nSee <a href=\"http://man7.org/linux/man-pages/man7/environ.7.html\"><code>environ(7)</code></a>.</p>\n<p>An example of this object looks like:</p>\n<!-- eslint-skip -->\n<pre><code class=\"language-js\">{\n  TERM: 'xterm-256color',\n  SHELL: '/usr/local/bin/bash',\n  USER: 'maciej',\n  PATH: '~/.bin/:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin',\n  PWD: '/Users/maciej',\n  EDITOR: 'vim',\n  SHLVL: '1',\n  HOME: '/Users/maciej',\n  LOGNAME: 'maciej',\n  _: '/usr/local/bin/node'\n}\n</code></pre>\n<p>It is possible to modify this object, but such modifications will not be\nreflected outside the Node.js process, or (unless explicitly requested)\nto other <a href=\"worker_threads.html#class-worker\"><code>Worker</code></a> threads.\nIn other words, the following example would not work:</p>\n<pre><code class=\"language-bash\">node -e 'process.env.foo = \"bar\"' &#x26;&#x26; echo $foo\n</code></pre>\n<p>While the following will:</p>\n<pre><code class=\"language-mjs\">import { env } from 'node:process';\n\nenv.foo = 'bar';\nconsole.log(env.foo);\n</code></pre>\n<pre><code class=\"language-cjs\">const { env } = require('node:process');\n\nenv.foo = 'bar';\nconsole.log(env.foo);\n</code></pre>\n<p>Assigning a property on <code>process.env</code> will implicitly convert the value\nto a string. <strong>This behavior is deprecated.</strong> Future versions of Node.js may\nthrow an error when the value is not a string, number, or boolean.</p>\n<pre><code class=\"language-mjs\">import { env } from 'node:process';\n\nenv.test = null;\nconsole.log(env.test);\n// => 'null'\nenv.test = undefined;\nconsole.log(env.test);\n// => 'undefined'\n</code></pre>\n<pre><code class=\"language-cjs\">const { env } = require('node:process');\n\nenv.test = null;\nconsole.log(env.test);\n// => 'null'\nenv.test = undefined;\nconsole.log(env.test);\n// => 'undefined'\n</code></pre>\n<p>Use <code>delete</code> to delete a property from <code>process.env</code>.</p>\n<pre><code class=\"language-mjs\">import { env } from 'node:process';\n\nenv.TEST = 1;\ndelete env.TEST;\nconsole.log(env.TEST);\n// => undefined\n</code></pre>\n<pre><code class=\"language-cjs\">const { env } = require('node:process');\n\nenv.TEST = 1;\ndelete env.TEST;\nconsole.log(env.TEST);\n// => undefined\n</code></pre>\n<p>On Windows operating systems, environment variables are case-insensitive.</p>\n<pre><code class=\"language-mjs\">import { env } from 'node:process';\n\nenv.TEST = 1;\nconsole.log(env.test);\n// => 1\n</code></pre>\n<pre><code class=\"language-cjs\">const { env } = require('node:process');\n\nenv.TEST = 1;\nconsole.log(env.test);\n// => 1\n</code></pre>\n<p>Unless explicitly specified when creating a <a href=\"worker_threads.html#class-worker\"><code>Worker</code></a> instance,\neach <a href=\"worker_threads.html#class-worker\"><code>Worker</code></a> thread has its own copy of <code>process.env</code>, based on its\nparent thread's <code>process.env</code>, or whatever was specified as the <code>env</code> option\nto the <a href=\"worker_threads.html#class-worker\"><code>Worker</code></a> constructor. Changes to <code>process.env</code> will not be visible\nacross <a href=\"worker_threads.html#class-worker\"><code>Worker</code></a> threads, and only the main thread can make changes that\nare visible to the operating system or to native add-ons. On Windows, a copy of\n<code>process.env</code> on a <a href=\"worker_threads.html#class-worker\"><code>Worker</code></a> instance operates in a case-sensitive manner\nunlike the main thread.</p>"
         },
         {
-          "textRaw": "`execArgv` {string\\[]}",
+          "textRaw": "`execArgv` Type: {string\\[]}",
           "type": "string\\[]",
-          "name": "execArgv",
+          "name": "Type",
           "meta": {
             "added": [
               "v0.7.7"
@@ -2070,9 +2081,9 @@
           "desc": "<p>The <code>process.execArgv</code> property returns the set of Node.js-specific command-line\noptions passed when the Node.js process was launched. These options do not\nappear in the array returned by the <a href=\"#processargv\"><code>process.argv</code></a> property, and do not\ninclude the Node.js executable, the name of the script, or any options following\nthe script name. These options are useful in order to spawn child processes with\nthe same execution environment as the parent.</p>\n<pre><code class=\"language-bash\">node --icu-data-dir=./foo --require ./bar.js script.js --version\n</code></pre>\n<p>Results in <code>process.execArgv</code>:</p>\n<pre><code class=\"language-json\">[\"--icu-data-dir=./foo\", \"--require\", \"./bar.js\"]\n</code></pre>\n<p>And <code>process.argv</code>:</p>\n<!-- eslint-disable @stylistic/js/semi -->\n<pre><code class=\"language-js\">['/usr/local/bin/node', 'script.js', '--version']\n</code></pre>\n<p>Refer to <a href=\"worker_threads.html#new-workerfilename-options\"><code>Worker</code> constructor</a> for the detailed behavior of worker\nthreads with this property.</p>"
         },
         {
-          "textRaw": "`execPath` {string}",
+          "textRaw": "`execPath` Type: {string}",
           "type": "string",
-          "name": "execPath",
+          "name": "Type",
           "meta": {
             "added": [
               "v0.1.100"
@@ -2082,9 +2093,9 @@
           "desc": "<p>The <code>process.execPath</code> property returns the absolute pathname of the executable\nthat started the Node.js process. Symbolic links, if any, are resolved.</p>\n<!-- eslint-disable @stylistic/js/semi -->\n<pre><code class=\"language-js\">'/usr/local/bin/node'\n</code></pre>"
         },
         {
-          "textRaw": "`exitCode` {integer|string|null|undefined} The exit code. For string type, only integer strings (e.g.,'1') are allowed. **Default:** `undefined`.",
+          "textRaw": "`exitCode` Type: {integer|string|null|undefined} The exit code. For string type, only integer strings (e.g.,'1') are allowed. **Default:** `undefined`.",
           "type": "integer|string|null|undefined",
-          "name": "exitCode",
+          "name": "Type",
           "meta": {
             "added": [
               "v0.11.8"
@@ -2102,9 +2113,9 @@
           "shortDesc": "The exit code. For string type, only integer strings (e.g.,'1') are allowed."
         },
         {
-          "textRaw": "`cached_builtins` {boolean}",
+          "textRaw": "`cached_builtins` Type: {boolean}",
           "type": "boolean",
-          "name": "cached_builtins",
+          "name": "Type",
           "meta": {
             "added": [
               "v12.0.0"
@@ -2114,9 +2125,9 @@
           "desc": "<p>A boolean value that is <code>true</code> if the current Node.js build is caching builtin modules.</p>"
         },
         {
-          "textRaw": "`debug` {boolean}",
+          "textRaw": "`debug` Type: {boolean}",
           "type": "boolean",
-          "name": "debug",
+          "name": "Type",
           "meta": {
             "added": [
               "v0.5.5"
@@ -2126,9 +2137,9 @@
           "desc": "<p>A boolean value that is <code>true</code> if the current Node.js build is a debug build.</p>"
         },
         {
-          "textRaw": "`inspector` {boolean}",
+          "textRaw": "`inspector` Type: {boolean}",
           "type": "boolean",
-          "name": "inspector",
+          "name": "Type",
           "meta": {
             "added": [
               "v11.10.0"
@@ -2138,9 +2149,9 @@
           "desc": "<p>A boolean value that is <code>true</code> if the current Node.js build includes the inspector.</p>"
         },
         {
-          "textRaw": "`ipv6` {boolean}",
+          "textRaw": "`ipv6` Type: {boolean}",
           "type": "boolean",
-          "name": "ipv6",
+          "name": "Type",
           "meta": {
             "added": [
               "v0.5.3"
@@ -2156,9 +2167,9 @@
           "desc": "<p>A boolean value that is <code>true</code> if the current Node.js build includes support for IPv6.</p>\n<p>Since all Node.js builds have IPv6 support, this value is always <code>true</code>.</p>"
         },
         {
-          "textRaw": "`require_module` {boolean}",
+          "textRaw": "`require_module` Type: {boolean}",
           "type": "boolean",
-          "name": "require_module",
+          "name": "Type",
           "meta": {
             "added": [
               "v23.0.0",
@@ -2170,9 +2181,9 @@
           "desc": "<p>A boolean value that is <code>true</code> if the current Node.js build supports\n<a href=\"modules.html#loading-ecmascript-modules-using-require\">loading ECMAScript modules using <code>require()</code></a>.</p>"
         },
         {
-          "textRaw": "`tls` {boolean}",
+          "textRaw": "`tls` Type: {boolean}",
           "type": "boolean",
-          "name": "tls",
+          "name": "Type",
           "meta": {
             "added": [
               "v0.5.3"
@@ -2182,9 +2193,9 @@
           "desc": "<p>A boolean value that is <code>true</code> if the current Node.js build includes support for TLS.</p>"
         },
         {
-          "textRaw": "`tls_alpn` {boolean}",
+          "textRaw": "`tls_alpn` Type: {boolean}",
           "type": "boolean",
-          "name": "tls_alpn",
+          "name": "Type",
           "meta": {
             "added": [
               "v4.8.0"
@@ -2200,9 +2211,9 @@
           "desc": "<p>A boolean value that is <code>true</code> if the current Node.js build includes support for ALPN in TLS.</p>\n<p>In Node.js 11.0.0 and later versions, the OpenSSL dependencies feature unconditional ALPN support.\nThis value is therefore identical to that of <code>process.features.tls</code>.</p>"
         },
         {
-          "textRaw": "`tls_ocsp` {boolean}",
+          "textRaw": "`tls_ocsp` Type: {boolean}",
           "type": "boolean",
-          "name": "tls_ocsp",
+          "name": "Type",
           "meta": {
             "added": [
               "v0.11.13"
@@ -2218,9 +2229,9 @@
           "desc": "<p>A boolean value that is <code>true</code> if the current Node.js build includes support for OCSP in TLS.</p>\n<p>In Node.js 11.0.0 and later versions, the OpenSSL dependencies feature unconditional OCSP support.\nThis value is therefore identical to that of <code>process.features.tls</code>.</p>"
         },
         {
-          "textRaw": "`tls_sni` {boolean}",
+          "textRaw": "`tls_sni` Type: {boolean}",
           "type": "boolean",
-          "name": "tls_sni",
+          "name": "Type",
           "meta": {
             "added": [
               "v0.5.3"
@@ -2236,9 +2247,9 @@
           "desc": "<p>A boolean value that is <code>true</code> if the current Node.js build includes support for SNI in TLS.</p>\n<p>In Node.js 11.0.0 and later versions, the OpenSSL dependencies feature unconditional SNI support.\nThis value is therefore identical to that of <code>process.features.tls</code>.</p>"
         },
         {
-          "textRaw": "`typescript` {boolean|string}",
+          "textRaw": "`typescript` Type: {boolean|string}",
           "type": "boolean|string",
-          "name": "typescript",
+          "name": "Type",
           "meta": {
             "added": [
               "v23.0.0",
@@ -2251,9 +2262,9 @@
           "desc": "<p>A value that is <code>\"strip\"</code> by default,\n<code>\"transform\"</code> if Node.js is run with <code>--experimental-transform-types</code>, and <code>false</code> if\nNode.js is run with <code>--no-experimental-strip-types</code>.</p>"
         },
         {
-          "textRaw": "`uv` {boolean}",
+          "textRaw": "`uv` Type: {boolean}",
           "type": "boolean",
-          "name": "uv",
+          "name": "Type",
           "meta": {
             "added": [
               "v0.5.3"
@@ -2269,9 +2280,9 @@
           "desc": "<p>A boolean value that is <code>true</code> if the current Node.js build includes support for libuv.</p>\n<p>Since it's not possible to build Node.js without libuv, this value is always <code>true</code>.</p>"
         },
         {
-          "textRaw": "`mainModule` {Object}",
+          "textRaw": "`mainModule` Type: {Object}",
           "type": "Object",
-          "name": "mainModule",
+          "name": "Type",
           "meta": {
             "added": [
               "v0.1.17"
@@ -2286,9 +2297,9 @@
           "desc": "<p>The <code>process.mainModule</code> property provides an alternative way of retrieving\n<a href=\"modules.html#accessing-the-main-module\"><code>require.main</code></a>. The difference is that if the main module changes at\nruntime, <a href=\"modules.html#accessing-the-main-module\"><code>require.main</code></a> may still refer to the original main module in\nmodules that were required before the change occurred. Generally, it's\nsafe to assume that the two refer to the same module.</p>\n<p>As with <a href=\"modules.html#accessing-the-main-module\"><code>require.main</code></a>, <code>process.mainModule</code> will be <code>undefined</code> if there\nis no entry script.</p>"
         },
         {
-          "textRaw": "`noDeprecation` {boolean}",
+          "textRaw": "`noDeprecation` Type: {boolean}",
           "type": "boolean",
-          "name": "noDeprecation",
+          "name": "Type",
           "meta": {
             "added": [
               "v0.8.0"
@@ -2298,9 +2309,9 @@
           "desc": "<p>The <code>process.noDeprecation</code> property indicates whether the <code>--no-deprecation</code>\nflag is set on the current Node.js process. See the documentation for\nthe <a href=\"#event-warning\"><code>'warning'</code> event</a> and the\n<a href=\"#processemitwarningwarning-type-code-ctor\"><code>emitWarning()</code> method</a> for more information about this\nflag's behavior.</p>"
         },
         {
-          "textRaw": "`permission` {Object}",
+          "textRaw": "`permission` Type: {Object}",
           "type": "Object",
-          "name": "permission",
+          "name": "Type",
           "meta": {
             "added": [
               "v20.0.0"
@@ -2345,9 +2356,9 @@
           ]
         },
         {
-          "textRaw": "`pid` {integer}",
+          "textRaw": "`pid` Type: {integer}",
           "type": "integer",
-          "name": "pid",
+          "name": "Type",
           "meta": {
             "added": [
               "v0.1.15"
@@ -2357,9 +2368,9 @@
           "desc": "<p>The <code>process.pid</code> property returns the PID of the process.</p>\n<pre><code class=\"language-mjs\">import { pid } from 'node:process';\n\nconsole.log(`This process is pid ${pid}`);\n</code></pre>\n<pre><code class=\"language-cjs\">const { pid } = require('node:process');\n\nconsole.log(`This process is pid ${pid}`);\n</code></pre>"
         },
         {
-          "textRaw": "`platform` {string}",
+          "textRaw": "`platform` Type: {string}",
           "type": "string",
-          "name": "platform",
+          "name": "Type",
           "meta": {
             "added": [
               "v0.1.16"
@@ -2369,9 +2380,9 @@
           "desc": "<p>The <code>process.platform</code> property returns a string identifying the operating\nsystem platform for which the Node.js binary was compiled.</p>\n<p>Currently possible values are:</p>\n<ul>\n<li><code>'aix'</code></li>\n<li><code>'darwin'</code></li>\n<li><code>'freebsd'</code></li>\n<li><code>'linux'</code></li>\n<li><code>'openbsd'</code></li>\n<li><code>'sunos'</code></li>\n<li><code>'win32'</code></li>\n</ul>\n<pre><code class=\"language-mjs\">import { platform } from 'node:process';\n\nconsole.log(`This platform is ${platform}`);\n</code></pre>\n<pre><code class=\"language-cjs\">const { platform } = require('node:process');\n\nconsole.log(`This platform is ${platform}`);\n</code></pre>\n<p>The value <code>'android'</code> may also be returned if the Node.js is built on the\nAndroid operating system. However, Android support in Node.js\n<a href=\"https://github.com/nodejs/node/blob/HEAD/BUILDING.md#android\">is experimental</a>.</p>"
         },
         {
-          "textRaw": "`ppid` {integer}",
+          "textRaw": "`ppid` Type: {integer}",
           "type": "integer",
-          "name": "ppid",
+          "name": "Type",
           "meta": {
             "added": [
               "v9.2.0",
@@ -2383,9 +2394,9 @@
           "desc": "<p>The <code>process.ppid</code> property returns the PID of the parent of the\ncurrent process.</p>\n<pre><code class=\"language-mjs\">import { ppid } from 'node:process';\n\nconsole.log(`The parent process is pid ${ppid}`);\n</code></pre>\n<pre><code class=\"language-cjs\">const { ppid } = require('node:process');\n\nconsole.log(`The parent process is pid ${ppid}`);\n</code></pre>"
         },
         {
-          "textRaw": "`release` {Object}",
+          "textRaw": "`release` Type: {Object}",
           "type": "Object",
-          "name": "release",
+          "name": "Type",
           "meta": {
             "added": [
               "v3.0.0"
@@ -2401,9 +2412,9 @@
           "desc": "<p>The <code>process.release</code> property returns an <code>Object</code> containing metadata related\nto the current release, including URLs for the source tarball and headers-only\ntarball.</p>\n<p><code>process.release</code> contains the following properties:</p>\n<ul>\n<li><code>name</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> A value that will always be <code>'node'</code>.</li>\n<li><code>sourceUrl</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> an absolute URL pointing to a <em><code>.tar.gz</code></em> file containing\nthe source code of the current release.</li>\n<li><code>headersUrl</code><a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> an absolute URL pointing to a <em><code>.tar.gz</code></em> file containing\nonly the source header files for the current release. This file is\nsignificantly smaller than the full source file and can be used for compiling\nNode.js native add-ons.</li>\n<li><code>libUrl</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type\" class=\"type\">&lt;undefined&gt;</a> an absolute URL pointing to a <em><code>node.lib</code></em> file\nmatching the architecture and version of the current release. This file is\nused for compiling Node.js native add-ons. <em>This property is only present on\nWindows builds of Node.js and will be missing on all other platforms.</em></li>\n<li><code>lts</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type\" class=\"type\">&lt;undefined&gt;</a> a string label identifying the <a href=\"https://github.com/nodejs/Release\">LTS</a> label for this\nrelease. This property only exists for LTS releases and is <code>undefined</code> for all\nother release types, including <em>Current</em> releases. Valid values include the\nLTS Release code names (including those that are no longer supported).\n<ul>\n<li><code>'Fermium'</code> for the 14.x LTS line beginning with 14.15.0.</li>\n<li><code>'Gallium'</code> for the 16.x LTS line beginning with 16.13.0.</li>\n<li><code>'Hydrogen'</code> for the 18.x LTS line beginning with 18.12.0.\nFor other LTS Release code names, see <a href=\"https://github.com/nodejs/node/blob/HEAD/doc/changelogs/CHANGELOG_ARCHIVE.md\">Node.js Changelog Archive</a></li>\n</ul>\n</li>\n</ul>\n<!-- eslint-skip -->\n<pre><code class=\"language-js\">{\n  name: 'node',\n  lts: 'Hydrogen',\n  sourceUrl: 'https://nodejs.org/download/release/v18.12.0/node-v18.12.0.tar.gz',\n  headersUrl: 'https://nodejs.org/download/release/v18.12.0/node-v18.12.0-headers.tar.gz',\n  libUrl: 'https://nodejs.org/download/release/v18.12.0/win-x64/node.lib'\n}\n</code></pre>\n<p>In custom builds from non-release versions of the source tree, only the\n<code>name</code> property may be present. The additional properties should not be\nrelied upon to exist.</p>"
         },
         {
-          "textRaw": "`report` {Object}",
+          "textRaw": "`report` Type: {Object}",
           "type": "Object",
-          "name": "report",
+          "name": "Type",
           "meta": {
             "added": [
               "v11.8.0"
@@ -2422,9 +2433,9 @@
           "desc": "<p><code>process.report</code> is an object whose methods are used to generate diagnostic\nreports for the current process. Additional documentation is available in the\n<a href=\"report.html\">report documentation</a>.</p>",
           "properties": [
             {
-              "textRaw": "`compact` {boolean}",
+              "textRaw": "`compact` Type: {boolean}",
               "type": "boolean",
-              "name": "compact",
+              "name": "Type",
               "meta": {
                 "added": [
                   "v13.12.0",
@@ -2435,9 +2446,9 @@
               "desc": "<p>Write reports in a compact format, single-line JSON, more easily consumable\nby log processing systems than the default multi-line format designed for\nhuman consumption.</p>\n<pre><code class=\"language-mjs\">import { report } from 'node:process';\n\nconsole.log(`Reports are compact? ${report.compact}`);\n</code></pre>\n<pre><code class=\"language-cjs\">const { report } = require('node:process');\n\nconsole.log(`Reports are compact? ${report.compact}`);\n</code></pre>"
             },
             {
-              "textRaw": "`directory` {string}",
+              "textRaw": "`directory` Type: {string}",
               "type": "string",
-              "name": "directory",
+              "name": "Type",
               "meta": {
                 "added": [
                   "v11.12.0"
@@ -2456,9 +2467,9 @@
               "desc": "<p>Directory where the report is written. The default value is the empty string,\nindicating that reports are written to the current working directory of the\nNode.js process.</p>\n<pre><code class=\"language-mjs\">import { report } from 'node:process';\n\nconsole.log(`Report directory is ${report.directory}`);\n</code></pre>\n<pre><code class=\"language-cjs\">const { report } = require('node:process');\n\nconsole.log(`Report directory is ${report.directory}`);\n</code></pre>"
             },
             {
-              "textRaw": "`filename` {string}",
+              "textRaw": "`filename` Type: {string}",
               "type": "string",
-              "name": "filename",
+              "name": "Type",
               "meta": {
                 "added": [
                   "v11.12.0"
@@ -2477,9 +2488,9 @@
               "desc": "<p>Filename where the report is written. If set to the empty string, the output\nfilename will be comprised of a timestamp, PID, and sequence number. The default\nvalue is the empty string.</p>\n<p>If the value of <code>process.report.filename</code> is set to <code>'stdout'</code> or <code>'stderr'</code>,\nthe report is written to the stdout or stderr of the process respectively.</p>\n<pre><code class=\"language-mjs\">import { report } from 'node:process';\n\nconsole.log(`Report filename is ${report.filename}`);\n</code></pre>\n<pre><code class=\"language-cjs\">const { report } = require('node:process');\n\nconsole.log(`Report filename is ${report.filename}`);\n</code></pre>"
             },
             {
-              "textRaw": "`reportOnFatalError` {boolean}",
+              "textRaw": "`reportOnFatalError` Type: {boolean}",
               "type": "boolean",
-              "name": "reportOnFatalError",
+              "name": "Type",
               "meta": {
                 "added": [
                   "v11.12.0"
@@ -2498,9 +2509,9 @@
               "desc": "<p>If <code>true</code>, a diagnostic report is generated on fatal errors, such as out of\nmemory errors or failed C++ assertions.</p>\n<pre><code class=\"language-mjs\">import { report } from 'node:process';\n\nconsole.log(`Report on fatal error: ${report.reportOnFatalError}`);\n</code></pre>\n<pre><code class=\"language-cjs\">const { report } = require('node:process');\n\nconsole.log(`Report on fatal error: ${report.reportOnFatalError}`);\n</code></pre>"
             },
             {
-              "textRaw": "`reportOnSignal` {boolean}",
+              "textRaw": "`reportOnSignal` Type: {boolean}",
               "type": "boolean",
-              "name": "reportOnSignal",
+              "name": "Type",
               "meta": {
                 "added": [
                   "v11.12.0"
@@ -2519,9 +2530,9 @@
               "desc": "<p>If <code>true</code>, a diagnostic report is generated when the process receives the\nsignal specified by <code>process.report.signal</code>.</p>\n<pre><code class=\"language-mjs\">import { report } from 'node:process';\n\nconsole.log(`Report on signal: ${report.reportOnSignal}`);\n</code></pre>\n<pre><code class=\"language-cjs\">const { report } = require('node:process');\n\nconsole.log(`Report on signal: ${report.reportOnSignal}`);\n</code></pre>"
             },
             {
-              "textRaw": "`reportOnUncaughtException` {boolean}",
+              "textRaw": "`reportOnUncaughtException` Type: {boolean}",
               "type": "boolean",
-              "name": "reportOnUncaughtException",
+              "name": "Type",
               "meta": {
                 "added": [
                   "v11.12.0"
@@ -2540,9 +2551,9 @@
               "desc": "<p>If <code>true</code>, a diagnostic report is generated on uncaught exception.</p>\n<pre><code class=\"language-mjs\">import { report } from 'node:process';\n\nconsole.log(`Report on exception: ${report.reportOnUncaughtException}`);\n</code></pre>\n<pre><code class=\"language-cjs\">const { report } = require('node:process');\n\nconsole.log(`Report on exception: ${report.reportOnUncaughtException}`);\n</code></pre>"
             },
             {
-              "textRaw": "`excludeEnv` {boolean}",
+              "textRaw": "`excludeEnv` Type: {boolean}",
               "type": "boolean",
-              "name": "excludeEnv",
+              "name": "Type",
               "meta": {
                 "added": [
                   "v23.3.0",
@@ -2553,9 +2564,9 @@
               "desc": "<p>If <code>true</code>, a diagnostic report is generated without the environment variables.</p>"
             },
             {
-              "textRaw": "`signal` {string}",
+              "textRaw": "`signal` Type: {string}",
               "type": "string",
-              "name": "signal",
+              "name": "Type",
               "meta": {
                 "added": [
                   "v11.12.0"
@@ -2661,9 +2672,9 @@
           ]
         },
         {
-          "textRaw": "`sourceMapsEnabled` {boolean}",
+          "textRaw": "`sourceMapsEnabled` Type: {boolean}",
           "type": "boolean",
-          "name": "sourceMapsEnabled",
+          "name": "Type",
           "meta": {
             "added": [
               "v20.7.0",
@@ -2676,43 +2687,43 @@
           "desc": "<p>The <code>process.sourceMapsEnabled</code> property returns whether the\n<a href=\"https://tc39.es/ecma426/\">Source Map</a> support for stack traces is enabled.</p>"
         },
         {
-          "textRaw": "`stderr` {Stream}",
+          "textRaw": "`stderr` Type: {Stream}",
           "type": "Stream",
-          "name": "stderr",
+          "name": "Type",
           "desc": "<p>The <code>process.stderr</code> property returns a stream connected to\n<code>stderr</code> (fd <code>2</code>). It is a <a href=\"net.html#class-netsocket\"><code>net.Socket</code></a> (which is a <a href=\"stream.html#duplex-and-transform-streams\">Duplex</a>\nstream) unless fd <code>2</code> refers to a file, in which case it is\na <a href=\"stream.html#writable-streams\">Writable</a> stream.</p>\n<p><code>process.stderr</code> differs from other Node.js streams in important ways. See\n<a href=\"#a-note-on-process-io\">note on process I/O</a> for more information.</p>",
           "properties": [
             {
-              "textRaw": "`fd` {number}",
+              "textRaw": "`fd` Type: {number}",
               "type": "number",
-              "name": "fd",
+              "name": "Type",
               "desc": "<p>This property refers to the value of underlying file descriptor of\n<code>process.stderr</code>. The value is fixed at <code>2</code>. In <a href=\"worker_threads.html#class-worker\"><code>Worker</code></a> threads,\nthis field does not exist.</p>"
             }
           ]
         },
         {
-          "textRaw": "`stdin` {Stream}",
+          "textRaw": "`stdin` Type: {Stream}",
           "type": "Stream",
-          "name": "stdin",
+          "name": "Type",
           "desc": "<p>The <code>process.stdin</code> property returns a stream connected to\n<code>stdin</code> (fd <code>0</code>). It is a <a href=\"net.html#class-netsocket\"><code>net.Socket</code></a> (which is a <a href=\"stream.html#duplex-and-transform-streams\">Duplex</a>\nstream) unless fd <code>0</code> refers to a file, in which case it is\na <a href=\"stream.html#readable-streams\">Readable</a> stream.</p>\n<p>For details of how to read from <code>stdin</code> see <a href=\"stream.html#readablereadsize\"><code>readable.read()</code></a>.</p>\n<p>As a <a href=\"stream.html#duplex-and-transform-streams\">Duplex</a> stream, <code>process.stdin</code> can also be used in \"old\" mode that\nis compatible with scripts written for Node.js prior to v0.10.\nFor more information see <a href=\"stream.html#compatibility-with-older-nodejs-versions\">Stream compatibility</a>.</p>\n<p>In \"old\" streams mode the <code>stdin</code> stream is paused by default, so one\nmust call <code>process.stdin.resume()</code> to read from it. Note also that calling\n<code>process.stdin.resume()</code> itself would switch stream to \"old\" mode.</p>",
           "properties": [
             {
-              "textRaw": "`fd` {number}",
+              "textRaw": "`fd` Type: {number}",
               "type": "number",
-              "name": "fd",
+              "name": "Type",
               "desc": "<p>This property refers to the value of underlying file descriptor of\n<code>process.stdin</code>. The value is fixed at <code>0</code>. In <a href=\"worker_threads.html#class-worker\"><code>Worker</code></a> threads,\nthis field does not exist.</p>"
             }
           ]
         },
         {
-          "textRaw": "`stdout` {Stream}",
+          "textRaw": "`stdout` Type: {Stream}",
           "type": "Stream",
-          "name": "stdout",
+          "name": "Type",
           "desc": "<p>The <code>process.stdout</code> property returns a stream connected to\n<code>stdout</code> (fd <code>1</code>). It is a <a href=\"net.html#class-netsocket\"><code>net.Socket</code></a> (which is a <a href=\"stream.html#duplex-and-transform-streams\">Duplex</a>\nstream) unless fd <code>1</code> refers to a file, in which case it is\na <a href=\"stream.html#writable-streams\">Writable</a> stream.</p>\n<p>For example, to copy <code>process.stdin</code> to <code>process.stdout</code>:</p>\n<pre><code class=\"language-mjs\">import { stdin, stdout } from 'node:process';\n\nstdin.pipe(stdout);\n</code></pre>\n<pre><code class=\"language-cjs\">const { stdin, stdout } = require('node:process');\n\nstdin.pipe(stdout);\n</code></pre>\n<p><code>process.stdout</code> differs from other Node.js streams in important ways. See\n<a href=\"#a-note-on-process-io\">note on process I/O</a> for more information.</p>",
           "properties": [
             {
-              "textRaw": "`fd` {number}",
+              "textRaw": "`fd` Type: {number}",
               "type": "number",
-              "name": "fd",
+              "name": "Type",
               "desc": "<p>This property refers to the value of underlying file descriptor of\n<code>process.stdout</code>. The value is fixed at <code>1</code>. In <a href=\"worker_threads.html#class-worker\"><code>Worker</code></a> threads,\nthis field does not exist.</p>"
             }
           ],
@@ -2727,9 +2738,9 @@
           ]
         },
         {
-          "textRaw": "`throwDeprecation` {boolean}",
+          "textRaw": "`throwDeprecation` Type: {boolean}",
           "type": "boolean",
-          "name": "throwDeprecation",
+          "name": "Type",
           "meta": {
             "added": [
               "v0.9.12"
@@ -2739,9 +2750,9 @@
           "desc": "<p>The initial value of <code>process.throwDeprecation</code> indicates whether the\n<code>--throw-deprecation</code> flag is set on the current Node.js process.\n<code>process.throwDeprecation</code> is mutable, so whether or not deprecation\nwarnings result in errors may be altered at runtime. See the\ndocumentation for the <a href=\"#event-warning\"><code>'warning'</code> event</a> and the\n<a href=\"#processemitwarningwarning-type-code-ctor\"><code>emitWarning()</code> method</a> for more information.</p>\n<pre><code class=\"language-console\">$ node --throw-deprecation -p \"process.throwDeprecation\"\ntrue\n$ node -p \"process.throwDeprecation\"\nundefined\n$ node\n> process.emitWarning('test', 'DeprecationWarning');\nundefined\n> (node:26598) DeprecationWarning: test\n> process.throwDeprecation = true;\ntrue\n> process.emitWarning('test', 'DeprecationWarning');\nThrown:\n[DeprecationWarning: test] { name: 'DeprecationWarning' }\n</code></pre>"
         },
         {
-          "textRaw": "`title` {string}",
+          "textRaw": "`title` Type: {string}",
           "type": "string",
-          "name": "title",
+          "name": "Type",
           "meta": {
             "added": [
               "v0.1.104"
@@ -2751,9 +2762,9 @@
           "desc": "<p>The <code>process.title</code> property returns the current process title (i.e. returns\nthe current value of <code>ps</code>). Assigning a new value to <code>process.title</code> modifies\nthe current value of <code>ps</code>.</p>\n<p>When a new value is assigned, different platforms will impose different maximum\nlength restrictions on the title. Usually such restrictions are quite limited.\nFor instance, on Linux and macOS, <code>process.title</code> is limited to the size of the\nbinary name plus the length of the command-line arguments because setting the\n<code>process.title</code> overwrites the <code>argv</code> memory of the process. Node.js v0.8\nallowed for longer process title strings by also overwriting the <code>environ</code>\nmemory but that was potentially insecure and confusing in some (rather obscure)\ncases.</p>\n<p>Assigning a value to <code>process.title</code> might not result in an accurate label\nwithin process manager applications such as macOS Activity Monitor or Windows\nServices Manager.</p>"
         },
         {
-          "textRaw": "`traceDeprecation` {boolean}",
+          "textRaw": "`traceDeprecation` Type: {boolean}",
           "type": "boolean",
-          "name": "traceDeprecation",
+          "name": "Type",
           "meta": {
             "added": [
               "v0.8.0"
@@ -2763,9 +2774,9 @@
           "desc": "<p>The <code>process.traceDeprecation</code> property indicates whether the\n<code>--trace-deprecation</code> flag is set on the current Node.js process. See the\ndocumentation for the <a href=\"#event-warning\"><code>'warning'</code> event</a> and the\n<a href=\"#processemitwarningwarning-type-code-ctor\"><code>emitWarning()</code> method</a> for more information about this\nflag's behavior.</p>"
         },
         {
-          "textRaw": "`version` {string}",
+          "textRaw": "`version` Type: {string}",
           "type": "string",
-          "name": "version",
+          "name": "Type",
           "meta": {
             "added": [
               "v0.1.3"
@@ -2775,9 +2786,9 @@
           "desc": "<p>The <code>process.version</code> property contains the Node.js version string.</p>\n<pre><code class=\"language-mjs\">import { version } from 'node:process';\n\nconsole.log(`Version: ${version}`);\n// Version: v14.8.0\n</code></pre>\n<pre><code class=\"language-cjs\">const { version } = require('node:process');\n\nconsole.log(`Version: ${version}`);\n// Version: v14.8.0\n</code></pre>\n<p>To get the version string without the prepended <em>v</em>, use\n<code>process.versions.node</code>.</p>"
         },
         {
-          "textRaw": "`versions` {Object}",
+          "textRaw": "`versions` Type: {Object}",
           "type": "Object",
-          "name": "versions",
+          "name": "Type",
           "meta": {
             "added": [
               "v0.2.0"

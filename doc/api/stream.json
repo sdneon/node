@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.4.1/lib/stream.js\">lib/stream.js</a></p>\n<p>A stream is an abstract interface for working with streaming data in Node.js.\nThe <code>node:stream</code> module provides an API for implementing the stream interface.</p>\n<p>There are many stream objects provided by Node.js. For instance, a\n<a href=\"http.html#class-httpincomingmessage\">request to an HTTP server</a> and <a href=\"process.html#processstdout\"><code>process.stdout</code></a>\nare both stream instances.</p>\n<p>Streams can be readable, writable, or both. All streams are instances of\n<a href=\"events.html#class-eventemitter\"><code>EventEmitter</code></a>.</p>\n<p>To access the <code>node:stream</code> module:</p>\n<pre><code class=\"language-js\">const stream = require('node:stream');\n</code></pre>\n<p>The <code>node:stream</code> module is useful for creating new types of stream instances.\nIt is usually not necessary to use the <code>node:stream</code> module to consume streams.</p>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.6.0/lib/stream.js\">lib/stream.js</a></p>\n<p>A stream is an abstract interface for working with streaming data in Node.js.\nThe <code>node:stream</code> module provides an API for implementing the stream interface.</p>\n<p>There are many stream objects provided by Node.js. For instance, a\n<a href=\"http.html#class-httpincomingmessage\">request to an HTTP server</a> and <a href=\"process.html#processstdout\"><code>process.stdout</code></a>\nare both stream instances.</p>\n<p>Streams can be readable, writable, or both. All streams are instances of\n<a href=\"events.html#class-eventemitter\"><code>EventEmitter</code></a>.</p>\n<p>To access the <code>node:stream</code> module:</p>\n<pre><code class=\"language-js\">const stream = require('node:stream');\n</code></pre>\n<p>The <code>node:stream</code> module is useful for creating new types of stream instances.\nIt is usually not necessary to use the <code>node:stream</code> module to consume streams.</p>",
       "modules": [
         {
           "textRaw": "Organization of this document",
@@ -45,7 +45,7 @@
           ],
           "methods": [
             {
-              "textRaw": "`stream.pipeline(source[, ...transforms], destination[, options])`",
+              "textRaw": "`stream.pipeline(streams[, options])`",
               "type": "method",
               "name": "pipeline",
               "meta": {
@@ -150,7 +150,7 @@
               "desc": "<pre><code class=\"language-cjs\">const { pipeline } = require('node:stream/promises');\nconst fs = require('node:fs');\nconst zlib = require('node:zlib');\n\nasync function run() {\n  await pipeline(\n    fs.createReadStream('archive.tar'),\n    zlib.createGzip(),\n    fs.createWriteStream('archive.tar.gz'),\n  );\n  console.log('Pipeline succeeded.');\n}\n\nrun().catch(console.error);\n</code></pre>\n<pre><code class=\"language-mjs\">import { pipeline } from 'node:stream/promises';\nimport { createReadStream, createWriteStream } from 'node:fs';\nimport { createGzip } from 'node:zlib';\n\nawait pipeline(\n  createReadStream('archive.tar'),\n  createGzip(),\n  createWriteStream('archive.tar.gz'),\n);\nconsole.log('Pipeline succeeded.');\n</code></pre>\n<p>To use an <code>AbortSignal</code>, pass it inside an options object, as the last argument.\nWhen the signal is aborted, <code>destroy</code> will be called on the underlying pipeline,\nwith an <code>AbortError</code>.</p>\n<pre><code class=\"language-cjs\">const { pipeline } = require('node:stream/promises');\nconst fs = require('node:fs');\nconst zlib = require('node:zlib');\n\nasync function run() {\n  const ac = new AbortController();\n  const signal = ac.signal;\n\n  setImmediate(() => ac.abort());\n  await pipeline(\n    fs.createReadStream('archive.tar'),\n    zlib.createGzip(),\n    fs.createWriteStream('archive.tar.gz'),\n    { signal },\n  );\n}\n\nrun().catch(console.error); // AbortError\n</code></pre>\n<pre><code class=\"language-mjs\">import { pipeline } from 'node:stream/promises';\nimport { createReadStream, createWriteStream } from 'node:fs';\nimport { createGzip } from 'node:zlib';\n\nconst ac = new AbortController();\nconst { signal } = ac;\nsetImmediate(() => ac.abort());\ntry {\n  await pipeline(\n    createReadStream('archive.tar'),\n    createGzip(),\n    createWriteStream('archive.tar.gz'),\n    { signal },\n  );\n} catch (err) {\n  console.error(err); // AbortError\n}\n</code></pre>\n<p>The <code>pipeline</code> API also supports async generators:</p>\n<pre><code class=\"language-cjs\">const { pipeline } = require('node:stream/promises');\nconst fs = require('node:fs');\n\nasync function run() {\n  await pipeline(\n    fs.createReadStream('lowercase.txt'),\n    async function* (source, { signal }) {\n      source.setEncoding('utf8');  // Work with strings rather than `Buffer`s.\n      for await (const chunk of source) {\n        yield await processChunk(chunk, { signal });\n      }\n    },\n    fs.createWriteStream('uppercase.txt'),\n  );\n  console.log('Pipeline succeeded.');\n}\n\nrun().catch(console.error);\n</code></pre>\n<pre><code class=\"language-mjs\">import { pipeline } from 'node:stream/promises';\nimport { createReadStream, createWriteStream } from 'node:fs';\n\nawait pipeline(\n  createReadStream('lowercase.txt'),\n  async function* (source, { signal }) {\n    source.setEncoding('utf8');  // Work with strings rather than `Buffer`s.\n    for await (const chunk of source) {\n      yield await processChunk(chunk, { signal });\n    }\n  },\n  createWriteStream('uppercase.txt'),\n);\nconsole.log('Pipeline succeeded.');\n</code></pre>\n<p>Remember to handle the <code>signal</code> argument passed into the async generator.\nEspecially in the case where the async generator is the source for the\npipeline (i.e. first argument) or the pipeline will never complete.</p>\n<pre><code class=\"language-cjs\">const { pipeline } = require('node:stream/promises');\nconst fs = require('node:fs');\n\nasync function run() {\n  await pipeline(\n    async function* ({ signal }) {\n      await someLongRunningfn({ signal });\n      yield 'asd';\n    },\n    fs.createWriteStream('uppercase.txt'),\n  );\n  console.log('Pipeline succeeded.');\n}\n\nrun().catch(console.error);\n</code></pre>\n<pre><code class=\"language-mjs\">import { pipeline } from 'node:stream/promises';\nimport fs from 'node:fs';\nawait pipeline(\n  async function* ({ signal }) {\n    await someLongRunningfn({ signal });\n    yield 'asd';\n  },\n  fs.createWriteStream('uppercase.txt'),\n);\nconsole.log('Pipeline succeeded.');\n</code></pre>\n<p>The <code>pipeline</code> API provides <a href=\"#streampipelinesource-transforms-destination-callback\">callback version</a>:</p>"
             },
             {
-              "textRaw": "`stream.pipeline(streams[, options])`",
+              "textRaw": "`stream.pipeline(source[, ...transforms], destination[, options])`",
               "type": "method",
               "name": "pipeline",
               "meta": {
@@ -1450,7 +1450,8 @@
                       },
                       "params": [
                         {
-                          "textRaw": "{Error}",
+                          "textRaw": "Type: {Error}",
+                          "name": "Type",
                           "type": "Error"
                         }
                       ],
@@ -1774,9 +1775,9 @@
                   ],
                   "properties": [
                     {
-                      "textRaw": "`closed` {boolean}",
+                      "textRaw": "`closed` Type: {boolean}",
                       "type": "boolean",
-                      "name": "closed",
+                      "name": "Type",
                       "meta": {
                         "added": [
                           "v18.0.0"
@@ -1786,9 +1787,9 @@
                       "desc": "<p>Is <code>true</code> after <code>'close'</code> has been emitted.</p>"
                     },
                     {
-                      "textRaw": "`destroyed` {boolean}",
+                      "textRaw": "`destroyed` Type: {boolean}",
                       "type": "boolean",
-                      "name": "destroyed",
+                      "name": "Type",
                       "meta": {
                         "added": [
                           "v8.0.0"
@@ -1798,9 +1799,9 @@
                       "desc": "<p>Is <code>true</code> after <a href=\"#writabledestroyerror\"><code>writable.destroy()</code></a> has been called.</p>\n<pre><code class=\"language-cjs\">const { Writable } = require('node:stream');\n\nconst myStream = new Writable();\n\nconsole.log(myStream.destroyed); // false\nmyStream.destroy();\nconsole.log(myStream.destroyed); // true\n</code></pre>"
                     },
                     {
-                      "textRaw": "`writable` {boolean}",
+                      "textRaw": "`writable` Type: {boolean}",
                       "type": "boolean",
-                      "name": "writable",
+                      "name": "Type",
                       "meta": {
                         "added": [
                           "v11.4.0"
@@ -1810,9 +1811,9 @@
                       "desc": "<p>Is <code>true</code> if it is safe to call <a href=\"#writablewritechunk-encoding-callback\"><code>writable.write()</code></a>, which means\nthe stream has not been destroyed, errored, or ended.</p>"
                     },
                     {
-                      "textRaw": "`writableAborted` {boolean}",
+                      "textRaw": "`writableAborted` Type: {boolean}",
                       "type": "boolean",
-                      "name": "writableAborted",
+                      "name": "Type",
                       "meta": {
                         "added": [
                           "v18.0.0",
@@ -1829,9 +1830,9 @@
                       "desc": "<p>Returns whether the stream was destroyed or errored before emitting <code>'finish'</code>.</p>"
                     },
                     {
-                      "textRaw": "`writableEnded` {boolean}",
+                      "textRaw": "`writableEnded` Type: {boolean}",
                       "type": "boolean",
-                      "name": "writableEnded",
+                      "name": "Type",
                       "meta": {
                         "added": [
                           "v12.9.0"
@@ -1841,9 +1842,9 @@
                       "desc": "<p>Is <code>true</code> after <a href=\"#writableendchunk-encoding-callback\"><code>writable.end()</code></a> has been called. This property\ndoes not indicate whether the data has been flushed, for this use\n<a href=\"#writablewritablefinished\"><code>writable.writableFinished</code></a> instead.</p>"
                     },
                     {
-                      "textRaw": "`writableCorked` {integer}",
+                      "textRaw": "`writableCorked` Type: {integer}",
                       "type": "integer",
-                      "name": "writableCorked",
+                      "name": "Type",
                       "meta": {
                         "added": [
                           "v13.2.0",
@@ -1854,9 +1855,9 @@
                       "desc": "<p>Number of times <a href=\"#writableuncork\"><code>writable.uncork()</code></a> needs to be\ncalled in order to fully uncork the stream.</p>"
                     },
                     {
-                      "textRaw": "`errored` {Error}",
+                      "textRaw": "`errored` Type: {Error}",
                       "type": "Error",
-                      "name": "errored",
+                      "name": "Type",
                       "meta": {
                         "added": [
                           "v18.0.0"
@@ -1866,9 +1867,9 @@
                       "desc": "<p>Returns error if the stream has been destroyed with an error.</p>"
                     },
                     {
-                      "textRaw": "`writableFinished` {boolean}",
+                      "textRaw": "`writableFinished` Type: {boolean}",
                       "type": "boolean",
-                      "name": "writableFinished",
+                      "name": "Type",
                       "meta": {
                         "added": [
                           "v12.6.0"
@@ -1878,9 +1879,9 @@
                       "desc": "<p>Is set to <code>true</code> immediately before the <a href=\"#event-finish\"><code>'finish'</code></a> event is emitted.</p>"
                     },
                     {
-                      "textRaw": "`writableHighWaterMark` {number}",
+                      "textRaw": "`writableHighWaterMark` Type: {number}",
                       "type": "number",
-                      "name": "writableHighWaterMark",
+                      "name": "Type",
                       "meta": {
                         "added": [
                           "v9.3.0"
@@ -1890,9 +1891,9 @@
                       "desc": "<p>Return the value of <code>highWaterMark</code> passed when creating this <code>Writable</code>.</p>"
                     },
                     {
-                      "textRaw": "`writableLength` {number}",
+                      "textRaw": "`writableLength` Type: {number}",
                       "type": "number",
-                      "name": "writableLength",
+                      "name": "Type",
                       "meta": {
                         "added": [
                           "v9.4.0"
@@ -1902,9 +1903,9 @@
                       "desc": "<p>This property contains the number of bytes (or objects) in the queue\nready to be written. The value provides introspection data regarding\nthe status of the <code>highWaterMark</code>.</p>"
                     },
                     {
-                      "textRaw": "`writableNeedDrain` {boolean}",
+                      "textRaw": "`writableNeedDrain` Type: {boolean}",
                       "type": "boolean",
-                      "name": "writableNeedDrain",
+                      "name": "Type",
                       "meta": {
                         "added": [
                           "v15.2.0",
@@ -1915,9 +1916,9 @@
                       "desc": "<p>Is <code>true</code> if the stream's buffer has been full and stream will emit <code>'drain'</code>.</p>"
                     },
                     {
-                      "textRaw": "`writableObjectMode` {boolean}",
+                      "textRaw": "`writableObjectMode` Type: {boolean}",
                       "type": "boolean",
-                      "name": "writableObjectMode",
+                      "name": "Type",
                       "meta": {
                         "added": [
                           "v12.3.0"
@@ -2035,7 +2036,8 @@
                       },
                       "params": [
                         {
-                          "textRaw": "{Error}",
+                          "textRaw": "Type: {Error}",
+                          "name": "Type",
                           "type": "Error"
                         }
                       ],
@@ -3315,9 +3317,9 @@
                   ],
                   "properties": [
                     {
-                      "textRaw": "`closed` {boolean}",
+                      "textRaw": "`closed` Type: {boolean}",
                       "type": "boolean",
-                      "name": "closed",
+                      "name": "Type",
                       "meta": {
                         "added": [
                           "v18.0.0"
@@ -3327,9 +3329,9 @@
                       "desc": "<p>Is <code>true</code> after <code>'close'</code> has been emitted.</p>"
                     },
                     {
-                      "textRaw": "`destroyed` {boolean}",
+                      "textRaw": "`destroyed` Type: {boolean}",
                       "type": "boolean",
-                      "name": "destroyed",
+                      "name": "Type",
                       "meta": {
                         "added": [
                           "v8.0.0"
@@ -3339,9 +3341,9 @@
                       "desc": "<p>Is <code>true</code> after <a href=\"#readabledestroyerror\"><code>readable.destroy()</code></a> has been called.</p>"
                     },
                     {
-                      "textRaw": "`readable` {boolean}",
+                      "textRaw": "`readable` Type: {boolean}",
                       "type": "boolean",
-                      "name": "readable",
+                      "name": "Type",
                       "meta": {
                         "added": [
                           "v11.4.0"
@@ -3351,9 +3353,9 @@
                       "desc": "<p>Is <code>true</code> if it is safe to call <a href=\"#readablereadsize\"><code>readable.read()</code></a>, which means\nthe stream has not been destroyed or emitted <code>'error'</code> or <code>'end'</code>.</p>"
                     },
                     {
-                      "textRaw": "`readableAborted` {boolean}",
+                      "textRaw": "`readableAborted` Type: {boolean}",
                       "type": "boolean",
-                      "name": "readableAborted",
+                      "name": "Type",
                       "meta": {
                         "added": [
                           "v16.8.0"
@@ -3369,9 +3371,9 @@
                       "desc": "<p>Returns whether the stream was destroyed or errored before emitting <code>'end'</code>.</p>"
                     },
                     {
-                      "textRaw": "`readableDidRead` {boolean}",
+                      "textRaw": "`readableDidRead` Type: {boolean}",
                       "type": "boolean",
-                      "name": "readableDidRead",
+                      "name": "Type",
                       "meta": {
                         "added": [
                           "v16.7.0",
@@ -3388,9 +3390,9 @@
                       "desc": "<p>Returns whether <code>'data'</code> has been emitted.</p>"
                     },
                     {
-                      "textRaw": "`readableEncoding` {null|string}",
+                      "textRaw": "`readableEncoding` Type: {null|string}",
                       "type": "null|string",
-                      "name": "readableEncoding",
+                      "name": "Type",
                       "meta": {
                         "added": [
                           "v12.7.0"
@@ -3400,9 +3402,9 @@
                       "desc": "<p>Getter for the property <code>encoding</code> of a given <code>Readable</code> stream. The <code>encoding</code>\nproperty can be set using the <a href=\"#readablesetencodingencoding\"><code>readable.setEncoding()</code></a> method.</p>"
                     },
                     {
-                      "textRaw": "`readableEnded` {boolean}",
+                      "textRaw": "`readableEnded` Type: {boolean}",
                       "type": "boolean",
-                      "name": "readableEnded",
+                      "name": "Type",
                       "meta": {
                         "added": [
                           "v12.9.0"
@@ -3412,9 +3414,9 @@
                       "desc": "<p>Becomes <code>true</code> when <a href=\"#event-end\"><code>'end'</code></a> event is emitted.</p>"
                     },
                     {
-                      "textRaw": "`errored` {Error}",
+                      "textRaw": "`errored` Type: {Error}",
                       "type": "Error",
-                      "name": "errored",
+                      "name": "Type",
                       "meta": {
                         "added": [
                           "v18.0.0"
@@ -3424,9 +3426,9 @@
                       "desc": "<p>Returns error if the stream has been destroyed with an error.</p>"
                     },
                     {
-                      "textRaw": "`readableFlowing` {boolean}",
+                      "textRaw": "`readableFlowing` Type: {boolean}",
                       "type": "boolean",
-                      "name": "readableFlowing",
+                      "name": "Type",
                       "meta": {
                         "added": [
                           "v9.4.0"
@@ -3436,9 +3438,9 @@
                       "desc": "<p>This property reflects the current state of a <code>Readable</code> stream as described\nin the <a href=\"#three-states\">Three states</a> section.</p>"
                     },
                     {
-                      "textRaw": "`readableHighWaterMark` {number}",
+                      "textRaw": "`readableHighWaterMark` Type: {number}",
                       "type": "number",
-                      "name": "readableHighWaterMark",
+                      "name": "Type",
                       "meta": {
                         "added": [
                           "v9.3.0"
@@ -3448,9 +3450,9 @@
                       "desc": "<p>Returns the value of <code>highWaterMark</code> passed when creating this <code>Readable</code>.</p>"
                     },
                     {
-                      "textRaw": "`readableLength` {number}",
+                      "textRaw": "`readableLength` Type: {number}",
                       "type": "number",
-                      "name": "readableLength",
+                      "name": "Type",
                       "meta": {
                         "added": [
                           "v9.4.0"
@@ -3460,9 +3462,9 @@
                       "desc": "<p>This property contains the number of bytes (or objects) in the queue\nready to be read. The value provides introspection data regarding\nthe status of the <code>highWaterMark</code>.</p>"
                     },
                     {
-                      "textRaw": "`readableObjectMode` {boolean}",
+                      "textRaw": "`readableObjectMode` Type: {boolean}",
                       "type": "boolean",
-                      "name": "readableObjectMode",
+                      "name": "Type",
                       "meta": {
                         "added": [
                           "v12.3.0"
@@ -3500,9 +3502,9 @@
                   "desc": "<p>Duplex streams are streams that implement both the <a href=\"#class-streamreadable\"><code>Readable</code></a> and\n<a href=\"#class-streamwritable\"><code>Writable</code></a> interfaces.</p>\n<p>Examples of <code>Duplex</code> streams include:</p>\n<ul>\n<li><a href=\"net.html#class-netsocket\">TCP sockets</a></li>\n<li><a href=\"zlib.html\">zlib streams</a></li>\n<li><a href=\"crypto.html\">crypto streams</a></li>\n</ul>",
                   "properties": [
                     {
-                      "textRaw": "`allowHalfOpen` {boolean}",
+                      "textRaw": "`allowHalfOpen` Type: {boolean}",
                       "type": "boolean",
-                      "name": "allowHalfOpen",
+                      "name": "Type",
                       "meta": {
                         "added": [
                           "v0.9.4"

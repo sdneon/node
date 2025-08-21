@@ -8,7 +8,7 @@
       "introduced_in": "v0.1.21",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.4.1/lib/assert.js\">lib/assert.js</a></p>\n<p>The <code>node:assert</code> module provides a set of assertion functions for verifying\ninvariants.</p>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.6.0/lib/assert.js\">lib/assert.js</a></p>\n<p>The <code>node:assert</code> module provides a set of assertion functions for verifying\ninvariants.</p>",
       "modules": [
         {
           "textRaw": "Strict assertion mode",
@@ -57,7 +57,7 @@
       ],
       "classes": [
         {
-          "textRaw": "Class: assert.AssertionError",
+          "textRaw": "Class: `assert.AssertionError`",
           "type": "class",
           "name": "assert.AssertionError",
           "desc": "<ul>\n<li>Extends: <a href=\"errors.html#class-error\" class=\"type\">&lt;errors.Error&gt;</a></li>\n</ul>\n<p>Indicates the failure of an assertion. All errors thrown by the <code>node:assert</code>\nmodule will be instances of the <code>AssertionError</code> class.</p>",
@@ -98,11 +98,55 @@
                       "name": "stackStartFn",
                       "type": "Function",
                       "desc": "If provided, the generated stack trace omits frames before this function."
+                    },
+                    {
+                      "textRaw": "`diff` {string} If set to `'full'`, shows the full diff in assertion errors. Defaults to `'simple'`. Accepted values: `'simple'`, `'full'`.",
+                      "name": "diff",
+                      "type": "string",
+                      "desc": "If set to `'full'`, shows the full diff in assertion errors. Defaults to `'simple'`. Accepted values: `'simple'`, `'full'`."
                     }
                   ]
                 }
               ],
               "desc": "<p>A subclass of <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error\" class=\"type\">&lt;Error&gt;</a> that indicates the failure of an assertion.</p>\n<p>All instances contain the built-in <code>Error</code> properties (<code>message</code> and <code>name</code>)\nand:</p>\n<ul>\n<li><code>actual</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types\" class=\"type\">&lt;any&gt;</a> Set to the <code>actual</code> argument for methods such as\n<a href=\"#assertstrictequalactual-expected-message\"><code>assert.strictEqual()</code></a>.</li>\n<li><code>expected</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types\" class=\"type\">&lt;any&gt;</a> Set to the <code>expected</code> value for methods such as\n<a href=\"#assertstrictequalactual-expected-message\"><code>assert.strictEqual()</code></a>.</li>\n<li><code>generatedMessage</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type\" class=\"type\">&lt;boolean&gt;</a> Indicates if the message was auto-generated\n(<code>true</code>) or not.</li>\n<li><code>code</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> Value is always <code>ERR_ASSERTION</code> to show that the error is an\nassertion error.</li>\n<li><code>operator</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> Set to the passed in operator value.</li>\n</ul>\n<pre><code class=\"language-mjs\">import assert from 'node:assert';\n\n// Generate an AssertionError to compare the error message later:\nconst { message } = new assert.AssertionError({\n  actual: 1,\n  expected: 2,\n  operator: 'strictEqual',\n});\n\n// Verify error output:\ntry {\n  assert.strictEqual(1, 2);\n} catch (err) {\n  assert(err instanceof assert.AssertionError);\n  assert.strictEqual(err.message, message);\n  assert.strictEqual(err.name, 'AssertionError');\n  assert.strictEqual(err.actual, 1);\n  assert.strictEqual(err.expected, 2);\n  assert.strictEqual(err.code, 'ERR_ASSERTION');\n  assert.strictEqual(err.operator, 'strictEqual');\n  assert.strictEqual(err.generatedMessage, true);\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const assert = require('node:assert');\n\n// Generate an AssertionError to compare the error message later:\nconst { message } = new assert.AssertionError({\n  actual: 1,\n  expected: 2,\n  operator: 'strictEqual',\n});\n\n// Verify error output:\ntry {\n  assert.strictEqual(1, 2);\n} catch (err) {\n  assert(err instanceof assert.AssertionError);\n  assert.strictEqual(err.message, message);\n  assert.strictEqual(err.name, 'AssertionError');\n  assert.strictEqual(err.actual, 1);\n  assert.strictEqual(err.expected, 2);\n  assert.strictEqual(err.code, 'ERR_ASSERTION');\n  assert.strictEqual(err.operator, 'strictEqual');\n  assert.strictEqual(err.generatedMessage, true);\n}\n</code></pre>"
+            }
+          ]
+        },
+        {
+          "textRaw": "Class: `assert.Assert`",
+          "type": "class",
+          "name": "assert.Assert",
+          "meta": {
+            "added": [
+              "v24.6.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>The <code>Assert</code> class allows creating independent assertion instances with custom options.</p>",
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`options` {Object}",
+                  "name": "options",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`diff` {string} If set to `'full'`, shows the full diff in assertion errors. Defaults to `'simple'`. Accepted values: `'simple'`, `'full'`.",
+                      "name": "diff",
+                      "type": "string",
+                      "desc": "If set to `'full'`, shows the full diff in assertion errors. Defaults to `'simple'`. Accepted values: `'simple'`, `'full'`."
+                    },
+                    {
+                      "textRaw": "`strict` {boolean} If set to `true`, non-strict methods behave like their corresponding strict methods. Defaults to `true`.",
+                      "name": "strict",
+                      "type": "boolean",
+                      "desc": "If set to `true`, non-strict methods behave like their corresponding strict methods. Defaults to `true`."
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>Creates a new assertion instance. The <code>diff</code> option controls the verbosity of diffs in assertion error messages.</p>\n<pre><code class=\"language-js\">const { Assert } = require('node:assert');\nconst assertInstance = new Assert({ diff: 'full' });\nassertInstance.deepStrictEqual({ a: 1 }, { a: 2 });\n// Shows a full diff in the error message.\n</code></pre>\n<p><strong>Important</strong>: When destructuring assertion methods from an <code>Assert</code> instance,\nthe methods lose their connection to the instance's configuration options (such as <code>diff</code> and <code>strict</code> settings).\nThe destructured methods will fall back to default behavior instead.</p>\n<pre><code class=\"language-js\">const myAssert = new Assert({ diff: 'full' });\n\n// This works as expected - uses 'full' diff\nmyAssert.strictEqual({ a: 1 }, { b: { c: 1 } });\n\n// This loses the 'full' diff setting - falls back to default 'simple' diff\nconst { strictEqual } = myAssert;\nstrictEqual({ a: 1 }, { b: { c: 1 } });\n</code></pre>\n<p>When destructured, methods lose access to the instance's <code>this</code> context and revert to default assertion behavior\n(diff: 'simple', non-strict mode).\nTo maintain custom options when using destructured methods, avoid\ndestructuring and call methods directly on the instance.</p>"
             }
           ]
         },

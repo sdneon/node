@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.4.1/lib/cluster.js\">lib/cluster.js</a></p>\n<p>Clusters of Node.js processes can be used to run multiple instances of Node.js\nthat can distribute workloads among their application threads. When process\nisolation is not needed, use the <a href=\"worker_threads.html\"><code>worker_threads</code></a> module instead, which\nallows running multiple application threads within a single Node.js instance.</p>\n<p>The cluster module allows easy creation of child processes that all share\nserver ports.</p>\n<pre><code class=\"language-mjs\">import cluster from 'node:cluster';\nimport http from 'node:http';\nimport { availableParallelism } from 'node:os';\nimport process from 'node:process';\n\nconst numCPUs = availableParallelism();\n\nif (cluster.isPrimary) {\n  console.log(`Primary ${process.pid} is running`);\n\n  // Fork workers.\n  for (let i = 0; i &#x3C; numCPUs; i++) {\n    cluster.fork();\n  }\n\n  cluster.on('exit', (worker, code, signal) => {\n    console.log(`worker ${worker.process.pid} died`);\n  });\n} else {\n  // Workers can share any TCP connection\n  // In this case it is an HTTP server\n  http.createServer((req, res) => {\n    res.writeHead(200);\n    res.end('hello world\\n');\n  }).listen(8000);\n\n  console.log(`Worker ${process.pid} started`);\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const cluster = require('node:cluster');\nconst http = require('node:http');\nconst numCPUs = require('node:os').availableParallelism();\nconst process = require('node:process');\n\nif (cluster.isPrimary) {\n  console.log(`Primary ${process.pid} is running`);\n\n  // Fork workers.\n  for (let i = 0; i &#x3C; numCPUs; i++) {\n    cluster.fork();\n  }\n\n  cluster.on('exit', (worker, code, signal) => {\n    console.log(`worker ${worker.process.pid} died`);\n  });\n} else {\n  // Workers can share any TCP connection\n  // In this case it is an HTTP server\n  http.createServer((req, res) => {\n    res.writeHead(200);\n    res.end('hello world\\n');\n  }).listen(8000);\n\n  console.log(`Worker ${process.pid} started`);\n}\n</code></pre>\n<p>Running Node.js will now share port 8000 between the workers:</p>\n<pre><code class=\"language-console\">$ node server.js\nPrimary 3596 is running\nWorker 4324 started\nWorker 4520 started\nWorker 6056 started\nWorker 5644 started\n</code></pre>\n<p>On Windows, it is not yet possible to set up a named pipe server in a worker.</p>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.6.0/lib/cluster.js\">lib/cluster.js</a></p>\n<p>Clusters of Node.js processes can be used to run multiple instances of Node.js\nthat can distribute workloads among their application threads. When process\nisolation is not needed, use the <a href=\"worker_threads.html\"><code>worker_threads</code></a> module instead, which\nallows running multiple application threads within a single Node.js instance.</p>\n<p>The cluster module allows easy creation of child processes that all share\nserver ports.</p>\n<pre><code class=\"language-mjs\">import cluster from 'node:cluster';\nimport http from 'node:http';\nimport { availableParallelism } from 'node:os';\nimport process from 'node:process';\n\nconst numCPUs = availableParallelism();\n\nif (cluster.isPrimary) {\n  console.log(`Primary ${process.pid} is running`);\n\n  // Fork workers.\n  for (let i = 0; i &#x3C; numCPUs; i++) {\n    cluster.fork();\n  }\n\n  cluster.on('exit', (worker, code, signal) => {\n    console.log(`worker ${worker.process.pid} died`);\n  });\n} else {\n  // Workers can share any TCP connection\n  // In this case it is an HTTP server\n  http.createServer((req, res) => {\n    res.writeHead(200);\n    res.end('hello world\\n');\n  }).listen(8000);\n\n  console.log(`Worker ${process.pid} started`);\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const cluster = require('node:cluster');\nconst http = require('node:http');\nconst numCPUs = require('node:os').availableParallelism();\nconst process = require('node:process');\n\nif (cluster.isPrimary) {\n  console.log(`Primary ${process.pid} is running`);\n\n  // Fork workers.\n  for (let i = 0; i &#x3C; numCPUs; i++) {\n    cluster.fork();\n  }\n\n  cluster.on('exit', (worker, code, signal) => {\n    console.log(`worker ${worker.process.pid} died`);\n  });\n} else {\n  // Workers can share any TCP connection\n  // In this case it is an HTTP server\n  http.createServer((req, res) => {\n    res.writeHead(200);\n    res.end('hello world\\n');\n  }).listen(8000);\n\n  console.log(`Worker ${process.pid} started`);\n}\n</code></pre>\n<p>Running Node.js will now share port 8000 between the workers:</p>\n<pre><code class=\"language-console\">$ node server.js\nPrimary 3596 is running\nWorker 4324 started\nWorker 4520 started\nWorker 6056 started\nWorker 5644 started\n</code></pre>\n<p>On Windows, it is not yet possible to set up a named pipe server in a worker.</p>",
       "miscs": [
         {
           "textRaw": "How it works",
@@ -290,9 +290,9 @@
           ],
           "properties": [
             {
-              "textRaw": "`exitedAfterDisconnect` {boolean}",
+              "textRaw": "`exitedAfterDisconnect` Type: {boolean}",
               "type": "boolean",
-              "name": "exitedAfterDisconnect",
+              "name": "Type",
               "meta": {
                 "added": [
                   "v6.0.0"
@@ -302,9 +302,9 @@
               "desc": "<p>This property is <code>true</code> if the worker exited due to <code>.disconnect()</code>.\nIf the worker exited any other way, it is <code>false</code>. If the\nworker has not exited, it is <code>undefined</code>.</p>\n<p>The boolean <a href=\"#workerexitedafterdisconnect\"><code>worker.exitedAfterDisconnect</code></a> allows distinguishing between\nvoluntary and accidental exit, the primary may choose not to respawn a worker\nbased on this value.</p>\n<pre><code class=\"language-js\">cluster.on('exit', (worker, code, signal) => {\n  if (worker.exitedAfterDisconnect === true) {\n    console.log('Oh, it was just voluntary – no need to worry');\n  }\n});\n\n// kill worker\nworker.kill();\n</code></pre>"
             },
             {
-              "textRaw": "`id` {integer}",
+              "textRaw": "`id` Type: {integer}",
               "type": "integer",
-              "name": "id",
+              "name": "Type",
               "meta": {
                 "added": [
                   "v0.8.0"
@@ -314,9 +314,9 @@
               "desc": "<p>Each new worker is given its own unique id, this id is stored in the\n<code>id</code>.</p>\n<p>While a worker is alive, this is the key that indexes it in\n<code>cluster.workers</code>.</p>"
             },
             {
-              "textRaw": "`process` {ChildProcess}",
+              "textRaw": "`process` Type: {ChildProcess}",
               "type": "ChildProcess",
-              "name": "process",
+              "name": "Type",
               "meta": {
                 "added": [
                   "v0.7.0"
@@ -621,9 +621,9 @@
           "desc": "<p>Deprecated alias for <a href=\"#clusterisprimary\"><code>cluster.isPrimary</code></a>.</p>"
         },
         {
-          "textRaw": "`isPrimary` {boolean}",
+          "textRaw": "`isPrimary` Type: {boolean}",
           "type": "boolean",
-          "name": "isPrimary",
+          "name": "Type",
           "meta": {
             "added": [
               "v16.0.0"
@@ -633,9 +633,9 @@
           "desc": "<p>True if the process is a primary. This is determined\nby the <code>process.env.NODE_UNIQUE_ID</code>. If <code>process.env.NODE_UNIQUE_ID</code> is\nundefined, then <code>isPrimary</code> is <code>true</code>.</p>"
         },
         {
-          "textRaw": "`isWorker` {boolean}",
+          "textRaw": "`isWorker` Type: {boolean}",
           "type": "boolean",
-          "name": "isWorker",
+          "name": "Type",
           "meta": {
             "added": [
               "v0.6.0"
@@ -656,9 +656,9 @@
           "desc": "<p>The scheduling policy, either <code>cluster.SCHED_RR</code> for round-robin or\n<code>cluster.SCHED_NONE</code> to leave it to the operating system. This is a\nglobal setting and effectively frozen once either the first worker is spawned,\nor <a href=\"#clustersetupprimarysettings\"><code>.setupPrimary()</code></a> is called, whichever comes first.</p>\n<p><code>SCHED_RR</code> is the default on all operating systems except Windows.\nWindows will change to <code>SCHED_RR</code> once libuv is able to effectively\ndistribute IOCP handles without incurring a large performance hit.</p>\n<p><code>cluster.schedulingPolicy</code> can also be set through the\n<code>NODE_CLUSTER_SCHED_POLICY</code> environment variable. Valid\nvalues are <code>'rr'</code> and <code>'none'</code>.</p>"
         },
         {
-          "textRaw": "`settings` {Object}",
+          "textRaw": "`settings` Type: {Object}",
           "type": "Object",
-          "name": "settings",
+          "name": "Type",
           "meta": {
             "added": [
               "v0.7.1"
@@ -772,9 +772,9 @@
           "desc": "<p>After calling <a href=\"#clustersetupprimarysettings\"><code>.setupPrimary()</code></a> (or <a href=\"#clusterforkenv\"><code>.fork()</code></a>) this settings object will\ncontain the settings, including the default values.</p>\n<p>This object is not intended to be changed or set manually.</p>"
         },
         {
-          "textRaw": "`worker` {Object}",
+          "textRaw": "`worker` Type: {Object}",
           "type": "Object",
-          "name": "worker",
+          "name": "Type",
           "meta": {
             "added": [
               "v0.7.0"
@@ -784,9 +784,9 @@
           "desc": "<p>A reference to the current worker object. Not available in the primary process.</p>\n<pre><code class=\"language-mjs\">import cluster from 'node:cluster';\n\nif (cluster.isPrimary) {\n  console.log('I am primary');\n  cluster.fork();\n  cluster.fork();\n} else if (cluster.isWorker) {\n  console.log(`I am worker #${cluster.worker.id}`);\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const cluster = require('node:cluster');\n\nif (cluster.isPrimary) {\n  console.log('I am primary');\n  cluster.fork();\n  cluster.fork();\n} else if (cluster.isWorker) {\n  console.log(`I am worker #${cluster.worker.id}`);\n}\n</code></pre>"
         },
         {
-          "textRaw": "`workers` {Object}",
+          "textRaw": "`workers` Type: {Object}",
           "type": "Object",
-          "name": "workers",
+          "name": "Type",
           "meta": {
             "added": [
               "v0.7.0"

@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v24.4.1">
-  <title>HTTP | Node.js v24.4.1 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v24.6.0">
+  <title>HTTP | Node.js v24.6.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -57,6 +57,7 @@
 <li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
 <li><a href="dns.html" class="nav-dns">DNS</a></li>
 <li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="environment_variables.html" class="nav-environment_variables">Environment Variables</a></li>
 <li><a href="errors.html" class="nav-errors">Errors</a></li>
 <li><a href="events.html" class="nav-events">Events</a></li>
 <li><a href="fs.html" class="nav-fs">File system</a></li>
@@ -111,7 +112,7 @@
     <div id="column1" data-id="http" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v24.4.1 documentation</h1>
+          <h1>Node.js v24.6.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -126,7 +127,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v24.4.1</li>
+            <li class="pinned-header">Node.js v24.6.0</li>
             
     <li class="picker-header">
       <a href="#toc-picker" aria-controls="toc-picker">
@@ -223,6 +224,7 @@
 <li><a href="#servermaxrequestspersocket"><code>server.maxRequestsPerSocket</code></a></li>
 <li><a href="#servertimeout"><code>server.timeout</code></a></li>
 <li><a href="#serverkeepalivetimeout"><code>server.keepAliveTimeout</code></a></li>
+<li><a href="#serverkeepalivetimeoutbuffer"><code>server.keepAliveTimeoutBuffer</code></a></li>
 <li><a href="#serversymbolasyncdispose"><code>server[Symbol.asyncDispose]()</code></a></li>
 </ul>
 </li>
@@ -329,6 +331,13 @@
 <li><a href="#httpvalidateheadervaluename-value"><code>http.validateHeaderValue(name, value)</code></a></li>
 <li><a href="#httpsetmaxidlehttpparsersmax"><code>http.setMaxIdleHTTPParsers(max)</code></a></li>
 <li><a href="#class-websocket">Class: <code>WebSocket</code></a></li>
+<li><span class="stability_1.1"><a href="#built-in-proxy-support">Built-in Proxy Support</a></span>
+<ul>
+<li><a href="#proxy-url-format">Proxy URL Format</a></li>
+<li><a href="#no_proxy-format"><code>NO_PROXY</code> Format</a></li>
+<li><a href="#example">Example</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul></div></div>
@@ -369,6 +378,7 @@
 <li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
 <li><a href="dns.html" class="nav-dns">DNS</a></li>
 <li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="environment_variables.html" class="nav-environment_variables">Environment Variables</a></li>
 <li><a href="errors.html" class="nav-errors">Errors</a></li>
 <li><a href="events.html" class="nav-events">Events</a></li>
 <li><a href="fs.html" class="nav-fs">File system</a></li>
@@ -563,6 +573,7 @@
 <li><a href="#servermaxrequestspersocket"><code>server.maxRequestsPerSocket</code></a></li>
 <li><a href="#servertimeout"><code>server.timeout</code></a></li>
 <li><a href="#serverkeepalivetimeout"><code>server.keepAliveTimeout</code></a></li>
+<li><a href="#serverkeepalivetimeoutbuffer"><code>server.keepAliveTimeoutBuffer</code></a></li>
 <li><a href="#serversymbolasyncdispose"><code>server[Symbol.asyncDispose]()</code></a></li>
 </ul>
 </li>
@@ -669,6 +680,13 @@
 <li><a href="#httpvalidateheadervaluename-value"><code>http.validateHeaderValue(name, value)</code></a></li>
 <li><a href="#httpsetmaxidlehttpparsersmax"><code>http.setMaxIdleHTTPParsers(max)</code></a></li>
 <li><a href="#class-websocket">Class: <code>WebSocket</code></a></li>
+<li><span class="stability_1.1"><a href="#built-in-proxy-support">Built-in Proxy Support</a></span>
+<ul>
+<li><a href="#proxy-url-format">Proxy URL Format</a></li>
+<li><a href="#no_proxy-format"><code>NO_PROXY</code> Format</a></li>
+<li><a href="#example">Example</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul></details>
@@ -677,7 +695,7 @@
         <h2>HTTP<span><a class="mark" href="#http" id="http">#</a></span><a aria-hidden="true" class="legacy" id="http_http"></a></h2>
 
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v24.4.1/lib/http.js">lib/http.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v24.6.0/lib/http.js">lib/http.js</a></p>
 <p>This module, containing both a client and server, can be imported via
 <code>require('node:http')</code> (CommonJS) or <code>import * as http from 'node:http'</code> (ES module).</p>
 <p>The HTTP interfaces in Node.js are designed to support many features
@@ -760,6 +778,10 @@ for the client connection.</p>
 <details class="changelog"><summary>History</summary>
 <table>
 <tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v24.5.0</td>
+<td><p>Add support for <code>proxyEnv</code>.</p></td></tr>
+<tr><td>v24.5.0</td>
+<td><p>Add support for <code>defaultPort</code> and <code>protocol</code>.</p></td></tr>
 <tr><td>v15.6.0, v14.17.0</td>
 <td><p>Change the default scheduling from 'fifo' to 'lifo'.</p></td></tr>
 <tr><td>v14.5.0, v12.20.0</td>
@@ -817,6 +839,23 @@ while the <code>'lifo'</code> scheduling will keep it as low as possible.
 <strong>Default:</strong> <code>'lifo'</code>.</li>
 <li><code>timeout</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> Socket timeout in milliseconds.
 This will set the timeout when the socket is created.</li>
+<li><code>proxyEnv</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> Environment variables for proxy configuration.
+See <a href="#built-in-proxy-support">Built-in Proxy Support</a> for details. <strong>Default:</strong> <code>undefined</code>
+<ul>
+<li><code>HTTP_PROXY</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> URL for the proxy server that HTTP requests should use.
+If undefined, no proxy is used for HTTP requests.</li>
+<li><code>HTTPS_PROXY</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> URL for the proxy server that HTTPS requests should use.
+If undefined, no proxy is used for HTTPS requests.</li>
+<li><code>NO_PROXY</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> Patterns specifying the endpoints
+that should not be routed through a proxy.</li>
+<li><code>http_proxy</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> Same as <code>HTTP_PROXY</code>. If both are set, <code>http_proxy</code> takes precedence.</li>
+<li><code>https_proxy</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> Same as <code>HTTPS_PROXY</code>. If both are set, <code>https_proxy</code> takes precedence.</li>
+<li><code>no_proxy</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> Same as <code>NO_PROXY</code>. If both are set, <code>no_proxy</code> takes precedence.</li>
+</ul>
+</li>
+<li><code>defaultPort</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> Default port to use when the port is not specified
+in requests. <strong>Default:</strong> <code>80</code>.</li>
+<li><code>protocol</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> The protocol to use for the agent. <strong>Default:</strong> <code>'http:'</code>.</li>
 </ul>
 </li>
 </ul>
@@ -908,7 +947,7 @@ terminates them.</p>
 </details>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
 </ul>
 <p>An object which contains arrays of sockets currently awaiting use by
 the agent when <code>keepAlive</code> is enabled. Do not modify.</p>
@@ -951,7 +990,7 @@ that determine socket reusability.</p>
 <span>Added in: v0.11.7</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
 </ul>
 <p>By default set to 256. For agents with <code>keepAlive</code> enabled, this
 sets the maximum number of sockets that will be left open in the free
@@ -962,7 +1001,7 @@ state.</p>
 <span>Added in: v0.3.6</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
 </ul>
 <p>By default set to <code>Infinity</code>. Determines how many concurrent sockets the agent
 can have open per origin. Origin is the returned value of <a href="#agentgetnameoptions"><code>agent.getName()</code></a>.</p>
@@ -972,7 +1011,7 @@ can have open per origin. Origin is the returned value of <a href="#agentgetname
 <span>Added in: v14.5.0, v12.19.0</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
 </ul>
 <p>By default set to <code>Infinity</code>. Determines how many concurrent sockets the agent
 can have open. Unlike <code>maxSockets</code>, this parameter applies across all origins.</p>
@@ -990,7 +1029,7 @@ can have open. Unlike <code>maxSockets</code>, this parameter applies across all
 </details>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
 </ul>
 <p>An object which contains queues of requests that have not yet been assigned to
 sockets. Do not modify.</p>
@@ -1008,7 +1047,7 @@ sockets. Do not modify.</p>
 </details>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
 </ul>
 <p>An object which contains arrays of sockets currently in use by the
 agent. Do not modify.</p>
@@ -1405,7 +1444,7 @@ in the response to be dropped and the socket to be destroyed.</p>
 </div>
 <p></p><div class="api_stability api_stability_0"><a href="documentation.html#stability-index">Stability: 0</a> - Deprecated. Check <a href="#requestdestroyed"><code>request.destroyed</code></a> instead.</div><p></p>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
 </ul>
 <p>The <code>request.aborted</code> property will be <code>true</code> if the request has
 been aborted.</p>
@@ -1416,7 +1455,7 @@ been aborted.</p>
 </div>
 <p></p><div class="api_stability api_stability_0"><a href="documentation.html#stability-index">Stability: 0</a> - Deprecated. Use <a href="#requestsocket"><code>request.socket</code></a>.</div><p></p>
 <ul>
-<li><a href="stream.html#class-streamduplex" class="type">&#x3C;stream.Duplex></a></li>
+<li>Type: <a href="stream.html#class-streamduplex" class="type">&#x3C;stream.Duplex></a></li>
 </ul>
 <p>See <a href="#requestsocket"><code>request.socket</code></a>.</p>
 </div><div>
@@ -1480,7 +1519,7 @@ in the response to be dropped and the socket to be destroyed.</p>
 <span>Added in: v14.1.0, v13.14.0</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
 </ul>
 <p>Is <code>true</code> after <a href="#requestdestroyerror"><code>request.destroy()</code></a> has been called.</p>
 <p>See <a href="stream.html#writabledestroyed"><code>writable.destroyed</code></a> for further details.</p>
@@ -1491,7 +1530,7 @@ in the response to be dropped and the socket to be destroyed.</p>
 </div>
 <p></p><div class="api_stability api_stability_0"><a href="documentation.html#stability-index">Stability: 0</a> - Deprecated. Use <a href="#requestwritableended"><code>request.writableEnded</code></a>.</div><p></p>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
 </ul>
 <p>The <code>request.finished</code> property will be <code>true</code> if <a href="#requestenddata-encoding-callback"><code>request.end()</code></a>
 has been called. <code>request.end()</code> will automatically be called if the
@@ -1596,7 +1635,7 @@ outgoing headers. The header name matching is case-insensitive.</p>
 </div><div>
 <h4><code>request.maxHeadersCount</code><span><a class="mark" href="#requestmaxheaderscount" id="requestmaxheaderscount">#</a></span><a aria-hidden="true" class="legacy" id="http_request_maxheaderscount"></a></h4>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> <strong>Default:</strong> <code>2000</code></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> <strong>Default:</strong> <code>2000</code></li>
 </ul>
 <p>Limits maximum response headers count. If set to 0, no limit will be applied.</p>
 </div><div>
@@ -1605,7 +1644,7 @@ outgoing headers. The header name matching is case-insensitive.</p>
 <span>Added in: v0.4.0</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> The request path.</li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> The request path.</li>
 </ul>
 </div><div>
 <h4><code>request.method</code><span><a class="mark" href="#requestmethod" id="requestmethod">#</a></span><a aria-hidden="true" class="legacy" id="http_request_method"></a></h4>
@@ -1613,7 +1652,7 @@ outgoing headers. The header name matching is case-insensitive.</p>
 <span>Added in: v0.1.97</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> The request method.</li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> The request method.</li>
 </ul>
 </div><div>
 <h4><code>request.host</code><span><a class="mark" href="#requesthost" id="requesthost">#</a></span><a aria-hidden="true" class="legacy" id="http_request_host"></a></h4>
@@ -1621,7 +1660,7 @@ outgoing headers. The header name matching is case-insensitive.</p>
 <span>Added in: v14.5.0, v12.19.0</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> The request host.</li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> The request host.</li>
 </ul>
 </div><div>
 <h4><code>request.protocol</code><span><a class="mark" href="#requestprotocol" id="requestprotocol">#</a></span><a aria-hidden="true" class="legacy" id="http_request_protocol"></a></h4>
@@ -1629,7 +1668,7 @@ outgoing headers. The header name matching is case-insensitive.</p>
 <span>Added in: v14.5.0, v12.19.0</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> The request protocol.</li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> The request protocol.</li>
 </ul>
 </div><div>
 <h4><code>request.removeHeader(name)</code><span><a class="mark" href="#requestremoveheadername" id="requestremoveheadername">#</a></span><a aria-hidden="true" class="legacy" id="http_request_removeheader_name"></a></h4>
@@ -1647,7 +1686,7 @@ outgoing headers. The header name matching is case-insensitive.</p>
 <span>Added in: v13.0.0, v12.16.0</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> Whether the request is send through a reused socket.</li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> Whether the request is send through a reused socket.</li>
 </ul>
 <p>When sending request through a keep-alive enabled agent, the underlying socket
 might be reused. But if server closes connection at unfortunate time, client
@@ -1796,7 +1835,7 @@ Same as binding to the <code>'timeout'</code> event.</li>
 <span>Added in: v0.3.0</span>
 </div>
 <ul>
-<li><a href="stream.html#class-streamduplex" class="type">&#x3C;stream.Duplex></a></li>
+<li>Type: <a href="stream.html#class-streamduplex" class="type">&#x3C;stream.Duplex></a></li>
 </ul>
 <p>Reference to the underlying socket. Usually users will not want to access
 this property. In particular, the socket will not emit <code>'readable'</code> events
@@ -1840,7 +1879,7 @@ type other than <a href="net.html#class-netsocket" class="type">&#x3C;net.Socket
 <span>Added in: v12.9.0</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
 </ul>
 <p>Is <code>true</code> after <a href="#requestenddata-encoding-callback"><code>request.end()</code></a> has been called. This property
 does not indicate whether the data has been flushed, for this use
@@ -1851,7 +1890,7 @@ does not indicate whether the data has been flushed, for this use
 <span>Added in: v12.7.0</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
 </ul>
 <p>Is <code>true</code> if all data has been flushed to the underlying system, immediately
 before the <a href="#event-finish"><code>'finish'</code></a> event is emitted.</p>
@@ -2219,7 +2258,7 @@ server.<span class="hljs-title function_">listen</span>(<span class="hljs-number
 </details>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> <strong>Default:</strong> The minimum between <a href="#serverrequesttimeout"><code>server.requestTimeout</code></a> or <code>60000</code>.</li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> <strong>Default:</strong> The minimum between <a href="#serverrequesttimeout"><code>server.requestTimeout</code></a> or <code>60000</code>.</li>
 </ul>
 <p>Limit the amount of time the parser will wait to receive the complete HTTP
 headers.</p>
@@ -2238,7 +2277,7 @@ This method is identical to <a href="net.html#serverlisten"><code>server.listen(
 <span>Added in: v5.7.0</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> Indicates whether or not the server is listening for connections.</li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> Indicates whether or not the server is listening for connections.</li>
 </ul>
 </div><div>
 <h4><code>server.maxHeadersCount</code><span><a class="mark" href="#servermaxheaderscount" id="servermaxheaderscount">#</a></span><a aria-hidden="true" class="legacy" id="http_server_maxheaderscount"></a></h4>
@@ -2246,7 +2285,7 @@ This method is identical to <a href="net.html#serverlisten"><code>server.listen(
 <span>Added in: v0.7.0</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> <strong>Default:</strong> <code>2000</code></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> <strong>Default:</strong> <code>2000</code></li>
 </ul>
 <p>Limits maximum incoming headers count. If set to 0, no limit will be applied.</p>
 </div><div>
@@ -2263,7 +2302,7 @@ This method is identical to <a href="net.html#serverlisten"><code>server.listen(
 </details>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> <strong>Default:</strong> <code>300000</code></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> <strong>Default:</strong> <code>300000</code></li>
 </ul>
 <p>Sets the timeout value in milliseconds for receiving the entire request from
 the client.</p>
@@ -2304,7 +2343,7 @@ explicitly.</p>
 <span>Added in: v16.10.0</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> Requests per socket. <strong>Default:</strong> 0 (no limit)</li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> Requests per socket. <strong>Default:</strong> 0 (no limit)</li>
 </ul>
 <p>The maximum number of requests socket can handle
 before closing keep alive connection.</p>
@@ -2326,7 +2365,7 @@ after the limit is reached will get <code>503 Service Unavailable</code> as a re
 </details>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> Timeout in milliseconds. <strong>Default:</strong> 0 (no timeout)</li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> Timeout in milliseconds. <strong>Default:</strong> 0 (no timeout)</li>
 </ul>
 <p>The number of milliseconds of inactivity before a socket is presumed
 to have timed out.</p>
@@ -2339,19 +2378,36 @@ value only affects new connections to the server, not any existing connections.<
 <span>Added in: v8.0.0</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> Timeout in milliseconds. <strong>Default:</strong> <code>5000</code> (5 seconds).</li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> Timeout in milliseconds. <strong>Default:</strong> <code>5000</code> (5 seconds).</li>
 </ul>
 <p>The number of milliseconds of inactivity a server needs to wait for additional
 incoming data, after it has finished writing the last response, before a socket
-will be destroyed. If the server receives new data before the keep-alive
-timeout has fired, it will reset the regular inactivity timeout, i.e.,
-<a href="#servertimeout"><code>server.timeout</code></a>.</p>
+will be destroyed.</p>
+<p>This timeout value is combined with the
+<a href="#serverkeepalivetimeoutbuffer"><code>server.keepAliveTimeoutBuffer</code></a> option to determine the actual socket
+timeout, calculated as:
+socketTimeout = keepAliveTimeout + keepAliveTimeoutBuffer
+If the server receives new data before the keep-alive timeout has fired, it
+will reset the regular inactivity timeout, i.e., <a href="#servertimeout"><code>server.timeout</code></a>.</p>
 <p>A value of <code>0</code> will disable the keep-alive timeout behavior on incoming
 connections.
-A value of <code>0</code> makes the http server behave similarly to Node.js versions prior
+A value of <code>0</code> makes the HTTP server behave similarly to Node.js versions prior
 to 8.0.0, which did not have a keep-alive timeout.</p>
 <p>The socket timeout logic is set up on connection, so changing this value only
 affects new connections to the server, not any existing connections.</p>
+</div><div>
+<h4><code>server.keepAliveTimeoutBuffer</code><span><a class="mark" href="#serverkeepalivetimeoutbuffer" id="serverkeepalivetimeoutbuffer">#</a></span><a aria-hidden="true" class="legacy" id="http_server_keepalivetimeoutbuffer"></a></h4>
+<div class="api_metadata">
+<span>Added in: v24.6.0</span>
+</div>
+<ul>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> Timeout in milliseconds. <strong>Default:</strong> <code>1000</code> (1 second).</li>
+</ul>
+<p>An additional buffer time added to the
+<a href="#serverkeepalivetimeout"><code>server.keepAliveTimeout</code></a> to extend the internal socket timeout.</p>
+<p>This buffer helps reduce connection reset (<code>ECONNRESET</code>) errors by increasing
+the socket timeout slightly beyond the advertised keep-alive timeout.</p>
+<p>This option applies only to new incoming connections.</p>
 </div><div>
 <h4><code>server[Symbol.asyncDispose]()</code><span><a class="mark" href="#serversymbolasyncdispose" id="serversymbolasyncdispose">#</a></span><a aria-hidden="true" class="legacy" id="http_server_symbol_asyncdispose"></a></h4>
 <div class="api_metadata">
@@ -2422,7 +2478,7 @@ will result in a <a href="errors.html#class-typeerror"><code>TypeError</code></a
 </div>
 <p></p><div class="api_stability api_stability_0"><a href="documentation.html#stability-index">Stability: 0</a> - Deprecated. Use <a href="#responsesocket"><code>response.socket</code></a>.</div><p></p>
 <ul>
-<li><a href="stream.html#class-streamduplex" class="type">&#x3C;stream.Duplex></a></li>
+<li>Type: <a href="stream.html#class-streamduplex" class="type">&#x3C;stream.Duplex></a></li>
 </ul>
 <p>See <a href="#responsesocket"><code>response.socket</code></a>.</p>
 </div><div>
@@ -2466,7 +2522,7 @@ is finished.</p>
 </div>
 <p></p><div class="api_stability api_stability_0"><a href="documentation.html#stability-index">Stability: 0</a> - Deprecated. Use <a href="#responsewritableended"><code>response.writableEnded</code></a>.</div><p></p>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
 </ul>
 <p>The <code>response.finished</code> property will be <code>true</code> if <a href="#responseenddata-encoding-callback"><code>response.end()</code></a>
 has been called.</p>
@@ -2552,7 +2608,7 @@ outgoing headers. The header name matching is case-insensitive.</p>
 <span>Added in: v0.9.3</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
 </ul>
 <p>Boolean (read-only). True if headers were sent, false otherwise.</p>
 </div><div>
@@ -2571,7 +2627,7 @@ outgoing headers. The header name matching is case-insensitive.</p>
 <span>Added in: v15.7.0</span>
 </div>
 <ul>
-<li><a href="http.html#class-httpincomingmessage" class="type">&#x3C;http.IncomingMessage></a></li>
+<li>Type: <a href="http.html#class-httpincomingmessage" class="type">&#x3C;http.IncomingMessage></a></li>
 </ul>
 <p>A reference to the original HTTP <code>request</code> object.</p>
 </div><div>
@@ -2580,7 +2636,7 @@ outgoing headers. The header name matching is case-insensitive.</p>
 <span>Added in: v0.7.5</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
 </ul>
 <p>When true, the Date header will be automatically generated and sent in
 the response if it is not already present in the headers. Defaults to true.</p>
@@ -2648,7 +2704,7 @@ timed out sockets must be handled explicitly.</p>
 <span>Added in: v0.3.0</span>
 </div>
 <ul>
-<li><a href="stream.html#class-streamduplex" class="type">&#x3C;stream.Duplex></a></li>
+<li>Type: <a href="stream.html#class-streamduplex" class="type">&#x3C;stream.Duplex></a></li>
 </ul>
 <p>Reference to the underlying socket. Usually users will not want to access
 this property. In particular, the socket will not emit <code>'readable'</code> events
@@ -2675,7 +2731,7 @@ type other than <a href="net.html#class-netsocket" class="type">&#x3C;net.Socket
 <span>Added in: v0.4.0</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> <strong>Default:</strong> <code>200</code></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> <strong>Default:</strong> <code>200</code></li>
 </ul>
 <p>When using implicit headers (not calling <a href="#responsewriteheadstatuscode-statusmessage-headers"><code>response.writeHead()</code></a> explicitly),
 this property controls the status code that will be sent to the client when
@@ -2689,7 +2745,7 @@ status code which was sent out.</p>
 <span>Added in: v0.11.8</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
 </ul>
 <p>When using implicit headers (not calling <a href="#responsewriteheadstatuscode-statusmessage-headers"><code>response.writeHead()</code></a> explicitly),
 this property controls the status message that will be sent to the client when
@@ -2704,7 +2760,7 @@ status message which was sent out.</p>
 <span>Added in: v18.10.0, v16.18.0</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> <strong>Default:</strong> <code>false</code></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> <strong>Default:</strong> <code>false</code></li>
 </ul>
 <p>If set to <code>true</code>, Node.js will check whether the <code>Content-Length</code>
 header value and the size of the body, in bytes, are equal.
@@ -2722,7 +2778,7 @@ in an <code>Error</code> being thrown, identified by <code>code:</code> <a href=
 <span>Added in: v12.9.0</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
 </ul>
 <p>Is <code>true</code> after <a href="#responseenddata-encoding-callback"><code>response.end()</code></a> has been called. This property
 does not indicate whether the data has been flushed, for this use
@@ -2733,7 +2789,7 @@ does not indicate whether the data has been flushed, for this use
 <span>Added in: v12.7.0</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
 </ul>
 <p>Is <code>true</code> if all data has been flushed to the underlying system, immediately
 before the <a href="#event-finish"><code>'finish'</code></a> event is emitted.</p>
@@ -2953,7 +3009,7 @@ may be reused multiple times in case of keep-alive.</p>
 </div>
 <p></p><div class="api_stability api_stability_0"><a href="documentation.html#stability-index">Stability: 0</a> - Deprecated. Check <code>message.destroyed</code> from <a href="stream.html#class-streamreadable" class="type">&#x3C;stream.Readable></a>.</div><p></p>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
 </ul>
 <p>The <code>message.aborted</code> property will be <code>true</code> if the request has
 been aborted.</p>
@@ -2963,7 +3019,7 @@ been aborted.</p>
 <span>Added in: v0.3.0</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
 </ul>
 <p>The <code>message.complete</code> property will be <code>true</code> if a complete HTTP message has
 been received and successfully parsed.</p>
@@ -3024,7 +3080,7 @@ as an argument to any listeners on the event.</p>
 </details>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
 </ul>
 <p>The request/response headers object.</p>
 <p>Key-value pairs of header names and values. Header names are lower-cased.</p>
@@ -3055,7 +3111,7 @@ information.</li>
 <span>Added in: v18.3.0, v16.17.0</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
 </ul>
 <p>Similar to <a href="#messageheaders"><code>message.headers</code></a>, but there is no join logic and the values are
 always arrays of strings, even for headers received just once.</p>
@@ -3071,7 +3127,7 @@ always arrays of strings, even for headers received just once.</p>
 <span>Added in: v0.1.1</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
 </ul>
 <p>In case of server request, the HTTP version sent by the client. In the case of
 client response, the HTTP version of the connected-to server.
@@ -3084,7 +3140,7 @@ Probably either <code>'1.1'</code> or <code>'1.0'</code>.</p>
 <span>Added in: v0.1.1</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
 </ul>
 <p><strong>Only valid for request obtained from <a href="#class-httpserver"><code>http.Server</code></a>.</strong></p>
 <p>The request method as a string. Read only. Examples: <code>'GET'</code>, <code>'DELETE'</code>.</p>
@@ -3094,7 +3150,7 @@ Probably either <code>'1.1'</code> or <code>'1.0'</code>.</p>
 <span>Added in: v0.11.6</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a></li>
 </ul>
 <p>The raw request/response headers list exactly as they were received.</p>
 <p>The keys and values are in the same list. It is <em>not</em> a
@@ -3118,7 +3174,7 @@ odd-numbered offsets are the associated values.</p>
 <span>Added in: v0.11.6</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a></li>
 </ul>
 <p>The raw request/response trailer keys and values exactly as they were
 received. Only populated at the <code>'end'</code> event.</p>
@@ -3139,7 +3195,7 @@ received. Only populated at the <code>'end'</code> event.</p>
 <span>Added in: v0.3.0</span>
 </div>
 <ul>
-<li><a href="stream.html#class-streamduplex" class="type">&#x3C;stream.Duplex></a></li>
+<li>Type: <a href="stream.html#class-streamduplex" class="type">&#x3C;stream.Duplex></a></li>
 </ul>
 <p>The <a href="net.html#class-netsocket"><code>net.Socket</code></a> object associated with the connection.</p>
 <p>With HTTPS support, use <a href="tls.html#tlssocketgetpeercertificatedetailed"><code>request.socket.getPeerCertificate()</code></a> to obtain the
@@ -3153,7 +3209,7 @@ type other than <a href="net.html#class-netsocket" class="type">&#x3C;net.Socket
 <span>Added in: v0.1.1</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
 </ul>
 <p><strong>Only valid for response obtained from <a href="#class-httpclientrequest"><code>http.ClientRequest</code></a>.</strong></p>
 <p>The 3-digit HTTP response status code. E.G. <code>404</code>.</p>
@@ -3163,7 +3219,7 @@ type other than <a href="net.html#class-netsocket" class="type">&#x3C;net.Socket
 <span>Added in: v0.11.10</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
 </ul>
 <p><strong>Only valid for response obtained from <a href="#class-httpclientrequest"><code>http.ClientRequest</code></a>.</strong></p>
 <p>The HTTP response status message (reason phrase). E.G. <code>OK</code> or <code>Internal Server Error</code>.</p>
@@ -3173,7 +3229,7 @@ type other than <a href="net.html#class-netsocket" class="type">&#x3C;net.Socket
 <span>Added in: v0.3.0</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
 </ul>
 <p>The request/response trailers object. Only populated at the <code>'end'</code> event.</p>
 </div><div>
@@ -3182,7 +3238,7 @@ type other than <a href="net.html#class-netsocket" class="type">&#x3C;net.Socket
 <span>Added in: v18.3.0, v16.17.0</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
 </ul>
 <p>Similar to <a href="#messagetrailers"><code>message.trailers</code></a>, but there is no join logic and the values are
 always arrays of strings, even for headers received just once.
@@ -3193,7 +3249,7 @@ Only populated at the <code>'end'</code> event.</p>
 <span>Added in: v0.1.90</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
 </ul>
 <p><strong>Only valid for request obtained from <a href="#class-httpserver"><code>http.Server</code></a>.</strong></p>
 <p>Request URL string. This contains only the URL that is present in the actual
@@ -3418,7 +3474,7 @@ outgoing headers. The header name is case-insensitive.</p>
 <span>Added in: v0.9.3</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
 </ul>
 <p>Read-only. <code>true</code> if the headers were sent, otherwise <code>false</code>.</p>
 </div><div>
@@ -3500,7 +3556,7 @@ occurs. Same as binding to the <code>timeout</code> event.</li>
 <span>Added in: v0.3.0</span>
 </div>
 <ul>
-<li><a href="stream.html#class-streamduplex" class="type">&#x3C;stream.Duplex></a></li>
+<li>Type: <a href="stream.html#class-streamduplex" class="type">&#x3C;stream.Duplex></a></li>
 </ul>
 <p>Reference to the underlying socket. Usually, users will not want to access
 this property.</p>
@@ -3517,7 +3573,7 @@ this property.</p>
 <span>Added in: v13.2.0, v12.16.0</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
 </ul>
 <p>The number of times <code>outgoingMessage.cork()</code> has been called.</p>
 </div><div>
@@ -3526,7 +3582,7 @@ this property.</p>
 <span>Added in: v12.9.0</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
 </ul>
 <p>Is <code>true</code> if <code>outgoingMessage.end()</code> has been called. This property does
 not indicate whether the data has been flushed. For that purpose, use
@@ -3537,7 +3593,7 @@ not indicate whether the data has been flushed. For that purpose, use
 <span>Added in: v12.7.0</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
 </ul>
 <p>Is <code>true</code> if all data has been flushed to the underlying system.</p>
 </div><div>
@@ -3546,7 +3602,7 @@ not indicate whether the data has been flushed. For that purpose, use
 <span>Added in: v12.9.0</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
 </ul>
 <p>The <code>highWaterMark</code> of the underlying socket if assigned. Otherwise, the default
 buffer level when <a href="stream.html#writablewritechunk-encoding-callback"><code>writable.write()</code></a> starts returning false (<code>16384</code>).</p>
@@ -3556,7 +3612,7 @@ buffer level when <a href="stream.html#writablewritechunk-encoding-callback"><co
 <span>Added in: v12.9.0</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
 </ul>
 <p>The number of buffered bytes.</p>
 </div><div>
@@ -3565,7 +3621,7 @@ buffer level when <a href="stream.html#writablewritechunk-encoding-callback"><co
 <span>Added in: v12.9.0</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
 </ul>
 <p>Always <code>false</code>.</p>
 </div><div>
@@ -3603,7 +3659,7 @@ memory. The <code>'drain'</code> event will be emitted when the buffer is free a
 <span>Added in: v0.11.8</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a></li>
 </ul>
 <p>A list of the HTTP methods that are supported by the parser.</p>
 </section><section><h3><code>http.STATUS_CODES</code><span><a class="mark" href="#httpstatus_codes" id="httpstatus_codes">#</a></span><a aria-hidden="true" class="legacy" id="http_http_status_codes"></a></h3>
@@ -3611,7 +3667,7 @@ memory. The <code>'drain'</code> event will be emitted when the buffer is free a
 <span>Added in: v0.1.22</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
 </ul>
 <p>A collection of all the standard HTTP response status codes, and the
 short description of each. For example, <code>http.STATUS_CODES[404] === 'Not Found'</code>.</p>
@@ -3853,7 +3909,7 @@ server.<span class="hljs-title function_">listen</span>(<span class="hljs-number
 </details>
 </div>
 <ul>
-<li><a href="http.html#class-httpagent" class="type">&#x3C;http.Agent></a></li>
+<li>Type: <a href="http.html#class-httpagent" class="type">&#x3C;http.Agent></a></li>
 </ul>
 <p>Global instance of <code>Agent</code> which is used as the default for all HTTP client
 requests. Diverges from a default <code>Agent</code> configuration by having <code>keepAlive</code>
@@ -3863,7 +3919,7 @@ enabled and a <code>timeout</code> of 5 seconds.</p>
 <span>Added in: v11.6.0, v10.15.0</span>
 </div>
 <ul>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
 </ul>
 <p>Read-only property specifying the maximum allowed size of HTTP headers in bytes.
 Defaults to 16 KiB. Configurable using the <a href="cli.html#--max-http-header-sizesize"><code>--max-http-header-size</code></a> CLI
@@ -4311,7 +4367,82 @@ or response. The HTTP module will automatically validate such headers.</p>
 <div class="api_metadata">
 <span>Added in: v22.5.0</span>
 </div>
-<p>A browser-compatible implementation of <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebSocket" class="type">&#x3C;WebSocket></a>.</p></section>
+<p>A browser-compatible implementation of <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebSocket" class="type">&#x3C;WebSocket></a>.</p>
+</section><section><h3>Built-in Proxy Support<span><a class="mark" href="#built-in-proxy-support" id="built-in-proxy-support">#</a></span><a aria-hidden="true" class="legacy" id="http_built_in_proxy_support"></a></h3>
+<div class="api_metadata">
+<span>Added in: v24.5.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1.1</a> - Active development</div><p></p>
+<p>When Node.js creates the global agent, if the <code>NODE_USE_ENV_PROXY</code> environment variable is
+set to <code>1</code> or <code>--use-env-proxy</code> is enabled, the global agent will be constructed
+with <code>proxyEnv: process.env</code>, enabling proxy support based on the environment variables.
+Custom agents can also be created with proxy support by passing a
+<code>proxyEnv</code> option when constructing the agent. The value can be <code>process.env</code>
+if they just want to inherit the configuration from the environment variables,
+or an object with specific setting overriding the environment.</p>
+<p>The following properties of the <code>proxyEnv</code> are checked to configure proxy
+support.</p>
+<ul>
+<li><code>HTTP_PROXY</code> or <code>http_proxy</code>: Proxy server URL for HTTP requests. If both are set,
+<code>http_proxy</code> takes precedence.</li>
+<li><code>HTTPS_PROXY</code> or <code>https_proxy</code>: Proxy server URL for HTTPS requests. If both are set,
+<code>https_proxy</code> takes precedence.</li>
+<li><code>NO_PROXY</code> or <code>no_proxy</code>: Comma-separated list of hosts to bypass the proxy. If both are set,
+<code>no_proxy</code> takes precedence.</li>
+</ul>
+<p>If the request is made to a Unix domain socket, the proxy settings will be ignored.</p>
+<div>
+<h4>Proxy URL Format<span><a class="mark" href="#proxy-url-format" id="proxy-url-format">#</a></span><a aria-hidden="true" class="legacy" id="http_proxy_url_format"></a></h4>
+<p>Proxy URLs can use either HTTP or HTTPS protocols:</p>
+<ul>
+<li>HTTP proxy: <code>http://proxy.example.com:8080</code></li>
+<li>HTTPS proxy: <code>https://proxy.example.com:8080</code></li>
+<li>Proxy with authentication: <code>http://username:password@proxy.example.com:8080</code></li>
+</ul>
+</div><div>
+<h4><code>NO_PROXY</code> Format<span><a class="mark" href="#no_proxy-format" id="no_proxy-format">#</a></span><a aria-hidden="true" class="legacy" id="http_no_proxy_format"></a></h4>
+<p>The <code>NO_PROXY</code> environment variable supports several formats:</p>
+<ul>
+<li><code>*</code> - Bypass proxy for all hosts</li>
+<li><code>example.com</code> - Exact host name match</li>
+<li><code>.example.com</code> - Domain suffix match (matches <code>sub.example.com</code>)</li>
+<li><code>*.example.com</code> - Wildcard domain match</li>
+<li><code>192.168.1.100</code> - Exact IP address match</li>
+<li><code>192.168.1.1-192.168.1.100</code> - IP address range</li>
+<li><code>example.com:8080</code> - Hostname with specific port</li>
+</ul>
+<p>Multiple entries should be separated by commas.</p>
+</div><div>
+<h4>Example<span><a class="mark" href="#example" id="example">#</a></span><a aria-hidden="true" class="legacy" id="http_example"></a></h4>
+<p>To start a Node.js process with proxy support enabled for all requests sent
+through the default global agent, either use the <code>NODE_USE_ENV_PROXY</code> environment
+variable:</p>
+<pre><code class="language-console">NODE_USE_ENV_PROXY=1 HTTP_PROXY=http://proxy.example.com:8080 NO_PROXY=localhost,127.0.0.1 node client.js</code> <button class="copy-button">copy</button></pre>
+<p>Or the <code>--use-env-proxy</code> flag.</p>
+<pre><code class="language-console">HTTP_PROXY=http://proxy.example.com:8080 NO_PROXY=localhost,127.0.0.1 node --use-env-proxy client.js</code> <button class="copy-button">copy</button></pre>
+<p>To create a custom agent with built-in proxy support:</p>
+<pre><code class="language-js cjs"><span class="hljs-keyword">const</span> http = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:http'</span>);
+
+<span class="hljs-comment">// Creating a custom agent with custom proxy support.</span>
+<span class="hljs-keyword">const</span> agent = <span class="hljs-keyword">new</span> http.<span class="hljs-title class_">Agent</span>({ <span class="hljs-attr">proxyEnv</span>: { <span class="hljs-attr">HTTP_PROXY</span>: <span class="hljs-string">'http://proxy.example.com:8080'</span> } });
+
+http.<span class="hljs-title function_">request</span>({
+  <span class="hljs-attr">hostname</span>: <span class="hljs-string">'www.example.com'</span>,
+  <span class="hljs-attr">port</span>: <span class="hljs-number">80</span>,
+  <span class="hljs-attr">path</span>: <span class="hljs-string">'/'</span>,
+  agent,
+}, <span class="hljs-function">(<span class="hljs-params">res</span>) =></span> {
+  <span class="hljs-comment">// This request will be proxied through proxy.example.com:8080 using the HTTP protocol.</span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`STATUS: <span class="hljs-subst">${res.statusCode}</span>`</span>);
+});</code> <button class="copy-button">copy</button></pre>
+<p>Alternatively, the following also works:</p>
+<pre><code class="language-js cjs"><span class="hljs-keyword">const</span> http = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:http'</span>);
+<span class="hljs-comment">// Use lower-cased option name.</span>
+<span class="hljs-keyword">const</span> agent1 = <span class="hljs-keyword">new</span> http.<span class="hljs-title class_">Agent</span>({ <span class="hljs-attr">proxyEnv</span>: { <span class="hljs-attr">http_proxy</span>: <span class="hljs-string">'http://proxy.example.com:8080'</span> } });
+<span class="hljs-comment">// Use values inherited from the environment variables, if the process is started with</span>
+<span class="hljs-comment">// HTTP_PROXY=http://proxy.example.com:8080 this will use the proxy server specified</span>
+<span class="hljs-comment">// in process.env.HTTP_PROXY.</span>
+<span class="hljs-keyword">const</span> agent2 = <span class="hljs-keyword">new</span> http.<span class="hljs-title class_">Agent</span>({ <span class="hljs-attr">proxyEnv</span>: process.<span class="hljs-property">env</span> });</code> <button class="copy-button">copy</button></pre></div></section>
         <!-- API END -->
       </div>
     </div>

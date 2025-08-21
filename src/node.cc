@@ -776,6 +776,13 @@ static ExitCode ProcessGlobalArgsInternal(std::vector<std::string>* args,
     v8_args.emplace_back("--harmony-import-attributes");
   }
 
+  if (!per_process::cli_options->per_isolate->max_old_space_size_percentage
+           .empty()) {
+    v8_args.emplace_back(
+        "--max_old_space_size=" +
+        per_process::cli_options->per_isolate->max_old_space_size);
+  }
+
   auto env_opts = per_process::cli_options->per_isolate->per_env;
   if (std::ranges::find(v8_args, "--abort-on-uncaught-exception") !=
           v8_args.end() ||
@@ -784,9 +791,7 @@ static ExitCode ProcessGlobalArgsInternal(std::vector<std::string>* args,
     env_opts->abort_on_uncaught_exception = true;
   }
 
-  if (env_opts->experimental_wasm_modules) {
-    v8_args.emplace_back("--js-source-phase-imports");
-  }
+  v8_args.emplace_back("--js-source-phase-imports");
 
 #ifdef __POSIX__
   // Block SIGPROF signals when sleeping in epoll_wait/kevent/etc.  Avoids the
@@ -874,6 +879,15 @@ static ExitCode InitializeNodeWithArgsInternal(
   // default value.
   V8::SetFlagsFromString("--rehash-snapshot");
 
+#if HAVE_OPENSSL
+  // TODO(joyeecheung): make this a per-env option and move the normalization
+  // into HandleEnvOptions.
+  std::string use_system_ca;
+  if (credentials::SafeGetenv("NODE_USE_SYSTEM_CA", &use_system_ca) &&
+      use_system_ca == "1") {
+    per_process::cli_options->use_system_ca = true;
+  }
+#endif  // HAVE_OPENSSL
   HandleEnvOptions(per_process::cli_options->per_isolate->per_env);
 
   std::string node_options;

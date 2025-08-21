@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.4.1/lib/tls.js\">lib/tls.js</a></p>\n<p>The <code>node:tls</code> module provides an implementation of the Transport Layer Security\n(TLS) and Secure Socket Layer (SSL) protocols that is built on top of OpenSSL.\nThe module can be accessed using:</p>\n<pre><code class=\"language-mjs\">import tls from 'node:tls';\n</code></pre>\n<pre><code class=\"language-cjs\">const tls = require('node:tls');\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.6.0/lib/tls.js\">lib/tls.js</a></p>\n<p>The <code>node:tls</code> module provides an implementation of the Transport Layer Security\n(TLS) and Secure Socket Layer (SSL) protocols that is built on top of OpenSSL.\nThe module can be accessed using:</p>\n<pre><code class=\"language-mjs\">import tls from 'node:tls';\n</code></pre>\n<pre><code class=\"language-cjs\">const tls = require('node:tls');\n</code></pre>",
       "modules": [
         {
           "textRaw": "Determining if crypto support is unavailable",
@@ -38,7 +38,7 @@
               "textRaw": "Pre-shared keys",
               "name": "Pre-shared keys",
               "type": "misc",
-              "desc": "<p>TLS-PSK support is available as an alternative to normal certificate-based\nauthentication. It uses a pre-shared key instead of certificates to\nauthenticate a TLS connection, providing mutual authentication.\nTLS-PSK and public key infrastructure are not mutually exclusive. Clients and\nservers can accommodate both, choosing either of them during the normal cipher\nnegotiation step.</p>\n<p>TLS-PSK is only a good choice where means exist to securely share a\nkey with every connecting machine, so it does not replace the public key\ninfrastructure (PKI) for the majority of TLS uses.\nThe TLS-PSK implementation in OpenSSL has seen many security flaws in\nrecent years, mostly because it is used only by a minority of applications.\nPlease consider all alternative solutions before switching to PSK ciphers.\nUpon generating PSK it is of critical importance to use sufficient entropy as\ndiscussed in <a href=\"https://tools.ietf.org/html/rfc4086\">RFC 4086</a>. Deriving a shared secret from a password or other\nlow-entropy sources is not secure.</p>\n<p>PSK ciphers are disabled by default, and using TLS-PSK thus requires explicitly\nspecifying a cipher suite with the <code>ciphers</code> option. The list of available\nciphers can be retrieved via <code>openssl ciphers -v 'PSK'</code>. All TLS 1.3\nciphers are eligible for PSK and can be retrieved via\n<code>openssl ciphers -v -s -tls1_3 -psk</code>.\nOn the client connection, a custom <code>checkServerIdentity</code> should be passed\nbecause the default one will fail in the absence of a certificate.</p>\n<p>According to the <a href=\"https://tools.ietf.org/html/rfc4279\">RFC 4279</a>, PSK identities up to 128 bytes in length and\nPSKs up to 64 bytes in length must be supported. As of OpenSSL 1.1.0\nmaximum identity size is 128 bytes, and maximum PSK length is 256 bytes.</p>\n<p>The current implementation doesn't support asynchronous PSK callbacks due to the\nlimitations of the underlying OpenSSL API.</p>\n<p>To use TLS-PSK, client and server must specify the <code>pskCallback</code> option,\na function that returns the PSK to use (which must be compatible with\nthe selected cipher's digest).</p>\n<p>It will be called first on the client:</p>\n<ul>\n<li>hint: <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> optional message sent from the server to help the client\ndecide which identity to use during negotiation.\nAlways <code>null</code> if TLS 1.3 is used.</li>\n<li>Returns: <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a> in the form\n<code>{ psk: &#x3C;Buffer|TypedArray|DataView>, identity: &#x3C;string> }</code> or <code>null</code>.</li>\n</ul>\n<p>Then on the server:</p>\n<ul>\n<li>socket: <a href=\"tls.html#class-tlstlssocket\" class=\"type\">&lt;tls.TLSSocket&gt;</a> the server socket instance, equivalent to <code>this</code>.</li>\n<li>identity: <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> identity parameter sent from the client.</li>\n<li>Returns: <a href=\"buffer.html#class-buffer\" class=\"type\">&lt;Buffer&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\" class=\"type\">&lt;TypedArray&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView\" class=\"type\">&lt;DataView&gt;</a> the PSK (or <code>null</code>).</li>\n</ul>\n<p>A return value of <code>null</code> stops the negotiation process and sends an\n<code>unknown_psk_identity</code> alert message to the other party.\nIf the server wishes to hide the fact that the PSK identity was not known,\nthe callback must provide some random data as <code>psk</code> to make the connection\nfail with <code>decrypt_error</code> before negotiation is finished.</p>"
+              "desc": "<p>TLS-PSK support is available as an alternative to normal certificate-based\nauthentication. It uses a pre-shared key instead of certificates to\nauthenticate a TLS connection, providing mutual authentication.\nTLS-PSK and public key infrastructure are not mutually exclusive. Clients and\nservers can accommodate both, choosing either of them during the normal cipher\nnegotiation step.</p>\n<p>TLS-PSK is only a good choice where means exist to securely share a\nkey with every connecting machine, so it does not replace the public key\ninfrastructure (PKI) for the majority of TLS uses.\nThe TLS-PSK implementation in OpenSSL has seen many security flaws in\nrecent years, mostly because it is used only by a minority of applications.\nPlease consider all alternative solutions before switching to PSK ciphers.\nUpon generating PSK it is of critical importance to use sufficient entropy as\ndiscussed in <a href=\"https://tools.ietf.org/html/rfc4086\">RFC 4086</a>. Deriving a shared secret from a password or other\nlow-entropy sources is not secure.</p>\n<p>PSK ciphers are disabled by default, and using TLS-PSK thus requires explicitly\nspecifying a cipher suite with the <code>ciphers</code> option. The list of available\nciphers can be retrieved via <code>openssl ciphers -v 'PSK'</code>. All TLS 1.3\nciphers are eligible for PSK and can be retrieved via\n<code>openssl ciphers -v -s -tls1_3 -psk</code>.\nOn the client connection, a custom <code>checkServerIdentity</code> should be passed\nbecause the default one will fail in the absence of a certificate.</p>\n<p>According to the <a href=\"https://tools.ietf.org/html/rfc4279\">RFC 4279</a>, PSK identities up to 128 bytes in length and\nPSKs up to 64 bytes in length must be supported. As of OpenSSL 1.1.0\nmaximum identity size is 128 bytes, and maximum PSK length is 256 bytes.</p>\n<p>The current implementation doesn't support asynchronous PSK callbacks due to the\nlimitations of the underlying OpenSSL API.</p>\n<p>To use TLS-PSK, client and server must specify the <code>pskCallback</code> option,\na function that returns the PSK to use (which must be compatible with\nthe selected cipher's digest).</p>\n<p>It will be called first on the client:</p>\n<ul>\n<li><code>hint</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> optional message sent from the server to help the client\ndecide which identity to use during negotiation.\nAlways <code>null</code> if TLS 1.3 is used.</li>\n<li>Returns: <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a> in the form\n<code>{ psk: &#x3C;Buffer|TypedArray|DataView>, identity: &#x3C;string> }</code> or <code>null</code>.</li>\n</ul>\n<p>Then on the server:</p>\n<ul>\n<li><code>socket</code> <a href=\"tls.html#class-tlstlssocket\" class=\"type\">&lt;tls.TLSSocket&gt;</a> the server socket instance, equivalent to <code>this</code>.</li>\n<li><code>identity</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> identity parameter sent from the client.</li>\n<li>Returns: <a href=\"buffer.html#class-buffer\" class=\"type\">&lt;Buffer&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\" class=\"type\">&lt;TypedArray&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView\" class=\"type\">&lt;DataView&gt;</a> the PSK (or <code>null</code>).</li>\n</ul>\n<p>A return value of <code>null</code> stops the negotiation process and sends an\n<code>unknown_psk_identity</code> alert message to the other party.\nIf the server wishes to hide the fact that the PSK identity was not known,\nthe callback must provide some random data as <code>psk</code> to make the connection\nfail with <code>decrypt_error</code> before negotiation is finished.</p>"
             },
             {
               "textRaw": "Client-initiated renegotiation attack mitigation",
@@ -868,7 +868,8 @@
                 {
                   "params": [
                     {
-                      "textRaw": "{Buffer}",
+                      "textRaw": "Type: {Buffer}",
+                      "name": "Type",
                       "type": "Buffer"
                     }
                   ]
@@ -913,7 +914,8 @@
                 {
                   "params": [
                     {
-                      "textRaw": "{Buffer}",
+                      "textRaw": "Type: {Buffer}",
+                      "name": "Type",
                       "type": "Buffer"
                     }
                   ]
@@ -1089,9 +1091,9 @@
               "desc": "<p>Returns the reason why the peer's certificate was not been verified. This\nproperty is set only when <code>tlsSocket.authorized === false</code>.</p>"
             },
             {
-              "textRaw": "`authorized` {boolean}",
+              "textRaw": "`authorized` Type: {boolean}",
               "type": "boolean",
-              "name": "authorized",
+              "name": "Type",
               "meta": {
                 "added": [
                   "v0.11.4"
@@ -1112,9 +1114,9 @@
               "desc": "<p>Always returns <code>true</code>. This may be used to distinguish TLS sockets from regular\n<code>net.Socket</code> instances.</p>"
             },
             {
-              "textRaw": "`localAddress` {string}",
+              "textRaw": "`localAddress` Type: {string}",
               "type": "string",
-              "name": "localAddress",
+              "name": "Type",
               "meta": {
                 "added": [
                   "v0.11.4"
@@ -1124,9 +1126,9 @@
               "desc": "<p>Returns the string representation of the local IP address.</p>"
             },
             {
-              "textRaw": "`localPort` {integer}",
+              "textRaw": "`localPort` Type: {integer}",
               "type": "integer",
-              "name": "localPort",
+              "name": "Type",
               "meta": {
                 "added": [
                   "v0.11.4"
@@ -1136,9 +1138,9 @@
               "desc": "<p>Returns the numeric representation of the local port.</p>"
             },
             {
-              "textRaw": "`remoteAddress` {string}",
+              "textRaw": "`remoteAddress` Type: {string}",
               "type": "string",
-              "name": "remoteAddress",
+              "name": "Type",
               "meta": {
                 "added": [
                   "v0.11.4"
@@ -1148,9 +1150,9 @@
               "desc": "<p>Returns the string representation of the remote IP address. For example,\n<code>'74.125.127.100'</code> or <code>'2001:4860:a005::68'</code>.</p>"
             },
             {
-              "textRaw": "`remoteFamily` {string}",
+              "textRaw": "`remoteFamily` Type: {string}",
               "type": "string",
-              "name": "remoteFamily",
+              "name": "Type",
               "meta": {
                 "added": [
                   "v0.11.4"
@@ -1160,9 +1162,9 @@
               "desc": "<p>Returns the string representation of the remote IP family. <code>'IPv4'</code> or <code>'IPv6'</code>.</p>"
             },
             {
-              "textRaw": "`remotePort` {integer}",
+              "textRaw": "`remotePort` Type: {integer}",
               "type": "integer",
-              "name": "remotePort",
+              "name": "Type",
               "meta": {
                 "added": [
                   "v0.11.4"
@@ -1445,13 +1447,13 @@
                       "desc": "For TLS-PSK negotiation, see [Pre-shared keys][]."
                     },
                     {
-                      "textRaw": "`ALPNProtocols`: {string\\[]|Buffer\\[]|TypedArray\\[]|DataView\\[]|Buffer| TypedArray|DataView} An array of strings, `Buffer`s, `TypedArray`s, or `DataView`s, or a single `Buffer`, `TypedArray`, or `DataView` containing the supported ALPN protocols. `Buffer`s should have the format `[len][name][len][name]...` e.g. `'\\x08http/1.1\\x08http/1.0'`, where the `len` byte is the length of the next protocol name. Passing an array is usually much simpler, e.g. `['http/1.1', 'http/1.0']`. Protocols earlier in the list have higher preference than those later.",
+                      "textRaw": "`ALPNProtocols` {string\\[]|Buffer\\[]|TypedArray\\[]|DataView\\[]|Buffer| TypedArray|DataView} An array of strings, `Buffer`s, `TypedArray`s, or `DataView`s, or a single `Buffer`, `TypedArray`, or `DataView` containing the supported ALPN protocols. `Buffer`s should have the format `[len][name][len][name]...` e.g. `'\\x08http/1.1\\x08http/1.0'`, where the `len` byte is the length of the next protocol name. Passing an array is usually much simpler, e.g. `['http/1.1', 'http/1.0']`. Protocols earlier in the list have higher preference than those later.",
                       "name": "ALPNProtocols",
                       "type": "string\\[]|Buffer\\[]|TypedArray\\[]|DataView\\[]|Buffer| TypedArray|DataView",
                       "desc": "An array of strings, `Buffer`s, `TypedArray`s, or `DataView`s, or a single `Buffer`, `TypedArray`, or `DataView` containing the supported ALPN protocols. `Buffer`s should have the format `[len][name][len][name]...` e.g. `'\\x08http/1.1\\x08http/1.0'`, where the `len` byte is the length of the next protocol name. Passing an array is usually much simpler, e.g. `['http/1.1', 'http/1.0']`. Protocols earlier in the list have higher preference than those later."
                     },
                     {
-                      "textRaw": "`servername`: {string} Server name for the SNI (Server Name Indication) TLS extension. It is the name of the host being connected to, and must be a host name, and not an IP address. It can be used by a multi-homed server to choose the correct certificate to present to the client, see the `SNICallback` option to [`tls.createServer()`][].",
+                      "textRaw": "`servername` {string} Server name for the SNI (Server Name Indication) TLS extension. It is the name of the host being connected to, and must be a host name, and not an IP address. It can be used by a multi-homed server to choose the correct certificate to present to the client, see the `SNICallback` option to [`tls.createServer()`][].",
                       "name": "servername",
                       "type": "string",
                       "desc": "Server name for the SNI (Server Name Indication) TLS extension. It is the name of the host being connected to, and must be a host name, and not an IP address. It can be used by a multi-homed server to choose the correct certificate to present to the client, see the `SNICallback` option to [`tls.createServer()`][]."
@@ -1475,7 +1477,7 @@
                       "desc": "Minimum size of the DH parameter in bits to accept a TLS connection. When a server offers a DH parameter with a size less than `minDHSize`, the TLS connection is destroyed and an error is thrown."
                     },
                     {
-                      "textRaw": "`highWaterMark`: {number} Consistent with the readable stream `highWaterMark` parameter. **Default:** `16 * 1024`.",
+                      "textRaw": "`highWaterMark` {number} Consistent with the readable stream `highWaterMark` parameter. **Default:** `16 * 1024`.",
                       "name": "highWaterMark",
                       "type": "number",
                       "default": "`16 * 1024`",
@@ -1823,7 +1825,7 @@
                       "desc": "Opaque identifier used by servers to ensure session state is not shared between applications. Unused by clients."
                     },
                     {
-                      "textRaw": "`ticketKeys`: {Buffer} 48-bytes of cryptographically strong pseudorandom data. See [Session Resumption][] for more information.",
+                      "textRaw": "`ticketKeys` {Buffer} 48-bytes of cryptographically strong pseudorandom data. See [Session Resumption][] for more information.",
                       "name": "ticketKeys",
                       "type": "Buffer",
                       "desc": "48-bytes of cryptographically strong pseudorandom data. See [Session Resumption][] for more information."
@@ -1908,13 +1910,13 @@
                   "type": "Object",
                   "options": [
                     {
-                      "textRaw": "`ALPNProtocols`: {string\\[]|Buffer\\[]|TypedArray\\[]|DataView\\[]|Buffer| TypedArray|DataView} An array of strings, `Buffer`s, `TypedArray`s, or `DataView`s, or a single `Buffer`, `TypedArray`, or `DataView` containing the supported ALPN protocols. `Buffer`s should have the format `[len][name][len][name]...` e.g. `0x05hello0x05world`, where the first byte is the length of the next protocol name. Passing an array is usually much simpler, e.g. `['hello', 'world']`. (Protocols should be ordered by their priority.)",
+                      "textRaw": "`ALPNProtocols` {string\\[]|Buffer\\[]|TypedArray\\[]|DataView\\[]|Buffer| TypedArray|DataView} An array of strings, `Buffer`s, `TypedArray`s, or `DataView`s, or a single `Buffer`, `TypedArray`, or `DataView` containing the supported ALPN protocols. `Buffer`s should have the format `[len][name][len][name]...` e.g. `0x05hello0x05world`, where the first byte is the length of the next protocol name. Passing an array is usually much simpler, e.g. `['hello', 'world']`. (Protocols should be ordered by their priority.)",
                       "name": "ALPNProtocols",
                       "type": "string\\[]|Buffer\\[]|TypedArray\\[]|DataView\\[]|Buffer| TypedArray|DataView",
                       "desc": "An array of strings, `Buffer`s, `TypedArray`s, or `DataView`s, or a single `Buffer`, `TypedArray`, or `DataView` containing the supported ALPN protocols. `Buffer`s should have the format `[len][name][len][name]...` e.g. `0x05hello0x05world`, where the first byte is the length of the next protocol name. Passing an array is usually much simpler, e.g. `['hello', 'world']`. (Protocols should be ordered by their priority.)"
                     },
                     {
-                      "textRaw": "`ALPNCallback`: {Function} If set, this will be called when a client opens a connection using the ALPN extension. One argument will be passed to the callback: an object containing `servername` and `protocols` fields, respectively containing the server name from the SNI extension (if any) and an array of ALPN protocol name strings. The callback must return either one of the strings listed in `protocols`, which will be returned to the client as the selected ALPN protocol, or `undefined`, to reject the connection with a fatal alert. If a string is returned that does not match one of the client's ALPN protocols, an error will be thrown. This option cannot be used with the `ALPNProtocols` option, and setting both options will throw an error.",
+                      "textRaw": "`ALPNCallback` {Function} If set, this will be called when a client opens a connection using the ALPN extension. One argument will be passed to the callback: an object containing `servername` and `protocols` fields, respectively containing the server name from the SNI extension (if any) and an array of ALPN protocol name strings. The callback must return either one of the strings listed in `protocols`, which will be returned to the client as the selected ALPN protocol, or `undefined`, to reject the connection with a fatal alert. If a string is returned that does not match one of the client's ALPN protocols, an error will be thrown. This option cannot be used with the `ALPNProtocols` option, and setting both options will throw an error.",
                       "name": "ALPNCallback",
                       "type": "Function",
                       "desc": "If set, this will be called when a client opens a connection using the ALPN extension. One argument will be passed to the callback: an object containing `servername` and `protocols` fields, respectively containing the server name from the SNI extension (if any) and an array of ALPN protocol name strings. The callback must return either one of the strings listed in `protocols`, which will be returned to the client as the selected ALPN protocol, or `undefined`, to reject the connection with a fatal alert. If a string is returned that does not match one of the client's ALPN protocols, an error will be thrown. This option cannot be used with the `ALPNProtocols` option, and setting both options will throw an error."
@@ -1966,7 +1968,7 @@
                       "desc": "callback)` {Function} A function that will be called if the client supports SNI TLS extension. Two arguments will be passed when called: `servername` and `callback`. `callback` is an error-first callback that takes two optional arguments: `error` and `ctx`. `ctx`, if provided, is a `SecureContext` instance. [`tls.createSecureContext()`][] can be used to get a proper `SecureContext`. If `callback` is called with a falsy `ctx` argument, the default secure context of the server will be used. If `SNICallback` wasn't provided the default callback with high-level API will be used (see below)."
                     },
                     {
-                      "textRaw": "`ticketKeys`: {Buffer} 48-bytes of cryptographically strong pseudorandom data. See [Session Resumption][] for more information.",
+                      "textRaw": "`ticketKeys` {Buffer} 48-bytes of cryptographically strong pseudorandom data. See [Session Resumption][] for more information.",
                       "name": "ticketKeys",
                       "type": "Buffer",
                       "desc": "48-bytes of cryptographically strong pseudorandom data. See [Session Resumption][] for more information."
@@ -2004,6 +2006,30 @@
             }
           ],
           "desc": "<p>Creates a new <a href=\"#class-tlsserver\"><code>tls.Server</code></a>. The <code>secureConnectionListener</code>, if provided, is\nautomatically set as a listener for the <a href=\"#event-secureconnection\"><code>'secureConnection'</code></a> event.</p>\n<p>The <code>ticketKeys</code> options is automatically shared between <code>node:cluster</code> module\nworkers.</p>\n<p>The following illustrates a simple echo server:</p>\n<pre><code class=\"language-mjs\">import { createServer } from 'node:tls';\nimport { readFileSync } from 'node:fs';\n\nconst options = {\n  key: readFileSync('server-key.pem'),\n  cert: readFileSync('server-cert.pem'),\n\n  // This is necessary only if using client certificate authentication.\n  requestCert: true,\n\n  // This is necessary only if the client uses a self-signed certificate.\n  ca: [ readFileSync('client-cert.pem') ],\n};\n\nconst server = createServer(options, (socket) => {\n  console.log('server connected',\n              socket.authorized ? 'authorized' : 'unauthorized');\n  socket.write('welcome!\\n');\n  socket.setEncoding('utf8');\n  socket.pipe(socket);\n});\nserver.listen(8000, () => {\n  console.log('server bound');\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const { createServer } = require('node:tls');\nconst { readFileSync } = require('node:fs');\n\nconst options = {\n  key: readFileSync('server-key.pem'),\n  cert: readFileSync('server-cert.pem'),\n\n  // This is necessary only if using client certificate authentication.\n  requestCert: true,\n\n  // This is necessary only if the client uses a self-signed certificate.\n  ca: [ readFileSync('client-cert.pem') ],\n};\n\nconst server = createServer(options, (socket) => {\n  console.log('server connected',\n              socket.authorized ? 'authorized' : 'unauthorized');\n  socket.write('welcome!\\n');\n  socket.setEncoding('utf8');\n  socket.pipe(socket);\n});\nserver.listen(8000, () => {\n  console.log('server bound');\n});\n</code></pre>\n<p>To generate the certificate and key for this example, run:</p>\n<pre><code class=\"language-bash\">openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' \\\n  -keyout server-key.pem -out server-cert.pem\n</code></pre>\n<p>Then, to generate the <code>client-cert.pem</code> certificate for this example, run:</p>\n<pre><code class=\"language-bash\">openssl pkcs12 -certpbe AES-256-CBC -export -out client-cert.pem \\\n  -inkey server-key.pem -in server-cert.pem\n</code></pre>\n<p>The server can be tested by connecting to it using the example client from\n<a href=\"#tlsconnectoptions-callback\"><code>tls.connect()</code></a>.</p>"
+        },
+        {
+          "textRaw": "`tls.setDefaultCACertificates(certs)`",
+          "type": "method",
+          "name": "setDefaultCACertificates",
+          "meta": {
+            "added": [
+              "v24.5.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`certs` {string\\[]|ArrayBufferView\\[]} An array of CA certificates in PEM format.",
+                  "name": "certs",
+                  "type": "string\\[]|ArrayBufferView\\[]",
+                  "desc": "An array of CA certificates in PEM format."
+                }
+              ]
+            }
+          ],
+          "desc": "<p>Sets the default CA certificates used by Node.js TLS clients. If the provided\ncertificates are parsed successfully, they will become the default CA\ncertificate list returned by <a href=\"#tlsgetcacertificatestype\"><code>tls.getCACertificates()</code></a> and used\nby subsequent TLS connections that don't specify their own CA certificates.\nThe certificates will be deduplicated before being set as the default.</p>\n<p>This function only affects the current Node.js thread. Previous\nsessions cached by the HTTPS agent won't be affected by this change, so\nthis method should be called before any unwanted cachable TLS connections are\nmade.</p>\n<p>To use system CA certificates as the default:</p>\n<pre><code class=\"language-cjs\">const tls = require('node:tls');\ntls.setDefaultCACertificates(tls.getCACertificates('system'));\n</code></pre>\n<pre><code class=\"language-mjs\">import tls from 'node:tls';\ntls.setDefaultCACertificates(tls.getCACertificates('system'));\n</code></pre>\n<p>This function completely replaces the default CA certificate list. To add additional\ncertificates to the existing defaults, get the current certificates and append to them:</p>\n<pre><code class=\"language-cjs\">const tls = require('node:tls');\nconst currentCerts = tls.getCACertificates('default');\nconst additionalCerts = ['-----BEGIN CERTIFICATE-----\\n...'];\ntls.setDefaultCACertificates([...currentCerts, ...additionalCerts]);\n</code></pre>\n<pre><code class=\"language-mjs\">import tls from 'node:tls';\nconst currentCerts = tls.getCACertificates('default');\nconst additionalCerts = ['-----BEGIN CERTIFICATE-----\\n...'];\ntls.setDefaultCACertificates([...currentCerts, ...additionalCerts]);\n</code></pre>"
         },
         {
           "textRaw": "`tls.getCACertificates([type])`",
@@ -2062,9 +2088,9 @@
       ],
       "properties": [
         {
-          "textRaw": "`rootCertificates` {string\\[]}",
+          "textRaw": "`rootCertificates` Type: {string\\[]}",
           "type": "string\\[]",
-          "name": "rootCertificates",
+          "name": "Type",
           "meta": {
             "added": [
               "v12.3.0"
@@ -2091,9 +2117,9 @@
           "desc": "<p>The default curve name to use for ECDH key agreement in a tls server. The\ndefault value is <code>'auto'</code>. See <a href=\"#tlscreatesecurecontextoptions\"><code>tls.createSecureContext()</code></a> for further\ninformation.</p>"
         },
         {
-          "textRaw": "`DEFAULT_MAX_VERSION` {string} The default value of the `maxVersion` option of [`tls.createSecureContext()`][]. It can be assigned any of the supported TLS protocol versions, `'TLSv1.3'`, `'TLSv1.2'`, `'TLSv1.1'`, or `'TLSv1'`. **Default:** `'TLSv1.3'`, unless changed using CLI options. Using `--tls-max-v1.2` sets the default to `'TLSv1.2'`. Using `--tls-max-v1.3` sets the default to `'TLSv1.3'`. If multiple of the options are provided, the highest maximum is used.",
+          "textRaw": "`DEFAULT_MAX_VERSION` Type: {string} The default value of the `maxVersion` option of [`tls.createSecureContext()`][]. It can be assigned any of the supported TLS protocol versions, `'TLSv1.3'`, `'TLSv1.2'`, `'TLSv1.1'`, or `'TLSv1'`. **Default:** `'TLSv1.3'`, unless changed using CLI options. Using `--tls-max-v1.2` sets the default to `'TLSv1.2'`. Using `--tls-max-v1.3` sets the default to `'TLSv1.3'`. If multiple of the options are provided, the highest maximum is used.",
           "type": "string",
-          "name": "DEFAULT_MAX_VERSION",
+          "name": "Type",
           "meta": {
             "added": [
               "v11.4.0"
@@ -2104,9 +2130,9 @@
           "desc": "The default value of the `maxVersion` option of [`tls.createSecureContext()`][]. It can be assigned any of the supported TLS protocol versions, `'TLSv1.3'`, `'TLSv1.2'`, `'TLSv1.1'`, or `'TLSv1'`."
         },
         {
-          "textRaw": "`DEFAULT_MIN_VERSION` {string} The default value of the `minVersion` option of [`tls.createSecureContext()`][]. It can be assigned any of the supported TLS protocol versions, `'TLSv1.3'`, `'TLSv1.2'`, `'TLSv1.1'`, or `'TLSv1'`. Versions before TLSv1.2 may require downgrading the [OpenSSL Security Level][]. **Default:** `'TLSv1.2'`, unless changed using CLI options. Using `--tls-min-v1.0` sets the default to `'TLSv1'`. Using `--tls-min-v1.1` sets the default to `'TLSv1.1'`. Using `--tls-min-v1.3` sets the default to `'TLSv1.3'`. If multiple of the options are provided, the lowest minimum is used.",
+          "textRaw": "`DEFAULT_MIN_VERSION` Type: {string} The default value of the `minVersion` option of [`tls.createSecureContext()`][]. It can be assigned any of the supported TLS protocol versions, `'TLSv1.3'`, `'TLSv1.2'`, `'TLSv1.1'`, or `'TLSv1'`. Versions before TLSv1.2 may require downgrading the [OpenSSL Security Level][]. **Default:** `'TLSv1.2'`, unless changed using CLI options. Using `--tls-min-v1.0` sets the default to `'TLSv1'`. Using `--tls-min-v1.1` sets the default to `'TLSv1.1'`. Using `--tls-min-v1.3` sets the default to `'TLSv1.3'`. If multiple of the options are provided, the lowest minimum is used.",
           "type": "string",
-          "name": "DEFAULT_MIN_VERSION",
+          "name": "Type",
           "meta": {
             "added": [
               "v11.4.0"
@@ -2117,9 +2143,9 @@
           "desc": "The default value of the `minVersion` option of [`tls.createSecureContext()`][]. It can be assigned any of the supported TLS protocol versions, `'TLSv1.3'`, `'TLSv1.2'`, `'TLSv1.1'`, or `'TLSv1'`. Versions before TLSv1.2 may require downgrading the [OpenSSL Security Level][]."
         },
         {
-          "textRaw": "`DEFAULT_CIPHERS` {string} The default value of the `ciphers` option of [`tls.createSecureContext()`][]. It can be assigned any of the supported OpenSSL ciphers. Defaults to the content of `crypto.constants.defaultCoreCipherList`, unless changed using CLI options using `--tls-default-ciphers`.",
+          "textRaw": "`DEFAULT_CIPHERS` Type: {string} The default value of the `ciphers` option of [`tls.createSecureContext()`][]. It can be assigned any of the supported OpenSSL ciphers. Defaults to the content of `crypto.constants.defaultCoreCipherList`, unless changed using CLI options using `--tls-default-ciphers`.",
           "type": "string",
-          "name": "DEFAULT_CIPHERS",
+          "name": "Type",
           "meta": {
             "added": [
               "v19.8.0",

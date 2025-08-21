@@ -74,7 +74,6 @@ import {
   createReadStream,
   createWriteStream,
 } from 'node:fs';
-import process from 'node:process';
 import { createGzip } from 'node:zlib';
 import { pipeline } from 'node:stream/promises';
 
@@ -991,7 +990,7 @@ be used in pipes and similar stream operations.
 added: v10.0.0
 -->
 
-* {number}
+* Type: {number}
 
 The `zlib.bytesWritten` property specifies the number of bytes written to
 the engine, before the bytes are processed (compressed or decompressed,
@@ -1070,6 +1069,9 @@ Each Zstd-based class takes an `options` object. All options are optional.
 * `maxOutputLength` {integer} Limits output size when using
   [convenience methods][]. **Default:** [`buffer.kMaxLength`][]
 * `info` {boolean} If `true`, returns an object with `buffer` and `engine`. **Default:** `false`
+* `dictionary` {Buffer} Optional dictionary used to
+  improve compression efficiency when compressing or decompressing data that
+  shares common patterns with the dictionary.
 
 For example:
 

@@ -8,7 +8,7 @@
       "introduced_in": "v10.5.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.4.1/lib/worker_threads.js\">lib/worker_threads.js</a></p>\n<p>The <code>node:worker_threads</code> module enables the use of threads that execute\nJavaScript in parallel. To access it:</p>\n<pre><code class=\"language-mjs\">import worker from 'node:worker_threads';\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\n\nconst worker = require('node:worker_threads');\n</code></pre>\n<p>Workers (threads) are useful for performing CPU-intensive JavaScript operations.\nThey do not help much with I/O-intensive work. The Node.js built-in\nasynchronous I/O operations are more efficient than Workers can be.</p>\n<p>Unlike <code>child_process</code> or <code>cluster</code>, <code>worker_threads</code> can share memory. They do\nso by transferring <code>ArrayBuffer</code> instances or sharing <code>SharedArrayBuffer</code>\ninstances.</p>\n<pre><code class=\"language-mjs\">import {\n  Worker,\n  isMainThread,\n  parentPort,\n  workerData,\n} from 'node:worker_threads';\n\nif (!isMainThread) {\n  const { parse } = await import('some-js-parsing-library');\n  const script = workerData;\n  parentPort.postMessage(parse(script));\n}\n\nexport default function parseJSAsync(script) {\n  return new Promise((resolve, reject) => {\n    const worker = new Worker(new URL(import.meta.url), {\n      workerData: script,\n    });\n    worker.on('message', resolve);\n    worker.on('error', reject);\n    worker.on('exit', (code) => {\n      if (code !== 0)\n        reject(new Error(`Worker stopped with exit code ${code}`));\n    });\n  });\n};\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\n\nconst {\n  Worker,\n  isMainThread,\n  parentPort,\n  workerData,\n} = require('node:worker_threads');\n\nif (isMainThread) {\n  module.exports = function parseJSAsync(script) {\n    return new Promise((resolve, reject) => {\n      const worker = new Worker(__filename, {\n        workerData: script,\n      });\n      worker.on('message', resolve);\n      worker.on('error', reject);\n      worker.on('exit', (code) => {\n        if (code !== 0)\n          reject(new Error(`Worker stopped with exit code ${code}`));\n      });\n    });\n  };\n} else {\n  const { parse } = require('some-js-parsing-library');\n  const script = workerData;\n  parentPort.postMessage(parse(script));\n}\n</code></pre>\n<p>The above example spawns a Worker thread for each <code>parseJSAsync()</code> call. In\npractice, use a pool of Workers for these kinds of tasks. Otherwise, the\noverhead of creating Workers would likely exceed their benefit.</p>\n<p>When implementing a worker pool, use the <a href=\"async_hooks.html#class-asyncresource\"><code>AsyncResource</code></a> API to inform\ndiagnostic tools (e.g. to provide asynchronous stack traces) about the\ncorrelation between tasks and their outcomes. See\n<a href=\"async_context.html#using-asyncresource-for-a-worker-thread-pool\">\"Using <code>AsyncResource</code> for a <code>Worker</code> thread pool\"</a>\nin the <code>async_hooks</code> documentation for an example implementation.</p>\n<p>Worker threads inherit non-process-specific options by default. Refer to\n<a href=\"#new-workerfilename-options\"><code>Worker constructor options</code></a> to know how to customize worker thread options,\nspecifically <code>argv</code> and <code>execArgv</code> options.</p>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.6.0/lib/worker_threads.js\">lib/worker_threads.js</a></p>\n<p>The <code>node:worker_threads</code> module enables the use of threads that execute\nJavaScript in parallel. To access it:</p>\n<pre><code class=\"language-mjs\">import worker from 'node:worker_threads';\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\n\nconst worker = require('node:worker_threads');\n</code></pre>\n<p>Workers (threads) are useful for performing CPU-intensive JavaScript operations.\nThey do not help much with I/O-intensive work. The Node.js built-in\nasynchronous I/O operations are more efficient than Workers can be.</p>\n<p>Unlike <code>child_process</code> or <code>cluster</code>, <code>worker_threads</code> can share memory. They do\nso by transferring <code>ArrayBuffer</code> instances or sharing <code>SharedArrayBuffer</code>\ninstances.</p>\n<pre><code class=\"language-mjs\">import {\n  Worker,\n  isMainThread,\n  parentPort,\n  workerData,\n} from 'node:worker_threads';\n\nif (!isMainThread) {\n  const { parse } = await import('some-js-parsing-library');\n  const script = workerData;\n  parentPort.postMessage(parse(script));\n}\n\nexport default function parseJSAsync(script) {\n  return new Promise((resolve, reject) => {\n    const worker = new Worker(new URL(import.meta.url), {\n      workerData: script,\n    });\n    worker.on('message', resolve);\n    worker.on('error', reject);\n    worker.on('exit', (code) => {\n      if (code !== 0)\n        reject(new Error(`Worker stopped with exit code ${code}`));\n    });\n  });\n};\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\n\nconst {\n  Worker,\n  isMainThread,\n  parentPort,\n  workerData,\n} = require('node:worker_threads');\n\nif (isMainThread) {\n  module.exports = function parseJSAsync(script) {\n    return new Promise((resolve, reject) => {\n      const worker = new Worker(__filename, {\n        workerData: script,\n      });\n      worker.on('message', resolve);\n      worker.on('error', reject);\n      worker.on('exit', (code) => {\n        if (code !== 0)\n          reject(new Error(`Worker stopped with exit code ${code}`));\n      });\n    });\n  };\n} else {\n  const { parse } = require('some-js-parsing-library');\n  const script = workerData;\n  parentPort.postMessage(parse(script));\n}\n</code></pre>\n<p>The above example spawns a Worker thread for each <code>parseJSAsync()</code> call. In\npractice, use a pool of Workers for these kinds of tasks. Otherwise, the\noverhead of creating Workers would likely exceed their benefit.</p>\n<p>When implementing a worker pool, use the <a href=\"async_hooks.html#class-asyncresource\"><code>AsyncResource</code></a> API to inform\ndiagnostic tools (e.g. to provide asynchronous stack traces) about the\ncorrelation between tasks and their outcomes. See\n<a href=\"async_context.html#using-asyncresource-for-a-worker-thread-pool\">\"Using <code>AsyncResource</code> for a <code>Worker</code> thread pool\"</a>\nin the <code>async_hooks</code> documentation for an example implementation.</p>\n<p>Worker threads inherit non-process-specific options by default. Refer to\n<a href=\"#new-workerfilename-options\"><code>Worker constructor options</code></a> to know how to customize worker thread options,\nspecifically <code>argv</code> and <code>execArgv</code> options.</p>",
       "methods": [
         {
           "textRaw": "`worker.getEnvironmentData(key)`",
@@ -291,9 +291,9 @@
       ],
       "properties": [
         {
-          "textRaw": "`isInternalThread` {boolean}",
+          "textRaw": "`isInternalThread` Type: {boolean}",
           "type": "boolean",
-          "name": "isInternalThread",
+          "name": "Type",
           "meta": {
             "added": [
               "v23.7.0",
@@ -304,9 +304,9 @@
           "desc": "<p>Is <code>true</code> if this code is running inside of an internal <a href=\"#class-worker\"><code>Worker</code></a> thread (e.g the loader thread).</p>\n<pre><code class=\"language-bash\">node --experimental-loader ./loader.js main.js\n</code></pre>\n<pre><code class=\"language-mjs\">// loader.js\nimport { isInternalThread } from 'node:worker_threads';\nconsole.log(isInternalThread);  // true\n</code></pre>\n<pre><code class=\"language-cjs\">// loader.js\n'use strict';\n\nconst { isInternalThread } = require('node:worker_threads');\nconsole.log(isInternalThread);  // true\n</code></pre>\n<pre><code class=\"language-mjs\">// main.js\nimport { isInternalThread } from 'node:worker_threads';\nconsole.log(isInternalThread);  // false\n</code></pre>\n<pre><code class=\"language-cjs\">// main.js\n'use strict';\n\nconst { isInternalThread } = require('node:worker_threads');\nconsole.log(isInternalThread);  // false\n</code></pre>"
         },
         {
-          "textRaw": "`isMainThread` {boolean}",
+          "textRaw": "`isMainThread` Type: {boolean}",
           "type": "boolean",
-          "name": "isMainThread",
+          "name": "Type",
           "meta": {
             "added": [
               "v10.5.0"
@@ -316,9 +316,9 @@
           "desc": "<p>Is <code>true</code> if this code is not running inside of a <a href=\"#class-worker\"><code>Worker</code></a> thread.</p>\n<pre><code class=\"language-mjs\">import { Worker, isMainThread } from 'node:worker_threads';\n\nif (isMainThread) {\n  // This re-loads the current file inside a Worker instance.\n  new Worker(new URL(import.meta.url));\n} else {\n  console.log('Inside Worker!');\n  console.log(isMainThread);  // Prints 'false'.\n}\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\n\nconst { Worker, isMainThread } = require('node:worker_threads');\n\nif (isMainThread) {\n  // This re-loads the current file inside a Worker instance.\n  new Worker(__filename);\n} else {\n  console.log('Inside Worker!');\n  console.log(isMainThread);  // Prints 'false'.\n}\n</code></pre>"
         },
         {
-          "textRaw": "`parentPort` {null|MessagePort}",
+          "textRaw": "`parentPort` Type: {null|MessagePort}",
           "type": "null|MessagePort",
-          "name": "parentPort",
+          "name": "Type",
           "meta": {
             "added": [
               "v10.5.0"
@@ -328,9 +328,9 @@
           "desc": "<p>If this thread is a <a href=\"#class-worker\"><code>Worker</code></a>, this is a <a href=\"#class-messageport\"><code>MessagePort</code></a>\nallowing communication with the parent thread. Messages sent using\n<code>parentPort.postMessage()</code> are available in the parent thread\nusing <code>worker.on('message')</code>, and messages sent from the parent thread\nusing <code>worker.postMessage()</code> are available in this thread using\n<code>parentPort.on('message')</code>.</p>\n<pre><code class=\"language-mjs\">import { Worker, isMainThread, parentPort } from 'node:worker_threads';\n\nif (isMainThread) {\n  const worker = new Worker(new URL(import.meta.url));\n  worker.once('message', (message) => {\n    console.log(message);  // Prints 'Hello, world!'.\n  });\n  worker.postMessage('Hello, world!');\n} else {\n  // When a message from the parent thread is received, send it back:\n  parentPort.once('message', (message) => {\n    parentPort.postMessage(message);\n  });\n}\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\n\nconst { Worker, isMainThread, parentPort } = require('node:worker_threads');\n\nif (isMainThread) {\n  const worker = new Worker(__filename);\n  worker.once('message', (message) => {\n    console.log(message);  // Prints 'Hello, world!'.\n  });\n  worker.postMessage('Hello, world!');\n} else {\n  // When a message from the parent thread is received, send it back:\n  parentPort.once('message', (message) => {\n    parentPort.postMessage(message);\n  });\n}\n</code></pre>"
         },
         {
-          "textRaw": "`resourceLimits` {Object}",
+          "textRaw": "`resourceLimits` Type: {Object}",
           "type": "Object",
-          "name": "resourceLimits",
+          "name": "Type",
           "meta": {
             "added": [
               "v13.2.0",
@@ -363,9 +363,9 @@
           "desc": "<p>Provides the set of JS engine resource constraints inside this Worker thread.\nIf the <code>resourceLimits</code> option was passed to the <a href=\"#class-worker\"><code>Worker</code></a> constructor,\nthis matches its values.</p>\n<p>If this is used in the main thread, its value is an empty object.</p>"
         },
         {
-          "textRaw": "`SHARE_ENV` {symbol}",
+          "textRaw": "`SHARE_ENV` Type: {symbol}",
           "type": "symbol",
-          "name": "SHARE_ENV",
+          "name": "Type",
           "meta": {
             "added": [
               "v11.14.0"
@@ -375,9 +375,9 @@
           "desc": "<p>A special value that can be passed as the <code>env</code> option of the <a href=\"#class-worker\"><code>Worker</code></a>\nconstructor, to indicate that the current thread and the Worker thread should\nshare read and write access to the same set of environment variables.</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\nimport { Worker, SHARE_ENV } from 'node:worker_threads';\nnew Worker('process.env.SET_IN_WORKER = \"foo\"', { eval: true, env: SHARE_ENV })\n  .on('exit', () => {\n    console.log(process.env.SET_IN_WORKER);  // Prints 'foo'.\n  });\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\n\nconst { Worker, SHARE_ENV } = require('node:worker_threads');\nnew Worker('process.env.SET_IN_WORKER = \"foo\"', { eval: true, env: SHARE_ENV })\n  .on('exit', () => {\n    console.log(process.env.SET_IN_WORKER);  // Prints 'foo'.\n  });\n</code></pre>"
         },
         {
-          "textRaw": "`threadId` {integer}",
+          "textRaw": "`threadId` Type: {integer}",
           "type": "integer",
-          "name": "threadId",
+          "name": "Type",
           "meta": {
             "added": [
               "v10.5.0"
@@ -385,6 +385,18 @@
             "changes": []
           },
           "desc": "<p>An integer identifier for the current thread. On the corresponding worker object\n(if there is any), it is available as <a href=\"#workerthreadid_1\"><code>worker.threadId</code></a>.\nThis value is unique for each <a href=\"#class-worker\"><code>Worker</code></a> instance inside a single process.</p>"
+        },
+        {
+          "textRaw": "`threadName` {string|null}",
+          "type": "string|null",
+          "name": "threadName",
+          "meta": {
+            "added": [
+              "v24.6.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>A string identifier for the current thread or null if the thread is not running.\nOn the corresponding worker object (if there is any), it is available as <a href=\"#workerthreadname_1\"><code>worker.threadName</code></a>.</p>"
         },
         {
           "textRaw": "`worker.workerData`",
@@ -396,6 +408,165 @@
             "changes": []
           },
           "desc": "<p>An arbitrary JavaScript value that contains a clone of the data passed\nto this thread's <code>Worker</code> constructor.</p>\n<p>The data is cloned as if using <a href=\"#portpostmessagevalue-transferlist\"><code>postMessage()</code></a>,\naccording to the <a href=\"https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm\">HTML structured clone algorithm</a>.</p>\n<pre><code class=\"language-mjs\">import { Worker, isMainThread, workerData } from 'node:worker_threads';\n\nif (isMainThread) {\n  const worker = new Worker(new URL(import.meta.url), { workerData: 'Hello, world!' });\n} else {\n  console.log(workerData);  // Prints 'Hello, world!'.\n}\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\n\nconst { Worker, isMainThread, workerData } = require('node:worker_threads');\n\nif (isMainThread) {\n  const worker = new Worker(__filename, { workerData: 'Hello, world!' });\n} else {\n  console.log(workerData);  // Prints 'Hello, world!'.\n}\n</code></pre>"
+        },
+        {
+          "textRaw": "`locks` {LockManager}",
+          "type": "LockManager",
+          "name": "locks",
+          "meta": {
+            "added": [
+              "v24.5.0"
+            ],
+            "changes": []
+          },
+          "stability": 1,
+          "stabilityText": "Experimental",
+          "desc": "<p>An instance of a <a href=\"#class-lockmanager\"><code>LockManager</code></a> that can be used to coordinate\naccess to resources that may be shared across multiple threads within the same\nprocess. The API mirrors the semantics of the\n<a href=\"https://developer.mozilla.org/en-US/docs/Web/API/LockManager\">browser <code>LockManager</code></a></p>",
+          "classes": [
+            {
+              "textRaw": "Class: `Lock`",
+              "type": "class",
+              "name": "Lock",
+              "meta": {
+                "added": [
+                  "v24.5.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>The <code>Lock</code> interface provides information about a lock that has been granted via\n<a href=\"#locksrequestname-options-callback\"><code>locks.request()</code></a></p>",
+              "properties": [
+                {
+                  "textRaw": "`name` {string}",
+                  "type": "string",
+                  "name": "name",
+                  "meta": {
+                    "added": [
+                      "v24.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>The name of the lock.</p>"
+                },
+                {
+                  "textRaw": "`mode` {string}",
+                  "type": "string",
+                  "name": "mode",
+                  "meta": {
+                    "added": [
+                      "v24.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>The mode of the lock. Either <code>shared</code> or <code>exclusive</code>.</p>"
+                }
+              ]
+            },
+            {
+              "textRaw": "Class: `LockManager`",
+              "type": "class",
+              "name": "LockManager",
+              "meta": {
+                "added": [
+                  "v24.5.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>The <code>LockManager</code> interface provides methods for requesting and introspecting\nlocks. To obtain a <code>LockManager</code> instance use</p>\n<pre><code class=\"language-mjs\">import { locks } from 'node:worker_threads';\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\n\nconst { locks } = require('node:worker_threads');\n</code></pre>\n<p>This implementation matches the <a href=\"https://developer.mozilla.org/en-US/docs/Web/API/LockManager\">browser <code>LockManager</code></a> API.</p>",
+              "methods": [
+                {
+                  "textRaw": "`locks.request(name[, options], callback)`",
+                  "type": "method",
+                  "name": "request",
+                  "meta": {
+                    "added": [
+                      "v24.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "return": {
+                        "textRaw": "Returns: {Promise} Resolves once the lock has been released.",
+                        "name": "return",
+                        "type": "Promise",
+                        "desc": "Resolves once the lock has been released."
+                      },
+                      "params": [
+                        {
+                          "textRaw": "`name` {string}",
+                          "name": "name",
+                          "type": "string"
+                        },
+                        {
+                          "textRaw": "`options` {Object}",
+                          "name": "options",
+                          "type": "Object",
+                          "options": [
+                            {
+                              "textRaw": "`mode` {string} Either `'exclusive'` or `'shared'`. **Default:** `'exclusive'`.",
+                              "name": "mode",
+                              "type": "string",
+                              "default": "`'exclusive'`",
+                              "desc": "Either `'exclusive'` or `'shared'`."
+                            },
+                            {
+                              "textRaw": "`ifAvailable` {boolean} If `true`, the request will only be granted if the lock is not already held. If it cannot be granted, `callback` will be invoked with `null` instead of a `Lock` instance. **Default:** `false`.",
+                              "name": "ifAvailable",
+                              "type": "boolean",
+                              "default": "`false`",
+                              "desc": "If `true`, the request will only be granted if the lock is not already held. If it cannot be granted, `callback` will be invoked with `null` instead of a `Lock` instance."
+                            },
+                            {
+                              "textRaw": "`steal` {boolean} If `true`, any existing locks with the same name are released and the request is granted immediately, pre-empting any queued requests. **Default:** `false`.",
+                              "name": "steal",
+                              "type": "boolean",
+                              "default": "`false`",
+                              "desc": "If `true`, any existing locks with the same name are released and the request is granted immediately, pre-empting any queued requests."
+                            },
+                            {
+                              "textRaw": "`signal` {AbortSignal} that can be used to abort a pending (but not yet granted) lock request.",
+                              "name": "signal",
+                              "type": "AbortSignal",
+                              "desc": "that can be used to abort a pending (but not yet granted) lock request."
+                            }
+                          ]
+                        },
+                        {
+                          "textRaw": "`callback` {Function} Invoked once the lock is granted (or immediately with `null` if `ifAvailable` is `true` and the lock is unavailable). The lock is released automatically when the function returns, or—if the function returns a promise—when that promise settles.",
+                          "name": "callback",
+                          "type": "Function",
+                          "desc": "Invoked once the lock is granted (or immediately with `null` if `ifAvailable` is `true` and the lock is unavailable). The lock is released automatically when the function returns, or—if the function returns a promise—when that promise settles."
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<pre><code class=\"language-mjs\">import { locks } from 'node:worker_threads';\n\nawait locks.request('my_resource', async (lock) => {\n  // The lock has been acquired.\n});\n// The lock has been released here.\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\n\nconst { locks } = require('node:worker_threads');\n\nlocks.request('my_resource', async (lock) => {\n  // The lock has been acquired.\n}).then(() => {\n  // The lock has been released here.\n});\n</code></pre>"
+                },
+                {
+                  "textRaw": "`locks.query()`",
+                  "type": "method",
+                  "name": "query",
+                  "meta": {
+                    "added": [
+                      "v24.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "return": {
+                        "textRaw": "Returns: {Promise}",
+                        "name": "return",
+                        "type": "Promise"
+                      },
+                      "params": []
+                    }
+                  ],
+                  "desc": "<p>Resolves with a <code>LockManagerSnapshot</code> describing the currently held and pending\nlocks for the current process.</p>\n<pre><code class=\"language-mjs\">import { locks } from 'node:worker_threads';\n\nconst snapshot = await locks.query();\nfor (const lock of snapshot.held) {\n  console.log(`held lock: name ${lock.name}, mode ${lock.mode}`);\n}\nfor (const pending of snapshot.pending) {\n  console.log(`pending lock: name ${pending.name}, mode ${pending.mode}`);\n}\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\n\nconst { locks } = require('node:worker_threads');\n\nlocks.query().then((snapshot) => {\n  for (const lock of snapshot.held) {\n    console.log(`held lock: name ${lock.name}, mode ${lock.mode}`);\n  }\n  for (const pending of snapshot.pending) {\n    console.log(`pending lock: name ${pending.name}, mode ${pending.mode}`);\n  }\n});\n</code></pre>"
+                }
+              ]
+            }
+          ]
         }
       ],
       "classes": [
@@ -917,6 +1088,28 @@
           ],
           "methods": [
             {
+              "textRaw": "`worker.cpuUsage([prev])`",
+              "type": "method",
+              "name": "cpuUsage",
+              "meta": {
+                "added": [
+                  "v24.6.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "return": {
+                    "textRaw": "Returns: {Promise}",
+                    "name": "return",
+                    "type": "Promise"
+                  },
+                  "params": []
+                }
+              ],
+              "desc": "<p>This method returns a <code>Promise</code> that will resolve to an object identical to <a href=\"process.html#processthreadcpuusagepreviousvalue\"><code>process.threadCpuUsage()</code></a>,\nor reject with an <a href=\"errors.html#err_worker_not_running\"><code>ERR_WORKER_NOT_RUNNING</code></a> error if the worker is no longer running.\nThis methods allows the statistics to be observed from outside the actual thread.</p>"
+            },
+            {
               "textRaw": "`worker.getHeapSnapshot([options])`",
               "type": "method",
               "name": "getHeapSnapshot",
@@ -1169,9 +1362,9 @@
               ]
             },
             {
-              "textRaw": "`resourceLimits` {Object}",
+              "textRaw": "`resourceLimits` Type: {Object}",
               "type": "Object",
-              "name": "resourceLimits",
+              "name": "Type",
               "meta": {
                 "added": [
                   "v13.2.0",
@@ -1204,9 +1397,9 @@
               "desc": "<p>Provides the set of JS engine resource constraints for this Worker thread.\nIf the <code>resourceLimits</code> option was passed to the <a href=\"#class-worker\"><code>Worker</code></a> constructor,\nthis matches its values.</p>\n<p>If the worker has stopped, the return value is an empty object.</p>"
             },
             {
-              "textRaw": "`stderr` {stream.Readable}",
+              "textRaw": "`stderr` Type: {stream.Readable}",
               "type": "stream.Readable",
-              "name": "stderr",
+              "name": "Type",
               "meta": {
                 "added": [
                   "v10.5.0"
@@ -1216,9 +1409,9 @@
               "desc": "<p>This is a readable stream which contains data written to <a href=\"process.html#processstderr\"><code>process.stderr</code></a>\ninside the worker thread. If <code>stderr: true</code> was not passed to the\n<a href=\"#class-worker\"><code>Worker</code></a> constructor, then data is piped to the parent thread's\n<a href=\"process.html#processstderr\"><code>process.stderr</code></a> stream.</p>"
             },
             {
-              "textRaw": "`stdin` {null|stream.Writable}",
+              "textRaw": "`stdin` Type: {null|stream.Writable}",
               "type": "null|stream.Writable",
-              "name": "stdin",
+              "name": "Type",
               "meta": {
                 "added": [
                   "v10.5.0"
@@ -1228,9 +1421,9 @@
               "desc": "<p>If <code>stdin: true</code> was passed to the <a href=\"#class-worker\"><code>Worker</code></a> constructor, this is a\nwritable stream. The data written to this stream will be made available in\nthe worker thread as <a href=\"process.html#processstdin\"><code>process.stdin</code></a>.</p>"
             },
             {
-              "textRaw": "`stdout` {stream.Readable}",
+              "textRaw": "`stdout` Type: {stream.Readable}",
               "type": "stream.Readable",
-              "name": "stdout",
+              "name": "Type",
               "meta": {
                 "added": [
                   "v10.5.0"
@@ -1240,9 +1433,9 @@
               "desc": "<p>This is a readable stream which contains data written to <a href=\"process.html#processstdout\"><code>process.stdout</code></a>\ninside the worker thread. If <code>stdout: true</code> was not passed to the\n<a href=\"#class-worker\"><code>Worker</code></a> constructor, then data is piped to the parent thread's\n<a href=\"process.html#processstdout\"><code>process.stdout</code></a> stream.</p>"
             },
             {
-              "textRaw": "`threadId` {integer}",
+              "textRaw": "`threadId` Type: {integer}",
               "type": "integer",
-              "name": "threadId",
+              "name": "Type",
               "meta": {
                 "added": [
                   "v10.5.0"
@@ -1250,6 +1443,18 @@
                 "changes": []
               },
               "desc": "<p>An integer identifier for the referenced thread. Inside the worker thread,\nit is available as <a href=\"#workerthreadid\"><code>require('node:worker_threads').threadId</code></a>.\nThis value is unique for each <code>Worker</code> instance inside a single process.</p>"
+            },
+            {
+              "textRaw": "`threadName` {string|null}",
+              "type": "string|null",
+              "name": "threadName",
+              "meta": {
+                "added": [
+                  "v24.6.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>A string identifier for the referenced thread or null if the thread is not running.\nInside the worker thread, it is available as <a href=\"#workerthreadname\"><code>require('node:worker_threads').threadName</code></a>.</p>"
             }
           ],
           "signatures": [
