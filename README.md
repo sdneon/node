@@ -6,7 +6,7 @@ This is a *fun* mod of Node.JS that initially embedded a modified version of dco
 Thanks to the inspiration from dcodeIO et al =D
 
 ## Version 24.6.0
-* Update to Node.JS 24.4.1 baseline.
+* Update to Node.JS 24.6.0 baseline.
 
 It embeds:
 * DS v1.2.2.
