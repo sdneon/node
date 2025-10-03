@@ -174,7 +174,7 @@ class ProgressIndicator(object):
       raise
     self.Done()
     return {
-      'allPassed': not self.failed,
+      'allPassed': not self.failed and not self.shutdown_event.is_set(),
       'failed': self.failed,
     }
 
@@ -787,6 +787,11 @@ def Execute(args, context, timeout=None, env=None, disable_core_files=False,
   # Extend environment
   for key, value in env.items():
     env_copy[key] = value
+
+  # We append NODE_SKIP_FLAG_CHECK (ref: test/common/index.js)
+  # to avoid parsing the test files twice when looking for
+  # flags or environment variables defined via // Flags: and // Env:
+  env_copy["NODE_SKIP_FLAG_CHECK"] = "true"
 
   preexec_fn = None
 
@@ -1838,11 +1843,12 @@ def Main():
 
   if result['allPassed']:
     print("\nAll tests passed.")
-  else:
+  elif result['failed']:
     print("\nFailed tests:")
     for failure in result['failed']:
       print(EscapeCommand(failure.command))
-
+  else:
+    print("\nTest aborted.")
   return exitcode
 
 

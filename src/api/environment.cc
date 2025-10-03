@@ -1,4 +1,7 @@
 #include <cstdlib>
+#if HAVE_OPENSSL
+#include "crypto/crypto_util.h"
+#endif  // HAVE_OPENSSL
 #include "env_properties.h"
 #include "node.h"
 #include "node_builtins.h"
@@ -532,8 +535,19 @@ NODE_EXTERN std::unique_ptr<InspectorParentHandle> GetInspectorParentHandle(
 
 NODE_EXTERN std::unique_ptr<InspectorParentHandle> GetInspectorParentHandle(
     Environment* env, ThreadId thread_id, const char* url, const char* name) {
-  CHECK_NOT_NULL(env);
+  if (url == nullptr) url = "";
   if (name == nullptr) name = "";
+  std::string_view url_view(url);
+  std::string_view name_view(name);
+  return GetInspectorParentHandle(env, thread_id, url_view, name_view);
+}
+
+NODE_EXTERN std::unique_ptr<InspectorParentHandle> GetInspectorParentHandle(
+    Environment* env,
+    ThreadId thread_id,
+    std::string_view url,
+    std::string_view name) {
+  CHECK_NOT_NULL(env);
   CHECK_NE(thread_id.id, static_cast<uint64_t>(-1));
   if (!env->should_create_inspector()) {
     return nullptr;
@@ -1013,6 +1027,11 @@ void DefaultProcessExitHandlerInternal(Environment* env, ExitCode exit_code) {
   // in node_v8_platform-inl.h
   uv_library_shutdown();
   DisposePlatform();
+
+#if HAVE_OPENSSL
+  crypto::CleanupCachedRootCertificates();
+#endif  // HAVE_OPENSSL
+
   Exit(exit_code);
 }
 

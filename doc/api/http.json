@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.6.0/lib/http.js\">lib/http.js</a></p>\n<p>This module, containing both a client and server, can be imported via\n<code>require('node:http')</code> (CommonJS) or <code>import * as http from 'node:http'</code> (ES module).</p>\n<p>The HTTP interfaces in Node.js are designed to support many features\nof the protocol which have been traditionally difficult to use.\nIn particular, large, possibly chunk-encoded, messages. The interface is\ncareful to never buffer entire requests or responses, so the\nuser is able to stream data.</p>\n<p>HTTP message headers are represented by an object like this:</p>\n<pre><code class=\"language-json\">{ \"content-length\": \"123\",\n  \"content-type\": \"text/plain\",\n  \"connection\": \"keep-alive\",\n  \"host\": \"example.com\",\n  \"accept\": \"*/*\" }\n</code></pre>\n<p>Keys are lowercased. Values are not modified.</p>\n<p>In order to support the full spectrum of possible HTTP applications, the Node.js\nHTTP API is very low-level. It deals with stream handling and message\nparsing only. It parses a message into headers and body but it does not\nparse the actual headers or the body.</p>\n<p>See <a href=\"#messageheaders\"><code>message.headers</code></a> for details on how duplicate headers are handled.</p>\n<p>The raw headers as they were received are retained in the <code>rawHeaders</code>\nproperty, which is an array of <code>[key, value, key2, value2, ...]</code>. For\nexample, the previous message header object might have a <code>rawHeaders</code>\nlist like the following:</p>\n<!-- eslint-disable @stylistic/js/semi -->\n<pre><code class=\"language-js\">[ 'ConTent-Length', '123456',\n  'content-LENGTH', '123',\n  'content-type', 'text/plain',\n  'CONNECTION', 'keep-alive',\n  'Host', 'example.com',\n  'accepT', '*/*' ]\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.9.0/lib/http.js\">lib/http.js</a></p>\n<p>This module, containing both a client and server, can be imported via\n<code>require('node:http')</code> (CommonJS) or <code>import * as http from 'node:http'</code> (ES module).</p>\n<p>The HTTP interfaces in Node.js are designed to support many features\nof the protocol which have been traditionally difficult to use.\nIn particular, large, possibly chunk-encoded, messages. The interface is\ncareful to never buffer entire requests or responses, so the\nuser is able to stream data.</p>\n<p>HTTP message headers are represented by an object like this:</p>\n<pre><code class=\"language-json\">{ \"content-length\": \"123\",\n  \"content-type\": \"text/plain\",\n  \"connection\": \"keep-alive\",\n  \"host\": \"example.com\",\n  \"accept\": \"*/*\" }\n</code></pre>\n<p>Keys are lowercased. Values are not modified.</p>\n<p>In order to support the full spectrum of possible HTTP applications, the Node.js\nHTTP API is very low-level. It deals with stream handling and message\nparsing only. It parses a message into headers and body but it does not\nparse the actual headers or the body.</p>\n<p>See <a href=\"#messageheaders\"><code>message.headers</code></a> for details on how duplicate headers are handled.</p>\n<p>The raw headers as they were received are retained in the <code>rawHeaders</code>\nproperty, which is an array of <code>[key, value, key2, value2, ...]</code>. For\nexample, the previous message header object might have a <code>rawHeaders</code>\nlist like the following:</p>\n<!-- eslint-disable @stylistic/js/semi -->\n<pre><code class=\"language-js\">[ 'ConTent-Length', '123456',\n  'content-LENGTH', '123',\n  'content-type', 'text/plain',\n  'CONNECTION', 'keep-alive',\n  'Host', 'example.com',\n  'accepT', '*/*' ]\n</code></pre>",
       "classes": [
         {
           "textRaw": "Class: `http.Agent`",
@@ -305,6 +305,13 @@
                       "type": "number",
                       "default": "`1000`",
                       "desc": "When using the `keepAlive` option, specifies the [initial delay][] for TCP Keep-Alive packets. Ignored when the `keepAlive` option is `false` or `undefined`."
+                    },
+                    {
+                      "textRaw": "`agentKeepAliveTimeoutBuffer` {number} Milliseconds to subtract from the server-provided `keep-alive: timeout=...` hint when determining socket expiration time. This buffer helps ensure the agent closes the socket slightly before the server does, reducing the chance of sending a request on a socket that’s about to be closed by the server. **Default:** `1000`.",
+                      "name": "agentKeepAliveTimeoutBuffer",
+                      "type": "number",
+                      "default": "`1000`",
+                      "desc": "Milliseconds to subtract from the server-provided `keep-alive: timeout=...` hint when determining socket expiration time. This buffer helps ensure the agent closes the socket slightly before the server does, reducing the chance of sending a request on a socket that’s about to be closed by the server."
                     },
                     {
                       "textRaw": "`maxSockets` {number} Maximum number of sockets to allow per host. If the same host opens multiple concurrent connections, each request will use new socket until the `maxSockets` value is reached. If the host attempts to open more connections than `maxSockets`, the additional requests will enter into a pending request queue, and will enter active connection state when an existing connection terminates. This makes sure there are at most `maxSockets` active connections at any point in time, from a given host. **Default:** `Infinity`.",
@@ -1523,6 +1530,11 @@
                 ],
                 "changes": [
                   {
+                    "version": "v24.9.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/59824",
+                    "description": "Whether this event is fired can now be controlled by the `shouldUpgradeCallback` and sockets will be destroyed if upgraded while no event handler is listening."
+                  },
+                  {
                     "version": "v10.0.0",
                     "pr-url": "https://github.com/nodejs/node/pull/19981",
                     "description": "Not listening to this event no longer causes the socket to be destroyed if a client sends an Upgrade header."
@@ -1549,7 +1561,7 @@
                   "desc": "The first packet of the upgraded stream (may be empty)"
                 }
               ],
-              "desc": "<p>Emitted each time a client requests an HTTP upgrade. Listening to this event\nis optional and clients cannot insist on a protocol change.</p>\n<p>After this event is emitted, the request's socket will not have a <code>'data'</code>\nevent listener, meaning it will need to be bound in order to handle data\nsent to the server on that socket.</p>\n<p>This event is guaranteed to be passed an instance of the <a href=\"net.html#class-netsocket\" class=\"type\">&lt;net.Socket&gt;</a> class,\na subclass of <a href=\"stream.html#class-streamduplex\" class=\"type\">&lt;stream.Duplex&gt;</a>, unless the user specifies a socket\ntype other than <a href=\"net.html#class-netsocket\" class=\"type\">&lt;net.Socket&gt;</a>.</p>"
+              "desc": "<p>Emitted each time a client's HTTP upgrade request is accepted. By default\nall HTTP upgrade requests are ignored (i.e. only regular <code>'request'</code> events\nare emitted, sticking with the normal HTTP request/response flow) unless you\nlisten to this event, in which case they are all accepted (i.e. the <code>'upgrade'</code>\nevent is emitted instead, and future communication must handled directly\nthrough the raw socket). You can control this more precisely by using the\nserver <code>shouldUpgradeCallback</code> option.</p>\n<p>Listening to this event is optional and clients cannot insist on a protocol\nchange.</p>\n<p>After this event is emitted, the request's socket will not have a <code>'data'</code>\nevent listener, meaning it will need to be bound in order to handle data\nsent to the server on that socket.</p>\n<p>If an upgrade is accepted by <code>shouldUpgradeCallback</code> but no event handler\nis registered then the socket is destroyed, resulting in an immediate\nconnection closure for the client.</p>\n<p>This event is guaranteed to be passed an instance of the <a href=\"net.html#class-netsocket\" class=\"type\">&lt;net.Socket&gt;</a> class,\na subclass of <a href=\"stream.html#class-streamduplex\" class=\"type\">&lt;stream.Duplex&gt;</a>, unless the user specifies a socket\ntype other than <a href=\"net.html#class-netsocket\" class=\"type\">&lt;net.Socket&gt;</a>.</p>"
             }
           ],
           "methods": [
@@ -1985,9 +1997,9 @@
               "signatures": [
                 {
                   "return": {
-                    "textRaw": "Returns: {any}",
+                    "textRaw": "Returns: {number | string | string\\[] | undefined}",
                     "name": "return",
-                    "type": "any"
+                    "type": "number | string | string\\[] | undefined"
                   },
                   "params": [
                     {
@@ -2119,9 +2131,9 @@
                       "type": "string"
                     },
                     {
-                      "textRaw": "`value` {any}",
+                      "textRaw": "`value` {number | string | string\\[]}",
                       "name": "value",
-                      "type": "any"
+                      "type": "number | string | string\\[]"
                     }
                   ]
                 }
@@ -2333,7 +2345,7 @@
                   ]
                 }
               ],
-              "desc": "<p>Sends a response header to the request. The status code is a 3-digit HTTP\nstatus code, like <code>404</code>. The last argument, <code>headers</code>, are the response headers.\nOptionally one can give a human-readable <code>statusMessage</code> as the second\nargument.</p>\n<p><code>headers</code> may be an <code>Array</code> where the keys and values are in the same list.\nIt is <em>not</em> a list of tuples. So, the even-numbered offsets are key values,\nand the odd-numbered offsets are the associated values. The array is in the same\nformat as <code>request.rawHeaders</code>.</p>\n<p>Returns a reference to the <code>ServerResponse</code>, so that calls can be chained.</p>\n<pre><code class=\"language-js\">const body = 'hello world';\nresponse\n  .writeHead(200, {\n    'Content-Length': Buffer.byteLength(body),\n    'Content-Type': 'text/plain',\n  })\n  .end(body);\n</code></pre>\n<p>This method must only be called once on a message and it must\nbe called before <a href=\"#responseenddata-encoding-callback\"><code>response.end()</code></a> is called.</p>\n<p>If <a href=\"#responsewritechunk-encoding-callback\"><code>response.write()</code></a> or <a href=\"#responseenddata-encoding-callback\"><code>response.end()</code></a> are called before calling\nthis, the implicit/mutable headers will be calculated and call this function.</p>\n<p>When headers have been set with <a href=\"#responsesetheadername-value\"><code>response.setHeader()</code></a>, they will be merged\nwith any headers passed to <a href=\"#responsewriteheadstatuscode-statusmessage-headers\"><code>response.writeHead()</code></a>, with the headers passed\nto <a href=\"#responsewriteheadstatuscode-statusmessage-headers\"><code>response.writeHead()</code></a> given precedence.</p>\n<p>If this method is called and <a href=\"#responsesetheadername-value\"><code>response.setHeader()</code></a> has not been called,\nit will directly write the supplied header values onto the network channel\nwithout caching internally, and the <a href=\"#responsegetheadername\"><code>response.getHeader()</code></a> on the header\nwill not yield the expected result. If progressive population of headers is\ndesired with potential future retrieval and modification, use\n<a href=\"#responsesetheadername-value\"><code>response.setHeader()</code></a> instead.</p>\n<pre><code class=\"language-js\">// Returns content-type = text/plain\nconst server = http.createServer((req, res) => {\n  res.setHeader('Content-Type', 'text/html');\n  res.setHeader('X-Foo', 'bar');\n  res.writeHead(200, { 'Content-Type': 'text/plain' });\n  res.end('ok');\n});\n</code></pre>\n<p><code>Content-Length</code> is read in bytes, not characters. Use\n<a href=\"buffer.html#static-method-bufferbytelengthstring-encoding\"><code>Buffer.byteLength()</code></a> to determine the length of the body in bytes. Node.js\nwill check whether <code>Content-Length</code> and the length of the body which has\nbeen transmitted are equal or not.</p>\n<p>Attempting to set a header field name or value that contains invalid characters\nwill result in a [<code>Error</code>][] being thrown.</p>"
+              "desc": "<p>Sends a response header to the request. The status code is a 3-digit HTTP\nstatus code, like <code>404</code>. The last argument, <code>headers</code>, are the response headers.\nOptionally one can give a human-readable <code>statusMessage</code> as the second\nargument.</p>\n<p><code>headers</code> may be an <code>Array</code> where the keys and values are in the same list.\nIt is <em>not</em> a list of tuples. So, the even-numbered offsets are key values,\nand the odd-numbered offsets are the associated values. The array is in the same\nformat as <code>request.rawHeaders</code>.</p>\n<p>Returns a reference to the <code>ServerResponse</code>, so that calls can be chained.</p>\n<pre><code class=\"language-js\">const body = 'hello world';\nresponse\n  .writeHead(200, {\n    'Content-Length': Buffer.byteLength(body),\n    'Content-Type': 'text/plain',\n  })\n  .end(body);\n</code></pre>\n<p>This method must only be called once on a message and it must\nbe called before <a href=\"#responseenddata-encoding-callback\"><code>response.end()</code></a> is called.</p>\n<p>If <a href=\"#responsewritechunk-encoding-callback\"><code>response.write()</code></a> or <a href=\"#responseenddata-encoding-callback\"><code>response.end()</code></a> are called before calling\nthis, the implicit/mutable headers will be calculated and call this function.</p>\n<p>When headers have been set with <a href=\"#responsesetheadername-value\"><code>response.setHeader()</code></a>, they will be merged\nwith any headers passed to <a href=\"#responsewriteheadstatuscode-statusmessage-headers\"><code>response.writeHead()</code></a>, with the headers passed\nto <a href=\"#responsewriteheadstatuscode-statusmessage-headers\"><code>response.writeHead()</code></a> given precedence.</p>\n<p>If this method is called and <a href=\"#responsesetheadername-value\"><code>response.setHeader()</code></a> has not been called,\nit will directly write the supplied header values onto the network channel\nwithout caching internally, and the <a href=\"#responsegetheadername\"><code>response.getHeader()</code></a> on the header\nwill not yield the expected result. If progressive population of headers is\ndesired with potential future retrieval and modification, use\n<a href=\"#responsesetheadername-value\"><code>response.setHeader()</code></a> instead.</p>\n<pre><code class=\"language-js\">// Returns content-type = text/plain\nconst server = http.createServer((req, res) => {\n  res.setHeader('Content-Type', 'text/html');\n  res.setHeader('X-Foo', 'bar');\n  res.writeHead(200, { 'Content-Type': 'text/plain' });\n  res.end('ok');\n});\n</code></pre>\n<p><code>Content-Length</code> is read in bytes, not characters. Use\n<a href=\"buffer.html#static-method-bufferbytelengthstring-encoding\"><code>Buffer.byteLength()</code></a> to determine the length of the body in bytes. Node.js\nwill check whether <code>Content-Length</code> and the length of the body which has\nbeen transmitted are equal or not.</p>\n<p>Attempting to set a header field name or value that contains invalid characters\nwill result in a <a href=\"errors.html#class-typeerror\"><code>TypeError</code></a> being thrown.</p>"
             },
             {
               "textRaw": "`response.writeProcessing()`",
@@ -3087,9 +3099,9 @@
               "signatures": [
                 {
                   "return": {
-                    "textRaw": "Returns: {string | undefined}",
+                    "textRaw": "Returns: {number | string | string\\[] | undefined}",
                     "name": "return",
-                    "type": "string | undefined"
+                    "type": "number | string | string\\[] | undefined"
                   },
                   "params": [
                     {
@@ -3241,9 +3253,9 @@
                       "desc": "Header name"
                     },
                     {
-                      "textRaw": "`value` {any} Header value",
+                      "textRaw": "`value` {number | string | string\\[]} Header value",
                       "name": "value",
-                      "type": "any",
+                      "type": "number | string | string\\[]",
                       "desc": "Header value"
                     }
                   ]
@@ -3582,6 +3594,11 @@
             ],
             "changes": [
               {
+                "version": "v24.9.0",
+                "pr-url": "https://github.com/nodejs/node/pull/59824",
+                "description": "The `shouldUpgradeCallback` option is now supported."
+              },
+              {
                 "version": [
                   "v20.1.0",
                   "v18.17.0"
@@ -3737,6 +3754,12 @@
                       "type": "http.ServerResponse",
                       "default": "`ServerResponse`",
                       "desc": "Specifies the `ServerResponse` class to be used. Useful for extending the original `ServerResponse`."
+                    },
+                    {
+                      "textRaw": "`shouldUpgradeCallback(request)` {Function} A callback which receives an incoming request and returns a boolean, to control which upgrade attempts should be accepted. Accepted upgrades will fire an `'upgrade'` event (or their sockets will be destroyed, if no listener is registered) while rejected upgrades will fire a `'request'` event like any non-upgrade request. This options defaults to `() => server.listenerCount('upgrade') > 0`.",
+                      "name": "shouldUpgradeCallback(request)",
+                      "type": "Function",
+                      "desc": "A callback which receives an incoming request and returns a boolean, to control which upgrade attempts should be accepted. Accepted upgrades will fire an `'upgrade'` event (or their sockets will be destroyed, if no listener is registered) while rejected upgrades will fire a `'request'` event like any non-upgrade request. This options defaults to `() => server.listenerCount('upgrade') > 0`."
                     },
                     {
                       "textRaw": "`uniqueHeaders` {Array} A list of response headers that should be sent only once. If the header's value is an array, the items will be joined using `; `.",

@@ -5,13 +5,13 @@ This is a *fun* mod of Node.JS that initially embedded a modified version of dco
 
 Thanks to the inspiration from dcodeIO et al =D
 
-## Version 24.6.0
-* Update to Node.JS 24.6.0 baseline.
+## Version 24.9.0
+* Update to Node.JS 24.9.0 baseline and TypeScript v5.9.3.
 
 It embeds:
 * DS v1.2.2.
 * CS v2.7.0.
-* TS v5.9.2.
+* TS v5.9.3.
 
 Refer to prior readmes for old changes.
 * `--experimental-strip-types` is disabled (in favour of full TS transpiler), although Node.JS 23.6.0 enables it by default.
@@ -1001,6 +1001,8 @@ maintaining the Node.js project.
   **Akhil Marsonya** <<akhil.marsonya27@gmail.com>> (he/him)
 * [meixg](https://github.com/meixg) -
   **Xuguang Mei** <<meixuguang@gmail.com>> (he/him)
+* [milesguicent](https://github.com/milesguicent) -
+  **Miles Guicent** <<guicent@pm.me>> (he/him)
 * [preveen-stack](https://github.com/preveen-stack) -
   **Preveen Padmanabhan** <<wide4head@gmail.com>> (he/him)
 * [RaisinTen](https://github.com/RaisinTen) -

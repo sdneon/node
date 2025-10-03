@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v24.6.0">
-  <title>Assert | Node.js v24.6.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v24.9.0">
+  <title>Assert | Node.js v24.9.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -112,7 +112,7 @@
     <div id="column1" data-id="assert" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v24.6.0 documentation</h1>
+          <h1>Node.js v24.9.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -127,7 +127,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v24.6.0</li>
+            <li class="pinned-header">Node.js v24.9.0</li>
             
     <li class="picker-header">
       <a href="#toc-picker" aria-controls="toc-picker">
@@ -403,7 +403,7 @@
         <h2>Assert<span><a class="mark" href="#assert" id="assert">#</a></span><a aria-hidden="true" class="legacy" id="assert_assert"></a></h2>
 
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v24.6.0/lib/assert.js">lib/assert.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v24.9.0/lib/assert.js">lib/assert.js</a></p>
 <p>The <code>node:assert</code> module provides a set of assertion functions for verifying
 invariants.</p>
 <section><h3>Strict assertion mode<span><a class="mark" href="#strict-assertion-mode" id="strict-assertion-mode">#</a></span><a aria-hidden="true" class="legacy" id="assert_strict_assertion_mode"></a></h3>
@@ -577,6 +577,15 @@ assertion error.</li>
 <p>The <code>Assert</code> class allows creating independent assertion instances with custom options.</p>
 <div>
 <h4><code>new assert.Assert([options])</code><span><a class="mark" href="#new-assertassertoptions" id="new-assertassertoptions">#</a></span><a aria-hidden="true" class="legacy" id="assert_new_assert_assert_options"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v24.9.0</td>
+<td><p>Added <code>skipPrototype</code> option.</p></td></tr>
+</tbody></table>
+</details>
+</div>
 <ul>
 <li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
 <ul>
@@ -584,6 +593,8 @@ assertion error.</li>
 Accepted values: <code>'simple'</code>, <code>'full'</code>.</li>
 <li><code>strict</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> If set to <code>true</code>, non-strict methods behave like their
 corresponding strict methods. Defaults to <code>true</code>.</li>
+<li><code>skipPrototype</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> If set to <code>true</code>, skips prototype and constructor
+comparison in deep equality checks. Defaults to <code>false</code>.</li>
 </ul>
 </li>
 </ul>
@@ -593,7 +604,8 @@ corresponding strict methods. Defaults to <code>true</code>.</li>
 assertInstance.<span class="hljs-title function_">deepStrictEqual</span>({ <span class="hljs-attr">a</span>: <span class="hljs-number">1</span> }, { <span class="hljs-attr">a</span>: <span class="hljs-number">2</span> });
 <span class="hljs-comment">// Shows a full diff in the error message.</span></code> <button class="copy-button">copy</button></pre>
 <p><strong>Important</strong>: When destructuring assertion methods from an <code>Assert</code> instance,
-the methods lose their connection to the instance's configuration options (such as <code>diff</code> and <code>strict</code> settings).
+the methods lose their connection to the instance's configuration options (such
+as <code>diff</code>, <code>strict</code>, and <code>skipPrototype</code> settings).
 The destructured methods will fall back to default behavior instead.</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> myAssert = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Assert</span>({ <span class="hljs-attr">diff</span>: <span class="hljs-string">'full'</span> });
 
@@ -603,6 +615,29 @@ myAssert.<span class="hljs-title function_">strictEqual</span>({ <span class="hl
 <span class="hljs-comment">// This loses the 'full' diff setting - falls back to default 'simple' diff</span>
 <span class="hljs-keyword">const</span> { strictEqual } = myAssert;
 <span class="hljs-title function_">strictEqual</span>({ <span class="hljs-attr">a</span>: <span class="hljs-number">1</span> }, { <span class="hljs-attr">b</span>: { <span class="hljs-attr">c</span>: <span class="hljs-number">1</span> } });</code> <button class="copy-button">copy</button></pre>
+<p>The <code>skipPrototype</code> option affects all deep equality methods:</p>
+<pre><code class="language-js"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Foo</span> {
+  <span class="hljs-title function_">constructor</span>(<span class="hljs-params">a</span>) {
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">a</span> = a;
+  }
+}
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">Bar</span> {
+  <span class="hljs-title function_">constructor</span>(<span class="hljs-params">a</span>) {
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">a</span> = a;
+  }
+}
+
+<span class="hljs-keyword">const</span> foo = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Foo</span>(<span class="hljs-number">1</span>);
+<span class="hljs-keyword">const</span> bar = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Bar</span>(<span class="hljs-number">1</span>);
+
+<span class="hljs-comment">// Default behavior - fails due to different constructors</span>
+<span class="hljs-keyword">const</span> assert1 = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Assert</span>();
+assert1.<span class="hljs-title function_">deepStrictEqual</span>(foo, bar); <span class="hljs-comment">// AssertionError</span>
+
+<span class="hljs-comment">// Skip prototype comparison - passes if properties are equal</span>
+<span class="hljs-keyword">const</span> assert2 = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Assert</span>({ <span class="hljs-attr">skipPrototype</span>: <span class="hljs-literal">true</span> });
+assert2.<span class="hljs-title function_">deepStrictEqual</span>(foo, bar); <span class="hljs-comment">// OK</span></code> <button class="copy-button">copy</button></pre>
 <p>When destructured, methods lose access to the instance's <code>this</code> context and revert to default assertion behavior
 (diff: 'simple', non-strict mode).
 To maintain custom options when using destructured methods, avoid

@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v24.6.0">
-  <title>VM (executing JavaScript) | Node.js v24.6.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v24.9.0">
+  <title>VM (executing JavaScript) | Node.js v24.9.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -112,7 +112,7 @@
     <div id="column1" data-id="vm" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v24.6.0 documentation</h1>
+          <h1>Node.js v24.9.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -127,7 +127,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v24.6.0</li>
+            <li class="pinned-header">Node.js v24.9.0</li>
             
     <li class="picker-header">
       <a href="#toc-picker" aria-controls="toc-picker">
@@ -164,6 +164,10 @@
 <li><a href="#new-vmsourcetextmodulecode-options"><code>new vm.SourceTextModule(code[, options])</code></a></li>
 <li><a href="#sourcetextmodulecreatecacheddata"><code>sourceTextModule.createCachedData()</code></a></li>
 <li><span class="stability_0"><a href="#sourcetextmoduledependencyspecifiers"><code>sourceTextModule.dependencySpecifiers</code></a></span></li>
+<li><a href="#sourcetextmodulehasasyncgraph"><code>sourceTextModule.hasAsyncGraph()</code></a></li>
+<li><a href="#sourcetextmodulehastoplevelawait"><code>sourceTextModule.hasTopLevelAwait()</code></a></li>
+<li><a href="#sourcetextmoduleinstantiate"><code>sourceTextModule.instantiate()</code></a></li>
+<li><a href="#sourcetextmodulelinkrequestsmodules"><code>sourceTextModule.linkRequests(modules)</code></a></li>
 <li><a href="#sourcetextmodulemodulerequests"><code>sourceTextModule.moduleRequests</code></a></li>
 </ul>
 </li>
@@ -192,7 +196,11 @@
 <li><a href="#vmconstantsdont_contextify"><code>vm.constants.DONT_CONTEXTIFY</code></a></li>
 </ul>
 </li>
-<li><a href="#timeout-interactions-with-asynchronous-tasks-and-promises">Timeout interactions with asynchronous tasks and Promises</a></li>
+<li><a href="#timeout-interactions-with-asynchronous-tasks-and-promises">Timeout interactions with asynchronous tasks and Promises</a>
+<ul>
+<li><a href="#when-microtaskmode-is-afterevaluate-beware-sharing-promises-between-contexts">When <code>microtaskMode</code> is <code>'afterEvaluate'</code>, beware sharing Promises between Contexts</a></li>
+</ul>
+</li>
 <li><a href="#support-of-dynamic-import-in-compilation-apis">Support of dynamic <code>import()</code> in compilation APIs</a>
 <ul>
 <li><a href="#when-the-importmoduledynamically-option-is-not-specified-or-undefined">When the <code>importModuleDynamically</code> option is not specified or undefined</a></li>
@@ -375,6 +383,10 @@
 <li><a href="#new-vmsourcetextmodulecode-options"><code>new vm.SourceTextModule(code[, options])</code></a></li>
 <li><a href="#sourcetextmodulecreatecacheddata"><code>sourceTextModule.createCachedData()</code></a></li>
 <li><span class="stability_0"><a href="#sourcetextmoduledependencyspecifiers"><code>sourceTextModule.dependencySpecifiers</code></a></span></li>
+<li><a href="#sourcetextmodulehasasyncgraph"><code>sourceTextModule.hasAsyncGraph()</code></a></li>
+<li><a href="#sourcetextmodulehastoplevelawait"><code>sourceTextModule.hasTopLevelAwait()</code></a></li>
+<li><a href="#sourcetextmoduleinstantiate"><code>sourceTextModule.instantiate()</code></a></li>
+<li><a href="#sourcetextmodulelinkrequestsmodules"><code>sourceTextModule.linkRequests(modules)</code></a></li>
 <li><a href="#sourcetextmodulemodulerequests"><code>sourceTextModule.moduleRequests</code></a></li>
 </ul>
 </li>
@@ -403,7 +415,11 @@
 <li><a href="#vmconstantsdont_contextify"><code>vm.constants.DONT_CONTEXTIFY</code></a></li>
 </ul>
 </li>
-<li><a href="#timeout-interactions-with-asynchronous-tasks-and-promises">Timeout interactions with asynchronous tasks and Promises</a></li>
+<li><a href="#timeout-interactions-with-asynchronous-tasks-and-promises">Timeout interactions with asynchronous tasks and Promises</a>
+<ul>
+<li><a href="#when-microtaskmode-is-afterevaluate-beware-sharing-promises-between-contexts">When <code>microtaskMode</code> is <code>'afterEvaluate'</code>, beware sharing Promises between Contexts</a></li>
+</ul>
+</li>
 <li><a href="#support-of-dynamic-import-in-compilation-apis">Support of dynamic <code>import()</code> in compilation APIs</a>
 <ul>
 <li><a href="#when-the-importmoduledynamically-option-is-not-specified-or-undefined">When the <code>importModuleDynamically</code> option is not specified or undefined</a></li>
@@ -420,7 +436,7 @@
 
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
 
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v24.6.0/lib/vm.js">lib/vm.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v24.9.0/lib/vm.js">lib/vm.js</a></p>
 <p>The <code>node:vm</code> module enables compiling and running code within V8 Virtual
 Machine contexts.</p>
 <p><strong class="critical">The <code>node:vm</code> module is not a security
@@ -797,9 +813,7 @@ ECMAScript modules in VM contexts. It is the counterpart of the <code>vm.Script<
 class that closely mirrors <a href="https://tc39.es/ecma262/#sec-abstract-module-records">Module Record</a>s as defined in the ECMAScript
 specification.</p>
 <p>Unlike <code>vm.Script</code> however, every <code>vm.Module</code> object is bound to a context from
-its creation. Operations on <code>vm.Module</code> objects are intrinsically asynchronous,
-in contrast with the synchronous nature of <code>vm.Script</code> objects. The use of
-'async' functions can help with manipulating <code>vm.Module</code> objects.</p>
+its creation.</p>
 <p>Using a <code>vm.Module</code> object requires three distinct steps: creation/parsing,
 linking, and evaluation. These three steps are illustrated in the following
 example.</p>
@@ -824,7 +838,7 @@ support is planned.</p>
 <span class="hljs-comment">// Here, we attempt to obtain the default export from the module "foo", and</span>
 <span class="hljs-comment">// put it into local binding "secret".</span>
 
-<span class="hljs-keyword">const</span> bar = <span class="hljs-keyword">new</span> vm.<span class="hljs-title class_">SourceTextModule</span>(<span class="hljs-string">`
+<span class="hljs-keyword">const</span> rootModule = <span class="hljs-keyword">new</span> vm.<span class="hljs-title class_">SourceTextModule</span>(<span class="hljs-string">`
   import s from 'foo';
   s;
   print(s);
@@ -834,39 +848,48 @@ support is planned.</p>
 <span class="hljs-comment">//</span>
 <span class="hljs-comment">// "Link" the imported dependencies of this Module to it.</span>
 <span class="hljs-comment">//</span>
-<span class="hljs-comment">// The provided linking callback (the "linker") accepts two arguments: the</span>
-<span class="hljs-comment">// parent module (`bar` in this case) and the string that is the specifier of</span>
-<span class="hljs-comment">// the imported module. The callback is expected to return a Module that</span>
-<span class="hljs-comment">// corresponds to the provided specifier, with certain requirements documented</span>
-<span class="hljs-comment">// in `module.link()`.</span>
-<span class="hljs-comment">//</span>
-<span class="hljs-comment">// If linking has not started for the returned Module, the same linker</span>
-<span class="hljs-comment">// callback will be called on the returned Module.</span>
+<span class="hljs-comment">// Obtain the requested dependencies of a SourceTextModule by</span>
+<span class="hljs-comment">// `sourceTextModule.moduleRequests` and resolve them.</span>
 <span class="hljs-comment">//</span>
 <span class="hljs-comment">// Even top-level Modules without dependencies must be explicitly linked. The</span>
-<span class="hljs-comment">// callback provided would never be called, however.</span>
+<span class="hljs-comment">// array passed to `sourceTextModule.linkRequests(modules)` can be</span>
+<span class="hljs-comment">// empty, however.</span>
 <span class="hljs-comment">//</span>
-<span class="hljs-comment">// The link() method returns a Promise that will be resolved when all the</span>
-<span class="hljs-comment">// Promises returned by the linker resolve.</span>
-<span class="hljs-comment">//</span>
-<span class="hljs-comment">// Note: This is a contrived example in that the linker function creates a new</span>
-<span class="hljs-comment">// "foo" module every time it is called. In a full-fledged module system, a</span>
-<span class="hljs-comment">// cache would probably be used to avoid duplicated modules.</span>
+<span class="hljs-comment">// Note: This is a contrived example in that the resolveAndLinkDependencies</span>
+<span class="hljs-comment">// creates a new "foo" module every time it is called. In a full-fledged</span>
+<span class="hljs-comment">// module system, a cache would probably be used to avoid duplicated modules.</span>
 
-<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">linker</span>(<span class="hljs-params">specifier, referencingModule</span>) {
-  <span class="hljs-keyword">if</span> (specifier === <span class="hljs-string">'foo'</span>) {
-    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> vm.<span class="hljs-title class_">SourceTextModule</span>(<span class="hljs-string">`
-      // The "secret" variable refers to the global variable we added to
-      // "contextifiedObject" when creating the context.
-      export default secret;
-    `</span>, { <span class="hljs-attr">context</span>: referencingModule.<span class="hljs-property">context</span> });
+<span class="hljs-keyword">const</span> moduleMap = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Map</span>([
+  [<span class="hljs-string">'root'</span>, rootModule],
+]);
 
-    <span class="hljs-comment">// Using `contextifiedObject` instead of `referencingModule.context`</span>
-    <span class="hljs-comment">// here would work as well.</span>
-  }
-  <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">`Unable to resolve dependency: <span class="hljs-subst">${specifier}</span>`</span>);
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">resolveAndLinkDependencies</span>(<span class="hljs-params"><span class="hljs-variable language_">module</span></span>) {
+  <span class="hljs-keyword">const</span> requestedModules = <span class="hljs-variable language_">module</span>.<span class="hljs-property">moduleRequests</span>.<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">request</span>) =></span> {
+    <span class="hljs-comment">// In a full-fledged module system, the resolveAndLinkDependencies would</span>
+    <span class="hljs-comment">// resolve the module with the module cache key `[specifier, attributes]`.</span>
+    <span class="hljs-comment">// In this example, we just use the specifier as the key.</span>
+    <span class="hljs-keyword">const</span> specifier = request.<span class="hljs-property">specifier</span>;
+
+    <span class="hljs-keyword">let</span> requestedModule = moduleMap.<span class="hljs-title function_">get</span>(specifier);
+    <span class="hljs-keyword">if</span> (requestedModule === <span class="hljs-literal">undefined</span>) {
+      requestedModule = <span class="hljs-keyword">new</span> vm.<span class="hljs-title class_">SourceTextModule</span>(<span class="hljs-string">`
+        // The "secret" variable refers to the global variable we added to
+        // "contextifiedObject" when creating the context.
+        export default secret;
+      `</span>, { <span class="hljs-attr">context</span>: referencingModule.<span class="hljs-property">context</span> });
+      moduleMap.<span class="hljs-title function_">set</span>(specifier, linkedModule);
+      <span class="hljs-comment">// Resolve the dependencies of the new module as well.</span>
+      <span class="hljs-title function_">resolveAndLinkDependencies</span>(requestedModule);
+    }
+
+    <span class="hljs-keyword">return</span> requestedModule;
+  });
+
+  <span class="hljs-variable language_">module</span>.<span class="hljs-title function_">linkRequests</span>(requestedModules);
 }
-<span class="hljs-keyword">await</span> bar.<span class="hljs-title function_">link</span>(linker);
+
+<span class="hljs-title function_">resolveAndLinkDependencies</span>(rootModule);
+rootModule.<span class="hljs-title function_">instantiate</span>();
 
 <span class="hljs-comment">// Step 3</span>
 <span class="hljs-comment">//</span>
@@ -874,7 +897,7 @@ support is planned.</p>
 <span class="hljs-comment">// resolve after the module has finished evaluating.</span>
 
 <span class="hljs-comment">// Prints 42.</span>
-<span class="hljs-keyword">await</span> bar.<span class="hljs-title function_">evaluate</span>();</code><code class="language-js cjs"><span class="hljs-keyword">const</span> vm = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:vm'</span>);
+<span class="hljs-keyword">await</span> rootModule.<span class="hljs-title function_">evaluate</span>();</code><code class="language-js cjs"><span class="hljs-keyword">const</span> vm = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:vm'</span>);
 
 <span class="hljs-keyword">const</span> contextifiedObject = vm.<span class="hljs-title function_">createContext</span>({
   <span class="hljs-attr">secret</span>: <span class="hljs-number">42</span>,
@@ -892,7 +915,7 @@ support is planned.</p>
   <span class="hljs-comment">// Here, we attempt to obtain the default export from the module "foo", and</span>
   <span class="hljs-comment">// put it into local binding "secret".</span>
 
-  <span class="hljs-keyword">const</span> bar = <span class="hljs-keyword">new</span> vm.<span class="hljs-title class_">SourceTextModule</span>(<span class="hljs-string">`
+  <span class="hljs-keyword">const</span> rootModule = <span class="hljs-keyword">new</span> vm.<span class="hljs-title class_">SourceTextModule</span>(<span class="hljs-string">`
     import s from 'foo';
     s;
     print(s);
@@ -902,39 +925,48 @@ support is planned.</p>
   <span class="hljs-comment">//</span>
   <span class="hljs-comment">// "Link" the imported dependencies of this Module to it.</span>
   <span class="hljs-comment">//</span>
-  <span class="hljs-comment">// The provided linking callback (the "linker") accepts two arguments: the</span>
-  <span class="hljs-comment">// parent module (`bar` in this case) and the string that is the specifier of</span>
-  <span class="hljs-comment">// the imported module. The callback is expected to return a Module that</span>
-  <span class="hljs-comment">// corresponds to the provided specifier, with certain requirements documented</span>
-  <span class="hljs-comment">// in `module.link()`.</span>
-  <span class="hljs-comment">//</span>
-  <span class="hljs-comment">// If linking has not started for the returned Module, the same linker</span>
-  <span class="hljs-comment">// callback will be called on the returned Module.</span>
+  <span class="hljs-comment">// Obtain the requested dependencies of a SourceTextModule by</span>
+  <span class="hljs-comment">// `sourceTextModule.moduleRequests` and resolve them.</span>
   <span class="hljs-comment">//</span>
   <span class="hljs-comment">// Even top-level Modules without dependencies must be explicitly linked. The</span>
-  <span class="hljs-comment">// callback provided would never be called, however.</span>
+  <span class="hljs-comment">// array passed to `sourceTextModule.linkRequests(modules)` can be</span>
+  <span class="hljs-comment">// empty, however.</span>
   <span class="hljs-comment">//</span>
-  <span class="hljs-comment">// The link() method returns a Promise that will be resolved when all the</span>
-  <span class="hljs-comment">// Promises returned by the linker resolve.</span>
-  <span class="hljs-comment">//</span>
-  <span class="hljs-comment">// Note: This is a contrived example in that the linker function creates a new</span>
-  <span class="hljs-comment">// "foo" module every time it is called. In a full-fledged module system, a</span>
-  <span class="hljs-comment">// cache would probably be used to avoid duplicated modules.</span>
+  <span class="hljs-comment">// Note: This is a contrived example in that the resolveAndLinkDependencies</span>
+  <span class="hljs-comment">// creates a new "foo" module every time it is called. In a full-fledged</span>
+  <span class="hljs-comment">// module system, a cache would probably be used to avoid duplicated modules.</span>
 
-  <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">linker</span>(<span class="hljs-params">specifier, referencingModule</span>) {
-    <span class="hljs-keyword">if</span> (specifier === <span class="hljs-string">'foo'</span>) {
-      <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> vm.<span class="hljs-title class_">SourceTextModule</span>(<span class="hljs-string">`
-        // The "secret" variable refers to the global variable we added to
-        // "contextifiedObject" when creating the context.
-        export default secret;
-      `</span>, { <span class="hljs-attr">context</span>: referencingModule.<span class="hljs-property">context</span> });
+  <span class="hljs-keyword">const</span> moduleMap = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Map</span>([
+    [<span class="hljs-string">'root'</span>, rootModule],
+  ]);
 
-      <span class="hljs-comment">// Using `contextifiedObject` instead of `referencingModule.context`</span>
-      <span class="hljs-comment">// here would work as well.</span>
-    }
-    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">`Unable to resolve dependency: <span class="hljs-subst">${specifier}</span>`</span>);
+  <span class="hljs-keyword">function</span> <span class="hljs-title function_">resolveAndLinkDependencies</span>(<span class="hljs-params"><span class="hljs-variable language_">module</span></span>) {
+    <span class="hljs-keyword">const</span> requestedModules = <span class="hljs-variable language_">module</span>.<span class="hljs-property">moduleRequests</span>.<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">request</span>) =></span> {
+      <span class="hljs-comment">// In a full-fledged module system, the resolveAndLinkDependencies would</span>
+      <span class="hljs-comment">// resolve the module with the module cache key `[specifier, attributes]`.</span>
+      <span class="hljs-comment">// In this example, we just use the specifier as the key.</span>
+      <span class="hljs-keyword">const</span> specifier = request.<span class="hljs-property">specifier</span>;
+
+      <span class="hljs-keyword">let</span> requestedModule = moduleMap.<span class="hljs-title function_">get</span>(specifier);
+      <span class="hljs-keyword">if</span> (requestedModule === <span class="hljs-literal">undefined</span>) {
+        requestedModule = <span class="hljs-keyword">new</span> vm.<span class="hljs-title class_">SourceTextModule</span>(<span class="hljs-string">`
+          // The "secret" variable refers to the global variable we added to
+          // "contextifiedObject" when creating the context.
+          export default secret;
+        `</span>, { <span class="hljs-attr">context</span>: referencingModule.<span class="hljs-property">context</span> });
+        moduleMap.<span class="hljs-title function_">set</span>(specifier, linkedModule);
+        <span class="hljs-comment">// Resolve the dependencies of the new module as well.</span>
+        <span class="hljs-title function_">resolveAndLinkDependencies</span>(requestedModule);
+      }
+
+      <span class="hljs-keyword">return</span> requestedModule;
+    });
+
+    <span class="hljs-variable language_">module</span>.<span class="hljs-title function_">linkRequests</span>(requestedModules);
   }
-  <span class="hljs-keyword">await</span> bar.<span class="hljs-title function_">link</span>(linker);
+
+  <span class="hljs-title function_">resolveAndLinkDependencies</span>(rootModule);
+  rootModule.<span class="hljs-title function_">instantiate</span>();
 
   <span class="hljs-comment">// Step 3</span>
   <span class="hljs-comment">//</span>
@@ -942,7 +974,7 @@ support is planned.</p>
   <span class="hljs-comment">// resolve after the module has finished evaluating.</span>
 
   <span class="hljs-comment">// Prints 42.</span>
-  <span class="hljs-keyword">await</span> bar.<span class="hljs-title function_">evaluate</span>();
+  <span class="hljs-keyword">await</span> rootModule.<span class="hljs-title function_">evaluate</span>();
 })();</code><button class="copy-button">copy</button></pre>
 <div>
 <h4><code>module.error</code><span><a class="mark" href="#moduleerror" id="moduleerror">#</a></span><a aria-hidden="true" class="legacy" id="vm_module_error"></a></h4>
@@ -1031,6 +1063,9 @@ unsupported attribute is present.</li>
 </ul>
 <p>Link module dependencies. This method must be called before evaluation, and
 can only be called once per module.</p>
+<p>Use <a href="#sourcetextmodulelinkrequestsmodules"><code>sourceTextModule.linkRequests(modules)</code></a> and
+<a href="#sourcetextmoduleinstantiate"><code>sourceTextModule.instantiate()</code></a> to link modules either synchronously or
+asynchronously.</p>
 <p>The function is expected to return a <code>Module</code> object or a <code>Promise</code> that
 eventually resolves to a <code>Module</code> object. The returned <code>Module</code> must satisfy the
 following two invariants:</p>
@@ -1179,8 +1214,9 @@ allow the module to access information outside the specified <code>context</code
       meta.<span class="hljs-property">prop</span> = {};
     },
   });
-<span class="hljs-comment">// Since module has no dependencies, the linker function will never be called.</span>
-<span class="hljs-keyword">await</span> <span class="hljs-variable language_">module</span>.<span class="hljs-title function_">link</span>(<span class="hljs-function">() =></span> {});
+<span class="hljs-comment">// The module has an empty `moduleRequests` array.</span>
+<span class="hljs-variable language_">module</span>.<span class="hljs-title function_">linkRequests</span>([]);
+<span class="hljs-variable language_">module</span>.<span class="hljs-title function_">instantiate</span>();
 <span class="hljs-keyword">await</span> <span class="hljs-variable language_">module</span>.<span class="hljs-title function_">evaluate</span>();
 
 <span class="hljs-comment">// Now, Object.prototype.secret will be equal to 42.</span>
@@ -1202,8 +1238,9 @@ allow the module to access information outside the specified <code>context</code
         meta.<span class="hljs-property">prop</span> = {};
       },
     });
-  <span class="hljs-comment">// Since module has no dependencies, the linker function will never be called.</span>
-  <span class="hljs-keyword">await</span> <span class="hljs-variable language_">module</span>.<span class="hljs-title function_">link</span>(<span class="hljs-function">() =></span> {});
+  <span class="hljs-comment">// The module has an empty `moduleRequests` array.</span>
+  <span class="hljs-variable language_">module</span>.<span class="hljs-title function_">linkRequests</span>([]);
+  <span class="hljs-variable language_">module</span>.<span class="hljs-title function_">instantiate</span>();
   <span class="hljs-keyword">await</span> <span class="hljs-variable language_">module</span>.<span class="hljs-title function_">evaluate</span>();
   <span class="hljs-comment">// Now, Object.prototype.secret will be equal to 42.</span>
   <span class="hljs-comment">//</span>
@@ -1258,6 +1295,79 @@ code cache serializes the metadata that V8 currently knows about the
 to disallow any changes to it.</p>
 <p>Corresponds to the <code>[[RequestedModules]]</code> field of <a href="https://tc39.es/ecma262/#sec-cyclic-module-records">Cyclic Module Record</a>s in
 the ECMAScript specification.</p>
+</div><div>
+<h4><code>sourceTextModule.hasAsyncGraph()</code><span><a class="mark" href="#sourcetextmodulehasasyncgraph" id="sourcetextmodulehasasyncgraph">#</a></span><a aria-hidden="true" class="legacy" id="vm_sourcetextmodule_hasasyncgraph"></a></h4>
+<div class="api_metadata">
+<span>Added in: v24.9.0</span>
+</div>
+<ul>
+<li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+</ul>
+<p>Iterates over the dependency graph and returns <code>true</code> if any module in its
+dependencies or this module itself contains top-level <code>await</code> expressions,
+otherwise returns <code>false</code>.</p>
+<p>The search may be slow if the graph is big enough.</p>
+<p>This requires the module to be instantiated first. If the module is not
+instantiated yet, an error will be thrown.</p>
+</div><div>
+<h4><code>sourceTextModule.hasTopLevelAwait()</code><span><a class="mark" href="#sourcetextmodulehastoplevelawait" id="sourcetextmodulehastoplevelawait">#</a></span><a aria-hidden="true" class="legacy" id="vm_sourcetextmodule_hastoplevelawait"></a></h4>
+<div class="api_metadata">
+<span>Added in: v24.9.0</span>
+</div>
+<ul>
+<li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+</ul>
+<p>Returns whether the module itself contains any top-level <code>await</code> expressions.</p>
+<p>This corresponds to the field <code>[[HasTLA]]</code> in <a href="https://tc39.es/ecma262/#sec-cyclic-module-records">Cyclic Module Record</a> in the
+ECMAScript specification.</p>
+</div><div>
+<h4><code>sourceTextModule.instantiate()</code><span><a class="mark" href="#sourcetextmoduleinstantiate" id="sourcetextmoduleinstantiate">#</a></span><a aria-hidden="true" class="legacy" id="vm_sourcetextmodule_instantiate"></a></h4>
+<div class="api_metadata">
+<span>Added in: v24.8.0</span>
+</div>
+<ul>
+<li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a></li>
+</ul>
+<p>Instantiate the module with the linked requested modules.</p>
+<p>This resolves the imported bindings of the module, including re-exported
+binding names. When there are any bindings that cannot be resolved,
+an error would be thrown synchronously.</p>
+<p>If the requested modules include cyclic dependencies, the
+<a href="#sourcetextmodulelinkrequestsmodules"><code>sourceTextModule.linkRequests(modules)</code></a> method must be called on all
+modules in the cycle before calling this method.</p>
+</div><div>
+<h4><code>sourceTextModule.linkRequests(modules)</code><span><a class="mark" href="#sourcetextmodulelinkrequestsmodules" id="sourcetextmodulelinkrequestsmodules">#</a></span><a aria-hidden="true" class="legacy" id="vm_sourcetextmodule_linkrequests_modules"></a></h4>
+<div class="api_metadata">
+<span>Added in: v24.8.0</span>
+</div>
+<ul>
+<li><code>modules</code> <a href="vm.html#class-vmmodule" class="type">&#x3C;vm.Module[]></a> Array of <code>vm.Module</code> objects that this module depends on.
+The order of the modules in the array is the order of
+<a href="#sourcetextmodulemodulerequests"><code>sourceTextModule.moduleRequests</code></a>.</li>
+<li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a></li>
+</ul>
+<p>Link module dependencies. This method must be called before evaluation, and
+can only be called once per module.</p>
+<p>The order of the module instances in the <code>modules</code> array should correspond to the order of
+<a href="#sourcetextmodulemodulerequests"><code>sourceTextModule.moduleRequests</code></a> being resolved. If two module requests have the same
+specifier and import attributes, they must be resolved with the same module instance or an
+<code>ERR_MODULE_LINK_MISMATCH</code> would be thrown. For example, when linking requests for this
+module:</p>
+<!-- eslint-disable no-duplicate-imports -->
+<pre><code class="language-js mjs"><span class="hljs-keyword">import</span> foo <span class="hljs-keyword">from</span> <span class="hljs-string">'foo'</span>;
+<span class="hljs-keyword">import</span> source <span class="hljs-title class_">Foo</span> <span class="hljs-keyword">from</span> <span class="hljs-string">'foo'</span>;</code> <button class="copy-button">copy</button></pre>
+<!-- eslint-enable no-duplicate-imports -->
+<p>The <code>modules</code> array must contain two references to the same instance, because the two
+module requests are identical but in two phases.</p>
+<p>If the module has no dependencies, the <code>modules</code> array can be empty.</p>
+<p>Users can use <code>sourceTextModule.moduleRequests</code> to implement the host-defined
+<a href="https://tc39.es/ecma262/#sec-HostLoadImportedModule">HostLoadImportedModule</a> abstract operation in the ECMAScript specification,
+and using <code>sourceTextModule.linkRequests()</code> to invoke specification defined
+<a href="https://tc39.es/ecma262/#sec-FinishLoadingImportedModule">FinishLoadingImportedModule</a>, on the module with all dependencies in a batch.</p>
+<p>It's up to the creator of the <code>SourceTextModule</code> to determine if the resolution
+of the dependencies is synchronous or asynchronous.</p>
+<p>After each module in the <code>modules</code> array is linked, call
+<a href="#sourcetextmoduleinstantiate"><code>sourceTextModule.instantiate()</code></a>.</p>
 </div><div>
 <h4><code>sourceTextModule.moduleRequests</code><span><a class="mark" href="#sourcetextmodulemodulerequests" id="sourcetextmodulemodulerequests">#</a></span><a aria-hidden="true" class="legacy" id="vm_sourcetextmodule_modulerequests"></a></h4>
 <div class="api_metadata">
@@ -1354,15 +1464,21 @@ the module to access information outside the specified <code>context</code>. Use
 </div><div>
 <h4><code>syntheticModule.setExport(name, value)</code><span><a class="mark" href="#syntheticmodulesetexportname-value" id="syntheticmodulesetexportname-value">#</a></span><a aria-hidden="true" class="legacy" id="vm_syntheticmodule_setexport_name_value"></a></h4>
 <div class="api_metadata">
-<span>Added in: v13.0.0, v12.16.0</span>
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v24.8.0</td>
+<td><p>No longer need to call <code>syntheticModule.link()</code> before calling this method.</p></td></tr>
+<tr><td>v13.0.0, v12.16.0</td>
+<td><p><span>Added in: v13.0.0, v12.16.0</span></p></td></tr>
+</tbody></table>
+</details>
 </div>
 <ul>
 <li><code>name</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> Name of the export to set.</li>
 <li><code>value</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> The value to set the export to.</li>
 </ul>
-<p>This method is used after the module is linked to set the values of exports. If
-it is called before the module is linked, an <a href="errors.html#err_vm_module_status"><code>ERR_VM_MODULE_STATUS</code></a> error
-will be thrown.</p>
+<p>This method sets the module export binding slots with the given value.</p>
 
 <pre class="with-30-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> vm <span class="hljs-keyword">from</span> <span class="hljs-string">'node:vm'</span>;
 
@@ -1370,7 +1486,6 @@ will be thrown.</p>
   m.<span class="hljs-title function_">setExport</span>(<span class="hljs-string">'x'</span>, <span class="hljs-number">1</span>);
 });
 
-<span class="hljs-keyword">await</span> m.<span class="hljs-title function_">link</span>(<span class="hljs-function">() =></span> {});
 <span class="hljs-keyword">await</span> m.<span class="hljs-title function_">evaluate</span>();
 
 assert.<span class="hljs-title function_">strictEqual</span>(m.<span class="hljs-property">namespace</span>.<span class="hljs-property">x</span>, <span class="hljs-number">1</span>);</code><code class="language-js cjs"><span class="hljs-keyword">const</span> vm = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:vm'</span>);
@@ -1378,7 +1493,6 @@ assert.<span class="hljs-title function_">strictEqual</span>(m.<span class="hljs
   <span class="hljs-keyword">const</span> m = <span class="hljs-keyword">new</span> vm.<span class="hljs-title class_">SyntheticModule</span>([<span class="hljs-string">'x'</span>], <span class="hljs-function">() =></span> {
     m.<span class="hljs-title function_">setExport</span>(<span class="hljs-string">'x'</span>, <span class="hljs-number">1</span>);
   });
-  <span class="hljs-keyword">await</span> m.<span class="hljs-title function_">link</span>(<span class="hljs-function">() =></span> {});
   <span class="hljs-keyword">await</span> m.<span class="hljs-title function_">evaluate</span>();
   assert.<span class="hljs-title function_">strictEqual</span>(m.<span class="hljs-property">namespace</span>.<span class="hljs-property">x</span>, <span class="hljs-number">1</span>);
 })();</code><button class="copy-button">copy</button></pre>
@@ -2062,6 +2176,57 @@ also be able to escape the timeout.</p>
 inside a <code>vm.Context</code>, functions passed to them will be added to global queues,
 which are shared by all contexts. Therefore, callbacks passed to those functions
 are not controllable through the timeout either.</p>
+<div>
+<h4>When <code>microtaskMode</code> is <code>'afterEvaluate'</code>, beware sharing Promises between Contexts<span><a class="mark" href="#when-microtaskmode-is-afterevaluate-beware-sharing-promises-between-contexts" id="when-microtaskmode-is-afterevaluate-beware-sharing-promises-between-contexts">#</a></span><a aria-hidden="true" class="legacy" id="vm_when_microtaskmode_is_afterevaluate_beware_sharing_promises_between_contexts"></a></h4>
+<p>In <code>'afterEvaluate'</code> mode, the <code>Context</code> has its own microtask queue, separate
+from the global microtask queue used by the outer (main) context. While this
+mode is necessary to enforce <code>timeout</code> and enable <code>breakOnSigint</code> with
+asynchronous tasks, it also makes sharing promises between contexts challenging.</p>
+<p>In the example below, a promise is created in the inner context and shared with
+the outer context. When the outer context <code>await</code> on the promise, the execution
+flow of the outer context is disrupted in a surprising way: the log statement
+is never executed.</p>
+<pre><code class="language-js mjs"><span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> vm <span class="hljs-keyword">from</span> <span class="hljs-string">'node:vm'</span>;
+
+<span class="hljs-keyword">const</span> inner_context = vm.<span class="hljs-title function_">createContext</span>({}, { <span class="hljs-attr">microtaskMode</span>: <span class="hljs-string">'afterEvaluate'</span> });
+
+<span class="hljs-comment">// runInContext() returns a Promise created in the inner context.</span>
+<span class="hljs-keyword">const</span> inner_promise = vm.<span class="hljs-title function_">runInContext</span>(
+  <span class="hljs-string">'Promise.resolve()'</span>,
+  context,
+);
+
+<span class="hljs-comment">// As part of performing `await`, the JavaScript runtime must enqueue a task</span>
+<span class="hljs-comment">// on the microtask queue of the context where `inner_promise` was created.</span>
+<span class="hljs-comment">// A task is added on the inner microtask queue, but **it will not be run</span>
+<span class="hljs-comment">// automatically**: this task will remain pending indefinitely.</span>
+<span class="hljs-comment">//</span>
+<span class="hljs-comment">// Since the outer microtask queue is empty, execution in the outer module</span>
+<span class="hljs-comment">// falls through, and the log statement below is never executed.</span>
+<span class="hljs-keyword">await</span> inner_promise;
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'this will NOT be printed'</span>);</code> <button class="copy-button">copy</button></pre>
+<p>To successfully share promises between contexts with different microtask queues,
+it is necessary to ensure that tasks on the inner microtask queue will be run
+<strong>whenever</strong> the outer context enqueues a task on the inner microtask queue.</p>
+<p>The tasks on the microtask queue of a given context are run whenever
+<code>runInContext()</code> or <code>SourceTextModule.evaluate()</code> are invoked on a script or
+module using this context. In our example, the normal execution flow can be
+restored by scheduling a second call to <code>runInContext()</code> <em>before</em> <code>await inner_promise</code>.</p>
+<pre><code class="language-js mjs"><span class="hljs-comment">// Schedule `runInContext()` to manually drain the inner context microtask</span>
+<span class="hljs-comment">// queue; it will run after the `await` statement below.</span>
+<span class="hljs-title function_">setImmediate</span>(<span class="hljs-function">() =></span> {
+  vm.<span class="hljs-title function_">runInContext</span>(<span class="hljs-string">''</span>, context);
+});
+
+<span class="hljs-keyword">await</span> inner_promise;
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'OK'</span>);</code> <button class="copy-button">copy</button></pre>
+<p><strong>Note:</strong> Strictly speaking, in this mode, <code>node:vm</code> departs from the letter of
+the ECMAScript specification for <a href="https://tc39.es/ecma262/#sec-hostenqueuepromisejob">enqueing jobs</a>, by allowing asynchronous
+tasks from different contexts to run in a different order than they were
+enqueued.</p>
+</div>
 </section><section><h3>Support of dynamic <code>import()</code> in compilation APIs<span><a class="mark" href="#support-of-dynamic-import-in-compilation-apis" id="support-of-dynamic-import-in-compilation-apis">#</a></span><a aria-hidden="true" class="legacy" id="vm_support_of_dynamic_import_in_compilation_apis"></a></h3>
 <p>The following APIs support an <code>importModuleDynamically</code> option to enable dynamic
 <code>import()</code> in code compiled by the vm module.</p>

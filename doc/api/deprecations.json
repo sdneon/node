@@ -1334,7 +1334,7 @@
                   }
                 ]
               },
-              "desc": "<p>Type: End-of-Life</p>\n<p>The <code>util.isDate()</code> API has been removed. Please use\n<code>arg instanceof Date</code> instead.</p>",
+              "desc": "<p>Type: End-of-Life</p>\n<p>The <code>util.isDate()</code> API has been removed. Please use\n<code>arg instanceof Date</code> instead.</p>\n<p>Also for stronger approaches, consider using:\n<code>Date.prototype.toString.call(arg) === '[object Date]' &#x26;&#x26; !isNaN(arg)</code>.\nThis can also be used in a <code>try/catch</code> block to handle invalid date objects.</p>",
               "type": "module",
               "displayName": "DEP0047: `util.isDate()`"
             },
@@ -1371,7 +1371,7 @@
                   }
                 ]
               },
-              "desc": "<p>Type: End-of-Life</p>\n<p>The <code>util.isError()</code> API has been removed. Please use\n<code>Object.prototype.toString(arg) === '[object Error]' || arg instanceof Error</code>\ninstead.</p>",
+              "desc": "<p>Type: End-of-Life</p>\n<p>The <code>util.isError()</code> API has been removed. Please use <code>Error.isError(arg)</code>.</p>",
               "type": "module",
               "displayName": "DEP0048: `util.isError()`"
             },
@@ -1593,7 +1593,7 @@
                   }
                 ]
               },
-              "desc": "<p>Type: End-of-Life</p>\n<p>The <code>util.isPrimitive()</code> API has been removed. Please use\n<code>arg === null || (typeof arg !=='object' &#x26;&#x26; typeof arg !== 'function')</code>\ninstead.</p>",
+              "desc": "<p>Type: End-of-Life</p>\n<p>The <code>util.isPrimitive()</code> API has been removed. Please use <code>Object(arg) !== arg</code> instead.</p>",
               "type": "module",
               "displayName": "DEP0054: `util.isPrimitive()`"
             },
@@ -3875,6 +3875,11 @@
               "meta": {
                 "changes": [
                   {
+                    "version": "v24.8.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/59758",
+                    "description": "Deprecation revoked."
+                  },
+                  {
                     "version": [
                       "v18.7.0",
                       "v16.17.0"
@@ -3884,7 +3889,7 @@
                   }
                 ]
               },
-              "desc": "<p>Type: Documentation-only</p>\n<p>These methods were deprecated because they can be used in a way which does not\nhold the channel reference alive long enough to receive the events.</p>\n<p>Use <a href=\"diagnostics_channel.html#diagnostics_channelsubscribename-onmessage\"><code>diagnostics_channel.subscribe(name, onMessage)</code></a> or\n<a href=\"diagnostics_channel.html#diagnostics_channelunsubscribename-onmessage\"><code>diagnostics_channel.unsubscribe(name, onMessage)</code></a> which does the same\nthing instead.</p>",
+              "desc": "<p>Type: Deprecation revoked</p>\n<p>These methods were deprecated because their use could leave the channel object\nvulnerable to being garbage-collected if not strongly referenced by the user.\nThe deprecation was revoked because channel objects are now resistant to\ngarbage collection when the channel has active subscribers.</p>",
               "type": "module",
               "displayName": "DEP0163: `channel.subscribe(onMessage)`, `channel.unsubscribe(onMessage)`"
             },
@@ -4634,6 +4639,22 @@
               "desc": "<p>Type: Documentation-only</p>\n<p>The <code>node:_http_agent</code>, <code>node:_http_client</code>, <code>node:_http_common</code>, <code>node:_http_incoming</code>,\n<code>node:_http_outgoing</code> and <code>node:_http_server</code> modules are deprecated as they should be considered\nan internal nodejs implementation rather than a public facing API, use <code>node:http</code> instead.</p>",
               "type": "module",
               "displayName": "DEP0199: `require('node:_http_*')`"
+            },
+            {
+              "textRaw": "DEP0200: Closing fs.Dir on garbage collection",
+              "name": "dep0200:_closing_fs.dir_on_garbage_collection",
+              "meta": {
+                "changes": [
+                  {
+                    "version": "v24.9.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/59839",
+                    "description": "Documentation-only deprecation."
+                  }
+                ]
+              },
+              "desc": "<p>Type: Documentation-only</p>\n<p>Allowing a <a href=\"fs.html#class-fsdir\"><code>fs.Dir</code></a> object to be closed on garbage collection is\ndeprecated. In the future, doing so might result in a thrown error that will\nterminate the process.</p>\n<p>Please ensure that all <code>fs.Dir</code> objects are explicitly closed using\n<code>Dir.prototype.close()</code> or <code>using</code> keyword:</p>\n<pre><code class=\"language-mjs\">import { opendir } from 'node:fs/promises';\n\n{\n  await using dir = await opendir('/async/disposable/directory');\n} // Closed by dir[Symbol.asyncDispose]()\n\n{\n  using dir = await opendir('/sync/disposable/directory');\n} // Closed by dir[Symbol.dispose]()\n\n{\n  const dir = await opendir('/unconditionally/iterated/directory');\n  for await (const entry of dir) {\n    // process an entry\n  } // Closed by iterator\n}\n\n{\n  let dir;\n  try {\n    dir = await opendir('/legacy/closeable/directory');\n  } finally {\n    await dir?.close();\n  }\n}\n</code></pre>",
+              "type": "module",
+              "displayName": "DEP0200: Closing fs.Dir on garbage collection"
             }
           ],
           "type": "misc",

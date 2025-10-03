@@ -3096,7 +3096,7 @@ is drained immediately after.
 
 So in CJS modules `process.nextTick()` callbacks are always run before `queueMicrotask()` ones.
 However since ESM modules are processed already as part of the microtask queue, there
-`queueMicrotask()` callbacks are always exectued before `process.nextTick()` ones since Node.js
+`queueMicrotask()` callbacks are always executed before `process.nextTick()` ones since Node.js
 is already in the process of draining the microtask queue.
 
 ```mjs
@@ -3725,7 +3725,7 @@ added: v12.6.0
   * `systemCPUTime` {integer} maps to `ru_stime` computed in microseconds.
     It is the same value as [`process.cpuUsage().system`][process.cpuUsage].
   * `maxRSS` {integer} maps to `ru_maxrss` which is the maximum resident set
-    size used in kilobytes.
+    size used in kibibytes (1024 bytes).
   * `sharedMemorySize` {integer} maps to `ru_ixrss` but is not supported by
     any platform.
   * `unsharedDataSize` {integer} maps to `ru_idrss` but is not supported by

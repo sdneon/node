@@ -21,7 +21,7 @@
       },
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.6.0/lib/test.js\">lib/test.js</a></p>\n<p>The <code>node:test</code> module facilitates the creation of JavaScript tests.\nTo access it:</p>\n<pre><code class=\"language-mjs\">import test from 'node:test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('node:test');\n</code></pre>\n<p>This module is only available under the <code>node:</code> scheme.</p>\n<p>Tests created via the <code>test</code> module consist of a single function that is\nprocessed in one of three ways:</p>\n<ol>\n<li>A synchronous function that is considered failing if it throws an exception,\nand is considered passing otherwise.</li>\n<li>A function that returns a <code>Promise</code> that is considered failing if the\n<code>Promise</code> rejects, and is considered passing if the <code>Promise</code> fulfills.</li>\n<li>A function that receives a callback function. If the callback receives any\ntruthy value as its first argument, the test is considered failing. If a\nfalsy value is passed as the first argument to the callback, the test is\nconsidered passing. If the test function receives a callback function and\nalso returns a <code>Promise</code>, the test will fail.</li>\n</ol>\n<p>The following example illustrates how tests are written using the\n<code>test</code> module.</p>\n<pre><code class=\"language-js\">test('synchronous passing test', (t) => {\n  // This test passes because it does not throw an exception.\n  assert.strictEqual(1, 1);\n});\n\ntest('synchronous failing test', (t) => {\n  // This test fails because it throws an exception.\n  assert.strictEqual(1, 2);\n});\n\ntest('asynchronous passing test', async (t) => {\n  // This test passes because the Promise returned by the async\n  // function is settled and not rejected.\n  assert.strictEqual(1, 1);\n});\n\ntest('asynchronous failing test', async (t) => {\n  // This test fails because the Promise returned by the async\n  // function is rejected.\n  assert.strictEqual(1, 2);\n});\n\ntest('failing test using Promises', (t) => {\n  // Promises can be used directly as well.\n  return new Promise((resolve, reject) => {\n    setImmediate(() => {\n      reject(new Error('this will cause the test to fail'));\n    });\n  });\n});\n\ntest('callback passing test', (t, done) => {\n  // done() is the callback function. When the setImmediate() runs, it invokes\n  // done() with no arguments.\n  setImmediate(done);\n});\n\ntest('callback failing test', (t, done) => {\n  // When the setImmediate() runs, done() is invoked with an Error object and\n  // the test fails.\n  setImmediate(() => {\n    done(new Error('callback failure'));\n  });\n});\n</code></pre>\n<p>If any tests fail, the process exit code is set to <code>1</code>.</p>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.9.0/lib/test.js\">lib/test.js</a></p>\n<p>The <code>node:test</code> module facilitates the creation of JavaScript tests.\nTo access it:</p>\n<pre><code class=\"language-mjs\">import test from 'node:test';\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('node:test');\n</code></pre>\n<p>This module is only available under the <code>node:</code> scheme.</p>\n<p>Tests created via the <code>test</code> module consist of a single function that is\nprocessed in one of three ways:</p>\n<ol>\n<li>A synchronous function that is considered failing if it throws an exception,\nand is considered passing otherwise.</li>\n<li>A function that returns a <code>Promise</code> that is considered failing if the\n<code>Promise</code> rejects, and is considered passing if the <code>Promise</code> fulfills.</li>\n<li>A function that receives a callback function. If the callback receives any\ntruthy value as its first argument, the test is considered failing. If a\nfalsy value is passed as the first argument to the callback, the test is\nconsidered passing. If the test function receives a callback function and\nalso returns a <code>Promise</code>, the test will fail.</li>\n</ol>\n<p>The following example illustrates how tests are written using the\n<code>test</code> module.</p>\n<pre><code class=\"language-js\">test('synchronous passing test', (t) => {\n  // This test passes because it does not throw an exception.\n  assert.strictEqual(1, 1);\n});\n\ntest('synchronous failing test', (t) => {\n  // This test fails because it throws an exception.\n  assert.strictEqual(1, 2);\n});\n\ntest('asynchronous passing test', async (t) => {\n  // This test passes because the Promise returned by the async\n  // function is settled and not rejected.\n  assert.strictEqual(1, 1);\n});\n\ntest('asynchronous failing test', async (t) => {\n  // This test fails because the Promise returned by the async\n  // function is rejected.\n  assert.strictEqual(1, 2);\n});\n\ntest('failing test using Promises', (t) => {\n  // Promises can be used directly as well.\n  return new Promise((resolve, reject) => {\n    setImmediate(() => {\n      reject(new Error('this will cause the test to fail'));\n    });\n  });\n});\n\ntest('callback passing test', (t, done) => {\n  // done() is the callback function. When the setImmediate() runs, it invokes\n  // done() with no arguments.\n  setImmediate(done);\n});\n\ntest('callback failing test', (t, done) => {\n  // When the setImmediate() runs, done() is invoked with an Error object and\n  // the test fails.\n  setImmediate(() => {\n    done(new Error('callback failure'));\n  });\n});\n</code></pre>\n<p>If any tests fail, the process exit code is set to <code>1</code>.</p>",
       "modules": [
         {
           "textRaw": "Subtests",
@@ -36,6 +36,13 @@
           "desc": "<p>Individual tests can be skipped by passing the <code>skip</code> option to the test, or by\ncalling the test context's <code>skip()</code> method as shown in the\nfollowing example.</p>\n<pre><code class=\"language-js\">// The skip option is used, but no message is provided.\ntest('skip option', { skip: true }, (t) => {\n  // This code is never executed.\n});\n\n// The skip option is used, and a message is provided.\ntest('skip option with message', { skip: 'this is skipped' }, (t) => {\n  // This code is never executed.\n});\n\ntest('skip() method', (t) => {\n  // Make sure to return here as well if the test contains additional logic.\n  t.skip();\n});\n\ntest('skip() method with message', (t) => {\n  // Make sure to return here as well if the test contains additional logic.\n  t.skip('this is skipped');\n});\n</code></pre>",
           "type": "module",
           "displayName": "Skipping tests"
+        },
+        {
+          "textRaw": "Rerunning failed tests",
+          "name": "rerunning_failed_tests",
+          "desc": "<p>The test runner supports persisting the state of the run to a file, allowing\nthe test runner to rerun failed tests without having to re-run the entire test suite.\nUse the <a href=\"cli.html#--test-rerun-failures\"><code>--test-rerun-failures</code></a> command-line option to specify a file path where the\nstate of the run is stored. if the state file does not exist, the test runner will\ncreate it.\nthe state file is a JSON file that contains an array of run attempts.\nEach run attempt is an object mapping successful tests to the attempt they have passed in.\nThe key identifying a test in this map is the test file path, with the line and column where the test is defined.\nin a case where a test defined in a specific location is run multiple times,\nfor example within a function or a loop,\na counter will be appended to the key, to disambiguate the test runs.\nnote changing the order of test execution or the location of a test can lead the test runner\nto consider tests as passed on a previous attempt,\nmeaning <code>--test-rerun-failures</code> should be used when tests run in a deterministic order.</p>\n<p>example of a state file:</p>\n<pre><code class=\"language-json\">[\n  {\n    \"test.js:10:5\": { \"passed_on_attempt\": 0, \"name\": \"test 1\" },\n  },\n  {\n    \"test.js:10:5\": { \"passed_on_attempt\": 0, \"name\": \"test 1\" },\n    \"test.js:20:5\": { \"passed_on_attempt\": 1, \"name\": \"test 2\" }\n  }\n]\n</code></pre>\n<p>in this example, there are two run attempts, with two tests defined in <code>test.js</code>,\nthe first test succeeded on the first attempt, and the second test succeeded on the second attempt.</p>\n<p>When the <code>--test-rerun-failures</code> option is used, the test runner will only run tests that have not yet passed.</p>\n<pre><code class=\"language-bash\">node --test-rerun-failures /path/to/state/file\n</code></pre>",
+          "type": "module",
+          "displayName": "Rerunning failed tests"
         },
         {
           "textRaw": "TODO tests",
@@ -112,6 +119,15 @@
               "textRaw": "Test runner execution model",
               "name": "test_runner_execution_model",
               "desc": "<p>When process-level test isolation is enabled, each matching test file is\nexecuted in a separate child process. The maximum number of child processes\nrunning at any time is controlled by the <a href=\"cli.html#--test-concurrency\"><code>--test-concurrency</code></a> flag. If the\nchild process finishes with an exit code of 0, the test is considered passing.\nOtherwise, the test is considered to be a failure. Test files must be executable\nby Node.js, but are not required to use the <code>node:test</code> module internally.</p>\n<p>Each test file is executed as if it was a regular script. That is, if the test\nfile itself uses <code>node:test</code> to define tests, all of those tests will be\nexecuted within a single application thread, regardless of the value of the\n<code>concurrency</code> option of <a href=\"#testname-options-fn\"><code>test()</code></a>.</p>\n<p>When process-level test isolation is disabled, each matching test file is\nimported into the test runner process. Once all test files have been loaded, the\ntop level tests are executed with a concurrency of one. Because the test files\nare all run within the same context, it is possible for tests to interact with\neach other in ways that are not possible when isolation is enabled. For example,\nif a test relies on global state, it is possible for that state to be modified\nby a test originating from another file.</p>",
+              "modules": [
+                {
+                  "textRaw": "Child process option inheritance",
+                  "name": "child_process_option_inheritance",
+                  "desc": "<p>When running tests in process isolation mode (the default), spawned child processes\ninherit Node.js options from the parent process, including those specified in\n<a href=\"cli.html#--experimental-config-fileconfig\">configuration files</a>. However, certain flags are filtered out to enable proper\ntest runner functionality:</p>\n<ul>\n<li><code>--test</code> - Prevented to avoid recursive test execution</li>\n<li><code>--experimental-test-coverage</code> - Managed by the test runner</li>\n<li><code>--watch</code> - Watch mode is handled at the parent level</li>\n<li><code>--experimental-default-config-file</code> - Config file loading is handled by the parent</li>\n<li><code>--test-reporter</code> - Reporting is managed by the parent process</li>\n<li><code>--test-reporter-destination</code> - Output destinations are controlled by the parent</li>\n<li><code>--experimental-config-file</code> - Config file paths are managed by the parent</li>\n</ul>\n<p>All other Node.js options from command line arguments, environment variables,\nand configuration files are inherited by the child processes.</p>",
+                  "type": "module",
+                  "displayName": "Child process option inheritance"
+                }
+              ],
               "type": "module",
               "displayName": "Test runner execution model"
             }
@@ -333,6 +349,11 @@
             ],
             "changes": [
               {
+                "version": "v24.7.0",
+                "pr-url": "https://github.com/nodejs/node/pull/59443",
+                "description": "Added a rerunFailuresFilePath option."
+              },
+              {
                 "version": "v23.0.0",
                 "pr-url": "https://github.com/nodejs/node/pull/54705",
                 "description": "Added the `cwd` option."
@@ -517,6 +538,13 @@
                           "desc": "is a positive integer that specifies the total number of shards to split the test files to. This option is _required_."
                         }
                       ]
+                    },
+                    {
+                      "textRaw": "`rerunFailuresFilePath` {string} A file path where the test runner will store the state of the tests to allow rerunning only the failed tests on a next run. see \\[Rerunning failed tests]\\[] for more information. **Default:** `undefined`.",
+                      "name": "rerunFailuresFilePath",
+                      "type": "string",
+                      "default": "`undefined`",
+                      "desc": "A file path where the test runner will store the state of the tests to allow rerunning only the failed tests on a next run. see \\[Rerunning failed tests]\\[] for more information."
                     },
                     {
                       "textRaw": "`coverage` {boolean} enable [code coverage][] collection. **Default:** `false`.",
@@ -2500,6 +2528,12 @@
                           "name": "type",
                           "type": "string|undefined",
                           "desc": "The type of the test, used to denote whether this is a suite."
+                        },
+                        {
+                          "textRaw": "`attempt` {number|undefined} The attempt number of the test run, present only when using the [`--test-rerun-failures`][] flag.",
+                          "name": "attempt",
+                          "type": "number|undefined",
+                          "desc": "The attempt number of the test run, present only when using the [`--test-rerun-failures`][] flag."
                         }
                       ]
                     },
@@ -2583,6 +2617,18 @@
                           "name": "type",
                           "type": "string|undefined",
                           "desc": "The type of the test, used to denote whether this is a suite."
+                        },
+                        {
+                          "textRaw": "`attempt` {number|undefined} The attempt number of the test run, present only when using the [`--test-rerun-failures`][] flag.",
+                          "name": "attempt",
+                          "type": "number|undefined",
+                          "desc": "The attempt number of the test run, present only when using the [`--test-rerun-failures`][] flag."
+                        },
+                        {
+                          "textRaw": "`passed_on_attempt` {number|undefined} The attempt number the test passed on, present only when using the [`--test-rerun-failures`][] flag.",
+                          "name": "passed_on_attempt",
+                          "type": "number|undefined",
+                          "desc": "The attempt number the test passed on, present only when using the [`--test-rerun-failures`][] flag."
                         }
                       ]
                     },

@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v24.6.0">
-  <title>Worker threads | Node.js v24.6.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v24.9.0">
+  <title>Worker threads | Node.js v24.9.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -112,7 +112,7 @@
     <div id="column1" data-id="worker_threads" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v24.6.0 documentation</h1>
+          <h1>Node.js v24.9.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -127,7 +127,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v24.6.0</li>
+            <li class="pinned-header">Node.js v24.9.0</li>
             
     <li class="picker-header">
       <a href="#toc-picker" aria-controls="toc-picker">
@@ -219,6 +219,8 @@
 <li><a href="#workerpostmessagevalue-transferlist"><code>worker.postMessage(value[, transferList])</code></a></li>
 <li><a href="#workerref"><code>worker.ref()</code></a></li>
 <li><a href="#workerresourcelimits_1"><code>worker.resourceLimits</code></a></li>
+<li><a href="#workerstartcpuprofile"><code>worker.startCpuProfile()</code></a></li>
+<li><a href="#workerstartheapprofile"><code>worker.startHeapProfile()</code></a></li>
 <li><a href="#workerstderr"><code>worker.stderr</code></a></li>
 <li><a href="#workerstdin"><code>worker.stdin</code></a></li>
 <li><a href="#workerstdout"><code>worker.stdout</code></a></li>
@@ -457,6 +459,8 @@
 <li><a href="#workerpostmessagevalue-transferlist"><code>worker.postMessage(value[, transferList])</code></a></li>
 <li><a href="#workerref"><code>worker.ref()</code></a></li>
 <li><a href="#workerresourcelimits_1"><code>worker.resourceLimits</code></a></li>
+<li><a href="#workerstartcpuprofile"><code>worker.startCpuProfile()</code></a></li>
+<li><a href="#workerstartheapprofile"><code>worker.startHeapProfile()</code></a></li>
 <li><a href="#workerstderr"><code>worker.stderr</code></a></li>
 <li><a href="#workerstdin"><code>worker.stdin</code></a></li>
 <li><a href="#workerstdout"><code>worker.stdout</code></a></li>
@@ -481,7 +485,7 @@
         <h2>Worker threads<span><a class="mark" href="#worker-threads" id="worker-threads">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_threads"></a></h2>
 
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v24.6.0/lib/worker_threads.js">lib/worker_threads.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v24.9.0/lib/worker_threads.js">lib/worker_threads.js</a></p>
 <p>The <code>node:worker_threads</code> module enables the use of threads that execute
 JavaScript in parallel. To access it:</p>
 
@@ -2130,6 +2134,76 @@ no effect.</p>
 If the <code>resourceLimits</code> option was passed to the <a href="#class-worker"><code>Worker</code></a> constructor,
 this matches its values.</p>
 <p>If the worker has stopped, the return value is an empty object.</p>
+</div><div>
+<h4><code>worker.startCpuProfile()</code><span><a class="mark" href="#workerstartcpuprofile" id="workerstartcpuprofile">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_startcpuprofile"></a></h4>
+<div class="api_metadata">
+<span>Added in: v24.8.0</span>
+</div>
+<ul>
+<li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" class="type">&#x3C;Promise></a></li>
+</ul>
+<p>Starting a CPU profile then return a Promise that fulfills with an error
+or an <code>CPUProfileHandle</code> object. This API supports <code>await using</code> syntax.</p>
+<pre><code class="language-js cjs"><span class="hljs-keyword">const</span> { <span class="hljs-title class_">Worker</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:worker_threads'</span>);
+
+<span class="hljs-keyword">const</span> worker = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Worker</span>(<span class="hljs-string">`
+  const { parentPort } = require('worker_threads');
+  parentPort.on('message', () => {});
+  `</span>, { <span class="hljs-attr">eval</span>: <span class="hljs-literal">true</span> });
+
+worker.<span class="hljs-title function_">on</span>(<span class="hljs-string">'online'</span>, <span class="hljs-title function_">async</span> () => {
+  <span class="hljs-keyword">const</span> handle = <span class="hljs-keyword">await</span> worker.<span class="hljs-title function_">startCpuProfile</span>();
+  <span class="hljs-keyword">const</span> profile = <span class="hljs-keyword">await</span> handle.<span class="hljs-title function_">stop</span>();
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(profile);
+  worker.<span class="hljs-title function_">terminate</span>();
+});</code> <button class="copy-button">copy</button></pre>
+<p><code>await using</code> example.</p>
+<pre><code class="language-js cjs"><span class="hljs-keyword">const</span> { <span class="hljs-title class_">Worker</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node::worker_threads'</span>);
+
+<span class="hljs-keyword">const</span> w = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Worker</span>(<span class="hljs-string">`
+  const { parentPort } = require('worker_threads');
+  parentPort.on('message', () => {});
+  `</span>, { <span class="hljs-attr">eval</span>: <span class="hljs-literal">true</span> });
+
+w.<span class="hljs-title function_">on</span>(<span class="hljs-string">'online'</span>, <span class="hljs-title function_">async</span> () => {
+  <span class="hljs-comment">// Stop profile automatically when return and profile will be discarded</span>
+  <span class="hljs-keyword">await</span> <span class="hljs-keyword">using</span> handle = <span class="hljs-keyword">await</span> w.<span class="hljs-title function_">startCpuProfile</span>();
+});</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>worker.startHeapProfile()</code><span><a class="mark" href="#workerstartheapprofile" id="workerstartheapprofile">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_startheapprofile"></a></h4>
+<div class="api_metadata">
+<span>Added in: v24.9.0</span>
+</div>
+<ul>
+<li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" class="type">&#x3C;Promise></a></li>
+</ul>
+<p>Starting a Heap profile then return a Promise that fulfills with an error
+or an <code>HeapProfileHandle</code> object. This API supports <code>await using</code> syntax.</p>
+<pre><code class="language-js cjs"><span class="hljs-keyword">const</span> { <span class="hljs-title class_">Worker</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:worker_threads'</span>);
+
+<span class="hljs-keyword">const</span> worker = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Worker</span>(<span class="hljs-string">`
+  const { parentPort } = require('worker_threads');
+  parentPort.on('message', () => {});
+  `</span>, { <span class="hljs-attr">eval</span>: <span class="hljs-literal">true</span> });
+
+worker.<span class="hljs-title function_">on</span>(<span class="hljs-string">'online'</span>, <span class="hljs-title function_">async</span> () => {
+  <span class="hljs-keyword">const</span> handle = <span class="hljs-keyword">await</span> worker.<span class="hljs-title function_">startHeapProfile</span>();
+  <span class="hljs-keyword">const</span> profile = <span class="hljs-keyword">await</span> handle.<span class="hljs-title function_">stop</span>();
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(profile);
+  worker.<span class="hljs-title function_">terminate</span>();
+});</code> <button class="copy-button">copy</button></pre>
+<p><code>await using</code> example.</p>
+<pre><code class="language-js cjs"><span class="hljs-keyword">const</span> { <span class="hljs-title class_">Worker</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node::worker_threads'</span>);
+
+<span class="hljs-keyword">const</span> w = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Worker</span>(<span class="hljs-string">`
+  const { parentPort } = require('worker_threads');
+  parentPort.on('message', () => {});
+  `</span>, { <span class="hljs-attr">eval</span>: <span class="hljs-literal">true</span> });
+
+w.<span class="hljs-title function_">on</span>(<span class="hljs-string">'online'</span>, <span class="hljs-title function_">async</span> () => {
+  <span class="hljs-comment">// Stop profile automatically when return and profile will be discarded</span>
+  <span class="hljs-keyword">await</span> <span class="hljs-keyword">using</span> handle = <span class="hljs-keyword">await</span> w.<span class="hljs-title function_">startHeapProfile</span>();
+});</code> <button class="copy-button">copy</button></pre>
 </div><div>
 <h4><code>worker.stderr</code><span><a class="mark" href="#workerstderr" id="workerstderr">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_stderr"></a></h4>
 <div class="api_metadata">

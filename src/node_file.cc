@@ -1565,12 +1565,12 @@ static void Unlink(const FunctionCallbackInfo<Value>& args) {
 
   if (argc > 1) {  // unlink(path, req)
     FSReqBase* req_wrap_async = GetReqWrap(args, 1);
+    CHECK_NOT_NULL(req_wrap_async);
     ASYNC_THROW_IF_INSUFFICIENT_PERMISSIONS(
         env,
         req_wrap_async,
         permission::PermissionScope::kFileSystemWrite,
         path.ToStringView());
-    CHECK_NOT_NULL(req_wrap_async);
     FS_ASYNC_TRACE_BEGIN1(
         UV_FS_UNLINK, req_wrap_async, "path", TRACE_STR_COPY(*path))
     AsyncCall(env, req_wrap_async, args, "unlink", UTF8, AfterNoArgs,
@@ -1994,7 +1994,7 @@ static void ReadDir(const FunctionCallbackInfo<Value>& args) {
   ToNamespacedPath(env, &path);
 
 #ifdef _WIN32
-  if (slashCheck) {
+  if (slashCheck && !path.ToStringView().ends_with("\\")) {
     size_t new_length = path.length() + 1;
     path.AllocateSufficientStorage(new_length + 1);
     path.SetLengthAndZeroTerminate(new_length);
@@ -3251,8 +3251,8 @@ static void CpSyncCheckPaths(const FunctionCallbackInfo<Value>& args) {
         errorno, dereference ? "stat" : "lstat", nullptr, src.out());
   }
   auto dest_status =
-      dereference ? std::filesystem::symlink_status(dest_path, error_code)
-                  : std::filesystem::status(dest_path, error_code);
+      dereference ? std::filesystem::status(dest_path, error_code)
+                  : std::filesystem::symlink_status(dest_path, error_code);
 
   bool dest_exists = !error_code && dest_status.type() !=
                                         std::filesystem::file_type::not_found;
@@ -3276,7 +3276,7 @@ static void CpSyncCheckPaths(const FunctionCallbackInfo<Value>& args) {
       std::string message =
           "Cannot overwrite non-directory %s with directory %s";
       return THROW_ERR_FS_CP_DIR_TO_NON_DIR(
-          env, message.c_str(), src_path_str, dest_path_str);
+          env, message.c_str(), dest_path_str, src_path_str);
     }
 
     if (!src_is_dir && dest_is_dir) {

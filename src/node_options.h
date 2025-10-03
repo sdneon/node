@@ -197,6 +197,7 @@ class EnvironmentOptions : public Options {
   bool test_runner_update_snapshots = false;
   std::vector<std::string> test_name_pattern;
   std::vector<std::string> test_reporter;
+  std::string test_rerun_failures_path;
   std::vector<std::string> test_reporter_destination;
   std::string test_global_setup_path;
   bool test_only = false;
@@ -649,6 +650,8 @@ class OptionsParser {
       std::string namespace_name);
   friend std::vector<std::string> MapAvailableNamespaces();
   friend void GetEnvOptionsInputType(
+      const v8::FunctionCallbackInfo<v8::Value>& args);
+  friend void GetOptionsAsFlags(
       const v8::FunctionCallbackInfo<v8::Value>& args);
 };
 

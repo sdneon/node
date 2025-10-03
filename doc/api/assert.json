@@ -8,7 +8,7 @@
       "introduced_in": "v0.1.21",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.6.0/lib/assert.js\">lib/assert.js</a></p>\n<p>The <code>node:assert</code> module provides a set of assertion functions for verifying\ninvariants.</p>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.9.0/lib/assert.js\">lib/assert.js</a></p>\n<p>The <code>node:assert</code> module provides a set of assertion functions for verifying\ninvariants.</p>",
       "modules": [
         {
           "textRaw": "Strict assertion mode",
@@ -142,11 +142,17 @@
                       "name": "strict",
                       "type": "boolean",
                       "desc": "If set to `true`, non-strict methods behave like their corresponding strict methods. Defaults to `true`."
+                    },
+                    {
+                      "textRaw": "`skipPrototype` {boolean} If set to `true`, skips prototype and constructor comparison in deep equality checks. Defaults to `false`.",
+                      "name": "skipPrototype",
+                      "type": "boolean",
+                      "desc": "If set to `true`, skips prototype and constructor comparison in deep equality checks. Defaults to `false`."
                     }
                   ]
                 }
               ],
-              "desc": "<p>Creates a new assertion instance. The <code>diff</code> option controls the verbosity of diffs in assertion error messages.</p>\n<pre><code class=\"language-js\">const { Assert } = require('node:assert');\nconst assertInstance = new Assert({ diff: 'full' });\nassertInstance.deepStrictEqual({ a: 1 }, { a: 2 });\n// Shows a full diff in the error message.\n</code></pre>\n<p><strong>Important</strong>: When destructuring assertion methods from an <code>Assert</code> instance,\nthe methods lose their connection to the instance's configuration options (such as <code>diff</code> and <code>strict</code> settings).\nThe destructured methods will fall back to default behavior instead.</p>\n<pre><code class=\"language-js\">const myAssert = new Assert({ diff: 'full' });\n\n// This works as expected - uses 'full' diff\nmyAssert.strictEqual({ a: 1 }, { b: { c: 1 } });\n\n// This loses the 'full' diff setting - falls back to default 'simple' diff\nconst { strictEqual } = myAssert;\nstrictEqual({ a: 1 }, { b: { c: 1 } });\n</code></pre>\n<p>When destructured, methods lose access to the instance's <code>this</code> context and revert to default assertion behavior\n(diff: 'simple', non-strict mode).\nTo maintain custom options when using destructured methods, avoid\ndestructuring and call methods directly on the instance.</p>"
+              "desc": "<p>Creates a new assertion instance. The <code>diff</code> option controls the verbosity of diffs in assertion error messages.</p>\n<pre><code class=\"language-js\">const { Assert } = require('node:assert');\nconst assertInstance = new Assert({ diff: 'full' });\nassertInstance.deepStrictEqual({ a: 1 }, { a: 2 });\n// Shows a full diff in the error message.\n</code></pre>\n<p><strong>Important</strong>: When destructuring assertion methods from an <code>Assert</code> instance,\nthe methods lose their connection to the instance's configuration options (such\nas <code>diff</code>, <code>strict</code>, and <code>skipPrototype</code> settings).\nThe destructured methods will fall back to default behavior instead.</p>\n<pre><code class=\"language-js\">const myAssert = new Assert({ diff: 'full' });\n\n// This works as expected - uses 'full' diff\nmyAssert.strictEqual({ a: 1 }, { b: { c: 1 } });\n\n// This loses the 'full' diff setting - falls back to default 'simple' diff\nconst { strictEqual } = myAssert;\nstrictEqual({ a: 1 }, { b: { c: 1 } });\n</code></pre>\n<p>The <code>skipPrototype</code> option affects all deep equality methods:</p>\n<pre><code class=\"language-js\">class Foo {\n  constructor(a) {\n    this.a = a;\n  }\n}\n\nclass Bar {\n  constructor(a) {\n    this.a = a;\n  }\n}\n\nconst foo = new Foo(1);\nconst bar = new Bar(1);\n\n// Default behavior - fails due to different constructors\nconst assert1 = new Assert();\nassert1.deepStrictEqual(foo, bar); // AssertionError\n\n// Skip prototype comparison - passes if properties are equal\nconst assert2 = new Assert({ skipPrototype: true });\nassert2.deepStrictEqual(foo, bar); // OK\n</code></pre>\n<p>When destructured, methods lose access to the instance's <code>this</code> context and revert to default assertion behavior\n(diff: 'simple', non-strict mode).\nTo maintain custom options when using destructured methods, avoid\ndestructuring and call methods directly on the instance.</p>"
             }
           ]
         },

@@ -27,12 +27,6 @@ using v8::Object;
 using v8::PropertyCallbackInfo;
 using v8::SideEffectType;
 using v8::Value;
-using v8::NewStringType;
-using v8::String;
-
-#define JS_STRING(str)                                          \
-  String::NewFromUtf8(pIso, str, v8::NewStringType::kInternalized)             \
-      .ToLocalChecked()
 
 static void ProcessTitleGetter(Local<Name> property,
                                const PropertyCallbackInfo<Value>& info) {
@@ -89,24 +83,7 @@ static void SetVersions(Isolate* isolate, Local<Object> versions) {
   READONLY_STRING_PROPERTY(
       versions, "node", per_process::metadata.versions.node);
 
-#define V(key) +1
-  std::pair<std::string_view, std::string_view>
-      versions_array[NODE_VERSIONS_KEYS(V)];
-#undef V
-  auto* slot = &versions_array[0];
-
-#define V(key)                                                                 \
-  do {                                                                         \
-    *slot++ = std::pair<std::string_view, std::string_view>(                   \
-        #key, per_process::metadata.versions.key);                             \
-  } while (0);
-  NODE_VERSIONS_KEYS(V)
-#undef V
-
-  std::ranges::sort(versions_array,
-                    [](auto& a, auto& b) { return a.first < b.first; });
-
-  for (const auto& version : versions_array) {
+  for (const auto& version : per_process::metadata.versions.pairs()) {
     versions
         ->DefineOwnProperty(context,
                             OneByteString(isolate, version.first),
@@ -114,103 +91,6 @@ static void SetVersions(Isolate* isolate, Local<Object> versions) {
                             v8::ReadOnly)
         .Check();
   }
-}
-
-/*
-* //SD: "re-launch" in main script mode with given script (path),
-* and any subsequent strings as arguments.
-*/
-static void RunMain(const FunctionCallbackInfo<Value>& args) {
-  Environment* env = Environment::GetCurrent(args);
-  Local<Context> ctx = env->context();
-
-  int argc = args.Length();
-  if ((argc < 1) || (!args[0]->IsString())) {
-    THROW_ERR_MISSING_ARGS(env, "Bad argument.");
-  }
-
-  const std::vector<std::string>& _argv = env->argv();
-  std::vector<std::string>& argv = const_cast<std::vector<std::string>&>(_argv);
-  if (_argv.size() > 1) {
-    argv.erase(argv.begin() + 1, argv.end());
-  }
-  Isolate* pIso = Isolate::GetCurrent();
-  Local<Object> global = ctx->Global();
-  // add any string args
-  for (int i = 0; i < argc; ++i)
-  {
-    Local<Value> v = args[i];
-    if (v->IsString()) {
-      Utf8Value param(pIso, v);
-      argv.push_back(*param);
-    }
-  }
-
-  //purge script, so that it can re-run
-  Local<Object> require = Local<Object>::Cast(
-                    global->Get(ctx, JS_STRING("require")).ToLocalChecked()),
-                cache = Local<Object>::Cast(
-                    require->Get(ctx, JS_STRING("cache")).ToLocalChecked());
-  Local<Function> resolve = Local<Function>::Cast(
-      require->Get(ctx, JS_STRING("resolve")).ToLocalChecked());
-  if (!cache.IsEmpty())
-  {
-    Local<Value> params[] = {args[0]};
-    MaybeLocal<Value> _path = resolve->Call(ctx, v8::Null(pIso), 1, params);
-    if (!_path.IsEmpty())
-    {
-      Local<Value> path = _path.ToLocalChecked();
-      if (cache->Has(ctx, path).ToChecked()) {
-        cache->Delete(ctx, path);
-      }
-    }
-  }
-
-  //shutdown REPL if active
-  Local<Object> process = Local<Object>::Cast(global->Get(ctx, JS_STRING("process")).ToLocalChecked());
-  MaybeLocal<Value> _closeRepl = process->Get(ctx, JS_STRING("closeRepl"));
-  if (!_closeRepl.IsEmpty())
-  {
-    Local<Function> closeRepl = Local<Function>::Cast(_closeRepl.ToLocalChecked());
-    closeRepl->Call(ctx, v8::Null(pIso), 0, 0).ToLocalChecked();
-  }
-
-  global->Set(ctx, JS_STRING("skipInit"), v8::True(pIso));
-  MaybeLocal<Value> retal = RunMainScript(env, "internal/main/run_main_module");
-  if (!retal.IsEmpty())
-      args.GetReturnValue().Set(retal.ToLocalChecked());
-}
-
-/*
- * //SD: "re-launch" in REPL mode
- */
-static void RunRepl(const FunctionCallbackInfo<Value>& args) {
-  Environment* env = Environment::GetCurrent(args);
-  Local<Context> ctx = env->context();
-
-  const std::vector<std::string>& _argv = env->argv();
-  std::vector<std::string>& argv = const_cast<std::vector<std::string>&>(_argv);
-  if (_argv.size() > 1) {
-    argv.erase(argv.begin() + 1, argv.end());
-  }
-
-  // check REPL if active
-  Isolate* pIso = Isolate::GetCurrent();
-  Local<Object> global = ctx->Global();
-  Local<Object> process = Local<Object>::Cast(
-      global->Get(ctx, JS_STRING("process")).ToLocalChecked());
-  MaybeLocal<Value> _closeRepl = process->Get(ctx, JS_STRING("closeRepl"));
-  if (_closeRepl.ToLocalChecked()->IsFunction()) {
-    fprintf(stderr, "REPL is already running!\n");
-    args.GetReturnValue().Set(v8::False(pIso));
-    return; //already running, so abort
-  }
-  // set flag to skip some init steps, to avoid failure.
-  global->Set(ctx, JS_STRING("skipInit"), v8::True(pIso));
-
-  MaybeLocal<Value> retal = RunMainScript(env, "internal/main/repl");
-  if (!retal.IsEmpty())
-      args.GetReturnValue().Set(retal.ToLocalChecked());
 }
 
 MaybeLocal<Object> CreateProcessObject(Realm* realm) {
@@ -273,9 +153,6 @@ MaybeLocal<Object> CreateProcessObject(Realm* realm) {
   // process._rawDebug: may be overwritten later in JS land, but should be
   // available from the beginning for debugging purposes
   SetMethod(context, process, "_rawDebug", RawDebug);
-
-  SetMethod(context, process, "runMain", RunMain);
-  SetMethod(context, process, "runRepl", RunRepl);
 
   return scope.Escape(process);
 }
@@ -368,8 +245,6 @@ void PatchProcessObject(const FunctionCallbackInfo<Value>& args) {
 
 void RegisterProcessExternalReferences(ExternalReferenceRegistry* registry) {
   registry->Register(RawDebug);
-  registry->Register(RunMain);
-  registry->Register(RunRepl);
   registry->Register(GetParentProcessId);
   registry->Register(DebugPortSetter);
   registry->Register(DebugPortGetter);

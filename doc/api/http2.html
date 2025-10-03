@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v24.6.0">
-  <title>HTTP/2 | Node.js v24.6.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v24.9.0">
+  <title>HTTP/2 | Node.js v24.9.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -112,7 +112,7 @@
     <div id="column1" data-id="http2" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v24.6.0 documentation</h1>
+          <h1>Node.js v24.9.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -127,7 +127,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v24.6.0</li>
+            <li class="pinned-header">Node.js v24.9.0</li>
             
     <li class="picker-header">
       <a href="#toc-picker" aria-controls="toc-picker">
@@ -294,6 +294,7 @@
 <li><a href="#http2sensitiveheaders"><code>http2.sensitiveHeaders</code></a></li>
 <li><a href="#headers-object">Headers object</a>
 <ul>
+<li><a href="#raw-headers">Raw headers</a></li>
 <li><a href="#sensitive-headers">Sensitive headers</a></li>
 </ul>
 </li>
@@ -664,6 +665,7 @@
 <li><a href="#http2sensitiveheaders"><code>http2.sensitiveHeaders</code></a></li>
 <li><a href="#headers-object">Headers object</a>
 <ul>
+<li><a href="#raw-headers">Raw headers</a></li>
 <li><a href="#sensitive-headers">Sensitive headers</a></li>
 </ul>
 </li>
@@ -758,7 +760,7 @@
 </div>
 
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v24.6.0/lib/http2.js">lib/http2.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v24.9.0/lib/http2.js">lib/http2.js</a></p>
 <p>The <code>node:http2</code> module provides an implementation of the <a href="https://tools.ietf.org/html/rfc7540">HTTP/2</a> protocol.
 It can be accessed using:</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> http2 = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:http2'</span>);</code> <button class="copy-button">copy</button></pre>
@@ -1040,8 +1042,7 @@ from the connected peer.</p>
 <li><code>stream</code> <a href="http2.html#class-http2stream" class="type">&#x3C;Http2Stream></a> A reference to the stream</li>
 <li><code>headers</code> <a href="http2.html#headers-object" class="type">&#x3C;HTTP/2 Headers Object></a> An object describing the headers</li>
 <li><code>flags</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The associated numeric flags</li>
-<li><code>rawHeaders</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="type">&#x3C;Array></a> An array containing the raw header names followed by
-their respective values.</li>
+<li><code>rawHeaders</code> <a href="http2.html#raw-headers" class="type">&#x3C;HTTP/2 Raw Headers></a> An array containing the raw headers</li>
 </ul>
 <p>The <code>'stream'</code> event is emitted when a new <code>Http2Stream</code> is created.</p>
 <pre><code class="language-js">session.<span class="hljs-title function_">on</span>(<span class="hljs-string">'stream'</span>, <span class="hljs-function">(<span class="hljs-params">stream, headers, flags</span>) =></span> {
@@ -1650,6 +1651,8 @@ client.<span class="hljs-title function_">on</span>(<span class="hljs-string">'o
 <td><p>The <code>weight</code> option is now ignored, setting it will trigger a runtime warning.</p></td></tr>
 <tr><td>v24.2.0</td>
 <td><p>Following the deprecation of priority signaling as of RFC 9113, <code>weight</code> option is deprecated.</p></td></tr>
+<tr><td>v24.0.0, v22.17.0</td>
+<td><p>Allow passing headers in raw array format.</p></td></tr>
 <tr><td>v8.4.0</td>
 <td><p><span>Added in: v8.4.0</span></p></td></tr>
 </tbody></table>
@@ -1657,7 +1660,7 @@ client.<span class="hljs-title function_">on</span>(<span class="hljs-string">'o
 </div>
 <ul>
 <li>
-<p><code>headers</code> <a href="http2.html#headers-object" class="type">&#x3C;HTTP/2 Headers Object></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="type">&#x3C;Array></a></p>
+<p><code>headers</code> <a href="http2.html#headers-object" class="type">&#x3C;HTTP/2 Headers Object></a> | <a href="http2.html#raw-headers" class="type">&#x3C;HTTP/2 Raw Headers></a></p>
 </li>
 <li>
 <p><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></p>
@@ -2181,11 +2184,12 @@ the client should send the request body.</p>
 <ul>
 <li><code>headers</code> <a href="http2.html#headers-object" class="type">&#x3C;HTTP/2 Headers Object></a></li>
 <li><code>flags</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+<li><code>rawHeaders</code> <a href="http2.html#raw-headers" class="type">&#x3C;HTTP/2 Raw Headers></a></li>
 </ul>
 <p>The <code>'headers'</code> event is emitted when an additional block of headers is received
 for a stream, such as when a block of <code>1xx</code> informational headers is received.
-The listener callback is passed the <a href="#headers-object">HTTP/2 Headers Object</a> and flags
-associated with the headers.</p>
+The listener callback is passed the <a href="#headers-object">HTTP/2 Headers Object</a>, flags associated
+with the headers, and the headers in raw format (see <a href="#raw-headers">HTTP/2 Raw Headers</a>).</p>
 <pre><code class="language-js">stream.<span class="hljs-title function_">on</span>(<span class="hljs-string">'headers'</span>, <span class="hljs-function">(<span class="hljs-params">headers, flags</span>) =></span> {
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(headers);
 });</code> <button class="copy-button">copy</button></pre>
@@ -2212,11 +2216,13 @@ flags associated with the headers.</p>
 <ul>
 <li><code>headers</code> <a href="http2.html#headers-object" class="type">&#x3C;HTTP/2 Headers Object></a></li>
 <li><code>flags</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+<li><code>rawHeaders</code> <a href="http2.html#raw-headers" class="type">&#x3C;HTTP/2 Raw Headers></a></li>
 </ul>
 <p>The <code>'response'</code> event is emitted when a response <code>HEADERS</code> frame has been
 received for this stream from the connected HTTP/2 server. The listener is
-invoked with two arguments: an <code>Object</code> containing the received
-<a href="#headers-object">HTTP/2 Headers Object</a>, and flags associated with the headers.</p>
+invoked with three arguments: an <code>Object</code> containing the received
+<a href="#headers-object">HTTP/2 Headers Object</a>, flags associated with the headers, and the headers
+in raw format (see <a href="#raw-headers">HTTP/2 Raw Headers</a>).</p>
 
 <pre class="with-50-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { connect } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:http2'</span>;
 <span class="hljs-keyword">const</span> client = <span class="hljs-title function_">connect</span>(<span class="hljs-string">'https://localhost'</span>);
@@ -2342,6 +2348,8 @@ and will throw an error.</p>
 <details class="changelog"><summary>History</summary>
 <table>
 <tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v24.7.0</td>
+<td><p>Allow passing headers in raw array format.</p></td></tr>
 <tr><td>v14.5.0, v12.19.0</td>
 <td><p>Allow explicitly setting date headers.</p></td></tr>
 <tr><td>v8.4.0</td>
@@ -2350,7 +2358,7 @@ and will throw an error.</p>
 </details>
 </div>
 <ul>
-<li><code>headers</code> <a href="http2.html#headers-object" class="type">&#x3C;HTTP/2 Headers Object></a></li>
+<li><code>headers</code> <a href="http2.html#headers-object" class="type">&#x3C;HTTP/2 Headers Object></a> | <a href="http2.html#raw-headers" class="type">&#x3C;HTTP/2 Raw Headers></a></li>
 <li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
 <ul>
 <li><code>endStream</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> Set to <code>true</code> to indicate that the response will not
@@ -2771,8 +2779,7 @@ an <code>Http2Session</code> object associated with the <code>Http2Server</code>
 <li><code>stream</code> <a href="http2.html#class-http2stream" class="type">&#x3C;Http2Stream></a> A reference to the stream</li>
 <li><code>headers</code> <a href="http2.html#headers-object" class="type">&#x3C;HTTP/2 Headers Object></a> An object describing the headers</li>
 <li><code>flags</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The associated numeric flags</li>
-<li><code>rawHeaders</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="type">&#x3C;Array></a> An array containing the raw header names followed by
-their respective values.</li>
+<li><code>rawHeaders</code> <a href="http2.html#raw-headers" class="type">&#x3C;HTTP/2 Raw Headers></a> An array containing the raw headers</li>
 </ul>
 <p>The <code>'stream'</code> event is emitted when a <code>'stream'</code> event has been emitted by
 an <code>Http2Session</code> associated with the server.</p>
@@ -3006,8 +3013,7 @@ an <code>Http2Session</code> object associated with the <code>Http2SecureServer<
 <li><code>stream</code> <a href="http2.html#class-http2stream" class="type">&#x3C;Http2Stream></a> A reference to the stream</li>
 <li><code>headers</code> <a href="http2.html#headers-object" class="type">&#x3C;HTTP/2 Headers Object></a> An object describing the headers</li>
 <li><code>flags</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The associated numeric flags</li>
-<li><code>rawHeaders</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="type">&#x3C;Array></a> An array containing the raw header names followed by
-their respective values.</li>
+<li><code>rawHeaders</code> <a href="http2.html#raw-headers" class="type">&#x3C;HTTP/2 Raw Headers></a> An array containing the raw headers</li>
 </ul>
 <p>The <code>'stream'</code> event is emitted when a <code>'stream'</code> event has been emitted by
 an <code>Http2Session</code> associated with the server.</p>
@@ -3809,6 +3815,26 @@ server.<span class="hljs-title function_">on</span>(<span class="hljs-string">'s
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(headers.<span class="hljs-property">ABC</span>);
 });</code><button class="copy-button">copy</button></pre>
 <div>
+<h5>Raw headers<span><a class="mark" href="#raw-headers" id="raw-headers">#</a></span><a aria-hidden="true" class="legacy" id="http2_raw_headers"></a></h5>
+<p>In some APIs, in addition to object format, headers can also be passed or
+accessed as a raw flat array, preserving details of ordering and
+duplicate keys to match the raw transmission format.</p>
+<p>In this format the keys and values are in the same list. It is <em>not</em> a
+list of tuples. So, the even-numbered offsets are key values, and the
+odd-numbered offsets are the associated values. Duplicate headers are
+not merged and so each key-value pair will appear separately.</p>
+<p>This can be useful for cases such as proxies, where existing headers
+should be exactly forwarded as received, or as a performance
+optimization when the headers are already available in raw format.</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> rawHeaders = [
+  <span class="hljs-string">':status'</span>,
+  <span class="hljs-string">'404'</span>,
+  <span class="hljs-string">'content-type'</span>,
+  <span class="hljs-string">'text/plain'</span>,
+];
+
+stream.<span class="hljs-title function_">respond</span>(rawHeaders);</code> <button class="copy-button">copy</button></pre>
+</div><div>
 <h5>Sensitive headers<span><a class="mark" href="#sensitive-headers" id="sensitive-headers">#</a></span><a aria-hidden="true" class="legacy" id="http2_sensitive_headers"></a></h5>
 <p>HTTP2 headers can be marked as sensitive, which means that the HTTP/2
 header compression algorithm will never index them. This can make sense for
@@ -3828,6 +3854,9 @@ stream.<span class="hljs-title function_">respond</span>(headers);</code> <butto
 this flag is set automatically.</p>
 <p>This property is also set for received headers. It will contain the names of
 all headers marked as sensitive, including ones marked that way automatically.</p>
+<p>For raw headers, this should still be set as a property on the array, like
+<code>rawHeadersArray[http2.sensitiveHeaders] = ['cookie']</code>, not as a separate key
+and value pair within the array itself.</p>
 </div></div><div>
 <h4>Settings object<span><a class="mark" href="#settings-object" id="settings-object">#</a></span><a aria-hidden="true" class="legacy" id="http2_settings_object"></a></h4>
 <div class="api_metadata">
@@ -4325,13 +4354,9 @@ client response, the HTTP version of the connected-to server. Returns
 <span>Added in: v8.4.0</span>
 </div>
 <ul>
-<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a></li>
+<li>Type: <a href="http2.html#raw-headers" class="type">&#x3C;HTTP/2 Raw Headers></a></li>
 </ul>
 <p>The raw request/response headers list exactly as they were received.</p>
-<p>The keys and values are in the same list. It is <em>not</em> a
-list of tuples. So, the even-numbered offsets are key values, and the
-odd-numbered offsets are the associated values.</p>
-<p>Header names are not lowercased, and duplicates are not merged.</p>
 <pre><code class="language-js"><span class="hljs-comment">// Prints something like:</span>
 <span class="hljs-comment">//</span>
 <span class="hljs-comment">// [ 'user-agent',</span>
@@ -4891,7 +4916,7 @@ response.<span class="hljs-title function_">writeEarlyHints</span>({
 <ul>
 <li><code>statusCode</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
 <li><code>statusMessage</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
-<li><code>headers</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="type">&#x3C;Array></a></li>
+<li><code>headers</code> <a href="http2.html#headers-object" class="type">&#x3C;HTTP/2 Headers Object></a> | <a href="http2.html#raw-headers" class="type">&#x3C;HTTP/2 Raw Headers></a></li>
 <li>Returns: <a href="http2.html#class-http2http2serverresponse" class="type">&#x3C;http2.Http2ServerResponse></a></li>
 </ul>
 <p>Sends a response header to the request. The status code is a 3-digit HTTP

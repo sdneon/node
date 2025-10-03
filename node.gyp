@@ -96,8 +96,6 @@
       'src/js_stream.cc',
       'src/json_utils.cc',
       'src/js_udp_wrap.cc',
-      'src/json_parser.h',
-      'src/json_parser.cc',
       'src/module_wrap.cc',
       'src/node.cc',
       'src/node_api.cc',
@@ -324,7 +322,9 @@
     ],
     'node_crypto_sources': [
       'src/crypto/crypto_aes.cc',
+      'src/crypto/crypto_argon2.cc',
       'src/crypto/crypto_bio.cc',
+      'src/crypto/crypto_chacha20_poly1305.cc',
       'src/crypto/crypto_common.cc',
       'src/crypto/crypto_dsa.cc',
       'src/crypto/crypto_hkdf.cc',
@@ -335,7 +335,9 @@
       'src/crypto/crypto_context.cc',
       'src/crypto/crypto_ec.cc',
       'src/crypto/crypto_ml_dsa.cc',
+      'src/crypto/crypto_kem.cc',
       'src/crypto/crypto_hmac.cc',
+      'src/crypto/crypto_kmac.cc',
       'src/crypto/crypto_random.cc',
       'src/crypto/crypto_rsa.cc',
       'src/crypto/crypto_spkac.cc',
@@ -348,10 +350,12 @@
       'src/crypto/crypto_scrypt.cc',
       'src/crypto/crypto_tls.cc',
       'src/crypto/crypto_x509.cc',
+      'src/crypto/crypto_argon2.h',
       'src/crypto/crypto_bio.h',
       'src/crypto/crypto_clienthello-inl.h',
       'src/crypto/crypto_dh.h',
       'src/crypto/crypto_hmac.h',
+      'src/crypto/crypto_kmac.h',
       'src/crypto/crypto_rsa.h',
       'src/crypto/crypto_spkac.h',
       'src/crypto/crypto_util.h',
@@ -973,11 +977,11 @@
           'variables': {
             'mkssldef_flags': [
               # Categories to export.
-              '-CAES,BF,BIO,DES,DH,DSA,EC,ECDH,ECDSA,ENGINE,EVP,HMAC,MD4,MD5,'
-              'PSK,RC2,RC4,RSA,SHA,SHA0,SHA1,SHA256,SHA512,SOCK,STDIO,TLSEXT,'
-              'UI,FP_API,TLS1_METHOD,TLS1_1_METHOD,TLS1_2_METHOD,SCRYPT,OCSP,'
-              'NEXTPROTONEG,RMD160,CAST,DEPRECATEDIN_1_1_0,DEPRECATEDIN_1_2_0,'
-              'DEPRECATEDIN_3_0',
+              '-CAES,ARGON2,BF,BIO,DES,DH,DSA,EC,ECDH,ECDSA,ENGINE,EVP,HMAC,'
+              'MD4,MD5,PSK,RC2,RC4,RSA,SHA,SHA0,SHA1,SHA256,SHA512,SOCK,STDIO,'
+              'TLSEXT,UI,FP_API,TLS1_METHOD,TLS1_1_METHOD,TLS1_2_METHOD,'
+              'SCRYPT,OCSP,NEXTPROTONEG,RMD160,CAST,DEPRECATEDIN_1_1_0,'
+              'DEPRECATEDIN_1_2_0,DEPRECATEDIN_3_0',
               # Defines.
               '-DWIN32',
               # Symbols to filter from the export list.
@@ -1090,7 +1094,6 @@
       'dependencies': [
         '<(node_lib_target_name)',
         'deps/histogram/histogram.gyp:histogram',
-        'deps/uvwasi/uvwasi.gyp:uvwasi',
       ],
       'includes': [
         'node.gypi'
@@ -1101,7 +1104,6 @@
         'deps/v8/include',
         'deps/cares/include',
         'deps/uv/include',
-        'deps/uvwasi/include',
         'test/cctest',
       ],
       'defines': [
@@ -1114,6 +1116,10 @@
         'test/fuzzers/fuzz_ClientHelloParser.cc',
       ],
       'conditions': [
+        [ 'node_shared_uvwasi=="false"', {
+          'dependencies': [ 'deps/uvwasi/uvwasi.gyp:uvwasi' ],
+          'include_dirs': [ 'deps/uvwasi/include' ],
+        }],
         ['OS=="linux" or OS=="openharmony"', {
           'ldflags': [ '-fsanitize=fuzzer' ]
         }],
@@ -1134,7 +1140,6 @@
         '<(node_lib_target_name)',
         'deps/googletest/googletest.gyp:gtest_prod',
         'deps/histogram/histogram.gyp:histogram',
-        'deps/uvwasi/uvwasi.gyp:uvwasi',
         'deps/nbytes/nbytes.gyp:nbytes',
       ],
       'includes': [
@@ -1146,7 +1151,6 @@
         'deps/v8/include',
         'deps/cares/include',
         'deps/uv/include',
-        'deps/uvwasi/include',
         'test/cctest',
       ],
       'defines': [
@@ -1159,6 +1163,10 @@
         'test/fuzzers/fuzz_strings.cc',
       ],
       'conditions': [
+        [ 'node_shared_uvwasi=="false"', {
+          'dependencies': [ 'deps/uvwasi/uvwasi.gyp:uvwasi' ],
+          'include_dirs': [ 'deps/uvwasi/include' ],
+        }],
         ['OS=="linux" or OS=="openharmony"', {
           'ldflags': [ '-fsanitize=fuzzer' ]
         }],

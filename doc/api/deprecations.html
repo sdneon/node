@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v24.6.0">
-  <title>Deprecated APIs | Node.js v24.6.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v24.9.0">
+  <title>Deprecated APIs | Node.js v24.9.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -112,7 +112,7 @@
     <div id="column1" data-id="deprecations" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v24.6.0 documentation</h1>
+          <h1>Node.js v24.9.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -127,7 +127,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v24.6.0</li>
+            <li class="pinned-header">Node.js v24.9.0</li>
             
     <li class="picker-header">
       <a href="#toc-picker" aria-controls="toc-picker">
@@ -337,6 +337,7 @@
 <li><a href="#DEP0197">DEP0197: <code>util.types.isNativeError()</code></a></li>
 <li><a href="#DEP0198">DEP0198: Creating SHAKE-128 and SHAKE-256 digests without an explicit <code>options.outputLength</code></a></li>
 <li><a href="#DEP0199">DEP0199: <code>require('node:_http_*')</code></a></li>
+<li><a href="#DEP0200">DEP0200: Closing fs.Dir on garbage collection</a></li>
 </ul>
 </li>
 </ul>
@@ -682,6 +683,7 @@
 <li><a href="#DEP0197">DEP0197: <code>util.types.isNativeError()</code></a></li>
 <li><a href="#DEP0198">DEP0198: Creating SHAKE-128 and SHAKE-256 digests without an explicit <code>options.outputLength</code></a></li>
 <li><a href="#DEP0199">DEP0199: <code>require('node:_http_*')</code></a></li>
+<li><a href="#DEP0200">DEP0200: Closing fs.Dir on garbage collection</a></li>
 </ul>
 </li>
 </ul>
@@ -1597,6 +1599,9 @@ instead.</p>
 <p>Type: End-of-Life</p>
 <p>The <code>util.isDate()</code> API has been removed. Please use
 <code>arg instanceof Date</code> instead.</p>
+<p>Also for stronger approaches, consider using:
+<code>Date.prototype.toString.call(arg) === '[object Date]' &#x26;&#x26; !isNaN(arg)</code>.
+This can also be used in a <code>try/catch</code> block to handle invalid date objects.</p>
 </div><div>
 <h4 id="DEP0048">DEP0048: <code>util.isError()</code><span><a class="mark" href="#dep0048-utiliserror" id="dep0048-utiliserror">#</a></span><a aria-hidden="true" class="legacy" id="deprecations_dep0048_util_iserror"></a></h4>
 <div class="api_metadata">
@@ -1615,9 +1620,7 @@ instead.</p>
 </details>
 </div>
 <p>Type: End-of-Life</p>
-<p>The <code>util.isError()</code> API has been removed. Please use
-<code>Object.prototype.toString(arg) === '[object Error]' || arg instanceof Error</code>
-instead.</p>
+<p>The <code>util.isError()</code> API has been removed. Please use <code>Error.isError(arg)</code>.</p>
 </div><div>
 <h4 id="DEP0049">DEP0049: <code>util.isFunction()</code><span><a class="mark" href="#dep0049-utilisfunction" id="dep0049-utilisfunction">#</a></span><a aria-hidden="true" class="legacy" id="deprecations_dep0049_util_isfunction"></a></h4>
 <div class="api_metadata">
@@ -1736,9 +1739,7 @@ instead.</p>
 </details>
 </div>
 <p>Type: End-of-Life</p>
-<p>The <code>util.isPrimitive()</code> API has been removed. Please use
-<code>arg === null || (typeof arg !=='object' &#x26;&#x26; typeof arg !== 'function')</code>
-instead.</p>
+<p>The <code>util.isPrimitive()</code> API has been removed. Please use <code>Object(arg) !== arg</code> instead.</p>
 </div><div>
 <h4 id="DEP0055">DEP0055: <code>util.isRegExp()</code><span><a class="mark" href="#dep0055-utilisregexp" id="dep0055-utilisregexp">#</a></span><a aria-hidden="true" class="legacy" id="deprecations_dep0055_util_isregexp"></a></h4>
 <div class="api_metadata">
@@ -3628,17 +3629,18 @@ Convert them to primitive strings.</p>
 <details class="changelog"><summary>History</summary>
 <table>
 <tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v24.8.0</td>
+<td><p>Deprecation revoked.</p></td></tr>
 <tr><td>v18.7.0, v16.17.0</td>
 <td><p>Documentation-only deprecation.</p></td></tr>
 </tbody></table>
 </details>
 </div>
-<p>Type: Documentation-only</p>
-<p>These methods were deprecated because they can be used in a way which does not
-hold the channel reference alive long enough to receive the events.</p>
-<p>Use <a href="diagnostics_channel.html#diagnostics_channelsubscribename-onmessage"><code>diagnostics_channel.subscribe(name, onMessage)</code></a> or
-<a href="diagnostics_channel.html#diagnostics_channelunsubscribename-onmessage"><code>diagnostics_channel.unsubscribe(name, onMessage)</code></a> which does the same
-thing instead.</p>
+<p>Type: Deprecation revoked</p>
+<p>These methods were deprecated because their use could leave the channel object
+vulnerable to being garbage-collected if not strongly referenced by the user.
+The deprecation was revoked because channel objects are now resistant to
+garbage collection when the channel has active subscribers.</p>
 </div><div>
 <h4 id="DEP0164">DEP0164: <code>process.exit(code)</code>, <code>process.exitCode</code> coercion to integer<span><a class="mark" href="#dep0164-processexitcode-processexitcode-coercion-to-integer" id="dep0164-processexitcode-processexitcode-coercion-to-integer">#</a></span><a aria-hidden="true" class="legacy" id="deprecations_dep0164_process_exit_code_process_exitcode_coercion_to_integer"></a></h4>
 <div class="api_metadata">
@@ -4210,7 +4212,49 @@ a shell, use <a href="child_process.html#child_processexecfilefile-args-options-
 <p>Type: Documentation-only</p>
 <p>The <code>node:_http_agent</code>, <code>node:_http_client</code>, <code>node:_http_common</code>, <code>node:_http_incoming</code>,
 <code>node:_http_outgoing</code> and <code>node:_http_server</code> modules are deprecated as they should be considered
-an internal nodejs implementation rather than a public facing API, use <code>node:http</code> instead.</p></div></section>
+an internal nodejs implementation rather than a public facing API, use <code>node:http</code> instead.</p>
+</div><div>
+<h4 id="DEP0200">DEP0200: Closing fs.Dir on garbage collection<span><a class="mark" href="#dep0200-closing-fsdir-on-garbage-collection" id="dep0200-closing-fsdir-on-garbage-collection">#</a></span><a aria-hidden="true" class="legacy" id="deprecations_dep0200_closing_fs_dir_on_garbage_collection"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v24.9.0</td>
+<td><p>Documentation-only deprecation.</p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p>Type: Documentation-only</p>
+<p>Allowing a <a href="fs.html#class-fsdir"><code>fs.Dir</code></a> object to be closed on garbage collection is
+deprecated. In the future, doing so might result in a thrown error that will
+terminate the process.</p>
+<p>Please ensure that all <code>fs.Dir</code> objects are explicitly closed using
+<code>Dir.prototype.close()</code> or <code>using</code> keyword:</p>
+<pre><code class="language-js mjs"><span class="hljs-keyword">import</span> { opendir } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:fs/promises'</span>;
+
+{
+  <span class="hljs-keyword">await</span> <span class="hljs-keyword">using</span> dir = <span class="hljs-keyword">await</span> <span class="hljs-title function_">opendir</span>(<span class="hljs-string">'/async/disposable/directory'</span>);
+} <span class="hljs-comment">// Closed by dir[Symbol.asyncDispose]()</span>
+
+{
+  <span class="hljs-keyword">using</span> dir = <span class="hljs-keyword">await</span> <span class="hljs-title function_">opendir</span>(<span class="hljs-string">'/sync/disposable/directory'</span>);
+} <span class="hljs-comment">// Closed by dir[Symbol.dispose]()</span>
+
+{
+  <span class="hljs-keyword">const</span> dir = <span class="hljs-keyword">await</span> <span class="hljs-title function_">opendir</span>(<span class="hljs-string">'/unconditionally/iterated/directory'</span>);
+  <span class="hljs-keyword">for</span> <span class="hljs-title function_">await</span> (<span class="hljs-keyword">const</span> entry <span class="hljs-keyword">of</span> dir) {
+    <span class="hljs-comment">// process an entry</span>
+  } <span class="hljs-comment">// Closed by iterator</span>
+}
+
+{
+  <span class="hljs-keyword">let</span> dir;
+  <span class="hljs-keyword">try</span> {
+    dir = <span class="hljs-keyword">await</span> <span class="hljs-title function_">opendir</span>(<span class="hljs-string">'/legacy/closeable/directory'</span>);
+  } <span class="hljs-keyword">finally</span> {
+    <span class="hljs-keyword">await</span> dir?.<span class="hljs-title function_">close</span>();
+  }
+}</code> <button class="copy-button">copy</button></pre></div></section>
         <!-- API END -->
       </div>
     </div>

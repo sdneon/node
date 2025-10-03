@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v24.6.0">
-  <title>Test runner | Node.js v24.6.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v24.9.0">
+  <title>Test runner | Node.js v24.9.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -112,7 +112,7 @@
     <div id="column1" data-id="test" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v24.6.0 documentation</h1>
+          <h1>Node.js v24.9.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -127,7 +127,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v24.6.0</li>
+            <li class="pinned-header">Node.js v24.9.0</li>
             
     <li class="picker-header">
       <a href="#toc-picker" aria-controls="toc-picker">
@@ -140,6 +140,7 @@
 <ul>
 <li><a href="#subtests">Subtests</a></li>
 <li><a href="#skipping-tests">Skipping tests</a></li>
+<li><a href="#rerunning-failed-tests">Rerunning failed tests</a></li>
 <li><a href="#todo-tests">TODO tests</a></li>
 <li><a href="#describe-and-it-aliases"><code>describe()</code> and <code>it()</code> aliases</a></li>
 <li><a href="#only-tests"><code>only</code> tests</a></li>
@@ -149,7 +150,11 @@
 <li><span class="stability_1.0"><a href="#global-setup-and-teardown">Global setup and teardown</a></span></li>
 <li><a href="#running-tests-from-the-command-line">Running tests from the command line</a>
 <ul>
-<li><a href="#test-runner-execution-model">Test runner execution model</a></li>
+<li><a href="#test-runner-execution-model">Test runner execution model</a>
+<ul>
+<li><a href="#child-process-option-inheritance">Child process option inheritance</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><span class="stability_1"><a href="#collecting-code-coverage">Collecting code coverage</a></span>
@@ -447,6 +452,7 @@
 <ul>
 <li><a href="#subtests">Subtests</a></li>
 <li><a href="#skipping-tests">Skipping tests</a></li>
+<li><a href="#rerunning-failed-tests">Rerunning failed tests</a></li>
 <li><a href="#todo-tests">TODO tests</a></li>
 <li><a href="#describe-and-it-aliases"><code>describe()</code> and <code>it()</code> aliases</a></li>
 <li><a href="#only-tests"><code>only</code> tests</a></li>
@@ -456,7 +462,11 @@
 <li><span class="stability_1.0"><a href="#global-setup-and-teardown">Global setup and teardown</a></span></li>
 <li><a href="#running-tests-from-the-command-line">Running tests from the command line</a>
 <ul>
-<li><a href="#test-runner-execution-model">Test runner execution model</a></li>
+<li><a href="#test-runner-execution-model">Test runner execution model</a>
+<ul>
+<li><a href="#child-process-option-inheritance">Child process option inheritance</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><span class="stability_1"><a href="#collecting-code-coverage">Collecting code coverage</a></span>
@@ -638,7 +648,7 @@
 </details>
 </div>
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v24.6.0/lib/test.js">lib/test.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v24.9.0/lib/test.js">lib/test.js</a></p>
 <p>The <code>node:test</code> module facilitates the creation of JavaScript tests.
 To access it:</p>
 
@@ -753,6 +763,35 @@ following example.</p>
   <span class="hljs-comment">// Make sure to return here as well if the test contains additional logic.</span>
   t.<span class="hljs-title function_">skip</span>(<span class="hljs-string">'this is skipped'</span>);
 });</code> <button class="copy-button">copy</button></pre>
+</section><section><h3>Rerunning failed tests<span><a class="mark" href="#rerunning-failed-tests" id="rerunning-failed-tests">#</a></span><a aria-hidden="true" class="legacy" id="test_rerunning_failed_tests"></a></h3>
+<p>The test runner supports persisting the state of the run to a file, allowing
+the test runner to rerun failed tests without having to re-run the entire test suite.
+Use the <a href="cli.html#--test-rerun-failures"><code>--test-rerun-failures</code></a> command-line option to specify a file path where the
+state of the run is stored. if the state file does not exist, the test runner will
+create it.
+the state file is a JSON file that contains an array of run attempts.
+Each run attempt is an object mapping successful tests to the attempt they have passed in.
+The key identifying a test in this map is the test file path, with the line and column where the test is defined.
+in a case where a test defined in a specific location is run multiple times,
+for example within a function or a loop,
+a counter will be appended to the key, to disambiguate the test runs.
+note changing the order of test execution or the location of a test can lead the test runner
+to consider tests as passed on a previous attempt,
+meaning <code>--test-rerun-failures</code> should be used when tests run in a deterministic order.</p>
+<p>example of a state file:</p>
+<pre><code class="language-json"><span class="hljs-punctuation">[</span>
+  <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"test.js:10:5"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">"passed_on_attempt"</span><span class="hljs-punctuation">:</span> <span class="hljs-number">0</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">"name"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"test 1"</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"test.js:10:5"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">"passed_on_attempt"</span><span class="hljs-punctuation">:</span> <span class="hljs-number">0</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">"name"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"test 1"</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"test.js:20:5"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">"passed_on_attempt"</span><span class="hljs-punctuation">:</span> <span class="hljs-number">1</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">"name"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"test 2"</span> <span class="hljs-punctuation">}</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">]</span></code> <button class="copy-button">copy</button></pre>
+<p>in this example, there are two run attempts, with two tests defined in <code>test.js</code>,
+the first test succeeded on the first attempt, and the second test succeeded on the second attempt.</p>
+<p>When the <code>--test-rerun-failures</code> option is used, the test runner will only run tests that have not yet passed.</p>
+<pre><code class="language-bash">node --test-rerun-failures /path/to/state/file</code> <button class="copy-button">copy</button></pre>
 </section><section><h3>TODO tests<span><a class="mark" href="#todo-tests" id="todo-tests">#</a></span><a aria-hidden="true" class="legacy" id="test_todo_tests"></a></h3>
 <p>Individual tests can be marked as flaky or incomplete by passing the <code>todo</code>
 option to the test, or by calling the test context's <code>todo()</code> method, as shown
@@ -1040,7 +1079,24 @@ are all run within the same context, it is possible for tests to interact with
 each other in ways that are not possible when isolation is enabled. For example,
 if a test relies on global state, it is possible for that state to be modified
 by a test originating from another file.</p>
-</div>
+<div>
+<h5>Child process option inheritance<span><a class="mark" href="#child-process-option-inheritance" id="child-process-option-inheritance">#</a></span><a aria-hidden="true" class="legacy" id="test_child_process_option_inheritance"></a></h5>
+<p>When running tests in process isolation mode (the default), spawned child processes
+inherit Node.js options from the parent process, including those specified in
+<a href="cli.html#--experimental-config-fileconfig">configuration files</a>. However, certain flags are filtered out to enable proper
+test runner functionality:</p>
+<ul>
+<li><code>--test</code> - Prevented to avoid recursive test execution</li>
+<li><code>--experimental-test-coverage</code> - Managed by the test runner</li>
+<li><code>--watch</code> - Watch mode is handled at the parent level</li>
+<li><code>--experimental-default-config-file</code> - Config file loading is handled by the parent</li>
+<li><code>--test-reporter</code> - Reporting is managed by the parent process</li>
+<li><code>--test-reporter-destination</code> - Output destinations are controlled by the parent</li>
+<li><code>--experimental-config-file</code> - Config file paths are managed by the parent</li>
+</ul>
+<p>All other Node.js options from command line arguments, environment variables,
+and configuration files are inherited by the child processes.</p>
+</div></div>
 </section><section><h3>Collecting code coverage<span><a class="mark" href="#collecting-code-coverage" id="collecting-code-coverage">#</a></span><a aria-hidden="true" class="legacy" id="test_collecting_code_coverage"></a></h3>
 <p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
 <p>When Node.js is started with the <a href="cli.html#--experimental-test-coverage"><code>--experimental-test-coverage</code></a>
@@ -1724,6 +1780,8 @@ unless a destination is explicitly provided.</p>
 <details class="changelog"><summary>History</summary>
 <table>
 <tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v24.7.0</td>
+<td><p>Added a rerunFailuresFilePath option.</p></td></tr>
 <tr><td>v23.0.0</td>
 <td><p>Added the <code>cwd</code> option.</p></td></tr>
 <tr><td>v23.0.0, v22.10.0</td>
@@ -1810,6 +1868,10 @@ that specifies the index of the shard to run. This option is <em>required</em>.<
 of shards to split the test files to. This option is <em>required</em>.</li>
 </ul>
 </li>
+<li><code>rerunFailuresFilePath</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> A file path where the test runner will
+store the state of the tests to allow rerunning only the failed tests on a next run.
+see [Rerunning failed tests][] for more information.
+<strong>Default:</strong> <code>undefined</code>.</li>
 <li><code>coverage</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> enable <a href="#collecting-code-coverage">code coverage</a> collection.
 <strong>Default:</strong> <code>false</code>.</li>
 <li><code>coverageExcludeGlobs</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="type">&#x3C;Array></a> Excludes specific files from code coverage
@@ -3350,6 +3412,8 @@ defined.</p>
 </li>
 <li><code>type</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> The type of the test, used to denote whether
 this is a suite.</li>
+<li><code>attempt</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> The attempt number of the test run,
+present only when using the <a href="cli.html#--test-rerun-failures"><code>--test-rerun-failures</code></a> flag.</li>
 </ul>
 </li>
 <li><code>file</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> The path of the test file,
@@ -3380,6 +3444,10 @@ The corresponding execution ordered event is <code>'test:complete'</code>.</p>
 <li><code>duration_ms</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The duration of the test in milliseconds.</li>
 <li><code>type</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> The type of the test, used to denote whether
 this is a suite.</li>
+<li><code>attempt</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> The attempt number of the test run,
+present only when using the <a href="cli.html#--test-rerun-failures"><code>--test-rerun-failures</code></a> flag.</li>
+<li><code>passed_on_attempt</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> The attempt number the test passed on,
+present only when using the <a href="cli.html#--test-rerun-failures"><code>--test-rerun-failures</code></a> flag.</li>
 </ul>
 </li>
 <li><code>file</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> The path of the test file,
