@@ -176,95 +176,6 @@ process, the `message` argument can contain data that JSON is not able
 to represent.
 See [Advanced serialization for `child_process`][] for more details.
 
-### Event: `'multipleResolves'`
-
-<!-- YAML
-added: v10.12.0
-deprecated:
-  - v17.6.0
-  - v16.15.0
--->
-
-> Stability: 0 - Deprecated
-
-* `type` {string} The resolution type. One of `'resolve'` or `'reject'`.
-* `promise` {Promise} The promise that resolved or rejected more than once.
-* `value` {any} The value with which the promise was either resolved or
-  rejected after the original resolve.
-
-The `'multipleResolves'` event is emitted whenever a `Promise` has been either:
-
-* Resolved more than once.
-* Rejected more than once.
-* Rejected after resolve.
-* Resolved after reject.
-
-This is useful for tracking potential errors in an application while using the
-`Promise` constructor, as multiple resolutions are silently swallowed. However,
-the occurrence of this event does not necessarily indicate an error. For
-example, [`Promise.race()`][] can trigger a `'multipleResolves'` event.
-
-Because of the unreliability of the event in cases like the
-[`Promise.race()`][] example above it has been deprecated.
-
-```mjs
-import process from 'node:process';
-
-process.on('multipleResolves', (type, promise, reason) => {
-  console.error(type, promise, reason);
-  setImmediate(() => process.exit(1));
-});
-
-async function main() {
-  try {
-    return await new Promise((resolve, reject) => {
-      resolve('First call');
-      resolve('Swallowed resolve');
-      reject(new Error('Swallowed reject'));
-    });
-  } catch {
-    throw new Error('Failed');
-  }
-}
-
-main().then(console.log);
-// resolve: Promise { 'First call' } 'Swallowed resolve'
-// reject: Promise { 'First call' } Error: Swallowed reject
-//     at Promise (*)
-//     at new Promise (<anonymous>)
-//     at main (*)
-// First call
-```
-
-```cjs
-const process = require('node:process');
-
-process.on('multipleResolves', (type, promise, reason) => {
-  console.error(type, promise, reason);
-  setImmediate(() => process.exit(1));
-});
-
-async function main() {
-  try {
-    return await new Promise((resolve, reject) => {
-      resolve('First call');
-      resolve('Swallowed resolve');
-      reject(new Error('Swallowed reject'));
-    });
-  } catch {
-    throw new Error('Failed');
-  }
-}
-
-main().then(console.log);
-// resolve: Promise { 'First call' } 'Swallowed resolve'
-// reject: Promise { 'First call' } Error: Swallowed reject
-//     at Promise (*)
-//     at new Promise (<anonymous>)
-//     at main (*)
-// First call
-```
-
 ### Event: `'rejectionHandled'`
 
 <!-- YAML
@@ -923,8 +834,8 @@ added: v0.1.27
 The `process.argv` property returns an array containing the command-line
 arguments passed when the Node.js process was launched. The first element will
 be [`process.execPath`][]. See `process.argv0` if access to the original value
-of `argv[0]` is needed. The second element will be the path to the JavaScript
-file being executed. The remaining elements will be any additional command-line
+of `argv[0]` is needed. If a [program entry point][] was provided, the second element
+will be the absolute path to it. The remaining elements are additional command-line
 arguments.
 
 For example, assuming the following script for `process-args.js`:
@@ -989,7 +900,9 @@ added:
   - v22.0.0
   - v20.13.0
 changes:
-  - version: v24.0.0
+  - version:
+    - v24.0.0
+    - v22.16.0
     pr-url: https://github.com/nodejs/node/pull/57765
     description: Change stability index for this feature from Experimental to Stable.
 -->
@@ -1156,7 +1069,9 @@ added:
   - v19.6.0
   - v18.15.0
 changes:
-  - version: v24.0.0
+  - version:
+    - v24.0.0
+    - v22.16.0
     pr-url: https://github.com/nodejs/node/pull/57765
     description: Change stability index for this feature from Experimental to Stable.
   - version:
@@ -2086,6 +2001,10 @@ This value is therefore identical to that of `process.features.tls`.
 added:
  - v23.0.0
  - v22.10.0
+changes:
+  - version: v25.2.0
+    pr-url: https://github.com/nodejs/node/pull/60600
+    description: Type stripping is now stable.
 -->
 
 > Stability: 1.2 - Release candidate
@@ -2094,7 +2013,7 @@ added:
 
 A value that is `"strip"` by default,
 `"transform"` if Node.js is run with `--experimental-transform-types`, and `false` if
-Node.js is run with `--no-experimental-strip-types`.
+Node.js is run with `--no-strip-types`.
 
 ## `process.features.uv`
 
@@ -2334,7 +2253,9 @@ added:
   - v17.3.0
   - v16.14.0
 changes:
-  - version: v24.0.0
+  - version:
+    - v24.0.0
+    - v22.16.0
     pr-url: https://github.com/nodejs/node/pull/57765
     description: Change stability index for this feature from Experimental to Stable.
 -->
@@ -2779,9 +2700,11 @@ debugger. See [Signal Events][].
 added:
   - v21.7.0
   - v20.12.0
+changes:
+  - version: v24.10.0
+    pr-url: https://github.com/nodejs/node/pull/59925
+    description: This API is no longer experimental.
 -->
-
-> Stability: 1.1 - Active development
 
 * `path` {string | URL | Buffer | undefined}. **Default:** `'./.env'`
 
@@ -4292,7 +4215,9 @@ Thrown:
 ## `process.threadCpuUsage([previousValue])`
 
 <!-- YAML
-added: v23.9.0
+added:
+ - v23.9.0
+ - v22.19.0
 -->
 
 * `previousValue` {Object} A previous return value from calling
@@ -4324,7 +4249,7 @@ When a new value is assigned, different platforms will impose different maximum
 length restrictions on the title. Usually such restrictions are quite limited.
 For instance, on Linux and macOS, `process.title` is limited to the size of the
 binary name plus the length of the command-line arguments because setting the
-`process.title` overwrites the `argv` memory of the process. Node.js v0.8
+`process.title` overwrites the `argv` memory of the process. Node.js 0.8
 allowed for longer process title strings by also overwriting the `environ`
 memory but that was potentially insecure and confusing in some (rather obscure)
 cases.
@@ -4346,6 +4271,29 @@ The `process.traceDeprecation` property indicates whether the
 documentation for the [`'warning'` event][process_warning] and the
 [`emitWarning()` method][process_emit_warning] for more information about this
 flag's behavior.
+
+## `process.traceProcessWarnings`
+
+<!-- YAML
+added: v6.10.0
+-->
+
+* {boolean}
+
+The `process.traceProcessWarnings` property indicates whether the `--trace-warnings` flag
+is set on the current Node.js process. This property allows programmatic control over the
+tracing of warnings, enabling or disabling stack traces for warnings at runtime.
+
+```js
+// Enable trace warnings
+process.traceProcessWarnings = true;
+
+// Emit a warning with a stack trace
+process.emitWarning('Warning with stack trace');
+
+// Disable trace warnings
+process.traceProcessWarnings = false;
+```
 
 ## `process.umask()`
 
@@ -4410,7 +4358,7 @@ added:
 
 > Stability: 1 - Experimental
 
-* `maybeUnfefable` {any} An object that may be "unref'd".
+* `maybeRefable` {any} An object that may be "unref'd".
 
 An object is "unrefable" if it implements the Node.js "Refable protocol".
 Specifically, this means that the object implements the `Symbol.for('nodejs.ref')`
@@ -4604,7 +4552,6 @@ cases:
 [`Error`]: errors.md#class-error
 [`EventEmitter`]: events.md#class-eventemitter
 [`NODE_OPTIONS`]: cli.md#node_optionsoptions
-[`Promise.race()`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/race
 [`Worker`]: worker_threads.md#class-worker
 [`Worker` constructor]: worker_threads.md#new-workerfilename-options
 [`console.error()`]: console.md#consoleerrordata-args
@@ -4616,7 +4563,7 @@ cases:
 [`net.Server`]: net.md#class-netserver
 [`net.Socket`]: net.md#class-netsocket
 [`os.constants.dlopen`]: os.md#dlopen-constants
-[`postMessageToThread()`]: worker_threads.md#workerpostmessagetothreadthreadid-value-transferlist-timeout
+[`postMessageToThread()`]: worker_threads.md#worker_threadspostmessagetothreadthreadid-value-transferlist-timeout
 [`process.argv`]: #processargv
 [`process.config`]: #processconfig
 [`process.execPath`]: #processexecpath
@@ -4643,6 +4590,7 @@ cases:
 [process.cpuUsage]: #processcpuusagepreviousvalue
 [process_emit_warning]: #processemitwarningwarning-type-code-ctor
 [process_warning]: #event-warning
+[program entry point]: https://nodejs.org/api/cli.html#program-entry-point
 [report documentation]: report.md
 [terminal raw mode]: tty.md#readstreamsetrawmodemode
 [uv_get_available_memory]: https://docs.libuv.org/en/v1.x/misc.html#c.uv_get_available_memory

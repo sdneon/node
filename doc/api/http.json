@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.9.0/lib/http.js\">lib/http.js</a></p>\n<p>This module, containing both a client and server, can be imported via\n<code>require('node:http')</code> (CommonJS) or <code>import * as http from 'node:http'</code> (ES module).</p>\n<p>The HTTP interfaces in Node.js are designed to support many features\nof the protocol which have been traditionally difficult to use.\nIn particular, large, possibly chunk-encoded, messages. The interface is\ncareful to never buffer entire requests or responses, so the\nuser is able to stream data.</p>\n<p>HTTP message headers are represented by an object like this:</p>\n<pre><code class=\"language-json\">{ \"content-length\": \"123\",\n  \"content-type\": \"text/plain\",\n  \"connection\": \"keep-alive\",\n  \"host\": \"example.com\",\n  \"accept\": \"*/*\" }\n</code></pre>\n<p>Keys are lowercased. Values are not modified.</p>\n<p>In order to support the full spectrum of possible HTTP applications, the Node.js\nHTTP API is very low-level. It deals with stream handling and message\nparsing only. It parses a message into headers and body but it does not\nparse the actual headers or the body.</p>\n<p>See <a href=\"#messageheaders\"><code>message.headers</code></a> for details on how duplicate headers are handled.</p>\n<p>The raw headers as they were received are retained in the <code>rawHeaders</code>\nproperty, which is an array of <code>[key, value, key2, value2, ...]</code>. For\nexample, the previous message header object might have a <code>rawHeaders</code>\nlist like the following:</p>\n<!-- eslint-disable @stylistic/js/semi -->\n<pre><code class=\"language-js\">[ 'ConTent-Length', '123456',\n  'content-LENGTH', '123',\n  'content-type', 'text/plain',\n  'CONNECTION', 'keep-alive',\n  'Host', 'example.com',\n  'accepT', '*/*' ]\n</code></pre>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v25.5.0/lib/http.js\">lib/http.js</a></p>\n<p>This module, containing both a client and server, can be imported via\n<code>require('node:http')</code> (CommonJS) or <code>import * as http from 'node:http'</code> (ES module).</p>\n<p>The HTTP interfaces in Node.js are designed to support many features\nof the protocol which have been traditionally difficult to use.\nIn particular, large, possibly chunk-encoded, messages. The interface is\ncareful to never buffer entire requests or responses, so the\nuser is able to stream data.</p>\n<p>HTTP message headers are represented by an object like this:</p>\n<pre><code class=\"language-json\">{ \"content-length\": \"123\",\n  \"content-type\": \"text/plain\",\n  \"connection\": \"keep-alive\",\n  \"host\": \"example.com\",\n  \"accept\": \"*/*\" }\n</code></pre>\n<p>Keys are lowercased. Values are not modified.</p>\n<p>In order to support the full spectrum of possible HTTP applications, the Node.js\nHTTP API is very low-level. It deals with stream handling and message\nparsing only. It parses a message into headers and body but it does not\nparse the actual headers or the body.</p>\n<p>See <a href=\"#messageheaders\"><code>message.headers</code></a> for details on how duplicate headers are handled.</p>\n<p>The raw headers as they were received are retained in the <code>rawHeaders</code>\nproperty, which is an array of <code>[key, value, key2, value2, ...]</code>. For\nexample, the previous message header object might have a <code>rawHeaders</code>\nlist like the following:</p>\n<!-- eslint-disable @stylistic/js/semi -->\n<pre><code class=\"language-js\">[ 'ConTent-Length', '123456',\n  'content-LENGTH', '123',\n  'content-type', 'text/plain',\n  'CONNECTION', 'keep-alive',\n  'Host', 'example.com',\n  'accepT', '*/*' ]\n</code></pre>",
       "classes": [
         {
           "textRaw": "Class: `http.Agent`",
@@ -35,27 +35,42 @@
               "signatures": [
                 {
                   "return": {
-                    "textRaw": "Returns: {stream.Duplex}",
+                    "textRaw": "Returns: {stream.Duplex} The created socket. This is returned by the default implementation or by a custom synchronous `createConnection` implementation. If a custom `createConnection` uses the `callback` for asynchronous operation, this return value might not be the primary way to obtain the socket.",
                     "name": "return",
-                    "type": "stream.Duplex"
+                    "type": "stream.Duplex",
+                    "desc": "The created socket. This is returned by the default implementation or by a custom synchronous `createConnection` implementation. If a custom `createConnection` uses the `callback` for asynchronous operation, this return value might not be the primary way to obtain the socket."
                   },
                   "params": [
                     {
-                      "textRaw": "`options` {Object} Options containing connection details. Check [`net.createConnection()`][] for the format of the options",
+                      "textRaw": "`options` {Object} Options containing connection details. Check [`net.createConnection()`][] for the format of the options. For custom agents, this object is passed to the custom `createConnection` function.",
                       "name": "options",
                       "type": "Object",
-                      "desc": "Options containing connection details. Check [`net.createConnection()`][] for the format of the options"
+                      "desc": "Options containing connection details. Check [`net.createConnection()`][] for the format of the options. For custom agents, this object is passed to the custom `createConnection` function."
                     },
                     {
-                      "textRaw": "`callback` {Function} Callback function that receives the created socket",
+                      "textRaw": "`callback` {Function} (Optional, primarily for custom agents) A function to be called by a custom `createConnection` implementation when the socket is created, especially for asynchronous operations.",
                       "name": "callback",
                       "type": "Function",
-                      "desc": "Callback function that receives the created socket"
+                      "desc": "(Optional, primarily for custom agents) A function to be called by a custom `createConnection` implementation when the socket is created, especially for asynchronous operations.",
+                      "options": [
+                        {
+                          "textRaw": "`err` {Error | null} An error object if socket creation failed.",
+                          "name": "err",
+                          "type": "Error | null",
+                          "desc": "An error object if socket creation failed."
+                        },
+                        {
+                          "textRaw": "`socket` {stream.Duplex} The created socket.",
+                          "name": "socket",
+                          "type": "stream.Duplex",
+                          "desc": "The created socket."
+                        }
+                      ]
                     }
                   ]
                 }
               ],
-              "desc": "<p>Produces a socket/stream to be used for HTTP requests.</p>\n<p>By default, this function is the same as <a href=\"net.html#netcreateconnectionoptions-connectlistener\"><code>net.createConnection()</code></a>. However,\ncustom agents may override this method in case greater flexibility is desired.</p>\n<p>A socket/stream can be supplied in one of two ways: by returning the\nsocket/stream from this function, or by passing the socket/stream to <code>callback</code>.</p>\n<p>This method is guaranteed to return an instance of the <a href=\"net.html#class-netsocket\" class=\"type\">&lt;net.Socket&gt;</a> class,\na subclass of <a href=\"stream.html#class-streamduplex\" class=\"type\">&lt;stream.Duplex&gt;</a>, unless the user specifies a socket\ntype other than <a href=\"net.html#class-netsocket\" class=\"type\">&lt;net.Socket&gt;</a>.</p>\n<p><code>callback</code> has a signature of <code>(err, stream)</code>.</p>"
+              "desc": "<p>Produces a socket/stream to be used for HTTP requests.</p>\n<p>By default, this function behaves identically to <a href=\"net.html#netcreateconnectionoptions-connectlistener\"><code>net.createConnection()</code></a>,\nsynchronously returning the created socket. The optional <code>callback</code> parameter in the\nsignature is <strong>not</strong> used by this default implementation.</p>\n<p>However, custom agents may override this method to provide greater flexibility,\nfor example, to create sockets asynchronously. When overriding <code>createConnection</code>:</p>\n<ol>\n<li><strong>Synchronous socket creation</strong>: The overriding method can return the\nsocket/stream directly.</li>\n<li><strong>Asynchronous socket creation</strong>: The overriding method can accept the <code>callback</code>\nand pass the created socket/stream to it (e.g., <code>callback(null, newSocket)</code>).\nIf an error occurs during socket creation, it should be passed as the first\nargument to the <code>callback</code> (e.g., <code>callback(err)</code>).</li>\n</ol>\n<p>The agent will call the provided <code>createConnection</code> function with <code>options</code> and\nthis internal <code>callback</code>. The <code>callback</code> provided by the agent has a signature\nof <code>(err, stream)</code>.</p>"
             },
             {
               "textRaw": "`agent.keepSocketAlive(socket)`",
@@ -510,7 +525,7 @@
                 "changes": []
               },
               "params": [],
-              "desc": "<p>Emitted when the request has been sent. More specifically, this event is emitted\nwhen the last segment of the response headers and body have been handed off to\nthe operating system for transmission over the network. It does not imply that\nthe server has received anything yet.</p>"
+              "desc": "<p>Emitted when the request has been sent. More specifically, this event is emitted\nwhen the last segment of the request headers and body have been handed off to\nthe operating system for transmission over the network. It does not imply that\nthe server has received anything yet.</p>"
             },
             {
               "textRaw": "Event: `'information'`",
@@ -1264,7 +1279,7 @@
                 ],
                 "changes": []
               },
-              "desc": "<p>When sending request through a keep-alive enabled agent, the underlying socket\nmight be reused. But if server closes connection at unfortunate time, client\nmay run into a 'ECONNRESET' error.</p>\n<pre><code class=\"language-mjs\">import http from 'node:http';\n\n// Server has a 5 seconds keep-alive timeout by default\nhttp\n  .createServer((req, res) => {\n    res.write('hello\\n');\n    res.end();\n  })\n  .listen(3000);\n\nsetInterval(() => {\n  // Adapting a keep-alive agent\n  http.get('http://localhost:3000', { agent }, (res) => {\n    res.on('data', (data) => {\n      // Do nothing\n    });\n  });\n}, 5000); // Sending request on 5s interval so it's easy to hit idle timeout\n</code></pre>\n<pre><code class=\"language-cjs\">const http = require('node:http');\n\n// Server has a 5 seconds keep-alive timeout by default\nhttp\n  .createServer((req, res) => {\n    res.write('hello\\n');\n    res.end();\n  })\n  .listen(3000);\n\nsetInterval(() => {\n  // Adapting a keep-alive agent\n  http.get('http://localhost:3000', { agent }, (res) => {\n    res.on('data', (data) => {\n      // Do nothing\n    });\n  });\n}, 5000); // Sending request on 5s interval so it's easy to hit idle timeout\n</code></pre>\n<p>By marking a request whether it reused socket or not, we can do\nautomatic error retry base on it.</p>\n<pre><code class=\"language-mjs\">import http from 'node:http';\nconst agent = new http.Agent({ keepAlive: true });\n\nfunction retriableRequest() {\n  const req = http\n    .get('http://localhost:3000', { agent }, (res) => {\n      // ...\n    })\n    .on('error', (err) => {\n      // Check if retry is needed\n      if (req.reusedSocket &#x26;&#x26; err.code === 'ECONNRESET') {\n        retriableRequest();\n      }\n    });\n}\n\nretriableRequest();\n</code></pre>\n<pre><code class=\"language-cjs\">const http = require('node:http');\nconst agent = new http.Agent({ keepAlive: true });\n\nfunction retriableRequest() {\n  const req = http\n    .get('http://localhost:3000', { agent }, (res) => {\n      // ...\n    })\n    .on('error', (err) => {\n      // Check if retry is needed\n      if (req.reusedSocket &#x26;&#x26; err.code === 'ECONNRESET') {\n        retriableRequest();\n      }\n    });\n}\n\nretriableRequest();\n</code></pre>",
+              "desc": "<p>When sending request through a keep-alive enabled agent, the underlying socket\nmight be reused. But if server closes connection at unfortunate time, client\nmay run into a 'ECONNRESET' error.</p>\n<pre><code class=\"language-mjs\">import http from 'node:http';\nconst agent = new http.Agent({ keepAlive: true });\n\n// Server has a 5 seconds keep-alive timeout by default\nhttp\n  .createServer((req, res) => {\n    res.write('hello\\n');\n    res.end();\n  })\n  .listen(3000);\n\nsetInterval(() => {\n  // Adapting a keep-alive agent\n  http.get('http://localhost:3000', { agent }, (res) => {\n    res.on('data', (data) => {\n      // Do nothing\n    });\n  });\n}, 5000); // Sending request on 5s interval so it's easy to hit idle timeout\n</code></pre>\n<pre><code class=\"language-cjs\">const http = require('node:http');\nconst agent = new http.Agent({ keepAlive: true });\n\n// Server has a 5 seconds keep-alive timeout by default\nhttp\n  .createServer((req, res) => {\n    res.write('hello\\n');\n    res.end();\n  })\n  .listen(3000);\n\nsetInterval(() => {\n  // Adapting a keep-alive agent\n  http.get('http://localhost:3000', { agent }, (res) => {\n    res.on('data', (data) => {\n      // Do nothing\n    });\n  });\n}, 5000); // Sending request on 5s interval so it's easy to hit idle timeout\n</code></pre>\n<p>By marking a request whether it reused socket or not, we can do\nautomatic error retry base on it.</p>\n<pre><code class=\"language-mjs\">import http from 'node:http';\nconst agent = new http.Agent({ keepAlive: true });\n\nfunction retriableRequest() {\n  const req = http\n    .get('http://localhost:3000', { agent }, (res) => {\n      // ...\n    })\n    .on('error', (err) => {\n      // Check if retry is needed\n      if (req.reusedSocket &#x26;&#x26; err.code === 'ECONNRESET') {\n        retriableRequest();\n      }\n    });\n}\n\nretriableRequest();\n</code></pre>\n<pre><code class=\"language-cjs\">const http = require('node:http');\nconst agent = new http.Agent({ keepAlive: true });\n\nfunction retriableRequest() {\n  const req = http\n    .get('http://localhost:3000', { agent }, (res) => {\n      // ...\n    })\n    .on('error', (err) => {\n      // Check if retry is needed\n      if (req.reusedSocket &#x26;&#x26; err.code === 'ECONNRESET') {\n        retriableRequest();\n      }\n    });\n}\n\nretriableRequest();\n</code></pre>",
               "shortDesc": "Whether the request is send through a reused socket."
             },
             {
@@ -1827,7 +1842,8 @@
               "name": "Type",
               "meta": {
                 "added": [
-                  "v24.6.0"
+                  "v24.6.0",
+                  "v22.19.0"
                 ],
                 "changes": []
               },
@@ -3594,6 +3610,11 @@
             ],
             "changes": [
               {
+                "version": "v25.1.0",
+                "pr-url": "https://github.com/nodejs/node/pull/59778",
+                "description": "Add optimizeEmptyRequests option."
+              },
+              {
                 "version": "v24.9.0",
                 "pr-url": "https://github.com/nodejs/node/pull/59824",
                 "description": "The `shouldUpgradeCallback` option is now supported."
@@ -3773,6 +3794,13 @@
                       "type": "boolean",
                       "default": "`false`",
                       "desc": "If set to `true`, an error is thrown when writing to an HTTP response which does not have a body."
+                    },
+                    {
+                      "textRaw": "`optimizeEmptyRequests` {boolean} If set to `true`, requests without `Content-Length` or `Transfer-Encoding` headers (indicating no body) will be initialized with an already-ended body stream, so they will never emit any stream events (like `'data'` or `'end'`). You can use `req.readableEnded` to detect this case. **Default:** `false`.",
+                      "name": "optimizeEmptyRequests",
+                      "type": "boolean",
+                      "default": "`false`",
+                      "desc": "If set to `true`, requests without `Content-Length` or `Transfer-Encoding` headers (indicating no body) will be initialized with an already-ended body stream, so they will never emit any stream events (like `'data'` or `'end'`). You can use `req.readableEnded` to detect this case."
                     }
                   ]
                 },
@@ -4493,6 +4521,37 @@
             }
           ],
           "desc": "<p>Set the maximum number of idle HTTP parsers.</p>"
+        },
+        {
+          "textRaw": "`http.setGlobalProxyFromEnv([proxyEnv])`",
+          "type": "method",
+          "name": "setGlobalProxyFromEnv",
+          "meta": {
+            "added": [
+              "v25.4.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "return": {
+                "textRaw": "Returns: {Function} A function that restores the original agent and dispatcher settings to the state before this `http.setGlobalProxyFromEnv()` is invoked.",
+                "name": "return",
+                "type": "Function",
+                "desc": "A function that restores the original agent and dispatcher settings to the state before this `http.setGlobalProxyFromEnv()` is invoked."
+              },
+              "params": [
+                {
+                  "textRaw": "`proxyEnv` {Object} An object containing proxy configuration. This accepts the same options as the `proxyEnv` option accepted by [`Agent`][]. **Default:** `process.env`.",
+                  "name": "proxyEnv",
+                  "type": "Object",
+                  "default": "`process.env`",
+                  "desc": "An object containing proxy configuration. This accepts the same options as the `proxyEnv` option accepted by [`Agent`][]."
+                }
+              ]
+            }
+          ],
+          "desc": "<p>Dynamically resets the global configurations to enable built-in proxy support for\n<code>fetch()</code> and <code>http.request()</code>/<code>https.request()</code> at runtime, as an alternative\nto using the <code>--use-env-proxy</code> flag or <code>NODE_USE_ENV_PROXY</code> environment variable.\nIt can also be used to override settings configured from the environment variables.</p>\n<p>As this function resets the global configurations, any previously configured\n<code>http.globalAgent</code>, <code>https.globalAgent</code> or undici global dispatcher would be\noverridden after this function is invoked. It's recommended to invoke it before any\nrequests are made and avoid invoking it in the middle of any requests.</p>\n<p>See <a href=\"#built-in-proxy-support\">Built-in Proxy Support</a> for details on proxy URL formats and <code>NO_PROXY</code>\nsyntax.</p>"
         }
       ],
       "modules": [
@@ -4507,7 +4566,7 @@
           },
           "stability": 1,
           "stabilityText": ".1 - Active development",
-          "desc": "<p>When Node.js creates the global agent, if the <code>NODE_USE_ENV_PROXY</code> environment variable is\nset to <code>1</code> or <code>--use-env-proxy</code> is enabled, the global agent will be constructed\nwith <code>proxyEnv: process.env</code>, enabling proxy support based on the environment variables.\nCustom agents can also be created with proxy support by passing a\n<code>proxyEnv</code> option when constructing the agent. The value can be <code>process.env</code>\nif they just want to inherit the configuration from the environment variables,\nor an object with specific setting overriding the environment.</p>\n<p>The following properties of the <code>proxyEnv</code> are checked to configure proxy\nsupport.</p>\n<ul>\n<li><code>HTTP_PROXY</code> or <code>http_proxy</code>: Proxy server URL for HTTP requests. If both are set,\n<code>http_proxy</code> takes precedence.</li>\n<li><code>HTTPS_PROXY</code> or <code>https_proxy</code>: Proxy server URL for HTTPS requests. If both are set,\n<code>https_proxy</code> takes precedence.</li>\n<li><code>NO_PROXY</code> or <code>no_proxy</code>: Comma-separated list of hosts to bypass the proxy. If both are set,\n<code>no_proxy</code> takes precedence.</li>\n</ul>\n<p>If the request is made to a Unix domain socket, the proxy settings will be ignored.</p>",
+          "desc": "<p>When Node.js creates the global agent, if the <code>NODE_USE_ENV_PROXY</code> environment variable is\nset to <code>1</code> or <code>--use-env-proxy</code> is enabled, the global agent will be constructed\nwith <code>proxyEnv: process.env</code>, enabling proxy support based on the environment variables.</p>\n<p>To enable proxy support dynamically and globally, use <a href=\"#httpsetglobalproxyfromenvproxyenv\"><code>http.setGlobalProxyFromEnv()</code></a>.</p>\n<p>Custom agents can also be created with proxy support by passing a\n<code>proxyEnv</code> option when constructing the agent. The value can be <code>process.env</code>\nif they just want to inherit the configuration from the environment variables,\nor an object with specific setting overriding the environment.</p>\n<p>The following properties of the <code>proxyEnv</code> are checked to configure proxy\nsupport.</p>\n<ul>\n<li><code>HTTP_PROXY</code> or <code>http_proxy</code>: Proxy server URL for HTTP requests. If both are set,\n<code>http_proxy</code> takes precedence.</li>\n<li><code>HTTPS_PROXY</code> or <code>https_proxy</code>: Proxy server URL for HTTPS requests. If both are set,\n<code>https_proxy</code> takes precedence.</li>\n<li><code>NO_PROXY</code> or <code>no_proxy</code>: Comma-separated list of hosts to bypass the proxy. If both are set,\n<code>no_proxy</code> takes precedence.</li>\n</ul>\n<p>If the request is made to a Unix domain socket, the proxy settings will be ignored.</p>",
           "modules": [
             {
               "textRaw": "Proxy URL Format",
@@ -4519,7 +4578,7 @@
             {
               "textRaw": "`NO_PROXY` Format",
               "name": "`no_proxy`_format",
-              "desc": "<p>The <code>NO_PROXY</code> environment variable supports several formats:</p>\n<ul>\n<li><code>*</code> - Bypass proxy for all hosts</li>\n<li><code>example.com</code> - Exact host name match</li>\n<li><code>.example.com</code> - Domain suffix match (matches <code>sub.example.com</code>)</li>\n<li><code>*.example.com</code> - Wildcard domain match</li>\n<li><code>192.168.1.100</code> - Exact IP address match</li>\n<li><code>192.168.1.1-192.168.1.100</code> - IP address range</li>\n<li><code>example.com:8080</code> - Hostname with specific port</li>\n</ul>\n<p>Multiple entries should be separated by commas.</p>\n<h3>Example</h3>\n<p>To start a Node.js process with proxy support enabled for all requests sent\nthrough the default global agent, either use the <code>NODE_USE_ENV_PROXY</code> environment\nvariable:</p>\n<pre><code class=\"language-console\">NODE_USE_ENV_PROXY=1 HTTP_PROXY=http://proxy.example.com:8080 NO_PROXY=localhost,127.0.0.1 node client.js\n</code></pre>\n<p>Or the <code>--use-env-proxy</code> flag.</p>\n<pre><code class=\"language-console\">HTTP_PROXY=http://proxy.example.com:8080 NO_PROXY=localhost,127.0.0.1 node --use-env-proxy client.js\n</code></pre>\n<p>To create a custom agent with built-in proxy support:</p>\n<pre><code class=\"language-cjs\">const http = require('node:http');\n\n// Creating a custom agent with custom proxy support.\nconst agent = new http.Agent({ proxyEnv: { HTTP_PROXY: 'http://proxy.example.com:8080' } });\n\nhttp.request({\n  hostname: 'www.example.com',\n  port: 80,\n  path: '/',\n  agent,\n}, (res) => {\n  // This request will be proxied through proxy.example.com:8080 using the HTTP protocol.\n  console.log(`STATUS: ${res.statusCode}`);\n});\n</code></pre>\n<p>Alternatively, the following also works:</p>\n<pre><code class=\"language-cjs\">const http = require('node:http');\n// Use lower-cased option name.\nconst agent1 = new http.Agent({ proxyEnv: { http_proxy: 'http://proxy.example.com:8080' } });\n// Use values inherited from the environment variables, if the process is started with\n// HTTP_PROXY=http://proxy.example.com:8080 this will use the proxy server specified\n// in process.env.HTTP_PROXY.\nconst agent2 = new http.Agent({ proxyEnv: process.env });\n</code></pre>",
+              "desc": "<p>The <code>NO_PROXY</code> environment variable supports several formats:</p>\n<ul>\n<li><code>*</code> - Bypass proxy for all hosts</li>\n<li><code>example.com</code> - Exact host name match</li>\n<li><code>.example.com</code> - Domain suffix match (matches <code>sub.example.com</code>)</li>\n<li><code>*.example.com</code> - Wildcard domain match</li>\n<li><code>192.168.1.100</code> - Exact IP address match</li>\n<li><code>192.168.1.1-192.168.1.100</code> - IP address range</li>\n<li><code>example.com:8080</code> - Hostname with specific port</li>\n</ul>\n<p>Multiple entries should be separated by commas.</p>\n<h3>Example</h3>\n<p>To start a Node.js process with proxy support enabled for all requests sent\nthrough the default global agent, either use the <code>NODE_USE_ENV_PROXY</code> environment\nvariable:</p>\n<pre><code class=\"language-console\">NODE_USE_ENV_PROXY=1 HTTP_PROXY=http://proxy.example.com:8080 NO_PROXY=localhost,127.0.0.1 node client.js\n</code></pre>\n<p>Or the <code>--use-env-proxy</code> flag.</p>\n<pre><code class=\"language-console\">HTTP_PROXY=http://proxy.example.com:8080 NO_PROXY=localhost,127.0.0.1 node --use-env-proxy client.js\n</code></pre>\n<p>To enable proxy support dynamically and globally with <code>process.env</code> (the default option of <code>http.setGlobalProxyFromEnv()</code>):</p>\n<pre><code class=\"language-cjs\">const http = require('node:http');\n\n// Reads proxy-related environment variables from process.env\nconst restore = http.setGlobalProxyFromEnv();\n\n// Subsequent requests will use the configured proxies from environment variables\nhttp.get('http://www.example.com', (res) => {\n  // This request will be proxied if HTTP_PROXY or http_proxy is set\n});\n\nfetch('https://www.example.com', (res) => {\n  // This request will be proxied if HTTPS_PROXY or https_proxy is set\n});\n\n// To restore the original global agent and dispatcher settings, call the returned function.\n// restore();\n</code></pre>\n<pre><code class=\"language-mjs\">import http from 'node:http';\n\n// Reads proxy-related environment variables from process.env\nhttp.setGlobalProxyFromEnv();\n\n// Subsequent requests will use the configured proxies from environment variables\nhttp.get('http://www.example.com', (res) => {\n  // This request will be proxied if HTTP_PROXY or http_proxy is set\n});\n\nfetch('https://www.example.com', (res) => {\n  // This request will be proxied if HTTPS_PROXY or https_proxy is set\n});\n\n// To restore the original global agent and dispatcher settings, call the returned function.\n// restore();\n</code></pre>\n<p>To enable proxy support dynamically and globally with custom settings:</p>\n<pre><code class=\"language-cjs\">const http = require('node:http');\n\nconst restore = http.setGlobalProxyFromEnv({\n  http_proxy: 'http://proxy.example.com:8080',\n  https_proxy: 'https://proxy.example.com:8443',\n  no_proxy: 'localhost,127.0.0.1,.internal.example.com',\n});\n\n// Subsequent requests will use the configured proxies\nhttp.get('http://www.example.com', (res) => {\n  // This request will be proxied through proxy.example.com:8080\n});\n\nfetch('https://www.example.com', (res) => {\n  // This request will be proxied through proxy.example.com:8443\n});\n</code></pre>\n<pre><code class=\"language-mjs\">import http from 'node:http';\n\nhttp.setGlobalProxyFromEnv({\n  http_proxy: 'http://proxy.example.com:8080',\n  https_proxy: 'https://proxy.example.com:8443',\n  no_proxy: 'localhost,127.0.0.1,.internal.example.com',\n});\n\n// Subsequent requests will use the configured proxies\nhttp.get('http://www.example.com', (res) => {\n  // This request will be proxied through proxy.example.com:8080\n});\n\nfetch('https://www.example.com', (res) => {\n  // This request will be proxied through proxy.example.com:8443\n});\n</code></pre>\n<p>To create a custom agent with built-in proxy support:</p>\n<pre><code class=\"language-cjs\">const http = require('node:http');\n\n// Creating a custom agent with custom proxy support.\nconst agent = new http.Agent({ proxyEnv: { HTTP_PROXY: 'http://proxy.example.com:8080' } });\n\nhttp.request({\n  hostname: 'www.example.com',\n  port: 80,\n  path: '/',\n  agent,\n}, (res) => {\n  // This request will be proxied through proxy.example.com:8080 using the HTTP protocol.\n  console.log(`STATUS: ${res.statusCode}`);\n});\n</code></pre>\n<p>Alternatively, the following also works:</p>\n<pre><code class=\"language-cjs\">const http = require('node:http');\n// Use lower-cased option name.\nconst agent1 = new http.Agent({ proxyEnv: { http_proxy: 'http://proxy.example.com:8080' } });\n// Use values inherited from the environment variables, if the process is started with\n// HTTP_PROXY=http://proxy.example.com:8080 this will use the proxy server specified\n// in process.env.HTTP_PROXY.\nconst agent2 = new http.Agent({ proxyEnv: process.env });\n</code></pre>",
               "type": "module",
               "displayName": "`NO_PROXY` Format"
             }

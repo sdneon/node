@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.9.0/lib/fs.js\">lib/fs.js</a></p>\n<p>The <code>node:fs</code> module enables interacting with the file system in a\nway modeled on standard POSIX functions.</p>\n<p>To use the promise-based APIs:</p>\n<pre><code class=\"language-mjs\">import * as fs from 'node:fs/promises';\n</code></pre>\n<pre><code class=\"language-cjs\">const fs = require('node:fs/promises');\n</code></pre>\n<p>To use the callback and sync APIs:</p>\n<pre><code class=\"language-mjs\">import * as fs from 'node:fs';\n</code></pre>\n<pre><code class=\"language-cjs\">const fs = require('node:fs');\n</code></pre>\n<p>All file system operations have synchronous, callback, and promise-based\nforms, and are accessible using both CommonJS syntax and ES6 Modules (ESM).</p>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v25.5.0/lib/fs.js\">lib/fs.js</a></p>\n<p>The <code>node:fs</code> module enables interacting with the file system in a\nway modeled on standard POSIX functions.</p>\n<p>To use the promise-based APIs:</p>\n<pre><code class=\"language-mjs\">import * as fs from 'node:fs/promises';\n</code></pre>\n<pre><code class=\"language-cjs\">const fs = require('node:fs/promises');\n</code></pre>\n<p>To use the callback and sync APIs:</p>\n<pre><code class=\"language-mjs\">import * as fs from 'node:fs';\n</code></pre>\n<pre><code class=\"language-cjs\">const fs = require('node:fs');\n</code></pre>\n<p>All file system operations have synchronous, callback, and promise-based\nforms, and are accessible using both CommonJS syntax and ES6 Modules (ESM).</p>",
       "modules": [
         {
           "textRaw": "Promise example",
@@ -657,12 +657,10 @@
                     ],
                     "changes": [
                       {
-                        "version": "v24.2.0",
-                        "pr-url": "https://github.com/nodejs/node/pull/58548",
-                        "description": "Added the `autoClose` option."
-                      },
-                      {
-                        "version": "v24.0.0",
+                        "version": [
+                          "v24.0.0",
+                          "v22.17.0"
+                        ],
                         "pr-url": "https://github.com/nodejs/node/pull/57513",
                         "description": "Marking the API stable."
                       },
@@ -709,7 +707,7 @@
                       ]
                     }
                   ],
-                  "desc": "<p>Returns a byte-oriented <code>ReadableStream</code> that may be used to read the file's\ncontents.</p>\n<p>An error will be thrown if this method is called more than once or is called\nafter the <code>FileHandle</code> is closed or closing.</p>\n<pre><code class=\"language-mjs\">import {\n  open,\n} from 'node:fs/promises';\n\nconst file = await open('./some/file/to/read');\n\nfor await (const chunk of file.readableWebStream())\n  console.log(chunk);\n\nawait file.close();\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  open,\n} = require('node:fs/promises');\n\n(async () => {\n  const file = await open('./some/file/to/read');\n\n  for await (const chunk of file.readableWebStream())\n    console.log(chunk);\n\n  await file.close();\n})();\n</code></pre>\n<p>While the <code>ReadableStream</code> will read the file to completion, it will not\nclose the <code>FileHandle</code> automatically. User code must still call the\n<code>fileHandle.close()</code> method.</p>"
+                  "desc": "<p>Returns a byte-oriented <code>ReadableStream</code> that may be used to read the file's\ncontents.</p>\n<p>An error will be thrown if this method is called more than once or is called\nafter the <code>FileHandle</code> is closed or closing.</p>\n<pre><code class=\"language-mjs\">import {\n  open,\n} from 'node:fs/promises';\n\nconst file = await open('./some/file/to/read');\n\nfor await (const chunk of file.readableWebStream())\n  console.log(chunk);\n\nawait file.close();\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  open,\n} = require('node:fs/promises');\n\n(async () => {\n  const file = await open('./some/file/to/read');\n\n  for await (const chunk of file.readableWebStream())\n    console.log(chunk);\n\n  await file.close();\n})();\n</code></pre>\n<p>While the <code>ReadableStream</code> will read the file to completion, it will not\nclose the <code>FileHandle</code> automatically. User code must still call the\n<code>fileHandle.close()</code> method unless the <code>autoClose</code> option is set to <code>true</code>.</p>"
                 },
                 {
                   "textRaw": "`filehandle.readFile(options)`",
@@ -1051,7 +1049,7 @@
                       ]
                     }
                   ],
-                  "desc": "<p>Write <code>buffer</code> to the file.</p>\n<p>The promise is fulfilled with an object containing two properties:</p>\n<ul>\n<li><code>bytesWritten</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;integer&gt;</a> the number of bytes written</li>\n<li><code>buffer</code> <a href=\"buffer.html#class-buffer\" class=\"type\">&lt;Buffer&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\" class=\"type\">&lt;TypedArray&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView\" class=\"type\">&lt;DataView&gt;</a> a reference to the\n<code>buffer</code> written.</li>\n</ul>\n<p>It is unsafe to use <code>filehandle.write()</code> multiple times on the same file\nwithout waiting for the promise to be fulfilled (or rejected). For this\nscenario, use <a href=\"#filehandlecreatewritestreamoptions\"><code>filehandle.createWriteStream()</code></a>.</p>\n<p>On Linux, positional writes do not work when the file is opened in append mode.\nThe kernel ignores the position argument and always appends the data to\nthe end of the file.</p>"
+                  "desc": "<p>Write <code>buffer</code> to the file.</p>\n<p>The promise is fulfilled with an object containing two properties:</p>\n<ul>\n<li><code>bytesWritten</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type\" class=\"type\">&lt;integer&gt;</a> the number of bytes written</li>\n<li><code>buffer</code> <a href=\"buffer.html#class-buffer\" class=\"type\">&lt;Buffer&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\" class=\"type\">&lt;TypedArray&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView\" class=\"type\">&lt;DataView&gt;</a> a reference to the\n<code>buffer</code> written.</li>\n</ul>\n<p>It is unsafe to use <code>filehandle.write()</code> multiple times on the same file\nwithout waiting for the promise to be fulfilled (or rejected). For this\nscenario, use <a href=\"#filehandlecreatewritestreamoptions\"><code>filehandle.createWriteStream()</code></a>.</p>\n<p>On Linux, positional writes do not work when the file is opened in append mode.\nThe kernel ignores the position argument and always appends the data to\nthe end of the file.</p>"
                 },
                 {
                   "textRaw": "`filehandle.write(buffer[, options])`",
@@ -1153,7 +1151,7 @@
                       ]
                     }
                   ],
-                  "desc": "<p>Write <code>string</code> to the file. If <code>string</code> is not a string, the promise is\nrejected with an error.</p>\n<p>The promise is fulfilled with an object containing two properties:</p>\n<ul>\n<li><code>bytesWritten</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;integer&gt;</a> the number of bytes written</li>\n<li><code>buffer</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> a reference to the <code>string</code> written.</li>\n</ul>\n<p>It is unsafe to use <code>filehandle.write()</code> multiple times on the same file\nwithout waiting for the promise to be fulfilled (or rejected). For this\nscenario, use <a href=\"#filehandlecreatewritestreamoptions\"><code>filehandle.createWriteStream()</code></a>.</p>\n<p>On Linux, positional writes do not work when the file is opened in append mode.\nThe kernel ignores the position argument and always appends the data to\nthe end of the file.</p>"
+                  "desc": "<p>Write <code>string</code> to the file. If <code>string</code> is not a string, the promise is\nrejected with an error.</p>\n<p>The promise is fulfilled with an object containing two properties:</p>\n<ul>\n<li><code>bytesWritten</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type\" class=\"type\">&lt;integer&gt;</a> the number of bytes written</li>\n<li><code>buffer</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type\" class=\"type\">&lt;string&gt;</a> a reference to the <code>string</code> written.</li>\n</ul>\n<p>It is unsafe to use <code>filehandle.write()</code> multiple times on the same file\nwithout waiting for the promise to be fulfilled (or rejected). For this\nscenario, use <a href=\"#filehandlecreatewritestreamoptions\"><code>filehandle.createWriteStream()</code></a>.</p>\n<p>On Linux, positional writes do not work when the file is opened in append mode.\nThe kernel ignores the position argument and always appends the data to\nthe end of the file.</p>"
                 },
                 {
                   "textRaw": "`filehandle.writeFile(data, options)`",
@@ -1251,7 +1249,7 @@
                       ]
                     }
                   ],
-                  "desc": "<p>Write an array of <a href=\"https://developer.mozilla.org/en-US/docs/Web/API/ArrayBufferView\" class=\"type\">&lt;ArrayBufferView&gt;</a>s to the file.</p>\n<p>The promise is fulfilled with an object containing a two properties:</p>\n<ul>\n<li><code>bytesWritten</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;integer&gt;</a> the number of bytes written</li>\n<li><code>buffers</code> <a href=\"buffer.html#class-buffer\" class=\"type\">&lt;Buffer[]&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\" class=\"type\">&lt;TypedArray[]&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView\" class=\"type\">&lt;DataView[]&gt;</a> a reference to the <code>buffers</code>\ninput.</li>\n</ul>\n<p>It is unsafe to call <code>writev()</code> multiple times on the same file without waiting\nfor the promise to be fulfilled (or rejected).</p>\n<p>On Linux, positional writes don't work when the file is opened in append mode.\nThe kernel ignores the position argument and always appends the data to\nthe end of the file.</p>"
+                  "desc": "<p>Write an array of <a href=\"https://developer.mozilla.org/en-US/docs/Web/API/ArrayBufferView\" class=\"type\">&lt;ArrayBufferView&gt;</a>s to the file.</p>\n<p>The promise is fulfilled with an object containing a two properties:</p>\n<ul>\n<li><code>bytesWritten</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type\" class=\"type\">&lt;integer&gt;</a> the number of bytes written</li>\n<li><code>buffers</code> <a href=\"buffer.html#class-buffer\" class=\"type\">&lt;Buffer[]&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\" class=\"type\">&lt;TypedArray[]&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView\" class=\"type\">&lt;DataView[]&gt;</a> a reference to the <code>buffers</code>\ninput.</li>\n</ul>\n<p>It is unsafe to call <code>writev()</code> multiple times on the same file without waiting\nfor the promise to be fulfilled (or rejected).</p>\n<p>On Linux, positional writes don't work when the file is opened in append mode.\nThe kernel ignores the position argument and always appends the data to\nthe end of the file.</p>"
                 },
                 {
                   "textRaw": "`filehandle[Symbol.asyncDispose]()`",
@@ -1697,12 +1695,18 @@
                 ],
                 "changes": [
                   {
-                    "version": "v24.1.0",
+                    "version": [
+                      "v24.1.0",
+                      "v22.17.0"
+                    ],
                     "pr-url": "https://github.com/nodejs/node/pull/58182",
                     "description": "Add support for `URL` instances for `cwd` option."
                   },
                   {
-                    "version": "v24.0.0",
+                    "version": [
+                      "v24.0.0",
+                      "v22.17.0"
+                    ],
                     "pr-url": "https://github.com/nodejs/node/pull/57513",
                     "description": "Marking the API stable."
                   },
@@ -2008,11 +2012,11 @@
                           "default": "`false`"
                         },
                         {
-                          "textRaw": "`mode` {string|integer} Not supported on Windows. **Default:** `0o777`.",
+                          "textRaw": "`mode` {string|integer} Not supported on Windows. See [File modes][] for more details. **Default:** `0o777`.",
                           "name": "mode",
                           "type": "string|integer",
                           "default": "`0o777`",
-                          "desc": "Not supported on Windows."
+                          "desc": "Not supported on Windows. See [File modes][] for more details."
                         }
                       ]
                     }
@@ -2180,11 +2184,11 @@
                       "desc": "See [support of file system `flags`][]."
                     },
                     {
-                      "textRaw": "`mode` {string|integer} Sets the file mode (permission and sticky bits) if the file is created. **Default:** `0o666` (readable and writable)",
+                      "textRaw": "`mode` {string|integer} Sets the file mode (permission and sticky bits) if the file is created. See [File modes][] for more details. **Default:** `0o666` (readable and writable)",
                       "name": "mode",
                       "type": "string|integer",
                       "default": "`0o666` (readable and writable)",
-                      "desc": "Sets the file mode (permission and sticky bits) if the file is created."
+                      "desc": "Sets the file mode (permission and sticky bits) if the file is created. See [File modes][] for more details."
                     }
                   ]
                 }
@@ -2526,6 +2530,11 @@
                 ],
                 "changes": [
                   {
+                    "version": "v25.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/58616",
+                    "description": "Remove `recursive` option."
+                  },
+                  {
                     "version": "v16.0.0",
                     "pr-url": "https://github.com/nodejs/node/pull/37216",
                     "description": "Using `fsPromises.rmdir(path, { recursive: true })` on a `path` that is a file is no longer permitted and results in an `ENOENT` error on Windows and an `ENOTDIR` error on POSIX."
@@ -2575,32 +2584,10 @@
                       "type": "string|Buffer|URL"
                     },
                     {
-                      "textRaw": "`options` {Object}",
+                      "textRaw": "`options` {Object} There are currently no options exposed. There used to be options for `recursive`, `maxBusyTries`, and `emfileWait` but they were deprecated and removed. The `options` argument is still accepted for backwards compatibility but it is not used.",
                       "name": "options",
                       "type": "Object",
-                      "options": [
-                        {
-                          "textRaw": "`maxRetries` {integer} If an `EBUSY`, `EMFILE`, `ENFILE`, `ENOTEMPTY`, or `EPERM` error is encountered, Node.js retries the operation with a linear backoff wait of `retryDelay` milliseconds longer on each try. This option represents the number of retries. This option is ignored if the `recursive` option is not `true`. **Default:** `0`.",
-                          "name": "maxRetries",
-                          "type": "integer",
-                          "default": "`0`",
-                          "desc": "If an `EBUSY`, `EMFILE`, `ENFILE`, `ENOTEMPTY`, or `EPERM` error is encountered, Node.js retries the operation with a linear backoff wait of `retryDelay` milliseconds longer on each try. This option represents the number of retries. This option is ignored if the `recursive` option is not `true`."
-                        },
-                        {
-                          "textRaw": "`recursive` {boolean} If `true`, perform a recursive directory removal. In recursive mode, operations are retried on failure. **Default:** `false`. **Deprecated.**",
-                          "name": "recursive",
-                          "type": "boolean",
-                          "default": "`false`. **Deprecated.**",
-                          "desc": "If `true`, perform a recursive directory removal. In recursive mode, operations are retried on failure."
-                        },
-                        {
-                          "textRaw": "`retryDelay` {integer} The amount of time in milliseconds to wait between retries. This option is ignored if the `recursive` option is not `true`. **Default:** `100`.",
-                          "name": "retryDelay",
-                          "type": "integer",
-                          "default": "`100`",
-                          "desc": "The amount of time in milliseconds to wait between retries. This option is ignored if the `recursive` option is not `true`."
-                        }
-                      ]
+                      "desc": "There are currently no options exposed. There used to be options for `recursive`, `maxBusyTries`, and `emfileWait` but they were deprecated and removed. The `options` argument is still accepted for backwards compatibility but it is not used."
                     }
                   ]
                 }
@@ -2995,6 +2982,13 @@
                           "type": "string",
                           "default": "`'ignore'`",
                           "desc": "Either `'ignore'` or `'throw'` when there are more events to be queued than `maxQueue` allows. `'ignore'` means overflow events are dropped and a warning is emitted, while `'throw'` means to throw an exception."
+                        },
+                        {
+                          "textRaw": "`ignore` {string|RegExp|Function|Array} Pattern(s) to ignore. Strings are glob patterns (using [`minimatch`][]), RegExp patterns are tested against the filename, and functions receive the filename and return `true` to ignore. **Default:** `undefined`.",
+                          "name": "ignore",
+                          "type": "string|RegExp|Function|Array",
+                          "default": "`undefined`",
+                          "desc": "Pattern(s) to ignore. Strings are glob patterns (using [`minimatch`][]), RegExp patterns are tested against the filename, and functions receive the filename and return `true` to ignore."
                         }
                       ]
                     }
@@ -3140,6 +3134,11 @@
                   "v0.11.15"
                 ],
                 "changes": [
+                  {
+                    "version": "v25.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/55862",
+                    "description": "The constants `fs.F_OK`, `fs.R_OK`, `fs.W_OK` and `fs.X_OK` which were present directly on `fs` are removed."
+                  },
                   {
                     "version": "v20.8.0",
                     "pr-url": "https://github.com/nodejs/node/pull/49683",
@@ -4519,12 +4518,18 @@
                 ],
                 "changes": [
                   {
-                    "version": "v24.1.0",
+                    "version": [
+                      "v24.1.0",
+                      "v22.17.0"
+                    ],
                     "pr-url": "https://github.com/nodejs/node/pull/58182",
                     "description": "Add support for `URL` instances for `cwd` option."
                   },
                   {
-                    "version": "v24.0.0",
+                    "version": [
+                      "v24.0.0",
+                      "v22.17.0"
+                    ],
                     "pr-url": "https://github.com/nodejs/node/pull/57513",
                     "description": "Marking the API stable."
                   },
@@ -4988,11 +4993,11 @@
                           "default": "`false`"
                         },
                         {
-                          "textRaw": "`mode` {string|integer} Not supported on Windows. **Default:** `0o777`.",
+                          "textRaw": "`mode` {string|integer} Not supported on Windows. See [File modes][] for more details. **Default:** `0o777`.",
                           "name": "mode",
                           "type": "string|integer",
                           "default": "`0o777`",
-                          "desc": "Not supported on Windows."
+                          "desc": "Not supported on Windows. See [File modes][] for more details."
                         }
                       ]
                     },
@@ -5193,7 +5198,10 @@
                 ],
                 "changes": [
                   {
-                    "version": "v24.0.0",
+                    "version": [
+                      "v24.0.0",
+                      "v22.17.0"
+                    ],
                     "pr-url": "https://github.com/nodejs/node/pull/57513",
                     "description": "Marking the API stable."
                   }
@@ -6160,6 +6168,11 @@
                 ],
                 "changes": [
                   {
+                    "version": "v25.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/58616",
+                    "description": "Remove `recursive` option."
+                  },
+                  {
                     "version": "v18.0.0",
                     "pr-url": "https://github.com/nodejs/node/pull/41678",
                     "description": "Passing an invalid callback to the `callback` argument now throws `ERR_INVALID_ARG_TYPE` instead of `ERR_INVALID_CALLBACK`."
@@ -6223,32 +6236,10 @@
                       "type": "string|Buffer|URL"
                     },
                     {
-                      "textRaw": "`options` {Object}",
+                      "textRaw": "`options` {Object} There are currently no options exposed. There used to be options for `recursive`, `maxBusyTries`, and `emfileWait` but they were deprecated and removed. The `options` argument is still accepted for backwards compatibility but it is not used.",
                       "name": "options",
                       "type": "Object",
-                      "options": [
-                        {
-                          "textRaw": "`maxRetries` {integer} If an `EBUSY`, `EMFILE`, `ENFILE`, `ENOTEMPTY`, or `EPERM` error is encountered, Node.js retries the operation with a linear backoff wait of `retryDelay` milliseconds longer on each try. This option represents the number of retries. This option is ignored if the `recursive` option is not `true`. **Default:** `0`.",
-                          "name": "maxRetries",
-                          "type": "integer",
-                          "default": "`0`",
-                          "desc": "If an `EBUSY`, `EMFILE`, `ENFILE`, `ENOTEMPTY`, or `EPERM` error is encountered, Node.js retries the operation with a linear backoff wait of `retryDelay` milliseconds longer on each try. This option represents the number of retries. This option is ignored if the `recursive` option is not `true`."
-                        },
-                        {
-                          "textRaw": "`recursive` {boolean} If `true`, perform a recursive directory removal. In recursive mode, operations are retried on failure. **Default:** `false`. **Deprecated.**",
-                          "name": "recursive",
-                          "type": "boolean",
-                          "default": "`false`. **Deprecated.**",
-                          "desc": "If `true`, perform a recursive directory removal. In recursive mode, operations are retried on failure."
-                        },
-                        {
-                          "textRaw": "`retryDelay` {integer} The amount of time in milliseconds to wait between retries. This option is ignored if the `recursive` option is not `true`. **Default:** `100`.",
-                          "name": "retryDelay",
-                          "type": "integer",
-                          "default": "`100`",
-                          "desc": "The amount of time in milliseconds to wait between retries. This option is ignored if the `recursive` option is not `true`."
-                        }
-                      ]
+                      "desc": "There are currently no options exposed. There used to be options for `recursive`, `maxBusyTries`, and `emfileWait` but they were deprecated and removed. The `options` argument is still accepted for backwards compatibility but it is not used."
                     },
                     {
                       "textRaw": "`callback` {Function}",
@@ -6844,6 +6835,13 @@
                           "name": "signal",
                           "type": "AbortSignal",
                           "desc": "allows closing the watcher with an AbortSignal."
+                        },
+                        {
+                          "textRaw": "`ignore` {string|RegExp|Function|Array} Pattern(s) to ignore. Strings are glob patterns (using [`minimatch`][]), RegExp patterns are tested against the filename, and functions receive the filename and return `true` to ignore. **Default:** `undefined`.",
+                          "name": "ignore",
+                          "type": "string|RegExp|Function|Array",
+                          "default": "`undefined`",
+                          "desc": "Pattern(s) to ignore. Strings are glob patterns (using [`minimatch`][]), RegExp patterns are tested against the filename, and functions receive the filename and return `true` to ignore."
                         }
                       ]
                     },
@@ -8148,12 +8146,18 @@
                 ],
                 "changes": [
                   {
-                    "version": "v24.1.0",
+                    "version": [
+                      "v24.1.0",
+                      "v22.17.0"
+                    ],
                     "pr-url": "https://github.com/nodejs/node/pull/58182",
                     "description": "Add support for `URL` instances for `cwd` option."
                   },
                   {
-                    "version": "v24.0.0",
+                    "version": [
+                      "v24.0.0",
+                      "v22.17.0"
+                    ],
                     "pr-url": "https://github.com/nodejs/node/pull/57513",
                     "description": "Marking the API stable."
                   },
@@ -9237,6 +9241,11 @@
                 ],
                 "changes": [
                   {
+                    "version": "v25.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/58616",
+                    "description": "Remove `recursive` option."
+                  },
+                  {
                     "version": "v16.0.0",
                     "pr-url": "https://github.com/nodejs/node/pull/37216",
                     "description": "Using `fs.rmdirSync(path, { recursive: true })` on a `path` that is a file is no longer permitted and results in an `ENOENT` error on Windows and an `ENOTDIR` error on POSIX."
@@ -9285,32 +9294,10 @@
                       "type": "string|Buffer|URL"
                     },
                     {
-                      "textRaw": "`options` {Object}",
+                      "textRaw": "`options` {Object} There are currently no options exposed. There used to be options for `recursive`, `maxBusyTries`, and `emfileWait` but they were deprecated and removed. The `options` argument is still accepted for backwards compatibility but it is not used.",
                       "name": "options",
                       "type": "Object",
-                      "options": [
-                        {
-                          "textRaw": "`maxRetries` {integer} If an `EBUSY`, `EMFILE`, `ENFILE`, `ENOTEMPTY`, or `EPERM` error is encountered, Node.js retries the operation with a linear backoff wait of `retryDelay` milliseconds longer on each try. This option represents the number of retries. This option is ignored if the `recursive` option is not `true`. **Default:** `0`.",
-                          "name": "maxRetries",
-                          "type": "integer",
-                          "default": "`0`",
-                          "desc": "If an `EBUSY`, `EMFILE`, `ENFILE`, `ENOTEMPTY`, or `EPERM` error is encountered, Node.js retries the operation with a linear backoff wait of `retryDelay` milliseconds longer on each try. This option represents the number of retries. This option is ignored if the `recursive` option is not `true`."
-                        },
-                        {
-                          "textRaw": "`recursive` {boolean} If `true`, perform a recursive directory removal. In recursive mode, operations are retried on failure. **Default:** `false`. **Deprecated.**",
-                          "name": "recursive",
-                          "type": "boolean",
-                          "default": "`false`. **Deprecated.**",
-                          "desc": "If `true`, perform a recursive directory removal. In recursive mode, operations are retried on failure."
-                        },
-                        {
-                          "textRaw": "`retryDelay` {integer} The amount of time in milliseconds to wait between retries. This option is ignored if the `recursive` option is not `true`. **Default:** `100`.",
-                          "name": "retryDelay",
-                          "type": "integer",
-                          "default": "`100`",
-                          "desc": "The amount of time in milliseconds to wait between retries. This option is ignored if the `recursive` option is not `true`."
-                        }
-                      ]
+                      "desc": "There are currently no options exposed. There used to be options for `recursive`, `maxBusyTries`, and `emfileWait` but they were deprecated and removed. The `options` argument is still accepted for backwards compatibility but it is not used."
                     }
                   ]
                 }
@@ -10202,7 +10189,8 @@
                   "name": "[Symbol.asyncDispose]",
                   "meta": {
                     "added": [
-                      "v24.1.0"
+                      "v24.1.0",
+                      "v22.1.0"
                     ],
                     "changes": [
                       {
@@ -10225,7 +10213,8 @@
                   "name": "[Symbol.dispose]",
                   "meta": {
                     "added": [
-                      "v24.1.0"
+                      "v24.1.0",
+                      "v22.1.0"
                     ],
                     "changes": [
                       {
@@ -10450,7 +10439,10 @@
                     ],
                     "changes": [
                       {
-                        "version": "v24.0.0",
+                        "version": [
+                          "v24.0.0",
+                          "v22.17.0"
+                        ],
                         "pr-url": "https://github.com/nodejs/node/pull/57513",
                         "description": "Marking the API stable."
                       }
@@ -11148,7 +11140,7 @@
                 {
                   "textRaw": "Stat time values",
                   "name": "stat_time_values",
-                  "desc": "<p>The <code>atimeMs</code>, <code>mtimeMs</code>, <code>ctimeMs</code>, <code>birthtimeMs</code> properties are\nnumeric values that hold the corresponding times in milliseconds. Their\nprecision is platform specific. When <code>bigint: true</code> is passed into the\nmethod that generates the object, the properties will be <a href=\"https://tc39.github.io/proposal-bigint\">bigints</a>,\notherwise they will be <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\">numbers</a>.</p>\n<p>The <code>atimeNs</code>, <code>mtimeNs</code>, <code>ctimeNs</code>, <code>birthtimeNs</code> properties are\n<a href=\"https://tc39.github.io/proposal-bigint\">bigints</a> that hold the corresponding times in nanoseconds. They are\nonly present when <code>bigint: true</code> is passed into the method that generates\nthe object. Their precision is platform specific.</p>\n<p><code>atime</code>, <code>mtime</code>, <code>ctime</code>, and <code>birthtime</code> are\n<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date\"><code>Date</code></a> object alternate representations of the various times. The\n<code>Date</code> and number values are not connected. Assigning a new number value, or\nmutating the <code>Date</code> value, will not be reflected in the corresponding alternate\nrepresentation.</p>\n<p>The times in the stat object have the following semantics:</p>\n<ul>\n<li><code>atime</code> \"Access Time\": Time when file data last accessed. Changed\nby the <a href=\"http://man7.org/linux/man-pages/man2/mknod.2.html\"><code>mknod(2)</code></a>, <a href=\"http://man7.org/linux/man-pages/man2/utimes.2.html\"><code>utimes(2)</code></a>, and <a href=\"http://man7.org/linux/man-pages/man2/read.2.html\"><code>read(2)</code></a> system calls.</li>\n<li><code>mtime</code> \"Modified Time\": Time when file data last modified.\nChanged by the <a href=\"http://man7.org/linux/man-pages/man2/mknod.2.html\"><code>mknod(2)</code></a>, <a href=\"http://man7.org/linux/man-pages/man2/utimes.2.html\"><code>utimes(2)</code></a>, and <a href=\"http://man7.org/linux/man-pages/man2/write.2.html\"><code>write(2)</code></a> system calls.</li>\n<li><code>ctime</code> \"Change Time\": Time when file status was last changed\n(inode data modification). Changed by the <a href=\"http://man7.org/linux/man-pages/man2/chmod.2.html\"><code>chmod(2)</code></a>, <a href=\"http://man7.org/linux/man-pages/man2/chown.2.html\"><code>chown(2)</code></a>,\n<a href=\"http://man7.org/linux/man-pages/man2/link.2.html\"><code>link(2)</code></a>, <a href=\"http://man7.org/linux/man-pages/man2/mknod.2.html\"><code>mknod(2)</code></a>, <a href=\"http://man7.org/linux/man-pages/man2/rename.2.html\"><code>rename(2)</code></a>, <a href=\"http://man7.org/linux/man-pages/man2/unlink.2.html\"><code>unlink(2)</code></a>, <a href=\"http://man7.org/linux/man-pages/man2/utimes.2.html\"><code>utimes(2)</code></a>,\n<a href=\"http://man7.org/linux/man-pages/man2/read.2.html\"><code>read(2)</code></a>, and <a href=\"http://man7.org/linux/man-pages/man2/write.2.html\"><code>write(2)</code></a> system calls.</li>\n<li><code>birthtime</code> \"Birth Time\": Time of file creation. Set once when the\nfile is created. On file systems where birthtime is not available,\nthis field may instead hold either the <code>ctime</code> or\n<code>1970-01-01T00:00Z</code> (ie, Unix epoch timestamp <code>0</code>). This value may be greater\nthan <code>atime</code> or <code>mtime</code> in this case. On Darwin and other FreeBSD variants,\nalso set if the <code>atime</code> is explicitly set to an earlier value than the current\n<code>birthtime</code> using the <a href=\"http://man7.org/linux/man-pages/man2/utimes.2.html\"><code>utimes(2)</code></a> system call.</li>\n</ul>\n<p>Prior to Node.js 0.12, the <code>ctime</code> held the <code>birthtime</code> on Windows systems. As\nof 0.12, <code>ctime</code> is not \"creation time\", and on Unix systems, it never was.</p>",
+                  "desc": "<p>The <code>atimeMs</code>, <code>mtimeMs</code>, <code>ctimeMs</code>, <code>birthtimeMs</code> properties are\nnumeric values that hold the corresponding times in milliseconds. Their\nprecision is platform specific. When <code>bigint: true</code> is passed into the\nmethod that generates the object, the properties will be <a href=\"https://tc39.github.io/proposal-bigint\">bigints</a>,\notherwise they will be <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Data_structures#number_type\">numbers</a>.</p>\n<p>The <code>atimeNs</code>, <code>mtimeNs</code>, <code>ctimeNs</code>, <code>birthtimeNs</code> properties are\n<a href=\"https://tc39.github.io/proposal-bigint\">bigints</a> that hold the corresponding times in nanoseconds. They are\nonly present when <code>bigint: true</code> is passed into the method that generates\nthe object. Their precision is platform specific.</p>\n<p><code>atime</code>, <code>mtime</code>, <code>ctime</code>, and <code>birthtime</code> are\n<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date\"><code>Date</code></a> object alternate representations of the various times. The\n<code>Date</code> and number values are not connected. Assigning a new number value, or\nmutating the <code>Date</code> value, will not be reflected in the corresponding alternate\nrepresentation.</p>\n<p>The times in the stat object have the following semantics:</p>\n<ul>\n<li><code>atime</code> \"Access Time\": Time when file data last accessed. Changed\nby the <a href=\"http://man7.org/linux/man-pages/man2/mknod.2.html\"><code>mknod(2)</code></a>, <a href=\"http://man7.org/linux/man-pages/man2/utimes.2.html\"><code>utimes(2)</code></a>, and <a href=\"http://man7.org/linux/man-pages/man2/read.2.html\"><code>read(2)</code></a> system calls.</li>\n<li><code>mtime</code> \"Modified Time\": Time when file data last modified.\nChanged by the <a href=\"http://man7.org/linux/man-pages/man2/mknod.2.html\"><code>mknod(2)</code></a>, <a href=\"http://man7.org/linux/man-pages/man2/utimes.2.html\"><code>utimes(2)</code></a>, and <a href=\"http://man7.org/linux/man-pages/man2/write.2.html\"><code>write(2)</code></a> system calls.</li>\n<li><code>ctime</code> \"Change Time\": Time when file status was last changed\n(inode data modification). Changed by the <a href=\"http://man7.org/linux/man-pages/man2/chmod.2.html\"><code>chmod(2)</code></a>, <a href=\"http://man7.org/linux/man-pages/man2/chown.2.html\"><code>chown(2)</code></a>,\n<a href=\"http://man7.org/linux/man-pages/man2/link.2.html\"><code>link(2)</code></a>, <a href=\"http://man7.org/linux/man-pages/man2/mknod.2.html\"><code>mknod(2)</code></a>, <a href=\"http://man7.org/linux/man-pages/man2/rename.2.html\"><code>rename(2)</code></a>, <a href=\"http://man7.org/linux/man-pages/man2/unlink.2.html\"><code>unlink(2)</code></a>, <a href=\"http://man7.org/linux/man-pages/man2/utimes.2.html\"><code>utimes(2)</code></a>,\n<a href=\"http://man7.org/linux/man-pages/man2/read.2.html\"><code>read(2)</code></a>, and <a href=\"http://man7.org/linux/man-pages/man2/write.2.html\"><code>write(2)</code></a> system calls.</li>\n<li><code>birthtime</code> \"Birth Time\": Time of file creation. Set once when the\nfile is created. On file systems where birthtime is not available,\nthis field may instead hold either the <code>ctime</code> or\n<code>1970-01-01T00:00Z</code> (ie, Unix epoch timestamp <code>0</code>). This value may be greater\nthan <code>atime</code> or <code>mtime</code> in this case. On Darwin and other FreeBSD variants,\nalso set if the <code>atime</code> is explicitly set to an earlier value than the current\n<code>birthtime</code> using the <a href=\"http://man7.org/linux/man-pages/man2/utimes.2.html\"><code>utimes(2)</code></a> system call.</li>\n</ul>\n<p>Prior to Node.js 0.12, the <code>ctime</code> held the <code>birthtime</code> on Windows systems. As\nof 0.12, <code>ctime</code> is not \"creation time\", and on Unix systems, it never was.</p>",
                   "type": "module",
                   "displayName": "Stat time values"
                 }
@@ -11293,7 +11285,7 @@
                   "type": "event",
                   "name": "drop",
                   "params": [],
-                  "desc": "<p>The <code>'drop'</code> event is emitted when to maximal length is reached and that data\nwill not be written. The data that was dropped is passed as the first argument\nto the event handle.</p>"
+                  "desc": "<p>The <code>'drop'</code> event is emitted when the maximal length is reached and that data\nwill not be written. The data that was dropped is passed as the first argument\nto the event handler.</p>"
                 },
                 {
                   "textRaw": "Event: `'error'`",

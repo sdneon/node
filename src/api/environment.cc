@@ -6,6 +6,7 @@
 #include "node.h"
 #include "node_builtins.h"
 #include "node_context_data.h"
+#include "node_debug.h"
 #include "node_errors.h"
 #include "node_exit_code.h"
 #include "node_internals.h"
@@ -18,7 +19,7 @@
 #include "node_wasm_web_api.h"
 #include "uv.h"
 #ifdef NODE_ENABLE_VTUNE_PROFILING
-#include "../deps/v8/src/third_party/vtune/v8-vtune.h"
+#include "../deps/v8/third_party/vtune/v8-vtune.h"
 #endif
 #if HAVE_INSPECTOR
 #include "inspector/worker_inspector.h"  // ParentInspectorHandle
@@ -37,6 +38,7 @@ using v8::Function;
 using v8::FunctionCallbackInfo;
 using v8::HandleScope;
 using v8::Isolate;
+using v8::IsolateGroup;
 using v8::Just;
 using v8::JustVoid;
 using v8::Local;
@@ -111,10 +113,8 @@ MaybeLocal<Value> PrepareStackTraceCallback(Local<Context> context,
 
 void* NodeArrayBufferAllocator::Allocate(size_t size) {
   void* ret;
-  if (zero_fill_field_ || per_process::cli_options->zero_fill_all_buffers)
-    ret = allocator_->Allocate(size);
-  else
-    ret = allocator_->AllocateUninitialized(size);
+  COUNT_GENERIC_USAGE("NodeArrayBufferAllocator.Allocate.ZeroFilled");
+  ret = allocator_->Allocate(size);
   if (ret != nullptr) [[likely]] {
     total_mem_usage_.fetch_add(size, std::memory_order_relaxed);
   }
@@ -122,6 +122,7 @@ void* NodeArrayBufferAllocator::Allocate(size_t size) {
 }
 
 void* NodeArrayBufferAllocator::AllocateUninitialized(size_t size) {
+  COUNT_GENERIC_USAGE("NodeArrayBufferAllocator.Allocate.Uninitialized");
   void* ret = allocator_->AllocateUninitialized(size);
   if (ret != nullptr) [[likely]] {
     total_mem_usage_.fetch_add(size, std::memory_order_relaxed);
@@ -304,6 +305,17 @@ void SetIsolateUpForNode(v8::Isolate* isolate) {
   SetIsolateUpForNode(isolate, settings);
 }
 
+//
+IsolateGroup GetOrCreateIsolateGroup() {
+  // When pointer compression is disabled, we cannot create new groups,
+  // in which case we'll always return the default.
+  if (IsolateGroup::CanCreateNewGroups()) {
+    return IsolateGroup::Create();
+  }
+
+  return IsolateGroup::GetDefault();
+}
+
 // TODO(joyeecheung): we may want to expose this, but then we need to be
 // careful about what we override in the params.
 Isolate* NewIsolate(Isolate::CreateParams* params,
@@ -311,7 +323,8 @@ Isolate* NewIsolate(Isolate::CreateParams* params,
                     MultiIsolatePlatform* platform,
                     const SnapshotData* snapshot_data,
                     const IsolateSettings& settings) {
-  Isolate* isolate = Isolate::Allocate();
+  IsolateGroup group = GetOrCreateIsolateGroup();
+  Isolate* isolate = Isolate::Allocate(group);
   if (isolate == nullptr) return nullptr;
 
   if (snapshot_data != nullptr) {
@@ -617,26 +630,6 @@ MultiIsolatePlatform* GetMultiIsolatePlatform(IsolateData* env) {
   return env->platform();
 }
 
-MultiIsolatePlatform* CreatePlatform(
-    int thread_pool_size,
-    node::tracing::TracingController* tracing_controller) {
-  return CreatePlatform(
-      thread_pool_size,
-      static_cast<v8::TracingController*>(tracing_controller));
-}
-
-MultiIsolatePlatform* CreatePlatform(
-    int thread_pool_size,
-    v8::TracingController* tracing_controller) {
-  return MultiIsolatePlatform::Create(thread_pool_size,
-                                      tracing_controller)
-      .release();
-}
-
-void FreePlatform(MultiIsolatePlatform* platform) {
-  delete platform;
-}
-
 std::unique_ptr<MultiIsolatePlatform> MultiIsolatePlatform::Create(
     int thread_pool_size,
     v8::TracingController* tracing_controller,
@@ -648,7 +641,7 @@ std::unique_ptr<MultiIsolatePlatform> MultiIsolatePlatform::Create(
 
 MaybeLocal<Object> GetPerContextExports(Local<Context> context,
                                         IsolateData* isolate_data) {
-  Isolate* isolate = context->GetIsolate();
+  Isolate* isolate = Isolate::GetCurrent();
   EscapableHandleScope handle_scope(isolate);
 
   Local<Object> global = context->Global();
@@ -694,7 +687,7 @@ void ProtoThrower(const FunctionCallbackInfo<Value>& info) {
 // This runs at runtime, regardless of whether the context
 // is created from a snapshot.
 Maybe<void> InitializeContextRuntime(Local<Context> context) {
-  Isolate* isolate = context->GetIsolate();
+  Isolate* isolate = Isolate::GetCurrent();
   HandleScope handle_scope(isolate);
 
   // When `IsCodeGenerationFromStringsAllowed` is true, V8 takes the fast path
@@ -773,7 +766,7 @@ Maybe<void> InitializeContextRuntime(Local<Context> context) {
 }
 
 Maybe<void> InitializeBaseContextForSnapshot(Local<Context> context) {
-  Isolate* isolate = context->GetIsolate();
+  Isolate* isolate = Isolate::GetCurrent();
   HandleScope handle_scope(isolate);
 
   // Delete `Intl.v8BreakIterator`
@@ -798,7 +791,7 @@ Maybe<void> InitializeBaseContextForSnapshot(Local<Context> context) {
 }
 
 Maybe<void> InitializeMainContextForSnapshot(Local<Context> context) {
-  Isolate* isolate = context->GetIsolate();
+  Isolate* isolate = Isolate::GetCurrent();
   HandleScope handle_scope(isolate);
 
   // Initialize the default values.
@@ -816,7 +809,7 @@ Maybe<void> InitializeMainContextForSnapshot(Local<Context> context) {
 MaybeLocal<Object> InitializePrivateSymbols(Local<Context> context,
                                             IsolateData* isolate_data) {
   CHECK(isolate_data);
-  Isolate* isolate = context->GetIsolate();
+  Isolate* isolate = Isolate::GetCurrent();
   EscapableHandleScope scope(isolate);
   Context::Scope context_scope(context);
 
@@ -840,7 +833,7 @@ MaybeLocal<Object> InitializePrivateSymbols(Local<Context> context,
 MaybeLocal<Object> InitializePerIsolateSymbols(Local<Context> context,
                                                IsolateData* isolate_data) {
   CHECK(isolate_data);
-  Isolate* isolate = context->GetIsolate();
+  Isolate* isolate = Isolate::GetCurrent();
   EscapableHandleScope scope(isolate);
   Context::Scope context_scope(context);
 
@@ -866,15 +859,14 @@ MaybeLocal<Object> InitializePerIsolateSymbols(Local<Context> context,
 Maybe<void> InitializePrimordials(Local<Context> context,
                                   IsolateData* isolate_data) {
   // Run per-context JS files.
-  Isolate* isolate = context->GetIsolate();
+  Isolate* isolate = Isolate::GetCurrent();
   Context::Scope context_scope(context);
   Local<Object> exports;
 
   if (!GetPerContextExports(context).ToLocal(&exports)) {
     return Nothing<void>();
   }
-  Local<String> primordials_string =
-      FIXED_ONE_BYTE_STRING(isolate, "primordials");
+  Local<String> primordials_string = isolate_data->primordials_string();
   // Ensure that `InitializePrimordials` is called exactly once on a given
   // context.
   CHECK(!exports->Has(context, primordials_string).FromJust());
@@ -917,7 +909,7 @@ Maybe<void> InitializePrimordials(Local<Context> context,
         exports, primordials, private_symbols, per_isolate_symbols};
 
     if (builtin_loader
-            .CompileAndCall(
+            .CompileAndCallWith(
                 context, *module, arraysize(arguments), arguments, nullptr)
             .IsEmpty()) {
       // Execution failed during context creation.

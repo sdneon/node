@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v24.9.0">
-  <title>Permissions | Node.js v24.9.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v25.5.0">
+  <title>Permissions | Node.js v25.5.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -112,7 +112,7 @@
     <div id="column1" data-id="permissions" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v24.9.0 documentation</h1>
+          <h1>Node.js v25.5.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -127,7 +127,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v24.9.0</li>
+            <li class="pinned-header">Node.js v25.5.0</li>
             
     <li class="picker-header">
       <a href="#toc-picker" aria-controls="toc-picker">
@@ -148,6 +148,7 @@
 </ul>
 </li>
 <li><a href="#file-system-permissions">File System Permissions</a></li>
+<li><a href="#configuration-file-support">Configuration file support</a></li>
 <li><a href="#using-the-permission-model-with-npx">Using the Permission Model with <code>npx</code></a></li>
 <li><a href="#permission-model-constraints">Permission Model constraints</a></li>
 <li><a href="#limitations-and-known-issues">Limitations and Known Issues</a></li>
@@ -253,7 +254,8 @@
         <span class="picker-arrow"></span>
         Other versions
       </a>
-      <div class="picker" tabindex="-1"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v24.x/api/permissions.html">24.x</a></li>
+      <div class="picker" tabindex="-1"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v25.x/api/permissions.html">25.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v24.x/api/permissions.html">24.x <b>LTS</b></a></li>
 <li><a href="https://nodejs.org/docs/latest-v23.x/api/permissions.html">23.x</a></li>
 <li><a href="https://nodejs.org/docs/latest-v22.x/api/permissions.html">22.x <b>LTS</b></a></li>
 <li><a href="https://nodejs.org/docs/latest-v21.x/api/permissions.html">21.x</a></li>
@@ -296,6 +298,7 @@
 </ul>
 </li>
 <li><a href="#file-system-permissions">File System Permissions</a></li>
+<li><a href="#configuration-file-support">Configuration file support</a></li>
 <li><a href="#using-the-permission-model-with-npx">Using the Permission Model with <code>npx</code></a></li>
 <li><a href="#permission-model-constraints">Permission Model constraints</a></li>
 <li><a href="#limitations-and-known-issues">Limitations and Known Issues</a></li>
@@ -352,9 +355,10 @@ will restrict access to all available permissions.</p>
 <p>The available permissions are documented by the <a href="cli.html#--permission"><code>--permission</code></a>
 flag.</p>
 <p>When starting Node.js with <code>--permission</code>,
-the ability to access the file system through the <code>fs</code> module, spawn processes,
-use <code>node:worker_threads</code>, use native addons, use WASI, and enable the runtime inspector
-will be restricted.</p>
+the ability to access the file system through the <code>fs</code> module, access the network,
+spawn processes, use <code>node:worker_threads</code>, use native addons, use WASI, and
+enable the runtime inspector will be restricted (the listener for SIGUSR1 won't
+be created).</p>
 <pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">node --permission index.js</span>
 
 Error: Access to this API has been restricted
@@ -365,7 +369,8 @@ Error: Access to this API has been restricted
 }</code> <button class="copy-button">copy</button></pre>
 <p>Allowing access to spawning a process and creating worker threads can be done
 using the <a href="cli.html#--allow-child-process"><code>--allow-child-process</code></a> and <a href="cli.html#--allow-worker"><code>--allow-worker</code></a> respectively.</p>
-<p>To allow native addons when using permission model, use the <a href="cli.html#--allow-addons"><code>--allow-addons</code></a>
+<p>To allow network access, use <a href="cli.html#--allow-net"><code>--allow-net</code></a> and for allowing native addons
+when using permission model, use the <a href="cli.html#--allow-addons"><code>--allow-addons</code></a>
 flag. For WASI, use the <a href="cli.html#--allow-wasi"><code>--allow-wasi</code></a> flag.</p>
 <div>
 <h5>Runtime API<span><a class="mark" href="#runtime-api" id="runtime-api">#</a></span><a aria-hidden="true" class="legacy" id="permissions_runtime_api"></a></h5>
@@ -432,6 +437,26 @@ does not exist, the wildcard will not be added, and access will be limited to
 yet, make sure to explicitly include the wildcard:
 <code>/my-path/folder-do-not-exist/*</code>.</p>
 </div><div>
+<h5>Configuration file support<span><a class="mark" href="#configuration-file-support" id="configuration-file-support">#</a></span><a aria-hidden="true" class="legacy" id="permissions_configuration_file_support"></a></h5>
+<p>In addition to passing permission flags on the command line, they can also be
+declared in a Node.js configuration file when using the experimental
+[<code>--experimental-config-file</code>][] flag. Permission options must be placed inside
+the <code>permission</code> top-level object.</p>
+<p>Example <code>node.config.json</code>:</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"permission"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"allow-fs-read"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">"./foo"</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"allow-fs-write"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">"./bar"</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"allow-child-process"</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"allow-worker"</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"allow-net"</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"allow-addons"</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">false</span></span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
+<p>When the <code>permission</code> namespace is present in the configuration file, Node.js
+automatically enables the <code>--permission</code> flag. Run with:</p>
+<pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">node --experimental-default-config-file app.js</span></code> <button class="copy-button">copy</button></pre>
+</div><div>
 <h5>Using the Permission Model with <code>npx</code><span><a class="mark" href="#using-the-permission-model-with-npx" id="using-the-permission-model-with-npx">#</a></span><a aria-hidden="true" class="legacy" id="permissions_using_the_permission_model_with_npx"></a></h5>
 <p>If you're using <a href="https://docs.npmjs.com/cli/commands/npx"><code>npx</code></a> to execute a Node.js script, you can enable the
 Permission Model by passing the <code>--node-options</code> flag. For example:</p>
@@ -466,6 +491,7 @@ easy to configure permissions as needed when using <code>npx</code>.</p>
 <li>When using the Permission Model the following features will be restricted:
 <ul>
 <li>Native modules</li>
+<li>Network</li>
 <li>Child process</li>
 <li>Worker Threads</li>
 <li>Inspector protocol</li>

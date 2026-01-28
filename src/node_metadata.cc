@@ -12,6 +12,7 @@
 #include "simdjson.h"
 #include "simdutf.h"
 #if HAVE_SQLITE
+#include "quic/guard.h"
 #include "sqlite3.h"
 #endif  // HAVE_SQLITE
 #include "undici_version.h"
@@ -30,12 +31,12 @@
 #if HAVE_OPENSSL
 #include <openssl/crypto.h>
 #include "ncrypto.h"
-#if NODE_OPENSSL_HAS_QUIC
+#ifndef OPENSSL_NO_QUIC
 #include <openssl/quic.h>
 #endif
 #endif  // HAVE_OPENSSL
 
-#ifdef NODE_OPENSSL_HAS_QUIC
+#ifndef OPENSSL_NO_QUIC
 #include <ngtcp2/version.h>
 #include <nghttp3/version.h>
 #endif
@@ -46,6 +47,10 @@
 #include <unicode/uvernum.h>
 #include <unicode/uversion.h>
 #endif  // NODE_HAVE_I18N_SUPPORT
+
+#if HAVE_LIEF
+#include "LIEF/version.h"
+#endif
 
 namespace node {
 
@@ -109,6 +114,13 @@ Metadata::Versions::Versions() {
   modules = NODE_STRINGIFY(NODE_MODULE_VERSION);
   nghttp2 = NGHTTP2_VERSION;
   napi = NODE_STRINGIFY(NODE_API_SUPPORTED_VERSION_MAX);
+
+#if HAVE_LIEF
+  lief = (std::to_string(LIEF_VERSION_MAJOR) + "." +
+          std::to_string(LIEF_VERSION_MINOR) + "." +
+          std::to_string(LIEF_VERSION_PATCH));
+#endif
+
   llhttp =
       NODE_STRINGIFY(LLHTTP_VERSION_MAJOR)
       "."
@@ -147,7 +159,7 @@ Metadata::Versions::Versions() {
   unicode = U_UNICODE_VERSION;
 #endif  // NODE_HAVE_I18N_SUPPORT
 
-#ifdef NODE_OPENSSL_HAS_QUIC
+#ifndef OPENSSL_NO_QUIC
   ngtcp2 = NGTCP2_VERSION;
   nghttp3 = NGHTTP3_VERSION;
 #endif

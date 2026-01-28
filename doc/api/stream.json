@@ -8,7 +8,7 @@
       "introduced_in": "v0.10.0",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.9.0/lib/stream.js\">lib/stream.js</a></p>\n<p>A stream is an abstract interface for working with streaming data in Node.js.\nThe <code>node:stream</code> module provides an API for implementing the stream interface.</p>\n<p>There are many stream objects provided by Node.js. For instance, a\n<a href=\"http.html#class-httpincomingmessage\">request to an HTTP server</a> and <a href=\"process.html#processstdout\"><code>process.stdout</code></a>\nare both stream instances.</p>\n<p>Streams can be readable, writable, or both. All streams are instances of\n<a href=\"events.html#class-eventemitter\"><code>EventEmitter</code></a>.</p>\n<p>To access the <code>node:stream</code> module:</p>\n<pre><code class=\"language-js\">const stream = require('node:stream');\n</code></pre>\n<p>The <code>node:stream</code> module is useful for creating new types of stream instances.\nIt is usually not necessary to use the <code>node:stream</code> module to consume streams.</p>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v25.5.0/lib/stream.js\">lib/stream.js</a></p>\n<p>A stream is an abstract interface for working with streaming data in Node.js.\nThe <code>node:stream</code> module provides an API for implementing the stream interface.</p>\n<p>There are many stream objects provided by Node.js. For instance, a\n<a href=\"http.html#class-httpincomingmessage\">request to an HTTP server</a> and <a href=\"process.html#processstdout\"><code>process.stdout</code></a>\nare both stream instances.</p>\n<p>Streams can be readable, writable, or both. All streams are instances of\n<a href=\"events.html#class-eventemitter\"><code>EventEmitter</code></a>.</p>\n<p>To access the <code>node:stream</code> module:</p>\n<pre><code class=\"language-js\">const stream = require('node:stream');\n</code></pre>\n<p>The <code>node:stream</code> module is useful for creating new types of stream instances.\nIt is usually not necessary to use the <code>node:stream</code> module to consume streams.</p>",
       "modules": [
         {
           "textRaw": "Organization of this document",
@@ -722,7 +722,7 @@
               ]
             }
           ],
-          "desc": "<p>Combines two or more streams into a <code>Duplex</code> stream that writes to the\nfirst stream and reads from the last. Each provided stream is piped into\nthe next, using <code>stream.pipeline</code>. If any of the streams error then all\nare destroyed, including the outer <code>Duplex</code> stream.</p>\n<p>Because <code>stream.compose</code> returns a new stream that in turn can (and\nshould) be piped into other streams, it enables composition. In contrast,\nwhen passing streams to <code>stream.pipeline</code>, typically the first stream is\na readable stream and the last a writable stream, forming a closed\ncircuit.</p>\n<p>If passed a <code>Function</code> it must be a factory method taking a <code>source</code>\n<code>Iterable</code>.</p>\n<pre><code class=\"language-mjs\">import { compose, Transform } from 'node:stream';\n\nconst removeSpaces = new Transform({\n  transform(chunk, encoding, callback) {\n    callback(null, String(chunk).replace(' ', ''));\n  },\n});\n\nasync function* toUpper(source) {\n  for await (const chunk of source) {\n    yield String(chunk).toUpperCase();\n  }\n}\n\nlet res = '';\nfor await (const buf of compose(removeSpaces, toUpper).end('hello world')) {\n  res += buf;\n}\n\nconsole.log(res); // prints 'HELLOWORLD'\n</code></pre>\n<p><code>stream.compose</code> can be used to convert async iterables, generators and\nfunctions into streams.</p>\n<ul>\n<li><code>AsyncIterable</code> converts into a readable <code>Duplex</code>. Cannot yield\n<code>null</code>.</li>\n<li><code>AsyncGeneratorFunction</code> converts into a readable/writable transform <code>Duplex</code>.\nMust take a source <code>AsyncIterable</code> as first parameter. Cannot yield\n<code>null</code>.</li>\n<li><code>AsyncFunction</code> converts into a writable <code>Duplex</code>. Must return\neither <code>null</code> or <code>undefined</code>.</li>\n</ul>\n<pre><code class=\"language-mjs\">import { compose } from 'node:stream';\nimport { finished } from 'node:stream/promises';\n\n// Convert AsyncIterable into readable Duplex.\nconst s1 = compose(async function*() {\n  yield 'Hello';\n  yield 'World';\n}());\n\n// Convert AsyncGenerator into transform Duplex.\nconst s2 = compose(async function*(source) {\n  for await (const chunk of source) {\n    yield String(chunk).toUpperCase();\n  }\n});\n\nlet res = '';\n\n// Convert AsyncFunction into writable Duplex.\nconst s3 = compose(async function(source) {\n  for await (const chunk of source) {\n    res += chunk;\n  }\n});\n\nawait finished(compose(s1, s2, s3));\n\nconsole.log(res); // prints 'HELLOWORLD'\n</code></pre>\n<p>See <a href=\"#readablecomposestream-options\"><code>readable.compose(stream)</code></a> for <code>stream.compose</code> as operator.</p>"
+          "desc": "<p>Combines two or more streams into a <code>Duplex</code> stream that writes to the\nfirst stream and reads from the last. Each provided stream is piped into\nthe next, using <code>stream.pipeline</code>. If any of the streams error then all\nare destroyed, including the outer <code>Duplex</code> stream.</p>\n<p>Because <code>stream.compose</code> returns a new stream that in turn can (and\nshould) be piped into other streams, it enables composition. In contrast,\nwhen passing streams to <code>stream.pipeline</code>, typically the first stream is\na readable stream and the last a writable stream, forming a closed\ncircuit.</p>\n<p>If passed a <code>Function</code> it must be a factory method taking a <code>source</code>\n<code>Iterable</code>.</p>\n<pre><code class=\"language-mjs\">import { compose, Transform } from 'node:stream';\n\nconst removeSpaces = new Transform({\n  transform(chunk, encoding, callback) {\n    callback(null, String(chunk).replace(' ', ''));\n  },\n});\n\nasync function* toUpper(source) {\n  for await (const chunk of source) {\n    yield String(chunk).toUpperCase();\n  }\n}\n\nlet res = '';\nfor await (const buf of compose(removeSpaces, toUpper).end('hello world')) {\n  res += buf;\n}\n\nconsole.log(res); // prints 'HELLOWORLD'\n</code></pre>\n<p><code>stream.compose</code> can be used to convert async iterables, generators and\nfunctions into streams.</p>\n<ul>\n<li><code>AsyncIterable</code> converts into a readable <code>Duplex</code>. Cannot yield\n<code>null</code>.</li>\n<li><code>AsyncGeneratorFunction</code> converts into a readable/writable transform <code>Duplex</code>.\nMust take a source <code>AsyncIterable</code> as first parameter. Cannot yield\n<code>null</code>.</li>\n<li><code>AsyncFunction</code> converts into a writable <code>Duplex</code>. Must return\neither <code>null</code> or <code>undefined</code>.</li>\n</ul>\n<pre><code class=\"language-mjs\">import { compose } from 'node:stream';\nimport { finished } from 'node:stream/promises';\n\n// Convert AsyncIterable into readable Duplex.\nconst s1 = compose(async function*() {\n  yield 'Hello';\n  yield 'World';\n}());\n\n// Convert AsyncGenerator into transform Duplex.\nconst s2 = compose(async function*(source) {\n  for await (const chunk of source) {\n    yield String(chunk).toUpperCase();\n  }\n});\n\nlet res = '';\n\n// Convert AsyncFunction into writable Duplex.\nconst s3 = compose(async function(source) {\n  for await (const chunk of source) {\n    res += chunk;\n  }\n});\n\nawait finished(compose(s1, s2, s3));\n\nconsole.log(res); // prints 'HELLOWORLD'\n</code></pre>\n<p>For convenience, the <a href=\"#readablecomposestream-options\"><code>readable.compose(stream)</code></a> method is available on\n<a href=\"stream.html#class-streamreadable\" class=\"type\">&lt;Readable&gt;</a> and <a href=\"stream.html#class-streamduplex\" class=\"type\">&lt;Duplex&gt;</a> streams as a wrapper for this function.</p>"
         },
         {
           "textRaw": "`stream.isErrored(stream)`",
@@ -870,7 +870,10 @@
             ],
             "changes": [
               {
-                "version": "v24.0.0",
+                "version": [
+                  "v24.0.0",
+                  "v22.17.0"
+                ],
                 "pr-url": "https://github.com/nodejs/node/pull/57513",
                 "description": "Marking the API stable."
               }
@@ -930,7 +933,10 @@
             ],
             "changes": [
               {
-                "version": "v24.0.0",
+                "version": [
+                  "v24.0.0",
+                  "v22.17.0"
+                ],
                 "pr-url": "https://github.com/nodejs/node/pull/57513",
                 "description": "Marking the API stable."
               }
@@ -964,7 +970,15 @@
             ],
             "changes": [
               {
-                "version": "v24.0.0",
+                "version": "v25.4.0",
+                "pr-url": "https://github.com/nodejs/node/pull/58664",
+                "description": "Add 'type' option to specify 'bytes'."
+              },
+              {
+                "version": [
+                  "v24.0.0",
+                  "v22.17.0"
+                ],
                 "pr-url": "https://github.com/nodejs/node/pull/57513",
                 "description": "Marking the API stable."
               },
@@ -1025,6 +1039,12 @@
                           ]
                         }
                       ]
+                    },
+                    {
+                      "textRaw": "`type` {string} Must be 'bytes' or undefined.",
+                      "name": "type",
+                      "type": "string",
+                      "desc": "Must be 'bytes' or undefined."
                     }
                   ]
                 }
@@ -1042,7 +1062,10 @@
             ],
             "changes": [
               {
-                "version": "v24.0.0",
+                "version": [
+                  "v24.0.0",
+                  "v22.17.0"
+                ],
                 "pr-url": "https://github.com/nodejs/node/pull/57513",
                 "description": "Marking the API stable."
               }
@@ -1102,7 +1125,10 @@
             ],
             "changes": [
               {
-                "version": "v24.0.0",
+                "version": [
+                  "v24.0.0",
+                  "v22.17.0"
+                ],
                 "pr-url": "https://github.com/nodejs/node/pull/57513",
                 "description": "Marking the API stable."
               }
@@ -1167,7 +1193,10 @@
             ],
             "changes": [
               {
-                "version": "v24.0.0",
+                "version": [
+                  "v24.0.0",
+                  "v22.17.0"
+                ],
                 "pr-url": "https://github.com/nodejs/node/pull/57513",
                 "description": "Marking the API stable."
               }
@@ -1241,7 +1270,7 @@
           "desc": "<pre><code class=\"language-mjs\">import { Duplex } from 'node:stream';\nimport {\n  ReadableStream,\n  WritableStream,\n} from 'node:stream/web';\n\nconst readable = new ReadableStream({\n  start(controller) {\n    controller.enqueue('world');\n  },\n});\n\nconst writable = new WritableStream({\n  write(chunk) {\n    console.log('writable', chunk);\n  },\n});\n\nconst pair = {\n  readable,\n  writable,\n};\nconst duplex = Duplex.fromWeb(pair, { encoding: 'utf8', objectMode: true });\n\nduplex.write('hello');\n\nfor await (const chunk of duplex) {\n  console.log('readable', chunk);\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const { Duplex } = require('node:stream');\nconst {\n  ReadableStream,\n  WritableStream,\n} = require('node:stream/web');\n\nconst readable = new ReadableStream({\n  start(controller) {\n    controller.enqueue('world');\n  },\n});\n\nconst writable = new WritableStream({\n  write(chunk) {\n    console.log('writable', chunk);\n  },\n});\n\nconst pair = {\n  readable,\n  writable,\n};\nconst duplex = Duplex.fromWeb(pair, { encoding: 'utf8', objectMode: true });\n\nduplex.write('hello');\nduplex.once('readable', () => console.log('readable', duplex.read()));\n</code></pre>"
         },
         {
-          "textRaw": "`stream.Duplex.toWeb(streamDuplex)`",
+          "textRaw": "`stream.Duplex.toWeb(streamDuplex[, options])`",
           "type": "method",
           "name": "toWeb",
           "meta": {
@@ -1250,7 +1279,15 @@
             ],
             "changes": [
               {
-                "version": "v24.0.0",
+                "version": "v25.4.0",
+                "pr-url": "https://github.com/nodejs/node/pull/58664",
+                "description": "Add 'type' option to specify 'bytes'."
+              },
+              {
+                "version": [
+                  "v24.0.0",
+                  "v22.17.0"
+                ],
                 "pr-url": "https://github.com/nodejs/node/pull/57513",
                 "description": "Marking the API stable."
               }
@@ -1280,6 +1317,19 @@
                   "textRaw": "`streamDuplex` {stream.Duplex}",
                   "name": "streamDuplex",
                   "type": "stream.Duplex"
+                },
+                {
+                  "textRaw": "`options` {Object}",
+                  "name": "options",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`type` {string} Must be 'bytes' or undefined.",
+                      "name": "type",
+                      "type": "string",
+                      "desc": "Must be 'bytes' or undefined."
+                    }
+                  ]
                 }
               ]
             }
@@ -1404,7 +1454,7 @@
               "params": []
             }
           ],
-          "desc": "<p>Use of <code>readable.push('')</code> is not recommended.</p>\n<p>Pushing a zero-byte <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a>, <a href=\"buffer.html#class-buffer\" class=\"type\">&lt;Buffer&gt;</a>, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\" class=\"type\">&lt;TypedArray&gt;</a> or <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView\" class=\"type\">&lt;DataView&gt;</a> to a stream\nthat is not in object mode has an interesting side effect.\nBecause it <em>is</em> a call to\n<a href=\"#readablepushchunk-encoding\"><code>readable.push()</code></a>, the call will end the reading process.\nHowever, because the argument is an empty string, no data is added to the\nreadable buffer so there is nothing for a user to consume.</p>"
+          "desc": "<p>Use of <code>readable.push('')</code> is not recommended.</p>\n<p>Pushing a zero-byte <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type\" class=\"type\">&lt;string&gt;</a>, <a href=\"buffer.html#class-buffer\" class=\"type\">&lt;Buffer&gt;</a>, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\" class=\"type\">&lt;TypedArray&gt;</a> or <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView\" class=\"type\">&lt;DataView&gt;</a> to a stream\nthat is not in object mode has an interesting side effect.\nBecause it <em>is</em> a call to\n<a href=\"#readablepushchunk-encoding\"><code>readable.push()</code></a>, the call will end the reading process.\nHowever, because the argument is an empty string, no data is added to the\nreadable buffer so there is nothing for a user to consume.</p>"
         }
       ],
       "miscs": [
@@ -1845,7 +1895,10 @@
                         ],
                         "changes": [
                           {
-                            "version": "v24.0.0",
+                            "version": [
+                              "v24.0.0",
+                              "v22.17.0"
+                            ],
                             "pr-url": "https://github.com/nodejs/node/pull/57513",
                             "description": "Marking the API stable."
                           }
@@ -2495,7 +2548,10 @@
                         ],
                         "changes": [
                           {
-                            "version": "v24.0.0",
+                            "version": [
+                              "v24.0.0",
+                              "v22.17.0"
+                            ],
                             "pr-url": "https://github.com/nodejs/node/pull/57513",
                             "description": "Marking the API stable."
                           }
@@ -2511,9 +2567,9 @@
                           },
                           "params": [
                             {
-                              "textRaw": "`stream` {Stream|Iterable|AsyncIterable|Function}",
+                              "textRaw": "`stream` {Writable|Duplex|WritableStream|TransformStream|Function}",
                               "name": "stream",
-                              "type": "Stream|Iterable|AsyncIterable|Function"
+                              "type": "Writable|Duplex|WritableStream|TransformStream|Function"
                             },
                             {
                               "textRaw": "`options` {Object}",
@@ -2531,7 +2587,7 @@
                           ]
                         }
                       ],
-                      "desc": "<pre><code class=\"language-mjs\">import { Readable } from 'node:stream';\n\nasync function* splitToWords(source) {\n  for await (const chunk of source) {\n    const words = String(chunk).split(' ');\n\n    for (const word of words) {\n      yield word;\n    }\n  }\n}\n\nconst wordsStream = Readable.from(['this is', 'compose as operator']).compose(splitToWords);\nconst words = await wordsStream.toArray();\n\nconsole.log(words); // prints ['this', 'is', 'compose', 'as', 'operator']\n</code></pre>\n<p>See <a href=\"#streamcomposestreams\"><code>stream.compose</code></a> for more information.</p>"
+                      "desc": "<pre><code class=\"language-mjs\">import { Readable } from 'node:stream';\n\nasync function* splitToWords(source) {\n  for await (const chunk of source) {\n    const words = String(chunk).split(' ');\n\n    for (const word of words) {\n      yield word;\n    }\n  }\n}\n\nconst wordsStream = Readable.from(['text passed through', 'composed stream']).compose(splitToWords);\nconst words = await wordsStream.toArray();\n\nconsole.log(words); // prints ['text', 'passed', 'through', 'composed', 'stream']\n</code></pre>\n<p><code>readable.compose(s)</code> is equivalent to <code>stream.compose(readable, s)</code>.</p>\n<p>This method also allows for an <a href=\"globals.html#class-abortsignal\" class=\"type\">&lt;AbortSignal&gt;</a> to be provided, which will destroy\nthe composed stream when aborted.</p>\n<p>See <a href=\"#streamcomposestreams\"><code>stream.compose(...streams)</code></a> for more information.</p>"
                     },
                     {
                       "textRaw": "`readable.iterator([options])`",
@@ -2543,7 +2599,10 @@
                         ],
                         "changes": [
                           {
-                            "version": "v24.0.0",
+                            "version": [
+                              "v24.0.0",
+                              "v22.17.0"
+                            ],
                             "pr-url": "https://github.com/nodejs/node/pull/57513",
                             "description": "Marking the API stable."
                           }
@@ -2869,7 +2928,7 @@
                           ]
                         }
                       ],
-                      "desc": "<p>This method allows easily obtaining the contents of a stream.</p>\n<p>As this method reads the entire stream into memory, it negates the benefits of\nstreams. It's intended for interoperability and convenience, not as the primary\nway to consume streams.</p>\n<pre><code class=\"language-mjs\">import { Readable } from 'node:stream';\nimport { Resolver } from 'node:dns/promises';\n\nawait Readable.from([1, 2, 3, 4]).toArray(); // [1, 2, 3, 4]\n\n// Make dns queries concurrently using .map and collect\n// the results into an array using toArray\nconst dnsResults = await Readable.from([\n  'nodejs.org',\n  'openjsf.org',\n  'www.linuxfoundation.org',\n]).map(async (domain) => {\n  const { address } = await resolver.resolve4(domain, { ttl: true });\n  return address;\n}, { concurrency: 2 }).toArray();\n</code></pre>"
+                      "desc": "<p>This method allows easily obtaining the contents of a stream.</p>\n<p>As this method reads the entire stream into memory, it negates the benefits of\nstreams. It's intended for interoperability and convenience, not as the primary\nway to consume streams.</p>\n<pre><code class=\"language-mjs\">import { Readable } from 'node:stream';\nimport { Resolver } from 'node:dns/promises';\n\nawait Readable.from([1, 2, 3, 4]).toArray(); // [1, 2, 3, 4]\n\nconst resolver = new Resolver();\n\n// Make dns queries concurrently using .map and collect\n// the results into an array using toArray\nconst dnsResults = await Readable.from([\n  'nodejs.org',\n  'openjsf.org',\n  'www.linuxfoundation.org',\n]).map(async (domain) => {\n  const { address } = await resolver.resolve4(domain, { ttl: true });\n  return address;\n}, { concurrency: 2 }).toArray();\n</code></pre>"
                     },
                     {
                       "textRaw": "`readable.some(fn[, options])`",
@@ -3386,7 +3445,10 @@
                         ],
                         "changes": [
                           {
-                            "version": "v24.0.0",
+                            "version": [
+                              "v24.0.0",
+                              "v22.17.0"
+                            ],
                             "pr-url": "https://github.com/nodejs/node/pull/57513",
                             "description": "Marking the API stable."
                           }
@@ -3405,7 +3467,10 @@
                         ],
                         "changes": [
                           {
-                            "version": "v24.0.0",
+                            "version": [
+                              "v24.0.0",
+                              "v22.17.0"
+                            ],
                             "pr-url": "https://github.com/nodejs/node/pull/57513",
                             "description": "Marking the API stable."
                           }
@@ -3999,7 +4064,7 @@
                   ]
                 }
               ],
-              "desc": "<p>Combines two or more streams into a <code>Duplex</code> stream that writes to the\nfirst stream and reads from the last. Each provided stream is piped into\nthe next, using <code>stream.pipeline</code>. If any of the streams error then all\nare destroyed, including the outer <code>Duplex</code> stream.</p>\n<p>Because <code>stream.compose</code> returns a new stream that in turn can (and\nshould) be piped into other streams, it enables composition. In contrast,\nwhen passing streams to <code>stream.pipeline</code>, typically the first stream is\na readable stream and the last a writable stream, forming a closed\ncircuit.</p>\n<p>If passed a <code>Function</code> it must be a factory method taking a <code>source</code>\n<code>Iterable</code>.</p>\n<pre><code class=\"language-mjs\">import { compose, Transform } from 'node:stream';\n\nconst removeSpaces = new Transform({\n  transform(chunk, encoding, callback) {\n    callback(null, String(chunk).replace(' ', ''));\n  },\n});\n\nasync function* toUpper(source) {\n  for await (const chunk of source) {\n    yield String(chunk).toUpperCase();\n  }\n}\n\nlet res = '';\nfor await (const buf of compose(removeSpaces, toUpper).end('hello world')) {\n  res += buf;\n}\n\nconsole.log(res); // prints 'HELLOWORLD'\n</code></pre>\n<p><code>stream.compose</code> can be used to convert async iterables, generators and\nfunctions into streams.</p>\n<ul>\n<li><code>AsyncIterable</code> converts into a readable <code>Duplex</code>. Cannot yield\n<code>null</code>.</li>\n<li><code>AsyncGeneratorFunction</code> converts into a readable/writable transform <code>Duplex</code>.\nMust take a source <code>AsyncIterable</code> as first parameter. Cannot yield\n<code>null</code>.</li>\n<li><code>AsyncFunction</code> converts into a writable <code>Duplex</code>. Must return\neither <code>null</code> or <code>undefined</code>.</li>\n</ul>\n<pre><code class=\"language-mjs\">import { compose } from 'node:stream';\nimport { finished } from 'node:stream/promises';\n\n// Convert AsyncIterable into readable Duplex.\nconst s1 = compose(async function*() {\n  yield 'Hello';\n  yield 'World';\n}());\n\n// Convert AsyncGenerator into transform Duplex.\nconst s2 = compose(async function*(source) {\n  for await (const chunk of source) {\n    yield String(chunk).toUpperCase();\n  }\n});\n\nlet res = '';\n\n// Convert AsyncFunction into writable Duplex.\nconst s3 = compose(async function(source) {\n  for await (const chunk of source) {\n    res += chunk;\n  }\n});\n\nawait finished(compose(s1, s2, s3));\n\nconsole.log(res); // prints 'HELLOWORLD'\n</code></pre>\n<p>See <a href=\"#readablecomposestream-options\"><code>readable.compose(stream)</code></a> for <code>stream.compose</code> as operator.</p>"
+              "desc": "<p>Combines two or more streams into a <code>Duplex</code> stream that writes to the\nfirst stream and reads from the last. Each provided stream is piped into\nthe next, using <code>stream.pipeline</code>. If any of the streams error then all\nare destroyed, including the outer <code>Duplex</code> stream.</p>\n<p>Because <code>stream.compose</code> returns a new stream that in turn can (and\nshould) be piped into other streams, it enables composition. In contrast,\nwhen passing streams to <code>stream.pipeline</code>, typically the first stream is\na readable stream and the last a writable stream, forming a closed\ncircuit.</p>\n<p>If passed a <code>Function</code> it must be a factory method taking a <code>source</code>\n<code>Iterable</code>.</p>\n<pre><code class=\"language-mjs\">import { compose, Transform } from 'node:stream';\n\nconst removeSpaces = new Transform({\n  transform(chunk, encoding, callback) {\n    callback(null, String(chunk).replace(' ', ''));\n  },\n});\n\nasync function* toUpper(source) {\n  for await (const chunk of source) {\n    yield String(chunk).toUpperCase();\n  }\n}\n\nlet res = '';\nfor await (const buf of compose(removeSpaces, toUpper).end('hello world')) {\n  res += buf;\n}\n\nconsole.log(res); // prints 'HELLOWORLD'\n</code></pre>\n<p><code>stream.compose</code> can be used to convert async iterables, generators and\nfunctions into streams.</p>\n<ul>\n<li><code>AsyncIterable</code> converts into a readable <code>Duplex</code>. Cannot yield\n<code>null</code>.</li>\n<li><code>AsyncGeneratorFunction</code> converts into a readable/writable transform <code>Duplex</code>.\nMust take a source <code>AsyncIterable</code> as first parameter. Cannot yield\n<code>null</code>.</li>\n<li><code>AsyncFunction</code> converts into a writable <code>Duplex</code>. Must return\neither <code>null</code> or <code>undefined</code>.</li>\n</ul>\n<pre><code class=\"language-mjs\">import { compose } from 'node:stream';\nimport { finished } from 'node:stream/promises';\n\n// Convert AsyncIterable into readable Duplex.\nconst s1 = compose(async function*() {\n  yield 'Hello';\n  yield 'World';\n}());\n\n// Convert AsyncGenerator into transform Duplex.\nconst s2 = compose(async function*(source) {\n  for await (const chunk of source) {\n    yield String(chunk).toUpperCase();\n  }\n});\n\nlet res = '';\n\n// Convert AsyncFunction into writable Duplex.\nconst s3 = compose(async function(source) {\n  for await (const chunk of source) {\n    res += chunk;\n  }\n});\n\nawait finished(compose(s1, s2, s3));\n\nconsole.log(res); // prints 'HELLOWORLD'\n</code></pre>\n<p>For convenience, the <a href=\"#readablecomposestream-options\"><code>readable.compose(stream)</code></a> method is available on\n<a href=\"stream.html#class-streamreadable\" class=\"type\">&lt;Readable&gt;</a> and <a href=\"stream.html#class-streamduplex\" class=\"type\">&lt;Duplex&gt;</a> streams as a wrapper for this function.</p>"
             },
             {
               "textRaw": "`stream.isErrored(stream)`",
@@ -4147,7 +4212,10 @@
                 ],
                 "changes": [
                   {
-                    "version": "v24.0.0",
+                    "version": [
+                      "v24.0.0",
+                      "v22.17.0"
+                    ],
                     "pr-url": "https://github.com/nodejs/node/pull/57513",
                     "description": "Marking the API stable."
                   }
@@ -4207,7 +4275,10 @@
                 ],
                 "changes": [
                   {
-                    "version": "v24.0.0",
+                    "version": [
+                      "v24.0.0",
+                      "v22.17.0"
+                    ],
                     "pr-url": "https://github.com/nodejs/node/pull/57513",
                     "description": "Marking the API stable."
                   }
@@ -4241,7 +4312,15 @@
                 ],
                 "changes": [
                   {
-                    "version": "v24.0.0",
+                    "version": "v25.4.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/58664",
+                    "description": "Add 'type' option to specify 'bytes'."
+                  },
+                  {
+                    "version": [
+                      "v24.0.0",
+                      "v22.17.0"
+                    ],
                     "pr-url": "https://github.com/nodejs/node/pull/57513",
                     "description": "Marking the API stable."
                   },
@@ -4302,6 +4381,12 @@
                               ]
                             }
                           ]
+                        },
+                        {
+                          "textRaw": "`type` {string} Must be 'bytes' or undefined.",
+                          "name": "type",
+                          "type": "string",
+                          "desc": "Must be 'bytes' or undefined."
                         }
                       ]
                     }
@@ -4319,7 +4404,10 @@
                 ],
                 "changes": [
                   {
-                    "version": "v24.0.0",
+                    "version": [
+                      "v24.0.0",
+                      "v22.17.0"
+                    ],
                     "pr-url": "https://github.com/nodejs/node/pull/57513",
                     "description": "Marking the API stable."
                   }
@@ -4379,7 +4467,10 @@
                 ],
                 "changes": [
                   {
-                    "version": "v24.0.0",
+                    "version": [
+                      "v24.0.0",
+                      "v22.17.0"
+                    ],
                     "pr-url": "https://github.com/nodejs/node/pull/57513",
                     "description": "Marking the API stable."
                   }
@@ -4444,7 +4535,10 @@
                 ],
                 "changes": [
                   {
-                    "version": "v24.0.0",
+                    "version": [
+                      "v24.0.0",
+                      "v22.17.0"
+                    ],
                     "pr-url": "https://github.com/nodejs/node/pull/57513",
                     "description": "Marking the API stable."
                   }
@@ -4518,7 +4612,7 @@
               "desc": "<pre><code class=\"language-mjs\">import { Duplex } from 'node:stream';\nimport {\n  ReadableStream,\n  WritableStream,\n} from 'node:stream/web';\n\nconst readable = new ReadableStream({\n  start(controller) {\n    controller.enqueue('world');\n  },\n});\n\nconst writable = new WritableStream({\n  write(chunk) {\n    console.log('writable', chunk);\n  },\n});\n\nconst pair = {\n  readable,\n  writable,\n};\nconst duplex = Duplex.fromWeb(pair, { encoding: 'utf8', objectMode: true });\n\nduplex.write('hello');\n\nfor await (const chunk of duplex) {\n  console.log('readable', chunk);\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const { Duplex } = require('node:stream');\nconst {\n  ReadableStream,\n  WritableStream,\n} = require('node:stream/web');\n\nconst readable = new ReadableStream({\n  start(controller) {\n    controller.enqueue('world');\n  },\n});\n\nconst writable = new WritableStream({\n  write(chunk) {\n    console.log('writable', chunk);\n  },\n});\n\nconst pair = {\n  readable,\n  writable,\n};\nconst duplex = Duplex.fromWeb(pair, { encoding: 'utf8', objectMode: true });\n\nduplex.write('hello');\nduplex.once('readable', () => console.log('readable', duplex.read()));\n</code></pre>"
             },
             {
-              "textRaw": "`stream.Duplex.toWeb(streamDuplex)`",
+              "textRaw": "`stream.Duplex.toWeb(streamDuplex[, options])`",
               "type": "method",
               "name": "toWeb",
               "meta": {
@@ -4527,7 +4621,15 @@
                 ],
                 "changes": [
                   {
-                    "version": "v24.0.0",
+                    "version": "v25.4.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/58664",
+                    "description": "Add 'type' option to specify 'bytes'."
+                  },
+                  {
+                    "version": [
+                      "v24.0.0",
+                      "v22.17.0"
+                    ],
                     "pr-url": "https://github.com/nodejs/node/pull/57513",
                     "description": "Marking the API stable."
                   }
@@ -4557,6 +4659,19 @@
                       "textRaw": "`streamDuplex` {stream.Duplex}",
                       "name": "streamDuplex",
                       "type": "stream.Duplex"
+                    },
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`type` {string} Must be 'bytes' or undefined.",
+                          "name": "type",
+                          "type": "string",
+                          "desc": "Must be 'bytes' or undefined."
+                        }
+                      ]
                     }
                   ]
                 }
@@ -5235,7 +5350,7 @@
                       ]
                     }
                   ],
-                  "desc": "<p>When <code>chunk</code> is a <a href=\"buffer.html#class-buffer\" class=\"type\">&lt;Buffer&gt;</a>, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\" class=\"type\">&lt;TypedArray&gt;</a>, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView\" class=\"type\">&lt;DataView&gt;</a> or <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a>, the <code>chunk</code>\nof data will be added to the internal queue for users of the stream to consume.\nPassing <code>chunk</code> as <code>null</code> signals the end of the stream (EOF), after which no\nmore data can be written.</p>\n<p>When the <code>Readable</code> is operating in paused mode, the data added with\n<code>readable.push()</code> can be read out by calling the\n<a href=\"#readablereadsize\"><code>readable.read()</code></a> method when the <a href=\"#event-readable\"><code>'readable'</code></a> event is\nemitted.</p>\n<p>When the <code>Readable</code> is operating in flowing mode, the data added with\n<code>readable.push()</code> will be delivered by emitting a <code>'data'</code> event.</p>\n<p>The <code>readable.push()</code> method is designed to be as flexible as possible. For\nexample, when wrapping a lower-level source that provides some form of\npause/resume mechanism, and a data callback, the low-level source can be wrapped\nby the custom <code>Readable</code> instance:</p>\n<pre><code class=\"language-js\">// `_source` is an object with readStop() and readStart() methods,\n// and an `ondata` member that gets called when it has data, and\n// an `onend` member that gets called when the data is over.\n\nclass SourceWrapper extends Readable {\n  constructor(options) {\n    super(options);\n\n    this._source = getLowLevelSourceObject();\n\n    // Every time there's data, push it into the internal buffer.\n    this._source.ondata = (chunk) => {\n      // If push() returns false, then stop reading from source.\n      if (!this.push(chunk))\n        this._source.readStop();\n    };\n\n    // When the source ends, push the EOF-signaling `null` chunk.\n    this._source.onend = () => {\n      this.push(null);\n    };\n  }\n  // _read() will be called when the stream wants to pull more data in.\n  // The advisory size argument is ignored in this case.\n  _read(size) {\n    this._source.readStart();\n  }\n}\n</code></pre>\n<p>The <code>readable.push()</code> method is used to push the content\ninto the internal buffer. It can be driven by the <a href=\"#readable_readsize\"><code>readable._read()</code></a> method.</p>\n<p>For streams not operating in object mode, if the <code>chunk</code> parameter of\n<code>readable.push()</code> is <code>undefined</code>, it will be treated as empty string or\nbuffer. See <a href=\"#readablepush\"><code>readable.push('')</code></a> for more information.</p>"
+                  "desc": "<p>When <code>chunk</code> is a <a href=\"buffer.html#class-buffer\" class=\"type\">&lt;Buffer&gt;</a>, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\" class=\"type\">&lt;TypedArray&gt;</a>, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView\" class=\"type\">&lt;DataView&gt;</a> or <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type\" class=\"type\">&lt;string&gt;</a>, the <code>chunk</code>\nof data will be added to the internal queue for users of the stream to consume.\nPassing <code>chunk</code> as <code>null</code> signals the end of the stream (EOF), after which no\nmore data can be written.</p>\n<p>When the <code>Readable</code> is operating in paused mode, the data added with\n<code>readable.push()</code> can be read out by calling the\n<a href=\"#readablereadsize\"><code>readable.read()</code></a> method when the <a href=\"#event-readable\"><code>'readable'</code></a> event is\nemitted.</p>\n<p>When the <code>Readable</code> is operating in flowing mode, the data added with\n<code>readable.push()</code> will be delivered by emitting a <code>'data'</code> event.</p>\n<p>The <code>readable.push()</code> method is designed to be as flexible as possible. For\nexample, when wrapping a lower-level source that provides some form of\npause/resume mechanism, and a data callback, the low-level source can be wrapped\nby the custom <code>Readable</code> instance:</p>\n<pre><code class=\"language-js\">// `_source` is an object with readStop() and readStart() methods,\n// and an `ondata` member that gets called when it has data, and\n// an `onend` member that gets called when the data is over.\n\nclass SourceWrapper extends Readable {\n  constructor(options) {\n    super(options);\n\n    this._source = getLowLevelSourceObject();\n\n    // Every time there's data, push it into the internal buffer.\n    this._source.ondata = (chunk) => {\n      // If push() returns false, then stop reading from source.\n      if (!this.push(chunk))\n        this._source.readStop();\n    };\n\n    // When the source ends, push the EOF-signaling `null` chunk.\n    this._source.onend = () => {\n      this.push(null);\n    };\n  }\n  // _read() will be called when the stream wants to pull more data in.\n  // The advisory size argument is ignored in this case.\n  _read(size) {\n    this._source.readStart();\n  }\n}\n</code></pre>\n<p>The <code>readable.push()</code> method is used to push the content\ninto the internal buffer. It can be driven by the <a href=\"#readable_readsize\"><code>readable._read()</code></a> method.</p>\n<p>For streams not operating in object mode, if the <code>chunk</code> parameter of\n<code>readable.push()</code> is <code>undefined</code>, it will be treated as empty string or\nbuffer. See <a href=\"#readablepush\"><code>readable.push('')</code></a> for more information.</p>"
                 }
               ],
               "modules": [
@@ -5547,7 +5662,7 @@
                   "params": []
                 }
               ],
-              "desc": "<p>Use of <code>readable.push('')</code> is not recommended.</p>\n<p>Pushing a zero-byte <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a>, <a href=\"buffer.html#class-buffer\" class=\"type\">&lt;Buffer&gt;</a>, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\" class=\"type\">&lt;TypedArray&gt;</a> or <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView\" class=\"type\">&lt;DataView&gt;</a> to a stream\nthat is not in object mode has an interesting side effect.\nBecause it <em>is</em> a call to\n<a href=\"#readablepushchunk-encoding\"><code>readable.push()</code></a>, the call will end the reading process.\nHowever, because the argument is an empty string, no data is added to the\nreadable buffer so there is nothing for a user to consume.</p>"
+              "desc": "<p>Use of <code>readable.push('')</code> is not recommended.</p>\n<p>Pushing a zero-byte <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type\" class=\"type\">&lt;string&gt;</a>, <a href=\"buffer.html#class-buffer\" class=\"type\">&lt;Buffer&gt;</a>, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\" class=\"type\">&lt;TypedArray&gt;</a> or <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView\" class=\"type\">&lt;DataView&gt;</a> to a stream\nthat is not in object mode has an interesting side effect.\nBecause it <em>is</em> a call to\n<a href=\"#readablepushchunk-encoding\"><code>readable.push()</code></a>, the call will end the reading process.\nHowever, because the argument is an empty string, no data is added to the\nreadable buffer so there is nothing for a user to consume.</p>"
             }
           ]
         }

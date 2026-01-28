@@ -68,7 +68,8 @@ static const char* const provider_names[] = {
 void AsyncWrap::DestroyAsyncIdsCallback(Environment* env) {
   Local<Function> fn = env->async_hooks_destroy_function();
 
-  TryCatchScope try_catch(env, TryCatchScope::CatchMode::kFatal);
+  TryCatchScope try_catch(env,
+                          TryCatchScope::CatchMode::kFatalRethrowStackOverflow);
 
   do {
     std::vector<double> destroy_async_id_list;
@@ -97,7 +98,8 @@ void Emit(Environment* env, double async_id, AsyncHooks::Fields type,
 
   HandleScope handle_scope(env->isolate());
   Local<Value> async_id_value = Number::New(env->isolate(), async_id);
-  TryCatchScope try_catch(env, TryCatchScope::CatchMode::kFatal);
+  TryCatchScope try_catch(env,
+                          TryCatchScope::CatchMode::kFatalRethrowStackOverflow);
   USE(fn->Call(env->context(), Undefined(env->isolate()), 1, &async_id_value));
 }
 
@@ -278,7 +280,7 @@ void AsyncWrap::PushAsyncContext(const FunctionCallbackInfo<Value>& args) {
   // then the checks in push_async_ids() and pop_async_id() will.
   double async_id = args[0]->NumberValue(env->context()).FromJust();
   double trigger_async_id = args[1]->NumberValue(env->context()).FromJust();
-  env->async_hooks()->push_async_context(async_id, trigger_async_id, nullptr);
+  env->async_hooks()->push_async_context(async_id, trigger_async_id, {});
 }
 
 
@@ -646,7 +648,8 @@ void AsyncWrap::EmitAsyncInit(Environment* env,
     object,
   };
 
-  TryCatchScope try_catch(env, TryCatchScope::CatchMode::kFatal);
+  TryCatchScope try_catch(env,
+                          TryCatchScope::CatchMode::kFatalRethrowStackOverflow);
   USE(init_fn->Call(env->context(), object, arraysize(argv), argv));
 }
 

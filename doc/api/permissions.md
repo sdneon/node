@@ -49,9 +49,10 @@ The available permissions are documented by the [`--permission`][]
 flag.
 
 When starting Node.js with `--permission`,
-the ability to access the file system through the `fs` module, spawn processes,
-use `node:worker_threads`, use native addons, use WASI, and enable the runtime inspector
-will be restricted.
+the ability to access the file system through the `fs` module, access the network,
+spawn processes, use `node:worker_threads`, use native addons, use WASI, and
+enable the runtime inspector will be restricted (the listener for SIGUSR1 won't
+be created).
 
 ```console
 $ node --permission index.js
@@ -67,7 +68,8 @@ Error: Access to this API has been restricted
 Allowing access to spawning a process and creating worker threads can be done
 using the [`--allow-child-process`][] and [`--allow-worker`][] respectively.
 
-To allow native addons when using permission model, use the [`--allow-addons`][]
+To allow network access, use [`--allow-net`][] and for allowing native addons
+when using permission model, use the [`--allow-addons`][]
 flag. For WASI, use the [`--allow-wasi`][] flag.
 
 #### Runtime API
@@ -151,6 +153,35 @@ does not exist, the wildcard will not be added, and access will be limited to
 yet, make sure to explicitly include the wildcard:
 `/my-path/folder-do-not-exist/*`.
 
+#### Configuration file support
+
+In addition to passing permission flags on the command line, they can also be
+declared in a Node.js configuration file when using the experimental
+\[`--experimental-config-file`]\[] flag. Permission options must be placed inside
+the `permission` top-level object.
+
+Example `node.config.json`:
+
+```json
+{
+  "permission": {
+    "allow-fs-read": ["./foo"],
+    "allow-fs-write": ["./bar"],
+    "allow-child-process": true,
+    "allow-worker": true,
+    "allow-net": true,
+    "allow-addons": false
+  }
+}
+```
+
+When the `permission` namespace is present in the configuration file, Node.js
+automatically enables the `--permission` flag. Run with:
+
+```console
+$ node --experimental-default-config-file app.js
+```
+
 #### Using the Permission Model with `npx`
 
 If you're using [`npx`][] to execute a Node.js script, you can enable the
@@ -195,6 +226,7 @@ There are constraints you need to know before using this system:
 * The model does not inherit to a worker thread.
 * When using the Permission Model the following features will be restricted:
   * Native modules
+  * Network
   * Child process
   * Worker Threads
   * Inspector protocol
@@ -225,6 +257,7 @@ There are constraints you need to know before using this system:
 [`--allow-child-process`]: cli.md#--allow-child-process
 [`--allow-fs-read`]: cli.md#--allow-fs-read
 [`--allow-fs-write`]: cli.md#--allow-fs-write
+[`--allow-net`]: cli.md#--allow-net
 [`--allow-wasi`]: cli.md#--allow-wasi
 [`--allow-worker`]: cli.md#--allow-worker
 [`--permission`]: cli.md#--permission

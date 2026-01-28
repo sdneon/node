@@ -41,6 +41,8 @@
                                      '../../deps/icu-small/source/common/errorcode.cpp',
                                      '../../deps/icu-small/source/common/filteredbrk.cpp',
                                      '../../deps/icu-small/source/common/filterednormalizer2.cpp',
+                                     '../../deps/icu-small/source/common/fixedstring.cpp',
+                                     '../../deps/icu-small/source/common/fixedstring.h',
                                      '../../deps/icu-small/source/common/hash.h',
                                      '../../deps/icu-small/source/common/icudataver.cpp',
                                      '../../deps/icu-small/source/common/icuplug.cpp',

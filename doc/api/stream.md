@@ -878,7 +878,9 @@ added:
   - v18.0.0
   - v16.17.0
 changes:
- - version: v24.0.0
+ - version:
+    - v24.0.0
+    - v22.17.0
    pr-url: https://github.com/nodejs/node/pull/57513
    description: Marking the API stable.
 -->
@@ -1646,7 +1648,9 @@ the stream has not been destroyed or emitted `'error'` or `'end'`.
 <!-- YAML
 added: v16.8.0
 changes:
- - version: v24.0.0
+ - version:
+    - v24.0.0
+    - v22.17.0
    pr-url: https://github.com/nodejs/node/pull/57513
    description: Marking the API stable.
 -->
@@ -1662,7 +1666,9 @@ added:
   - v16.7.0
   - v14.18.0
 changes:
- - version: v24.0.0
+ - version:
+    - v24.0.0
+    - v22.17.0
    pr-url: https://github.com/nodejs/node/pull/57513
    description: Marking the API stable.
 -->
@@ -2014,12 +2020,14 @@ added:
   - v19.1.0
   - v18.13.0
 changes:
- - version: v24.0.0
+ - version:
+    - v24.0.0
+    - v22.17.0
    pr-url: https://github.com/nodejs/node/pull/57513
    description: Marking the API stable.
 -->
 
-* `stream` {Stream|Iterable|AsyncIterable|Function}
+* `stream` {Writable|Duplex|WritableStream|TransformStream|Function}
 * `options` {Object}
   * `signal` {AbortSignal} allows destroying the stream if the signal is
     aborted.
@@ -2038,20 +2046,27 @@ async function* splitToWords(source) {
   }
 }
 
-const wordsStream = Readable.from(['this is', 'compose as operator']).compose(splitToWords);
+const wordsStream = Readable.from(['text passed through', 'composed stream']).compose(splitToWords);
 const words = await wordsStream.toArray();
 
-console.log(words); // prints ['this', 'is', 'compose', 'as', 'operator']
+console.log(words); // prints ['text', 'passed', 'through', 'composed', 'stream']
 ```
 
-See [`stream.compose`][] for more information.
+`readable.compose(s)` is equivalent to `stream.compose(readable, s)`.
+
+This method also allows for an {AbortSignal} to be provided, which will destroy
+the composed stream when aborted.
+
+See [`stream.compose(...streams)`][] for more information.
 
 ##### `readable.iterator([options])`
 
 <!-- YAML
 added: v16.3.0
 changes:
- - version: v24.0.0
+ - version:
+    - v24.0.0
+    - v22.17.0
    pr-url: https://github.com/nodejs/node/pull/57513
    description: Marking the API stable.
 -->
@@ -2304,6 +2319,8 @@ import { Readable } from 'node:stream';
 import { Resolver } from 'node:dns/promises';
 
 await Readable.from([1, 2, 3, 4]).toArray(); // [1, 2, 3, 4]
+
+const resolver = new Resolver();
 
 // Make dns queries concurrently using .map and collect
 // the results into an array using toArray
@@ -3038,7 +3055,8 @@ await finished(compose(s1, s2, s3));
 console.log(res); // prints 'HELLOWORLD'
 ```
 
-See [`readable.compose(stream)`][] for `stream.compose` as operator.
+For convenience, the [`readable.compose(stream)`][] method is available on
+{Readable} and {Duplex} streams as a wrapper for this function.
 
 ### `stream.isErrored(stream)`
 
@@ -3139,7 +3157,9 @@ Readable.from([
 <!-- YAML
 added: v17.0.0
 changes:
-  - version: v24.0.0
+  - version:
+      - v24.0.0
+      - v22.17.0
     pr-url: https://github.com/nodejs/node/pull/57513
     description: Marking the API stable.
 -->
@@ -3157,7 +3177,9 @@ changes:
 <!-- YAML
 added: v16.8.0
 changes:
-  - version: v24.0.0
+  - version:
+      - v24.0.0
+      - v22.17.0
     pr-url: https://github.com/nodejs/node/pull/57513
     description: Marking the API stable.
 -->
@@ -3172,7 +3194,12 @@ Returns whether the stream has been read from or cancelled.
 <!-- YAML
 added: v17.0.0
 changes:
-  - version: v24.0.0
+  - version: v25.4.0
+    pr-url: https://github.com/nodejs/node/pull/58664
+    description: Add 'type' option to specify 'bytes'.
+  - version:
+      - v24.0.0
+      - v22.17.0
     pr-url: https://github.com/nodejs/node/pull/57513
     description: Marking the API stable.
   - version:
@@ -3192,6 +3219,7 @@ changes:
       If no value is provided, the size will be `1` for all the chunks.
       * `chunk` {any}
       * Returns: {number}
+  * `type` {string} Must be 'bytes' or undefined.
 * Returns: {ReadableStream}
 
 ### `stream.Writable.fromWeb(writableStream[, options])`
@@ -3199,7 +3227,9 @@ changes:
 <!-- YAML
 added: v17.0.0
 changes:
-  - version: v24.0.0
+  - version:
+      - v24.0.0
+      - v22.17.0
     pr-url: https://github.com/nodejs/node/pull/57513
     description: Marking the API stable.
 -->
@@ -3217,7 +3247,9 @@ changes:
 <!-- YAML
 added: v17.0.0
 changes:
-  - version: v24.0.0
+  - version:
+      - v24.0.0
+      - v22.17.0
     pr-url: https://github.com/nodejs/node/pull/57513
     description: Marking the API stable.
 -->
@@ -3281,7 +3313,9 @@ Duplex.from([
 <!-- YAML
 added: v17.0.0
 changes:
-  - version: v24.0.0
+  - version:
+      - v24.0.0
+      - v22.17.0
     pr-url: https://github.com/nodejs/node/pull/57513
     description: Marking the API stable.
 -->
@@ -3359,17 +3393,24 @@ duplex.write('hello');
 duplex.once('readable', () => console.log('readable', duplex.read()));
 ```
 
-### `stream.Duplex.toWeb(streamDuplex)`
+### `stream.Duplex.toWeb(streamDuplex[, options])`
 
 <!-- YAML
 added: v17.0.0
 changes:
-  - version: v24.0.0
+  - version: v25.4.0
+    pr-url: https://github.com/nodejs/node/pull/58664
+    description: Add 'type' option to specify 'bytes'.
+  - version:
+      - v24.0.0
+      - v22.17.0
     pr-url: https://github.com/nodejs/node/pull/57513
     description: Marking the API stable.
 -->
 
 * `streamDuplex` {stream.Duplex}
+* `options` {Object}
+  * `type` {string} Must be 'bytes' or undefined.
 * Returns: {Object}
   * `readable` {ReadableStream}
   * `writable` {WritableStream}
@@ -4963,7 +5004,7 @@ contain multi-byte characters.
 [`readable.setEncoding()`]: #readablesetencodingencoding
 [`stream.Readable.from()`]: #streamreadablefromiterable-options
 [`stream.addAbortSignal()`]: #streamaddabortsignalsignal-stream
-[`stream.compose`]: #streamcomposestreams
+[`stream.compose(...streams)`]: #streamcomposestreams
 [`stream.cork()`]: #writablecork
 [`stream.duplexPair()`]: #streamduplexpairoptions
 [`stream.finished()`]: #streamfinishedstream-options-callback

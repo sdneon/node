@@ -268,7 +268,6 @@ class WorkerThreadData {
   uv_loop_t loop_;
   bool loop_init_failed_ = true;
   DeleteFnPtr<IsolateData, FreeIsolateData> isolate_data_;
-  const SnapshotData* snapshot_data_ = nullptr;
   friend class Worker;
 };
 
@@ -1263,6 +1262,7 @@ void Worker::GetHeapStatistics(const FunctionCallbackInfo<Value>& args) {
                 "total_global_handles_size",
                 "used_global_handles_size",
                 "external_memory",
+                "total_allocated_bytes",
             };
             tmpl = DictionaryTemplate::New(isolate, heap_stats_names);
             env->set_heap_statistics_template(tmpl);
@@ -1283,7 +1283,8 @@ void Worker::GetHeapStatistics(const FunctionCallbackInfo<Value>& args) {
               Number::New(isolate, heap_stats->number_of_detached_contexts()),
               Number::New(isolate, heap_stats->total_global_handles_size()),
               Number::New(isolate, heap_stats->used_global_handles_size()),
-              Number::New(isolate, heap_stats->external_memory())};
+              Number::New(isolate, heap_stats->external_memory()),
+              Number::New(isolate, isolate->GetTotalAllocatedBytes())};
 
           Local<Object> obj;
           if (!NewDictionaryInstanceNullProto(
@@ -1463,8 +1464,6 @@ void GetEnvMessagePort(const FunctionCallbackInfo<Value>& args) {
   Local<Object> port = env->message_port();
   CHECK_IMPLIES(!env->is_main_thread(), !port.IsEmpty());
   if (!port.IsEmpty()) {
-    CHECK_EQ(port->GetCreationContextChecked()->GetIsolate(),
-             args.GetIsolate());
     args.GetReturnValue().Set(port);
   }
 }

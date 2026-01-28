@@ -118,6 +118,7 @@ added: v0.3.4
 changes:
   - version:
     - v24.7.0
+    - v22.20.0
     pr-url: https://github.com/nodejs/node/pull/59315
     description: Add support for `agentKeepAliveTimeoutBuffer`.
   - version:
@@ -236,23 +237,37 @@ added: v0.11.4
 -->
 
 * `options` {Object} Options containing connection details. Check
-  [`net.createConnection()`][] for the format of the options
-* `callback` {Function} Callback function that receives the created socket
-* Returns: {stream.Duplex}
+  [`net.createConnection()`][] for the format of the options. For custom agents,
+  this object is passed to the custom `createConnection` function.
+* `callback` {Function} (Optional, primarily for custom agents) A function to be
+  called by a custom `createConnection` implementation when the socket is
+  created, especially for asynchronous operations.
+  * `err` {Error | null} An error object if socket creation failed.
+  * `socket` {stream.Duplex} The created socket.
+* Returns: {stream.Duplex} The created socket. This is returned by the default
+  implementation or by a custom synchronous `createConnection` implementation.
+  If a custom `createConnection` uses the `callback` for asynchronous
+  operation, this return value might not be the primary way to obtain the socket.
 
 Produces a socket/stream to be used for HTTP requests.
 
-By default, this function is the same as [`net.createConnection()`][]. However,
-custom agents may override this method in case greater flexibility is desired.
+By default, this function behaves identically to [`net.createConnection()`][],
+synchronously returning the created socket. The optional `callback` parameter in the
+signature is **not** used by this default implementation.
 
-A socket/stream can be supplied in one of two ways: by returning the
-socket/stream from this function, or by passing the socket/stream to `callback`.
+However, custom agents may override this method to provide greater flexibility,
+for example, to create sockets asynchronously. When overriding `createConnection`:
 
-This method is guaranteed to return an instance of the {net.Socket} class,
-a subclass of {stream.Duplex}, unless the user specifies a socket
-type other than {net.Socket}.
+1. **Synchronous socket creation**: The overriding method can return the
+   socket/stream directly.
+2. **Asynchronous socket creation**: The overriding method can accept the `callback`
+   and pass the created socket/stream to it (e.g., `callback(null, newSocket)`).
+   If an error occurs during socket creation, it should be passed as the first
+   argument to the `callback` (e.g., `callback(err)`).
 
-`callback` has a signature of `(err, stream)`.
+The agent will call the provided `createConnection` function with `options` and
+this internal `callback`. The `callback` provided by the agent has a signature
+of `(err, stream)`.
 
 ### `agent.keepSocketAlive(socket)`
 
@@ -636,7 +651,7 @@ added: v0.3.6
 -->
 
 Emitted when the request has been sent. More specifically, this event is emitted
-when the last segment of the response headers and body have been handed off to
+when the last segment of the request headers and body have been handed off to
 the operating system for transmission over the network. It does not imply that
 the server has received anything yet.
 
@@ -1171,6 +1186,7 @@ may run into a 'ECONNRESET' error.
 
 ```mjs
 import http from 'node:http';
+const agent = new http.Agent({ keepAlive: true });
 
 // Server has a 5 seconds keep-alive timeout by default
 http
@@ -1192,6 +1208,7 @@ setInterval(() => {
 
 ```cjs
 const http = require('node:http');
+const agent = new http.Agent({ keepAlive: true });
 
 // Server has a 5 seconds keep-alive timeout by default
 http
@@ -1989,7 +2006,9 @@ affects new connections to the server, not any existing connections.
 ### `server.keepAliveTimeoutBuffer`
 
 <!-- YAML
-added: v24.6.0
+added:
+ - v24.6.0
+ - v22.19.0
 -->
 
 * Type: {number} Timeout in milliseconds. **Default:** `1000` (1 second).
@@ -3552,6 +3571,9 @@ Found'`.
 <!-- YAML
 added: v0.1.13
 changes:
+  - version: v25.1.0
+    pr-url: https://github.com/nodejs/node/pull/59778
+    description: Add optimizeEmptyRequests option.
   - version: v24.9.0
     pr-url: https://github.com/nodejs/node/pull/59824
     description: The `shouldUpgradeCallback` option is now supported.
@@ -3656,6 +3678,11 @@ changes:
     using `; `.
   * `rejectNonStandardBodyWrites` {boolean} If set to `true`, an error is thrown
     when writing to an HTTP response which does not have a body.
+    **Default:** `false`.
+  * `optimizeEmptyRequests` {boolean} If set to `true`, requests without `Content-Length`
+    or `Transfer-Encoding` headers (indicating no body) will be initialized with an
+    already-ended body stream, so they will never emit any stream events
+    (like `'data'` or `'end'`). You can use `req.readableEnded` to detect this case.
     **Default:** `false`.
 
 * `requestListener` {Function}
@@ -4314,6 +4341,32 @@ added:
 
 Set the maximum number of idle HTTP parsers.
 
+## `http.setGlobalProxyFromEnv([proxyEnv])`
+
+<!-- YAML
+added:
+  - v25.4.0
+-->
+
+* `proxyEnv` {Object} An object containing proxy configuration. This accepts the
+  same options as the `proxyEnv` option accepted by [`Agent`][]. **Default:**
+  `process.env`.
+* Returns: {Function} A function that restores the original agent and dispatcher
+  settings to the state before this `http.setGlobalProxyFromEnv()` is invoked.
+
+Dynamically resets the global configurations to enable built-in proxy support for
+`fetch()` and `http.request()`/`https.request()` at runtime, as an alternative
+to using the `--use-env-proxy` flag or `NODE_USE_ENV_PROXY` environment variable.
+It can also be used to override settings configured from the environment variables.
+
+As this function resets the global configurations, any previously configured
+`http.globalAgent`, `https.globalAgent` or undici global dispatcher would be
+overridden after this function is invoked. It's recommended to invoke it before any
+requests are made and avoid invoking it in the middle of any requests.
+
+See [Built-in Proxy Support][] for details on proxy URL formats and `NO_PROXY`
+syntax.
+
 ## Class: `WebSocket`
 
 <!-- YAML
@@ -4334,6 +4387,9 @@ added: v24.5.0
 When Node.js creates the global agent, if the `NODE_USE_ENV_PROXY` environment variable is
 set to `1` or `--use-env-proxy` is enabled, the global agent will be constructed
 with `proxyEnv: process.env`, enabling proxy support based on the environment variables.
+
+To enable proxy support dynamically and globally, use [`http.setGlobalProxyFromEnv()`][].
+
 Custom agents can also be created with proxy support by passing a
 `proxyEnv` option when constructing the agent. The value can be `process.env`
 if they just want to inherit the configuration from the environment variables,
@@ -4387,6 +4443,86 @@ Or the `--use-env-proxy` flag.
 
 ```console
 HTTP_PROXY=http://proxy.example.com:8080 NO_PROXY=localhost,127.0.0.1 node --use-env-proxy client.js
+```
+
+To enable proxy support dynamically and globally with `process.env` (the default option of `http.setGlobalProxyFromEnv()`):
+
+```cjs
+const http = require('node:http');
+
+// Reads proxy-related environment variables from process.env
+const restore = http.setGlobalProxyFromEnv();
+
+// Subsequent requests will use the configured proxies from environment variables
+http.get('http://www.example.com', (res) => {
+  // This request will be proxied if HTTP_PROXY or http_proxy is set
+});
+
+fetch('https://www.example.com', (res) => {
+  // This request will be proxied if HTTPS_PROXY or https_proxy is set
+});
+
+// To restore the original global agent and dispatcher settings, call the returned function.
+// restore();
+```
+
+```mjs
+import http from 'node:http';
+
+// Reads proxy-related environment variables from process.env
+http.setGlobalProxyFromEnv();
+
+// Subsequent requests will use the configured proxies from environment variables
+http.get('http://www.example.com', (res) => {
+  // This request will be proxied if HTTP_PROXY or http_proxy is set
+});
+
+fetch('https://www.example.com', (res) => {
+  // This request will be proxied if HTTPS_PROXY or https_proxy is set
+});
+
+// To restore the original global agent and dispatcher settings, call the returned function.
+// restore();
+```
+
+To enable proxy support dynamically and globally with custom settings:
+
+```cjs
+const http = require('node:http');
+
+const restore = http.setGlobalProxyFromEnv({
+  http_proxy: 'http://proxy.example.com:8080',
+  https_proxy: 'https://proxy.example.com:8443',
+  no_proxy: 'localhost,127.0.0.1,.internal.example.com',
+});
+
+// Subsequent requests will use the configured proxies
+http.get('http://www.example.com', (res) => {
+  // This request will be proxied through proxy.example.com:8080
+});
+
+fetch('https://www.example.com', (res) => {
+  // This request will be proxied through proxy.example.com:8443
+});
+```
+
+```mjs
+import http from 'node:http';
+
+http.setGlobalProxyFromEnv({
+  http_proxy: 'http://proxy.example.com:8080',
+  https_proxy: 'https://proxy.example.com:8443',
+  no_proxy: 'localhost,127.0.0.1,.internal.example.com',
+});
+
+// Subsequent requests will use the configured proxies
+http.get('http://www.example.com', (res) => {
+  // This request will be proxied through proxy.example.com:8080
+});
+
+fetch('https://www.example.com', (res) => {
+  // This request will be proxied through proxy.example.com:8443
+});
 ```
 
 To create a custom agent with built-in proxy support:
@@ -4452,6 +4588,7 @@ const agent2 = new http.Agent({ proxyEnv: process.env });
 [`http.get()`]: #httpgetoptions-callback
 [`http.globalAgent`]: #httpglobalagent
 [`http.request()`]: #httprequestoptions-callback
+[`http.setGlobalProxyFromEnv()`]: #httpsetglobalproxyfromenvproxyenv
 [`message.headers`]: #messageheaders
 [`message.rawHeaders`]: #messagerawheaders
 [`message.socket`]: #messagesocket

@@ -25,7 +25,7 @@
       "introduced_in": "v0.10.0",
       "stability": 0,
       "stabilityText": "Deprecated",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.9.0/lib/domain.js\">lib/domain.js</a></p>\n<p><strong>This module is pending deprecation.</strong> Once a replacement API has been\nfinalized, this module will be fully deprecated. Most developers should\n<strong>not</strong> have cause to use this module. Users who absolutely must have\nthe functionality that domains provide may rely on it for the time being\nbut should expect to have to migrate to a different solution\nin the future.</p>\n<p>Domains provide a way to handle multiple different IO operations as a\nsingle group. If any of the event emitters or callbacks registered to a\ndomain emit an <code>'error'</code> event, or throw an error, then the domain object\nwill be notified, rather than losing the context of the error in the\n<code>process.on('uncaughtException')</code> handler, or causing the program to\nexit immediately with an error code.</p>",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v25.5.0/lib/domain.js\">lib/domain.js</a></p>\n<p><strong>This module is pending deprecation.</strong> Once a replacement API has been\nfinalized, this module will be fully deprecated. Most developers should\n<strong>not</strong> have cause to use this module. Users who absolutely must have\nthe functionality that domains provide may rely on it for the time being\nbut should expect to have to migrate to a different solution\nin the future.</p>\n<p>Domains provide a way to handle multiple different IO operations as a\nsingle group. If any of the event emitters or callbacks registered to a\ndomain emit an <code>'error'</code> event, or throw an error, then the domain object\nwill be notified, rather than losing the context of the error in the\n<code>process.on('uncaughtException')</code> handler, or causing the program to\nexit immediately with an error code.</p>",
       "miscs": [
         {
           "textRaw": "Warning: Don't ignore errors!",
@@ -80,7 +80,7 @@
               "textRaw": "`members` Type: {Array}",
               "type": "Array",
               "name": "Type",
-              "desc": "<p>An array of timers and event emitters that have been explicitly added\nto the domain.</p>"
+              "desc": "<p>An array of event emitters that have been explicitly added to the domain.</p>"
             }
           ],
           "methods": [
@@ -88,19 +88,28 @@
               "textRaw": "`domain.add(emitter)`",
               "type": "method",
               "name": "add",
+              "meta": {
+                "changes": [
+                  {
+                    "version": "v9.3.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/16222",
+                    "description": "No longer accepts timer objects."
+                  }
+                ]
+              },
               "signatures": [
                 {
                   "params": [
                     {
-                      "textRaw": "`emitter` {EventEmitter|Timer} emitter or timer to be added to the domain",
+                      "textRaw": "`emitter` {EventEmitter} emitter to be added to the domain",
                       "name": "emitter",
-                      "type": "EventEmitter|Timer",
-                      "desc": "emitter or timer to be added to the domain"
+                      "type": "EventEmitter",
+                      "desc": "emitter to be added to the domain"
                     }
                   ]
                 }
               ],
-              "desc": "<p>Explicitly adds an emitter to the domain. If any event handlers called by\nthe emitter throw an error, or if the emitter emits an <code>'error'</code> event, it\nwill be routed to the domain's <code>'error'</code> event, just like with implicit\nbinding.</p>\n<p>This also works with timers that are returned from <a href=\"timers.html#setintervalcallback-delay-args\"><code>setInterval()</code></a> and\n<a href=\"timers.html#settimeoutcallback-delay-args\"><code>setTimeout()</code></a>. If their callback function throws, it will be caught by\nthe domain <code>'error'</code> handler.</p>\n<p>If the Timer or <code>EventEmitter</code> was already bound to a domain, it is removed\nfrom that one, and bound to this one instead.</p>"
+              "desc": "<p>Explicitly adds an emitter to the domain. If any event handlers called by\nthe emitter throw an error, or if the emitter emits an <code>'error'</code> event, it\nwill be routed to the domain's <code>'error'</code> event, just like with implicit\nbinding.</p>\n<p>If the <code>EventEmitter</code> was already bound to a domain, it is removed from that\none, and bound to this one instead.</p>"
             },
             {
               "textRaw": "`domain.bind(callback)`",
@@ -180,10 +189,10 @@
                 {
                   "params": [
                     {
-                      "textRaw": "`emitter` {EventEmitter|Timer} emitter or timer to be removed from the domain",
+                      "textRaw": "`emitter` {EventEmitter} emitter to be removed from the domain",
                       "name": "emitter",
-                      "type": "EventEmitter|Timer",
-                      "desc": "emitter or timer to be removed from the domain"
+                      "type": "EventEmitter",
+                      "desc": "emitter to be removed from the domain"
                     }
                   ]
                 }

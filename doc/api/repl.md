@@ -687,7 +687,9 @@ with REPL instances programmatically.
 
 <!-- YAML
 added: v14.5.0
-deprecated: v24.0.0
+deprecated:
+  - v24.0.0
+  - v22.16.0
 -->
 
 > Stability: 0 - Deprecated. Use [`module.builtinModules`][] instead.
@@ -695,6 +697,12 @@ deprecated: v24.0.0
 * Type: {string\[]}
 
 A list of the names of some Node.js modules, e.g., `'http'`.
+
+An automated migration is available ([source](https://github.com/nodejs/userland-migrations/tree/main/recipes/repl-builtin-modules)):
+
+```bash
+npx codemod@latest @nodejs/repl-builtin-modules
+```
 
 ## `repl.start([options])`
 

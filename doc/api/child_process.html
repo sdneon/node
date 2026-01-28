@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v24.9.0">
-  <title>Child process | Node.js v24.9.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v25.5.0">
+  <title>Child process | Node.js v25.5.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -112,7 +112,7 @@
     <div id="column1" data-id="child_process" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v24.9.0 documentation</h1>
+          <h1>Node.js v25.5.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -127,7 +127,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v24.9.0</li>
+            <li class="pinned-header">Node.js v25.5.0</li>
             
     <li class="picker-header">
       <a href="#toc-picker" aria-controls="toc-picker">
@@ -299,7 +299,8 @@
         <span class="picker-arrow"></span>
         Other versions
       </a>
-      <div class="picker" tabindex="-1"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v24.x/api/child_process.html">24.x</a></li>
+      <div class="picker" tabindex="-1"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v25.x/api/child_process.html">25.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v24.x/api/child_process.html">24.x <b>LTS</b></a></li>
 <li><a href="https://nodejs.org/docs/latest-v23.x/api/child_process.html">23.x</a></li>
 <li><a href="https://nodejs.org/docs/latest-v22.x/api/child_process.html">22.x <b>LTS</b></a></li>
 <li><a href="https://nodejs.org/docs/latest-v21.x/api/child_process.html">21.x</a></li>
@@ -421,7 +422,7 @@
         <h2>Child process<span><a class="mark" href="#child-process" id="child-process">#</a></span><a aria-hidden="true" class="legacy" id="child_process_child_process"></a></h2>
 
 <p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v24.9.0/lib/child_process.js">lib/child_process.js</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v25.5.0/lib/child_process.js">lib/child_process.js</a></p>
 <p>The <code>node:child_process</code> module provides the ability to spawn subprocesses in
 a manner that is similar, but not identical, to <a href="http://man7.org/linux/man-pages/man3/popen.3.html"><code>popen(3)</code></a>. This capability
 is primarily provided by the <a href="#child_processspawncommand-args-options"><code>child_process.spawn()</code></a> function:</p>
@@ -440,6 +441,7 @@ ls.<span class="hljs-property">stderr</span>.<span class="hljs-title function_">
 ls.<span class="hljs-title function_">on</span>(<span class="hljs-string">'close'</span>, <span class="hljs-function">(<span class="hljs-params">code</span>) =></span> {
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`child process exited with code <span class="hljs-subst">${code}</span>`</span>);
 });</code><code class="language-js mjs"><span class="hljs-keyword">import</span> { spawn } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:child_process'</span>;
+<span class="hljs-keyword">import</span> { once } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:events'</span>;
 <span class="hljs-keyword">const</span> ls = <span class="hljs-title function_">spawn</span>(<span class="hljs-string">'ls'</span>, [<span class="hljs-string">'-lh'</span>, <span class="hljs-string">'/usr'</span>]);
 
 ls.<span class="hljs-property">stdout</span>.<span class="hljs-title function_">on</span>(<span class="hljs-string">'data'</span>, <span class="hljs-function">(<span class="hljs-params">data</span>) =></span> {
@@ -450,9 +452,8 @@ ls.<span class="hljs-property">stderr</span>.<span class="hljs-title function_">
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">`stderr: <span class="hljs-subst">${data}</span>`</span>);
 });
 
-ls.<span class="hljs-title function_">on</span>(<span class="hljs-string">'close'</span>, <span class="hljs-function">(<span class="hljs-params">code</span>) =></span> {
-  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`child process exited with code <span class="hljs-subst">${code}</span>`</span>);
-});</code><button class="copy-button">copy</button></pre>
+<span class="hljs-keyword">const</span> [code] = <span class="hljs-keyword">await</span> <span class="hljs-title function_">once</span>(ls, <span class="hljs-string">'close'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`child process exited with code <span class="hljs-subst">${code}</span>`</span>);</code><button class="copy-button">copy</button></pre>
 <p>By default, pipes for <code>stdin</code>, <code>stdout</code>, and <code>stderr</code> are established between
 the parent Node.js process and the spawned subprocess. These pipes have
 limited (and platform-specific) capacity. If the subprocess writes to
@@ -576,35 +577,35 @@ spaces it needs to be quoted.</p>
 </details>
 </div>
 <ul>
-<li><code>command</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> The command to run, with space-separated arguments.</li>
+<li><code>command</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> The command to run, with space-separated arguments.</li>
 <li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
 <ul>
-<li><code>cwd</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="url.html#the-whatwg-url-api" class="type">&#x3C;URL></a> Current working directory of the child process.
+<li><code>cwd</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> | <a href="url.html#the-whatwg-url-api" class="type">&#x3C;URL></a> Current working directory of the child process.
 <strong>Default:</strong> <code>process.cwd()</code>.</li>
 <li><code>env</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> Environment key-value pairs. <strong>Default:</strong> <code>process.env</code>.</li>
-<li><code>encoding</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> <strong>Default:</strong> <code>'utf8'</code></li>
-<li><code>shell</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> Shell to execute the command with. See
+<li><code>encoding</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> <strong>Default:</strong> <code>'utf8'</code></li>
+<li><code>shell</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> Shell to execute the command with. See
 <a href="#shell-requirements">Shell requirements</a> and <a href="#default-windows-shell">Default Windows shell</a>. <strong>Default:</strong>
 <code>'/bin/sh'</code> on Unix, <code>process.env.ComSpec</code> on Windows.</li>
 <li><code>signal</code> <a href="globals.html#class-abortsignal" class="type">&#x3C;AbortSignal></a> allows aborting the child process using an
 AbortSignal.</li>
-<li><code>timeout</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> <strong>Default:</strong> <code>0</code></li>
-<li><code>maxBuffer</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> Largest amount of data in bytes allowed on stdout or
+<li><code>timeout</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;number></a> <strong>Default:</strong> <code>0</code></li>
+<li><code>maxBuffer</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;number></a> Largest amount of data in bytes allowed on stdout or
 stderr. If exceeded, the child process is terminated and any output is
 truncated. See caveat at <a href="#maxbuffer-and-unicode"><code>maxBuffer</code> and Unicode</a>.
 <strong>Default:</strong> <code>1024 * 1024</code>.</li>
-<li><code>killSignal</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a> <strong>Default:</strong> <code>'SIGTERM'</code></li>
-<li><code>uid</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> Sets the user identity of the process (see <a href="http://man7.org/linux/man-pages/man2/setuid.2.html"><code>setuid(2)</code></a>).</li>
-<li><code>gid</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> Sets the group identity of the process (see <a href="http://man7.org/linux/man-pages/man2/setgid.2.html"><code>setgid(2)</code></a>).</li>
-<li><code>windowsHide</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> Hide the subprocess console window that would
+<li><code>killSignal</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;integer></a> <strong>Default:</strong> <code>'SIGTERM'</code></li>
+<li><code>uid</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;number></a> Sets the user identity of the process (see <a href="http://man7.org/linux/man-pages/man2/setuid.2.html"><code>setuid(2)</code></a>).</li>
+<li><code>gid</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;number></a> Sets the group identity of the process (see <a href="http://man7.org/linux/man-pages/man2/setgid.2.html"><code>setgid(2)</code></a>).</li>
+<li><code>windowsHide</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#boolean_type" class="type">&#x3C;boolean></a> Hide the subprocess console window that would
 normally be created on Windows systems. <strong>Default:</strong> <code>false</code>.</li>
 </ul>
 </li>
 <li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> called with the output when process terminates.
 <ul>
 <li><code>error</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="type">&#x3C;Error></a></li>
-<li><code>stdout</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a></li>
-<li><code>stderr</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a></li>
+<li><code>stdout</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a></li>
+<li><code>stderr</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a></li>
 </ul>
 </li>
 <li>Returns: <a href="child_process.html#class-childprocess" class="type">&#x3C;ChildProcess></a></li>
@@ -729,26 +730,26 @@ controller.<span class="hljs-title function_">abort</span>();</code><button clas
 </details>
 </div>
 <ul>
-<li><code>file</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> The name or path of the executable file to run.</li>
-<li><code>args</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a> List of string arguments.</li>
+<li><code>file</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> The name or path of the executable file to run.</li>
+<li><code>args</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string[]></a> List of string arguments.</li>
 <li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
 <ul>
-<li><code>cwd</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="url.html#the-whatwg-url-api" class="type">&#x3C;URL></a> Current working directory of the child process.</li>
+<li><code>cwd</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> | <a href="url.html#the-whatwg-url-api" class="type">&#x3C;URL></a> Current working directory of the child process.</li>
 <li><code>env</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> Environment key-value pairs. <strong>Default:</strong> <code>process.env</code>.</li>
-<li><code>encoding</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> <strong>Default:</strong> <code>'utf8'</code></li>
-<li><code>timeout</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> <strong>Default:</strong> <code>0</code></li>
-<li><code>maxBuffer</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> Largest amount of data in bytes allowed on stdout or
+<li><code>encoding</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> <strong>Default:</strong> <code>'utf8'</code></li>
+<li><code>timeout</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;number></a> <strong>Default:</strong> <code>0</code></li>
+<li><code>maxBuffer</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;number></a> Largest amount of data in bytes allowed on stdout or
 stderr. If exceeded, the child process is terminated and any output is
 truncated. See caveat at <a href="#maxbuffer-and-unicode"><code>maxBuffer</code> and Unicode</a>.
 <strong>Default:</strong> <code>1024 * 1024</code>.</li>
-<li><code>killSignal</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a> <strong>Default:</strong> <code>'SIGTERM'</code></li>
-<li><code>uid</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> Sets the user identity of the process (see <a href="http://man7.org/linux/man-pages/man2/setuid.2.html"><code>setuid(2)</code></a>).</li>
-<li><code>gid</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> Sets the group identity of the process (see <a href="http://man7.org/linux/man-pages/man2/setgid.2.html"><code>setgid(2)</code></a>).</li>
-<li><code>windowsHide</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> Hide the subprocess console window that would
+<li><code>killSignal</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;integer></a> <strong>Default:</strong> <code>'SIGTERM'</code></li>
+<li><code>uid</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;number></a> Sets the user identity of the process (see <a href="http://man7.org/linux/man-pages/man2/setuid.2.html"><code>setuid(2)</code></a>).</li>
+<li><code>gid</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;number></a> Sets the group identity of the process (see <a href="http://man7.org/linux/man-pages/man2/setgid.2.html"><code>setgid(2)</code></a>).</li>
+<li><code>windowsHide</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#boolean_type" class="type">&#x3C;boolean></a> Hide the subprocess console window that would
 normally be created on Windows systems. <strong>Default:</strong> <code>false</code>.</li>
-<li><code>windowsVerbatimArguments</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> No quoting or escaping of arguments is
+<li><code>windowsVerbatimArguments</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#boolean_type" class="type">&#x3C;boolean></a> No quoting or escaping of arguments is
 done on Windows. Ignored on Unix. <strong>Default:</strong> <code>false</code>.</li>
-<li><code>shell</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> If <code>true</code>, runs <code>command</code> inside of a shell. Uses
+<li><code>shell</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#boolean_type" class="type">&#x3C;boolean></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> If <code>true</code>, runs <code>command</code> inside of a shell. Uses
 <code>'/bin/sh'</code> on Unix, and <code>process.env.ComSpec</code> on Windows. A different
 shell can be specified as a string. See <a href="#shell-requirements">Shell requirements</a> and
 <a href="#default-windows-shell">Default Windows shell</a>. <strong>Default:</strong> <code>false</code> (no shell).</li>
@@ -759,8 +760,8 @@ AbortSignal.</li>
 <li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> Called with the output when process terminates.
 <ul>
 <li><code>error</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="type">&#x3C;Error></a></li>
-<li><code>stdout</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a></li>
-<li><code>stderr</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a></li>
+<li><code>stdout</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a></li>
+<li><code>stderr</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a></li>
 </ul>
 </li>
 <li>Returns: <a href="child_process.html#class-childprocess" class="type">&#x3C;ChildProcess></a></li>
@@ -861,39 +862,39 @@ controller.<span class="hljs-title function_">abort</span>();</code><button clas
 </details>
 </div>
 <ul>
-<li><code>modulePath</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="url.html#the-whatwg-url-api" class="type">&#x3C;URL></a> The module to run in the child.</li>
-<li><code>args</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a> List of string arguments.</li>
+<li><code>modulePath</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> | <a href="url.html#the-whatwg-url-api" class="type">&#x3C;URL></a> The module to run in the child.</li>
+<li><code>args</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string[]></a> List of string arguments.</li>
 <li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
 <ul>
-<li><code>cwd</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="url.html#the-whatwg-url-api" class="type">&#x3C;URL></a> Current working directory of the child process.</li>
-<li><code>detached</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> Prepare child process to run independently of its
+<li><code>cwd</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> | <a href="url.html#the-whatwg-url-api" class="type">&#x3C;URL></a> Current working directory of the child process.</li>
+<li><code>detached</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#boolean_type" class="type">&#x3C;boolean></a> Prepare child process to run independently of its
 parent process. Specific behavior depends on the platform (see
 <a href="#optionsdetached"><code>options.detached</code></a>).</li>
 <li><code>env</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> Environment key-value pairs. <strong>Default:</strong> <code>process.env</code>.</li>
-<li><code>execPath</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> Executable used to create the child process.</li>
-<li><code>execArgv</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a> List of string arguments passed to the executable.
+<li><code>execPath</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> Executable used to create the child process.</li>
+<li><code>execArgv</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string[]></a> List of string arguments passed to the executable.
 <strong>Default:</strong> <code>process.execArgv</code>.</li>
-<li><code>gid</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> Sets the group identity of the process (see <a href="http://man7.org/linux/man-pages/man2/setgid.2.html"><code>setgid(2)</code></a>).</li>
-<li><code>serialization</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> Specify the kind of serialization used for sending
+<li><code>gid</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;number></a> Sets the group identity of the process (see <a href="http://man7.org/linux/man-pages/man2/setgid.2.html"><code>setgid(2)</code></a>).</li>
+<li><code>serialization</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> Specify the kind of serialization used for sending
 messages between processes. Possible values are <code>'json'</code> and <code>'advanced'</code>.
 See <a href="#advanced-serialization">Advanced serialization</a> for more details. <strong>Default:</strong> <code>'json'</code>.</li>
 <li><code>signal</code> <a href="globals.html#class-abortsignal" class="type">&#x3C;AbortSignal></a> Allows closing the child process using an
 AbortSignal.</li>
-<li><code>killSignal</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a> The signal value to be used when the spawned
+<li><code>killSignal</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;integer></a> The signal value to be used when the spawned
 process will be killed by timeout or abort signal. <strong>Default:</strong> <code>'SIGTERM'</code>.</li>
-<li><code>silent</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> If <code>true</code>, stdin, stdout, and stderr of the child
+<li><code>silent</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#boolean_type" class="type">&#x3C;boolean></a> If <code>true</code>, stdin, stdout, and stderr of the child
 process will be piped to the parent process, otherwise they will be inherited
 from the parent process, see the <code>'pipe'</code> and <code>'inherit'</code> options for
 <a href="#child_processspawncommand-args-options"><code>child_process.spawn()</code></a>'s <a href="#optionsstdio"><code>stdio</code></a> for more details.
 <strong>Default:</strong> <code>false</code>.</li>
-<li><code>stdio</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="type">&#x3C;Array></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> See <a href="#child_processspawncommand-args-options"><code>child_process.spawn()</code></a>'s <a href="#optionsstdio"><code>stdio</code></a>.
+<li><code>stdio</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="type">&#x3C;Array></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> See <a href="#child_processspawncommand-args-options"><code>child_process.spawn()</code></a>'s <a href="#optionsstdio"><code>stdio</code></a>.
 When this option is provided, it overrides <code>silent</code>. If the array variant
 is used, it must contain exactly one item with value <code>'ipc'</code> or an error
 will be thrown. For instance <code>[0, 1, 2, 'ipc']</code>.</li>
-<li><code>uid</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> Sets the user identity of the process (see <a href="http://man7.org/linux/man-pages/man2/setuid.2.html"><code>setuid(2)</code></a>).</li>
-<li><code>windowsVerbatimArguments</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> No quoting or escaping of arguments is
+<li><code>uid</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;number></a> Sets the user identity of the process (see <a href="http://man7.org/linux/man-pages/man2/setuid.2.html"><code>setuid(2)</code></a>).</li>
+<li><code>windowsVerbatimArguments</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#boolean_type" class="type">&#x3C;boolean></a> No quoting or escaping of arguments is
 done on Windows. Ignored on Unix. <strong>Default:</strong> <code>false</code>.</li>
-<li><code>timeout</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> In milliseconds the maximum amount of time the process
+<li><code>timeout</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;number></a> In milliseconds the maximum amount of time the process
 is allowed to run. <strong>Default:</strong> <code>undefined</code>.</li>
 </ul>
 </li>
@@ -986,38 +987,38 @@ the error passed to the callback will be an <code>AbortError</code>:</p>
 </details>
 </div>
 <ul>
-<li><code>command</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> The command to run.</li>
-<li><code>args</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a> List of string arguments.</li>
+<li><code>command</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> The command to run.</li>
+<li><code>args</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string[]></a> List of string arguments.</li>
 <li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
 <ul>
-<li><code>cwd</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="url.html#the-whatwg-url-api" class="type">&#x3C;URL></a> Current working directory of the child process.</li>
+<li><code>cwd</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> | <a href="url.html#the-whatwg-url-api" class="type">&#x3C;URL></a> Current working directory of the child process.</li>
 <li><code>env</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> Environment key-value pairs. <strong>Default:</strong> <code>process.env</code>.</li>
-<li><code>argv0</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> Explicitly set the value of <code>argv[0]</code> sent to the child
+<li><code>argv0</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> Explicitly set the value of <code>argv[0]</code> sent to the child
 process. This will be set to <code>command</code> if not specified.</li>
-<li><code>stdio</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="type">&#x3C;Array></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> Child's stdio configuration (see
+<li><code>stdio</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="type">&#x3C;Array></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> Child's stdio configuration (see
 <a href="#optionsstdio"><code>options.stdio</code></a>).</li>
-<li><code>detached</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> Prepare child process to run independently of
+<li><code>detached</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#boolean_type" class="type">&#x3C;boolean></a> Prepare child process to run independently of
 its parent process. Specific behavior depends on the platform (see
 <a href="#optionsdetached"><code>options.detached</code></a>).</li>
-<li><code>uid</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> Sets the user identity of the process (see <a href="http://man7.org/linux/man-pages/man2/setuid.2.html"><code>setuid(2)</code></a>).</li>
-<li><code>gid</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> Sets the group identity of the process (see <a href="http://man7.org/linux/man-pages/man2/setgid.2.html"><code>setgid(2)</code></a>).</li>
-<li><code>serialization</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> Specify the kind of serialization used for sending
+<li><code>uid</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;number></a> Sets the user identity of the process (see <a href="http://man7.org/linux/man-pages/man2/setuid.2.html"><code>setuid(2)</code></a>).</li>
+<li><code>gid</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;number></a> Sets the group identity of the process (see <a href="http://man7.org/linux/man-pages/man2/setgid.2.html"><code>setgid(2)</code></a>).</li>
+<li><code>serialization</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> Specify the kind of serialization used for sending
 messages between processes. Possible values are <code>'json'</code> and <code>'advanced'</code>.
 See <a href="#advanced-serialization">Advanced serialization</a> for more details. <strong>Default:</strong> <code>'json'</code>.</li>
-<li><code>shell</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> If <code>true</code>, runs <code>command</code> inside of a shell. Uses
+<li><code>shell</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#boolean_type" class="type">&#x3C;boolean></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> If <code>true</code>, runs <code>command</code> inside of a shell. Uses
 <code>'/bin/sh'</code> on Unix, and <code>process.env.ComSpec</code> on Windows. A different
 shell can be specified as a string. See <a href="#shell-requirements">Shell requirements</a> and
 <a href="#default-windows-shell">Default Windows shell</a>. <strong>Default:</strong> <code>false</code> (no shell).</li>
-<li><code>windowsVerbatimArguments</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> No quoting or escaping of arguments is
+<li><code>windowsVerbatimArguments</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#boolean_type" class="type">&#x3C;boolean></a> No quoting or escaping of arguments is
 done on Windows. Ignored on Unix. This is set to <code>true</code> automatically
 when <code>shell</code> is specified and is CMD. <strong>Default:</strong> <code>false</code>.</li>
-<li><code>windowsHide</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> Hide the subprocess console window that would
+<li><code>windowsHide</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#boolean_type" class="type">&#x3C;boolean></a> Hide the subprocess console window that would
 normally be created on Windows systems. <strong>Default:</strong> <code>false</code>.</li>
 <li><code>signal</code> <a href="globals.html#class-abortsignal" class="type">&#x3C;AbortSignal></a> allows aborting the child process using an
 AbortSignal.</li>
-<li><code>timeout</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> In milliseconds the maximum amount of time the process
+<li><code>timeout</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;number></a> In milliseconds the maximum amount of time the process
 is allowed to run. <strong>Default:</strong> <code>undefined</code>.</li>
-<li><code>killSignal</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a> The signal value to be used when the spawned
+<li><code>killSignal</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;integer></a> The signal value to be used when the spawned
 process will be killed by timeout or abort signal. <strong>Default:</strong> <code>'SIGTERM'</code>.</li>
 </ul>
 </li>
@@ -1059,6 +1060,7 @@ ls.<span class="hljs-property">stderr</span>.<span class="hljs-title function_">
 ls.<span class="hljs-title function_">on</span>(<span class="hljs-string">'close'</span>, <span class="hljs-function">(<span class="hljs-params">code</span>) =></span> {
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`child process exited with code <span class="hljs-subst">${code}</span>`</span>);
 });</code><code class="language-js mjs"><span class="hljs-keyword">import</span> { spawn } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:child_process'</span>;
+<span class="hljs-keyword">import</span> { once } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:events'</span>;
 <span class="hljs-keyword">const</span> ls = <span class="hljs-title function_">spawn</span>(<span class="hljs-string">'ls'</span>, [<span class="hljs-string">'-lh'</span>, <span class="hljs-string">'/usr'</span>]);
 
 ls.<span class="hljs-property">stdout</span>.<span class="hljs-title function_">on</span>(<span class="hljs-string">'data'</span>, <span class="hljs-function">(<span class="hljs-params">data</span>) =></span> {
@@ -1069,9 +1071,8 @@ ls.<span class="hljs-property">stderr</span>.<span class="hljs-title function_">
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">`stderr: <span class="hljs-subst">${data}</span>`</span>);
 });
 
-ls.<span class="hljs-title function_">on</span>(<span class="hljs-string">'close'</span>, <span class="hljs-function">(<span class="hljs-params">code</span>) =></span> {
-  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`child process exited with code <span class="hljs-subst">${code}</span>`</span>);
-});</code><button class="copy-button">copy</button></pre>
+<span class="hljs-keyword">const</span> [code] = <span class="hljs-keyword">await</span> <span class="hljs-title function_">once</span>(ls, <span class="hljs-string">'close'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`child process exited with code <span class="hljs-subst">${code}</span>`</span>);</code><button class="copy-button">copy</button></pre>
 <p>Example: A very elaborate way to run <code>ps ax | grep ssh</code></p>
 
 <pre class="with-48-chars"><input class="js-flavor-toggle" type="checkbox" aria-label="Show modern ES modules syntax"><code class="language-js cjs"><span class="hljs-keyword">const</span> { spawn } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:child_process'</span>);
@@ -1330,8 +1331,8 @@ Readable and writable streams are designed with distinct behaviors, and using
 them incorrectly (e.g., passing a readable stream where a writable stream is
 expected) can lead to unexpected results or errors. This practice is discouraged
 as it may result in undefined behavior or dropped callbacks if the stream
-encounters errors. Always ensure that <code>stdin</code> is used as writable and
-<code>stdout</code>/<code>stderr</code> as readable to maintain the intended flow of data between
+encounters errors. Always ensure that <code>stdin</code> is used as readable and
+<code>stdout</code>/<code>stderr</code> as writable to maintain the intended flow of data between
 the parent and child processes.</p>
 </li>
 <li>
@@ -1409,39 +1410,39 @@ configuration at startup.</p>
 </details>
 </div>
 <ul>
-<li><code>file</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> The name or path of the executable file to run.</li>
-<li><code>args</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a> List of string arguments.</li>
+<li><code>file</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> The name or path of the executable file to run.</li>
+<li><code>args</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string[]></a> List of string arguments.</li>
 <li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
 <ul>
-<li><code>cwd</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="url.html#the-whatwg-url-api" class="type">&#x3C;URL></a> Current working directory of the child process.</li>
-<li><code>input</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray" class="type">&#x3C;TypedArray></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView" class="type">&#x3C;DataView></a> The value which will be passed
+<li><code>cwd</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> | <a href="url.html#the-whatwg-url-api" class="type">&#x3C;URL></a> Current working directory of the child process.</li>
+<li><code>input</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray" class="type">&#x3C;TypedArray></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView" class="type">&#x3C;DataView></a> The value which will be passed
 as stdin to the spawned process. If <code>stdio[0]</code> is set to <code>'pipe'</code>, Supplying
 this value will override <code>stdio[0]</code>.</li>
-<li><code>stdio</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="type">&#x3C;Array></a> Child's stdio configuration.
+<li><code>stdio</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="type">&#x3C;Array></a> Child's stdio configuration.
 See <a href="#child_processspawncommand-args-options"><code>child_process.spawn()</code></a>'s <a href="#optionsstdio"><code>stdio</code></a>. <code>stderr</code> by default will
 be output to the parent process' stderr unless <code>stdio</code> is specified.
 <strong>Default:</strong> <code>'pipe'</code>.</li>
 <li><code>env</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> Environment key-value pairs. <strong>Default:</strong> <code>process.env</code>.</li>
-<li><code>uid</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> Sets the user identity of the process (see <a href="http://man7.org/linux/man-pages/man2/setuid.2.html"><code>setuid(2)</code></a>).</li>
-<li><code>gid</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> Sets the group identity of the process (see <a href="http://man7.org/linux/man-pages/man2/setgid.2.html"><code>setgid(2)</code></a>).</li>
-<li><code>timeout</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> In milliseconds the maximum amount of time the process
+<li><code>uid</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;number></a> Sets the user identity of the process (see <a href="http://man7.org/linux/man-pages/man2/setuid.2.html"><code>setuid(2)</code></a>).</li>
+<li><code>gid</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;number></a> Sets the group identity of the process (see <a href="http://man7.org/linux/man-pages/man2/setgid.2.html"><code>setgid(2)</code></a>).</li>
+<li><code>timeout</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;number></a> In milliseconds the maximum amount of time the process
 is allowed to run. <strong>Default:</strong> <code>undefined</code>.</li>
-<li><code>killSignal</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a> The signal value to be used when the spawned
+<li><code>killSignal</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;integer></a> The signal value to be used when the spawned
 process will be killed. <strong>Default:</strong> <code>'SIGTERM'</code>.</li>
-<li><code>maxBuffer</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> Largest amount of data in bytes allowed on stdout or
+<li><code>maxBuffer</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;number></a> Largest amount of data in bytes allowed on stdout or
 stderr. If exceeded, the child process is terminated. See caveat at
 <a href="#maxbuffer-and-unicode"><code>maxBuffer</code> and Unicode</a>. <strong>Default:</strong> <code>1024 * 1024</code>.</li>
-<li><code>encoding</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> The encoding used for all stdio inputs and outputs.
+<li><code>encoding</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> The encoding used for all stdio inputs and outputs.
 <strong>Default:</strong> <code>'buffer'</code>.</li>
-<li><code>windowsHide</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> Hide the subprocess console window that would
+<li><code>windowsHide</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#boolean_type" class="type">&#x3C;boolean></a> Hide the subprocess console window that would
 normally be created on Windows systems. <strong>Default:</strong> <code>false</code>.</li>
-<li><code>shell</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> If <code>true</code>, runs <code>command</code> inside of a shell. Uses
+<li><code>shell</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#boolean_type" class="type">&#x3C;boolean></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> If <code>true</code>, runs <code>command</code> inside of a shell. Uses
 <code>'/bin/sh'</code> on Unix, and <code>process.env.ComSpec</code> on Windows. A different
 shell can be specified as a string. See <a href="#shell-requirements">Shell requirements</a> and
 <a href="#default-windows-shell">Default Windows shell</a>. <strong>Default:</strong> <code>false</code> (no shell).</li>
 </ul>
 </li>
-<li>Returns: <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> The stdout from the command.</li>
+<li>Returns: <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> The stdout from the command.</li>
 </ul>
 <p>The <code>child_process.execFileSync()</code> method is generally identical to
 <a href="#child_processexecfilefile-args-options-callback"><code>child_process.execFile()</code></a> with the exception that the method will not
@@ -1527,38 +1528,38 @@ arbitrary command execution.</strong></p>
 </details>
 </div>
 <ul>
-<li><code>command</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> The command to run.</li>
+<li><code>command</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> The command to run.</li>
 <li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
 <ul>
-<li><code>cwd</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="url.html#the-whatwg-url-api" class="type">&#x3C;URL></a> Current working directory of the child process.</li>
-<li><code>input</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray" class="type">&#x3C;TypedArray></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView" class="type">&#x3C;DataView></a> The value which will be passed
+<li><code>cwd</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> | <a href="url.html#the-whatwg-url-api" class="type">&#x3C;URL></a> Current working directory of the child process.</li>
+<li><code>input</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray" class="type">&#x3C;TypedArray></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView" class="type">&#x3C;DataView></a> The value which will be passed
 as stdin to the spawned process. If <code>stdio[0]</code> is set to <code>'pipe'</code>, Supplying
 this value will override <code>stdio[0]</code>.</li>
-<li><code>stdio</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="type">&#x3C;Array></a> Child's stdio configuration.
+<li><code>stdio</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="type">&#x3C;Array></a> Child's stdio configuration.
 See <a href="#child_processspawncommand-args-options"><code>child_process.spawn()</code></a>'s <a href="#optionsstdio"><code>stdio</code></a>. <code>stderr</code> by default will
 be output to the parent process' stderr unless <code>stdio</code> is specified.
 <strong>Default:</strong> <code>'pipe'</code>.</li>
 <li><code>env</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> Environment key-value pairs. <strong>Default:</strong> <code>process.env</code>.</li>
-<li><code>shell</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> Shell to execute the command with. See
+<li><code>shell</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> Shell to execute the command with. See
 <a href="#shell-requirements">Shell requirements</a> and <a href="#default-windows-shell">Default Windows shell</a>. <strong>Default:</strong>
 <code>'/bin/sh'</code> on Unix, <code>process.env.ComSpec</code> on Windows.</li>
-<li><code>uid</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> Sets the user identity of the process. (See <a href="http://man7.org/linux/man-pages/man2/setuid.2.html"><code>setuid(2)</code></a>).</li>
-<li><code>gid</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> Sets the group identity of the process. (See <a href="http://man7.org/linux/man-pages/man2/setgid.2.html"><code>setgid(2)</code></a>).</li>
-<li><code>timeout</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> In milliseconds the maximum amount of time the process
+<li><code>uid</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;number></a> Sets the user identity of the process. (See <a href="http://man7.org/linux/man-pages/man2/setuid.2.html"><code>setuid(2)</code></a>).</li>
+<li><code>gid</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;number></a> Sets the group identity of the process. (See <a href="http://man7.org/linux/man-pages/man2/setgid.2.html"><code>setgid(2)</code></a>).</li>
+<li><code>timeout</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;number></a> In milliseconds the maximum amount of time the process
 is allowed to run. <strong>Default:</strong> <code>undefined</code>.</li>
-<li><code>killSignal</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a> The signal value to be used when the spawned
+<li><code>killSignal</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;integer></a> The signal value to be used when the spawned
 process will be killed. <strong>Default:</strong> <code>'SIGTERM'</code>.</li>
-<li><code>maxBuffer</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> Largest amount of data in bytes allowed on stdout or
+<li><code>maxBuffer</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;number></a> Largest amount of data in bytes allowed on stdout or
 stderr. If exceeded, the child process is terminated and any output is
 truncated. See caveat at <a href="#maxbuffer-and-unicode"><code>maxBuffer</code> and Unicode</a>.
 <strong>Default:</strong> <code>1024 * 1024</code>.</li>
-<li><code>encoding</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> The encoding used for all stdio inputs and outputs.
+<li><code>encoding</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> The encoding used for all stdio inputs and outputs.
 <strong>Default:</strong> <code>'buffer'</code>.</li>
-<li><code>windowsHide</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> Hide the subprocess console window that would
+<li><code>windowsHide</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#boolean_type" class="type">&#x3C;boolean></a> Hide the subprocess console window that would
 normally be created on Windows systems. <strong>Default:</strong> <code>false</code>.</li>
 </ul>
 </li>
-<li>Returns: <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> The stdout from the command.</li>
+<li>Returns: <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> The stdout from the command.</li>
 </ul>
 <p>The <code>child_process.execSync()</code> method is generally identical to
 <a href="#child_processexeccommand-options-callback"><code>child_process.exec()</code></a> with the exception that the method will not return
@@ -1596,51 +1597,51 @@ metacharacters may be used to trigger arbitrary command execution.</strong></p>
 </details>
 </div>
 <ul>
-<li><code>command</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> The command to run.</li>
-<li><code>args</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a> List of string arguments.</li>
+<li><code>command</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> The command to run.</li>
+<li><code>args</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string[]></a> List of string arguments.</li>
 <li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
 <ul>
-<li><code>cwd</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="url.html#the-whatwg-url-api" class="type">&#x3C;URL></a> Current working directory of the child process.</li>
-<li><code>input</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray" class="type">&#x3C;TypedArray></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView" class="type">&#x3C;DataView></a> The value which will be passed
+<li><code>cwd</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> | <a href="url.html#the-whatwg-url-api" class="type">&#x3C;URL></a> Current working directory of the child process.</li>
+<li><code>input</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray" class="type">&#x3C;TypedArray></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView" class="type">&#x3C;DataView></a> The value which will be passed
 as stdin to the spawned process. If <code>stdio[0]</code> is set to <code>'pipe'</code>, Supplying
 this value will override <code>stdio[0]</code>.</li>
-<li><code>argv0</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> Explicitly set the value of <code>argv[0]</code> sent to the child
+<li><code>argv0</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> Explicitly set the value of <code>argv[0]</code> sent to the child
 process. This will be set to <code>command</code> if not specified.</li>
-<li><code>stdio</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="type">&#x3C;Array></a> Child's stdio configuration.
+<li><code>stdio</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="type">&#x3C;Array></a> Child's stdio configuration.
 See <a href="#child_processspawncommand-args-options"><code>child_process.spawn()</code></a>'s <a href="#optionsstdio"><code>stdio</code></a>. <strong>Default:</strong> <code>'pipe'</code>.</li>
 <li><code>env</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> Environment key-value pairs. <strong>Default:</strong> <code>process.env</code>.</li>
-<li><code>uid</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> Sets the user identity of the process (see <a href="http://man7.org/linux/man-pages/man2/setuid.2.html"><code>setuid(2)</code></a>).</li>
-<li><code>gid</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> Sets the group identity of the process (see <a href="http://man7.org/linux/man-pages/man2/setgid.2.html"><code>setgid(2)</code></a>).</li>
-<li><code>timeout</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> In milliseconds the maximum amount of time the process
+<li><code>uid</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;number></a> Sets the user identity of the process (see <a href="http://man7.org/linux/man-pages/man2/setuid.2.html"><code>setuid(2)</code></a>).</li>
+<li><code>gid</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;number></a> Sets the group identity of the process (see <a href="http://man7.org/linux/man-pages/man2/setgid.2.html"><code>setgid(2)</code></a>).</li>
+<li><code>timeout</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;number></a> In milliseconds the maximum amount of time the process
 is allowed to run. <strong>Default:</strong> <code>undefined</code>.</li>
-<li><code>killSignal</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a> The signal value to be used when the spawned
+<li><code>killSignal</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;integer></a> The signal value to be used when the spawned
 process will be killed. <strong>Default:</strong> <code>'SIGTERM'</code>.</li>
-<li><code>maxBuffer</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> Largest amount of data in bytes allowed on stdout or
+<li><code>maxBuffer</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;number></a> Largest amount of data in bytes allowed on stdout or
 stderr. If exceeded, the child process is terminated and any output is
 truncated. See caveat at <a href="#maxbuffer-and-unicode"><code>maxBuffer</code> and Unicode</a>.
 <strong>Default:</strong> <code>1024 * 1024</code>.</li>
-<li><code>encoding</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> The encoding used for all stdio inputs and outputs.
+<li><code>encoding</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> The encoding used for all stdio inputs and outputs.
 <strong>Default:</strong> <code>'buffer'</code>.</li>
-<li><code>shell</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> If <code>true</code>, runs <code>command</code> inside of a shell. Uses
+<li><code>shell</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#boolean_type" class="type">&#x3C;boolean></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> If <code>true</code>, runs <code>command</code> inside of a shell. Uses
 <code>'/bin/sh'</code> on Unix, and <code>process.env.ComSpec</code> on Windows. A different
 shell can be specified as a string. See <a href="#shell-requirements">Shell requirements</a> and
 <a href="#default-windows-shell">Default Windows shell</a>. <strong>Default:</strong> <code>false</code> (no shell).</li>
-<li><code>windowsVerbatimArguments</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> No quoting or escaping of arguments is
+<li><code>windowsVerbatimArguments</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#boolean_type" class="type">&#x3C;boolean></a> No quoting or escaping of arguments is
 done on Windows. Ignored on Unix. This is set to <code>true</code> automatically
 when <code>shell</code> is specified and is CMD. <strong>Default:</strong> <code>false</code>.</li>
-<li><code>windowsHide</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> Hide the subprocess console window that would
+<li><code>windowsHide</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#boolean_type" class="type">&#x3C;boolean></a> Hide the subprocess console window that would
 normally be created on Windows systems. <strong>Default:</strong> <code>false</code>.</li>
 </ul>
 </li>
 <li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
 <ul>
-<li><code>pid</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> Pid of the child process.</li>
+<li><code>pid</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;number></a> Pid of the child process.</li>
 <li><code>output</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="type">&#x3C;Array></a> Array of results from stdio output.</li>
-<li><code>stdout</code> <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> The contents of <code>output[1]</code>.</li>
-<li><code>stderr</code> <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> The contents of <code>output[2]</code>.</li>
-<li><code>status</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a> The exit code of the subprocess, or <code>null</code> if the
+<li><code>stdout</code> <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> The contents of <code>output[1]</code>.</li>
+<li><code>stderr</code> <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> The contents of <code>output[2]</code>.</li>
+<li><code>status</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;number></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#null_type" class="type">&#x3C;null></a> The exit code of the subprocess, or <code>null</code> if the
 subprocess terminated due to a signal.</li>
-<li><code>signal</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a> The signal used to kill the subprocess, or <code>null</code> if
+<li><code>signal</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#null_type" class="type">&#x3C;null></a> The signal used to kill the subprocess, or <code>null</code> if
 the subprocess did not terminate due to a signal.</li>
 <li><code>error</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="type">&#x3C;Error></a> The error object if the child process failed or timed out.</li>
 </ul>
@@ -1675,9 +1676,9 @@ instances of <code>ChildProcess</code>.</p>
 <span>Added in: v0.7.7</span>
 </div>
 <ul>
-<li><code>code</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The exit code if the child process exited on its own, or
+<li><code>code</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;number></a> The exit code if the child process exited on its own, or
 <code>null</code> if the child process terminated due to a signal.</li>
-<li><code>signal</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> The signal by which the child process was terminated, or
+<li><code>signal</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> The signal by which the child process was terminated, or
 <code>null</code> if the child process did not terminated due to a signal.</li>
 </ul>
 <p>The <code>'close'</code> event is emitted after a process has ended <em>and</em> the stdio
@@ -1704,6 +1705,7 @@ ls.<span class="hljs-title function_">on</span>(<span class="hljs-string">'close
 ls.<span class="hljs-title function_">on</span>(<span class="hljs-string">'exit'</span>, <span class="hljs-function">(<span class="hljs-params">code</span>) =></span> {
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`child process exited with code <span class="hljs-subst">${code}</span>`</span>);
 });</code><code class="language-js mjs"><span class="hljs-keyword">import</span> { spawn } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:child_process'</span>;
+<span class="hljs-keyword">import</span> { once } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:events'</span>;
 <span class="hljs-keyword">const</span> ls = <span class="hljs-title function_">spawn</span>(<span class="hljs-string">'ls'</span>, [<span class="hljs-string">'-lh'</span>, <span class="hljs-string">'/usr'</span>]);
 
 ls.<span class="hljs-property">stdout</span>.<span class="hljs-title function_">on</span>(<span class="hljs-string">'data'</span>, <span class="hljs-function">(<span class="hljs-params">data</span>) =></span> {
@@ -1716,7 +1718,10 @@ ls.<span class="hljs-title function_">on</span>(<span class="hljs-string">'close
 
 ls.<span class="hljs-title function_">on</span>(<span class="hljs-string">'exit'</span>, <span class="hljs-function">(<span class="hljs-params">code</span>) =></span> {
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`child process exited with code <span class="hljs-subst">${code}</span>`</span>);
-});</code><button class="copy-button">copy</button></pre>
+});
+
+<span class="hljs-keyword">const</span> [code] = <span class="hljs-keyword">await</span> <span class="hljs-title function_">once</span>(ls, <span class="hljs-string">'close'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`child process close all stdio with code <span class="hljs-subst">${code}</span>`</span>);</code><button class="copy-button">copy</button></pre>
 </div><div>
 <h4>Event: <code>'disconnect'</code><span><a class="mark" href="#event-disconnect" id="event-disconnect">#</a></span><a aria-hidden="true" class="legacy" id="child_process_event_disconnect"></a></h4>
 <div class="api_metadata">
@@ -1749,9 +1754,9 @@ against accidentally invoking handler functions multiple times.</p>
 <span>Added in: v0.1.90</span>
 </div>
 <ul>
-<li><code>code</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> The exit code if the child process exited on its own, or
+<li><code>code</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;number></a> The exit code if the child process exited on its own, or
 <code>null</code> if the child process terminated due to a signal.</li>
-<li><code>signal</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> The signal by which the child process was terminated, or
+<li><code>signal</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> The signal by which the child process was terminated, or
 <code>null</code> if the child process did not terminated due to a signal.</li>
 </ul>
 <p>The <code>'exit'</code> event is emitted after the child process ends. If the process
@@ -1765,6 +1770,9 @@ processes will not terminate immediately due to receipt of those signals.
 Rather, Node.js will perform a sequence of cleanup actions and then will
 re-raise the handled signal.</p>
 <p>See <a href="http://man7.org/linux/man-pages/man2/waitpid.2.html"><code>waitpid(2)</code></a>.</p>
+<p>When <code>code</code> is <code>null</code> due to signal termination, you can use
+<a href="util.html#utilconvertprocesssignaltoexitcodesignalcode"><code>util.convertProcessSignalToExitCode()</code></a> to convert the signal to a POSIX
+exit code.</p>
 </div><div>
 <h4>Event: <code>'message'</code><span><a class="mark" href="#event-message" id="event-message">#</a></span><a aria-hidden="true" class="legacy" id="child_process_event_message"></a></h4>
 <div class="api_metadata">
@@ -1772,7 +1780,7 @@ re-raise the handled signal.</p>
 </div>
 <ul>
 <li><code>message</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> A parsed JSON object or primitive value.</li>
-<li><code>sendHandle</code> <a href="net.html#serverlistenhandle-backlog-callback" class="type">&#x3C;Handle></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> <code>undefined</code> or a <a href="net.html#class-netsocket"><code>net.Socket</code></a>,
+<li><code>sendHandle</code> <a href="net.html#serverlistenhandle-backlog-callback" class="type">&#x3C;Handle></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#undefined_type" class="type">&#x3C;undefined></a> <code>undefined</code> or a <a href="net.html#class-netsocket"><code>net.Socket</code></a>,
 <a href="net.html#class-netserver"><code>net.Server</code></a>, or <a href="dgram.html#class-dgramsocket"><code>dgram.Socket</code></a> object.</li>
 </ul>
 <p>The <code>'message'</code> event is triggered when a child process uses
@@ -1835,7 +1843,7 @@ running, and lets it finish even while the channel is open.</p>
 <span>Added in: v0.7.2</span>
 </div>
 <ul>
-<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> Set to <code>false</code> after <code>subprocess.disconnect()</code> is called.</li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#boolean_type" class="type">&#x3C;boolean></a> Set to <code>false</code> after <code>subprocess.disconnect()</code> is called.</li>
 </ul>
 <p>The <code>subprocess.connected</code> property indicates whether it is still possible to
 send and receive messages from a child process. When <code>subprocess.connected</code> is
@@ -1860,18 +1868,22 @@ within the child process to close the IPC channel as well.</p>
 </div><div>
 <h4><code>subprocess.exitCode</code><span><a class="mark" href="#subprocessexitcode" id="subprocessexitcode">#</a></span><a aria-hidden="true" class="legacy" id="child_process_subprocess_exitcode"></a></h4>
 <ul>
-<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;integer></a></li>
 </ul>
 <p>The <code>subprocess.exitCode</code> property indicates the exit code of the child process.
 If the child process is still running, the field will be <code>null</code>.</p>
+<p>When the child process is terminated by a signal, <code>subprocess.exitCode</code> will be
+<code>null</code> and <a href="#subprocesssignalcode"><code>subprocess.signalCode</code></a> will be set. To get the corresponding
+POSIX exit code, use
+<a href="util.html#utilconvertprocesssignaltoexitcodesignalcode"><code>util.convertProcessSignalToExitCode(subprocess.signalCode)</code></a>.</p>
 </div><div>
 <h4><code>subprocess.kill([signal])</code><span><a class="mark" href="#subprocesskillsignal" id="subprocesskillsignal">#</a></span><a aria-hidden="true" class="legacy" id="child_process_subprocess_kill_signal"></a></h4>
 <div class="api_metadata">
 <span>Added in: v0.1.90</span>
 </div>
 <ul>
-<li><code>signal</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
-<li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+<li><code>signal</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;number></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a></li>
+<li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#boolean_type" class="type">&#x3C;boolean></a></li>
 </ul>
 <p>The <code>subprocess.kill()</code> method sends a signal to the child process. If no
 argument is given, the process will be sent the <code>'SIGTERM'</code> signal. See
@@ -1966,7 +1978,7 @@ new process in a shell or with the use of the <code>shell</code> option of <code
 <span>Added in: v0.5.10</span>
 </div>
 <ul>
-<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> Set to <code>true</code> after <code>subprocess.kill()</code> is used to successfully
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#boolean_type" class="type">&#x3C;boolean></a> Set to <code>true</code> after <code>subprocess.kill()</code> is used to successfully
 send a signal to the child process.</li>
 </ul>
 <p>The <code>subprocess.killed</code> property indicates whether the child process
@@ -1978,7 +1990,7 @@ does not indicate that the child process has been terminated.</p>
 <span>Added in: v0.1.90</span>
 </div>
 <ul>
-<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type" class="type">&#x3C;integer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#undefined_type" class="type">&#x3C;undefined></a></li>
 </ul>
 <p>Returns the process identifier (PID) of the child process. If the child process
 fails to spawn due to errors, then the value is <code>undefined</code> and <code>error</code> is
@@ -2040,19 +2052,19 @@ subprocess.<span class="hljs-title function_">ref</span>();</code><button class=
 </div>
 <ul>
 <li><code>message</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
-<li><code>sendHandle</code> <a href="net.html#serverlistenhandle-backlog-callback" class="type">&#x3C;Handle></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> <code>undefined</code>, or a <a href="net.html#class-netsocket"><code>net.Socket</code></a>,
+<li><code>sendHandle</code> <a href="net.html#serverlistenhandle-backlog-callback" class="type">&#x3C;Handle></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#undefined_type" class="type">&#x3C;undefined></a> <code>undefined</code>, or a <a href="net.html#class-netsocket"><code>net.Socket</code></a>,
 <a href="net.html#class-netserver"><code>net.Server</code></a>, or <a href="dgram.html#class-dgramsocket"><code>dgram.Socket</code></a> object.</li>
 <li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> The <code>options</code> argument, if present, is an object used to
 parameterize the sending of certain types of handles. <code>options</code> supports
 the following properties:
 <ul>
-<li><code>keepOpen</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> A value that can be used when passing instances of
+<li><code>keepOpen</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#boolean_type" class="type">&#x3C;boolean></a> A value that can be used when passing instances of
 <code>net.Socket</code>. When <code>true</code>, the socket is kept open in the sending process.
 <strong>Default:</strong> <code>false</code>.</li>
 </ul>
 </li>
 <li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a></li>
-<li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+<li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#boolean_type" class="type">&#x3C;boolean></a></li>
 </ul>
 <p>When an IPC channel has been established between the parent and child processes
 ( i.e. when using <a href="#child_processforkmodulepath-args-options"><code>child_process.fork()</code></a>), the <code>subprocess.send()</code> method
@@ -2221,10 +2233,13 @@ connection to the child.</p>
 </div></div><div>
 <h4><code>subprocess.signalCode</code><span><a class="mark" href="#subprocesssignalcode" id="subprocesssignalcode">#</a></span><a aria-hidden="true" class="legacy" id="child_process_subprocess_signalcode"></a></h4>
 <ul>
-<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#null_type" class="type">&#x3C;null></a></li>
 </ul>
 <p>The <code>subprocess.signalCode</code> property indicates the signal received by
 the child process if any, else <code>null</code>.</p>
+<p>When the child process is terminated by a signal, <a href="#subprocessexitcode"><code>subprocess.exitCode</code></a> will be <code>null</code>.
+To get the corresponding POSIX exit code, use
+<a href="util.html#utilconvertprocesssignaltoexitcodesignalcode"><code>util.convertProcessSignalToExitCode(subprocess.signalCode)</code></a>.</p>
 </div><div>
 <h4><code>subprocess.spawnargs</code><span><a class="mark" href="#subprocessspawnargs" id="subprocessspawnargs">#</a></span><a aria-hidden="true" class="legacy" id="child_process_subprocess_spawnargs"></a></h4>
 <ul>
@@ -2235,7 +2250,7 @@ arguments the child process was launched with.</p>
 </div><div>
 <h4><code>subprocess.spawnfile</code><span><a class="mark" href="#subprocessspawnfile" id="subprocessspawnfile">#</a></span><a aria-hidden="true" class="legacy" id="child_process_subprocess_spawnfile"></a></h4>
 <ul>
-<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a></li>
 </ul>
 <p>The <code>subprocess.spawnfile</code> property indicates the executable file name of
 the child process that is launched.</p>
@@ -2251,7 +2266,7 @@ in which the child process is launched.</p>
 <span>Added in: v0.1.90</span>
 </div>
 <ul>
-<li>Type: <a href="stream.html#class-streamreadable" class="type">&#x3C;stream.Readable></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a></li>
+<li>Type: <a href="stream.html#class-streamreadable" class="type">&#x3C;stream.Readable></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#null_type" class="type">&#x3C;null></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#undefined_type" class="type">&#x3C;undefined></a></li>
 </ul>
 <p>A <code>Readable Stream</code> that represents the child process's <code>stderr</code>.</p>
 <p>If the child process was spawned with <code>stdio[2]</code> set to anything other than <code>'pipe'</code>,
@@ -2266,7 +2281,7 @@ if the child process could not be successfully spawned.</p>
 <span>Added in: v0.1.90</span>
 </div>
 <ul>
-<li>Type: <a href="stream.html#class-streamwritable" class="type">&#x3C;stream.Writable></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a></li>
+<li>Type: <a href="stream.html#class-streamwritable" class="type">&#x3C;stream.Writable></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#null_type" class="type">&#x3C;null></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#undefined_type" class="type">&#x3C;undefined></a></li>
 </ul>
 <p>A <code>Writable Stream</code> that represents the child process's <code>stdin</code>.</p>
 <p>If a child process waits to read all of its input, the child process will not continue
@@ -2341,7 +2356,7 @@ not be successfully spawned.</p>
 <span>Added in: v0.1.90</span>
 </div>
 <ul>
-<li>Type: <a href="stream.html#class-streamreadable" class="type">&#x3C;stream.Readable></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a></li>
+<li>Type: <a href="stream.html#class-streamreadable" class="type">&#x3C;stream.Readable></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#null_type" class="type">&#x3C;null></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#undefined_type" class="type">&#x3C;undefined></a></li>
 </ul>
 <p>A <code>Readable Stream</code> that represents the child process's <code>stdout</code>.</p>
 <p>If the child process was spawned with <code>stdio[1]</code> set to anything other than <code>'pipe'</code>,

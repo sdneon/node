@@ -50,9 +50,11 @@
           'defines': [
             'USING_UV_SHARED',
             'USING_V8_SHARED',
+            'USING_V8_PLATFORM_SHARED',
             'BUILDING_NODE_EXTENSION'
           ],
           'defines!': [
+            'BUILDING_V8_PLATFORM_SHARED=1',
             'BUILDING_V8_SHARED=1',
             'BUILDING_UV_SHARED=1'
           ]
@@ -406,7 +408,7 @@
               'conditions': [
                 ['OS in "linux freebsd openharmony" and node_shared=="false"', {
                   'ldflags': [
-                    '-Wl,--whole-archive,'
+                    '-Wl,--whole-archive',
                       '<(obj_dir)/deps/openssl/<(openssl_product)',
                     '-Wl,--no-whole-archive',
                   ],
@@ -423,12 +425,6 @@
             }],
           ]
         }],
-        [ 'openssl_quic=="true" and node_shared_ngtcp2=="false"', {
-          'dependencies': [ './deps/ngtcp2/ngtcp2.gyp:ngtcp2' ]
-        }],
-        [ 'openssl_quic=="true" and node_shared_nghttp3=="false"', {
-          'dependencies': [ './deps/ngtcp2/ngtcp2.gyp:nghttp3' ]
-        }]
       ]
     }, {
       'defines': [ 'HAVE_OPENSSL=0' ]
@@ -437,6 +433,28 @@
       'defines': [ 'HAVE_AMARO=1' ],
     }, {
       'defines': [ 'HAVE_AMARO=0' ]
+    }],
+    [ 'node_use_sqlite=="true"', {
+      'defines': [ 'HAVE_SQLITE=1' ],
+    }, {
+      'defines': [ 'HAVE_SQLITE=0' ]
+    }],
+    [ 'node_use_quic=="true"', {
+      'defines': [ 'HAVE_QUIC=1' ],
+      'conditions': [
+        [ 'node_shared_openssl=="false"', {
+          'dependencies': [
+            './deps/ngtcp2/ngtcp2.gyp:ngtcp2',
+            './deps/ngtcp2/ngtcp2.gyp:nghttp3',
+
+            # For tests
+            './deps/ngtcp2/ngtcp2.gyp:ngtcp2_test_server',
+            './deps/ngtcp2/ngtcp2.gyp:ngtcp2_test_client',
+          ],
+        }],
+      ],
+    }, {
+      'defines': [ 'HAVE_QUIC=0' ]
     }],
   ],
 }

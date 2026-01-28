@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v24.9.0">
-  <title>Single executable applications | Node.js v24.9.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v25.5.0">
+  <title>Single executable applications | Node.js v25.5.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -112,7 +112,7 @@
     <div id="column1" data-id="single-executable-applications" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v24.9.0 documentation</h1>
+          <h1>Node.js v25.5.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -127,7 +127,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v24.9.0</li>
+            <li class="pinned-header">Node.js v25.5.0</li>
             
     <li class="picker-header">
       <a href="#toc-picker" aria-controls="toc-picker">
@@ -138,7 +138,7 @@
       <div class="picker" tabindex="-1"><div class="toc"><ul id="toc-picker">
 <li><span class="stability_1.1"><a href="#single-executable-applications">Single executable applications</a></span>
 <ul>
-<li><a href="#generating-single-executable-preparation-blobs">Generating single executable preparation blobs</a>
+<li><a href="#generating-single-executable-applications-with---build-sea">Generating single executable applications with <code>--build-sea</code></a>
 <ul>
 <li><a href="#assets">Assets</a></li>
 <li><a href="#startup-snapshot-support">Startup snapshot support</a></li>
@@ -161,11 +161,25 @@
 <li><a href="#requireid-in-the-injected-main-script-is-not-file-based"><code>require(id)</code> in the injected main script is not file based</a></li>
 <li><a href="#__filename-and-modulefilename-in-the-injected-main-script"><code>__filename</code> and <code>module.filename</code> in the injected main script</a></li>
 <li><a href="#__dirname-in-the-injected-main-script"><code>__dirname</code> in the injected main script</a></li>
+<li><a href="#using-native-addons-in-the-injected-main-script">Using native addons in the injected main script</a></li>
 </ul>
 </li>
 <li><a href="#notes">Notes</a>
 <ul>
-<li><a href="#single-executable-application-creation-process">Single executable application creation process</a></li>
+<li><a href="#single-executable-application-creation-process">Single executable application creation process</a>
+<ul>
+<li><a href="#1-generating-single-executable-preparation-blobs">1. Generating single executable preparation blobs</a>
+<ul>
+<li><a href="#dumping-the-preparation-blob-to-disk">Dumping the preparation blob to disk</a></li>
+</ul>
+</li>
+<li><a href="#2-injecting-the-preparation-blob-into-the-node-binary">2. Injecting the preparation blob into the <code>node</code> binary</a>
+<ul>
+<li><a href="#injecting-the-preparation-blob-manually">Injecting the preparation blob manually</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><a href="#platform-support">Platform support</a></li>
 </ul>
 </li>
@@ -267,7 +281,8 @@
         <span class="picker-arrow"></span>
         Other versions
       </a>
-      <div class="picker" tabindex="-1"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v24.x/api/single-executable-applications.html">24.x</a></li>
+      <div class="picker" tabindex="-1"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v25.x/api/single-executable-applications.html">25.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v24.x/api/single-executable-applications.html">24.x <b>LTS</b></a></li>
 <li><a href="https://nodejs.org/docs/latest-v23.x/api/single-executable-applications.html">23.x</a></li>
 <li><a href="https://nodejs.org/docs/latest-v22.x/api/single-executable-applications.html">22.x <b>LTS</b></a></li>
 <li><a href="https://nodejs.org/docs/latest-v21.x/api/single-executable-applications.html">21.x</a></li>
@@ -301,7 +316,7 @@
       <details role="navigation" id="toc" open><summary>Table of contents</summary><ul>
 <li><span class="stability_1.1"><a href="#single-executable-applications">Single executable applications</a></span>
 <ul>
-<li><a href="#generating-single-executable-preparation-blobs">Generating single executable preparation blobs</a>
+<li><a href="#generating-single-executable-applications-with---build-sea">Generating single executable applications with <code>--build-sea</code></a>
 <ul>
 <li><a href="#assets">Assets</a></li>
 <li><a href="#startup-snapshot-support">Startup snapshot support</a></li>
@@ -324,11 +339,25 @@
 <li><a href="#requireid-in-the-injected-main-script-is-not-file-based"><code>require(id)</code> in the injected main script is not file based</a></li>
 <li><a href="#__filename-and-modulefilename-in-the-injected-main-script"><code>__filename</code> and <code>module.filename</code> in the injected main script</a></li>
 <li><a href="#__dirname-in-the-injected-main-script"><code>__dirname</code> in the injected main script</a></li>
+<li><a href="#using-native-addons-in-the-injected-main-script">Using native addons in the injected main script</a></li>
 </ul>
 </li>
 <li><a href="#notes">Notes</a>
 <ul>
-<li><a href="#single-executable-application-creation-process">Single executable application creation process</a></li>
+<li><a href="#single-executable-application-creation-process">Single executable application creation process</a>
+<ul>
+<li><a href="#1-generating-single-executable-preparation-blobs">1. Generating single executable preparation blobs</a>
+<ul>
+<li><a href="#dumping-the-preparation-blob-to-disk">Dumping the preparation blob to disk</a></li>
+</ul>
+</li>
+<li><a href="#2-injecting-the-preparation-blob-into-the-node-binary">2. Injecting the preparation blob into the <code>node</code> binary</a>
+<ul>
+<li><a href="#injecting-the-preparation-blob-manually">Injecting the preparation blob manually</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><a href="#platform-support">Platform support</a></li>
 </ul>
 </li>
@@ -343,6 +372,8 @@
 <details class="changelog"><summary>History</summary>
 <table>
 <tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v25.5.0</td>
+<td><p>Added built-in single executable application generation via the CLI flag <code>--build-sea</code>.</p></td></tr>
 <tr><td>v20.6.0</td>
 <td><p>Added support for "useSnapshot".</p></td></tr>
 <tr><td>v20.6.0</td>
@@ -353,7 +384,7 @@
 </details>
 </div>
 <p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1.1</a> - Active development</div><p></p>
-<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v24.9.0/src/node_sea.cc">src/node_sea.cc</a></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v25.5.0/src/node_sea.cc">src/node_sea.cc</a></p>
 <p>This feature allows the distribution of a Node.js application conveniently to a
 system that does not have Node.js installed.</p>
 <p>Node.js supports the creation of <a href="https://github.com/nodejs/single-executable">single executable applications</a> by allowing
@@ -366,8 +397,6 @@ single embedded script using the <a href="modules.html#modules-commonjs-modules"
 <p>Users can create a single executable application from their bundled script
 with the <code>node</code> binary itself and any tool which can inject resources into the
 binary.</p>
-<p>Here are the steps for creating a single executable application using one such
-tool, <a href="https://github.com/nodejs/postject">postject</a>:</p>
 <ol>
 <li>
 <p>Create a JavaScript file:</p>
@@ -376,13 +405,368 @@ tool, <a href="https://github.com/nodejs/postject">postject</a>:</p>
 <li>
 <p>Create a configuration file building a blob that can be injected into the
 single executable application (see
-<a href="#generating-single-executable-preparation-blobs">Generating single executable preparation blobs</a> for details):</p>
-<pre><code class="language-bash"><span class="hljs-built_in">echo</span> <span class="hljs-string">'{ "main": "hello.js", "output": "sea-prep.blob" }'</span> > sea-config.json</code> <button class="copy-button">copy</button></pre>
+<a href="#1-generating-single-executable-preparation-blobs">Generating single executable preparation blobs</a> for details):</p>
+<ul>
+<li>On systems other than Windows:</li>
+</ul>
+<pre><code class="language-bash"><span class="hljs-built_in">echo</span> <span class="hljs-string">'{ "main": "hello.js", "output": "sea" }'</span> > sea-config.json</code> <button class="copy-button">copy</button></pre>
+<ul>
+<li>On Windows:</li>
+</ul>
+<pre><code class="language-bash"><span class="hljs-built_in">echo</span> <span class="hljs-string">'{ "main": "hello.js", "output": "sea.exe" }'</span> > sea-config.json</code> <button class="copy-button">copy</button></pre>
+<p>The <code>.exe</code> extension is necessary.</p>
 </li>
 <li>
-<p>Generate the blob to be injected:</p>
-<pre><code class="language-bash">node --experimental-sea-config sea-config.json</code> <button class="copy-button">copy</button></pre>
+<p>Generate the target executable:</p>
+<pre><code class="language-bash">node --build-sea sea-config.json</code> <button class="copy-button">copy</button></pre>
 </li>
+<li>
+<p>Sign the binary (macOS and Windows only):</p>
+<ul>
+<li>On macOS:</li>
+</ul>
+<pre><code class="language-bash">codesign --sign - hello</code> <button class="copy-button">copy</button></pre>
+<ul>
+<li>On Windows (optional):</li>
+</ul>
+<p>A certificate needs to be present for this to work. However, the unsigned
+binary would still be runnable.</p>
+<pre><code class="language-powershell">signtool sign /fd SHA256 hello.exe</code> <button class="copy-button">copy</button></pre>
+</li>
+<li>
+<p>Run the binary:</p>
+<ul>
+<li>On systems other than Windows</li>
+</ul>
+<pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">./hello world</span>
+Hello, world!</code> <button class="copy-button">copy</button></pre>
+<ul>
+<li>On Windows</li>
+</ul>
+<pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">.\hello.exe world</span>
+Hello, world!</code> <button class="copy-button">copy</button></pre>
+</li>
+</ol>
+<section><h3>Generating single executable applications with <code>--build-sea</code><span><a class="mark" href="#generating-single-executable-applications-with---build-sea" id="generating-single-executable-applications-with---build-sea">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_generating_single_executable_applications_with_build_sea"></a></h3>
+<p>To generate a single executable application directly, the <code>--build-sea</code> flag can be
+used. It takes a path to a configuration file in JSON format. If the path passed to it
+isn't absolute, Node.js will use the path relative to the current working directory.</p>
+<p>The configuration currently reads the following top-level fields:</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"main"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/path/to/bundled/script.js"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"executable"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/path/to/node/binary"</span><span class="hljs-punctuation">,</span> <span class="hljs-comment">// Optional, if not specified, uses the current Node.js binary</span>
+  <span class="hljs-attr">"output"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/path/to/write/the/generated/executable"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"disableExperimentalSEAWarning"</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span> <span class="hljs-comment">// Default: false</span>
+  <span class="hljs-attr">"useSnapshot"</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">false</span></span><span class="hljs-punctuation">,</span>  <span class="hljs-comment">// Default: false</span>
+  <span class="hljs-attr">"useCodeCache"</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span> <span class="hljs-comment">// Default: false</span>
+  <span class="hljs-attr">"execArgv"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">"--no-warnings"</span><span class="hljs-punctuation">,</span> <span class="hljs-string">"--max-old-space-size=4096"</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-comment">// Optional</span>
+  <span class="hljs-attr">"execArgvExtension"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"env"</span><span class="hljs-punctuation">,</span> <span class="hljs-comment">// Default: "env", options: "none", "env", "cli"</span>
+  <span class="hljs-attr">"assets"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>  <span class="hljs-comment">// Optional</span>
+    <span class="hljs-attr">"a.dat"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/path/to/a.dat"</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"b.txt"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/path/to/b.txt"</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
+<p>If the paths are not absolute, Node.js will use the path relative to the
+current working directory. The version of the Node.js binary used to produce
+the blob must be the same as the one to which the blob will be injected.</p>
+<p>Note: When generating cross-platform SEAs (e.g., generating a SEA
+for <code>linux-x64</code> on <code>darwin-arm64</code>), <code>useCodeCache</code> and <code>useSnapshot</code>
+must be set to false to avoid generating incompatible executables.
+Since code cache and snapshots can only be loaded on the same platform
+where they are compiled, the generated executable might crash on startup when
+trying to load code cache or snapshots built on a different platform.</p>
+<div>
+<h4>Assets<span><a class="mark" href="#assets" id="assets">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_assets"></a></h4>
+<p>Users can include assets by adding a key-path dictionary to the configuration
+as the <code>assets</code> field. At build time, Node.js would read the assets from the
+specified paths and bundle them into the preparation blob. In the generated
+executable, users can retrieve the assets using the <a href="#seagetassetkey-encoding"><code>sea.getAsset()</code></a> and
+<a href="#seagetassetasblobkey-options"><code>sea.getAssetAsBlob()</code></a> APIs.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"main"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/path/to/bundled/script.js"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"output"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/path/to/write/the/generated/executable"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"assets"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"a.jpg"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/path/to/a.jpg"</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"b.txt"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/path/to/b.txt"</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
+<p>The single-executable application can access the assets as follows:</p>
+<pre><code class="language-js cjs"><span class="hljs-keyword">const</span> { getAsset, getAssetAsBlob, getRawAsset, getAssetKeys } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:sea'</span>);
+<span class="hljs-comment">// Get all asset keys.</span>
+<span class="hljs-keyword">const</span> keys = <span class="hljs-title function_">getAssetKeys</span>();
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(keys); <span class="hljs-comment">// ['a.jpg', 'b.txt']</span>
+<span class="hljs-comment">// Returns a copy of the data in an ArrayBuffer.</span>
+<span class="hljs-keyword">const</span> image = <span class="hljs-title function_">getAsset</span>(<span class="hljs-string">'a.jpg'</span>);
+<span class="hljs-comment">// Returns a string decoded from the asset as UTF8.</span>
+<span class="hljs-keyword">const</span> text = <span class="hljs-title function_">getAsset</span>(<span class="hljs-string">'b.txt'</span>, <span class="hljs-string">'utf8'</span>);
+<span class="hljs-comment">// Returns a Blob containing the asset.</span>
+<span class="hljs-keyword">const</span> blob = <span class="hljs-title function_">getAssetAsBlob</span>(<span class="hljs-string">'a.jpg'</span>);
+<span class="hljs-comment">// Returns an ArrayBuffer containing the raw asset without copying.</span>
+<span class="hljs-keyword">const</span> raw = <span class="hljs-title function_">getRawAsset</span>(<span class="hljs-string">'a.jpg'</span>);</code> <button class="copy-button">copy</button></pre>
+<p>See documentation of the <a href="#seagetassetkey-encoding"><code>sea.getAsset()</code></a>, <a href="#seagetassetasblobkey-options"><code>sea.getAssetAsBlob()</code></a>,
+<a href="#seagetrawassetkey"><code>sea.getRawAsset()</code></a> and <a href="#seagetassetkeys"><code>sea.getAssetKeys()</code></a> APIs for more information.</p>
+</div><div>
+<h4>Startup snapshot support<span><a class="mark" href="#startup-snapshot-support" id="startup-snapshot-support">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_startup_snapshot_support"></a></h4>
+<p>The <code>useSnapshot</code> field can be used to enable startup snapshot support. In this
+case, the <code>main</code> script would not be executed when the final executable is launched.
+Instead, it would be run when the single executable application preparation
+blob is generated on the building machine. The generated preparation blob would
+then include a snapshot capturing the states initialized by the <code>main</code> script.
+The final executable, with the preparation blob injected, would deserialize
+the snapshot at run time.</p>
+<p>When <code>useSnapshot</code> is true, the main script must invoke the
+<a href="v8.html#v8startupsnapshotsetdeserializemainfunctioncallback-data"><code>v8.startupSnapshot.setDeserializeMainFunction()</code></a> API to configure code
+that needs to be run when the final executable is launched by the users.</p>
+<p>The typical pattern for an application to use snapshot in a single executable
+application is:</p>
+<ol>
+<li>At build time, on the building machine, the main script is run to
+initialize the heap to a state that's ready to take user input. The script
+should also configure a main function with
+<a href="v8.html#v8startupsnapshotsetdeserializemainfunctioncallback-data"><code>v8.startupSnapshot.setDeserializeMainFunction()</code></a>. This function will be
+compiled and serialized into the snapshot, but not invoked at build time.</li>
+<li>At run time, the main function will be run on top of the deserialized heap
+on the user machine to process user input and generate output.</li>
+</ol>
+<p>The general constraints of the startup snapshot scripts also apply to the main
+script when it's used to build snapshot for the single executable application,
+and the main script can use the <a href="v8.html#startup-snapshot-api"><code>v8.startupSnapshot</code> API</a> to adapt to
+these constraints. See
+<a href="cli.html#--build-snapshot">documentation about startup snapshot support in Node.js</a>.</p>
+</div><div>
+<h4>V8 code cache support<span><a class="mark" href="#v8-code-cache-support" id="v8-code-cache-support">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_v8_code_cache_support"></a></h4>
+<p>When <code>useCodeCache</code> is set to <code>true</code> in the configuration, during the generation
+of the single executable preparation blob, Node.js will compile the <code>main</code>
+script to generate the V8 code cache. The generated code cache would be part of
+the preparation blob and get injected into the final executable. When the single
+executable application is launched, instead of compiling the <code>main</code> script from
+scratch, Node.js would use the code cache to speed up the compilation, then
+execute the script, which would improve the startup performance.</p>
+<p><strong>Note:</strong> <code>import()</code> does not work when <code>useCodeCache</code> is <code>true</code>.</p>
+</div><div>
+<h4>Execution arguments<span><a class="mark" href="#execution-arguments" id="execution-arguments">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_execution_arguments"></a></h4>
+<p>The <code>execArgv</code> field can be used to specify Node.js-specific
+arguments that will be automatically applied when the single
+executable application starts. This allows application developers
+to configure Node.js runtime options without requiring end users
+to be aware of these flags.</p>
+<p>For example, the following configuration:</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"main"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/path/to/bundled/script.js"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"output"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/path/to/write/the/generated/executable"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"execArgv"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">"--no-warnings"</span><span class="hljs-punctuation">,</span> <span class="hljs-string">"--max-old-space-size=2048"</span><span class="hljs-punctuation">]</span>
+<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
+<p>will instruct the SEA to be launched with the <code>--no-warnings</code> and
+<code>--max-old-space-size=2048</code> flags. In the scripts embedded in the executable, these flags
+can be accessed using the <code>process.execArgv</code> property:</p>
+<pre><code class="language-js"><span class="hljs-comment">// If the executable is launched with `sea user-arg1 user-arg2`</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(process.<span class="hljs-property">execArgv</span>);
+<span class="hljs-comment">// Prints: ['--no-warnings', '--max-old-space-size=2048']</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(process.<span class="hljs-property">argv</span>);
+<span class="hljs-comment">// Prints ['/path/to/sea', 'path/to/sea', 'user-arg1', 'user-arg2']</span></code> <button class="copy-button">copy</button></pre>
+<p>The user-provided arguments are in the <code>process.argv</code> array starting from index 2,
+similar to what would happen if the application is started with:</p>
+<pre><code class="language-console">node --no-warnings --max-old-space-size=2048 /path/to/bundled/script.js user-arg1 user-arg2</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4>Execution argument extension<span><a class="mark" href="#execution-argument-extension" id="execution-argument-extension">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_execution_argument_extension"></a></h4>
+<p>The <code>execArgvExtension</code> field controls how additional execution arguments can be
+provided beyond those specified in the <code>execArgv</code> field. It accepts one of three string values:</p>
+<ul>
+<li><code>"none"</code>: No extension is allowed. Only the arguments specified in <code>execArgv</code> will be used,
+and the <code>NODE_OPTIONS</code> environment variable will be ignored.</li>
+<li><code>"env"</code>: <em>(Default)</em> The <code>NODE_OPTIONS</code> environment variable can extend the execution arguments.
+This is the default behavior to maintain backward compatibility.</li>
+<li><code>"cli"</code>: The executable can be launched with <code>--node-options="--flag1 --flag2"</code>, and those flags
+will be parsed as execution arguments for Node.js instead of being passed to the user script.
+This allows using arguments that are not supported by the <code>NODE_OPTIONS</code> environment variable.</li>
+</ul>
+<p>For example, with <code>"execArgvExtension": "cli"</code>:</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"main"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/path/to/bundled/script.js"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"output"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/path/to/write/the/generated/executable"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"execArgv"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">"--no-warnings"</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"execArgvExtension"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"cli"</span>
+<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
+<p>The executable can be launched as:</p>
+<pre><code class="language-console">./my-sea --node-options="--trace-exit" user-arg1 user-arg2</code> <button class="copy-button">copy</button></pre>
+<p>This would be equivalent to running:</p>
+<pre><code class="language-console">node --no-warnings --trace-exit /path/to/bundled/script.js user-arg1 user-arg2</code> <button class="copy-button">copy</button></pre>
+</div>
+</section><section><h3>In the injected main script<span><a class="mark" href="#in-the-injected-main-script" id="in-the-injected-main-script">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_in_the_injected_main_script"></a></h3>
+<div>
+<h4>Single-executable application API<span><a class="mark" href="#single-executable-application-api" id="single-executable-application-api">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_single_executable_application_api"></a></h4>
+<p>The <code>node:sea</code> builtin allows interaction with the single-executable application
+from the JavaScript main script embedded into the executable.</p>
+<div>
+<h5><code>sea.isSea()</code><span><a class="mark" href="#seaissea" id="seaissea">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_sea_issea"></a></h5>
+<div class="api_metadata">
+<span>Added in: v21.7.0, v20.12.0</span>
+</div>
+<ul>
+<li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#boolean_type" class="type">&#x3C;boolean></a> Whether this script is running inside a single-executable
+application.</li>
+</ul>
+</div></div><div>
+<h4><code>sea.getAsset(key[, encoding])</code><span><a class="mark" href="#seagetassetkey-encoding" id="seagetassetkey-encoding">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_sea_getasset_key_encoding"></a></h4>
+<div class="api_metadata">
+<span>Added in: v21.7.0, v20.12.0</span>
+</div>
+<p>This method can be used to retrieve the assets configured to be bundled into the
+single-executable application at build time.
+An error is thrown when no matching asset can be found.</p>
+<ul>
+<li><code>key</code>  <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> the key for the asset in the dictionary specified by the
+<code>assets</code> field in the single-executable application configuration.</li>
+<li><code>encoding</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> If specified, the asset will be decoded as
+a string. Any encoding supported by the <code>TextDecoder</code> is accepted.
+If unspecified, an <code>ArrayBuffer</code> containing a copy of the asset would be
+returned instead.</li>
+<li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer" class="type">&#x3C;ArrayBuffer></a></li>
+</ul>
+</div><div>
+<h4><code>sea.getAssetAsBlob(key[, options])</code><span><a class="mark" href="#seagetassetasblobkey-options" id="seagetassetasblobkey-options">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_sea_getassetasblob_key_options"></a></h4>
+<div class="api_metadata">
+<span>Added in: v21.7.0, v20.12.0</span>
+</div>
+<p>Similar to <a href="#seagetassetkey-encoding"><code>sea.getAsset()</code></a>, but returns the result in a <a href="buffer.html#class-blob" class="type">&#x3C;Blob></a>.
+An error is thrown when no matching asset can be found.</p>
+<ul>
+<li><code>key</code>  <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> the key for the asset in the dictionary specified by the
+<code>assets</code> field in the single-executable application configuration.</li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>type</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> An optional mime type for the blob.</li>
+</ul>
+</li>
+<li>Returns: <a href="buffer.html#class-blob" class="type">&#x3C;Blob></a></li>
+</ul>
+</div><div>
+<h4><code>sea.getRawAsset(key)</code><span><a class="mark" href="#seagetrawassetkey" id="seagetrawassetkey">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_sea_getrawasset_key"></a></h4>
+<div class="api_metadata">
+<span>Added in: v21.7.0, v20.12.0</span>
+</div>
+<p>This method can be used to retrieve the assets configured to be bundled into the
+single-executable application at build time.
+An error is thrown when no matching asset can be found.</p>
+<p>Unlike <code>sea.getAsset()</code> or <code>sea.getAssetAsBlob()</code>, this method does not
+return a copy. Instead, it returns the raw asset bundled inside the executable.</p>
+<p>For now, users should avoid writing to the returned array buffer. If the
+injected section is not marked as writable or not aligned properly,
+writes to the returned array buffer is likely to result in a crash.</p>
+<ul>
+<li><code>key</code>  <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> the key for the asset in the dictionary specified by the
+<code>assets</code> field in the single-executable application configuration.</li>
+<li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer" class="type">&#x3C;ArrayBuffer></a></li>
+</ul>
+</div><div>
+<h4><code>sea.getAssetKeys()</code><span><a class="mark" href="#seagetassetkeys" id="seagetassetkeys">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_sea_getassetkeys"></a></h4>
+<div class="api_metadata">
+<span>Added in: v24.8.0, v22.20.0</span>
+</div>
+<ul>
+<li>Returns <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string[]></a> An array containing all the keys of the assets
+embedded in the executable. If no assets are embedded, returns an empty array.</li>
+</ul>
+<p>This method can be used to retrieve an array of all the keys of assets
+embedded into the single-executable application.
+An error is thrown when not running inside a single-executable application.</p>
+</div><div>
+<h4><code>require(id)</code> in the injected main script is not file based<span><a class="mark" href="#requireid-in-the-injected-main-script-is-not-file-based" id="requireid-in-the-injected-main-script-is-not-file-based">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_require_id_in_the_injected_main_script_is_not_file_based"></a></h4>
+<p><code>require()</code> in the injected main script is not the same as the <a href="modules.html#requireid"><code>require()</code></a>
+available to modules that are not injected. It also does not have any of the
+properties that non-injected <a href="modules.html#requireid"><code>require()</code></a> has except <a href="modules.html#accessing-the-main-module"><code>require.main</code></a>. It
+can only be used to load built-in modules. Attempting to load a module that can
+only be found in the file system will throw an error.</p>
+<p>Instead of relying on a file based <code>require()</code>, users can bundle their
+application into a standalone JavaScript file to inject into the executable.
+This also ensures a more deterministic dependency graph.</p>
+<p>However, if a file based <code>require()</code> is still needed, that can also be achieved:</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> { createRequire } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:module'</span>);
+<span class="hljs-built_in">require</span> = <span class="hljs-title function_">createRequire</span>(__filename);</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>__filename</code> and <code>module.filename</code> in the injected main script<span><a class="mark" href="#__filename-and-modulefilename-in-the-injected-main-script" id="__filename-and-modulefilename-in-the-injected-main-script">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_filename_and_module_filename_in_the_injected_main_script"></a></h4>
+<p>The values of <code>__filename</code> and <code>module.filename</code> in the injected main script
+are equal to <a href="process.html#processexecpath"><code>process.execPath</code></a>.</p>
+</div><div>
+<h4><code>__dirname</code> in the injected main script<span><a class="mark" href="#__dirname-in-the-injected-main-script" id="__dirname-in-the-injected-main-script">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_dirname_in_the_injected_main_script"></a></h4>
+<p>The value of <code>__dirname</code> in the injected main script is equal to the directory
+name of <a href="process.html#processexecpath"><code>process.execPath</code></a>.</p>
+</div><div>
+<h4>Using native addons in the injected main script<span><a class="mark" href="#using-native-addons-in-the-injected-main-script" id="using-native-addons-in-the-injected-main-script">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_using_native_addons_in_the_injected_main_script"></a></h4>
+<p>Native addons can be bundled as assets into the single-executable application
+by specifying them in the <code>assets</code> field of the configuration file used to
+generate the single-executable application preparation blob.
+The addon can then be loaded in the injected main script by writing the asset
+to a temporary file and loading it with <code>process.dlopen()</code>.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"main"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/path/to/bundled/script.js"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"output"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/path/to/write/the/generated/executable"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"assets"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"myaddon.node"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/path/to/myaddon/build/Release/myaddon.node"</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
+<pre><code class="language-js"><span class="hljs-comment">// script.js</span>
+<span class="hljs-keyword">const</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:fs'</span>);
+<span class="hljs-keyword">const</span> os = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:os'</span>);
+<span class="hljs-keyword">const</span> path = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:path'</span>);
+<span class="hljs-keyword">const</span> { getRawAsset } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:sea'</span>);
+<span class="hljs-keyword">const</span> addonPath = path.<span class="hljs-title function_">join</span>(os.<span class="hljs-title function_">tmpdir</span>(), <span class="hljs-string">'myaddon.node'</span>);
+fs.<span class="hljs-title function_">writeFileSync</span>(addonPath, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Uint8Array</span>(<span class="hljs-title function_">getRawAsset</span>(<span class="hljs-string">'myaddon.node'</span>)));
+<span class="hljs-keyword">const</span> myaddon = { <span class="hljs-attr">exports</span>: {} };
+process.<span class="hljs-title function_">dlopen</span>(myaddon, addonPath);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myaddon.<span class="hljs-property">exports</span>);
+fs.<span class="hljs-title function_">rmSync</span>(addonPath);</code> <button class="copy-button">copy</button></pre>
+<p>Known caveat: if the single-executable application is produced by postject running on a Linux arm64 docker container,
+<a href="https://github.com/nodejs/postject/issues/105">the produced ELF binary does not have the correct hash table to load the addons</a> and
+will crash on <code>process.dlopen()</code>. Build the single-executable application on other platforms, or at least on
+a non-container Linux arm64 environment to work around this issue.</p>
+</div>
+</section><section><h3>Notes<span><a class="mark" href="#notes" id="notes">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_notes"></a></h3>
+<div>
+<h4>Single executable application creation process<span><a class="mark" href="#single-executable-application-creation-process" id="single-executable-application-creation-process">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_single_executable_application_creation_process"></a></h4>
+<p>The process documented here is subject to change.</p>
+<div>
+<h5>1. Generating single executable preparation blobs<span><a class="mark" href="#1-generating-single-executable-preparation-blobs" id="1-generating-single-executable-preparation-blobs">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_1_generating_single_executable_preparation_blobs"></a></h5>
+<p>To build a single executable application, Node.js would first generate a blob
+that contains all the necessary information to run the bundled script.
+When using <code>--build-sea</code>, this step is done internally along with the injection.</p>
+<div>
+<h6>Dumping the preparation blob to disk<span><a class="mark" href="#dumping-the-preparation-blob-to-disk" id="dumping-the-preparation-blob-to-disk">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_dumping_the_preparation_blob_to_disk"></a></h6>
+<p>Before <code>--build-sea</code> was introduced, an older workflow was introduced to write the
+preparation blob to disk for injection by external tools. This can still
+be used for verification purposes.</p>
+<p>To dump the preparation blob to disk for verification, use <code>--experimental-sea-config</code>.
+This writes a file that can be injected into a Node.js binary using tools like <a href="https://github.com/nodejs/postject">postject</a>.</p>
+<p>The configuration is similar to that of <code>--build-sea</code>, except that the
+<code>output</code> field specifies the path to write the generated blob file instead of
+the final executable.</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"main"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/path/to/bundled/script.js"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-comment">// Instead of the final executable, this is the path to write the blob.</span>
+  <span class="hljs-attr">"output"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/path/to/write/the/generated/blob.blob"</span>
+<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
+</div></div><div>
+<h5>2. Injecting the preparation blob into the <code>node</code> binary<span><a class="mark" href="#2-injecting-the-preparation-blob-into-the-node-binary" id="2-injecting-the-preparation-blob-into-the-node-binary">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_2_injecting_the_preparation_blob_into_the_node_binary"></a></h5>
+<p>To complete the creation of a single executable application, the generated blob
+needs to be injected into a copy of the <code>node</code> binary, as documented below.</p>
+<p>When using <code>--build-sea</code>, this step is done internally along with the blob generation.</p>
+<ul>
+<li>If the <code>node</code> binary is a <a href="https://en.wikipedia.org/wiki/Portable_Executable">PE</a> file, the blob should be injected as a resource
+named <code>NODE_SEA_BLOB</code>.</li>
+<li>If the <code>node</code> binary is a <a href="https://en.wikipedia.org/wiki/Mach-O">Mach-O</a> file, the blob should be injected as a section
+named <code>NODE_SEA_BLOB</code> in the <code>NODE_SEA</code> segment.</li>
+<li>If the <code>node</code> binary is an <a href="https://en.wikipedia.org/wiki/Executable_and_Linkable_Format">ELF</a> file, the blob should be injected as a note
+named <code>NODE_SEA_BLOB</code>.</li>
+</ul>
+<p>Then, the SEA building process searches the binary for the
+<code>NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2:0</code> <a href="https://www.electronjs.org/docs/latest/tutorial/fuses">fuse</a> string and flip the
+last character to <code>1</code> to indicate that a resource has been injected.</p>
+<div>
+<h6>Injecting the preparation blob manually<span><a class="mark" href="#injecting-the-preparation-blob-manually" id="injecting-the-preparation-blob-manually">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_injecting_the_preparation_blob_manually"></a></h6>
+<p>Before <code>--build-sea</code> was introduced, an older workflow was introduced to allow
+external tools to inject the generated blob into a copy of the <code>node</code> binary.</p>
+<p>For example, with <a href="https://github.com/nodejs/postject">postject</a>:</p>
+<ol>
 <li>
 <p>Create a copy of the <code>node</code> executable and name it according to your needs:</p>
 <ul>
@@ -448,295 +832,8 @@ stored.</li>
 </li>
 </ul>
 </li>
-<li>
-<p>Sign the binary (macOS and Windows only):</p>
-<ul>
-<li>On macOS:</li>
-</ul>
-<pre><code class="language-bash">codesign --sign - hello</code> <button class="copy-button">copy</button></pre>
-<ul>
-<li>On Windows (optional):</li>
-</ul>
-<p>A certificate needs to be present for this to work. However, the unsigned
-binary would still be runnable.</p>
-<pre><code class="language-powershell">signtool sign /fd SHA256 hello.exe</code> <button class="copy-button">copy</button></pre>
-</li>
-<li>
-<p>Run the binary:</p>
-<ul>
-<li>On systems other than Windows</li>
-</ul>
-<pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">./hello world</span>
-Hello, world!</code> <button class="copy-button">copy</button></pre>
-<ul>
-<li>On Windows</li>
-</ul>
-<pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">.\hello.exe world</span>
-Hello, world!</code> <button class="copy-button">copy</button></pre>
-</li>
 </ol>
-<section><h3>Generating single executable preparation blobs<span><a class="mark" href="#generating-single-executable-preparation-blobs" id="generating-single-executable-preparation-blobs">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_generating_single_executable_preparation_blobs"></a></h3>
-<p>Single executable preparation blobs that are injected into the application can
-be generated using the <code>--experimental-sea-config</code> flag of the Node.js binary
-that will be used to build the single executable. It takes a path to a
-configuration file in JSON format. If the path passed to it isn't absolute,
-Node.js will use the path relative to the current working directory.</p>
-<p>The configuration currently reads the following top-level fields:</p>
-<pre><code class="language-json"><span class="hljs-punctuation">{</span>
-  <span class="hljs-attr">"main"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/path/to/bundled/script.js"</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-attr">"output"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/path/to/write/the/generated/blob.blob"</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-attr">"disableExperimentalSEAWarning"</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span> <span class="hljs-comment">// Default: false</span>
-  <span class="hljs-attr">"useSnapshot"</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">false</span></span><span class="hljs-punctuation">,</span>  <span class="hljs-comment">// Default: false</span>
-  <span class="hljs-attr">"useCodeCache"</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span> <span class="hljs-comment">// Default: false</span>
-  <span class="hljs-attr">"execArgv"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">"--no-warnings"</span><span class="hljs-punctuation">,</span> <span class="hljs-string">"--max-old-space-size=4096"</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span> <span class="hljs-comment">// Optional</span>
-  <span class="hljs-attr">"execArgvExtension"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"env"</span><span class="hljs-punctuation">,</span> <span class="hljs-comment">// Default: "env", options: "none", "env", "cli"</span>
-  <span class="hljs-attr">"assets"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>  <span class="hljs-comment">// Optional</span>
-    <span class="hljs-attr">"a.dat"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/path/to/a.dat"</span><span class="hljs-punctuation">,</span>
-    <span class="hljs-attr">"b.txt"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/path/to/b.txt"</span>
-  <span class="hljs-punctuation">}</span>
-<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
-<p>If the paths are not absolute, Node.js will use the path relative to the
-current working directory. The version of the Node.js binary used to produce
-the blob must be the same as the one to which the blob will be injected.</p>
-<p>Note: When generating cross-platform SEAs (e.g., generating a SEA
-for <code>linux-x64</code> on <code>darwin-arm64</code>), <code>useCodeCache</code> and <code>useSnapshot</code>
-must be set to false to avoid generating incompatible executables.
-Since code cache and snapshots can only be loaded on the same platform
-where they are compiled, the generated executable might crash on startup when
-trying to load code cache or snapshots built on a different platform.</p>
-<div>
-<h4>Assets<span><a class="mark" href="#assets" id="assets">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_assets"></a></h4>
-<p>Users can include assets by adding a key-path dictionary to the configuration
-as the <code>assets</code> field. At build time, Node.js would read the assets from the
-specified paths and bundle them into the preparation blob. In the generated
-executable, users can retrieve the assets using the <a href="#seagetassetkey-encoding"><code>sea.getAsset()</code></a> and
-<a href="#seagetassetasblobkey-options"><code>sea.getAssetAsBlob()</code></a> APIs.</p>
-<pre><code class="language-json"><span class="hljs-punctuation">{</span>
-  <span class="hljs-attr">"main"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/path/to/bundled/script.js"</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-attr">"output"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/path/to/write/the/generated/blob.blob"</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-attr">"assets"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
-    <span class="hljs-attr">"a.jpg"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/path/to/a.jpg"</span><span class="hljs-punctuation">,</span>
-    <span class="hljs-attr">"b.txt"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/path/to/b.txt"</span>
-  <span class="hljs-punctuation">}</span>
-<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
-<p>The single-executable application can access the assets as follows:</p>
-<pre><code class="language-js cjs"><span class="hljs-keyword">const</span> { getAsset, getAssetAsBlob, getRawAsset, getAssetKeys } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:sea'</span>);
-<span class="hljs-comment">// Get all asset keys.</span>
-<span class="hljs-keyword">const</span> keys = <span class="hljs-title function_">getAssetKeys</span>();
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(keys); <span class="hljs-comment">// ['a.jpg', 'b.txt']</span>
-<span class="hljs-comment">// Returns a copy of the data in an ArrayBuffer.</span>
-<span class="hljs-keyword">const</span> image = <span class="hljs-title function_">getAsset</span>(<span class="hljs-string">'a.jpg'</span>);
-<span class="hljs-comment">// Returns a string decoded from the asset as UTF8.</span>
-<span class="hljs-keyword">const</span> text = <span class="hljs-title function_">getAsset</span>(<span class="hljs-string">'b.txt'</span>, <span class="hljs-string">'utf8'</span>);
-<span class="hljs-comment">// Returns a Blob containing the asset.</span>
-<span class="hljs-keyword">const</span> blob = <span class="hljs-title function_">getAssetAsBlob</span>(<span class="hljs-string">'a.jpg'</span>);
-<span class="hljs-comment">// Returns an ArrayBuffer containing the raw asset without copying.</span>
-<span class="hljs-keyword">const</span> raw = <span class="hljs-title function_">getRawAsset</span>(<span class="hljs-string">'a.jpg'</span>);</code> <button class="copy-button">copy</button></pre>
-<p>See documentation of the <a href="#seagetassetkey-encoding"><code>sea.getAsset()</code></a>, <a href="#seagetassetasblobkey-options"><code>sea.getAssetAsBlob()</code></a>,
-<a href="#seagetrawassetkey"><code>sea.getRawAsset()</code></a> and <a href="#seagetassetkeys"><code>sea.getAssetKeys()</code></a> APIs for more information.</p>
-</div><div>
-<h4>Startup snapshot support<span><a class="mark" href="#startup-snapshot-support" id="startup-snapshot-support">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_startup_snapshot_support"></a></h4>
-<p>The <code>useSnapshot</code> field can be used to enable startup snapshot support. In this
-case the <code>main</code> script would not be when the final executable is launched.
-Instead, it would be run when the single executable application preparation
-blob is generated on the building machine. The generated preparation blob would
-then include a snapshot capturing the states initialized by the <code>main</code> script.
-The final executable with the preparation blob injected would deserialize
-the snapshot at run time.</p>
-<p>When <code>useSnapshot</code> is true, the main script must invoke the
-<a href="v8.html#v8startupsnapshotsetdeserializemainfunctioncallback-data"><code>v8.startupSnapshot.setDeserializeMainFunction()</code></a> API to configure code
-that needs to be run when the final executable is launched by the users.</p>
-<p>The typical pattern for an application to use snapshot in a single executable
-application is:</p>
-<ol>
-<li>At build time, on the building machine, the main script is run to
-initialize the heap to a state that's ready to take user input. The script
-should also configure a main function with
-<a href="v8.html#v8startupsnapshotsetdeserializemainfunctioncallback-data"><code>v8.startupSnapshot.setDeserializeMainFunction()</code></a>. This function will be
-compiled and serialized into the snapshot, but not invoked at build time.</li>
-<li>At run time, the main function will be run on top of the deserialized heap
-on the user machine to process user input and generate output.</li>
-</ol>
-<p>The general constraints of the startup snapshot scripts also apply to the main
-script when it's used to build snapshot for the single executable application,
-and the main script can use the <a href="v8.html#startup-snapshot-api"><code>v8.startupSnapshot</code> API</a> to adapt to
-these constraints. See
-<a href="cli.html#--build-snapshot">documentation about startup snapshot support in Node.js</a>.</p>
-</div><div>
-<h4>V8 code cache support<span><a class="mark" href="#v8-code-cache-support" id="v8-code-cache-support">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_v8_code_cache_support"></a></h4>
-<p>When <code>useCodeCache</code> is set to <code>true</code> in the configuration, during the generation
-of the single executable preparation blob, Node.js will compile the <code>main</code>
-script to generate the V8 code cache. The generated code cache would be part of
-the preparation blob and get injected into the final executable. When the single
-executable application is launched, instead of compiling the <code>main</code> script from
-scratch, Node.js would use the code cache to speed up the compilation, then
-execute the script, which would improve the startup performance.</p>
-<p><strong>Note:</strong> <code>import()</code> does not work when <code>useCodeCache</code> is <code>true</code>.</p>
-</div><div>
-<h4>Execution arguments<span><a class="mark" href="#execution-arguments" id="execution-arguments">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_execution_arguments"></a></h4>
-<p>The <code>execArgv</code> field can be used to specify Node.js-specific
-arguments that will be automatically applied when the single
-executable application starts. This allows application developers
-to configure Node.js runtime options without requiring end users
-to be aware of these flags.</p>
-<p>For example, the following configuration:</p>
-<pre><code class="language-json"><span class="hljs-punctuation">{</span>
-  <span class="hljs-attr">"main"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/path/to/bundled/script.js"</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-attr">"output"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/path/to/write/the/generated/blob.blob"</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-attr">"execArgv"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">"--no-warnings"</span><span class="hljs-punctuation">,</span> <span class="hljs-string">"--max-old-space-size=2048"</span><span class="hljs-punctuation">]</span>
-<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
-<p>will instruct the SEA to be launched with the <code>--no-warnings</code> and
-<code>--max-old-space-size=2048</code> flags. In the scripts embedded in the executable, these flags
-can be accessed using the <code>process.execArgv</code> property:</p>
-<pre><code class="language-js"><span class="hljs-comment">// If the executable is launched with `sea user-arg1 user-arg2`</span>
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(process.<span class="hljs-property">execArgv</span>);
-<span class="hljs-comment">// Prints: ['--no-warnings', '--max-old-space-size=2048']</span>
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(process.<span class="hljs-property">argv</span>);
-<span class="hljs-comment">// Prints ['/path/to/sea', 'path/to/sea', 'user-arg1', 'user-arg2']</span></code> <button class="copy-button">copy</button></pre>
-<p>The user-provided arguments are in the <code>process.argv</code> array starting from index 2,
-similar to what would happen if the application is started with:</p>
-<pre><code class="language-console">node --no-warnings --max-old-space-size=2048 /path/to/bundled/script.js user-arg1 user-arg2</code> <button class="copy-button">copy</button></pre>
-</div><div>
-<h4>Execution argument extension<span><a class="mark" href="#execution-argument-extension" id="execution-argument-extension">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_execution_argument_extension"></a></h4>
-<p>The <code>execArgvExtension</code> field controls how additional execution arguments can be
-provided beyond those specified in the <code>execArgv</code> field. It accepts one of three string values:</p>
-<ul>
-<li><code>"none"</code>: No extension is allowed. Only the arguments specified in <code>execArgv</code> will be used,
-and the <code>NODE_OPTIONS</code> environment variable will be ignored.</li>
-<li><code>"env"</code>: <em>(Default)</em> The <code>NODE_OPTIONS</code> environment variable can extend the execution arguments.
-This is the default behavior to maintain backward compatibility.</li>
-<li><code>"cli"</code>: The executable can be launched with <code>--node-options="--flag1 --flag2"</code>, and those flags
-will be parsed as execution arguments for Node.js instead of being passed to the user script.
-This allows using arguments that are not supported by the <code>NODE_OPTIONS</code> environment variable.</li>
-</ul>
-<p>For example, with <code>"execArgvExtension": "cli"</code>:</p>
-<pre><code class="language-json"><span class="hljs-punctuation">{</span>
-  <span class="hljs-attr">"main"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/path/to/bundled/script.js"</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-attr">"output"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/path/to/write/the/generated/blob.blob"</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-attr">"execArgv"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">"--no-warnings"</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
-  <span class="hljs-attr">"execArgvExtension"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"cli"</span>
-<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
-<p>The executable can be launched as:</p>
-<pre><code class="language-console">./my-sea --node-options="--trace-exit" user-arg1 user-arg2</code> <button class="copy-button">copy</button></pre>
-<p>This would be equivalent to running:</p>
-<pre><code class="language-console">node --no-warnings --trace-exit /path/to/bundled/script.js user-arg1 user-arg2</code> <button class="copy-button">copy</button></pre>
-</div>
-</section><section><h3>In the injected main script<span><a class="mark" href="#in-the-injected-main-script" id="in-the-injected-main-script">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_in_the_injected_main_script"></a></h3>
-<div>
-<h4>Single-executable application API<span><a class="mark" href="#single-executable-application-api" id="single-executable-application-api">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_single_executable_application_api"></a></h4>
-<p>The <code>node:sea</code> builtin allows interaction with the single-executable application
-from the JavaScript main script embedded into the executable.</p>
-<div>
-<h5><code>sea.isSea()</code><span><a class="mark" href="#seaissea" id="seaissea">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_sea_issea"></a></h5>
-<div class="api_metadata">
-<span>Added in: v21.7.0, v20.12.0</span>
-</div>
-<ul>
-<li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> Whether this script is running inside a single-executable
-application.</li>
-</ul>
-</div></div><div>
-<h4><code>sea.getAsset(key[, encoding])</code><span><a class="mark" href="#seagetassetkey-encoding" id="seagetassetkey-encoding">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_sea_getasset_key_encoding"></a></h4>
-<div class="api_metadata">
-<span>Added in: v21.7.0, v20.12.0</span>
-</div>
-<p>This method can be used to retrieve the assets configured to be bundled into the
-single-executable application at build time.
-An error is thrown when no matching asset can be found.</p>
-<ul>
-<li><code>key</code>  <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> the key for the asset in the dictionary specified by the
-<code>assets</code> field in the single-executable application configuration.</li>
-<li><code>encoding</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> If specified, the asset will be decoded as
-a string. Any encoding supported by the <code>TextDecoder</code> is accepted.
-If unspecified, an <code>ArrayBuffer</code> containing a copy of the asset would be
-returned instead.</li>
-<li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer" class="type">&#x3C;ArrayBuffer></a></li>
-</ul>
-</div><div>
-<h4><code>sea.getAssetAsBlob(key[, options])</code><span><a class="mark" href="#seagetassetasblobkey-options" id="seagetassetasblobkey-options">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_sea_getassetasblob_key_options"></a></h4>
-<div class="api_metadata">
-<span>Added in: v21.7.0, v20.12.0</span>
-</div>
-<p>Similar to <a href="#seagetassetkey-encoding"><code>sea.getAsset()</code></a>, but returns the result in a <a href="buffer.html#class-blob" class="type">&#x3C;Blob></a>.
-An error is thrown when no matching asset can be found.</p>
-<ul>
-<li><code>key</code>  <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> the key for the asset in the dictionary specified by the
-<code>assets</code> field in the single-executable application configuration.</li>
-<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
-<ul>
-<li><code>type</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> An optional mime type for the blob.</li>
-</ul>
-</li>
-<li>Returns: <a href="buffer.html#class-blob" class="type">&#x3C;Blob></a></li>
-</ul>
-</div><div>
-<h4><code>sea.getRawAsset(key)</code><span><a class="mark" href="#seagetrawassetkey" id="seagetrawassetkey">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_sea_getrawasset_key"></a></h4>
-<div class="api_metadata">
-<span>Added in: v21.7.0, v20.12.0</span>
-</div>
-<p>This method can be used to retrieve the assets configured to be bundled into the
-single-executable application at build time.
-An error is thrown when no matching asset can be found.</p>
-<p>Unlike <code>sea.getAsset()</code> or <code>sea.getAssetAsBlob()</code>, this method does not
-return a copy. Instead, it returns the raw asset bundled inside the executable.</p>
-<p>For now, users should avoid writing to the returned array buffer. If the
-injected section is not marked as writable or not aligned properly,
-writes to the returned array buffer is likely to result in a crash.</p>
-<ul>
-<li><code>key</code>  <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> the key for the asset in the dictionary specified by the
-<code>assets</code> field in the single-executable application configuration.</li>
-<li>Returns: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer" class="type">&#x3C;ArrayBuffer></a></li>
-</ul>
-</div><div>
-<h4><code>sea.getAssetKeys()</code><span><a class="mark" href="#seagetassetkeys" id="seagetassetkeys">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_sea_getassetkeys"></a></h4>
-<div class="api_metadata">
-<span>Added in: v24.8.0</span>
-</div>
-<ul>
-<li>Returns <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a> An array containing all the keys of the assets
-embedded in the executable. If no assets are embedded, returns an empty array.</li>
-</ul>
-<p>This method can be used to retrieve an array of all the keys of assets
-embedded into the single-executable application.
-An error is thrown when not running inside a single-executable application.</p>
-</div><div>
-<h4><code>require(id)</code> in the injected main script is not file based<span><a class="mark" href="#requireid-in-the-injected-main-script-is-not-file-based" id="requireid-in-the-injected-main-script-is-not-file-based">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_require_id_in_the_injected_main_script_is_not_file_based"></a></h4>
-<p><code>require()</code> in the injected main script is not the same as the <a href="modules.html#requireid"><code>require()</code></a>
-available to modules that are not injected. It also does not have any of the
-properties that non-injected <a href="modules.html#requireid"><code>require()</code></a> has except <a href="modules.html#accessing-the-main-module"><code>require.main</code></a>. It
-can only be used to load built-in modules. Attempting to load a module that can
-only be found in the file system will throw an error.</p>
-<p>Instead of relying on a file based <code>require()</code>, users can bundle their
-application into a standalone JavaScript file to inject into the executable.
-This also ensures a more deterministic dependency graph.</p>
-<p>However, if a file based <code>require()</code> is still needed, that can also be achieved:</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> { createRequire } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:module'</span>);
-<span class="hljs-built_in">require</span> = <span class="hljs-title function_">createRequire</span>(__filename);</code> <button class="copy-button">copy</button></pre>
-</div><div>
-<h4><code>__filename</code> and <code>module.filename</code> in the injected main script<span><a class="mark" href="#__filename-and-modulefilename-in-the-injected-main-script" id="__filename-and-modulefilename-in-the-injected-main-script">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_filename_and_module_filename_in_the_injected_main_script"></a></h4>
-<p>The values of <code>__filename</code> and <code>module.filename</code> in the injected main script
-are equal to <a href="process.html#processexecpath"><code>process.execPath</code></a>.</p>
-</div><div>
-<h4><code>__dirname</code> in the injected main script<span><a class="mark" href="#__dirname-in-the-injected-main-script" id="__dirname-in-the-injected-main-script">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_dirname_in_the_injected_main_script"></a></h4>
-<p>The value of <code>__dirname</code> in the injected main script is equal to the directory
-name of <a href="process.html#processexecpath"><code>process.execPath</code></a>.</p>
-</div>
-</section><section><h3>Notes<span><a class="mark" href="#notes" id="notes">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_notes"></a></h3>
-<div>
-<h4>Single executable application creation process<span><a class="mark" href="#single-executable-application-creation-process" id="single-executable-application-creation-process">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_single_executable_application_creation_process"></a></h4>
-<p>A tool aiming to create a single executable Node.js application must
-inject the contents of the blob prepared with <code>--experimental-sea-config"</code>
-into:</p>
-<ul>
-<li>a resource named <code>NODE_SEA_BLOB</code> if the <code>node</code> binary is a <a href="https://en.wikipedia.org/wiki/Portable_Executable">PE</a> file</li>
-<li>a section named <code>NODE_SEA_BLOB</code> in the <code>NODE_SEA</code> segment if the <code>node</code> binary
-is a <a href="https://en.wikipedia.org/wiki/Mach-O">Mach-O</a> file</li>
-<li>a note named <code>NODE_SEA_BLOB</code> if the <code>node</code> binary is an <a href="https://en.wikipedia.org/wiki/Executable_and_Linkable_Format">ELF</a> file</li>
-</ul>
-<p>Search the binary for the
-<code>NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2:0</code> <a href="https://www.electronjs.org/docs/latest/tutorial/fuses">fuse</a> string and flip the
-last character to <code>1</code> to indicate that a resource has been injected.</p>
-</div><div>
+</div></div></div><div>
 <h4>Platform support<span><a class="mark" href="#platform-support" id="platform-support">#</a></span><a aria-hidden="true" class="legacy" id="single_executable_applications_platform_support"></a></h4>
 <p>Single-executable support is tested regularly on CI only on the following
 platforms:</p>

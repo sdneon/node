@@ -55,21 +55,12 @@ typedef struct ngtcp2_ksl_blk ngtcp2_ksl_blk;
 /*
  * ngtcp2_ksl_node is a node which contains either ngtcp2_ksl_blk or
  * opaque data.  If a node is an internal node, it contains
- * ngtcp2_ksl_blk.  Otherwise, it has data.  The key is stored at the
- * location starting at key.
+ * ngtcp2_ksl_blk.  Otherwise, it has data.
  */
 struct ngtcp2_ksl_node {
   union {
     ngtcp2_ksl_blk *blk;
     void *data;
-  };
-  union {
-    uint64_t align;
-    /* key is a buffer to include key associated to this node.
-       Because the length of key is unknown until ngtcp2_ksl_init is
-       called, the actual buffer will be allocated after this
-       field. */
-    uint8_t key[1];
   };
 };
 
@@ -88,15 +79,12 @@ struct ngtcp2_ksl_blk {
       uint32_t n;
       /* leaf is nonzero if this block contains leaf nodes. */
       uint32_t leaf;
-      union {
-        uint64_t align;
-        /* nodes is a buffer to contain NGTCP2_KSL_MAX_NBLK
-           ngtcp2_ksl_node objects.  Because ngtcp2_ksl_node object is
-           allocated along with the additional variable length key
-           storage, the size of buffer is unknown until ngtcp2_ksl_init is
-           called. */
-        uint8_t nodes[1];
-      };
+      ngtcp2_ksl_node nodes[NGTCP2_KSL_MAX_NBLK];
+      /* keys is a pointer to the buffer to include
+         NGTCP2_KSL_MAX_NBLK keys.  Because the length of key is
+         unknown until ngtcp2_ksl_init is called, the actual buffer
+         will be allocated after this field. */
+      uint8_t *keys;
     };
 
     ngtcp2_opl_entry oplent;
@@ -131,11 +119,10 @@ typedef size_t (*ngtcp2_ksl_search)(const ngtcp2_ksl *ksl, ngtcp2_ksl_blk *blk,
   static size_t ksl_##NAME##_search(                                           \
     const ngtcp2_ksl *ksl, ngtcp2_ksl_blk *blk, const ngtcp2_ksl_key *key) {   \
     size_t i;                                                                  \
-    ngtcp2_ksl_node *node;                                                     \
+    uint8_t *node_key;                                                         \
                                                                                \
-    for (i = 0, node = (ngtcp2_ksl_node *)(void *)blk->nodes;                  \
-         i < blk->n && COMPAR((ngtcp2_ksl_key *)node->key, key); ++i,          \
-        node = (ngtcp2_ksl_node *)(void *)((uint8_t *)node + ksl->nodelen))    \
+    for (i = 0, node_key = blk->keys; i < blk->n && COMPAR(node_key, key);     \
+         ++i, node_key += ksl->aligned_keylen)                                 \
       ;                                                                        \
                                                                                \
     return i;                                                                  \
@@ -169,9 +156,7 @@ struct ngtcp2_ksl {
   size_t n;
   /* keylen is the size of key */
   size_t keylen;
-  /* nodelen is the actual size of ngtcp2_ksl_node including key
-     storage. */
-  size_t nodelen;
+  size_t aligned_keylen;
 };
 
 /*
@@ -290,10 +275,12 @@ size_t ngtcp2_ksl_len(const ngtcp2_ksl *ksl);
 void ngtcp2_ksl_clear(ngtcp2_ksl *ksl);
 
 /*
- * ngtcp2_ksl_nth_node returns the |n|th node under |blk|.
+ * ngtcp2_ksl_nth_key returns the |n|th key under |blk|.
  */
-#define ngtcp2_ksl_nth_node(KSL, BLK, N)                                       \
-  ((ngtcp2_ksl_node *)(void *)((BLK)->nodes + (KSL)->nodelen * (N)))
+static inline const ngtcp2_ksl_key *
+ngtcp2_ksl_nth_key(const ngtcp2_ksl *ksl, const ngtcp2_ksl_blk *blk, size_t n) {
+  return blk->keys + n * ksl->aligned_keylen;
+}
 
 #ifndef WIN32
 /*
@@ -315,18 +302,21 @@ void ngtcp2_ksl_it_init(ngtcp2_ksl_it *it, const ngtcp2_ksl *ksl,
  * |it| points to.  It is undefined to call this function when
  * ngtcp2_ksl_it_end(it) returns nonzero.
  */
-#define ngtcp2_ksl_it_get(IT)                                                  \
-  ngtcp2_ksl_nth_node((IT)->ksl, (IT)->blk, (IT)->i)->data
+static inline void *ngtcp2_ksl_it_get(const ngtcp2_ksl_it *it) {
+  return it->blk->nodes[it->i].data;
+}
 
 /*
  * ngtcp2_ksl_it_next advances the iterator by one.  It is undefined
  * if this function is called when ngtcp2_ksl_it_end(it) returns
  * nonzero.
  */
-#define ngtcp2_ksl_it_next(IT)                                                 \
-  (++(IT)->i == (IT)->blk->n && (IT)->blk->next                                \
-     ? ((IT)->blk = (IT)->blk->next, (IT)->i = 0)                              \
-     : 0)
+static inline void ngtcp2_ksl_it_next(ngtcp2_ksl_it *it) {
+  if (++it->i == it->blk->n && it->blk->next) {
+    it->blk = it->blk->next;
+    it->i = 0;
+  }
+}
 
 /*
  * ngtcp2_ksl_it_prev moves backward the iterator by one.  It is
@@ -339,8 +329,9 @@ void ngtcp2_ksl_it_prev(ngtcp2_ksl_it *it);
  * ngtcp2_ksl_it_end returns nonzero if |it| points to the one beyond
  * the last node.
  */
-#define ngtcp2_ksl_it_end(IT)                                                  \
-  ((IT)->blk->n == (IT)->i && (IT)->blk->next == NULL)
+static inline int ngtcp2_ksl_it_end(const ngtcp2_ksl_it *it) {
+  return it->blk->n == it->i && it->blk->next == NULL;
+}
 
 /*
  * ngtcp2_ksl_it_begin returns nonzero if |it| points to the first
@@ -354,8 +345,9 @@ int ngtcp2_ksl_it_begin(const ngtcp2_ksl_it *it);
  * It is undefined to call this function when ngtcp2_ksl_it_end(it)
  * returns nonzero.
  */
-#define ngtcp2_ksl_it_key(IT)                                                  \
-  ((ngtcp2_ksl_key *)ngtcp2_ksl_nth_node((IT)->ksl, (IT)->blk, (IT)->i)->key)
+static inline const ngtcp2_ksl_key *ngtcp2_ksl_it_key(const ngtcp2_ksl_it *it) {
+  return ngtcp2_ksl_nth_key(it->ksl, it->blk, it->i);
+}
 
 /*
  * ngtcp2_ksl_range_compar is an implementation of ngtcp2_ksl_compar.

@@ -13,6 +13,7 @@
 
 #if HAVE_OPENSSL
 #include "openssl/opensslv.h"
+#include "quic/guard.h"
 #endif
 
 namespace node {
@@ -126,8 +127,8 @@ class EnvironmentOptions : public Options {
   bool experimental_fetch = true;
   bool experimental_websocket = true;
   bool experimental_sqlite = true;
-  bool experimental_webstorage = false;
-#ifdef NODE_OPENSSL_HAS_QUIC
+  bool webstorage = HAVE_SQLITE;
+#ifndef OPENSSL_NO_QUIC
   bool experimental_quic = false;
 #endif
   std::string localstorage_file;
@@ -140,7 +141,9 @@ class EnvironmentOptions : public Options {
   std::vector<std::string> allow_fs_read;
   std::vector<std::string> allow_fs_write;
   bool allow_addons = false;
+  bool allow_inspector = false;
   bool allow_child_process = false;
+  bool allow_net = false;
   bool allow_wasi = false;
   bool allow_worker_threads = false;
   bool experimental_repl_await = true;
@@ -152,7 +155,7 @@ class EnvironmentOptions : public Options {
   int64_t heap_snapshot_near_heap_limit = 0;
   std::string heap_snapshot_signal;
   bool network_family_autoselection = true;
-  uint64_t network_family_autoselection_attempt_timeout = 250;
+  uint64_t network_family_autoselection_attempt_timeout = 500;
   uint64_t max_http_header_size = 16 * 1024;
   bool deprecation = true;
   bool force_async_hooks_checks = true;
@@ -173,6 +176,7 @@ class EnvironmentOptions : public Options {
   bool cpu_prof = false;
   bool experimental_network_inspection = false;
   bool experimental_worker_inspection = false;
+  bool experimental_storage_inspection = false;
   bool experimental_inspector_network_resource = false;
   std::string heap_prof_dir;
   std::string heap_prof_name;
@@ -182,8 +186,8 @@ class EnvironmentOptions : public Options {
 #endif  // HAVE_INSPECTOR
   std::string redirect_warnings;
   std::string diagnostic_dir;
-  std::string env_file;
-  std::string optional_env_file;
+  std::vector<std::string> env_file;
+  std::vector<std::string> optional_env_file;
   bool has_env_file_string = false;
   bool test_runner = false;
   uint64_t test_runner_concurrency = 0;
@@ -240,7 +244,7 @@ class EnvironmentOptions : public Options {
   std::string eval_string;
   bool print_eval = false;
   bool force_repl = false;
-  std::string repl_lang;
+  std::string repl_lang; //SD
   bool experimental_external_dscript;
 
   bool insecure_http_parser = false;
@@ -258,7 +262,7 @@ class EnvironmentOptions : public Options {
 
   std::vector<std::string> preload_esm_modules;
 
-  bool experimental_strip_types = true;
+  bool strip_types = false; //HAVE_AMARO; //SD
   bool experimental_transform_types = false;
 
   std::vector<std::string> user_argv;
@@ -339,6 +343,7 @@ class PerProcessOptions : public Options {
   std::string experimental_sea_config;
   std::string run;
 
+  std::string build_sea;
 #ifdef NODE_HAVE_I18N_SUPPORT
   std::string icu_data_dir;
 #endif
@@ -414,7 +419,9 @@ std::vector<std::string> MapAvailableNamespaces();
 // Define all namespace entries
 #define OPTION_NAMESPACE_LIST(V)                                               \
   V(kNoNamespace, "")                                                          \
-  V(kTestRunnerNamespace, "testRunner")
+  V(kTestRunnerNamespace, "test")                                              \
+  V(kWatchNamespace, "watch")                                                  \
+  V(kPermissionNamespace, "permission")
 
 enum class OptionNamespaces {
 #define V(name, _) name,

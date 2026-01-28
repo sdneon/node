@@ -102,6 +102,17 @@ The listener function is called without passing any arguments.
 The `InterfaceConstructor` instance is finished once the `'close'` event is
 emitted.
 
+### Event: `'error'`
+
+<!-- YAML
+added: v16.0.0
+-->
+
+The `'error'` event is emitted when an error occurs on the `input` stream
+associated with the `node:readline` `Interface`.
+
+The listener function is called with an `Error` object passed as the single argument.
+
 ### Event: `'line'`
 
 <!-- YAML
@@ -503,7 +514,9 @@ line prompts are included in the calculations.
 <!-- YAML
 added: v17.0.0
 changes:
-  - version: v24.0.0
+  - version:
+      - v24.0.0
+      - v22.17.0
     pr-url: https://github.com/nodejs/node/pull/57513
     description: Marking the API stable.
 -->

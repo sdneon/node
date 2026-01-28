@@ -16,6 +16,8 @@ const {
   getBufferSources,
   getTTYfd,
   hasCrypto,
+  hasQuic,
+  hasInspector,
   hasSQLite,
   hasIntl,
   hasIPv6,
@@ -47,6 +49,7 @@ const {
   skipIfInspectorDisabled,
   skipIfSQLiteMissing,
   spawnPromisified,
+  sleepSync,
 } = common;
 
 const getPort = () => common.PORT;
@@ -66,6 +69,8 @@ export {
   getPort,
   getTTYfd,
   hasCrypto,
+  hasQuic,
+  hasInspector,
   hasSQLite,
   hasIntl,
   hasIPv6,
@@ -97,4 +102,5 @@ export {
   skipIfInspectorDisabled,
   skipIfSQLiteMissing,
   spawnPromisified,
+  sleepSync,
 };

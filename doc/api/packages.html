@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <meta name="nodejs.org:node-version" content="v24.9.0">
-  <title>Modules: Packages | Node.js v24.9.0 Documentation</title>
+  <meta name="nodejs.org:node-version" content="v25.5.0">
+  <title>Modules: Packages | Node.js v25.5.0 Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/hljs.css">
@@ -112,7 +112,7 @@
     <div id="column1" data-id="packages" class="interior">
       <header class="header">
         <div class="header-container">
-          <h1>Node.js v24.9.0 documentation</h1>
+          <h1>Node.js v25.5.0 documentation</h1>
           <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
               <path fill="none" d="M0 0h24v24H0z" />
@@ -127,7 +127,7 @@
         </div>
         <div id="gtoc">
           <ul>
-            <li class="pinned-header">Node.js v24.9.0</li>
+            <li class="pinned-header">Node.js v25.5.0</li>
             
     <li class="picker-header">
       <a href="#toc-picker" aria-controls="toc-picker">
@@ -143,7 +143,7 @@
 <ul>
 <li><a href="#introduction_1">Introduction</a></li>
 <li><span class="stability_1.2"><a href="#syntax-detection">Syntax detection</a></span></li>
-<li><a href="#modules-loaders">Modules loaders</a></li>
+<li><a href="#module-resolution-and-loading">Module resolution and loading</a></li>
 <li><a href="#packagejson-and-file-extensions"><code>package.json</code> and file extensions</a></li>
 <li><a href="#--input-type-flag"><code>--input-type</code> flag</a></li>
 </ul>
@@ -280,7 +280,8 @@
         <span class="picker-arrow"></span>
         Other versions
       </a>
-      <div class="picker" tabindex="-1"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v24.x/api/packages.html">24.x</a></li>
+      <div class="picker" tabindex="-1"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v25.x/api/packages.html">25.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v24.x/api/packages.html">24.x <b>LTS</b></a></li>
 <li><a href="https://nodejs.org/docs/latest-v23.x/api/packages.html">23.x</a></li>
 <li><a href="https://nodejs.org/docs/latest-v22.x/api/packages.html">22.x <b>LTS</b></a></li>
 <li><a href="https://nodejs.org/docs/latest-v21.x/api/packages.html">21.x</a></li>
@@ -326,7 +327,7 @@
 <ul>
 <li><a href="#introduction_1">Introduction</a></li>
 <li><span class="stability_1.2"><a href="#syntax-detection">Syntax detection</a></span></li>
-<li><a href="#modules-loaders">Modules loaders</a></li>
+<li><a href="#module-resolution-and-loading">Module resolution and loading</a></li>
 <li><a href="#packagejson-and-file-extensions"><code>package.json</code> and file extensions</a></li>
 <li><a href="#--input-type-flag"><code>--input-type</code> flag</a></li>
 </ul>
@@ -496,45 +497,66 @@ CommonJS).</li>
 <code>exports</code>, <code>__dirname</code>, <code>__filename</code>).</li>
 </ul>
 </div><div>
-<h4>Modules loaders<span><a class="mark" href="#modules-loaders" id="modules-loaders">#</a></span><a aria-hidden="true" class="legacy" id="packages_modules_loaders"></a></h4>
-<p>Node.js has two systems for resolving a specifier and loading modules.</p>
-<p>There is the CommonJS module loader:</p>
+<h4>Module resolution and loading<span><a class="mark" href="#module-resolution-and-loading" id="module-resolution-and-loading">#</a></span><a aria-hidden="true" class="legacy" id="packages_module_resolution_and_loading"></a></h4>
+<p>Node.js has two types of module resolution and loading, chosen based on how the module is requested.</p>
+<p>When a module is requested via <code>require()</code> (available by default in CommonJS modules,
+and can be dynamically generated using <code>createRequire()</code> in both CommonJS and ES Modules):</p>
 <ul>
-<li>It is fully synchronous.</li>
-<li>It is responsible for handling <code>require()</code> calls.</li>
-<li>It is monkey patchable.</li>
-<li>It supports <a href="modules.html#folders-as-modules">folders as modules</a>.</li>
-<li>When resolving a specifier, if no exact match is found, it will try to add
+<li>Resolution:
+<ul>
+<li>The resolution initiated by <code>require()</code> supports <a href="modules.html#folders-as-modules">folders as modules</a>.</li>
+<li>When resolving a specifier, if no exact match is found, <code>require()</code> will try to add
 extensions (<code>.js</code>, <code>.json</code>, and finally <code>.node</code>) and then attempt to resolve
 <a href="modules.html#folders-as-modules">folders as modules</a>.</li>
-<li>It treats <code>.json</code> as JSON text files.</li>
-<li><code>.node</code> files are interpreted as compiled addon modules loaded with
-<code>process.dlopen()</code>.</li>
-<li>It treats all files that lack <code>.json</code> or <code>.node</code> extensions as JavaScript
-text files.</li>
-<li>It can only be used to <a href="modules.html#loading-ecmascript-modules-using-require">load ECMAScript modules from CommonJS modules</a> if
-the module graph is synchronous (that contains no top-level <code>await</code>).
-When used to load a JavaScript text file that is not an ECMAScript module,
-the file will be loaded as a CommonJS module.</li>
+<li>It does not support URLs as specifiers by default.</li>
 </ul>
-<p>There is the ECMAScript module loader:</p>
+</li>
+<li>Loading:
 <ul>
-<li>It is asynchronous, unless it's being used to load modules for <code>require()</code>.</li>
-<li>It is responsible for handling <code>import</code> statements and <code>import()</code> expressions.</li>
-<li>It is not monkey patchable, can be customized using <a href="esm.html#loaders">loader hooks</a>.</li>
-<li>It does not support folders as modules, directory indexes (e.g.
-<code>'./startup/index.js'</code>) must be fully specified.</li>
-<li>It does no extension searching. A file extension must be provided
+<li><code>.json</code> files are treated as JSON text files.</li>
+<li><code>.node</code> files are interpreted as compiled addon modules loaded with <code>process.dlopen()</code>.</li>
+<li><code>.ts</code>, <code>.mts</code> and <code>.cts</code> files are treated as <a href="typescript.html">TypeScript</a> text files.</li>
+<li>Files with any other extension, or without extensions, are treated as JavaScript
+text files.</li>
+<li><code>require()</code> can only be used to <a href="modules.html#loading-ecmascript-modules-using-require">load ECMAScript modules from CommonJS modules</a> if
+the <a href="esm.html">ECMAScript module</a> <em>and its dependencies</em> are synchronous
+(i.e. they do not contain top-level <code>await</code>).</li>
+</ul>
+</li>
+</ul>
+<p>When a module is requested via static <code>import</code> statements (only available in ES Modules)
+or <code>import()</code> expressions (available in both CommonJS and ES Modules):</p>
+<ul>
+<li>Resolution:
+<ul>
+<li>The resolution of <code>import</code>/<code>import()</code> does not support folders as modules,
+directory indexes (e.g. <code>'./startup/index.js'</code>) must be fully specified.</li>
+<li>It does not perform extension searching. A file extension must be provided
 when the specifier is a relative or absolute file URL.</li>
-<li>It can load JSON modules, but an import type attribute is required.</li>
+<li>It supports <code>file://</code> and <code>data:</code> URLs as specifiers by default.</li>
+</ul>
+</li>
+<li>Loading:
+<ul>
+<li><code>.json</code> files are treated as JSON text files. When importing JSON modules,
+an import type attribute is required (e.g.
+<code>import json from './data.json' with { type: 'json' }</code>).</li>
+<li><code>.node</code> files are interpreted as compiled addon modules loaded with
+<code>process.dlopen()</code>, if <a href="cli.html#--experimental-addon-modules"><code>--experimental-addon-modules</code></a> is enabled.</li>
+<li><code>.ts</code>, <code>.mts</code> and <code>.cts</code> files are treated as <a href="typescript.html">TypeScript</a> text files.</li>
 <li>It accepts only <code>.js</code>, <code>.mjs</code>, and <code>.cjs</code> extensions for JavaScript text
 files.</li>
-<li>It can be used to load JavaScript CommonJS modules. Such modules
-are passed through the <code>cjs-module-lexer</code> to try to identify named exports,
-which are available if they can be determined through static analysis.
-Imported CommonJS modules have their URLs converted to absolute
-paths and are then loaded via the CommonJS module loader.</li>
+<li><code>.wasm</code> files are treated as <a href="esm.html#wasm-modules">WebAssembly modules</a>.</li>
+<li>Any other file extensions will result in a  <a href="errors.html#err_unknown_file_extension"><code>ERR_UNKNOWN_FILE_EXTENSION</code></a> error.
+Additional file extensions can be facilitated via <a href="module.html#customization-hooks">customization hooks</a>.</li>
+<li><code>import</code>/<code>import()</code> can be used to load JavaScript <a href="modules.html">CommonJS modules</a>.
+Such modules are passed through the <code>cjs-module-lexer</code> to try to identify named
+exports, which are available if they can be determined through static analysis.</li>
 </ul>
+</li>
+</ul>
+<p>Regardless of how a module is requested, the resolution and loading process can be customized
+using <a href="module.html#customization-hooks">customization hooks</a>.</p>
 </div><div>
 <h4><code>package.json</code> and file extensions<span><a class="mark" href="#packagejson-and-file-extensions" id="packagejson-and-file-extensions">#</a></span><a aria-hidden="true" class="legacy" id="packages_package_json_and_file_extensions"></a></h4>
 <p>Within a package, the <a href="#nodejs-packagejson-field-definitions"><code>package.json</code></a> <a href="#type"><code>"type"</code></a> field defines how
@@ -790,7 +812,15 @@ for this case being the direct <a href="#exports"><code>"exports"</code></a> fie
 </div><div>
 <h4>Subpath imports<span><a class="mark" href="#subpath-imports" id="subpath-imports">#</a></span><a aria-hidden="true" class="legacy" id="packages_subpath_imports"></a></h4>
 <div class="api_metadata">
-<span>Added in: v14.6.0, v12.19.0</span>
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v25.4.0</td>
+<td><p>Allow subpath imports that start with <code>#/</code>.</p></td></tr>
+<tr><td>v14.6.0, v12.19.0</td>
+<td><p><span>Added in: v14.6.0, v12.19.0</span></p></td></tr>
+</tbody></table>
+</details>
 </div>
 <p>In addition to the <a href="#exports"><code>"exports"</code></a> field, there is a package <code>"imports"</code> field
 to create private mappings that only apply to import specifiers from within the
@@ -858,7 +888,7 @@ value, including if it contains any <code>/</code> separators.</p>
 <span class="hljs-comment">// Loads ./node_modules/es-module-package/src/features/y/y.js</span>
 
 <span class="hljs-keyword">import</span> internalZ <span class="hljs-keyword">from</span> <span class="hljs-string">'#internal/z.js'</span>;
-<span class="hljs-comment">// Loads ./node_modules/es-module-package/src/internal/z.js</span></code> <button class="copy-button">copy</button></pre>
+<span class="hljs-comment">// Loads ./src/internal/z.js</span></code> <button class="copy-button">copy</button></pre>
 <p>This is a direct static matching and replacement without any special handling
 for file extensions. Including the <code>"*.js"</code> on both sides of the mapping
 restricts the exposed package exports to only JS files.</p>
@@ -1137,7 +1167,7 @@ itself.</li>
 </details>
 </div>
 <ul>
-<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a></li>
 </ul>
 <pre><code class="language-json"><span class="hljs-punctuation">{</span>
   <span class="hljs-attr">"name"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"package-name"</span>
@@ -1153,7 +1183,7 @@ itself.</li>
 <span>Added in: v0.4.0</span>
 </div>
 <ul>
-<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a></li>
 </ul>
 <pre><code class="language-json"><span class="hljs-punctuation">{</span>
   <span class="hljs-attr">"main"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./index.js"</span>
@@ -1180,7 +1210,7 @@ via <code>require()</code></a>.</p>
 </details>
 </div>
 <ul>
-<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a></li>
 </ul>
 <p>The <code>"type"</code> field defines the module format that Node.js uses for all
 <code>.js</code> files that have that <code>package.json</code> file as their nearest parent.</p>
@@ -1228,7 +1258,7 @@ as ES modules and <code>.cjs</code> files are always treated as CommonJS.</p>
 </details>
 </div>
 <ul>
-<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a></li>
+<li>Type: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type" class="type">&#x3C;string[]></a></li>
 </ul>
 <pre><code class="language-json"><span class="hljs-punctuation">{</span>
   <span class="hljs-attr">"exports"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./index.js"</span>

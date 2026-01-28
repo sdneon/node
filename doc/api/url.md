@@ -629,7 +629,9 @@ console.log(JSON.stringify(myURLs));
 <!-- YAML
 added: v16.7.0
 changes:
- - version: v24.0.0
+ - version:
+    - v24.0.0
+    - v22.17.0
    pr-url: https://github.com/nodejs/node/pull/57513
    description: Marking the API stable.
 -->
@@ -667,7 +669,9 @@ to other workers or the main thread.
 <!-- YAML
 added: v16.7.0
 changes:
- - version: v24.0.0
+ - version:
+    - v24.0.0
+    - v22.17.0
    pr-url: https://github.com/nodejs/node/pull/57513
    description: Marking the API stable.
 -->
@@ -1325,6 +1329,19 @@ changes:
 This function ensures the correct decodings of percent-encoded characters as
 well as ensuring a cross-platform valid absolute path string.
 
+**Security Considerations:**
+
+This function decodes percent-encoded characters, including encoded dot-segments
+(`%2e` as `.` and `%2e%2e` as `..`), and then normalizes the resulting path.
+This means that encoded directory traversal sequences (such as `%2e%2e`) are
+decoded and processed as actual path traversal, even though encoded slashes
+(`%2F`, `%5C`) are correctly rejected.
+
+**Applications must not rely on `fileURLToPath()` alone to prevent directory
+traversal attacks.** Always perform explicit path validation and security checks
+on the returned path value to ensure it remains within expected boundaries
+before using it for file system operations.
+
 ```mjs
 import { fileURLToPath } from 'node:url';
 
@@ -1361,7 +1378,9 @@ fileURLToPath('file:///hello world');      // Correct:   /hello world (POSIX)
 ### `url.fileURLToPathBuffer(url[, options])`
 
 <!--
-added: v24.3.0
+added:
+ - v24.3.0
+ - v22.18.0
 -->
 
 * `url` {URL | string} The file URL string or URL object to convert to a path.
@@ -1377,6 +1396,15 @@ Like `url.fileURLToPath(...)` except that instead of returning a string
 representation of the path, a `Buffer` is returned. This conversion is
 helpful when the input URL contains percent-encoded segments that are
 not valid UTF-8 / Unicode sequences.
+
+**Security Considerations:**
+
+This function has the same security considerations as [`url.fileURLToPath()`][].
+It decodes percent-encoded characters, including encoded dot-segments
+(`%2e` as `.` and `%2e%2e` as `..`), and normalizes the path. **Applications
+must not rely on this function alone to prevent directory traversal attacks.**
+Always perform explicit path validation on the returned buffer value before
+using it for file system operations.
 
 ### `url.format(URL[, options])`
 
@@ -1788,11 +1816,26 @@ The formatting process operates as follows:
   string, an [`Error`][] is thrown.
 * `result` is returned.
 
+An automated migration is available ([source](https://github.com/nodejs/userland-migrations/tree/main/recipes/node-url-to-whatwg-url)).
+
+```bash
+npx codemod@latest @nodejs/node-url-to-whatwg-url
+```
+
 ### `url.parse(urlString[, parseQueryString[, slashesDenoteHost]])`
 
 <!-- YAML
 added: v0.1.25
 changes:
+  - version:
+      - v24.0.0
+    pr-url: https://github.com/nodejs/node/pull/55017
+    description: Application deprecation.
+  - version:
+      - v19.9.0
+      - v18.17.0
+    pr-url: https://github.com/nodejs/node/pull/47203
+    description: Added support for `--pending-deprecation`.
   - version:
       - v19.0.0
       - v18.13.0
@@ -1841,7 +1884,31 @@ A `URIError` is thrown if the `auth` property is present but cannot be decoded.
 strings. It is prone to security issues such as [host name spoofing][]
 and incorrect handling of usernames and passwords. Do not use with untrusted
 input. CVEs are not issued for `url.parse()` vulnerabilities. Use the
-[WHATWG URL][] API instead.
+[WHATWG URL][] API instead, for example:
+
+```js
+function getURL(req) {
+  const proto = req.headers['x-forwarded-proto'] || 'https';
+  const host = req.headers['x-forwarded-host'] || req.headers.host || 'example.com';
+  return new URL(`${proto}://${host}${req.url || '/'}`);
+}
+```
+
+The example above assumes well-formed headers are forwarded from a reverse
+proxy to your Node.js server. If you are not using a reverse proxy, you should
+use the example below:
+
+```js
+function getURL(req) {
+  return new URL(`https://example.com${req.url || '/'}`);
+}
+```
+
+An automated migration is available ([source](https://github.com/nodejs/userland-migrations/tree/main/recipes/node-url-to-whatwg-url)).
+
+```bash
+npx codemod@latest @nodejs/node-url-to-whatwg-url
+```
 
 ### `url.resolve(from, to)`
 
@@ -1978,6 +2045,7 @@ console.log(myURL.origin);
 [`querystring`]: querystring.md
 [`url.domainToASCII()`]: #urldomaintoasciidomain
 [`url.domainToUnicode()`]: #urldomaintounicodedomain
+[`url.fileURLToPath()`]: #urlfileurltopathurl-options
 [`url.format()`]: #urlformaturlobject
 [`url.href`]: #urlhref
 [`url.parse()`]: #urlparseurlstring-parsequerystring-slashesdenotehost

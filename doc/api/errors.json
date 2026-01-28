@@ -67,7 +67,7 @@
           "textRaw": "`stack` Type: {string}",
           "type": "string",
           "name": "Type",
-          "desc": "<p>The <code>error.stack</code> property is a string describing the point in the code at which\nthe <code>Error</code> was instantiated.</p>\n<pre><code class=\"language-console\">Error: Things keep happening!\n   at /home/gbusey/file.js:525:2\n   at Frobnicator.refrobulate (/home/gbusey/business-logic.js:424:21)\n   at Actor.&#x3C;anonymous> (/home/gbusey/actors.js:400:8)\n   at increaseSynergy (/home/gbusey/actors.js:701:6)\n</code></pre>\n<p>The first line is formatted as <code>&#x3C;error class name>: &#x3C;error message></code>, and\nis followed by a series of stack frames (each line beginning with \"at \").\nEach frame describes a call site within the code that lead to the error being\ngenerated. V8 attempts to display a name for each function (by variable name,\nfunction name, or object method name), but occasionally it will not be able to\nfind a suitable name. If V8 cannot determine a name for the function, only\nlocation information will be displayed for that frame. Otherwise, the\ndetermined function name will be displayed with location information appended\nin parentheses.</p>\n<p>Frames are only generated for JavaScript functions. If, for example, execution\nsynchronously passes through a C++ addon function called <code>cheetahify</code> which\nitself calls a JavaScript function, the frame representing the <code>cheetahify</code> call\nwill not be present in the stack traces:</p>\n<pre><code class=\"language-js\">const cheetahify = require('./native-binding.node');\n\nfunction makeFaster() {\n  // `cheetahify()` *synchronously* calls speedy.\n  cheetahify(function speedy() {\n    throw new Error('oh no!');\n  });\n}\n\nmakeFaster();\n// will throw:\n//   /home/gbusey/file.js:6\n//       throw new Error('oh no!');\n//           ^\n//   Error: oh no!\n//       at speedy (/home/gbusey/file.js:6:11)\n//       at makeFaster (/home/gbusey/file.js:5:3)\n//       at Object.&#x3C;anonymous> (/home/gbusey/file.js:10:1)\n//       at Module._compile (module.js:456:26)\n//       at Object.Module._extensions..js (module.js:474:10)\n//       at Module.load (module.js:356:32)\n//       at Function.Module._load (module.js:312:12)\n//       at Function.Module.runMain (module.js:497:10)\n//       at startup (node.js:119:16)\n//       at node.js:906:3\n</code></pre>\n<p>The location information will be one of:</p>\n<ul>\n<li><code>native</code>, if the frame represents a call internal to V8 (as in <code>[].forEach</code>).</li>\n<li><code>plain-filename.js:line:column</code>, if the frame represents a call internal\nto Node.js.</li>\n<li><code>/absolute/path/to/file.js:line:column</code>, if the frame represents a call in\na user program (using CommonJS module system), or its dependencies.</li>\n<li><code>&#x3C;transport-protocol>:///url/to/module/file.mjs:line:column</code>, if the frame\nrepresents a call in a user program (using ES module system), or\nits dependencies.</li>\n</ul>\n<p>The string representing the stack trace is lazily generated when the\n<code>error.stack</code> property is <strong>accessed</strong>.</p>\n<p>The number of frames captured by the stack trace is bounded by the smaller of\n<code>Error.stackTraceLimit</code> or the number of available frames on the current event\nloop tick.</p>"
+          "desc": "<p>The <code>error.stack</code> property is a string describing the point in the code at which\nthe <code>Error</code> was instantiated.</p>\n<pre><code class=\"language-console\">Error: Things keep happening!\n   at /home/gbusey/file.js:525:2\n   at Frobnicator.refrobulate (/home/gbusey/business-logic.js:424:21)\n   at Actor.&#x3C;anonymous> (/home/gbusey/actors.js:400:8)\n   at increaseSynergy (/home/gbusey/actors.js:701:6)\n</code></pre>\n<p>The first line is formatted as <code>&#x3C;error class name>: &#x3C;error message></code>, and\nis followed by a series of stack frames (each line beginning with \"at \").\nEach frame describes a call site within the code that lead to the error being\ngenerated. V8 attempts to display a name for each function (by variable name,\nfunction name, or object method name), but occasionally it will not be able to\nfind a suitable name. If V8 cannot determine a name for the function, only\nlocation information will be displayed for that frame. Otherwise, the\ndetermined function name will be displayed with location information appended\nin parentheses.</p>\n<p>Frames are only generated for JavaScript functions. If, for example, execution\nsynchronously passes through a C++ addon function called <code>cheetahify</code> which\nitself calls a JavaScript function, the frame representing the <code>cheetahify</code> call\nwill not be present in the stack traces:</p>\n<pre><code class=\"language-js\">const cheetahify = require('./native-binding.node');\n\nfunction makeFaster() {\n  // `cheetahify()` *synchronously* calls speedy.\n  cheetahify(function speedy() {\n    throw new Error('oh no!');\n  });\n}\n\nmakeFaster();\n// will throw:\n//   /home/gbusey/file.js:6\n//       throw new Error('oh no!');\n//           ^\n//   Error: oh no!\n//       at speedy (/home/gbusey/file.js:6:11)\n//       at makeFaster (/home/gbusey/file.js:5:3)\n//       at Object.&#x3C;anonymous> (/home/gbusey/file.js:10:1)\n//       at Module._compile (module.js:456:26)\n//       at Object.Module._extensions..js (module.js:474:10)\n//       at Module.load (module.js:356:32)\n//       at Function.Module._load (module.js:312:12)\n//       at Function.Module.runMain (module.js:497:10)\n//       at startup (node.js:119:16)\n//       at node.js:906:3\n</code></pre>\n<p>The location information will be one of:</p>\n<ul>\n<li><code>native</code>, if the frame represents a call internal to V8 (as in <code>[].forEach</code>).</li>\n<li><code>plain-filename.js:line:column</code>, if the frame represents a call internal\nto Node.js.</li>\n<li><code>/absolute/path/to/file.js:line:column</code>, if the frame represents a call in\na user program (using CommonJS module system), or its dependencies.</li>\n<li><code>&#x3C;transport-protocol>:///url/to/module/file.mjs:line:column</code>, if the frame\nrepresents a call in a user program (using ES module system), or\nits dependencies.</li>\n</ul>\n<p>The number of frames captured by the stack trace is bounded by the smaller of\n<code>Error.stackTraceLimit</code> or the number of available frames on the current event\nloop tick.</p>\n<p><code>error.stack</code> is a getter/setter for a hidden internal property which is only\npresent on builtin <code>Error</code> objects (those for which <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/isError\"><code>Error.isError</code></a> returns\ntrue). If <code>error</code> is not a builtin error object, then the <code>error.stack</code> getter\nwill always return <code>undefined</code>, and the setter will do nothing. This can occur\nif the accessor is manually invoked with a <code>this</code> value that is not a builtin\nerror object, such as a <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy\" class=\"type\">&lt;Proxy&gt;</a>.</p>"
         }
       ],
       "signatures": [
@@ -124,7 +124,7 @@
       "textRaw": "Class: `SystemError`",
       "type": "class",
       "name": "SystemError",
-      "desc": "<ul>\n<li>Extends: <a href=\"errors.html#class-error\" class=\"type\">&lt;errors.Error&gt;</a></li>\n</ul>\n<p>Node.js generates system errors when exceptions occur within its runtime\nenvironment. These usually occur when an application violates an operating\nsystem constraint. For example, a system error will occur if an application\nattempts to read a file that does not exist.</p>\n<ul>\n<li><code>address</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> If present, the address to which a network connection\nfailed</li>\n<li><code>code</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> The string error code</li>\n<li><code>dest</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> If present, the file path destination when reporting a file\nsystem error</li>\n<li><code>errno</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> The system-provided error number</li>\n<li><code>info</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a> If present, extra details about the error condition</li>\n<li><code>message</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> A system-provided human-readable description of the error</li>\n<li><code>path</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> If present, the file path when reporting a file system error</li>\n<li><code>port</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> If present, the network connection port that is not available</li>\n<li><code>syscall</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> The name of the system call that triggered the error</li>\n</ul>",
+      "desc": "<ul>\n<li>Extends: <a href=\"errors.html#class-error\" class=\"type\">&lt;errors.Error&gt;</a></li>\n</ul>\n<p>Node.js generates system errors when exceptions occur within its runtime\nenvironment. These usually occur when an application violates an operating\nsystem constraint. For example, a system error will occur if an application\nattempts to read a file that does not exist.</p>\n<ul>\n<li><code>address</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type\" class=\"type\">&lt;string&gt;</a> If present, the address to which a network connection\nfailed</li>\n<li><code>code</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type\" class=\"type\">&lt;string&gt;</a> The string error code</li>\n<li><code>dest</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type\" class=\"type\">&lt;string&gt;</a> If present, the file path destination when reporting a file\nsystem error</li>\n<li><code>errno</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type\" class=\"type\">&lt;number&gt;</a> The system-provided error number</li>\n<li><code>info</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a> If present, extra details about the error condition</li>\n<li><code>message</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type\" class=\"type\">&lt;string&gt;</a> A system-provided human-readable description of the error</li>\n<li><code>path</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type\" class=\"type\">&lt;string&gt;</a> If present, the file path when reporting a file system error</li>\n<li><code>port</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type\" class=\"type\">&lt;number&gt;</a> If present, the network connection port that is not available</li>\n<li><code>syscall</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type\" class=\"type\">&lt;string&gt;</a> The name of the system call that triggered the error</li>\n</ul>",
       "properties": [
         {
           "textRaw": "`address` Type: {string}",
@@ -296,9 +296,16 @@
             {
               "textRaw": "`ERR_ASYNC_CALLBACK`",
               "name": "`err_async_callback`",
-              "desc": "<p>An attempt was made to register something that is not a function as an\n<code>AsyncHooks</code> callback.</p>\n<p><a id=\"ERR_ASYNC_TYPE\"></a></p>",
+              "desc": "<p>An attempt was made to register something that is not a function as an\n<code>AsyncHooks</code> callback.</p>\n<p><a id=\"ERR_ASYNC_LOADER_REQUEST_NEVER_SETTLED\"></a></p>",
               "type": "module",
               "displayName": "`ERR_ASYNC_CALLBACK`"
+            },
+            {
+              "textRaw": "`ERR_ASYNC_LOADER_REQUEST_NEVER_SETTLED`",
+              "name": "`err_async_loader_request_never_settled`",
+              "desc": "<p>An operation related to module loading is customized by an asynchronous loader\nhook that never settled the promise before the loader thread exits.</p>\n<p><a id=\"ERR_ASYNC_TYPE\"></a></p>",
+              "type": "module",
+              "displayName": "`ERR_ASYNC_LOADER_REQUEST_NEVER_SETTLED`"
             },
             {
               "textRaw": "`ERR_ASYNC_TYPE`",
@@ -436,7 +443,8 @@
               "name": "`err_cpu_profile_already_started`",
               "meta": {
                 "added": [
-                  "v24.8.0"
+                  "v24.8.0",
+                  "v22.20.0"
                 ],
                 "changes": []
               },
@@ -449,7 +457,8 @@
               "name": "`err_cpu_profile_not_started`",
               "meta": {
                 "added": [
-                  "v24.8.0"
+                  "v24.8.0",
+                  "v22.20.0"
                 ],
                 "changes": []
               },
@@ -462,7 +471,8 @@
               "name": "`err_cpu_profile_too_many`",
               "meta": {
                 "added": [
-                  "v24.8.0"
+                  "v24.8.0",
+                  "v22.20.0"
                 ],
                 "changes": []
               },
@@ -2183,7 +2193,8 @@
               "name": "`err_options_before_bootstrapping`",
               "meta": {
                 "added": [
-                  "v23.10.0"
+                  "v23.10.0",
+                  "v22.16.0"
                 ],
                 "changes": []
               },
@@ -2222,7 +2233,7 @@
                 ],
                 "changes": []
               },
-              "desc": "<p>When <code>strict</code> set to <code>true</code>, thrown by <a href=\"util.html#utilparseargsconfig\"><code>util.parseArgs()</code></a> if a <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type\" class=\"type\">&lt;boolean&gt;</a>\nvalue is provided for an option of type <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a>, or if a <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a>\nvalue is provided for an option of type <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type\" class=\"type\">&lt;boolean&gt;</a>.</p>\n<p><a id=\"ERR_PARSE_ARGS_UNEXPECTED_POSITIONAL\"></a></p>",
+              "desc": "<p>When <code>strict</code> set to <code>true</code>, thrown by <a href=\"util.html#utilparseargsconfig\"><code>util.parseArgs()</code></a> if a <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#boolean_type\" class=\"type\">&lt;boolean&gt;</a>\nvalue is provided for an option of type <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type\" class=\"type\">&lt;string&gt;</a>, or if a <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type\" class=\"type\">&lt;string&gt;</a>\nvalue is provided for an option of type <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#boolean_type\" class=\"type\">&lt;boolean&gt;</a>.</p>\n<p><a id=\"ERR_PARSE_ARGS_UNEXPECTED_POSITIONAL\"></a></p>",
               "type": "module",
               "displayName": "`ERR_PARSE_ARGS_INVALID_OPTION_VALUE`"
             },
@@ -2388,8 +2399,6 @@
             {
               "textRaw": "`ERR_REQUIRE_ASYNC_MODULE`",
               "name": "`err_require_async_module`",
-              "stability": 1,
-              "stabilityText": "Experimental",
               "desc": "<p>When trying to <code>require()</code> a <a href=\"esm.html\">ES Module</a>, the module turns out to be asynchronous.\nThat is, it contains top-level await.</p>\n<p>To see where the top-level await is, use\n<code>--experimental-print-required-tla</code> (this would execute the modules\nbefore looking for the top-level awaits).</p>\n<p><a id=\"ERR_REQUIRE_CYCLE_MODULE\"></a></p>",
               "type": "module",
               "displayName": "`ERR_REQUIRE_ASYNC_MODULE`"
@@ -2397,8 +2406,6 @@
             {
               "textRaw": "`ERR_REQUIRE_CYCLE_MODULE`",
               "name": "`err_require_cycle_module`",
-              "stability": 1,
-              "stabilityText": "Experimental",
               "desc": "<p>When trying to <code>require()</code> a <a href=\"esm.html\">ES Module</a>, a CommonJS to ESM or ESM to CommonJS edge\nparticipates in an immediate cycle.\nThis is not allowed because ES Modules cannot be evaluated while they are\nalready being evaluated.</p>\n<p>To avoid the cycle, the <code>require()</code> call involved in a cycle should not happen\nat the top-level of either an ES Module (via <code>createRequire()</code>) or a CommonJS\nmodule, and should be done lazily in an inner function.</p>\n<p><a id=\"ERR_REQUIRE_ESM\"></a></p>",
               "type": "module",
               "displayName": "`ERR_REQUIRE_CYCLE_MODULE`"
@@ -3061,9 +3068,16 @@
             {
               "textRaw": "`ERR_WASI_NOT_STARTED`",
               "name": "`err_wasi_not_started`",
-              "desc": "<p>The WASI instance has not been started.</p>\n<p><a id=\"ERR_WEBASSEMBLY_RESPONSE\"></a></p>",
+              "desc": "<p>The WASI instance has not been started.</p>\n<p><a id=\"ERR_WEBASSEMBLY_NOT_SUPPORTED\"></a></p>",
               "type": "module",
               "displayName": "`ERR_WASI_NOT_STARTED`"
+            },
+            {
+              "textRaw": "`ERR_WEBASSEMBLY_NOT_SUPPORTED`",
+              "name": "`err_webassembly_not_supported`",
+              "desc": "<p>A feature requiring WebAssembly was used, but WebAssembly is not supported or\nhas been disabled in the current environment (for example, when running with\n<code>--jitless</code>).</p>\n<p><a id=\"ERR_WEBASSEMBLY_RESPONSE\"></a></p>",
+              "type": "module",
+              "displayName": "`ERR_WEBASSEMBLY_NOT_SUPPORTED`"
             },
             {
               "textRaw": "`ERR_WEBASSEMBLY_RESPONSE`",
@@ -3103,7 +3117,7 @@
               },
               "stability": 1,
               "stabilityText": ".1 - Active development",
-              "desc": "<p>The destination thread threw an error while processing a message sent via <a href=\"worker_threads.html#workerpostmessagetothreadthreadid-value-transferlist-timeout\"><code>postMessageToThread()</code></a>.</p>\n<p><a id=\"ERR_WORKER_MESSAGING_FAILED\"></a></p>",
+              "desc": "<p>The destination thread threw an error while processing a message sent via <a href=\"worker_threads.html#worker_threadspostmessagetothreadthreadid-value-transferlist-timeout\"><code>postMessageToThread()</code></a>.</p>\n<p><a id=\"ERR_WORKER_MESSAGING_FAILED\"></a></p>",
               "type": "module",
               "displayName": "`ERR_WORKER_MESSAGING_ERRORED`"
             },
@@ -3118,7 +3132,7 @@
               },
               "stability": 1,
               "stabilityText": ".1 - Active development",
-              "desc": "<p>The thread requested in <a href=\"worker_threads.html#workerpostmessagetothreadthreadid-value-transferlist-timeout\"><code>postMessageToThread()</code></a> is invalid or has no <code>workerMessage</code> listener.</p>\n<p><a id=\"ERR_WORKER_MESSAGING_SAME_THREAD\"></a></p>",
+              "desc": "<p>The thread requested in <a href=\"worker_threads.html#worker_threadspostmessagetothreadthreadid-value-transferlist-timeout\"><code>postMessageToThread()</code></a> is invalid or has no <code>workerMessage</code> listener.</p>\n<p><a id=\"ERR_WORKER_MESSAGING_SAME_THREAD\"></a></p>",
               "type": "module",
               "displayName": "`ERR_WORKER_MESSAGING_FAILED`"
             },
@@ -3133,7 +3147,7 @@
               },
               "stability": 1,
               "stabilityText": ".1 - Active development",
-              "desc": "<p>The thread id requested in <a href=\"worker_threads.html#workerpostmessagetothreadthreadid-value-transferlist-timeout\"><code>postMessageToThread()</code></a> is the current thread id.</p>\n<p><a id=\"ERR_WORKER_MESSAGING_TIMEOUT\"></a></p>",
+              "desc": "<p>The thread id requested in <a href=\"worker_threads.html#worker_threadspostmessagetothreadthreadid-value-transferlist-timeout\"><code>postMessageToThread()</code></a> is the current thread id.</p>\n<p><a id=\"ERR_WORKER_MESSAGING_TIMEOUT\"></a></p>",
               "type": "module",
               "displayName": "`ERR_WORKER_MESSAGING_SAME_THREAD`"
             },
@@ -3148,7 +3162,7 @@
               },
               "stability": 1,
               "stabilityText": ".1 - Active development",
-              "desc": "<p>Sending a message via <a href=\"worker_threads.html#workerpostmessagetothreadthreadid-value-transferlist-timeout\"><code>postMessageToThread()</code></a> timed out.</p>\n<p><a id=\"ERR_WORKER_NOT_RUNNING\"></a></p>",
+              "desc": "<p>Sending a message via <a href=\"worker_threads.html#worker_threadspostmessagetothreadthreadid-value-transferlist-timeout\"><code>postMessageToThread()</code></a> timed out.</p>\n<p><a id=\"ERR_WORKER_NOT_RUNNING\"></a></p>",
               "type": "module",
               "displayName": "`ERR_WORKER_MESSAGING_TIMEOUT`"
             },
@@ -3684,7 +3698,7 @@
                 ],
                 "changes": []
               },
-              "desc": "<p>This error code was replaced by <a href=\"#err_missing_transferable_in_transfer_list\"><code>ERR_MISSING_TRANSFERABLE_IN_TRANSFER_LIST</code></a>\nin Node.js v15.0.0, because it is no longer accurate as other types of\ntransferable objects also exist now.</p>\n<p><a id=\"ERR_MISSING_TRANSFERABLE_IN_TRANSFER_LIST\"></a></p>",
+              "desc": "<p>This error code was replaced by <a href=\"#err_missing_transferable_in_transfer_list\"><code>ERR_MISSING_TRANSFERABLE_IN_TRANSFER_LIST</code></a>\nin Node.js 15.0.0, because it is no longer accurate as other types of\ntransferable objects also exist now.</p>\n<p><a id=\"ERR_MISSING_TRANSFERABLE_IN_TRANSFER_LIST\"></a></p>",
               "type": "module",
               "displayName": "`ERR_MISSING_MESSAGE_PORT_IN_TRANSFER_LIST`"
             },
@@ -4373,7 +4387,7 @@
               "textRaw": "`stack` Type: {string}",
               "type": "string",
               "name": "Type",
-              "desc": "<p>The <code>error.stack</code> property is a string describing the point in the code at which\nthe <code>Error</code> was instantiated.</p>\n<pre><code class=\"language-console\">Error: Things keep happening!\n   at /home/gbusey/file.js:525:2\n   at Frobnicator.refrobulate (/home/gbusey/business-logic.js:424:21)\n   at Actor.&#x3C;anonymous> (/home/gbusey/actors.js:400:8)\n   at increaseSynergy (/home/gbusey/actors.js:701:6)\n</code></pre>\n<p>The first line is formatted as <code>&#x3C;error class name>: &#x3C;error message></code>, and\nis followed by a series of stack frames (each line beginning with \"at \").\nEach frame describes a call site within the code that lead to the error being\ngenerated. V8 attempts to display a name for each function (by variable name,\nfunction name, or object method name), but occasionally it will not be able to\nfind a suitable name. If V8 cannot determine a name for the function, only\nlocation information will be displayed for that frame. Otherwise, the\ndetermined function name will be displayed with location information appended\nin parentheses.</p>\n<p>Frames are only generated for JavaScript functions. If, for example, execution\nsynchronously passes through a C++ addon function called <code>cheetahify</code> which\nitself calls a JavaScript function, the frame representing the <code>cheetahify</code> call\nwill not be present in the stack traces:</p>\n<pre><code class=\"language-js\">const cheetahify = require('./native-binding.node');\n\nfunction makeFaster() {\n  // `cheetahify()` *synchronously* calls speedy.\n  cheetahify(function speedy() {\n    throw new Error('oh no!');\n  });\n}\n\nmakeFaster();\n// will throw:\n//   /home/gbusey/file.js:6\n//       throw new Error('oh no!');\n//           ^\n//   Error: oh no!\n//       at speedy (/home/gbusey/file.js:6:11)\n//       at makeFaster (/home/gbusey/file.js:5:3)\n//       at Object.&#x3C;anonymous> (/home/gbusey/file.js:10:1)\n//       at Module._compile (module.js:456:26)\n//       at Object.Module._extensions..js (module.js:474:10)\n//       at Module.load (module.js:356:32)\n//       at Function.Module._load (module.js:312:12)\n//       at Function.Module.runMain (module.js:497:10)\n//       at startup (node.js:119:16)\n//       at node.js:906:3\n</code></pre>\n<p>The location information will be one of:</p>\n<ul>\n<li><code>native</code>, if the frame represents a call internal to V8 (as in <code>[].forEach</code>).</li>\n<li><code>plain-filename.js:line:column</code>, if the frame represents a call internal\nto Node.js.</li>\n<li><code>/absolute/path/to/file.js:line:column</code>, if the frame represents a call in\na user program (using CommonJS module system), or its dependencies.</li>\n<li><code>&#x3C;transport-protocol>:///url/to/module/file.mjs:line:column</code>, if the frame\nrepresents a call in a user program (using ES module system), or\nits dependencies.</li>\n</ul>\n<p>The string representing the stack trace is lazily generated when the\n<code>error.stack</code> property is <strong>accessed</strong>.</p>\n<p>The number of frames captured by the stack trace is bounded by the smaller of\n<code>Error.stackTraceLimit</code> or the number of available frames on the current event\nloop tick.</p>"
+              "desc": "<p>The <code>error.stack</code> property is a string describing the point in the code at which\nthe <code>Error</code> was instantiated.</p>\n<pre><code class=\"language-console\">Error: Things keep happening!\n   at /home/gbusey/file.js:525:2\n   at Frobnicator.refrobulate (/home/gbusey/business-logic.js:424:21)\n   at Actor.&#x3C;anonymous> (/home/gbusey/actors.js:400:8)\n   at increaseSynergy (/home/gbusey/actors.js:701:6)\n</code></pre>\n<p>The first line is formatted as <code>&#x3C;error class name>: &#x3C;error message></code>, and\nis followed by a series of stack frames (each line beginning with \"at \").\nEach frame describes a call site within the code that lead to the error being\ngenerated. V8 attempts to display a name for each function (by variable name,\nfunction name, or object method name), but occasionally it will not be able to\nfind a suitable name. If V8 cannot determine a name for the function, only\nlocation information will be displayed for that frame. Otherwise, the\ndetermined function name will be displayed with location information appended\nin parentheses.</p>\n<p>Frames are only generated for JavaScript functions. If, for example, execution\nsynchronously passes through a C++ addon function called <code>cheetahify</code> which\nitself calls a JavaScript function, the frame representing the <code>cheetahify</code> call\nwill not be present in the stack traces:</p>\n<pre><code class=\"language-js\">const cheetahify = require('./native-binding.node');\n\nfunction makeFaster() {\n  // `cheetahify()` *synchronously* calls speedy.\n  cheetahify(function speedy() {\n    throw new Error('oh no!');\n  });\n}\n\nmakeFaster();\n// will throw:\n//   /home/gbusey/file.js:6\n//       throw new Error('oh no!');\n//           ^\n//   Error: oh no!\n//       at speedy (/home/gbusey/file.js:6:11)\n//       at makeFaster (/home/gbusey/file.js:5:3)\n//       at Object.&#x3C;anonymous> (/home/gbusey/file.js:10:1)\n//       at Module._compile (module.js:456:26)\n//       at Object.Module._extensions..js (module.js:474:10)\n//       at Module.load (module.js:356:32)\n//       at Function.Module._load (module.js:312:12)\n//       at Function.Module.runMain (module.js:497:10)\n//       at startup (node.js:119:16)\n//       at node.js:906:3\n</code></pre>\n<p>The location information will be one of:</p>\n<ul>\n<li><code>native</code>, if the frame represents a call internal to V8 (as in <code>[].forEach</code>).</li>\n<li><code>plain-filename.js:line:column</code>, if the frame represents a call internal\nto Node.js.</li>\n<li><code>/absolute/path/to/file.js:line:column</code>, if the frame represents a call in\na user program (using CommonJS module system), or its dependencies.</li>\n<li><code>&#x3C;transport-protocol>:///url/to/module/file.mjs:line:column</code>, if the frame\nrepresents a call in a user program (using ES module system), or\nits dependencies.</li>\n</ul>\n<p>The number of frames captured by the stack trace is bounded by the smaller of\n<code>Error.stackTraceLimit</code> or the number of available frames on the current event\nloop tick.</p>\n<p><code>error.stack</code> is a getter/setter for a hidden internal property which is only\npresent on builtin <code>Error</code> objects (those for which <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/isError\"><code>Error.isError</code></a> returns\ntrue). If <code>error</code> is not a builtin error object, then the <code>error.stack</code> getter\nwill always return <code>undefined</code>, and the setter will do nothing. This can occur\nif the accessor is manually invoked with a <code>this</code> value that is not a builtin\nerror object, such as a <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy\" class=\"type\">&lt;Proxy&gt;</a>.</p>"
             }
           ],
           "signatures": [
@@ -4430,7 +4444,7 @@
           "textRaw": "Class: `SystemError`",
           "type": "class",
           "name": "SystemError",
-          "desc": "<ul>\n<li>Extends: <a href=\"errors.html#class-error\" class=\"type\">&lt;errors.Error&gt;</a></li>\n</ul>\n<p>Node.js generates system errors when exceptions occur within its runtime\nenvironment. These usually occur when an application violates an operating\nsystem constraint. For example, a system error will occur if an application\nattempts to read a file that does not exist.</p>\n<ul>\n<li><code>address</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> If present, the address to which a network connection\nfailed</li>\n<li><code>code</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> The string error code</li>\n<li><code>dest</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> If present, the file path destination when reporting a file\nsystem error</li>\n<li><code>errno</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> The system-provided error number</li>\n<li><code>info</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a> If present, extra details about the error condition</li>\n<li><code>message</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> A system-provided human-readable description of the error</li>\n<li><code>path</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> If present, the file path when reporting a file system error</li>\n<li><code>port</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> If present, the network connection port that is not available</li>\n<li><code>syscall</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> The name of the system call that triggered the error</li>\n</ul>",
+          "desc": "<ul>\n<li>Extends: <a href=\"errors.html#class-error\" class=\"type\">&lt;errors.Error&gt;</a></li>\n</ul>\n<p>Node.js generates system errors when exceptions occur within its runtime\nenvironment. These usually occur when an application violates an operating\nsystem constraint. For example, a system error will occur if an application\nattempts to read a file that does not exist.</p>\n<ul>\n<li><code>address</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type\" class=\"type\">&lt;string&gt;</a> If present, the address to which a network connection\nfailed</li>\n<li><code>code</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type\" class=\"type\">&lt;string&gt;</a> The string error code</li>\n<li><code>dest</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type\" class=\"type\">&lt;string&gt;</a> If present, the file path destination when reporting a file\nsystem error</li>\n<li><code>errno</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type\" class=\"type\">&lt;number&gt;</a> The system-provided error number</li>\n<li><code>info</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a> If present, extra details about the error condition</li>\n<li><code>message</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type\" class=\"type\">&lt;string&gt;</a> A system-provided human-readable description of the error</li>\n<li><code>path</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type\" class=\"type\">&lt;string&gt;</a> If present, the file path when reporting a file system error</li>\n<li><code>port</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type\" class=\"type\">&lt;number&gt;</a> If present, the network connection port that is not available</li>\n<li><code>syscall</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type\" class=\"type\">&lt;string&gt;</a> The name of the system call that triggered the error</li>\n</ul>",
           "properties": [
             {
               "textRaw": "`address` Type: {string}",

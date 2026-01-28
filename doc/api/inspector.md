@@ -514,7 +514,9 @@ inspector.Network.requestWillBeSent({
 ### `inspector.Network.dataReceived([params])`
 
 <!-- YAML
-added: v24.2.0
+added:
+ - v24.2.0
+ - v22.17.0
 -->
 
 * `params` {Object}
@@ -529,7 +531,9 @@ Also enables `Network.getResponseBody` command to retrieve the response data.
 ### `inspector.Network.dataSent([params])`
 
 <!-- YAML
-added: v24.3.0
+added:
+  - v24.3.0
+  - v22.18.0
 -->
 
 * `params` {Object}
@@ -645,6 +649,7 @@ This event indicates that a WebSocket connection has been closed.
 <!-- YAML
 added:
   - v24.5.0
+  - v22.19.0
 -->
 
 > Stability: 1.1 - Active Development
@@ -676,6 +681,103 @@ setNetworkResources().then(() => {
 ```
 
 For more details, see the official CDP documentation: [Network.loadNetworkResource](https://chromedevtools.github.io/devtools-protocol/tot/Network/#method-loadNetworkResource)
+
+### `inspector.DOMStorage.domStorageItemAdded`
+
+<!-- YAML
+added:
+  - v25.5.0
+-->
+
+* `params` {Object}
+  * `storageId` {Object}
+    * `securityOrigin` {string}
+    * `storageKey` {string}
+    * `isLocalStorage` {boolean}
+  * `key` {string}
+  * `newValue` {string}
+
+This feature is only available with the
+`--experimental-storage-inspection` flag enabled.
+
+Broadcasts the `DOMStorage.domStorageItemAdded` event to connected frontends.
+This event indicates that a new item has been added to the storage.
+
+### `inspector.DOMStorage.domStorageItemRemoved`
+
+<!-- YAML
+added:
+  - v25.5.0
+-->
+
+* `params` {Object}
+  * `storageId` {Object}
+    * `securityOrigin` {string}
+    * `storageKey` {string}
+    * `isLocalStorage` {boolean}
+  * `key` {string}
+
+This feature is only available with the
+`--experimental-storage-inspection` flag enabled.
+
+Broadcasts the `DOMStorage.domStorageItemRemoved` event to connected frontends.
+This event indicates that an item has been removed from the storage.
+
+### `inspector.DOMStorage.domStorageItemUpdated`
+
+<!-- YAML
+added:
+  - v25.5.0
+-->
+
+* `params` {Object}
+  * `storageId` {Object}
+    * `securityOrigin` {string}
+    * `storageKey` {string}
+    * `isLocalStorage` {boolean}
+  * `key` {string}
+  * `oldValue` {string}
+  * `newValue` {string}
+
+This feature is only available with the
+`--experimental-storage-inspection` flag enabled.
+
+Broadcasts the `DOMStorage.domStorageItemUpdated` event to connected frontends.
+This event indicates that a storage item has been updated.
+
+### `inspector.DOMStorage.domStorageItemsCleared`
+
+<!-- YAML
+added:
+  - v25.5.0
+-->
+
+* `params` {Object}
+  * `storageId` {Object}
+    * `securityOrigin` {string}
+    * `storageKey` {string}
+    * `isLocalStorage` {boolean}
+
+This feature is only available with the
+`--experimental-storage-inspection` flag enabled.
+
+Broadcasts the `DOMStorage.domStorageItemsCleared` event to connected
+frontends. This event indicates that all items have been cleared from the
+storage.
+
+### `inspector.DOMStorage.registerStorage`
+
+<!-- YAML
+added:
+  - v25.5.0
+-->
+
+* `params` {Object}
+  * `isLocalStorage` {boolean}
+  * `storageMap` {Object}
+
+This feature is only available with the
+`--experimental-storage-inspection` flag enabled.
 
 ## Support of breakpoints
 

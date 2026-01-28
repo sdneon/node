@@ -332,6 +332,12 @@ syncBuiltinESMExports();
 fs.readFileSync === readFileSync;
 ```
 
+> When importing built-in modules, all the named exports (i.e. properties of the module exports object)
+> are populated even if they are not individually accessed.
+> This can make initial imports of built-in modules slightly slower compared to loading them with
+> `require()` or `process.getBuiltinModule()`, where the module exports object is evaluated immediately,
+> but some of its properties may only be initialized when first accessed individually.
+
 ## `import()` expressions
 
 [Dynamic `import()`][] provides an asynchronous way to import modules. It is
@@ -352,7 +358,9 @@ added:
   - v21.2.0
   - v20.11.0
 changes:
-  - version: v24.0.0
+  - version:
+     - v24.0.0
+     - v22.16.0
     pr-url: https://github.com/nodejs/node/pull/58011
     description: This property is no longer experimental.
 -->
@@ -370,7 +378,9 @@ added:
   - v21.2.0
   - v20.11.0
 changes:
-  - version: v24.0.0
+  - version:
+     - v24.0.0
+     - v22.16.0
     pr-url: https://github.com/nodejs/node/pull/58011
     description: This property is no longer experimental.
 -->
@@ -402,6 +412,7 @@ const buffer = readFileSync(new URL('./data.proto', import.meta.url));
 <!-- YAML
 added:
   - v24.2.0
+  - v22.18.0
 -->
 
 > Stability: 1.0 - Early development
@@ -704,7 +715,9 @@ imported from the same path.
 
 <!-- YAML
 changes:
-  - version: v24.5.0
+  - version:
+     - v24.5.0
+     - v22.19.0
     pr-url: https://github.com/nodejs/node/pull/57038
     description: Wasm modules no longer require the `--experimental-wasm-modules` flag.
 -->
@@ -755,7 +768,9 @@ const instance = await WebAssembly.instantiate(dynamicLibrary, importObject);
 > Stability: 1.2 - Release candidate
 
 <!-- YAML
-added: v24.5.0
+added:
+ - v24.5.0
+ - v22.19.0
 -->
 
 When importing WebAssembly modules, the
@@ -828,7 +843,9 @@ would provide the exports interface for the instantiation of `library.wasm`.
 ### Reserved Wasm Namespaces
 
 <!-- YAML
-added: v24.5.0
+added:
+ - v24.5.0
+ - v22.19.0
 -->
 
 When importing WebAssembly module instances, they cannot use import module
@@ -1085,7 +1102,7 @@ Note: This function is directly invoked by the CommonJS resolution algorithm.
 Note: This function is directly invoked by the CommonJS resolution algorithm.
 
 > 1. Assert: _specifier_ begins with _"#"_.
-> 2. If _specifier_ is exactly equal to _"#"_ or starts with _"#/"_, then
+> 2. If _specifier_ is exactly equal to _"#"_, then
 >    1. Throw an _Invalid Module Specifier_ error.
 > 3. Let _packageURL_ be the result of **LOOKUP\_PACKAGE\_SCOPE**(_parentURL_).
 > 4. If _packageURL_ is not **null**, then
@@ -1287,7 +1304,7 @@ resolution for ESM specifiers is [commonjs-extension-resolution-loader][].
 [`"exports"`]: packages.md#exports
 [`"type"`]: packages.md#type
 [`--input-type`]: cli.md#--input-typetype
-[`data:` URLs]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
+[`data:` URLs]: https://developer.mozilla.org/en-US/docs/Web/URI/Reference/Schemes/data
 [`export`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/export
 [`import()`]: #import-expressions
 [`import.meta.dirname`]: #importmetadirname

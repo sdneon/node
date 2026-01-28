@@ -65,6 +65,10 @@ class DatabaseOpenConfiguration {
     return allow_unknown_named_params_;
   }
 
+  inline void set_enable_defensive(bool flag) { defensive_ = flag; }
+
+  inline bool get_enable_defensive() const { return defensive_; }
+
  private:
   std::string location_;
   bool read_only_ = false;
@@ -75,6 +79,7 @@ class DatabaseOpenConfiguration {
   bool return_arrays_ = false;
   bool allow_bare_named_params_ = true;
   bool allow_unknown_named_params_ = false;
+  bool defensive_ = true;
 };
 
 class DatabaseSync;
@@ -84,15 +89,15 @@ class BackupJob;
 
 class StatementExecutionHelper {
  public:
-  static v8::Local<v8::Value> All(Environment* env,
-                                  DatabaseSync* db,
-                                  sqlite3_stmt* stmt,
-                                  bool return_arrays,
-                                  bool use_big_ints);
-  static v8::Local<v8::Object> Run(Environment* env,
-                                   DatabaseSync* db,
-                                   sqlite3_stmt* stmt,
-                                   bool use_big_ints);
+  static v8::MaybeLocal<v8::Value> All(Environment* env,
+                                       DatabaseSync* db,
+                                       sqlite3_stmt* stmt,
+                                       bool return_arrays,
+                                       bool use_big_ints);
+  static v8::MaybeLocal<v8::Object> Run(Environment* env,
+                                        DatabaseSync* db,
+                                        sqlite3_stmt* stmt,
+                                        bool use_big_ints);
   static BaseObjectPtr<StatementSyncIterator> Iterate(
       Environment* env, BaseObjectPtr<StatementSync> stmt);
   static v8::MaybeLocal<v8::Value> ColumnToValue(Environment* env,
@@ -102,15 +107,20 @@ class StatementExecutionHelper {
   static v8::MaybeLocal<v8::Name> ColumnNameToName(Environment* env,
                                                    sqlite3_stmt* stmt,
                                                    const int column);
-  static v8::Local<v8::Value> Get(Environment* env,
-                                  DatabaseSync* db,
-                                  sqlite3_stmt* stmt,
-                                  bool return_arrays,
-                                  bool use_big_ints);
+  static v8::MaybeLocal<v8::Value> Get(Environment* env,
+                                       DatabaseSync* db,
+                                       sqlite3_stmt* stmt,
+                                       bool return_arrays,
+                                       bool use_big_ints);
 };
 
 class DatabaseSync : public BaseObject {
  public:
+  enum InternalFields {
+    kAuthorizerCallback = BaseObject::kInternalFieldCount,
+    kInternalFieldCount
+  };
+
   DatabaseSync(Environment* env,
                v8::Local<v8::Object> object,
                DatabaseOpenConfiguration&& open_config,
@@ -135,7 +145,15 @@ class DatabaseSync : public BaseObject {
   static void ApplyChangeset(const v8::FunctionCallbackInfo<v8::Value>& args);
   static void EnableLoadExtension(
       const v8::FunctionCallbackInfo<v8::Value>& args);
+  static void EnableDefensive(const v8::FunctionCallbackInfo<v8::Value>& args);
   static void LoadExtension(const v8::FunctionCallbackInfo<v8::Value>& args);
+  static void SetAuthorizer(const v8::FunctionCallbackInfo<v8::Value>& args);
+  static int AuthorizerCallback(void* user_data,
+                                int action_code,
+                                const char* param1,
+                                const char* param2,
+                                const char* param3,
+                                const char* param4);
   void FinalizeStatements();
   void RemoveBackup(BackupJob* backup);
   void AddBackup(BackupJob* backup);
@@ -228,6 +246,7 @@ class StatementSync : public BaseObject {
   bool BindParams(const v8::FunctionCallbackInfo<v8::Value>& args);
   bool BindValue(const v8::Local<v8::Value>& value, const int index);
 
+  friend class DatabaseSync;
   friend class StatementSyncIterator;
   friend class SQLTagStore;
   friend class StatementExecutionHelper;
@@ -295,15 +314,14 @@ class SQLTagStore : public BaseObject {
       Environment* env, BaseObjectWeakPtr<DatabaseSync> database, int capacity);
   static v8::Local<v8::FunctionTemplate> GetConstructorTemplate(
       Environment* env);
-  static void All(const v8::FunctionCallbackInfo<v8::Value>& info);
-  static void Get(const v8::FunctionCallbackInfo<v8::Value>& info);
-  static void Iterate(const v8::FunctionCallbackInfo<v8::Value>& info);
-  static void Run(const v8::FunctionCallbackInfo<v8::Value>& info);
-  static void Size(const v8::FunctionCallbackInfo<v8::Value>& info);
-  static void Capacity(const v8::FunctionCallbackInfo<v8::Value>& info);
-  static void Reset(const v8::FunctionCallbackInfo<v8::Value>& info);
-  static void Clear(const v8::FunctionCallbackInfo<v8::Value>& info);
-  static void DatabaseGetter(const v8::FunctionCallbackInfo<v8::Value>& info);
+  static void All(const v8::FunctionCallbackInfo<v8::Value>& args);
+  static void Get(const v8::FunctionCallbackInfo<v8::Value>& args);
+  static void Iterate(const v8::FunctionCallbackInfo<v8::Value>& args);
+  static void Run(const v8::FunctionCallbackInfo<v8::Value>& args);
+  static void Clear(const v8::FunctionCallbackInfo<v8::Value>& args);
+  static void CapacityGetter(const v8::FunctionCallbackInfo<v8::Value>& args);
+  static void DatabaseGetter(const v8::FunctionCallbackInfo<v8::Value>& args);
+  static void SizeGetter(const v8::FunctionCallbackInfo<v8::Value>& args);
   void MemoryInfo(MemoryTracker* tracker) const override;
   SET_MEMORY_INFO_NAME(SQLTagStore)
   SET_SELF_SIZE(SQLTagStore)
@@ -313,7 +331,6 @@ class SQLTagStore : public BaseObject {
       const v8::FunctionCallbackInfo<v8::Value>& args);
   BaseObjectWeakPtr<DatabaseSync> database_;
   LRUCache<std::string, BaseObjectPtr<StatementSync>> sql_tags_;
-  int capacity_;
   friend class StatementExecutionHelper;
 };
 

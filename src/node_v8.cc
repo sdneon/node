@@ -27,6 +27,7 @@
 #include "node.h"
 #include "node_external_reference.h"
 #include "util-inl.h"
+#include "v8-profiler.h"
 #include "v8.h"
 
 namespace node {
@@ -35,6 +36,9 @@ using v8::Array;
 using v8::BigInt;
 using v8::CFunction;
 using v8::Context;
+using v8::CpuProfile;
+using v8::CpuProfilingResult;
+using v8::CpuProfilingStatus;
 using v8::DictionaryTemplate;
 using v8::FunctionCallbackInfo;
 using v8::FunctionTemplate;
@@ -47,6 +51,7 @@ using v8::Isolate;
 using v8::Local;
 using v8::LocalVector;
 using v8::MaybeLocal;
+using v8::Number;
 using v8::Object;
 using v8::ScriptCompiler;
 using v8::String;
@@ -158,7 +163,7 @@ void BindingData::Deserialize(Local<Context> context,
                               int index,
                               InternalFieldInfoBase* info) {
   DCHECK_IS_SNAPSHOT_SLOT(index);
-  HandleScope scope(context->GetIsolate());
+  HandleScope scope(Isolate::GetCurrent());
   Realm* realm = Realm::GetCurrent(context);
   // Recreate the buffer in the constructor.
   InternalFieldInfo* casted_info = static_cast<InternalFieldInfo*>(info);
@@ -207,6 +212,12 @@ void UpdateHeapStatisticsBuffer(const FunctionCallbackInfo<Value>& args) {
 #undef V
 }
 
+void GetTotalAllocatedBytes(const FunctionCallbackInfo<Value>& args) {
+  Isolate* isolate = args.GetIsolate();
+  uint64_t allocated_bytes = isolate->GetTotalAllocatedBytes();
+  args.GetReturnValue().Set(Number::New(isolate, allocated_bytes));
+}
+
 
 void UpdateHeapSpaceStatisticsBuffer(const FunctionCallbackInfo<Value>& args) {
   BindingData* data = Realm::GetBindingData<BindingData>(args);
@@ -237,8 +248,41 @@ void UpdateHeapCodeStatisticsBuffer(const FunctionCallbackInfo<Value>& args) {
 
 void SetFlagsFromString(const FunctionCallbackInfo<Value>& args) {
   CHECK(args[0]->IsString());
-  String::Utf8Value flags(args.GetIsolate(), args[0]);
-  V8::SetFlagsFromString(*flags, static_cast<size_t>(flags.length()));
+  Utf8Value flags(args.GetIsolate(), args[0]);
+  V8::SetFlagsFromString(flags.out(), flags.length());
+}
+
+void StartCpuProfile(const FunctionCallbackInfo<Value>& args) {
+  Environment* env = Environment::GetCurrent(args);
+  Isolate* isolate = env->isolate();
+  CpuProfilingResult result = env->StartCpuProfile();
+  if (result.status == CpuProfilingStatus::kErrorTooManyProfilers) {
+    return THROW_ERR_CPU_PROFILE_TOO_MANY(isolate,
+                                          "There are too many CPU profiles");
+  } else if (result.status == CpuProfilingStatus::kStarted) {
+    args.GetReturnValue().Set(Number::New(isolate, result.id));
+  }
+}
+
+void StopCpuProfile(const FunctionCallbackInfo<Value>& args) {
+  Environment* env = Environment::GetCurrent(args);
+  Isolate* isolate = env->isolate();
+  CHECK(args[0]->IsUint32());
+  uint32_t profile_id = args[0]->Uint32Value(env->context()).FromJust();
+  CpuProfile* profile = env->StopCpuProfile(profile_id);
+  if (!profile) {
+    return THROW_ERR_CPU_PROFILE_NOT_STARTED(isolate,
+                                             "CPU profile not started");
+  }
+  auto json_out_stream = std::make_unique<node::JSONOutputStream>();
+  profile->Serialize(json_out_stream.get(),
+                     CpuProfile::SerializationFormat::kJSON);
+  profile->Delete();
+  Local<Value> ret;
+  if (ToV8Value(env->context(), json_out_stream->out_stream().str(), isolate)
+          .ToLocal(&ret)) {
+    args.GetReturnValue().Set(ret);
+  }
 }
 
 static void IsStringOneByteRepresentation(
@@ -656,6 +700,11 @@ void Initialize(Local<Object> target,
 
   SetMethod(context,
             target,
+            "getTotalAllocatedBytes",
+            GetTotalAllocatedBytes);
+
+  SetMethod(context,
+            target,
             "updateHeapCodeStatisticsBuffer",
             UpdateHeapCodeStatisticsBuffer);
   SetMethodNoSideEffect(
@@ -699,6 +748,9 @@ void Initialize(Local<Object> target,
   // Export symbols used by v8.setFlagsFromString()
   SetMethod(context, target, "setFlagsFromString", SetFlagsFromString);
 
+  SetMethod(context, target, "startCpuProfile", StartCpuProfile);
+  SetMethod(context, target, "stopCpuProfile", StopCpuProfile);
+
   // Export symbols used by v8.isStringOneByteRepresentation()
   SetFastMethodNoSideEffect(context,
                             target,
@@ -732,6 +784,7 @@ void Initialize(Local<Object> target,
 void RegisterExternalReferences(ExternalReferenceRegistry* registry) {
   registry->Register(CachedDataVersionTag);
   registry->Register(UpdateHeapStatisticsBuffer);
+  registry->Register(GetTotalAllocatedBytes);
   registry->Register(UpdateHeapCodeStatisticsBuffer);
   registry->Register(UpdateHeapSpaceStatisticsBuffer);
   registry->Register(SetFlagsFromString);
@@ -743,6 +796,8 @@ void RegisterExternalReferences(ExternalReferenceRegistry* registry) {
   registry->Register(GetCppHeapStatistics);
   registry->Register(IsStringOneByteRepresentation);
   registry->Register(fast_is_string_one_byte_representation_);
+  registry->Register(StartCpuProfile);
+  registry->Register(StopCpuProfile);
 }
 
 }  // namespace v8_utils
