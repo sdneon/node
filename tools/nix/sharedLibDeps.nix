@@ -1,5 +1,7 @@
 {
   pkgs ? import ./pkgs.nix { },
+  withLief ? true,
+  withQuic ? false,
   withSQLite ? true,
   withSSL ? true,
   withTemporal ? false,
@@ -11,8 +13,6 @@
     gtest
     libuv
     nghttp2
-    nghttp3
-    ngtcp2
     simdjson
     simdutf
     uvwasi
@@ -33,6 +33,18 @@
     }
   }/pkgs/by-name/nb/nbytes/package.nix" { };
 }
+// (pkgs.lib.optionalAttrs withLief {
+  lief = pkgs.callPackage (builtins.fetchurl {
+    url = "https://github.com/NixOS/nixpkgs/raw/8368442cb2c52e6b7badf0467b454c461ffc981f/pkgs/by-name/li/lief/package.nix";
+    sha256 = "0isxv5rw7m1x10k06rgwimmcbl6a1w18v8k6dqp60jr4i66lac08";
+  }) { };
+})
+// (pkgs.lib.optionalAttrs withQuic {
+  inherit (pkgs)
+    nghttp3
+    ngtcp2
+    ;
+})
 // (pkgs.lib.optionalAttrs withSQLite {
   inherit (pkgs) sqlite;
 })

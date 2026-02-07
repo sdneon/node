@@ -12,12 +12,16 @@
   # Build options
   icu ? pkgs.icu,
   withAmaro ? true,
+  withLief ? true,
+  withQuic ? false,
   withSQLite ? true,
   withSSL ? true,
   withTemporal ? false,
   sharedLibDeps ? import ./tools/nix/sharedLibDeps.nix {
     inherit
       pkgs
+      withLief
+      withQuic
       withSQLite
       withSSL
       withTemporal
@@ -80,6 +84,8 @@ pkgs.mkShell {
     ]
     ++ extraConfigFlags
     ++ pkgs.lib.optional (!withAmaro) "--without-amaro"
+    ++ pkgs.lib.optional (!withLief) "--without-lief"
+    ++ pkgs.lib.optional withQuic "--experimental-quic"
     ++ pkgs.lib.optional (!withSQLite) "--without-sqlite"
     ++ pkgs.lib.optional (!withSSL) "--without-ssl"
     ++ pkgs.lib.optional withTemporal "--v8-enable-temporal-support"

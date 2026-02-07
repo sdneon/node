@@ -3,8 +3,8 @@
   "variables": {
     "use_ccache_win": 0,
     "clang": 1,
-    "llvm_version": "19.1.5",
-    "nasm_version": "2.16",
+    "llvm_version": "19.1.1",
+    "nasm_version": "3.01",
     "node_prefix": "\\usr\\local",
     "node_install_npm": "true",
     "node_install_corepack": "false",
@@ -149,6 +149,7 @@
       "lib/internal/dns/utils.js",
       "lib/internal/encoding.js",
       "lib/internal/encoding/single-byte.js",
+      "lib/internal/encoding/util.js",
       "lib/internal/error_serdes.js",
       "lib/internal/errors.js",
       "lib/internal/errors/error_source.js",
@@ -444,6 +445,7 @@
     "node_shared_nghttp2": "false",
     "node_shared_nghttp3": "false",
     "node_shared_ngtcp2": "false",
+    "node_shared_lief": "false",
     "node_use_sqlite": "true",
     "node_shared_sqlite": "false",
     "node_shared_temporal_capi": "false",
@@ -481,7 +483,7 @@
     "openssl_is_fips": "false",
     "node_fipsinstall": "false",
     "node_without_node_options": "false",
-    "openssl_version": 810549327,
+    "openssl_version": 810549343,
     "node_use_quic": "false",
     "icu_small": "false",
     "v8_enable_i18n_support": 1,
@@ -497,7 +499,8 @@
       "deps/undici/undici.js",
       "deps/amaro/dist/index.js"
     ],
-    "ossfuzz": "false"
+    "ossfuzz": "false",
+    "v8_enable_v8_checks": 0
   },
   "target_defaults": {
     "include_dirs": [],
@@ -507,21 +510,7 @@
       "ICU_NO_USER_DATA_OVERRIDE"
     ],
     "cflags": [],
-    "conditions": [
-      [
-        "build_type==\"Release\"",
-        {
-          "variables": {
-            "v8_enable_v8_checks": 1
-          }
-        },
-        {
-          "variables": {
-            "v8_enable_v8_checks": 0
-          }
-        }
-      ]
-    ],
+    "conditions": [],
     "default_configuration": "Release",
     "configurations": {
       "Release": {},

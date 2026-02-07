@@ -1,240 +1,5 @@
 # Node.js
 
-# About this mod
-This is a *fun* mod of Node.JS that initially embedded a modified version of dcodeIO’s defunct  [pre-processor.js](https://github.com/dcodeIO/Preprocessor.js/), to allow use of simple C++ like preprocessor directives in CJS modules. Subsequently, it also embedded [CoffeeScript](https://coffeescript.org/) and [TypeScript](https://www.typescriptlang.org/).
-
-Thanks to the inspiration from dcodeIO et al =D
-
-## Version 25.5.0
-* Update to Node.JS 25.5.0 baseline.
-  * Notable change: `--build-sea` commandline option for streamlined building of Single Executable Applications (SEA).
-
-It embeds:
-* DS v1.2.2.
-* CS v2.7.0.
-* TS v5.9.3.
-
-Refer to prior readmes for old changes.
-* `--experimental-strip-types` is disabled (in favour of full TS transpiler), although Node.JS 23.6.0 enables it by default.
-
-## Usage
-The mod thus allows Node.JS+ to run .ds, .cs and .ts scripts directly for D Script, CoffeeScript and TypeScript directly. D being just a simple moniker for preprocessor sprinkled scripts.
-
-### Main Directives
-* Preprocessor directives are only available for D at the moment, but not for CS & TS.
-  * v1.2.0: #import/#cs/#ts/#include code blocks can now use preprocessor directives within.
-    * Each code block is transpiled (recursively) at the point of inclusion, and uses the `#define`'d variables at that point in time.
-    * The effects of `#define` and `#undef` within the code blocks carry back to the main/parent code.
-  * D transpiler does Not parse JS et al syntax, so it does Not recognise comments, and Will evaluate preprocessor directives in comment blocks as well.
-* `#ds`: D scripts can be identified by file extension of .ds, or CJS files with initial 3 characters of `#ds`.
-  *  From v1.2.0, ESM modules can also specify `#ds` to use preprocessor directives.
-  *  `#ds colors`: declares a D script file and imports [colors](https://github.com/marak/colors.js/) with basic color mapping:
-  ```javascript
-  require('colors').setTheme({
-      silly: 'rainbow',
-      input: 'grey',
-      verbose: 'cyan',
-      prompt: 'grey',
-      info: 'green',
-      data: 'grey',
-      help: 'cyan',
-      warn: 'yellow',
-      debug: 'blue',
-      error: 'red'
-  });
-  ```
-  * `#ds seapp`: [from v19.7.0] for embedding as single executable app, `seapp` 'restores' the normal 'require()'. Code inject:
-  ```javascript
-  require = require('module').createRequire(__filename);
-  ```
-  which is the shortened form of the doc suggested:
-  ```javascript
-  const { createRequire } = require('module');
-  require = createRequire(__filename);
-  ```
-    * Note: original doc suggests `require('node:module')` but that throw an error as 'node:' is unrecognized!
-    Simply use `require('module')` instead.
-* `#cs`, `#ts`, `#end`: CS & TS code fragments/blocks can be embedded in D using `#cs` & `#ts` respectively, and terminated by `#end`.
-  ```
-  #ds colors This is a D example 
-  #cs
-  # this is a sample CoffeeScript code block in D
-  square = (x) -> x * x
-  #end
-  console.log('2 squared='.bold.info, square(2));
-  ```
-  * To allow for `#private_member` syntax in TypeScript, all preprocessor directives must start the line. I.e. #'s that are not the 1st character of a line are ignored and not evaluated as preprocessor directives.
-* `#define`: declares preprocessor variables for use with `#ifdef`s et al.
-  * Does not support elaborate C++ like marco function definitions.
-  * Can declare variables via `DS_DEFINES` environment variable.
-    * Windows OS example: set DS_DEFINES=VERBOSE=false;DETAILS=true
-  * Evaluation is simplistic: all `#define` and `#undef` for the same variable are tallied till the end, where the final value is used to evaluate #if's et al.
-* `#undef`: (Since v1.2.0) undefines/removes preprocessor variables.
-* `#ifdef`, `#ifndef`, `#if`, `#elif`, `#else`, `#endif`: conditional code blocks
-* `#put`: [pre-processor.js](https://github.com/dcodeIO/Preprocessor.js/)' version of inline expressions.
-* `#include`, `#include_once`: inline one or more files, using simple path or [glob](https://github.com/isaacs/node-glob/) pattern.
-  * Root path defaults to '.' but can be specified via 'DS_ROOT' environment variable.
-
-### Other wacky experimental Directives
-* `#import`: asychonously import a ESM module.
-  * Example 1: 
-  ```
-  #import exported_name '<ESM module path>'
-  <callback content>
-  #end
-  ```
-  expands to:
-  ```javascript
-  (async () => {
-      const exported_name = await import('<ESM module path>');
-      <callback content>
-  })();
-  ```
-  * Example 2:
-  ```
-  #import {exported_names} '<ESM module path>'
-  <callback content>
-  #end
-  ```
-  expands to:
-  ```javascript
-  (async () => {
-      const {exported_names} = await import('<ESM module path>');
-      <callback content>
-  })();
-  ```
-* `#inflate`: inline base64 encoded and zipped code block.
-* others in the form `#name` where *name* is not a reserved directive keyword:  exapnds to `module.exports.name`; `##` expands to `module.exports`.
-
-### Exports
-The transpilers are made available in `global.transpiler`. I.e. the transpiler functions are: `transpiler.dscript.transpile`, `transpiler.coffeescript.compile`, and `transpiler.typescript.transpile`.
-Example:
-```javascript
-const dCode = '...'; //<- your code goes here
-const outputCode = global.transpiler.dscript.transpile(dCode);
-```
-Example:
-```javascript
-const coffeeCode = '...'; //<- your code goes here
-const outputCode = global.transpiler.coffeescript.compile(
-    coffeeCode,
-    { bare: true }); //<- this option is to exclude function wrapper
-```
-Example:
-```javascript
-const typescriptCode = '...'; //<- your code goes here
-const outputCode = global.transpiler.typescript.transpile(typescriptCode);
-```
-
-### Replacing Transpilers At Runtime
-You can replace the cs & ts transpilers at runtime, say if you wish to try different versions other than the latest embedded in Node.JS+. A few versions are provided in `src_packs` folder.
-* *.packed.js are the _non-minified_ ones good for digging into the innards of the transpiler.
-* *.packed._min_.js are the compact, _minified_ ones.
-
-To make the swap, for example in REPL, simple do this:
-```javascript
-//backup if need to restore latest later:
-global.transpiler.typescript_latest = global.transpiler.typescript;
-
-//override with alternate version:
-require('path_to_alternate_src/src_packs/ts/4.2.3/TypeScript.packed.min.js');
-```
-
-`src_packs` folder is not used in Node.JS build. It's purely provided for playing around with.
-
-#### Command-line Option
-Use `--experimental-external-dscript` command-line option to override the internal D Script transpiler with that in external `dscript.js` file in current working directory. This is loaded before running your main code.
-An example is provided in `src-packs/ds`
-
-### REPL mode for D Script, CoffeeScript and TypeScript
-REPL mode for D Script, CoffeeScript and TypeScript is activated by:
-* Setting environment variable `NODE_REPL_SCRIPT` to 'ds', 'cs' or 'ts' respectively.
-  * You can even change mode during REPL.
-    * E.g. enter this command in REPL to switch to CoffeeScript: `process.env.NODE_REPL_SCRIPT = 'cs'`
-  * You should also use **_editor_** mode for entering multi-lines code blocks.
-    * Simply enter this command in REPL: `.editor`
-    * Paste or type in your code.
-    * To end and execute the code block, use shortcut: CTRL-D
-    * To cancel and exit editor, use shortcut: CTRL-C
-* Or running with commandline option '--repl=<script_type>'.
-  * E.g.: node.exe --repl=ds
-
-This mode is not available/valid for nodejs4Cpp DLL (node.DLL).
-
-### Register Bundled Module
-If you use bundled modules (packed for example by [browserify](https://github.com/fossamagna/node-browserify) or [Webpack](https://webpack.js.org/)), the modules can now be registered using `global.registerPackedModule(name, module)` and subsequently obtained via `require(name)`.
-`require()` will work as usual in typical Node.JS module-scoped style. If it (actually is require.resolve) fails, then it will try to find in bundled modules, and return it if found. If not the require.resolve's error is rethrown.
-
-**Example**
-Register the modules to be exposed, in your WebPacked codes by calling `registerPackedModule`:
-```js
-//webpacked_bundle.min.js
-...
-var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
-(() => {
-function pack()
-{
-    registerPackedModule('@turf/turf', __webpack_require__(83855));
-    registerPackedModule('moment', moment);
-    registerPackedModule('express', __webpack_require__(26083));
-    registerPackedModule('http-proxy', __webpack_require__(99528));
-    registerPackedModule('abort-controller', __webpack_require__(44203));
-    registerPackedModule('geo-coordinates-parser', __webpack_require__(33185));
-}
-pack();
-...
-```
-Then in your app codes, use `require` as usual:
-```js
-//your app
-require('./webpacked_bundle.min.js'); //load the minified bundle
-const turf = require('@turf/turf'),
-    moment = require('moment'),
-    ...
-    { convert } = require('geo-coordinates-parser');
-```
-
-## Switching Modes
-Usually when Node.JS launches, it gets locked into one of many modes, such as SEA, REPL or simple running a main script specified. From Node.JS 23.11.0+, these are added for switching to either REPL or run main script modes:
-
-* process.`runRepl()`: Switch to REPL mode.
-  *  E.g.:
-  ```javascript
-  ...
-  console.log('End of main script, switching to REPL...');
-  process.runRepl();
-  ```
-* process.`runMain(scriptPath, ...argv)`: Switch to 'run main module' mode.
-  *  Inputs:
-     * scriptPath: path to main script to run. It will be purged (if it exists; i.e. was loaded before) from require.cache and re-run.
-     * argv: optional input argument strings.
-  *  E.g.:
-  ```
-  > process.runMain('./mainScript.js', 'argument 1', 'argument 2');
-  ```
-
-* Dev Notes:
-  * The different modes are script in `lib/internal/main/*.js`.
-    * Some codes in them have to be skipped to avoid crashing. For example, prepareMainThreadExecution() & markBootstrapComplete().
-    * For REPL, `internal/repl` is modded to have a "Don't Exit" flag when closing REPL. The corresponding `process.closeRepl()` method added let's us to know if REPL mode is active, and is used to close the REPL without exiting Node.JS.
-  * Tested OK switching back and forth between runRepl & runMain, and from SEA mode.
-    * As noted, main module/script has to be purged from require.cache so as to let it be re-loaded and run again.
-
-
-## Build Info
-From Node.JS 22.x, VS2022 is needed; as VS2019 fails to compile some template syntax in V8 codes.
-CoffeeScript, TypeScript and Glob are now packed using [Webpack](https://webpack.js.org/).
-
-### Backward Compatibility for Win 7
-If building for Windows 7, you'll need the `deps\uv\src\win\util.c` patch for uv_clock_gettime() to replace use of GetSystemTimePreciseAsFileTime() which is only available from Win8 onwards.
-If building for newer versions (>= 8.1), you may omit this patch.
-
-## Debugging Node.JS Internals
-It appears that `chrome://inspect` & `--inspect-brk` no longer respects breakpoints in Node.JS internals upon startup; i.e. will skip right to beginning of user code.
-Thus, you'll need to add `debugger;` statement (and build the EXE) to force a break to debug the internals!
-
-# Original README
 Node.js is an open-source, cross-platform JavaScript runtime environment.
 
 For information on using Node.js, see the [Node.js website][].
@@ -540,6 +305,8 @@ For information about the governance of the Node.js project, see
   **Ruben Bridgewater** <<ruben@bridgewater.de>> (he/him)
 * [cclauss](https://github.com/cclauss) -
   **Christian Clauss** <<cclauss@me.com>> (he/him)
+* [ChALkeR](https://github.com/ChALkeR) -
+  **Сковорода Никита Андреевич** <<chalkerx@gmail.com>> (he/him)
 * [cjihrig](https://github.com/cjihrig) -
   **Colin Ihrig** <<cjihrig@gmail.com>> (he/him)
 * [codebytere](https://github.com/codebytere) -
@@ -734,8 +501,6 @@ For information about the governance of the Node.js project, see
   **Bartosz Sosnowski** <<bartosz@janeasystems.com>>
 * [calvinmetcalf](https://github.com/calvinmetcalf) -
   **Calvin Metcalf** <<calvin.metcalf@gmail.com>>
-* [ChALkeR](https://github.com/ChALkeR) -
-  **Сковорода Никита Андреевич** <<chalkerx@gmail.com>> (he/him)
 * [chrisdickinson](https://github.com/chrisdickinson) -
   **Chris Dickinson** <<christopher.s.dickinson@gmail.com>>
 * [claudiorodriguez](https://github.com/claudiorodriguez) -
@@ -1135,10 +900,10 @@ releases on a rotation basis as outlined in the
   * [mcollina](https://github.com/mcollina) - OpenJSF handle: `mcollina`
     **Matteo Collina** <<matteo.collina@gmail.com>> (he/him)
 * [Red Hat](https://redhat.com) / [IBM](https://ibm.com)
-  * [joesepi](https://github.com/joesepi) -
-    **Joe Sepi** <<joesepi@ibm.com>> (he/him)
-  * [mhdawson](https://github.com/mhdawson) -
-    **Michael Dawson** <<midawson@redhat.com>> (he/him)
+  * [BethGriggs](https://github.com/BethGriggs) -
+    **Beth Griggs** <<bethanyngriggs@gmail.com>> (she/her)
+  * [sxa](https://github.com/sxa) -
+    **Stewart X Addison** <<sxa@redhat.com>> (he/him)
 
 ## License
 

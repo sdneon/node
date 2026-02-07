@@ -6,7 +6,7 @@
       "textRaw": "Net",
       "name": "net",
       "introduced_in": "v0.10.0",
-      "desc": "<!--lint disable maximum-line-length-->\n<blockquote>\n<p>Stability: 2 - Stable</p>\n</blockquote>\n<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v25.5.0/lib/net.js\">lib/net.js</a></p>\n<p>The <code>node:net</code> module provides an asynchronous network API for creating stream-based\nTCP or <a href=\"#ipc-support\">IPC</a> servers (<a href=\"#netcreateserveroptions-connectionlistener\"><code>net.createServer()</code></a>) and clients\n(<a href=\"#netcreateconnection\"><code>net.createConnection()</code></a>).</p>\n<p>It can be accessed using:</p>\n<pre><code class=\"language-mjs\">import net from 'node:net';\n</code></pre>\n<pre><code class=\"language-cjs\">const net = require('node:net');\n</code></pre>",
+      "desc": "<!--lint disable maximum-line-length-->\n<blockquote>\n<p>Stability: 2 - Stable</p>\n</blockquote>\n<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v25.6.0/lib/net.js\">lib/net.js</a></p>\n<p>The <code>node:net</code> module provides an asynchronous network API for creating stream-based\nTCP or <a href=\"#ipc-support\">IPC</a> servers (<a href=\"#netcreateserveroptions-connectionlistener\"><code>net.createServer()</code></a>) and clients\n(<a href=\"#netcreateconnection\"><code>net.createConnection()</code></a>).</p>\n<p>It can be accessed using:</p>\n<pre><code class=\"language-mjs\">import net from 'node:net';\n</code></pre>\n<pre><code class=\"language-cjs\">const net = require('node:net');\n</code></pre>",
       "modules": [
         {
           "textRaw": "IPC support",
@@ -1742,6 +1742,59 @@
               "desc": "<p>Sets the socket to timeout after <code>timeout</code> milliseconds of inactivity on\nthe socket. By default <code>net.Socket</code> do not have a timeout.</p>\n<p>When an idle timeout is triggered the socket will receive a <a href=\"#event-timeout\"><code>'timeout'</code></a>\nevent but the connection will not be severed. The user must manually call\n<a href=\"#socketenddata-encoding-callback\"><code>socket.end()</code></a> or <a href=\"#socketdestroyerror\"><code>socket.destroy()</code></a> to end the connection.</p>\n<pre><code class=\"language-js\">socket.setTimeout(3000);\nsocket.on('timeout', () => {\n  console.log('socket timeout');\n  socket.end();\n});\n</code></pre>\n<p>If <code>timeout</code> is 0, then the existing idle timeout is disabled.</p>\n<p>The optional <code>callback</code> parameter will be added as a one-time listener for the\n<a href=\"#event-timeout\"><code>'timeout'</code></a> event.</p>"
             },
             {
+              "textRaw": "`socket.getTypeOfService()`",
+              "type": "method",
+              "name": "getTypeOfService",
+              "meta": {
+                "added": [
+                  "v25.6.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "return": {
+                    "textRaw": "Returns: {integer} The current TOS value.",
+                    "name": "return",
+                    "type": "integer",
+                    "desc": "The current TOS value."
+                  },
+                  "params": []
+                }
+              ],
+              "desc": "<p>Returns the current Type of Service (TOS) field for IPv4 packets or Traffic\nClass for IPv6 packets for this socket.</p>\n<p><code>setTypeOfService()</code> may be called before the socket is connected; the value\nwill be cached and applied when the socket establishes a connection.\n<code>getTypeOfService()</code> will return the currently set value even before connection.</p>\n<p>On some platforms (e.g., Linux), certain TOS/ECN bits may be masked or ignored,\nand behavior can differ between IPv4 and IPv6 or dual-stack sockets. Callers\nshould verify platform-specific semantics.</p>"
+            },
+            {
+              "textRaw": "`socket.setTypeOfService(tos)`",
+              "type": "method",
+              "name": "setTypeOfService",
+              "meta": {
+                "added": [
+                  "v25.6.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "return": {
+                    "textRaw": "Returns: {net.Socket} The socket itself.",
+                    "name": "return",
+                    "type": "net.Socket",
+                    "desc": "The socket itself."
+                  },
+                  "params": [
+                    {
+                      "textRaw": "`tos` {integer} The TOS value to set (0-255).",
+                      "name": "tos",
+                      "type": "integer",
+                      "desc": "The TOS value to set (0-255)."
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>Sets the Type of Service (TOS) field for IPv4 packets or Traffic Class for IPv6\nPackets sent from this socket. This can be used to prioritize network traffic.</p>\n<p><code>setTypeOfService()</code> may be called before the socket is connected; the value\nwill be cached and applied when the socket establishes a connection.\n<code>getTypeOfService()</code> will return the currently set value even before connection.</p>\n<p>On some platforms (e.g., Linux), certain TOS/ECN bits may be masked or ignored,\nand behavior can differ between IPv4 and IPv6 or dual-stack sockets. Callers\nshould verify platform-specific semantics.</p>"
+            },
+            {
               "textRaw": "`socket.unref()`",
               "type": "method",
               "name": "unref",
@@ -2076,6 +2129,12 @@
                       "name": "signal",
                       "type": "AbortSignal",
                       "desc": "An Abort signal that may be used to destroy the socket."
+                    },
+                    {
+                      "textRaw": "`typeOfService` {number} The initial Type of Service (TOS) value.",
+                      "name": "typeOfService",
+                      "type": "number",
+                      "desc": "The initial Type of Service (TOS) value."
                     },
                     {
                       "textRaw": "`writable` {boolean} Allow writes on the socket when an `fd` is passed, otherwise ignored. **Default:** `false`.",

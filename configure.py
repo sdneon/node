@@ -357,6 +357,28 @@ shared_optgroup.add_argument('--shared-libuv-libpath',
     dest='shared_libuv_libpath',
     help='a directory to search for the shared libuv DLL')
 
+shared_optgroup.add_argument('--shared-lief',
+    action='store_true',
+    dest='shared_lief',
+    default=None,
+    help='link to a shared lief DLL instead of static linking')
+
+shared_optgroup.add_argument('--shared-lief-includes',
+    action='store',
+    dest='shared_lief_includes',
+    help='directory containing lief header files')
+
+shared_optgroup.add_argument('--shared-lief-libname',
+    action='store',
+    dest='shared_lief_libname',
+    default='LIEF',
+    help='alternative lib name to link to [default: %(default)s]')
+
+shared_optgroup.add_argument('--shared-lief-libpath',
+    action='store',
+    dest='shared_lief_libpath',
+    help='a directory to search for the shared lief DLL')
+
 shared_optgroup.add_argument('--shared-nbytes',
     action='store_true',
     dest='shared_nbytes',
@@ -1907,7 +1929,7 @@ def configure_library(lib, output, pkgname=None):
 
 
 def configure_v8(o, configs):
-  set_configuration_variable(configs, 'v8_enable_v8_checks', release=1, debug=0)
+  set_configuration_variable(configs, 'v8_enable_v8_checks', release=0, debug=1)
 
   o['variables']['v8_enable_webassembly'] = 0 if options.v8_lite_mode else 1
   o['variables']['v8_enable_javascript_promise_hooks'] = 1
@@ -2037,6 +2059,14 @@ def configure_openssl(o):
   configure_library('openssl', o)
 
   o['variables']['openssl_version'] = get_openssl_version(o)
+
+def configure_lief(o):
+  if options.without_lief:
+    if options.shared_lief:
+      error('--without-lief is incompatible with --shared-lief')
+    return
+
+  configure_library('lief', o, pkgname='LIEF')
 
 def configure_sqlite(o):
   o['variables']['node_use_sqlite'] = b(not options.without_sqlite)
@@ -2499,6 +2529,7 @@ configure_library('nbytes', output)
 configure_library('nghttp2', output, pkgname='libnghttp2')
 configure_library('nghttp3', output, pkgname='libnghttp3')
 configure_library('ngtcp2', output, pkgname='libngtcp2')
+configure_lief(output);
 configure_sqlite(output);
 configure_library('temporal_capi', output)
 configure_library('uvwasi', output)
@@ -2537,11 +2568,10 @@ config_release_vars = configurations['Release']['variables']
 del configurations['Release']['variables']
 config_debug_vars = configurations['Debug']['variables']
 del configurations['Debug']['variables']
-output['conditions'].append(['build_type=="Release"', {
-  'variables': config_release_vars,
-}, {
-  'variables': config_debug_vars,
-}])
+if options.debug:
+  variables = variables | config_debug_vars
+else:
+  variables = variables | config_release_vars
 
 # make_global_settings should be a root level element too
 if 'make_global_settings' in output:
