@@ -158,7 +158,7 @@ process.on('exit', (code) => {
 added: v0.5.10
 -->
 
-* `message` { Object | boolean | number | string | null } a parsed JSON object
+* `message` {Object|boolean|number|string|null} a parsed JSON object
   or a serializable primitive value.
 * `sendHandle` {net.Server|net.Socket} a [`net.Server`][] or [`net.Socket`][]
   object, or undefined.
@@ -736,6 +736,44 @@ generate a core file.
 
 This feature is not available in [`Worker`][] threads.
 
+## `process.addUncaughtExceptionCaptureCallback(fn)`
+
+<!-- YAML
+added: v25.9.0
+-->
+
+> Stability: 1 - Experimental
+
+* `fn` {Function}
+
+The `process.addUncaughtExceptionCaptureCallback()` function adds a callback
+that will be invoked when an uncaught exception occurs, receiving the exception
+value as its first argument.
+
+Unlike [`process.setUncaughtExceptionCaptureCallback()`][], this function allows
+multiple callbacks to be registered and does not conflict with the
+[`domain`][] module. Callbacks are called in reverse order of registration
+(most recent first). If a callback returns `true`, subsequent callbacks
+and the default uncaught exception handling are skipped.
+
+```mjs
+import process from 'node:process';
+
+process.addUncaughtExceptionCaptureCallback((err) => {
+  console.error('Caught exception:', err.message);
+  return true; // Indicates exception was handled
+});
+```
+
+```cjs
+const process = require('node:process');
+
+process.addUncaughtExceptionCaptureCallback((err) => {
+  console.error('Caught exception:', err.message);
+  return true; // Indicates exception was handled
+});
+```
+
 ## `process.allowedNodeEnvironmentFlags`
 
 <!-- YAML
@@ -907,7 +945,7 @@ changes:
     description: Change stability index for this feature from Experimental to Stable.
 -->
 
-* Type: {number}
+* Returns: {number}
 
 Gets the amount of free memory that is still available to the process
 (in bytes).
@@ -1081,7 +1119,7 @@ changes:
     description: Aligned return value with `uv_get_constrained_memory`.
 -->
 
-* Type: {number}
+* Returns: {number}
 
 Gets the amount of memory available to the process (in bytes) based on
 limits imposed by the OS. If there is no such constraint, or the constraint
@@ -4015,6 +4053,11 @@ This implies calling `module.setSourceMapsSupport()` with an option
 
 <!-- YAML
 added: v9.3.0
+changes:
+  - version: v25.9.0
+    pr-url: https://github.com/nodejs/node/pull/61227
+    description: Use `process.addUncaughtExceptionCaptureCallback()` to
+      register multiple callbacks.
 -->
 
 * `fn` {Function|null}
@@ -4034,8 +4077,8 @@ To unset the capture function,
 method with a non-`null` argument while another capture function is set will
 throw an error.
 
-Using this function is mutually exclusive with using the deprecated
-[`domain`][] built-in module.
+To register multiple callbacks that can coexist, use
+[`process.addUncaughtExceptionCaptureCallback()`][] instead.
 
 ## `process.sourceMapsEnabled`
 
@@ -4445,32 +4488,35 @@ console.log(versions);
 Will generate an object similar to:
 
 ```console
-{ node: '23.0.0',
-  acorn: '8.11.3',
-  ada: '2.7.8',
-  ares: '1.28.1',
-  base64: '0.5.2',
-  brotli: '1.1.0',
-  cjs_module_lexer: '1.2.2',
-  cldr: '45.0',
-  icu: '75.1',
-  llhttp: '9.2.1',
-  modules: '127',
-  napi: '9',
-  nghttp2: '1.61.0',
-  nghttp3: '0.7.0',
-  ngtcp2: '1.3.0',
-  openssl: '3.0.13+quic',
-  simdjson: '3.8.0',
-  simdutf: '5.2.4',
-  sqlite: '3.46.0',
-  tz: '2024a',
-  undici: '6.13.0',
-  unicode: '15.1',
-  uv: '1.48.0',
-  uvwasi: '0.0.20',
-  v8: '12.4.254.14-node.11',
-  zlib: '1.3.0.1-motley-7d77fb7' }
+{ node: '26.0.0-pre',
+  acorn: '8.15.0',
+  ada: '3.4.1',
+  amaro: '1.1.5',
+  ares: '1.34.6',
+  brotli: '1.2.0',
+  merve: '1.0.0',
+  cldr: '48.0',
+  icu: '78.2',
+  llhttp: '9.3.0',
+  modules: '144',
+  napi: '10',
+  nbytes: '0.1.1',
+  ncrypto: '0.0.1',
+  nghttp2: '1.68.0',
+  nghttp3: '',
+  ngtcp2: '',
+  openssl: '3.5.4',
+  simdjson: '4.2.4',
+  simdutf: '7.3.3',
+  sqlite: '3.51.2',
+  tz: '2025c',
+  undici: '7.18.2',
+  unicode: '17.0',
+  uv: '1.51.0',
+  uvwasi: '0.0.23',
+  v8: '14.3.127.18-node.10',
+  zlib: '1.3.1-e00f703',
+  zstd: '1.5.7' }
 ```
 
 ## Exit codes
@@ -4564,6 +4610,7 @@ cases:
 [`net.Socket`]: net.md#class-netsocket
 [`os.constants.dlopen`]: os.md#dlopen-constants
 [`postMessageToThread()`]: worker_threads.md#worker_threadspostmessagetothreadthreadid-value-transferlist-timeout
+[`process.addUncaughtExceptionCaptureCallback()`]: #processadduncaughtexceptioncapturecallbackfn
 [`process.argv`]: #processargv
 [`process.config`]: #processconfig
 [`process.execPath`]: #processexecpath

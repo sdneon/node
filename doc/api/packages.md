@@ -187,7 +187,7 @@ or `import()` expressions (available in both CommonJS and ES Modules):
   * Any other file extensions will result in a  [`ERR_UNKNOWN_FILE_EXTENSION`][] error.
     Additional file extensions can be facilitated via [customization hooks][].
   * `import`/`import()` can be used to load JavaScript [CommonJS modules][commonjs].
-    Such modules are passed through the `cjs-module-lexer` to try to identify named
+    Such modules are passed through [merve][] to try to identify named
     exports, which are available if they can be determined through static analysis.
 
 Regardless of how a module is requested, the resolution and loading process can be customized
@@ -1010,7 +1010,7 @@ added: v0.4.0
 The `"main"` field defines the entry point of a package when imported by name
 via a `node_modules` lookup.  Its value is a path.
 
-When a package has an [`"exports"`][] field, this will take precedence over the
+The [`"exports"`][] field, if it exists, takes precedence over the
 `"main"` field when importing the package by name.
 
 It also defines the script that is used when the [package directory is loaded
@@ -1184,6 +1184,7 @@ This field defines [subpath imports][] for the current package.
 [folders as modules]: modules.md#folders-as-modules
 [import maps]: https://github.com/WICG/import-maps
 [load ECMAScript modules from CommonJS modules]: modules.md#loading-ecmascript-modules-using-require
+[merve]: https://github.com/anonrig/merve
 [packages folder mapping]: https://github.com/WICG/import-maps#packages-via-trailing-slashes
 [self-reference]: #self-referencing-a-package-using-its-name
 [subpath exports]: #subpath-exports

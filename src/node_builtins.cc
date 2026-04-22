@@ -47,18 +47,6 @@ using v8::Value;
 BuiltinLoader::BuiltinLoader()
     : config_(GetConfig()), code_cache_(std::make_shared<BuiltinCodeCache>()) {
   LoadJavaScriptSource();
-#ifdef NODE_SHARED_BUILTIN_CJS_MODULE_LEXER_LEXER_PATH
-  AddExternalizedBuiltin(
-      "internal/deps/cjs-module-lexer/lexer",
-      STRINGIFY(NODE_SHARED_BUILTIN_CJS_MODULE_LEXER_LEXER_PATH));
-#endif  // NODE_SHARED_BUILTIN_CJS_MODULE_LEXER_LEXER_PATH
-
-#ifdef NODE_SHARED_BUILTIN_CJS_MODULE_LEXER_DIST_LEXER_PATH
-  AddExternalizedBuiltin(
-      "internal/deps/cjs-module-lexer/dist/lexer",
-      STRINGIFY(NODE_SHARED_BUILTIN_CJS_MODULE_LEXER_DIST_LEXER_PATH));
-#endif  // NODE_SHARED_BUILTIN_CJS_MODULE_LEXER_DIST_LEXER_PATH
-
 #ifdef NODE_SHARED_BUILTIN_UNDICI_UNDICI_PATH
   AddExternalizedBuiltin("internal/deps/undici/undici",
                          STRINGIFY(NODE_SHARED_BUILTIN_UNDICI_UNDICI_PATH));
@@ -86,7 +74,8 @@ const BuiltinSource* BuiltinLoader::AddFromDisk(const char* id,
                                                 const std::string& filename,
                                                 const UnionBytes& source) {
   BuiltinSourceType type = GetBuiltinSourceType(id, filename);
-  auto result = source_.write()->emplace(id, BuiltinSource{id, source, type});
+  auto result =
+      source_.write()->insert_or_assign(id, BuiltinSource{id, source, type});
   return &(result.first->second);
 }
 
@@ -127,9 +116,6 @@ BuiltinLoader::BuiltinCategories BuiltinLoader::GetBuiltinCategories() const {
     "internal/main/"
   };
 
-  builtin_categories.can_be_required.emplace(
-      "internal/deps/cjs-module-lexer/lexer");
-
   builtin_categories.cannot_be_required = std::set<std::string> {
 #if !HAVE_INSPECTOR
     "inspector", "inspector/promises", "internal/util/inspector",
@@ -148,15 +134,17 @@ BuiltinLoader::BuiltinCategories BuiltinLoader::GetBuiltinCategories() const {
         "internal/tls/wrap", "internal/tls/secure-context",
         "internal/http2/core", "internal/http2/compat",
         "internal/streams/lazy_transform",
-#endif           // !HAVE_OPENSSL
+#endif  // !HAVE_OPENSSL
 #ifndef OPENSSL_NO_QUIC
         "internal/quic/quic", "internal/quic/symbols", "internal/quic/stats",
         "internal/quic/state",
-#endif             // !OPENSSL_NO_QUIC
-        "quic",    // Experimental.
-        "sqlite",  // Experimental.
-        "sys",     // Deprecated.
-        "wasi",    // Experimental.
+#endif                  // !OPENSSL_NO_QUIC
+        "quic",         // Experimental.
+        "sqlite",       // Experimental.
+        "stream/iter",  // Experimental.
+        "zlib/iter",    // Experimental.
+        "sys",          // Deprecated.
+        "wasi",         // Experimental.
 #if !HAVE_SQLITE
         "internal/webstorage",  // Experimental.
 #endif
@@ -574,7 +562,7 @@ bool BuiltinLoader::CompileAllBuiltinsAndCopyCodeCache(
     if (bootstrapCatch.HasCaught()) {
       per_process::Debug(DebugCategory::CODE_CACHE,
                          "Failed to compile code cache for %s\n",
-                         id.data());
+                         id);
       all_succeeded = false;
       PrintCaughtException(Isolate::GetCurrent(), context, bootstrapCatch);
     } else {

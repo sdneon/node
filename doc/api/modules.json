@@ -4,8 +4,9 @@
   "modules": [
     {
       "textRaw": "Modules: CommonJS modules",
-      "name": "module",
+      "name": "modules:_commonjs_modules",
       "introduced_in": "v0.10.0",
+      "type": "module",
       "stability": 2,
       "stabilityText": "Stable",
       "desc": "<p>CommonJS modules are the original way to package JavaScript code for Node.js.\nNode.js also supports the <a href=\"esm.html\">ECMAScript modules</a> standard used by browsers\nand other JavaScript runtimes.</p>\n<p>In Node.js, each file is treated as a separate module. For\nexample, consider a file named <code>foo.js</code>:</p>\n<pre><code class=\"language-js\">const circle = require('./circle.js');\nconsole.log(`The area of a circle of radius 4 is ${circle.area(4)}`);\n</code></pre>\n<p>On the first line, <code>foo.js</code> loads the module <code>circle.js</code> that is in the same\ndirectory as <code>foo.js</code>.</p>\n<p>Here are the contents of <code>circle.js</code>:</p>\n<pre><code class=\"language-js\">const { PI } = Math;\n\nexports.area = (r) => PI * r ** 2;\n\nexports.circumference = (r) => 2 * PI * r;\n</code></pre>\n<p>The module <code>circle.js</code> has exported the functions <code>area()</code> and\n<code>circumference()</code>. Functions and objects are added to the root of a module\nby specifying additional properties on the special <code>exports</code> object.</p>\n<p>Variables local to the module will be private, because the module is wrapped\nin a function by Node.js (see <a href=\"#the-module-wrapper\">module wrapper</a>).\nIn this example, the variable <code>PI</code> is private to <code>circle.js</code>.</p>\n<p>The <code>module.exports</code> property can be assigned a new value (such as a function\nor object).</p>\n<p>In the following code, <code>bar.js</code> makes use of the <code>square</code> module, which exports\na Square class:</p>\n<pre><code class=\"language-js\">const Square = require('./square.js');\nconst mySquare = new Square(2);\nconsole.log(`The area of mySquare is ${mySquare.area()}`);\n</code></pre>\n<p>The <code>square</code> module is defined in <code>square.js</code>:</p>\n<pre><code class=\"language-js\">// Assigning to exports will not modify module, must use module.exports\nmodule.exports = class Square {\n  constructor(width) {\n    this.width = width;\n  }\n\n  area() {\n    return this.width ** 2;\n  }\n};\n</code></pre>\n<p>The CommonJS module system is implemented in the <a href=\"module.html\"><code>module</code> core module</a>.</p>",
@@ -69,8 +70,8 @@
             {
               "textRaw": "Built-in modules with mandatory `node:` prefix",
               "name": "built-in_modules_with_mandatory_`node:`_prefix",
-              "desc": "<p>When being loaded by <code>require()</code>, some built-in modules must be requested with the\n<code>node:</code> prefix. This requirement exists to prevent newly introduced built-in\nmodules from having a conflict with user land packages that already have\ntaken the name. Currently the built-in modules that requires the <code>node:</code> prefix are:</p>\n<ul>\n<li><a href=\"single-executable-applications.html#single-executable-application-api\"><code>node:sea</code></a></li>\n<li><a href=\"sqlite.html\"><code>node:sqlite</code></a></li>\n<li><a href=\"test.html\"><code>node:test</code></a></li>\n<li><a href=\"test.html#test-reporters\"><code>node:test/reporters</code></a></li>\n</ul>\n<p>The list of these modules is exposed in <a href=\"module.html#modulebuiltinmodules\"><code>module.builtinModules</code></a>, including the prefix.</p>",
               "type": "misc",
+              "desc": "<p>When being loaded by <code>require()</code>, some built-in modules must be requested with the\n<code>node:</code> prefix. This requirement exists to prevent newly introduced built-in\nmodules from having a conflict with user land packages that already have\ntaken the name. Currently the built-in modules that requires the <code>node:</code> prefix are:</p>\n<ul>\n<li><a href=\"single-executable-applications.html#single-executable-application-api\"><code>node:sea</code></a></li>\n<li><a href=\"sqlite.html\"><code>node:sqlite</code></a></li>\n<li><a href=\"test.html\"><code>node:test</code></a></li>\n<li><a href=\"test.html#test-reporters\"><code>node:test/reporters</code></a></li>\n</ul>\n<p>The list of these modules is exposed in <a href=\"module.html#modulebuiltinmodules\"><code>module.builtinModules</code></a>, including the prefix.</p>",
               "displayName": "Built-in modules with mandatory `node:` prefix"
             }
           ]
@@ -92,7 +93,7 @@
           "name": "Folders as modules",
           "type": "misc",
           "stability": 3,
-          "stabilityText": "Legacy: Use [subpath exports][] or [subpath imports][] instead.",
+          "stabilityText": "Legacy: Use subpath exports or subpath imports instead.",
           "desc": "<p>There are three ways in which a folder may be passed to <code>require()</code> as\nan argument.</p>\n<p>The first is to create a <a href=\"packages.html#nodejs-packagejson-field-definitions\"><code>package.json</code></a> file in the root of the folder,\nwhich specifies a <code>main</code> module. An example <a href=\"packages.html#nodejs-packagejson-field-definitions\"><code>package.json</code></a> file might\nlook like this:</p>\n<pre><code class=\"language-json\">{ \"name\" : \"some-library\",\n  \"main\" : \"./lib/some-library.js\" }\n</code></pre>\n<p>If this was in a folder at <code>./some-library</code>, then\n<code>require('./some-library')</code> would attempt to load\n<code>./some-library/lib/some-library.js</code>.</p>\n<p>If there is no <a href=\"packages.html#nodejs-packagejson-field-definitions\"><code>package.json</code></a> file present in the directory, or if the\n<a href=\"packages.html#main\"><code>\"main\"</code></a> entry is missing or cannot be resolved, then Node.js\nwill attempt to load an <code>index.js</code> or <code>index.node</code> file out of that\ndirectory. For example, if there was no <a href=\"packages.html#nodejs-packagejson-field-definitions\"><code>package.json</code></a> file in the previous\nexample, then <code>require('./some-library')</code> would attempt to load:</p>\n<ul>\n<li><code>./some-library/index.js</code></li>\n<li><code>./some-library/index.node</code></li>\n</ul>\n<p>If these attempts fail, then Node.js will report the entire module as missing\nwith the default error:</p>\n<pre><code class=\"language-console\">Error: Cannot find module 'some-library'\n</code></pre>\n<p>In all three above cases, an <code>import('./some-library')</code> call would result in a\n<a href=\"errors.html#err_unsupported_dir_import\"><code>ERR_UNSUPPORTED_DIR_IMPORT</code></a> error. Using package <a href=\"packages.html#subpath-exports\">subpath exports</a> or\n<a href=\"packages.html#subpath-imports\">subpath imports</a> can provide the same containment organization benefits as\nfolders as modules, and work for both <code>require</code> and <code>import</code>.</p>"
         },
         {
@@ -118,6 +119,7 @@
         {
           "textRaw": "Loading ECMAScript modules using `require()`",
           "name": "loading_ecmascript_modules_using_`require()`",
+          "type": "module",
           "meta": {
             "added": [
               "v22.0.0",
@@ -159,72 +161,72 @@
               }
             ]
           },
-          "desc": "<p>The <code>.mjs</code> extension is reserved for <a href=\"esm.html\">ECMAScript Modules</a>.\nSee <a href=\"packages.html#determining-module-system\">Determining module system</a> section for more info\nregarding which files are parsed as ECMAScript modules.</p>\n<p><code>require()</code> only supports loading ECMAScript modules that meet the following requirements:</p>\n<ul>\n<li>The module is fully synchronous (contains no top-level <code>await</code>); and</li>\n<li>One of these conditions are met:\n<ol>\n<li>The file has a <code>.mjs</code> extension.</li>\n<li>The file has a <code>.js</code> extension, and the closest <code>package.json</code> contains <code>\"type\": \"module\"</code></li>\n<li>The file has a <code>.js</code> extension, the closest <code>package.json</code> does not contain\n<code>\"type\": \"commonjs\"</code>, and the module contains ES module syntax.</li>\n</ol>\n</li>\n</ul>\n<p>If the ES Module being loaded meets the requirements, <code>require()</code> can load it and\nreturn the <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import#module_namespace_object\">module namespace object</a>. In this case it is similar to dynamic\n<code>import()</code> but is run synchronously and returns the name space object\ndirectly.</p>\n<p>With the following ES Modules:</p>\n<pre><code class=\"language-mjs\">// distance.mjs\nexport function distance(a, b) { return Math.sqrt((b.x - a.x) ** 2 + (b.y - a.y) ** 2); }\n</code></pre>\n<pre><code class=\"language-mjs\">// point.mjs\nexport default class Point {\n  constructor(x, y) { this.x = x; this.y = y; }\n}\n</code></pre>\n<p>A CommonJS module can load them with <code>require()</code>:</p>\n<pre><code class=\"language-cjs\">const distance = require('./distance.mjs');\nconsole.log(distance);\n// [Module: null prototype] {\n//   distance: [Function: distance]\n// }\n\nconst point = require('./point.mjs');\nconsole.log(point);\n// [Module: null prototype] {\n//   default: [class Point],\n//   __esModule: true,\n// }\n</code></pre>\n<p>For interoperability with existing tools that convert ES Modules into CommonJS,\nwhich could then load real ES Modules through <code>require()</code>, the returned namespace\nwould contain a <code>__esModule: true</code> property if it has a <code>default</code> export so that\nconsuming code generated by tools can recognize the default exports in real\nES Modules. If the namespace already defines <code>__esModule</code>, this would not be added.\nThis property is experimental and can change in the future. It should only be used\nby tools converting ES modules into CommonJS modules, following existing ecosystem\nconventions. Code authored directly in CommonJS should avoid depending on it.</p>\n<p>The result returned by <code>require()</code> is the <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import#module_namespace_object\">module namespace object</a>, which places\nthe default export in the <code>.default</code> property, similar to the results returned by <code>import()</code>.\nTo customize what should be returned by <code>require(esm)</code> directly, the ES Module can export the\ndesired value using the string name <code>\"module.exports\"</code>.</p>\n<!-- eslint-disable @stylistic/js/semi -->\n<pre><code class=\"language-mjs\">// point.mjs\nexport default class Point {\n  constructor(x, y) { this.x = x; this.y = y; }\n}\n\n// `distance` is lost to CommonJS consumers of this module, unless it's\n// added to `Point` as a static property.\nexport function distance(a, b) { return Math.sqrt((b.x - a.x) ** 2 + (b.y - a.y) ** 2); }\nexport { Point as 'module.exports' }\n</code></pre>\n<!-- eslint-disable node-core/no-duplicate-requires -->\n<pre><code class=\"language-cjs\">const Point = require('./point.mjs');\nconsole.log(Point); // [class Point]\n\n// Named exports are lost when 'module.exports' is used\nconst { distance } = require('./point.mjs');\nconsole.log(distance); // undefined\n</code></pre>\n<p>Notice in the example above, when the <code>module.exports</code> export name is used, named exports\nwill be lost to CommonJS consumers. To allow  CommonJS consumers to continue accessing\nnamed exports, the module can make sure that the default export is an object with the\nnamed exports attached to it as properties. For example with the example above,\n<code>distance</code> can be attached to the default export, the <code>Point</code> class, as a static method.</p>\n<!-- eslint-disable @stylistic/js/semi -->\n<pre><code class=\"language-mjs\">export function distance(a, b) { return Math.sqrt((b.x - a.x) ** 2 + (b.y - a.y) ** 2); }\n\nexport default class Point {\n  constructor(x, y) { this.x = x; this.y = y; }\n  static distance = distance;\n}\n\nexport { Point as 'module.exports' }\n</code></pre>\n<!-- eslint-disable node-core/no-duplicate-requires -->\n<pre><code class=\"language-cjs\">const Point = require('./point.mjs');\nconsole.log(Point); // [class Point]\n\nconst { distance } = require('./point.mjs');\nconsole.log(distance); // [Function: distance]\n</code></pre>\n<p>If the module being <code>require()</code>'d contains top-level <code>await</code>, or the module\ngraph it <code>import</code>s contains top-level <code>await</code>,\n<a href=\"errors.html#err_require_async_module\"><code>ERR_REQUIRE_ASYNC_MODULE</code></a> will be thrown. In this case, users should\nload the asynchronous module using <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import\"><code>import()</code></a>.</p>\n<p>If <code>--experimental-print-required-tla</code> is enabled, instead of throwing\n<code>ERR_REQUIRE_ASYNC_MODULE</code> before evaluation, Node.js will evaluate the\nmodule, try to locate the top-level awaits, and print their location to\nhelp users fix them.</p>\n<p>If support for loading ES modules using <code>require()</code> results in unexpected\nbreakage, it can be disabled using <code>--no-require-module</code>.\nTo print where this feature is used, use <a href=\"cli.html#--trace-require-modulemode\"><code>--trace-require-module</code></a>.</p>\n<p>This feature can be detected by checking if\n<a href=\"process.html#processfeaturesrequire_module\"><code>process.features.require_module</code></a> is <code>true</code>.</p>",
-          "type": "module",
+          "desc": "<p>The <code>.mjs</code> extension is reserved for <a href=\"esm.html\">ECMAScript Modules</a>.\nSee <a href=\"packages.html#determining-module-system\">Determining module system</a> section for more info\nregarding which files are parsed as ECMAScript modules.</p>\n<p><code>require()</code> only supports loading ECMAScript modules that meet the following requirements:</p>\n<ul>\n<li>The module is fully synchronous (contains no top-level <code>await</code>); and</li>\n<li>One of these conditions are met:\n<ol>\n<li>The file has a <code>.mjs</code> extension.</li>\n<li>The file has a <code>.js</code> extension, and the closest <code>package.json</code> contains <code>\"type\": \"module\"</code></li>\n<li>The file has a <code>.js</code> extension, the closest <code>package.json</code> does not contain\n<code>\"type\": \"commonjs\"</code>, and the module contains ES module syntax.</li>\n</ol>\n</li>\n</ul>\n<p>If the ES Module being loaded meets the requirements, <code>require()</code> can load it and\nreturn the <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import#module_namespace_object\">module namespace object</a>. In this case it is similar to dynamic\n<code>import()</code> but is run synchronously and returns the name space object\ndirectly.</p>\n<p>With the following ES Modules:</p>\n<pre><code class=\"language-mjs\">// distance.mjs\nexport function distance(a, b) { return Math.sqrt((b.x - a.x) ** 2 + (b.y - a.y) ** 2); }\n</code></pre>\n<pre><code class=\"language-mjs\">// point.mjs\nexport default class Point {\n  constructor(x, y) { this.x = x; this.y = y; }\n}\n</code></pre>\n<p>A CommonJS module can load them with <code>require()</code>:</p>\n<pre><code class=\"language-cjs\">const distance = require('./distance.mjs');\nconsole.log(distance);\n// [Module: null prototype] {\n//   distance: [Function: distance]\n// }\n\nconst point = require('./point.mjs');\nconsole.log(point);\n// [Module: null prototype] {\n//   default: [class Point],\n//   __esModule: true,\n// }\n</code></pre>\n<p>For interoperability with existing tools that convert ES Modules into CommonJS,\nwhich could then load real ES Modules through <code>require()</code>, the returned namespace\nwould contain a <code>__esModule: true</code> property if it has a <code>default</code> export so that\nconsuming code generated by tools can recognize the default exports in real\nES Modules. If the namespace already defines <code>__esModule</code>, this would not be added.\nThis property is experimental and can change in the future. It should only be used\nby tools converting ES modules into CommonJS modules, following existing ecosystem\nconventions. Code authored directly in CommonJS should avoid depending on it.</p>\n<p>The result returned by <code>require()</code> is the <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import#module_namespace_object\">module namespace object</a>, which places\nthe default export in the <code>.default</code> property, similar to the results returned by <code>import()</code>.\nTo customize what should be returned by <code>require(esm)</code> directly, the ES Module can export the\ndesired value using the string name <code>\"module.exports\"</code>.</p>\n<pre><code class=\"language-mjs\">// point.mjs\nexport default class Point {\n  constructor(x, y) { this.x = x; this.y = y; }\n}\n\n// `distance` is lost to CommonJS consumers of this module, unless it's\n// added to `Point` as a static property.\nexport function distance(a, b) { return Math.sqrt((b.x - a.x) ** 2 + (b.y - a.y) ** 2); }\nexport { Point as 'module.exports' }\n</code></pre>\n<pre><code class=\"language-cjs\">const Point = require('./point.mjs');\nconsole.log(Point); // [class Point]\n\n// Named exports are lost when 'module.exports' is used\nconst { distance } = require('./point.mjs');\nconsole.log(distance); // undefined\n</code></pre>\n<p>Notice in the example above, when the <code>module.exports</code> export name is used, named exports\nwill be lost to CommonJS consumers. To allow  CommonJS consumers to continue accessing\nnamed exports, the module can make sure that the default export is an object with the\nnamed exports attached to it as properties. For example with the example above,\n<code>distance</code> can be attached to the default export, the <code>Point</code> class, as a static method.</p>\n<pre><code class=\"language-mjs\">export function distance(a, b) { return Math.sqrt((b.x - a.x) ** 2 + (b.y - a.y) ** 2); }\n\nexport default class Point {\n  constructor(x, y) { this.x = x; this.y = y; }\n  static distance = distance;\n}\n\nexport { Point as 'module.exports' }\n</code></pre>\n<pre><code class=\"language-cjs\">const Point = require('./point.mjs');\nconsole.log(Point); // [class Point]\n\nconst { distance } = require('./point.mjs');\nconsole.log(distance); // [Function: distance]\n</code></pre>\n<p>If the module being <code>require()</code>'d contains top-level <code>await</code>, or the module\ngraph it <code>import</code>s contains top-level <code>await</code>,\n<a href=\"errors.html#err_require_async_module\"><code>ERR_REQUIRE_ASYNC_MODULE</code></a> will be thrown. In this case, users should\nload the asynchronous module using <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import\"><code>import()</code></a>.</p>\n<p>If <code>--experimental-print-required-tla</code> is enabled, instead of throwing\n<code>ERR_REQUIRE_ASYNC_MODULE</code> before evaluation, Node.js will evaluate the\nmodule, try to locate the top-level awaits, and print their location to\nhelp users fix them.</p>\n<p>If support for loading ES modules using <code>require()</code> results in unexpected\nbreakage, it can be disabled using <code>--no-require-module</code>.\nTo print where this feature is used, use <a href=\"cli.html#--trace-require-modulemode\"><code>--trace-require-module</code></a>.</p>\n<p>This feature can be detected by checking if\n<a href=\"process.html#processfeaturesrequire_module\"><code>process.features.require_module</code></a> is <code>true</code>.</p>",
           "displayName": "Loading ECMAScript modules using `require()`"
         },
         {
           "textRaw": "The module scope",
           "name": "the_module_scope",
+          "type": "module",
           "modules": [
             {
               "textRaw": "`__dirname`",
               "name": "`__dirname`",
+              "type": "module",
               "meta": {
                 "added": [
                   "v0.1.27"
                 ],
                 "changes": []
               },
-              "desc": "<ul>\n<li>Type: <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type\" class=\"type\">&lt;string&gt;</a></li>\n</ul>\n<p>The directory name of the current module. This is the same as the\n<a href=\"path.html#pathdirnamepath\"><code>path.dirname()</code></a> of the <a href=\"#__filename\"><code>__filename</code></a>.</p>\n<p>Example: running <code>node example.js</code> from <code>/Users/mjr</code></p>\n<pre><code class=\"language-js\">console.log(__dirname);\n// Prints: /Users/mjr\nconsole.log(path.dirname(__filename));\n// Prints: /Users/mjr\n</code></pre>",
-              "type": "module",
+              "desc": "<ul>\n<li>Type: <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a></li>\n</ul>\n<p>The directory name of the current module. This is the same as the\n<a href=\"path.html#pathdirnamepath\"><code>path.dirname()</code></a> of the <a href=\"#__filename\"><code>__filename</code></a>.</p>\n<p>Example: running <code>node example.js</code> from <code>/Users/mjr</code></p>\n<pre><code class=\"language-js\">console.log(__dirname);\n// Prints: /Users/mjr\nconsole.log(path.dirname(__filename));\n// Prints: /Users/mjr\n</code></pre>",
               "displayName": "`__dirname`"
             },
             {
               "textRaw": "`__filename`",
               "name": "`__filename`",
+              "type": "module",
               "meta": {
                 "added": [
                   "v0.0.1"
                 ],
                 "changes": []
               },
-              "desc": "<ul>\n<li>Type: <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type\" class=\"type\">&lt;string&gt;</a></li>\n</ul>\n<p>The file name of the current module. This is the current module file's absolute\npath with symlinks resolved.</p>\n<p>For a main program this is not necessarily the same as the file name used in the\ncommand line.</p>\n<p>See <a href=\"#__dirname\"><code>__dirname</code></a> for the directory name of the current module.</p>\n<p>Examples:</p>\n<p>Running <code>node example.js</code> from <code>/Users/mjr</code></p>\n<pre><code class=\"language-js\">console.log(__filename);\n// Prints: /Users/mjr/example.js\nconsole.log(__dirname);\n// Prints: /Users/mjr\n</code></pre>\n<p>Given two modules: <code>a</code> and <code>b</code>, where <code>b</code> is a dependency of\n<code>a</code> and there is a directory structure of:</p>\n<ul>\n<li><code>/Users/mjr/app/a.js</code></li>\n<li><code>/Users/mjr/app/node_modules/b/b.js</code></li>\n</ul>\n<p>References to <code>__filename</code> within <code>b.js</code> will return\n<code>/Users/mjr/app/node_modules/b/b.js</code> while references to <code>__filename</code> within\n<code>a.js</code> will return <code>/Users/mjr/app/a.js</code>.</p>",
-              "type": "module",
+              "desc": "<ul>\n<li>Type: <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a></li>\n</ul>\n<p>The file name of the current module. This is the current module file's absolute\npath with symlinks resolved.</p>\n<p>For a main program this is not necessarily the same as the file name used in the\ncommand line.</p>\n<p>See <a href=\"#__dirname\"><code>__dirname</code></a> for the directory name of the current module.</p>\n<p>Examples:</p>\n<p>Running <code>node example.js</code> from <code>/Users/mjr</code></p>\n<pre><code class=\"language-js\">console.log(__filename);\n// Prints: /Users/mjr/example.js\nconsole.log(__dirname);\n// Prints: /Users/mjr\n</code></pre>\n<p>Given two modules: <code>a</code> and <code>b</code>, where <code>b</code> is a dependency of\n<code>a</code> and there is a directory structure of:</p>\n<ul>\n<li><code>/Users/mjr/app/a.js</code></li>\n<li><code>/Users/mjr/app/node_modules/b/b.js</code></li>\n</ul>\n<p>References to <code>__filename</code> within <code>b.js</code> will return\n<code>/Users/mjr/app/node_modules/b/b.js</code> while references to <code>__filename</code> within\n<code>a.js</code> will return <code>/Users/mjr/app/a.js</code>.</p>",
               "displayName": "`__filename`"
             },
             {
               "textRaw": "`exports`",
               "name": "`exports`",
+              "type": "module",
               "meta": {
                 "added": [
                   "v0.1.12"
                 ],
                 "changes": []
               },
-              "desc": "<ul>\n<li>Type: <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a></li>\n</ul>\n<p>A reference to the <code>module.exports</code> that is shorter to type.\nSee the section about the <a href=\"#exports-shortcut\">exports shortcut</a> for details on when to use\n<code>exports</code> and when to use <code>module.exports</code>.</p>",
-              "type": "module",
+              "desc": "<ul>\n<li>Type: <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a></li>\n</ul>\n<p>A reference to the <code>module.exports</code> that is shorter to type.\nSee the section about the <a href=\"#exports-shortcut\">exports shortcut</a> for details on when to use\n<code>exports</code> and when to use <code>module.exports</code>.</p>",
               "displayName": "`exports`"
             },
             {
               "textRaw": "`module`",
               "name": "`module`",
+              "type": "module",
               "meta": {
                 "added": [
                   "v0.1.16"
                 ],
                 "changes": []
               },
-              "desc": "<ul>\n<li>Type: <a href=\"modules.html#the-module-object\" class=\"type\">&lt;module&gt;</a></li>\n</ul>\n<p>A reference to the current module, see the section about the\n<a href=\"#the-module-object\"><code>module</code> object</a>. In particular, <code>module.exports</code> is used for defining what\na module exports and makes available through <code>require()</code>.</p>",
-              "type": "module",
+              "desc": "<ul>\n<li>Type: <a href=\"modules.html#the-module-object\"><code>&#x3C;module></code></a></li>\n</ul>\n<p>A reference to the current module, see the section about the\n<a href=\"#the-module-object\"><code>module</code> object</a>. In particular, <code>module.exports</code> is used for defining what\na module exports and makes available through <code>require()</code>.</p>",
               "displayName": "`module`"
             }
           ],
           "methods": [
             {
               "textRaw": "`require(id)`",
-              "type": "method",
               "name": "require",
+              "type": "method",
               "meta": {
                 "added": [
                   "v0.1.13"
@@ -233,12 +235,6 @@
               },
               "signatures": [
                 {
-                  "return": {
-                    "textRaw": "Returns: {any} exported module content",
-                    "name": "return",
-                    "type": "any",
-                    "desc": "exported module content"
-                  },
                   "params": [
                     {
                       "textRaw": "`id` {string} module name or path",
@@ -246,58 +242,64 @@
                       "type": "string",
                       "desc": "module name or path"
                     }
-                  ]
+                  ],
+                  "return": {
+                    "textRaw": "Returns: {any} exported module content",
+                    "name": "return",
+                    "type": "any",
+                    "desc": "exported module content"
+                  }
                 }
               ],
               "desc": "<p>Used to import modules, <code>JSON</code>, and local files. Modules can be imported\nfrom <code>node_modules</code>. Local modules and JSON files can be imported using\na relative path (e.g. <code>./</code>, <code>./foo</code>, <code>./bar/baz</code>, <code>../foo</code>) that will be\nresolved against the directory named by <a href=\"#__dirname\"><code>__dirname</code></a> (if defined) or\nthe current working directory. The relative paths of POSIX style are resolved\nin an OS independent fashion, meaning that the examples above will work on\nWindows in the same way they would on Unix systems.</p>\n<pre><code class=\"language-js\">// Importing a local module with a path relative to the `__dirname` or current\n// working directory. (On Windows, this would resolve to .\\path\\myLocalModule.)\nconst myLocalModule = require('./path/myLocalModule');\n\n// Importing a JSON file:\nconst jsonData = require('./path/filename.json');\n\n// Importing a module from node_modules or Node.js built-in module:\nconst crypto = require('node:crypto');\n</code></pre>",
               "properties": [
                 {
-                  "textRaw": "`cache` Type: {Object}",
+                  "textRaw": "Type: {Object}",
+                  "name": "cache",
                   "type": "Object",
-                  "name": "Type",
                   "meta": {
                     "added": [
                       "v0.3.0"
                     ],
                     "changes": []
                   },
-                  "desc": "<p>Modules are cached in this object when they are required. By deleting a key\nvalue from this object, the next <code>require</code> will reload the module.\nThis does not apply to <a href=\"addons.html\">native addons</a>, for which reloading will result in an\nerror.</p>\n<p>Adding or replacing entries is also possible. This cache is checked before\nbuilt-in modules and if a name matching a built-in module is added to the cache,\nonly <code>node:</code>-prefixed require calls are going to receive the built-in module.\nUse with care!</p>\n<!-- eslint-disable node-core/no-duplicate-requires, no-restricted-syntax -->\n<pre><code class=\"language-js\">const assert = require('node:assert');\nconst realFs = require('node:fs');\n\nconst fakeFs = {};\nrequire.cache.fs = { exports: fakeFs };\n\nassert.strictEqual(require('fs'), fakeFs);\nassert.strictEqual(require('node:fs'), realFs);\n</code></pre>"
+                  "desc": "<p>Modules are cached in this object when they are required. By deleting a key\nvalue from this object, the next <code>require</code> will reload the module.\nThis does not apply to <a href=\"addons.html\">native addons</a>, for which reloading will result in an\nerror.</p>\n<p>Adding or replacing entries is also possible. This cache is checked before\nbuilt-in modules and if a name matching a built-in module is added to the cache,\nonly <code>node:</code>-prefixed require calls are going to receive the built-in module.\nUse with care!</p>\n<pre><code class=\"language-js\">const assert = require('node:assert');\nconst realFs = require('node:fs');\n\nconst fakeFs = {};\nrequire.cache.fs = { exports: fakeFs };\n\nassert.strictEqual(require('fs'), fakeFs);\nassert.strictEqual(require('node:fs'), realFs);\n</code></pre>"
                 },
                 {
-                  "textRaw": "`extensions` Type: {Object}",
+                  "textRaw": "Type: {Object}",
+                  "name": "extensions",
                   "type": "Object",
-                  "name": "Type",
                   "meta": {
                     "added": [
                       "v0.3.0"
                     ],
+                    "changes": [],
                     "deprecated": [
                       "v0.10.6"
-                    ],
-                    "changes": []
+                    ]
                   },
                   "stability": 0,
                   "stabilityText": "Deprecated",
                   "desc": "<p>Instruct <code>require</code> on how to handle certain file extensions.</p>\n<p>Process files with the extension <code>.sjs</code> as <code>.js</code>:</p>\n<pre><code class=\"language-js\">require.extensions['.sjs'] = require.extensions['.js'];\n</code></pre>\n<p><strong>Deprecated.</strong> In the past, this list has been used to load non-JavaScript\nmodules into Node.js by compiling them on-demand. However, in practice, there\nare much better ways to do this, such as loading modules via some other Node.js\nprogram, or compiling them to JavaScript ahead of time.</p>\n<p>Avoid using <code>require.extensions</code>. Use could cause subtle bugs and resolving the\nextensions gets slower with each registered extension.</p>"
                 },
                 {
-                  "textRaw": "`main` Type: {module | undefined}",
-                  "type": "module | undefined",
-                  "name": "Type",
+                  "textRaw": "Type: {module|undefined}",
+                  "name": "main",
+                  "type": "module|undefined",
                   "meta": {
                     "added": [
                       "v0.1.17"
                     ],
                     "changes": []
                   },
-                  "desc": "<p>The <code>Module</code> object representing the entry script loaded when the Node.js\nprocess launched, or <code>undefined</code> if the entry point of the program is not a\nCommonJS module.\nSee <a href=\"#accessing-the-main-module\">\"Accessing the main module\"</a>.</p>\n<p>In <code>entry.js</code> script:</p>\n<pre><code class=\"language-js\">console.log(require.main);\n</code></pre>\n<pre><code class=\"language-bash\">node entry.js\n</code></pre>\n<!-- eslint-skip -->\n<pre><code class=\"language-js\">Module {\n  id: '.',\n  path: '/absolute/path/to',\n  exports: {},\n  filename: '/absolute/path/to/entry.js',\n  loaded: false,\n  children: [],\n  paths:\n   [ '/absolute/path/to/node_modules',\n     '/absolute/path/node_modules',\n     '/absolute/node_modules',\n     '/node_modules' ] }\n</code></pre>"
+                  "desc": "<p>The <code>Module</code> object representing the entry script loaded when the Node.js\nprocess launched, or <code>undefined</code> if the entry point of the program is not a\nCommonJS module.\nSee <a href=\"#accessing-the-main-module\">\"Accessing the main module\"</a>.</p>\n<p>In <code>entry.js</code> script:</p>\n<pre><code class=\"language-js\">console.log(require.main);\n</code></pre>\n<pre><code class=\"language-bash\">node entry.js\n</code></pre>\n<pre><code class=\"language-js\">Module {\n  id: '.',\n  path: '/absolute/path/to',\n  exports: {},\n  filename: '/absolute/path/to/entry.js',\n  loaded: false,\n  children: [],\n  paths:\n   [ '/absolute/path/to/node_modules',\n     '/absolute/path/node_modules',\n     '/absolute/node_modules',\n     '/node_modules' ] }\n</code></pre>"
                 }
               ],
               "methods": [
                 {
                   "textRaw": "`require.resolve(request[, options])`",
-                  "type": "method",
                   "name": "resolve",
+                  "type": "method",
                   "meta": {
                     "added": [
                       "v0.3.0"
@@ -312,11 +314,6 @@
                   },
                   "signatures": [
                     {
-                      "return": {
-                        "textRaw": "Returns: {string}",
-                        "name": "return",
-                        "type": "string"
-                      },
                       "params": [
                         {
                           "textRaw": "`request` {string} The module path to resolve.",
@@ -330,22 +327,28 @@
                           "type": "Object",
                           "options": [
                             {
-                              "textRaw": "`paths` {string\\[]} Paths to resolve module location from. If present, these paths are used instead of the default resolution paths, with the exception of [GLOBAL\\_FOLDERS][GLOBAL_FOLDERS] like `$HOME/.node_modules`, which are always included. Each of these paths is used as a starting point for the module resolution algorithm, meaning that the `node_modules` hierarchy is checked from this location.",
+                              "textRaw": "`paths` {string[]} Paths to resolve module location from. If present, these paths are used instead of the default resolution paths, with the exception of GLOBAL_FOLDERS like `$HOME/.node_modules`, which are always included. Each of these paths is used as a starting point for the module resolution algorithm, meaning that the `node_modules` hierarchy is checked from this location.",
                               "name": "paths",
-                              "type": "string\\[]",
-                              "desc": "Paths to resolve module location from. If present, these paths are used instead of the default resolution paths, with the exception of [GLOBAL\\_FOLDERS][GLOBAL_FOLDERS] like `$HOME/.node_modules`, which are always included. Each of these paths is used as a starting point for the module resolution algorithm, meaning that the `node_modules` hierarchy is checked from this location."
+                              "type": "string[]",
+                              "desc": "Paths to resolve module location from. If present, these paths are used instead of the default resolution paths, with the exception of GLOBAL_FOLDERS like `$HOME/.node_modules`, which are always included. Each of these paths is used as a starting point for the module resolution algorithm, meaning that the `node_modules` hierarchy is checked from this location."
                             }
-                          ]
+                          ],
+                          "optional": true
                         }
-                      ]
+                      ],
+                      "return": {
+                        "textRaw": "Returns: {string}",
+                        "name": "return",
+                        "type": "string"
+                      }
                     }
                   ],
                   "desc": "<p>Use the internal <code>require()</code> machinery to look up the location of a module,\nbut rather than loading the module, just return the resolved filename.</p>\n<p>If the module can not be found, a <code>MODULE_NOT_FOUND</code> error is thrown.</p>",
                   "methods": [
                     {
                       "textRaw": "`require.resolve.paths(request)`",
-                      "type": "method",
                       "name": "paths",
+                      "type": "method",
                       "meta": {
                         "added": [
                           "v8.9.0"
@@ -354,11 +357,6 @@
                       },
                       "signatures": [
                         {
-                          "return": {
-                            "textRaw": "Returns: {string\\[]|null}",
-                            "name": "return",
-                            "type": "string\\[]|null"
-                          },
                           "params": [
                             {
                               "textRaw": "`request` {string} The module path whose lookup paths are being retrieved.",
@@ -366,7 +364,12 @@
                               "type": "string",
                               "desc": "The module path whose lookup paths are being retrieved."
                             }
-                          ]
+                          ],
+                          "return": {
+                            "textRaw": "Returns: {string[]|null}",
+                            "name": "return",
+                            "type": "string[]|null"
+                          }
                         }
                       ],
                       "desc": "<p>Returns an array containing the paths searched during resolution of <code>request</code> or\n<code>null</code> if the <code>request</code> string references a core module, for example <code>http</code> or\n<code>fs</code>.</p>"
@@ -376,24 +379,24 @@
               ]
             }
           ],
-          "type": "module",
           "displayName": "The module scope"
         },
         {
           "textRaw": "The `module` object",
-          "name": "module",
+          "name": "the_`module`_object",
+          "type": "module",
           "meta": {
             "added": [
               "v0.1.16"
             ],
             "changes": []
           },
-          "desc": "<ul>\n<li>Type: <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a></li>\n</ul>\n<p>In each module, the <code>module</code> free variable is a reference to the object\nrepresenting the current module. For convenience, <code>module.exports</code> is\nalso accessible via the <code>exports</code> module-global. <code>module</code> is not actually\na global but rather local to each module.</p>",
+          "desc": "<ul>\n<li>Type: <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a></li>\n</ul>\n<p>In each module, the <code>module</code> free variable is a reference to the object\nrepresenting the current module. For convenience, <code>module.exports</code> is\nalso accessible via the <code>exports</code> module-global. <code>module</code> is not actually\na global but rather local to each module.</p>",
           "properties": [
             {
-              "textRaw": "`children` Type: {module\\[]}",
-              "type": "module\\[]",
-              "name": "Type",
+              "textRaw": "Type: {module[]}",
+              "name": "children",
+              "type": "module[]",
               "meta": {
                 "added": [
                   "v0.1.16"
@@ -403,9 +406,9 @@
               "desc": "<p>The module objects required for the first time by this one.</p>"
             },
             {
-              "textRaw": "`exports` Type: {Object}",
+              "textRaw": "Type: {Object}",
+              "name": "exports",
               "type": "Object",
-              "name": "Type",
               "meta": {
                 "added": [
                   "v0.1.16"
@@ -417,22 +420,22 @@
                 {
                   "textRaw": "`exports` shortcut",
                   "name": "`exports`_shortcut",
+                  "type": "module",
                   "meta": {
                     "added": [
                       "v0.1.16"
                     ],
                     "changes": []
                   },
-                  "desc": "<p>The <code>exports</code> variable is available within a module's file-level scope, and is\nassigned the value of <code>module.exports</code> before the module is evaluated.</p>\n<p>It allows a shortcut, so that <code>module.exports.f = ...</code> can be written more\nsuccinctly as <code>exports.f = ...</code>. However, be aware that like any variable, if a\nnew value is assigned to <code>exports</code>, it is no longer bound to <code>module.exports</code>:</p>\n<pre><code class=\"language-js\">module.exports.hello = true; // Exported from require of module\nexports = { hello: false };  // Not exported, only available in the module\n</code></pre>\n<p>When the <code>module.exports</code> property is being completely replaced by a new\nobject, it is common to also reassign <code>exports</code>:</p>\n<!-- eslint-disable func-name-matching -->\n<pre><code class=\"language-js\">module.exports = exports = function Constructor() {\n  // ... etc.\n};\n</code></pre>\n<p>To illustrate the behavior, imagine this hypothetical implementation of\n<code>require()</code>, which is quite similar to what is actually done by <code>require()</code>:</p>\n<pre><code class=\"language-js\">function require(/* ... */) {\n  const module = { exports: {} };\n  ((module, exports) => {\n    // Module code here. In this example, define a function.\n    function someFunc() {}\n    exports = someFunc;\n    // At this point, exports is no longer a shortcut to module.exports, and\n    // this module will still export an empty default object.\n    module.exports = someFunc;\n    // At this point, the module will now export someFunc, instead of the\n    // default object.\n  })(module, module.exports);\n  return module.exports;\n}\n</code></pre>",
-                  "type": "module",
+                  "desc": "<p>The <code>exports</code> variable is available within a module's file-level scope, and is\nassigned the value of <code>module.exports</code> before the module is evaluated.</p>\n<p>It allows a shortcut, so that <code>module.exports.f = ...</code> can be written more\nsuccinctly as <code>exports.f = ...</code>. However, be aware that like any variable, if a\nnew value is assigned to <code>exports</code>, it is no longer bound to <code>module.exports</code>:</p>\n<pre><code class=\"language-js\">module.exports.hello = true; // Exported from require of module\nexports = { hello: false };  // Not exported, only available in the module\n</code></pre>\n<p>When the <code>module.exports</code> property is being completely replaced by a new\nobject, it is common to also reassign <code>exports</code>:</p>\n<pre><code class=\"language-js\">module.exports = exports = function Constructor() {\n  // ... etc.\n};\n</code></pre>\n<p>To illustrate the behavior, imagine this hypothetical implementation of\n<code>require()</code>, which is quite similar to what is actually done by <code>require()</code>:</p>\n<pre><code class=\"language-js\">function require(/* ... */) {\n  const module = { exports: {} };\n  ((module, exports) => {\n    // Module code here. In this example, define a function.\n    function someFunc() {}\n    exports = someFunc;\n    // At this point, exports is no longer a shortcut to module.exports, and\n    // this module will still export an empty default object.\n    module.exports = someFunc;\n    // At this point, the module will now export someFunc, instead of the\n    // default object.\n  })(module, module.exports);\n  return module.exports;\n}\n</code></pre>",
                   "displayName": "`exports` shortcut"
                 }
               ]
             },
             {
-              "textRaw": "`filename` Type: {string}",
+              "textRaw": "Type: {string}",
+              "name": "filename",
               "type": "string",
-              "name": "Type",
               "meta": {
                 "added": [
                   "v0.1.16"
@@ -442,9 +445,9 @@
               "desc": "<p>The fully resolved filename of the module.</p>"
             },
             {
-              "textRaw": "`id` Type: {string}",
+              "textRaw": "Type: {string}",
+              "name": "id",
               "type": "string",
-              "name": "Type",
               "meta": {
                 "added": [
                   "v0.1.16"
@@ -454,9 +457,9 @@
               "desc": "<p>The identifier for the module. Typically this is the fully resolved\nfilename.</p>"
             },
             {
-              "textRaw": "`isPreloading` Type: {boolean} `true` if the module is running during the Node.js preload phase.",
+              "textRaw": "Type: {boolean} `true` if the module is running during the Node.js preload phase.",
+              "name": "isPreloading",
               "type": "boolean",
-              "name": "Type",
               "meta": {
                 "added": [
                   "v15.4.0",
@@ -467,9 +470,9 @@
               "desc": "`true` if the module is running during the Node.js preload phase."
             },
             {
-              "textRaw": "`loaded` Type: {boolean}",
+              "textRaw": "Type: {boolean}",
+              "name": "loaded",
               "type": "boolean",
-              "name": "Type",
               "meta": {
                 "added": [
                   "v0.1.16"
@@ -479,27 +482,27 @@
               "desc": "<p>Whether or not the module is done loading, or is in the process of\nloading.</p>"
             },
             {
-              "textRaw": "`parent` Type: {module | null | undefined}",
-              "type": "module | null | undefined",
-              "name": "Type",
+              "textRaw": "Type: {module|null|undefined}",
+              "name": "parent",
+              "type": "module|null|undefined",
               "meta": {
                 "added": [
                   "v0.1.16"
                 ],
+                "changes": [],
                 "deprecated": [
                   "v14.6.0",
                   "v12.19.0"
-                ],
-                "changes": []
+                ]
               },
               "stability": 0,
-              "stabilityText": "Deprecated: Please use [`require.main`][] and [`module.children`][] instead.",
+              "stabilityText": "Deprecated: Please use `require.main` and `module.children` instead.",
               "desc": "<p>The module that first required this one, or <code>null</code> if the current module is the\nentry point of the current process, or <code>undefined</code> if the module was loaded by\nsomething that is not a CommonJS module (E.G.: REPL or <code>import</code>).</p>"
             },
             {
-              "textRaw": "`path` Type: {string}",
+              "textRaw": "Type: {string}",
+              "name": "path",
               "type": "string",
-              "name": "Type",
               "meta": {
                 "added": [
                   "v11.14.0"
@@ -509,9 +512,9 @@
               "desc": "<p>The directory name of the module. This is usually the same as the\n<a href=\"path.html#pathdirnamepath\"><code>path.dirname()</code></a> of the <a href=\"#moduleid\"><code>module.id</code></a>.</p>"
             },
             {
-              "textRaw": "`paths` Type: {string\\[]}",
-              "type": "string\\[]",
-              "name": "Type",
+              "textRaw": "Type: {string[]}",
+              "name": "paths",
+              "type": "string[]",
               "meta": {
                 "added": [
                   "v0.4.0"
@@ -524,8 +527,8 @@
           "methods": [
             {
               "textRaw": "`module.require(id)`",
-              "type": "method",
               "name": "require",
+              "type": "method",
               "meta": {
                 "added": [
                   "v0.5.1"
@@ -534,39 +537,38 @@
               },
               "signatures": [
                 {
-                  "return": {
-                    "textRaw": "Returns: {any} exported module content",
-                    "name": "return",
-                    "type": "any",
-                    "desc": "exported module content"
-                  },
                   "params": [
                     {
                       "textRaw": "`id` {string}",
                       "name": "id",
                       "type": "string"
                     }
-                  ]
+                  ],
+                  "return": {
+                    "textRaw": "Returns: {any} exported module content",
+                    "name": "return",
+                    "type": "any",
+                    "desc": "exported module content"
+                  }
                 }
               ],
               "desc": "<p>The <code>module.require()</code> method provides a way to load a module as if\n<code>require()</code> was called from the original module.</p>\n<p>In order to do this, it is necessary to get a reference to the <code>module</code> object.\nSince <code>require()</code> returns the <code>module.exports</code>, and the <code>module</code> is typically\n<em>only</em> available within a specific module's code, it must be explicitly exported\nin order to be used.</p>"
             }
           ],
-          "type": "module",
-          "displayName": "module"
+          "displayName": "The `module` object"
         },
         {
           "textRaw": "The `Module` object",
           "name": "the_`module`_object",
-          "desc": "<p>This section was moved to\n<a href=\"module.html#the-module-object\">Modules: <code>module</code> core module</a>.</p>\n<!-- Anchors to make sure old links find a target -->\n<ul>\n<li><a id=\"modules_module_builtinmodules\" href=\"module.html#modulebuiltinmodules\"><code>module.builtinModules</code></a></li>\n<li><a id=\"modules_module_createrequire_filename\" href=\"module.html#modulecreaterequirefilename\"><code>module.createRequire(filename)</code></a></li>\n<li><a id=\"modules_module_syncbuiltinesmexports\" href=\"module.html#modulesyncbuiltinesmexports\"><code>module.syncBuiltinESMExports()</code></a></li>\n</ul>",
           "type": "module",
+          "desc": "<p>This section was moved to\n<a href=\"module.html#the-module-object\">Modules: <code>module</code> core module</a>.</p>\n<ul>\n<li><a id=\"modules_module_builtinmodules\" href=\"module.html#modulebuiltinmodules\"><code>module.builtinModules</code></a></li>\n<li><a id=\"modules_module_createrequire_filename\" href=\"module.html#modulecreaterequirefilename\"><code>module.createRequire(filename)</code></a></li>\n<li><a id=\"modules_module_syncbuiltinesmexports\" href=\"module.html#modulesyncbuiltinesmexports\"><code>module.syncBuiltinESMExports()</code></a></li>\n</ul>",
           "displayName": "The `Module` object"
         },
         {
           "textRaw": "Source map v3 support",
           "name": "source_map_v3_support",
-          "desc": "<p>This section was moved to\n<a href=\"module.html#source-map-support\">Modules: <code>module</code> core module</a>.</p>\n<!-- Anchors to make sure old links find a target -->\n<ul>\n<li><a id=\"modules_module_findsourcemap_path_error\" href=\"module.html#modulefindsourcemappath\"><code>module.findSourceMap(path)</code></a></li>\n<li><a id=\"modules_class_module_sourcemap\" href=\"module.html#class-modulesourcemap\">Class: <code>module.SourceMap</code></a>\n<ul>\n<li><a id=\"modules_new_sourcemap_payload\" href=\"module.html#new-sourcemappayload--linelengths-\"><code>new SourceMap(payload)</code></a></li>\n<li><a id=\"modules_sourcemap_payload\" href=\"module.html#sourcemappayload\"><code>sourceMap.payload</code></a></li>\n<li><a id=\"modules_sourcemap_findentry_linenumber_columnnumber\" href=\"module.html#sourcemapfindentrylineoffset-columnoffset\"><code>sourceMap.findEntry(lineNumber, columnNumber)</code></a></li>\n</ul>\n</li>\n</ul>",
           "type": "module",
+          "desc": "<p>This section was moved to\n<a href=\"module.html#source-map-support\">Modules: <code>module</code> core module</a>.</p>\n<ul>\n<li><a id=\"modules_module_findsourcemap_path_error\" href=\"module.html#modulefindsourcemappath\"><code>module.findSourceMap(path)</code></a></li>\n<li><a id=\"modules_class_module_sourcemap\" href=\"module.html#class-modulesourcemap\">Class: <code>module.SourceMap</code></a>\n<ul>\n<li><a id=\"modules_new_sourcemap_payload\" href=\"module.html#new-sourcemappayload--linelengths-\"><code>new SourceMap(payload)</code></a></li>\n<li><a id=\"modules_sourcemap_payload\" href=\"module.html#sourcemappayload\"><code>sourceMap.payload</code></a></li>\n<li><a id=\"modules_sourcemap_findentry_linenumber_columnnumber\" href=\"module.html#sourcemapfindentrylineoffset-columnoffset\"><code>sourceMap.findEntry(lineNumber, columnNumber)</code></a></li>\n</ul>\n</li>\n</ul>",
           "displayName": "Source map v3 support"
         }
       ],
@@ -582,8 +584,7 @@
           }
         ]
       },
-      "type": "module",
-      "displayName": "module"
+      "displayName": "Modules: CommonJS modules"
     }
   ]
 }

@@ -6,9 +6,10 @@
       "textRaw": "Cluster",
       "name": "cluster",
       "introduced_in": "v0.10.0",
+      "type": "module",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v25.6.0/lib/cluster.js\">lib/cluster.js</a></p>\n<p>Clusters of Node.js processes can be used to run multiple instances of Node.js\nthat can distribute workloads among their application threads. When process\nisolation is not needed, use the <a href=\"worker_threads.html\"><code>worker_threads</code></a> module instead, which\nallows running multiple application threads within a single Node.js instance.</p>\n<p>The cluster module allows easy creation of child processes that all share\nserver ports.</p>\n<pre><code class=\"language-mjs\">import cluster from 'node:cluster';\nimport http from 'node:http';\nimport { availableParallelism } from 'node:os';\nimport process from 'node:process';\n\nconst numCPUs = availableParallelism();\n\nif (cluster.isPrimary) {\n  console.log(`Primary ${process.pid} is running`);\n\n  // Fork workers.\n  for (let i = 0; i &#x3C; numCPUs; i++) {\n    cluster.fork();\n  }\n\n  cluster.on('exit', (worker, code, signal) => {\n    console.log(`worker ${worker.process.pid} died`);\n  });\n} else {\n  // Workers can share any TCP connection\n  // In this case it is an HTTP server\n  http.createServer((req, res) => {\n    res.writeHead(200);\n    res.end('hello world\\n');\n  }).listen(8000);\n\n  console.log(`Worker ${process.pid} started`);\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const cluster = require('node:cluster');\nconst http = require('node:http');\nconst numCPUs = require('node:os').availableParallelism();\nconst process = require('node:process');\n\nif (cluster.isPrimary) {\n  console.log(`Primary ${process.pid} is running`);\n\n  // Fork workers.\n  for (let i = 0; i &#x3C; numCPUs; i++) {\n    cluster.fork();\n  }\n\n  cluster.on('exit', (worker, code, signal) => {\n    console.log(`worker ${worker.process.pid} died`);\n  });\n} else {\n  // Workers can share any TCP connection\n  // In this case it is an HTTP server\n  http.createServer((req, res) => {\n    res.writeHead(200);\n    res.end('hello world\\n');\n  }).listen(8000);\n\n  console.log(`Worker ${process.pid} started`);\n}\n</code></pre>\n<p>Running Node.js will now share port 8000 between the workers:</p>\n<pre><code class=\"language-console\">$ node server.js\nPrimary 3596 is running\nWorker 4324 started\nWorker 4520 started\nWorker 6056 started\nWorker 5644 started\n</code></pre>\n<p>On Windows, it is not yet possible to set up a named pipe server in a worker.</p>",
+      "desc": "<p>Clusters of Node.js processes can be used to run multiple instances of Node.js\nthat can distribute workloads among their application threads. When process\nisolation is not needed, use the <a href=\"worker_threads.html\"><code>worker_threads</code></a> module instead, which\nallows running multiple application threads within a single Node.js instance.</p>\n<p>The cluster module allows easy creation of child processes that all share\nserver ports.</p>\n<pre><code class=\"language-mjs\">import cluster from 'node:cluster';\nimport http from 'node:http';\nimport { availableParallelism } from 'node:os';\nimport process from 'node:process';\n\nconst numCPUs = availableParallelism();\n\nif (cluster.isPrimary) {\n  console.log(`Primary ${process.pid} is running`);\n\n  // Fork workers.\n  for (let i = 0; i &#x3C; numCPUs; i++) {\n    cluster.fork();\n  }\n\n  cluster.on('exit', (worker, code, signal) => {\n    console.log(`worker ${worker.process.pid} died`);\n  });\n} else {\n  // Workers can share any TCP connection\n  // In this case it is an HTTP server\n  http.createServer((req, res) => {\n    res.writeHead(200);\n    res.end('hello world\\n');\n  }).listen(8000);\n\n  console.log(`Worker ${process.pid} started`);\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const cluster = require('node:cluster');\nconst http = require('node:http');\nconst numCPUs = require('node:os').availableParallelism();\nconst process = require('node:process');\n\nif (cluster.isPrimary) {\n  console.log(`Primary ${process.pid} is running`);\n\n  // Fork workers.\n  for (let i = 0; i &#x3C; numCPUs; i++) {\n    cluster.fork();\n  }\n\n  cluster.on('exit', (worker, code, signal) => {\n    console.log(`worker ${worker.process.pid} died`);\n  });\n} else {\n  // Workers can share any TCP connection\n  // In this case it is an HTTP server\n  http.createServer((req, res) => {\n    res.writeHead(200);\n    res.end('hello world\\n');\n  }).listen(8000);\n\n  console.log(`Worker ${process.pid} started`);\n}\n</code></pre>\n<p>Running Node.js will now share port 8000 between the workers:</p>\n<pre><code class=\"language-console\">$ node server.js\nPrimary 3596 is running\nWorker 4324 started\nWorker 4520 started\nWorker 6056 started\nWorker 5644 started\n</code></pre>\n<p>On Windows, it is not yet possible to set up a named pipe server in a worker.</p>",
       "miscs": [
         {
           "textRaw": "How it works",
@@ -20,20 +21,20 @@
       "classes": [
         {
           "textRaw": "Class: `Worker`",
-          "type": "class",
           "name": "Worker",
+          "type": "class",
           "meta": {
             "added": [
               "v0.7.0"
             ],
             "changes": []
           },
-          "desc": "<ul>\n<li>Extends: <a href=\"events.html#class-eventemitter\" class=\"type\">&lt;EventEmitter&gt;</a></li>\n</ul>\n<p>A <code>Worker</code> object contains all public information and method about a worker.\nIn the primary it can be obtained using <code>cluster.workers</code>. In a worker\nit can be obtained using <code>cluster.worker</code>.</p>",
+          "desc": "<ul>\n<li>Extends: <a href=\"events.html#class-eventemitter\"><code>&#x3C;EventEmitter></code></a></li>\n</ul>\n<p>A <code>Worker</code> object contains all public information and method about a worker.\nIn the primary it can be obtained using <code>cluster.workers</code>. In a worker\nit can be obtained using <code>cluster.worker</code>.</p>",
           "events": [
             {
               "textRaw": "Event: `'disconnect'`",
-              "type": "event",
               "name": "disconnect",
+              "type": "event",
               "meta": {
                 "added": [
                   "v0.7.7"
@@ -45,8 +46,8 @@
             },
             {
               "textRaw": "Event: `'error'`",
-              "type": "event",
               "name": "error",
+              "type": "event",
               "meta": {
                 "added": [
                   "v0.7.3"
@@ -58,8 +59,8 @@
             },
             {
               "textRaw": "Event: `'exit'`",
-              "type": "event",
               "name": "exit",
+              "type": "event",
               "meta": {
                 "added": [
                   "v0.11.2"
@@ -84,8 +85,8 @@
             },
             {
               "textRaw": "Event: `'listening'`",
-              "type": "event",
               "name": "listening",
+              "type": "event",
               "meta": {
                 "added": [
                   "v0.7.0"
@@ -103,8 +104,8 @@
             },
             {
               "textRaw": "Event: `'message'`",
-              "type": "event",
               "name": "message",
+              "type": "event",
               "meta": {
                 "added": [
                   "v0.7.0"
@@ -127,8 +128,8 @@
             },
             {
               "textRaw": "Event: `'online'`",
-              "type": "event",
               "name": "online",
+              "type": "event",
               "meta": {
                 "added": [
                   "v0.7.0"
@@ -142,8 +143,8 @@
           "methods": [
             {
               "textRaw": "`worker.disconnect()`",
-              "type": "method",
               "name": "disconnect",
+              "type": "method",
               "meta": {
                 "added": [
                   "v0.7.7"
@@ -158,21 +159,21 @@
               },
               "signatures": [
                 {
+                  "params": [],
                   "return": {
                     "textRaw": "Returns: {cluster.Worker} A reference to `worker`.",
                     "name": "return",
                     "type": "cluster.Worker",
                     "desc": "A reference to `worker`."
-                  },
-                  "params": []
+                  }
                 }
               ],
               "desc": "<p>In a worker, this function will close all servers, wait for the <code>'close'</code> event\non those servers, and then disconnect the IPC channel.</p>\n<p>In the primary, an internal message is sent to the worker causing it to call\n<code>.disconnect()</code> on itself.</p>\n<p>Causes <code>.exitedAfterDisconnect</code> to be set.</p>\n<p>After a server is closed, it will no longer accept new connections,\nbut connections may be accepted by any other listening worker. Existing\nconnections will be allowed to close as usual. When no more connections exist,\nsee <a href=\"net.html#event-close\"><code>server.close()</code></a>, the IPC channel to the worker will close allowing it\nto die gracefully.</p>\n<p>The above applies <em>only</em> to server connections, client connections are not\nautomatically closed by workers, and disconnect does not wait for them to close\nbefore exiting.</p>\n<p>In a worker, <code>process.disconnect</code> exists, but it is not this function;\nit is <a href=\"child_process.html#subprocessdisconnect\"><code>disconnect()</code></a>.</p>\n<p>Because long living server connections may block workers from disconnecting, it\nmay be useful to send a message, so application specific actions may be taken to\nclose them. It also may be useful to implement a timeout, killing a worker if\nthe <code>'disconnect'</code> event has not been emitted after some time.</p>\n<pre><code class=\"language-js\">if (cluster.isPrimary) {\n  const worker = cluster.fork();\n  let timeout;\n\n  worker.on('listening', (address) => {\n    worker.send('shutdown');\n    worker.disconnect();\n    timeout = setTimeout(() => {\n      worker.kill();\n    }, 2000);\n  });\n\n  worker.on('disconnect', () => {\n    clearTimeout(timeout);\n  });\n\n} else if (cluster.isWorker) {\n  const net = require('node:net');\n  const server = net.createServer((socket) => {\n    // Connections never end\n  });\n\n  server.listen(8000);\n\n  process.on('message', (msg) => {\n    if (msg === 'shutdown') {\n      // Initiate graceful close of any connections to server\n    }\n  });\n}\n</code></pre>"
             },
             {
               "textRaw": "`worker.isConnected()`",
-              "type": "method",
               "name": "isConnected",
+              "type": "method",
               "meta": {
                 "added": [
                   "v0.11.14"
@@ -188,8 +189,8 @@
             },
             {
               "textRaw": "`worker.isDead()`",
-              "type": "method",
               "name": "isDead",
+              "type": "method",
               "meta": {
                 "added": [
                   "v0.11.14"
@@ -205,8 +206,8 @@
             },
             {
               "textRaw": "`worker.kill([signal])`",
-              "type": "method",
               "name": "kill",
+              "type": "method",
               "meta": {
                 "added": [
                   "v0.9.12"
@@ -221,7 +222,8 @@
                       "name": "signal",
                       "type": "string",
                       "default": "`'SIGTERM'`",
-                      "desc": "Name of the kill signal to send to the worker process."
+                      "desc": "Name of the kill signal to send to the worker process.",
+                      "optional": true
                     }
                   ]
                 }
@@ -230,8 +232,8 @@
             },
             {
               "textRaw": "`worker.send(message[, sendHandle[, options]][, callback])`",
-              "type": "method",
               "name": "send",
+              "type": "method",
               "meta": {
                 "added": [
                   "v0.7.0"
@@ -246,11 +248,6 @@
               },
               "signatures": [
                 {
-                  "return": {
-                    "textRaw": "Returns: {boolean}",
-                    "name": "return",
-                    "type": "boolean"
-                  },
                   "params": [
                     {
                       "textRaw": "`message` {Object}",
@@ -260,7 +257,8 @@
                     {
                       "textRaw": "`sendHandle` {Handle}",
                       "name": "sendHandle",
-                      "type": "Handle"
+                      "type": "Handle",
+                      "optional": true
                     },
                     {
                       "textRaw": "`options` {Object} The `options` argument, if present, is an object used to parameterize the sending of certain types of handles. `options` supports the following properties:",
@@ -275,14 +273,21 @@
                           "default": "`false`",
                           "desc": "A value that can be used when passing instances of `net.Socket`. When `true`, the socket is kept open in the sending process."
                         }
-                      ]
+                      ],
+                      "optional": true
                     },
                     {
                       "textRaw": "`callback` {Function}",
                       "name": "callback",
-                      "type": "Function"
+                      "type": "Function",
+                      "optional": true
                     }
-                  ]
+                  ],
+                  "return": {
+                    "textRaw": "Returns: {boolean}",
+                    "name": "return",
+                    "type": "boolean"
+                  }
                 }
               ],
               "desc": "<p>Send a message to a worker or primary, optionally with a handle.</p>\n<p>In the primary, this sends a message to a specific worker. It is identical to\n<a href=\"child_process.html#subprocesssendmessage-sendhandle-options-callback\"><code>ChildProcess.send()</code></a>.</p>\n<p>In a worker, this sends a message to the primary. It is identical to\n<code>process.send()</code>.</p>\n<p>This example will echo back all messages from the primary:</p>\n<pre><code class=\"language-js\">if (cluster.isPrimary) {\n  const worker = cluster.fork();\n  worker.send('hi there');\n\n} else if (cluster.isWorker) {\n  process.on('message', (msg) => {\n    process.send(msg);\n  });\n}\n</code></pre>"
@@ -290,9 +295,9 @@
           ],
           "properties": [
             {
-              "textRaw": "`exitedAfterDisconnect` Type: {boolean}",
+              "textRaw": "Type: {boolean}",
+              "name": "exitedAfterDisconnect",
               "type": "boolean",
-              "name": "Type",
               "meta": {
                 "added": [
                   "v6.0.0"
@@ -302,9 +307,9 @@
               "desc": "<p>This property is <code>true</code> if the worker exited due to <code>.disconnect()</code>.\nIf the worker exited any other way, it is <code>false</code>. If the\nworker has not exited, it is <code>undefined</code>.</p>\n<p>The boolean <a href=\"#workerexitedafterdisconnect\"><code>worker.exitedAfterDisconnect</code></a> allows distinguishing between\nvoluntary and accidental exit, the primary may choose not to respawn a worker\nbased on this value.</p>\n<pre><code class=\"language-js\">cluster.on('exit', (worker, code, signal) => {\n  if (worker.exitedAfterDisconnect === true) {\n    console.log('Oh, it was just voluntary – no need to worry');\n  }\n});\n\n// kill worker\nworker.kill();\n</code></pre>"
             },
             {
-              "textRaw": "`id` Type: {integer}",
+              "textRaw": "Type: {integer}",
+              "name": "id",
               "type": "integer",
-              "name": "Type",
               "meta": {
                 "added": [
                   "v0.8.0"
@@ -314,9 +319,9 @@
               "desc": "<p>Each new worker is given its own unique id, this id is stored in the\n<code>id</code>.</p>\n<p>While a worker is alive, this is the key that indexes it in\n<code>cluster.workers</code>.</p>"
             },
             {
-              "textRaw": "`process` Type: {ChildProcess}",
+              "textRaw": "Type: {ChildProcess}",
+              "name": "process",
               "type": "ChildProcess",
-              "name": "Type",
               "meta": {
                 "added": [
                   "v0.7.0"
@@ -331,8 +336,8 @@
       "events": [
         {
           "textRaw": "Event: `'disconnect'`",
-          "type": "event",
           "name": "disconnect",
+          "type": "event",
           "meta": {
             "added": [
               "v0.7.9"
@@ -350,8 +355,8 @@
         },
         {
           "textRaw": "Event: `'exit'`",
-          "type": "event",
           "name": "exit",
+          "type": "event",
           "meta": {
             "added": [
               "v0.7.9"
@@ -381,8 +386,8 @@
         },
         {
           "textRaw": "Event: `'fork'`",
-          "type": "event",
           "name": "fork",
+          "type": "event",
           "meta": {
             "added": [
               "v0.7.0"
@@ -400,8 +405,8 @@
         },
         {
           "textRaw": "Event: `'listening'`",
-          "type": "event",
           "name": "listening",
+          "type": "event",
           "meta": {
             "added": [
               "v0.7.0"
@@ -424,8 +429,8 @@
         },
         {
           "textRaw": "Event: `'message'`",
-          "type": "event",
           "name": "message",
+          "type": "event",
           "meta": {
             "added": [
               "v2.5.0"
@@ -459,8 +464,8 @@
         },
         {
           "textRaw": "Event: `'online'`",
-          "type": "event",
           "name": "online",
+          "type": "event",
           "meta": {
             "added": [
               "v0.7.0"
@@ -478,8 +483,8 @@
         },
         {
           "textRaw": "Event: `'setup'`",
-          "type": "event",
           "name": "setup",
+          "type": "event",
           "meta": {
             "added": [
               "v0.7.1"
@@ -499,8 +504,8 @@
       "methods": [
         {
           "textRaw": "`cluster.disconnect([callback])`",
-          "type": "method",
           "name": "disconnect",
+          "type": "method",
           "meta": {
             "added": [
               "v0.7.7"
@@ -514,7 +519,8 @@
                   "textRaw": "`callback` {Function} Called when all workers are disconnected and handles are closed.",
                   "name": "callback",
                   "type": "Function",
-                  "desc": "Called when all workers are disconnected and handles are closed."
+                  "desc": "Called when all workers are disconnected and handles are closed.",
+                  "optional": true
                 }
               ]
             }
@@ -523,8 +529,8 @@
         },
         {
           "textRaw": "`cluster.fork([env])`",
-          "type": "method",
           "name": "fork",
+          "type": "method",
           "meta": {
             "added": [
               "v0.6.0"
@@ -533,33 +539,31 @@
           },
           "signatures": [
             {
-              "return": {
-                "textRaw": "Returns: {cluster.Worker}",
-                "name": "return",
-                "type": "cluster.Worker"
-              },
               "params": [
                 {
                   "textRaw": "`env` {Object} Key/value pairs to add to worker process environment.",
                   "name": "env",
                   "type": "Object",
-                  "desc": "Key/value pairs to add to worker process environment."
+                  "desc": "Key/value pairs to add to worker process environment.",
+                  "optional": true
                 }
-              ]
+              ],
+              "return": {
+                "textRaw": "Returns: {cluster.Worker}",
+                "name": "return",
+                "type": "cluster.Worker"
+              }
             }
           ],
           "desc": "<p>Spawn a new worker process.</p>\n<p>This can only be called from the primary process.</p>"
         },
         {
           "textRaw": "`cluster.setupMaster([settings])`",
-          "type": "method",
           "name": "setupMaster",
+          "type": "method",
           "meta": {
             "added": [
               "v0.7.1"
-            ],
-            "deprecated": [
-              "v16.0.0"
             ],
             "changes": [
               {
@@ -567,21 +571,29 @@
                 "pr-url": "https://github.com/nodejs/node/pull/7838",
                 "description": "The `stdio` option is supported now."
               }
+            ],
+            "deprecated": [
+              "v16.0.0"
             ]
           },
           "stability": 0,
           "stabilityText": "Deprecated",
           "signatures": [
             {
-              "params": []
+              "params": [
+                {
+                  "name": "settings",
+                  "optional": true
+                }
+              ]
             }
           ],
           "desc": "<p>Deprecated alias for <a href=\"#clustersetupprimarysettings\"><code>.setupPrimary()</code></a>.</p>"
         },
         {
           "textRaw": "`cluster.setupPrimary([settings])`",
-          "type": "method",
           "name": "setupPrimary",
+          "type": "method",
           "meta": {
             "added": [
               "v16.0.0"
@@ -592,10 +604,11 @@
             {
               "params": [
                 {
-                  "textRaw": "`settings` {Object} See [`cluster.settings`][].",
+                  "textRaw": "`settings` {Object} See `cluster.settings`.",
                   "name": "settings",
                   "type": "Object",
-                  "desc": "See [`cluster.settings`][]."
+                  "desc": "See `cluster.settings`.",
+                  "optional": true
                 }
               ]
             }
@@ -607,23 +620,24 @@
         {
           "textRaw": "`cluster.isMaster`",
           "name": "isMaster",
+          "type": "property",
           "meta": {
             "added": [
               "v0.8.1"
             ],
+            "changes": [],
             "deprecated": [
               "v16.0.0"
-            ],
-            "changes": []
+            ]
           },
           "stability": 0,
           "stabilityText": "Deprecated",
           "desc": "<p>Deprecated alias for <a href=\"#clusterisprimary\"><code>cluster.isPrimary</code></a>.</p>"
         },
         {
-          "textRaw": "`isPrimary` Type: {boolean}",
+          "textRaw": "Type: {boolean}",
+          "name": "isPrimary",
           "type": "boolean",
-          "name": "Type",
           "meta": {
             "added": [
               "v16.0.0"
@@ -633,9 +647,9 @@
           "desc": "<p>True if the process is a primary. This is determined\nby the <code>process.env.NODE_UNIQUE_ID</code>. If <code>process.env.NODE_UNIQUE_ID</code> is\nundefined, then <code>isPrimary</code> is <code>true</code>.</p>"
         },
         {
-          "textRaw": "`isWorker` Type: {boolean}",
+          "textRaw": "Type: {boolean}",
+          "name": "isWorker",
           "type": "boolean",
-          "name": "Type",
           "meta": {
             "added": [
               "v0.6.0"
@@ -647,6 +661,7 @@
         {
           "textRaw": "`cluster.schedulingPolicy`",
           "name": "schedulingPolicy",
+          "type": "property",
           "meta": {
             "added": [
               "v0.11.2"
@@ -656,9 +671,9 @@
           "desc": "<p>The scheduling policy, either <code>cluster.SCHED_RR</code> for round-robin or\n<code>cluster.SCHED_NONE</code> to leave it to the operating system. This is a\nglobal setting and effectively frozen once either the first worker is spawned,\nor <a href=\"#clustersetupprimarysettings\"><code>.setupPrimary()</code></a> is called, whichever comes first.</p>\n<p><code>SCHED_RR</code> is the default on all operating systems except Windows.\nWindows will change to <code>SCHED_RR</code> once libuv is able to effectively\ndistribute IOCP handles without incurring a large performance hit.</p>\n<p><code>cluster.schedulingPolicy</code> can also be set through the\n<code>NODE_CLUSTER_SCHED_POLICY</code> environment variable. Valid\nvalues are <code>'rr'</code> and <code>'none'</code>.</p>"
         },
         {
-          "textRaw": "`settings` Type: {Object}",
+          "textRaw": "Type: {Object}",
+          "name": "settings",
           "type": "Object",
-          "name": "Type",
           "meta": {
             "added": [
               "v0.7.1"
@@ -694,11 +709,12 @@
               }
             ]
           },
+          "desc": "<p>After calling <a href=\"#clustersetupprimarysettings\"><code>.setupPrimary()</code></a> (or <a href=\"#clusterforkenv\"><code>.fork()</code></a>) this settings object will\ncontain the settings, including the default values.</p>\n<p>This object is not intended to be changed or set manually.</p>",
           "options": [
             {
-              "textRaw": "`execArgv` {string\\[]} List of string arguments passed to the Node.js executable. **Default:** `process.execArgv`.",
+              "textRaw": "`execArgv` {string[]} List of string arguments passed to the Node.js executable. **Default:** `process.execArgv`.",
               "name": "execArgv",
-              "type": "string\\[]",
+              "type": "string[]",
               "default": "`process.execArgv`",
               "desc": "List of string arguments passed to the Node.js executable."
             },
@@ -710,9 +726,9 @@
               "desc": "File path to worker file."
             },
             {
-              "textRaw": "`args` {string\\[]} String arguments passed to worker. **Default:** `process.argv.slice(2)`.",
+              "textRaw": "`args` {string[]} String arguments passed to worker. **Default:** `process.argv.slice(2)`.",
               "name": "args",
-              "type": "string\\[]",
+              "type": "string[]",
               "default": "`process.argv.slice(2)`",
               "desc": "String arguments passed to worker."
             },
@@ -724,11 +740,11 @@
               "desc": "Current working directory of the worker process."
             },
             {
-              "textRaw": "`serialization` {string} Specify the kind of serialization used for sending messages between processes. Possible values are `'json'` and `'advanced'`. See [Advanced serialization for `child_process`][] for more details. **Default:** `false`.",
+              "textRaw": "`serialization` {string} Specify the kind of serialization used for sending messages between processes. Possible values are `'json'` and `'advanced'`. See Advanced serialization for `child_process` for more details. **Default:** `false`.",
               "name": "serialization",
               "type": "string",
               "default": "`false`",
-              "desc": "Specify the kind of serialization used for sending messages between processes. Possible values are `'json'` and `'advanced'`. See [Advanced serialization for `child_process`][] for more details."
+              "desc": "Specify the kind of serialization used for sending messages between processes. Possible values are `'json'` and `'advanced'`. See Advanced serialization for `child_process` for more details."
             },
             {
               "textRaw": "`silent` {boolean} Whether or not to send output to parent's stdio. **Default:** `false`.",
@@ -738,22 +754,22 @@
               "desc": "Whether or not to send output to parent's stdio."
             },
             {
-              "textRaw": "`stdio` {Array} Configures the stdio of forked processes. Because the cluster module relies on IPC to function, this configuration must contain an `'ipc'` entry. When this option is provided, it overrides `silent`. See [`child_process.spawn()`][]'s [`stdio`][].",
+              "textRaw": "`stdio` {Array} Configures the stdio of forked processes. Because the cluster module relies on IPC to function, this configuration must contain an `'ipc'` entry. When this option is provided, it overrides `silent`. See `child_process.spawn()`'s `stdio`.",
               "name": "stdio",
               "type": "Array",
-              "desc": "Configures the stdio of forked processes. Because the cluster module relies on IPC to function, this configuration must contain an `'ipc'` entry. When this option is provided, it overrides `silent`. See [`child_process.spawn()`][]'s [`stdio`][]."
+              "desc": "Configures the stdio of forked processes. Because the cluster module relies on IPC to function, this configuration must contain an `'ipc'` entry. When this option is provided, it overrides `silent`. See `child_process.spawn()`'s `stdio`."
             },
             {
-              "textRaw": "`uid` {number} Sets the user identity of the process. (See setuid(2).)",
+              "textRaw": "`uid` {number} Sets the user identity of the process. (See `setuid(2)`.)",
               "name": "uid",
               "type": "number",
-              "desc": "Sets the user identity of the process. (See setuid(2).)"
+              "desc": "Sets the user identity of the process. (See `setuid(2)`.)"
             },
             {
-              "textRaw": "`gid` {number} Sets the group identity of the process. (See setgid(2).)",
+              "textRaw": "`gid` {number} Sets the group identity of the process. (See `setgid(2)`.)",
               "name": "gid",
               "type": "number",
-              "desc": "Sets the group identity of the process. (See setgid(2).)"
+              "desc": "Sets the group identity of the process. (See `setgid(2)`.)"
             },
             {
               "textRaw": "`inspectPort` {number|Function} Sets inspector port of worker. This can be a number, or a function that takes no arguments and returns a number. By default each worker gets its own port, incremented from the primary's `process.debugPort`.",
@@ -768,13 +784,12 @@
               "default": "`false`",
               "desc": "Hide the forked processes console window that would normally be created on Windows systems."
             }
-          ],
-          "desc": "<p>After calling <a href=\"#clustersetupprimarysettings\"><code>.setupPrimary()</code></a> (or <a href=\"#clusterforkenv\"><code>.fork()</code></a>) this settings object will\ncontain the settings, including the default values.</p>\n<p>This object is not intended to be changed or set manually.</p>"
+          ]
         },
         {
-          "textRaw": "`worker` Type: {Object}",
+          "textRaw": "Type: {Object}",
+          "name": "worker",
           "type": "Object",
-          "name": "Type",
           "meta": {
             "added": [
               "v0.7.0"
@@ -784,9 +799,9 @@
           "desc": "<p>A reference to the current worker object. Not available in the primary process.</p>\n<pre><code class=\"language-mjs\">import cluster from 'node:cluster';\n\nif (cluster.isPrimary) {\n  console.log('I am primary');\n  cluster.fork();\n  cluster.fork();\n} else if (cluster.isWorker) {\n  console.log(`I am worker #${cluster.worker.id}`);\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const cluster = require('node:cluster');\n\nif (cluster.isPrimary) {\n  console.log('I am primary');\n  cluster.fork();\n  cluster.fork();\n} else if (cluster.isWorker) {\n  console.log(`I am worker #${cluster.worker.id}`);\n}\n</code></pre>"
         },
         {
-          "textRaw": "`workers` Type: {Object}",
+          "textRaw": "Type: {Object}",
+          "name": "workers",
           "type": "Object",
-          "name": "Type",
           "meta": {
             "added": [
               "v0.7.0"
@@ -796,7 +811,6 @@
           "desc": "<p>A hash that stores the active worker objects, keyed by <code>id</code> field. This makes it\neasy to loop through all the workers. It is only available in the primary\nprocess.</p>\n<p>A worker is removed from <code>cluster.workers</code> after the worker has disconnected\n<em>and</em> exited. The order between these two events cannot be determined in\nadvance. However, it is guaranteed that the removal from the <code>cluster.workers</code>\nlist happens before the last <code>'disconnect'</code> or <code>'exit'</code> event is emitted.</p>\n<pre><code class=\"language-mjs\">import cluster from 'node:cluster';\n\nfor (const worker of Object.values(cluster.workers)) {\n  worker.send('big announcement to all workers');\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const cluster = require('node:cluster');\n\nfor (const worker of Object.values(cluster.workers)) {\n  worker.send('big announcement to all workers');\n}\n</code></pre>"
         }
       ],
-      "type": "module",
       "displayName": "Cluster"
     }
   ]

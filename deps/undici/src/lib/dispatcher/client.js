@@ -54,7 +54,8 @@ const {
   kMaxConcurrentStreams,
   kHTTP2InitialWindowSize,
   kHTTP2ConnectionWindowSize,
-  kResume
+  kResume,
+  kPingInterval
 } = require('../core/symbols.js')
 const connectH1 = require('./client-h1.js')
 const connectH2 = require('./client-h2.js')
@@ -68,7 +69,7 @@ const getDefaultNodeMaxHeaderSize = http &&
   ? () => http.maxHeaderSize
   : () => { throw new InvalidArgumentError('http module not available or http.maxHeaderSize invalid') }
 
-const noop = () => {}
+const noop = () => { }
 
 function getPipelining (client) {
   return client[kPipelining] ?? client[kHTTPContext]?.defaultPipelining ?? 1
@@ -112,7 +113,8 @@ class Client extends DispatcherBase {
     allowH2,
     useH2c,
     initialWindowSize,
-    connectionWindowSize
+    connectionWindowSize,
+    pingInterval
   } = {}) {
     if (keepAlive !== undefined) {
       throw new InvalidArgumentError('unsupported keepAlive, use pipelining=0 instead')
@@ -216,6 +218,10 @@ class Client extends DispatcherBase {
       throw new InvalidArgumentError('connectionWindowSize must be a positive integer, greater than 0')
     }
 
+    if (pingInterval != null && (typeof pingInterval !== 'number' || !Number.isInteger(pingInterval) || pingInterval < 0)) {
+      throw new InvalidArgumentError('pingInterval must be a positive integer, greater or equal to 0')
+    }
+
     super()
 
     if (typeof connect !== 'function') {
@@ -229,6 +235,9 @@ class Client extends DispatcherBase {
         ...(typeof autoSelectFamily === 'boolean' ? { autoSelectFamily, autoSelectFamilyAttemptTimeout } : undefined),
         ...connect
       })
+    } else if (socketPath != null) {
+      const customConnect = connect
+      connect = (opts, callback) => customConnect({ ...opts, socketPath }, callback)
     }
 
     this[kUrl] = util.parseOrigin(url)
@@ -250,6 +259,8 @@ class Client extends DispatcherBase {
     this[kMaxRequests] = maxRequestsPerClient
     this[kClosedResolve] = null
     this[kMaxResponseSize] = maxResponseSize > -1 ? maxResponseSize : -1
+    this[kHTTPContext] = null
+    // h2
     this[kMaxConcurrentStreams] = maxConcurrentStreams != null ? maxConcurrentStreams : 100 // Max peerConcurrentStreams for a Node h2 server
     // HTTP/2 window sizes are set to higher defaults than Node.js core for better performance:
     // - initialWindowSize: 262144 (256KB) vs Node.js default 65535 (64KB - 1)
@@ -259,7 +270,7 @@ class Client extends DispatcherBase {
     //   Provides better flow control for the entire connection across multiple streams.
     this[kHTTP2InitialWindowSize] = initialWindowSize != null ? initialWindowSize : 262144
     this[kHTTP2ConnectionWindowSize] = connectionWindowSize != null ? connectionWindowSize : 524288
-    this[kHTTPContext] = null
+    this[kPingInterval] = pingInterval != null ? pingInterval : 60e3 // Default ping interval for h2 - 1 minute
 
     // kQueue is built up of 3 sections separated by
     // the kRunningIdx and kPendingIdx indices.
@@ -598,6 +609,10 @@ function _resume (client, sync) {
     }
 
     const request = client[kQueue][client[kPendingIdx]]
+
+    if (request === null) {
+      return
+    }
 
     if (client[kUrl].protocol === 'https:' && client[kServerName] !== request.servername) {
       if (client[kRunning] > 0) {

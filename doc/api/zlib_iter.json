@@ -1,0 +1,650 @@
+{
+  "type": "module",
+  "source": "doc/api/zlib_iter.md",
+  "modules": [
+    {
+      "textRaw": "Iterable Compression",
+      "name": "iterable_compression",
+      "introduced_in": "v25.9.0",
+      "type": "module",
+      "stability": 1,
+      "stabilityText": "Experimental",
+      "desc": "<p>The <code>node:zlib/iter</code> module provides compression and decompression transforms\nfor use with the <a href=\"stream_iter.html\"><code>node:stream/iter</code></a> iterable streams API.</p>\n<p>This module is available only when the <code>--experimental-stream-iter</code> CLI flag\nis enabled.</p>\n<p>Each algorithm has both an async variant (stateful async generator, for use\nwith <a href=\"stream_iter.html#pullsource-transforms-options\"><code>pull()</code></a> and <a href=\"stream_iter.html#pipetosource-transforms-writer-options\"><code>pipeTo()</code></a>) and a sync variant (stateful sync\ngenerator, for use with <code>pullSync()</code> and <code>pipeToSync()</code>).</p>\n<p>The async transforms run compression on the libuv threadpool, overlapping\nI/O with JavaScript execution. The sync transforms run compression directly\non the main thread.</p>\n<blockquote>\n<p>Note: The defaults for these transforms are tuned for streaming throughput,\nand differ from the defaults in <code>node:zlib</code>. In particular, gzip/deflate\ndefault to level 4 (not 6) and memLevel 9 (not 8), and Brotli defaults to\nquality 6 (not 11). These choices match common HTTP server configurations\nand provide significantly faster compression with only a small reduction in\ncompression ratio. All defaults can be overridden via options.</p>\n</blockquote>\n<pre><code class=\"language-mjs\">import { from, pull, bytes, text } from 'node:stream/iter';\nimport { compressGzip, decompressGzip } from 'node:zlib/iter';\n\n// Async round-trip\nconst compressed = await bytes(pull(from('hello'), compressGzip()));\nconst original = await text(pull(from(compressed), decompressGzip()));\nconsole.log(original); // 'hello'\n</code></pre>\n<pre><code class=\"language-cjs\">const { from, pull, bytes, text } = require('node:stream/iter');\nconst { compressGzip, decompressGzip } = require('node:zlib/iter');\n\nasync function run() {\n  const compressed = await bytes(pull(from('hello'), compressGzip()));\n  const original = await text(pull(from(compressed), decompressGzip()));\n  console.log(original); // 'hello'\n}\n\nrun().catch(console.error);\n</code></pre>\n<pre><code class=\"language-mjs\">import { fromSync, pullSync, textSync } from 'node:stream/iter';\nimport { compressGzipSync, decompressGzipSync } from 'node:zlib/iter';\n\n// Sync round-trip\nconst compressed = pullSync(fromSync('hello'), compressGzipSync());\nconst original = textSync(pullSync(compressed, decompressGzipSync()));\nconsole.log(original); // 'hello'\n</code></pre>\n<pre><code class=\"language-cjs\">const { fromSync, pullSync, textSync } = require('node:stream/iter');\nconst { compressGzipSync, decompressGzipSync } = require('node:zlib/iter');\n\nconst compressed = pullSync(fromSync('hello'), compressGzipSync());\nconst original = textSync(pullSync(compressed, decompressGzipSync()));\nconsole.log(original); // 'hello'\n</code></pre>",
+      "methods": [
+        {
+          "textRaw": "`compressBrotli([options])`",
+          "name": "compressBrotli",
+          "type": "method",
+          "signatures": [
+            {
+              "params": [
+                {
+                  "name": "options",
+                  "optional": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "textRaw": "`compressBrotliSync([options])`",
+          "name": "compressBrotliSync",
+          "type": "method",
+          "meta": {
+            "added": [
+              "v25.9.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`options` {Object}",
+                  "name": "options",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`chunkSize` {number} Output buffer size. **Default:** `65536` (64 KB).",
+                      "name": "chunkSize",
+                      "type": "number",
+                      "default": "`65536` (64 KB)",
+                      "desc": "Output buffer size."
+                    },
+                    {
+                      "textRaw": "`params` {Object} Key-value object where keys and values are `zlib.constants` entries. The most important compressor parameters are:",
+                      "name": "params",
+                      "type": "Object",
+                      "desc": "Key-value object where keys and values are `zlib.constants` entries. The most important compressor parameters are:",
+                      "options": [
+                        {
+                          "textRaw": "`BROTLI_PARAM_MODE` -- `BROTLI_MODE_GENERIC` (default), `BROTLI_MODE_TEXT`, or `BROTLI_MODE_FONT`.",
+                          "name": "BROTLI_PARAM_MODE",
+                          "desc": "- `BROTLI_MODE_GENERIC` (default), `BROTLI_MODE_TEXT`, or `BROTLI_MODE_FONT`."
+                        },
+                        {
+                          "textRaw": "`BROTLI_PARAM_QUALITY` -- ranges from `BROTLI_MIN_QUALITY` to `BROTLI_MAX_QUALITY`. **Default:** `6` (not `BROTLI_DEFAULT_QUALITY` which is 11). Quality 6 is appropriate for streaming; quality 11 is intended for offline/build-time compression.",
+                          "name": "BROTLI_PARAM_QUALITY",
+                          "default": "`6` (not `BROTLI_DEFAULT_QUALITY` which is 11). Quality 6 is appropriate for streaming; quality 11 is intended for offline/build-time compression",
+                          "desc": "- ranges from `BROTLI_MIN_QUALITY` to `BROTLI_MAX_QUALITY`."
+                        },
+                        {
+                          "textRaw": "`BROTLI_PARAM_SIZE_HINT` -- expected input size. **Default:** `0` (unknown).",
+                          "name": "BROTLI_PARAM_SIZE_HINT",
+                          "default": "`0` (unknown)",
+                          "desc": "- expected input size."
+                        },
+                        {
+                          "textRaw": "`BROTLI_PARAM_LGWIN` -- window size (log2). **Default:** `20` (1 MB). The Brotli library default is 22 (4 MB); the reduced default saves memory without significant compression impact for streaming workloads.",
+                          "name": "BROTLI_PARAM_LGWIN",
+                          "default": "`20` (1 MB). The Brotli library default is 22 (4 MB); the reduced default saves memory without significant compression impact for streaming workloads",
+                          "desc": "- window size (log2)."
+                        },
+                        {
+                          "textRaw": "`BROTLI_PARAM_LGBLOCK` -- input block size (log2). See the Brotli compressor options in the zlib documentation for the full list.",
+                          "name": "BROTLI_PARAM_LGBLOCK",
+                          "desc": "- input block size (log2). See the Brotli compressor options in the zlib documentation for the full list."
+                        }
+                      ]
+                    },
+                    {
+                      "textRaw": "`dictionary` {Buffer|TypedArray|DataView}",
+                      "name": "dictionary",
+                      "type": "Buffer|TypedArray|DataView"
+                    }
+                  ],
+                  "optional": true
+                }
+              ],
+              "return": {
+                "textRaw": "Returns: {Object} A stateful transform.",
+                "name": "return",
+                "type": "Object",
+                "desc": "A stateful transform."
+              }
+            }
+          ],
+          "desc": "<p>Create a Brotli compression transform. Output is compatible with\n<code>zlib.brotliDecompress()</code> and <code>decompressBrotli()</code>/<code>decompressBrotliSync()</code>.</p>"
+        },
+        {
+          "textRaw": "`compressDeflate([options])`",
+          "name": "compressDeflate",
+          "type": "method",
+          "signatures": [
+            {
+              "params": [
+                {
+                  "name": "options",
+                  "optional": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "textRaw": "`compressDeflateSync([options])`",
+          "name": "compressDeflateSync",
+          "type": "method",
+          "meta": {
+            "added": [
+              "v25.9.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`options` {Object}",
+                  "name": "options",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`chunkSize` {number} Output buffer size. **Default:** `65536` (64 KB).",
+                      "name": "chunkSize",
+                      "type": "number",
+                      "default": "`65536` (64 KB)",
+                      "desc": "Output buffer size."
+                    },
+                    {
+                      "textRaw": "`level` {number} Compression level (`0`-`9`). **Default:** `4`.",
+                      "name": "level",
+                      "type": "number",
+                      "default": "`4`",
+                      "desc": "Compression level (`0`-`9`)."
+                    },
+                    {
+                      "textRaw": "`windowBits` {number} **Default:** `Z_DEFAULT_WINDOWBITS` (15).",
+                      "name": "windowBits",
+                      "type": "number",
+                      "default": "`Z_DEFAULT_WINDOWBITS` (15)"
+                    },
+                    {
+                      "textRaw": "`memLevel` {number} **Default:** `9`.",
+                      "name": "memLevel",
+                      "type": "number",
+                      "default": "`9`"
+                    },
+                    {
+                      "textRaw": "`strategy` {number} **Default:** `Z_DEFAULT_STRATEGY`.",
+                      "name": "strategy",
+                      "type": "number",
+                      "default": "`Z_DEFAULT_STRATEGY`"
+                    },
+                    {
+                      "textRaw": "`dictionary` {Buffer|TypedArray|DataView}",
+                      "name": "dictionary",
+                      "type": "Buffer|TypedArray|DataView"
+                    }
+                  ],
+                  "optional": true
+                }
+              ],
+              "return": {
+                "textRaw": "Returns: {Object} A stateful transform.",
+                "name": "return",
+                "type": "Object",
+                "desc": "A stateful transform."
+              }
+            }
+          ],
+          "desc": "<p>Create a deflate compression transform. Output is compatible with\n<code>zlib.inflate()</code> and <code>decompressDeflate()</code>/<code>decompressDeflateSync()</code>.</p>"
+        },
+        {
+          "textRaw": "`compressGzip([options])`",
+          "name": "compressGzip",
+          "type": "method",
+          "signatures": [
+            {
+              "params": [
+                {
+                  "name": "options",
+                  "optional": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "textRaw": "`compressGzipSync([options])`",
+          "name": "compressGzipSync",
+          "type": "method",
+          "meta": {
+            "added": [
+              "v25.9.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`options` {Object}",
+                  "name": "options",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`chunkSize` {number} Output buffer size. **Default:** `65536` (64 KB).",
+                      "name": "chunkSize",
+                      "type": "number",
+                      "default": "`65536` (64 KB)",
+                      "desc": "Output buffer size."
+                    },
+                    {
+                      "textRaw": "`level` {number} Compression level (`0`-`9`). **Default:** `4`.",
+                      "name": "level",
+                      "type": "number",
+                      "default": "`4`",
+                      "desc": "Compression level (`0`-`9`)."
+                    },
+                    {
+                      "textRaw": "`windowBits` {number} **Default:** `Z_DEFAULT_WINDOWBITS` (15).",
+                      "name": "windowBits",
+                      "type": "number",
+                      "default": "`Z_DEFAULT_WINDOWBITS` (15)"
+                    },
+                    {
+                      "textRaw": "`memLevel` {number} **Default:** `9`.",
+                      "name": "memLevel",
+                      "type": "number",
+                      "default": "`9`"
+                    },
+                    {
+                      "textRaw": "`strategy` {number} **Default:** `Z_DEFAULT_STRATEGY`.",
+                      "name": "strategy",
+                      "type": "number",
+                      "default": "`Z_DEFAULT_STRATEGY`"
+                    },
+                    {
+                      "textRaw": "`dictionary` {Buffer|TypedArray|DataView}",
+                      "name": "dictionary",
+                      "type": "Buffer|TypedArray|DataView"
+                    }
+                  ],
+                  "optional": true
+                }
+              ],
+              "return": {
+                "textRaw": "Returns: {Object} A stateful transform.",
+                "name": "return",
+                "type": "Object",
+                "desc": "A stateful transform."
+              }
+            }
+          ],
+          "desc": "<p>Create a gzip compression transform. Output is compatible with <code>zlib.gunzip()</code>\nand <code>decompressGzip()</code>/<code>decompressGzipSync()</code>.</p>"
+        },
+        {
+          "textRaw": "`compressZstd([options])`",
+          "name": "compressZstd",
+          "type": "method",
+          "signatures": [
+            {
+              "params": [
+                {
+                  "name": "options",
+                  "optional": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "textRaw": "`compressZstdSync([options])`",
+          "name": "compressZstdSync",
+          "type": "method",
+          "meta": {
+            "added": [
+              "v25.9.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`options` {Object}",
+                  "name": "options",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`chunkSize` {number} Output buffer size. **Default:** `65536` (64 KB).",
+                      "name": "chunkSize",
+                      "type": "number",
+                      "default": "`65536` (64 KB)",
+                      "desc": "Output buffer size."
+                    },
+                    {
+                      "textRaw": "`params` {Object} Key-value object where keys and values are `zlib.constants` entries. The most important compressor parameters are:",
+                      "name": "params",
+                      "type": "Object",
+                      "desc": "Key-value object where keys and values are `zlib.constants` entries. The most important compressor parameters are:",
+                      "options": [
+                        {
+                          "textRaw": "`ZSTD_c_compressionLevel` -- **Default:** `ZSTD_CLEVEL_DEFAULT` (3).",
+                          "name": "ZSTD_c_compressionLevel",
+                          "default": "`ZSTD_CLEVEL_DEFAULT` (3)",
+                          "desc": "-"
+                        },
+                        {
+                          "textRaw": "`ZSTD_c_checksumFlag` -- generate a checksum. **Default:** `0`.",
+                          "name": "ZSTD_c_checksumFlag",
+                          "default": "`0`",
+                          "desc": "- generate a checksum."
+                        },
+                        {
+                          "textRaw": "`ZSTD_c_strategy` -- compression strategy. Values include `ZSTD_fast`, `ZSTD_dfast`, `ZSTD_greedy`, `ZSTD_lazy`, `ZSTD_lazy2`, `ZSTD_btlazy2`, `ZSTD_btopt`, `ZSTD_btultra`, `ZSTD_btultra2`. See the Zstd compressor options in the zlib documentation for the full list.",
+                          "name": "ZSTD_c_strategy",
+                          "desc": "- compression strategy. Values include `ZSTD_fast`, `ZSTD_dfast`, `ZSTD_greedy`, `ZSTD_lazy`, `ZSTD_lazy2`, `ZSTD_btlazy2`, `ZSTD_btopt`, `ZSTD_btultra`, `ZSTD_btultra2`. See the Zstd compressor options in the zlib documentation for the full list."
+                        }
+                      ]
+                    },
+                    {
+                      "textRaw": "`pledgedSrcSize` {number} Expected uncompressed size (optional hint).",
+                      "name": "pledgedSrcSize",
+                      "type": "number",
+                      "desc": "Expected uncompressed size (optional hint)."
+                    },
+                    {
+                      "textRaw": "`dictionary` {Buffer|TypedArray|DataView}",
+                      "name": "dictionary",
+                      "type": "Buffer|TypedArray|DataView"
+                    }
+                  ],
+                  "optional": true
+                }
+              ],
+              "return": {
+                "textRaw": "Returns: {Object} A stateful transform.",
+                "name": "return",
+                "type": "Object",
+                "desc": "A stateful transform."
+              }
+            }
+          ],
+          "desc": "<p>Create a Zstandard compression transform. Output is compatible with\n<code>zlib.zstdDecompress()</code> and <code>decompressZstd()</code>/<code>decompressZstdSync()</code>.</p>"
+        },
+        {
+          "textRaw": "`decompressBrotli([options])`",
+          "name": "decompressBrotli",
+          "type": "method",
+          "signatures": [
+            {
+              "params": [
+                {
+                  "name": "options",
+                  "optional": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "textRaw": "`decompressBrotliSync([options])`",
+          "name": "decompressBrotliSync",
+          "type": "method",
+          "meta": {
+            "added": [
+              "v25.9.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`options` {Object}",
+                  "name": "options",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`chunkSize` {number} Output buffer size. **Default:** `65536` (64 KB).",
+                      "name": "chunkSize",
+                      "type": "number",
+                      "default": "`65536` (64 KB)",
+                      "desc": "Output buffer size."
+                    },
+                    {
+                      "textRaw": "`params` {Object} Key-value object where keys and values are `zlib.constants` entries. Available decompressor parameters:",
+                      "name": "params",
+                      "type": "Object",
+                      "desc": "Key-value object where keys and values are `zlib.constants` entries. Available decompressor parameters:",
+                      "options": [
+                        {
+                          "textRaw": "`BROTLI_DECODER_PARAM_DISABLE_RING_BUFFER_REALLOCATION` -- boolean flag affecting internal memory allocation.",
+                          "name": "BROTLI_DECODER_PARAM_DISABLE_RING_BUFFER_REALLOCATION",
+                          "desc": "- boolean flag affecting internal memory allocation."
+                        },
+                        {
+                          "textRaw": "`BROTLI_DECODER_PARAM_LARGE_WINDOW` -- boolean flag enabling \"Large Window Brotli\" mode (not compatible with RFC 7932). See the Brotli decompressor options in the zlib documentation for details.",
+                          "name": "BROTLI_DECODER_PARAM_LARGE_WINDOW",
+                          "desc": "- boolean flag enabling \"Large Window Brotli\" mode (not compatible with RFC 7932). See the Brotli decompressor options in the zlib documentation for details."
+                        }
+                      ]
+                    },
+                    {
+                      "textRaw": "`dictionary` {Buffer|TypedArray|DataView}",
+                      "name": "dictionary",
+                      "type": "Buffer|TypedArray|DataView"
+                    }
+                  ],
+                  "optional": true
+                }
+              ],
+              "return": {
+                "textRaw": "Returns: {Object} A stateful transform.",
+                "name": "return",
+                "type": "Object",
+                "desc": "A stateful transform."
+              }
+            }
+          ],
+          "desc": "<p>Create a Brotli decompression transform.</p>"
+        },
+        {
+          "textRaw": "`decompressDeflate([options])`",
+          "name": "decompressDeflate",
+          "type": "method",
+          "signatures": [
+            {
+              "params": [
+                {
+                  "name": "options",
+                  "optional": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "textRaw": "`decompressDeflateSync([options])`",
+          "name": "decompressDeflateSync",
+          "type": "method",
+          "meta": {
+            "added": [
+              "v25.9.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`options` {Object}",
+                  "name": "options",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`chunkSize` {number} Output buffer size. **Default:** `65536` (64 KB).",
+                      "name": "chunkSize",
+                      "type": "number",
+                      "default": "`65536` (64 KB)",
+                      "desc": "Output buffer size."
+                    },
+                    {
+                      "textRaw": "`windowBits` {number} **Default:** `Z_DEFAULT_WINDOWBITS` (15).",
+                      "name": "windowBits",
+                      "type": "number",
+                      "default": "`Z_DEFAULT_WINDOWBITS` (15)"
+                    },
+                    {
+                      "textRaw": "`dictionary` {Buffer|TypedArray|DataView}",
+                      "name": "dictionary",
+                      "type": "Buffer|TypedArray|DataView"
+                    }
+                  ],
+                  "optional": true
+                }
+              ],
+              "return": {
+                "textRaw": "Returns: {Object} A stateful transform.",
+                "name": "return",
+                "type": "Object",
+                "desc": "A stateful transform."
+              }
+            }
+          ],
+          "desc": "<p>Create a deflate decompression transform.</p>"
+        },
+        {
+          "textRaw": "`decompressGzip([options])`",
+          "name": "decompressGzip",
+          "type": "method",
+          "signatures": [
+            {
+              "params": [
+                {
+                  "name": "options",
+                  "optional": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "textRaw": "`decompressGzipSync([options])`",
+          "name": "decompressGzipSync",
+          "type": "method",
+          "meta": {
+            "added": [
+              "v25.9.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`options` {Object}",
+                  "name": "options",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`chunkSize` {number} Output buffer size. **Default:** `65536` (64 KB).",
+                      "name": "chunkSize",
+                      "type": "number",
+                      "default": "`65536` (64 KB)",
+                      "desc": "Output buffer size."
+                    },
+                    {
+                      "textRaw": "`windowBits` {number} **Default:** `Z_DEFAULT_WINDOWBITS` (15).",
+                      "name": "windowBits",
+                      "type": "number",
+                      "default": "`Z_DEFAULT_WINDOWBITS` (15)"
+                    },
+                    {
+                      "textRaw": "`dictionary` {Buffer|TypedArray|DataView}",
+                      "name": "dictionary",
+                      "type": "Buffer|TypedArray|DataView"
+                    }
+                  ],
+                  "optional": true
+                }
+              ],
+              "return": {
+                "textRaw": "Returns: {Object} A stateful transform.",
+                "name": "return",
+                "type": "Object",
+                "desc": "A stateful transform."
+              }
+            }
+          ],
+          "desc": "<p>Create a gzip decompression transform.</p>"
+        },
+        {
+          "textRaw": "`decompressZstd([options])`",
+          "name": "decompressZstd",
+          "type": "method",
+          "signatures": [
+            {
+              "params": [
+                {
+                  "name": "options",
+                  "optional": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "textRaw": "`decompressZstdSync([options])`",
+          "name": "decompressZstdSync",
+          "type": "method",
+          "meta": {
+            "added": [
+              "v25.9.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`options` {Object}",
+                  "name": "options",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`chunkSize` {number} Output buffer size. **Default:** `65536` (64 KB).",
+                      "name": "chunkSize",
+                      "type": "number",
+                      "default": "`65536` (64 KB)",
+                      "desc": "Output buffer size."
+                    },
+                    {
+                      "textRaw": "`params` {Object} Key-value object where keys and values are `zlib.constants` entries. Available decompressor parameters:",
+                      "name": "params",
+                      "type": "Object",
+                      "desc": "Key-value object where keys and values are `zlib.constants` entries. Available decompressor parameters:",
+                      "options": [
+                        {
+                          "textRaw": "`ZSTD_d_windowLogMax` -- maximum window size (log2) the decompressor will allocate. Limits memory usage against malicious input. See the Zstd decompressor options in the zlib documentation for details.",
+                          "name": "ZSTD_d_windowLogMax",
+                          "desc": "- maximum window size (log2) the decompressor will allocate. Limits memory usage against malicious input. See the Zstd decompressor options in the zlib documentation for details."
+                        }
+                      ]
+                    },
+                    {
+                      "textRaw": "`dictionary` {Buffer|TypedArray|DataView}",
+                      "name": "dictionary",
+                      "type": "Buffer|TypedArray|DataView"
+                    }
+                  ],
+                  "optional": true
+                }
+              ],
+              "return": {
+                "textRaw": "Returns: {Object} A stateful transform.",
+                "name": "return",
+                "type": "Object",
+                "desc": "A stateful transform."
+              }
+            }
+          ],
+          "desc": "<p>Create a Zstandard decompression transform.</p>"
+        }
+      ],
+      "displayName": "Iterable Compression"
+    }
+  ]
+}

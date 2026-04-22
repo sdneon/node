@@ -19,6 +19,7 @@
     'node_shared_http_parser%': 'false',
     'node_shared_libuv%': 'false',
     'node_shared_lief%': 'false',
+    'node_shared_merve%': 'false',
     'node_shared_nbytes%': 'false',
     'node_shared_nghttp2%': 'false',
     'node_shared_openssl%': 'false',
@@ -114,6 +115,7 @@
       'src/node_config.cc',
       'src/node_config_file.cc',
       'src/node_constants.cc',
+      'src/node_cjs_lexer.cc',
       'src/node_contextify.cc',
       'src/node_credentials.cc',
       'src/node_debug.cc',
@@ -123,6 +125,7 @@
       'src/node_errors.cc',
       'src/node_external_reference.cc',
       'src/node_file.cc',
+      'src/node_file_utils.cc',
       'src/node_http_parser.cc',
       'src/node_http2.cc',
       'src/node_i18n.cc',
@@ -130,6 +133,7 @@
       'src/node_main_instance.cc',
       'src/node_messaging.cc',
       'src/node_metadata.cc',
+      'src/node_diagnostics_channel.cc',
       'src/node_modules.cc',
       'src/node_options.cc',
       'src/node_os.cc',
@@ -267,6 +271,7 @@
       'src/node_messaging.h',
       'src/node_metadata.h',
       'src/node_mutex.h',
+      'src/node_diagnostics_channel.h',
       'src/node_modules.h',
       'src/node_object_wrap.h',
       'src/node_options.h',
@@ -385,6 +390,7 @@
       'src/crypto/crypto_kem.cc',
       'src/crypto/crypto_hmac.cc',
       'src/crypto/crypto_kmac.cc',
+      'src/crypto/crypto_turboshake.cc',
       'src/crypto/crypto_random.cc',
       'src/crypto/crypto_rsa.cc',
       'src/crypto/crypto_spkac.cc',
@@ -403,6 +409,7 @@
       'src/crypto/crypto_dh.h',
       'src/crypto/crypto_hmac.h',
       'src/crypto/crypto_kmac.h',
+      'src/crypto/crypto_turboshake.h',
       'src/crypto/crypto_rsa.h',
       'src/crypto/crypto_spkac.h',
       'src/crypto/crypto_util.h',
@@ -638,7 +645,6 @@
           'xcode_settings': {
             'OTHER_LDFLAGS': [
               '-Wl,-force_load,<(PRODUCT_DIR)/<(STATIC_LIB_PREFIX)<(node_core_target_name)<(STATIC_LIB_SUFFIX)',
-              '-Wl,-force_load,<(PRODUCT_DIR)/<(STATIC_LIB_PREFIX)v8_base_without_compiler<(STATIC_LIB_SUFFIX)',
             ],
           },
           'msvs_settings': {
@@ -650,11 +656,25 @@
             },
           },
           'conditions': [
-            ['OS != "aix" and OS != "os400" and OS != "mac" and OS != "ios"', {
+            ['node_use_bundled_v8=="true"', {
+              'xcode_settings': {
+                'OTHER_LDFLAGS': [
+                  '-Wl,-force_load,<(PRODUCT_DIR)/<(STATIC_LIB_PREFIX)v8_base_without_compiler<(STATIC_LIB_SUFFIX)',
+                ],
+              },
+            }],
+            ['node_use_bundled_v8=="true" and OS != "aix" and OS != "os400" and OS != "mac" and OS != "ios"', {
               'ldflags': [
                 '-Wl,--whole-archive',
                 '<(obj_dir)/<(STATIC_LIB_PREFIX)<(node_core_target_name)<(STATIC_LIB_SUFFIX)',
                 '<(obj_dir)/tools/v8_gypfiles/<(STATIC_LIB_PREFIX)v8_base_without_compiler<(STATIC_LIB_SUFFIX)',
+                '-Wl,--no-whole-archive',
+              ],
+            }],
+            ['node_use_bundled_v8!="true" and OS != "aix" and OS != "os400" and OS != "mac" and OS != "ios"', {
+              'ldflags': [
+                '-Wl,--whole-archive',
+                '<(obj_dir)/<(STATIC_LIB_PREFIX)<(node_core_target_name)<(STATIC_LIB_SUFFIX)',
                 '-Wl,--no-whole-archive',
               ],
             }],
@@ -877,7 +897,6 @@
         '<(SHARED_INTERMEDIATE_DIR)' # for node_natives.h
       ],
       'dependencies': [
-        'tools/v8_gypfiles/abseil.gyp:abseil',
         'node_js2c#host',
       ],
 
@@ -931,12 +950,21 @@
           },
         }],
         [ 'node_builtin_modules_path!=""', {
-          'defines': [ 'NODE_BUILTIN_MODULES_PATH="<(node_builtin_modules_path)"' ]
+          'defines': [ 'NODE_BUILTIN_MODULES_PATH="<(node_builtin_modules_path)"' ],
+          # When loading builtins from disk, JS source files do not need to
+          # trigger rebuilds since the binary reads them at runtime.
+          'sources!': [
+            '<@(library_files)',
+            '<@(deps_files)',
+          ],
         }],
         [ 'node_shared=="true"', {
           'sources': [
             'src/node_snapshot_stub.cc',
           ]
+        }],
+        [ 'node_use_bundled_v8!="false"', {
+          'dependencies': [ 'tools/v8_gypfiles/abseil.gyp:abseil' ],
         }],
         [ 'node_shared_gtest=="false"', {
           'dependencies': [
@@ -1082,6 +1110,16 @@
             '<@(library_files)',
             '<@(deps_files)',
             'config.gypi'
+          ],
+          'conditions': [
+            [ 'node_builtin_modules_path!=""', {
+              # When loading builtins from disk, JS source files do not need
+              # to trigger rebuilds since the binary reads them at runtime.
+              'inputs!': [
+                '<@(library_files)',
+                '<@(deps_files)',
+              ],
+            }],
           ],
           'outputs': [
             '<(SHARED_INTERMEDIATE_DIR)/node_javascript.cc',
@@ -1258,7 +1296,6 @@
 
       'dependencies': [
         '<(node_lib_target_name)',
-        'tools/v8_gypfiles/abseil.gyp:abseil',
       ],
 
       'includes': [
@@ -1291,6 +1328,9 @@
         }],
         [ 'node_shared_gtest=="true"', {
           'libraries': [ '-lgtest_main' ],
+        }],
+        [ 'node_use_bundled_v8!="false"', {
+          'dependencies': [ 'tools/v8_gypfiles/abseil.gyp:abseil' ],
         }],
         [ 'node_shared_hdr_histogram=="false"', {
           'dependencies': [
@@ -1527,7 +1567,10 @@
         'src/builtin_info.cc',
       ],
       'conditions': [
-        [ 'node_shared_simdutf=="false"', {
+        [ 'OS=="mac"', {
+          'libraries': [ '-framework CoreFoundation -framework Security' ],
+        }],
+        [ 'node_shared_simdutf=="false" and node_use_bundled_v8!="false"', {
           'dependencies': [ 'tools/v8_gypfiles/v8.gyp:simdutf#host' ],
         }],
         [ 'node_shared_libuv=="false"', {
