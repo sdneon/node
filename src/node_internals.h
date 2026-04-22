@@ -365,6 +365,8 @@ v8::Isolate* NewIsolate(v8::Isolate::CreateParams* params,
 // was provided by the embedder.
 v8::MaybeLocal<v8::Value> StartExecution(
     Environment* env, StartExecutionCallbackWithModule cb = nullptr);
+v8::MaybeLocal<v8::Value> RunMainScript(Environment* env,
+                                         const char* main_script_id);
 v8::MaybeLocal<v8::Object> GetPerContextExports(
     v8::Local<v8::Context> context, IsolateData* isolate_data = nullptr);
 void MarkBootstrapComplete(const v8::FunctionCallbackInfo<v8::Value>& args);
