@@ -57,23 +57,23 @@ using v8::Value;
 
 static void ThrowQuotaExceededException(Local<Context> context) {
   Isolate* isolate = Isolate::GetCurrent();
-  auto dom_exception_str = FIXED_ONE_BYTE_STRING(isolate, "DOMException");
-  auto err_name = FIXED_ONE_BYTE_STRING(isolate, "QuotaExceededError");
+  auto quota_exceeded_str =
+      FIXED_ONE_BYTE_STRING(isolate, "QuotaExceededError");
   auto err_message =
       FIXED_ONE_BYTE_STRING(isolate, "Setting the value exceeded the quota");
   Local<Object> per_context_bindings;
-  Local<Value> domexception_ctor_val;
+  Local<Value> quota_exceeded_ctor_val;
   if (!GetPerContextExports(context).ToLocal(&per_context_bindings) ||
-      !per_context_bindings->Get(context, dom_exception_str)
-           .ToLocal(&domexception_ctor_val)) {
+      !per_context_bindings->Get(context, quota_exceeded_str)
+           .ToLocal(&quota_exceeded_ctor_val)) {
     return;
   }
-  CHECK(domexception_ctor_val->IsFunction());
-  Local<Function> domexception_ctor = domexception_ctor_val.As<Function>();
-  Local<Value> argv[] = {err_message, err_name};
+  CHECK(quota_exceeded_ctor_val->IsFunction());
+  Local<Function> quota_exceeded_ctor = quota_exceeded_ctor_val.As<Function>();
+  Local<Value> argv[] = {err_message};
   Local<Value> exception;
 
-  if (!domexception_ctor->NewInstance(context, arraysize(argv), argv)
+  if (!quota_exceeded_ctor->NewInstance(context, arraysize(argv), argv)
            .ToLocal(&exception)) {
     return;
   }
@@ -530,7 +530,7 @@ template <typename T>
 static bool ShouldIntercept(Local<Name> property,
                             const PropertyCallbackInfo<T>& info) {
   Environment* env = Environment::GetCurrent(info);
-  Local<Value> proto = info.This()->GetPrototypeV2();
+  Local<Value> proto = info.HolderV2()->GetPrototypeV2();
 
   if (proto->IsObject()) {
     bool has_prop;
@@ -554,7 +554,7 @@ static Intercepted StorageGetter(Local<Name> property,
   }
 
   Storage* storage;
-  ASSIGN_OR_RETURN_UNWRAP(&storage, info.This(), Intercepted::kNo);
+  ASSIGN_OR_RETURN_UNWRAP(&storage, info.HolderV2(), Intercepted::kNo);
   Local<Value> result;
 
   if (storage->Load(property).ToLocal(&result) && !result->IsNull()) {
@@ -568,7 +568,7 @@ static Intercepted StorageSetter(Local<Name> property,
                                  Local<Value> value,
                                  const PropertyCallbackInfo<void>& info) {
   Storage* storage;
-  ASSIGN_OR_RETURN_UNWRAP(&storage, info.This(), Intercepted::kNo);
+  ASSIGN_OR_RETURN_UNWRAP(&storage, info.HolderV2(), Intercepted::kNo);
 
   if (storage->Store(property, value).IsNothing()) {
     info.GetReturnValue().SetFalse();
@@ -584,7 +584,7 @@ static Intercepted StorageQuery(Local<Name> property,
   }
 
   Storage* storage;
-  ASSIGN_OR_RETURN_UNWRAP(&storage, info.This(), Intercepted::kNo);
+  ASSIGN_OR_RETURN_UNWRAP(&storage, info.HolderV2(), Intercepted::kNo);
   Local<Value> result;
   if (!storage->Load(property).ToLocal(&result) || result->IsNull()) {
     return Intercepted::kNo;
@@ -597,7 +597,7 @@ static Intercepted StorageQuery(Local<Name> property,
 static Intercepted StorageDeleter(Local<Name> property,
                                   const PropertyCallbackInfo<Boolean>& info) {
   Storage* storage;
-  ASSIGN_OR_RETURN_UNWRAP(&storage, info.This(), Intercepted::kNo);
+  ASSIGN_OR_RETURN_UNWRAP(&storage, info.HolderV2(), Intercepted::kNo);
 
   info.GetReturnValue().Set(storage->Remove(property).IsJust());
 
@@ -606,7 +606,7 @@ static Intercepted StorageDeleter(Local<Name> property,
 
 static void StorageEnumerator(const PropertyCallbackInfo<Array>& info) {
   Storage* storage;
-  ASSIGN_OR_RETURN_UNWRAP(&storage, info.This());
+  ASSIGN_OR_RETURN_UNWRAP(&storage, info.HolderV2());
   Local<Array> result;
   if (!storage->Enumerate().ToLocal(&result)) {
     return;
@@ -618,7 +618,7 @@ static Intercepted StorageDefiner(Local<Name> property,
                                   const PropertyDescriptor& desc,
                                   const PropertyCallbackInfo<void>& info) {
   Storage* storage;
-  ASSIGN_OR_RETURN_UNWRAP(&storage, info.This(), Intercepted::kNo);
+  ASSIGN_OR_RETURN_UNWRAP(&storage, info.HolderV2(), Intercepted::kNo);
 
   if (desc.has_value()) {
     return StorageSetter(property, desc.value(), info);

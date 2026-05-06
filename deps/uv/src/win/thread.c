@@ -284,7 +284,7 @@ int uv_thread_equal(const uv_thread_t* t1, const uv_thread_t* t2) {
 static void uv__thread_name_init_once(void) {
   HMODULE m;
 
-  m = GetModuleHandleA("api-ms-win-core-processthreads-l1-1-3.dll");
+  m = GetModuleHandleW(L"api-ms-win-core-processthreads-l1-1-3.dll");
   if (m != NULL) {
     pGetThreadDescription = (void*) GetProcAddress(m, "GetThreadDescription");
     pSetThreadDescription = (void*) GetProcAddress(m, "SetThreadDescription");
@@ -346,7 +346,6 @@ int uv_thread_getname(uv_thread_t* tid, char* name, size_t size) {
   if (!GetExitCodeThread(*tid, &exit_code) || exit_code != STILL_ACTIVE)
     return UV_ENOENT;
 
-#if WINVER >= 0x0603  // >= Windows 8.1
   namew = NULL;
   thread_name = NULL;
   hr = pGetThreadDescription(*tid, &namew);
@@ -365,9 +364,6 @@ int uv_thread_getname(uv_thread_t* tid, char* name, size_t size) {
 
   LocalFree(namew);
   return r;
-#else
-  return 0;
-#endif
 }
 
 

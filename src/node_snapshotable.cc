@@ -1370,7 +1370,8 @@ StartupData SerializeNodeContextData(Local<Context> holder,
     case ContextEmbedderIndex::kContextifyContext:
     case ContextEmbedderIndex::kRealm:
     case ContextEmbedderIndex::kContextTag: {
-      void* data = holder->GetAlignedPointerFromEmbedderData(index);
+      void* data = holder->GetAlignedPointerFromEmbedderData(
+          index, EmbedderDataTag::kPerContextData);
       per_process::Debug(
           DebugCategory::MKSNAPSHOT,
           "Serialize context data, index=%d, holder=%p, ptr=%p\n",
@@ -1461,7 +1462,8 @@ StartupData SerializeNodeContextInternalFields(Local<Object> holder,
   // For the moment we do not set any internal fields in ArrayBuffer
   // or ArrayBufferViews, so just return nullptr.
   if (holder->IsArrayBuffer() || holder->IsArrayBufferView()) {
-    CHECK_NULL(holder->GetAlignedPointerFromInternalField(index));
+    CHECK_NULL(holder->GetAlignedPointerFromInternalField(
+        index, EmbedderDataTag::kDefault));
     return StartupData{nullptr, 0};
   }
 
@@ -1480,8 +1482,9 @@ StartupData SerializeNodeContextInternalFields(Local<Object> holder,
                      static_cast<int>(index),
                      *holder);
 
-  BaseObject* object_ptr = static_cast<BaseObject*>(
-      holder->GetAlignedPointerFromInternalField(BaseObject::kSlot));
+  BaseObject* object_ptr =
+      static_cast<BaseObject*>(holder->GetAlignedPointerFromInternalField(
+          BaseObject::kSlot, EmbedderDataTag::kDefault));
   // If the native object is already set to null, ignore it.
   if (object_ptr == nullptr) {
     return StartupData{nullptr, 0};

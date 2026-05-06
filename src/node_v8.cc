@@ -73,7 +73,8 @@ using v8::Value;
   V(10, number_of_detached_contexts, kNumberOfDetachedContextsIndex)           \
   V(11, total_global_handles_size, kTotalGlobalHandlesSizeIndex)               \
   V(12, used_global_handles_size, kUsedGlobalHandlesSizeIndex)                 \
-  V(13, external_memory, kExternalMemoryIndex)
+  V(13, external_memory, kExternalMemoryIndex)                                 \
+  V(14, total_allocated_bytes, kTotalAllocatedBytes)
 
 #define V(a, b, c) +1
 static constexpr size_t kHeapStatisticsPropertiesCount =
@@ -210,12 +211,6 @@ void UpdateHeapStatisticsBuffer(const FunctionCallbackInfo<Value>& args) {
 #define V(index, name, _) buffer[index] = static_cast<double>(s.name());
   HEAP_STATISTICS_PROPERTIES(V)
 #undef V
-}
-
-void GetTotalAllocatedBytes(const FunctionCallbackInfo<Value>& args) {
-  Isolate* isolate = args.GetIsolate();
-  uint64_t allocated_bytes = isolate->GetTotalAllocatedBytes();
-  args.GetReturnValue().Set(Number::New(isolate, allocated_bytes));
 }
 
 
@@ -700,11 +695,6 @@ void Initialize(Local<Object> target,
 
   SetMethod(context,
             target,
-            "getTotalAllocatedBytes",
-            GetTotalAllocatedBytes);
-
-  SetMethod(context,
-            target,
             "updateHeapCodeStatisticsBuffer",
             UpdateHeapCodeStatisticsBuffer);
   SetMethodNoSideEffect(
@@ -784,7 +774,6 @@ void Initialize(Local<Object> target,
 void RegisterExternalReferences(ExternalReferenceRegistry* registry) {
   registry->Register(CachedDataVersionTag);
   registry->Register(UpdateHeapStatisticsBuffer);
-  registry->Register(GetTotalAllocatedBytes);
   registry->Register(UpdateHeapCodeStatisticsBuffer);
   registry->Register(UpdateHeapSpaceStatisticsBuffer);
   registry->Register(SetFlagsFromString);

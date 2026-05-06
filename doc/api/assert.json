@@ -45,7 +45,16 @@
               }
             ]
           },
-          "desc": "<p>In strict assertion mode, non-strict methods behave like their corresponding\nstrict methods. For example, <a href=\"#assertdeepequalactual-expected-message\"><code>assert.deepEqual()</code></a> will behave like\n<a href=\"#assertdeepstrictequalactual-expected-message\"><code>assert.deepStrictEqual()</code></a>.</p>\n<p>In strict assertion mode, error messages for objects display a diff. In legacy\nassertion mode, error messages for objects display the objects, often truncated.</p>\n<p>To use strict assertion mode:</p>\n<pre><code class=\"language-mjs\">import { strict as assert } from 'node:assert';\n</code></pre>\n<pre><code class=\"language-cjs\">const assert = require('node:assert').strict;\n</code></pre>\n<pre><code class=\"language-mjs\">import assert from 'node:assert/strict';\n</code></pre>\n<pre><code class=\"language-cjs\">const assert = require('node:assert/strict');\n</code></pre>\n<p>Example error diff:</p>\n<pre><code class=\"language-mjs\">import { strict as assert } from 'node:assert';\n\nassert.deepEqual([[[1, 2, 3]], 4, 5], [[[1, 2, '3']], 4, 5]);\n// AssertionError: Expected inputs to be strictly deep-equal:\n// + actual - expected ... Lines skipped\n//\n//   [\n//     [\n// ...\n//       2,\n// +     3\n// -     '3'\n//     ],\n// ...\n//     5\n//   ]\n</code></pre>\n<pre><code class=\"language-cjs\">const assert = require('node:assert/strict');\n\nassert.deepEqual([[[1, 2, 3]], 4, 5], [[[1, 2, '3']], 4, 5]);\n// AssertionError: Expected inputs to be strictly deep-equal:\n// + actual - expected ... Lines skipped\n//\n//   [\n//     [\n// ...\n//       2,\n// +     3\n// -     '3'\n//     ],\n// ...\n//     5\n//   ]\n</code></pre>\n<p>To deactivate the colors, use the <code>NO_COLOR</code> or <code>NODE_DISABLE_COLORS</code>\nenvironment variables. This will also deactivate the colors in the REPL. For\nmore on color support in terminal environments, read the tty\n<a href=\"tty.html#writestreamgetcolordepthenv\"><code>getColorDepth()</code></a> documentation.</p>",
+          "desc": "<p>In strict assertion mode, non-strict methods behave like their corresponding\nstrict methods. For example, <a href=\"#assertdeepequalactual-expected-message\"><code>assert.deepEqual()</code></a> will behave like\n<a href=\"#assertdeepstrictequalactual-expected-message\"><code>assert.deepStrictEqual()</code></a>.</p>\n<p>In strict assertion mode, error messages for objects display a diff. In legacy\nassertion mode, error messages for objects display the objects, often truncated.</p>",
+          "modules": [
+            {
+              "textRaw": "Message parameter semantics",
+              "name": "message_parameter_semantics",
+              "type": "module",
+              "desc": "<p>For assertion methods that accept an optional <code>message</code> parameter, the message\nmay be provided in one of the following forms:</p>\n<ul>\n<li><strong>string</strong>: Used as-is. If additional arguments are supplied after the\n<code>message</code> string, they are treated as printf-like substitutions (see\n<a href=\"util.html#utilformatformat-args\"><code>util.format()</code></a>).</li>\n<li><strong>Error</strong>: If an <code>Error</code> instance is provided as <code>message</code>, that error is\nthrown directly instead of an <code>AssertionError</code>.</li>\n<li><strong>function</strong>: A function of the form <code>(actual, expected) => string</code>. It is\ncalled only when the assertion fails and should return a string to be used as\nthe error message. Non-string return values are ignored and the default\nmessage is used instead.</li>\n</ul>\n<p>If additional arguments are passed along with an <code>Error</code> or a function as\n<code>message</code>, the call is rejected with <code>ERR_AMBIGUOUS_ARGUMENT</code>.</p>\n<p>If the first item is neither a string, <code>Error</code>, nor function, <code>ERR_INVALID_ARG_TYPE</code>\nis thrown.</p>\n<p>To use strict assertion mode:</p>\n<pre><code class=\"language-mjs\">import { strict as assert } from 'node:assert';\n</code></pre>\n<pre><code class=\"language-cjs\">const assert = require('node:assert').strict;\n</code></pre>\n<pre><code class=\"language-mjs\">import assert from 'node:assert/strict';\n</code></pre>\n<pre><code class=\"language-cjs\">const assert = require('node:assert/strict');\n</code></pre>\n<p>Example error diff:</p>\n<pre><code class=\"language-mjs\">import { strict as assert } from 'node:assert';\n\nassert.deepEqual([[[1, 2, 3]], 4, 5], [[[1, 2, '3']], 4, 5]);\n// AssertionError: Expected inputs to be strictly deep-equal:\n// + actual - expected ... Lines skipped\n//\n//   [\n//     [\n// ...\n//       2,\n// +     3\n// -     '3'\n//     ],\n// ...\n//     5\n//   ]\n</code></pre>\n<pre><code class=\"language-cjs\">const assert = require('node:assert/strict');\n\nassert.deepEqual([[[1, 2, 3]], 4, 5], [[[1, 2, '3']], 4, 5]);\n// AssertionError: Expected inputs to be strictly deep-equal:\n// + actual - expected ... Lines skipped\n//\n//   [\n//     [\n// ...\n//       2,\n// +     3\n// -     '3'\n//     ],\n// ...\n//     5\n//   ]\n</code></pre>\n<p>To deactivate the colors, use the <code>NO_COLOR</code> or <code>NODE_DISABLE_COLORS</code>\nenvironment variables. This will also deactivate the colors in the REPL. For\nmore on color support in terminal environments, read the tty\n<a href=\"tty.html#writestreamgetcolordepthenv\"><code>getColorDepth()</code></a> documentation.</p>",
+              "displayName": "Message parameter semantics"
+            }
+          ],
           "displayName": "Strict assertion mode"
         },
         {
@@ -190,7 +199,13 @@
             "added": [
               "v0.5.9"
             ],
-            "changes": []
+            "changes": [
+              {
+                "version": "v26.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/58849",
+                "description": "Message may now be a `printf`-like format string or function."
+              }
+            ]
           },
           "signatures": [
             {
@@ -202,9 +217,9 @@
                   "desc": "The input that is checked for being truthy."
                 },
                 {
-                  "textRaw": "`message` {string|Error}",
+                  "textRaw": "`message` {string|Error|Function}",
                   "name": "message",
-                  "type": "string|Error",
+                  "type": "string|Error|Function",
                   "optional": true
                 }
               ]
@@ -221,6 +236,11 @@
               "v0.1.21"
             ],
             "changes": [
+              {
+                "version": "v26.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/58849",
+                "description": "Message may now be a `printf`-like format string or function."
+              },
               {
                 "version": "v25.0.0",
                 "pr-url": "https://github.com/nodejs/node/pull/59448",
@@ -319,9 +339,9 @@
                   "type": "any"
                 },
                 {
-                  "textRaw": "`message` {string|Error}",
+                  "textRaw": "`message` {string|Error|Function}",
                   "name": "message",
-                  "type": "string|Error",
+                  "type": "string|Error|Function",
                   "optional": true
                 }
               ]
@@ -347,6 +367,11 @@
               "v1.2.0"
             ],
             "changes": [
+              {
+                "version": "v25.1.0",
+                "pr-url": "https://github.com/nodejs/node/pull/58849",
+                "description": "Message may now be a `printf`-like format string or function."
+              },
               {
                 "version": "v25.0.0",
                 "pr-url": "https://github.com/nodejs/node/pull/59448",
@@ -432,9 +457,9 @@
                   "type": "any"
                 },
                 {
-                  "textRaw": "`message` {string|Error}",
+                  "textRaw": "`message` {string|Error|Function}",
                   "name": "message",
-                  "type": "string|Error",
+                  "type": "string|Error|Function",
                   "optional": true
                 }
               ]
@@ -462,6 +487,11 @@
             ],
             "changes": [
               {
+                "version": "v26.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/58849",
+                "description": "Message may now be a `printf`-like format string or function."
+              },
+              {
                 "version": "v16.0.0",
                 "pr-url": "https://github.com/nodejs/node/pull/38111",
                 "description": "This API is no longer experimental."
@@ -482,9 +512,9 @@
                   "type": "RegExp"
                 },
                 {
-                  "textRaw": "`message` {string|Error}",
+                  "textRaw": "`message` {string|Error|Function}",
                   "name": "message",
-                  "type": "string|Error",
+                  "type": "string|Error|Function",
                   "optional": true
                 }
               ]
@@ -591,6 +621,11 @@
             ],
             "changes": [
               {
+                "version": "v26.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/58849",
+                "description": "Message may now be a `printf`-like format string or function."
+              },
+              {
                 "version": [
                   "v16.0.0",
                   "v14.18.0"
@@ -621,9 +656,9 @@
                   "type": "any"
                 },
                 {
-                  "textRaw": "`message` {string|Error}",
+                  "textRaw": "`message` {string|Error|Function}",
                   "name": "message",
-                  "type": "string|Error",
+                  "type": "string|Error|Function",
                   "optional": true
                 }
               ]
@@ -701,6 +736,11 @@
             ],
             "changes": [
               {
+                "version": "v26.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/58849",
+                "description": "Message may now be a `printf`-like format string or function."
+              },
+              {
                 "version": "v16.0.0",
                 "pr-url": "https://github.com/nodejs/node/pull/38111",
                 "description": "This API is no longer experimental."
@@ -721,9 +761,9 @@
                   "type": "RegExp"
                 },
                 {
-                  "textRaw": "`message` {string|Error}",
+                  "textRaw": "`message` {string|Error|Function}",
                   "name": "message",
-                  "type": "string|Error",
+                  "type": "string|Error|Function",
                   "optional": true
                 }
               ]
@@ -740,6 +780,11 @@
               "v0.1.21"
             ],
             "changes": [
+              {
+                "version": "v26.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/58849",
+                "description": "Message may now be a `printf`-like format string or function."
+              },
               {
                 "version": [
                   "v16.0.0",
@@ -805,9 +850,9 @@
                   "type": "any"
                 },
                 {
-                  "textRaw": "`message` {string|Error}",
+                  "textRaw": "`message` {string|Error|Function}",
                   "name": "message",
-                  "type": "string|Error",
+                  "type": "string|Error|Function",
                   "optional": true
                 }
               ]
@@ -824,6 +869,11 @@
               "v1.2.0"
             ],
             "changes": [
+              {
+                "version": "v26.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/58849",
+                "description": "Message may now be a `printf`-like format string or function."
+              },
               {
                 "version": "v9.0.0",
                 "pr-url": "https://github.com/nodejs/node/pull/15398",
@@ -881,9 +931,9 @@
                   "type": "any"
                 },
                 {
-                  "textRaw": "`message` {string|Error}",
+                  "textRaw": "`message` {string|Error|Function}",
                   "name": "message",
-                  "type": "string|Error",
+                  "type": "string|Error|Function",
                   "optional": true
                 }
               ]
@@ -900,6 +950,11 @@
               "v0.1.21"
             ],
             "changes": [
+              {
+                "version": "v26.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/58849",
+                "description": "Message may now be a `printf`-like format string or function."
+              },
               {
                 "version": [
                   "v16.0.0",
@@ -931,9 +986,9 @@
                   "type": "any"
                 },
                 {
-                  "textRaw": "`message` {string|Error}",
+                  "textRaw": "`message` {string|Error|Function}",
                   "name": "message",
-                  "type": "string|Error",
+                  "type": "string|Error|Function",
                   "optional": true
                 }
               ]
@@ -950,6 +1005,11 @@
               "v0.1.21"
             ],
             "changes": [
+              {
+                "version": "v26.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/58849",
+                "description": "Message may now be a `printf`-like format string or function."
+              },
               {
                 "version": "v10.0.0",
                 "pr-url": "https://github.com/nodejs/node/pull/17003",
@@ -971,9 +1031,9 @@
                   "type": "any"
                 },
                 {
-                  "textRaw": "`message` {string|Error}",
+                  "textRaw": "`message` {string|Error|Function}",
                   "name": "message",
-                  "type": "string|Error",
+                  "type": "string|Error|Function",
                   "optional": true
                 }
               ]
@@ -991,6 +1051,11 @@
             ],
             "changes": [
               {
+                "version": "v26.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/58849",
+                "description": "Message may now be a `printf`-like format string or function."
+              },
+              {
                 "version": "v10.0.0",
                 "pr-url": "https://github.com/nodejs/node/pull/18319",
                 "description": "The `assert.ok()` (no arguments) will now use a predefined error message."
@@ -1006,9 +1071,9 @@
                   "type": "any"
                 },
                 {
-                  "textRaw": "`message` {string|Error}",
+                  "textRaw": "`message` {string|Error|Function}",
                   "name": "message",
-                  "type": "string|Error",
+                  "type": "string|Error|Function",
                   "optional": true
                 }
               ]
@@ -1066,6 +1131,11 @@
             ],
             "changes": [
               {
+                "version": "v26.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/58849",
+                "description": "Message may now be a `printf`-like format string or function."
+              },
+              {
                 "version": "v10.0.0",
                 "pr-url": "https://github.com/nodejs/node/pull/17003",
                 "description": "Used comparison changed from Strict Equality to `Object.is()`."
@@ -1086,15 +1156,16 @@
                   "type": "any"
                 },
                 {
-                  "textRaw": "`message` {string|Error}",
+                  "textRaw": "`message` {string|Error|Function} Postfix `printf`-like arguments in case it's used as format string. If message is a function, it is called in case of a comparison failure. The function receives the `actual` and `expected` arguments and has to return a string that is going to be used as error message. `printf`-like format strings and functions are beneficial for performance reasons in case arguments are passed through. In addition, it allows nice formatting with ease.",
                   "name": "message",
-                  "type": "string|Error",
+                  "type": "string|Error|Function",
+                  "desc": "Postfix `printf`-like arguments in case it's used as format string. If message is a function, it is called in case of a comparison failure. The function receives the `actual` and `expected` arguments and has to return a string that is going to be used as error message. `printf`-like format strings and functions are beneficial for performance reasons in case arguments are passed through. In addition, it allows nice formatting with ease.",
                   "optional": true
                 }
               ]
             }
           ],
-          "desc": "<p>Tests strict equality between the <code>actual</code> and <code>expected</code> parameters as\ndetermined by <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is\"><code>Object.is()</code></a>.</p>\n<pre><code class=\"language-mjs\">import assert from 'node:assert/strict';\n\nassert.strictEqual(1, 2);\n// AssertionError [ERR_ASSERTION]: Expected inputs to be strictly equal:\n//\n// 1 !== 2\n\nassert.strictEqual(1, 1);\n// OK\n\nassert.strictEqual('Hello foobar', 'Hello World!');\n// AssertionError [ERR_ASSERTION]: Expected inputs to be strictly equal:\n// + actual - expected\n//\n// + 'Hello foobar'\n// - 'Hello World!'\n//          ^\n\nconst apples = 1;\nconst oranges = 2;\nassert.strictEqual(apples, oranges, `apples ${apples} !== oranges ${oranges}`);\n// AssertionError [ERR_ASSERTION]: apples 1 !== oranges 2\n\nassert.strictEqual(1, '1', new TypeError('Inputs are not identical'));\n// TypeError: Inputs are not identical\n</code></pre>\n<pre><code class=\"language-cjs\">const assert = require('node:assert/strict');\n\nassert.strictEqual(1, 2);\n// AssertionError [ERR_ASSERTION]: Expected inputs to be strictly equal:\n//\n// 1 !== 2\n\nassert.strictEqual(1, 1);\n// OK\n\nassert.strictEqual('Hello foobar', 'Hello World!');\n// AssertionError [ERR_ASSERTION]: Expected inputs to be strictly equal:\n// + actual - expected\n//\n// + 'Hello foobar'\n// - 'Hello World!'\n//          ^\n\nconst apples = 1;\nconst oranges = 2;\nassert.strictEqual(apples, oranges, `apples ${apples} !== oranges ${oranges}`);\n// AssertionError [ERR_ASSERTION]: apples 1 !== oranges 2\n\nassert.strictEqual(1, '1', new TypeError('Inputs are not identical'));\n// TypeError: Inputs are not identical\n</code></pre>\n<p>If the values are not strictly equal, an <a href=\"#class-assertassertionerror\"><code>AssertionError</code></a> is thrown with a\n<code>message</code> property set equal to the value of the <code>message</code> parameter. If the\n<code>message</code> parameter is undefined, a default error message is assigned. If the\n<code>message</code> parameter is an instance of <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error\"><code>&#x3C;Error></code></a> then it will be thrown\ninstead of the <a href=\"#class-assertassertionerror\"><code>AssertionError</code></a>.</p>"
+          "desc": "<p>Tests strict equality between the <code>actual</code> and <code>expected</code> parameters as\ndetermined by <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is\"><code>Object.is()</code></a>.</p>\n<pre><code class=\"language-mjs\">import assert from 'node:assert/strict';\n\nassert.strictEqual(1, 2);\n// AssertionError [ERR_ASSERTION]: Expected inputs to be strictly equal:\n//\n// 1 !== 2\n\nassert.strictEqual(1, 1);\n// OK\n\nassert.strictEqual('Hello foobar', 'Hello World!');\n// AssertionError [ERR_ASSERTION]: Expected inputs to be strictly equal:\n// + actual - expected\n//\n// + 'Hello foobar'\n// - 'Hello World!'\n//          ^\n\nconst apples = 1;\nconst oranges = 2;\nassert.strictEqual(apples, oranges, `apples ${apples} !== oranges ${oranges}`);\n// AssertionError [ERR_ASSERTION]: apples 1 !== oranges 2\n\nassert.strictEqual(apples, oranges, 'apples %s !== oranges %s', apples, oranges);\n// AssertionError [ERR_ASSERTION]: apples 1 !== oranges 2\n\nassert.strictEqual(1, '1', new TypeError('Inputs are not identical'));\n// TypeError: Inputs are not identical\n\nassert.strictEqual(apples, oranges, (actual, expected) => {\n  // Do 'heavy' computations\n  return `I expected ${expected} but I got ${actual}`;\n});\n// AssertionError [ERR_ASSERTION]: I expected oranges but I got apples\n</code></pre>\n<pre><code class=\"language-cjs\">const assert = require('node:assert/strict');\n\nassert.strictEqual(1, 2);\n// AssertionError [ERR_ASSERTION]: Expected inputs to be strictly equal:\n//\n// 1 !== 2\n\nassert.strictEqual(1, 1);\n// OK\n\nassert.strictEqual('Hello foobar', 'Hello World!');\n// AssertionError [ERR_ASSERTION]: Expected inputs to be strictly equal:\n// + actual - expected\n//\n// + 'Hello foobar'\n// - 'Hello World!'\n//          ^\n\nconst apples = 1;\nconst oranges = 2;\nassert.strictEqual(apples, oranges, `apples ${apples} !== oranges ${oranges}`);\n// AssertionError [ERR_ASSERTION]: apples 1 !== oranges 2\n\nassert.strictEqual(apples, oranges, 'apples %s !== oranges %s', apples, oranges);\n// AssertionError [ERR_ASSERTION]: apples 1 !== oranges 2\n\nassert.strictEqual(1, '1', new TypeError('Inputs are not identical'));\n// TypeError: Inputs are not identical\n\nassert.strictEqual(apples, oranges, (actual, expected) => {\n  // Do 'heavy' computations\n  return `I expected ${expected} but I got ${actual}`;\n});\n// AssertionError [ERR_ASSERTION]: I expected oranges but I got apples\n</code></pre>\n<p>If the values are not strictly equal, an <a href=\"#class-assertassertionerror\"><code>AssertionError</code></a> is thrown with a\n<code>message</code> property set equal to the value of the <code>message</code> parameter. If the\n<code>message</code> parameter is undefined, a default error message is assigned. If the\n<code>message</code> parameter is an instance of <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error\"><code>&#x3C;Error></code></a> then it will be thrown\ninstead of the <a href=\"#class-assertassertionerror\"><code>AssertionError</code></a>.</p>"
         },
         {
           "textRaw": "`assert.throws(fn[, error][, message])`",
@@ -1191,9 +1262,9 @@
                   "type": "any"
                 },
                 {
-                  "textRaw": "`message` {string|Error}",
+                  "textRaw": "`message` {string|Error|Function}",
                   "name": "message",
-                  "type": "string|Error",
+                  "type": "string|Error|Function",
                   "optional": true
                 }
               ]

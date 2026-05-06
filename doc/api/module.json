@@ -154,6 +154,16 @@
                 ],
                 "changes": [
                   {
+                    "version": "v26.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/62401",
+                    "description": "Runtime deprecation (DEP0205)."
+                  },
+                  {
+                    "version": "v26.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/62395",
+                    "description": "Documentation-only deprecation (DEP0205). Use `module.registerHooks()` instead."
+                  },
+                  {
                     "version": [
                       "v23.6.1",
                       "v22.13.1",
@@ -172,7 +182,7 @@
                   }
                 ],
                 "deprecated": [
-                  "v25.9.0"
+                  "v26.0.0"
                 ]
               },
               "stability": 0,
@@ -238,7 +248,8 @@
                 "changes": [
                   {
                     "version": [
-                      "v25.4.0"
+                      "v25.4.0",
+                      "v24.13.1"
                     ],
                     "pr-url": "https://github.com/nodejs/node/pull/60960",
                     "description": "Synchronous and in-thread hooks are now release candidate."
@@ -291,7 +302,13 @@
                   "v23.2.0",
                   "v22.13.0"
                 ],
-                "changes": []
+                "changes": [
+                  {
+                    "version": "v26.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/61803",
+                    "description": "Removed `transform` and `sourceMap` options."
+                  }
+                ]
               },
               "stability": 1.2,
               "stabilityText": "Release candidate",
@@ -318,18 +335,8 @@
                             {
                               "textRaw": "`'strip'` Only strip type annotations without performing the transformation of TypeScript features.",
                               "desc": "`'strip'` Only strip type annotations without performing the transformation of TypeScript features."
-                            },
-                            {
-                              "textRaw": "`'transform'` Strip type annotations and transform TypeScript features to JavaScript.",
-                              "desc": "`'transform'` Strip type annotations and transform TypeScript features to JavaScript."
                             }
                           ]
-                        },
-                        {
-                          "textRaw": "`sourceMap` {boolean} **Default:** `false`. Only when `mode` is `'transform'`, if `true`, a source map will be generated for the transformed code.",
-                          "name": "sourceMap",
-                          "type": "boolean",
-                          "default": "`false`. Only when `mode` is `'transform'`, if `true`, a source map will be generated for the transformed code"
                         },
                         {
                           "textRaw": "`sourceUrl` {string} Specifies the source url used in the source map.",
@@ -349,7 +356,7 @@
                   }
                 }
               ],
-              "desc": "<p><code>module.stripTypeScriptTypes()</code> removes type annotations from TypeScript code. It\ncan be used to strip type annotations from TypeScript code before running it\nwith <code>vm.runInContext()</code> or <code>vm.compileFunction()</code>.</p>\n<p>By default, it will throw an error if the code contains TypeScript features\nthat require transformation such as <code>Enums</code>,\nsee <a href=\"typescript.html#type-stripping\">type-stripping</a> for more information.</p>\n<p>When mode is <code>'transform'</code>, it also transforms TypeScript features to JavaScript,\nsee <a href=\"typescript.html#typescript-features\">transform TypeScript features</a> for more information.</p>\n<p>When mode is <code>'strip'</code>, source maps are not generated, because locations are preserved.\nIf <code>sourceMap</code> is provided, when mode is <code>'strip'</code>, an error will be thrown.</p>\n<p><em>WARNING</em>: The output of this function should not be considered stable across Node.js versions,\ndue to changes in the TypeScript parser.</p>\n<pre><code class=\"language-mjs\">import { stripTypeScriptTypes } from 'node:module';\nconst code = 'const a: number = 1;';\nconst strippedCode = stripTypeScriptTypes(code);\nconsole.log(strippedCode);\n// Prints: const a         = 1;\n</code></pre>\n<pre><code class=\"language-cjs\">const { stripTypeScriptTypes } = require('node:module');\nconst code = 'const a: number = 1;';\nconst strippedCode = stripTypeScriptTypes(code);\nconsole.log(strippedCode);\n// Prints: const a         = 1;\n</code></pre>\n<p>If <code>sourceUrl</code> is provided, it will be used appended as a comment at the end of the output:</p>\n<pre><code class=\"language-mjs\">import { stripTypeScriptTypes } from 'node:module';\nconst code = 'const a: number = 1;';\nconst strippedCode = stripTypeScriptTypes(code, { mode: 'strip', sourceUrl: 'source.ts' });\nconsole.log(strippedCode);\n// Prints: const a         = 1\\n\\n//# sourceURL=source.ts;\n</code></pre>\n<pre><code class=\"language-cjs\">const { stripTypeScriptTypes } = require('node:module');\nconst code = 'const a: number = 1;';\nconst strippedCode = stripTypeScriptTypes(code, { mode: 'strip', sourceUrl: 'source.ts' });\nconsole.log(strippedCode);\n// Prints: const a         = 1\\n\\n//# sourceURL=source.ts;\n</code></pre>\n<p>When <code>mode</code> is <code>'transform'</code>, the code is transformed to JavaScript:</p>\n<pre><code class=\"language-mjs\">import { stripTypeScriptTypes } from 'node:module';\nconst code = `\n  namespace MathUtil {\n    export const add = (a: number, b: number) => a + b;\n  }`;\nconst strippedCode = stripTypeScriptTypes(code, { mode: 'transform', sourceMap: true });\nconsole.log(strippedCode);\n// Prints:\n// var MathUtil;\n// (function(MathUtil) {\n//     MathUtil.add = (a, b)=>a + b;\n// })(MathUtil || (MathUtil = {}));\n// # sourceMappingURL=data:application/json;base64, ...\n</code></pre>\n<pre><code class=\"language-cjs\">const { stripTypeScriptTypes } = require('node:module');\nconst code = `\n  namespace MathUtil {\n    export const add = (a: number, b: number) => a + b;\n  }`;\nconst strippedCode = stripTypeScriptTypes(code, { mode: 'transform', sourceMap: true });\nconsole.log(strippedCode);\n// Prints:\n// var MathUtil;\n// (function(MathUtil) {\n//     MathUtil.add = (a, b)=>a + b;\n// })(MathUtil || (MathUtil = {}));\n// # sourceMappingURL=data:application/json;base64, ...\n</code></pre>"
+              "desc": "<p><code>module.stripTypeScriptTypes()</code> removes type annotations from TypeScript code. It\ncan be used to strip type annotations from TypeScript code before running it\nwith <code>vm.runInContext()</code> or <code>vm.compileFunction()</code>.</p>\n<p>By default, it will throw an error if the code contains TypeScript features\nthat require transformation, such as <code>enum</code>s. See <a href=\"typescript.html#type-stripping\">type-stripping</a> for more information.</p>\n<p><em>WARNING</em>: The output of this function should not be considered stable across Node.js versions,\ndue to changes in the TypeScript parser.</p>\n<pre><code class=\"language-mjs\">import { stripTypeScriptTypes } from 'node:module';\nconst code = 'const a: number = 1;';\nconst strippedCode = stripTypeScriptTypes(code);\nconsole.log(strippedCode);\n// Prints: const a         = 1;\n</code></pre>\n<pre><code class=\"language-cjs\">const { stripTypeScriptTypes } = require('node:module');\nconst code = 'const a: number = 1;';\nconst strippedCode = stripTypeScriptTypes(code);\nconsole.log(strippedCode);\n// Prints: const a         = 1;\n</code></pre>\n<p>If <code>sourceUrl</code> is provided, it will be used appended as a comment at the end of the output:</p>\n<pre><code class=\"language-mjs\">import { stripTypeScriptTypes } from 'node:module';\nconst code = 'const a: number = 1;';\nconst strippedCode = stripTypeScriptTypes(code, { mode: 'strip', sourceUrl: 'source.ts' });\nconsole.log(strippedCode);\n// Prints: const a         = 1\\n\\n//# sourceURL=source.ts;\n</code></pre>\n<pre><code class=\"language-cjs\">const { stripTypeScriptTypes } = require('node:module');\nconst code = 'const a: number = 1;';\nconst strippedCode = stripTypeScriptTypes(code, { mode: 'strip', sourceUrl: 'source.ts' });\nconsole.log(strippedCode);\n// Prints: const a         = 1\\n\\n//# sourceURL=source.ts;\n</code></pre>"
             },
             {
               "textRaw": "`module.syncBuiltinESMExports()`",
@@ -440,12 +447,18 @@
                     "description": "This feature is no longer experimental."
                   },
                   {
-                    "version": "v25.0.0",
+                    "version": [
+                      "v25.0.0",
+                      "v24.12.0"
+                    ],
                     "pr-url": "https://github.com/nodejs/node/pull/58797",
                     "description": "Add `portable` option to enable portable compile cache."
                   },
                   {
-                    "version": "v25.0.0",
+                    "version": [
+                      "v25.0.0",
+                      "v24.12.0"
+                    ],
                     "pr-url": "https://github.com/nodejs/node/pull/59931",
                     "description": "Rename the unreleased `path` option to `directory` to maintain consistency."
                   }
@@ -830,7 +843,8 @@
             "changes": [
               {
                 "version": [
-                  "v25.4.0"
+                  "v25.4.0",
+                  "v24.13.1"
                 ],
                 "pr-url": "https://github.com/nodejs/node/pull/60960",
                 "description": "Synchronous and in-thread hooks are now release candidate."

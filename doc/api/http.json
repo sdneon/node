@@ -42,14 +42,16 @@
                   },
                   {
                     "version": [
-                      "v24.5.0"
+                      "v24.5.0",
+                      "v22.21.0"
                     ],
                     "pr-url": "https://github.com/nodejs/node/pull/58980",
                     "description": "Add support for `proxyEnv`."
                   },
                   {
                     "version": [
-                      "v24.5.0"
+                      "v24.5.0",
+                      "v22.21.0"
                     ],
                     "pr-url": "https://github.com/nodejs/node/pull/58980",
                     "description": "Add support for `defaultPort` and `protocol`."
@@ -711,8 +713,8 @@
                   "type": "http.IncomingMessage"
                 },
                 {
-                  "textRaw": "`socket` {stream.Duplex}",
-                  "name": "socket",
+                  "textRaw": "`stream` {stream.Duplex}",
+                  "name": "stream",
                   "type": "stream.Duplex"
                 },
                 {
@@ -721,7 +723,7 @@
                   "type": "Buffer"
                 }
               ],
-              "desc": "<p>Emitted each time a server responds to a request with an upgrade. If this\nevent is not being listened for and the response status code is 101 Switching\nProtocols, clients receiving an upgrade header will have their connections\nclosed.</p>\n<p>This event is guaranteed to be passed an instance of the <a href=\"net.html#class-netsocket\"><code>&#x3C;net.Socket></code></a> class,\na subclass of <a href=\"stream.html#class-streamduplex\"><code>&#x3C;stream.Duplex></code></a>, unless the user specifies a socket\ntype other than <a href=\"net.html#class-netsocket\"><code>&#x3C;net.Socket></code></a>.</p>\n<p>A client server pair demonstrating how to listen for the <code>'upgrade'</code> event.</p>\n<pre><code class=\"language-mjs\">import http from 'node:http';\nimport process from 'node:process';\n\n// Create an HTTP server\nconst server = http.createServer((req, res) => {\n  res.writeHead(200, { 'Content-Type': 'text/plain' });\n  res.end('okay');\n});\nserver.on('upgrade', (req, socket, head) => {\n  socket.write('HTTP/1.1 101 Web Socket Protocol Handshake\\r\\n' +\n               'Upgrade: WebSocket\\r\\n' +\n               'Connection: Upgrade\\r\\n' +\n               '\\r\\n');\n\n  socket.pipe(socket); // echo back\n});\n\n// Now that server is running\nserver.listen(1337, '127.0.0.1', () => {\n\n  // make a request\n  const options = {\n    port: 1337,\n    host: '127.0.0.1',\n    headers: {\n      'Connection': 'Upgrade',\n      'Upgrade': 'websocket',\n    },\n  };\n\n  const req = http.request(options);\n  req.end();\n\n  req.on('upgrade', (res, socket, upgradeHead) => {\n    console.log('got upgraded!');\n    socket.end();\n    process.exit(0);\n  });\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const http = require('node:http');\n\n// Create an HTTP server\nconst server = http.createServer((req, res) => {\n  res.writeHead(200, { 'Content-Type': 'text/plain' });\n  res.end('okay');\n});\nserver.on('upgrade', (req, socket, head) => {\n  socket.write('HTTP/1.1 101 Web Socket Protocol Handshake\\r\\n' +\n               'Upgrade: WebSocket\\r\\n' +\n               'Connection: Upgrade\\r\\n' +\n               '\\r\\n');\n\n  socket.pipe(socket); // echo back\n});\n\n// Now that server is running\nserver.listen(1337, '127.0.0.1', () => {\n\n  // make a request\n  const options = {\n    port: 1337,\n    host: '127.0.0.1',\n    headers: {\n      'Connection': 'Upgrade',\n      'Upgrade': 'websocket',\n    },\n  };\n\n  const req = http.request(options);\n  req.end();\n\n  req.on('upgrade', (res, socket, upgradeHead) => {\n    console.log('got upgraded!');\n    socket.end();\n    process.exit(0);\n  });\n});\n</code></pre>"
+              "desc": "<p>Emitted each time a server responds to a request with an upgrade. If this\nevent is not being listened for and the response status code is 101 Switching\nProtocols, clients receiving an upgrade header will have their connections\nclosed.</p>\n<p>This event is guaranteed to be passed an instance of the <a href=\"net.html#class-netsocket\"><code>&#x3C;net.Socket></code></a> class,\na subclass of <a href=\"stream.html#class-streamduplex\"><code>&#x3C;stream.Duplex></code></a>, unless the user specifies a socket\ntype other than <a href=\"net.html#class-netsocket\"><code>&#x3C;net.Socket></code></a>.</p>\n<p>A client server pair demonstrating how to listen for the <code>'upgrade'</code> event.</p>\n<pre><code class=\"language-mjs\">import http from 'node:http';\nimport process from 'node:process';\n\n// Create an HTTP server\nconst server = http.createServer((req, res) => {\n  res.writeHead(200, { 'Content-Type': 'text/plain' });\n  res.end('okay');\n});\nserver.on('upgrade', (req, stream, head) => {\n  stream.write('HTTP/1.1 101 Web Socket Protocol Handshake\\r\\n' +\n               'Upgrade: WebSocket\\r\\n' +\n               'Connection: Upgrade\\r\\n' +\n               '\\r\\n');\n\n  stream.pipe(stream); // echo back\n});\n\n// Now that server is running\nserver.listen(1337, '127.0.0.1', () => {\n\n  // make a request\n  const options = {\n    port: 1337,\n    host: '127.0.0.1',\n    headers: {\n      'Connection': 'Upgrade',\n      'Upgrade': 'websocket',\n    },\n  };\n\n  const req = http.request(options);\n  req.end();\n\n  req.on('upgrade', (res, stream, upgradeHead) => {\n    console.log('got upgraded!');\n    stream.end();\n    process.exit(0);\n  });\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const http = require('node:http');\n\n// Create an HTTP server\nconst server = http.createServer((req, res) => {\n  res.writeHead(200, { 'Content-Type': 'text/plain' });\n  res.end('okay');\n});\nserver.on('upgrade', (req, stream, head) => {\n  stream.write('HTTP/1.1 101 Web Socket Protocol Handshake\\r\\n' +\n               'Upgrade: WebSocket\\r\\n' +\n               'Connection: Upgrade\\r\\n' +\n               '\\r\\n');\n\n  stream.pipe(stream); // echo back\n});\n\n// Now that server is running\nserver.listen(1337, '127.0.0.1', () => {\n\n  // make a request\n  const options = {\n    port: 1337,\n    host: '127.0.0.1',\n    headers: {\n      'Connection': 'Upgrade',\n      'Upgrade': 'websocket',\n    },\n  };\n\n  const req = http.request(options);\n  req.end();\n\n  req.on('upgrade', (res, stream, upgradeHead) => {\n    console.log('got upgraded!');\n    stream.end();\n    process.exit(0);\n  });\n});\n</code></pre>"
             }
           ],
           "methods": [
@@ -1615,7 +1617,15 @@
                 ],
                 "changes": [
                   {
-                    "version": "v24.9.0",
+                    "version": "v26.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/60016",
+                    "description": "Request bodies are no longer exposed raw (unparsed) on the socket argument. Instead, if a body is received, the stream argument will be a duplex that emits socket content only after the request body, while the parsed request body data will be emitted from the request, just as in normal server `'request'` events."
+                  },
+                  {
+                    "version": [
+                      "v24.9.0",
+                      "v22.21.0"
+                    ],
                     "pr-url": "https://github.com/nodejs/node/pull/59824",
                     "description": "Whether this event is fired can now be controlled by the `shouldUpgradeCallback` and sockets will be destroyed if upgraded while no event handler is listening."
                   },
@@ -1634,10 +1644,10 @@
                   "desc": "Arguments for the HTTP request, as it is in the `'request'` event"
                 },
                 {
-                  "textRaw": "`socket` {stream.Duplex} Network socket between the server and client",
-                  "name": "socket",
+                  "textRaw": "`stream` {stream.Duplex} The upgraded stream between the server and client",
+                  "name": "stream",
                   "type": "stream.Duplex",
-                  "desc": "Network socket between the server and client"
+                  "desc": "The upgraded stream between the server and client"
                 },
                 {
                   "textRaw": "`head` {Buffer} The first packet of the upgraded stream (may be empty)",
@@ -1646,7 +1656,7 @@
                   "desc": "The first packet of the upgraded stream (may be empty)"
                 }
               ],
-              "desc": "<p>Emitted each time a client's HTTP upgrade request is accepted. By default\nall HTTP upgrade requests are ignored (i.e. only regular <code>'request'</code> events\nare emitted, sticking with the normal HTTP request/response flow) unless you\nlisten to this event, in which case they are all accepted (i.e. the <code>'upgrade'</code>\nevent is emitted instead, and future communication must handled directly\nthrough the raw socket). You can control this more precisely by using the\nserver <code>shouldUpgradeCallback</code> option.</p>\n<p>Listening to this event is optional and clients cannot insist on a protocol\nchange.</p>\n<p>After this event is emitted, the request's socket will not have a <code>'data'</code>\nevent listener, meaning it will need to be bound in order to handle data\nsent to the server on that socket.</p>\n<p>If an upgrade is accepted by <code>shouldUpgradeCallback</code> but no event handler\nis registered then the socket is destroyed, resulting in an immediate\nconnection closure for the client.</p>\n<p>This event is guaranteed to be passed an instance of the <a href=\"net.html#class-netsocket\"><code>&#x3C;net.Socket></code></a> class,\na subclass of <a href=\"stream.html#class-streamduplex\"><code>&#x3C;stream.Duplex></code></a>, unless the user specifies a socket\ntype other than <a href=\"net.html#class-netsocket\"><code>&#x3C;net.Socket></code></a>.</p>"
+              "desc": "<p>Emitted each time a client's HTTP upgrade request is accepted. By default\nall HTTP upgrade requests are ignored (i.e. only regular <code>'request'</code> events\nare emitted, sticking with the normal HTTP request/response flow) unless you\nlisten to this event, in which case they are all accepted (i.e. the <code>'upgrade'</code>\nevent is emitted instead, and future communication must handled directly\nthrough the raw stream). You can control this more precisely by using the\nserver <code>shouldUpgradeCallback</code> option.</p>\n<p>Listening to this event is optional and clients cannot insist on a protocol\nchange.</p>\n<p>If an upgrade is accepted by <code>shouldUpgradeCallback</code> but no event handler\nis registered then the socket will be destroyed, resulting in an immediate\nconnection closure for the client.</p>\n<p>In the uncommon case that the incoming request has a body, this body will be\nparsed as normal, separate to the upgrade stream, and the raw stream data will\nonly begin after it has completed. To ensure that reading from the stream isn't\nblocked by waiting for the request body to be read, any reads on the stream\nwill start the request body flowing automatically. If you want to read the\nrequest body, ensure that you do so (i.e. you attach <code>'data'</code> listeners)\nbefore starting to read from the upgraded stream.</p>\n<p>The stream argument will typically be the <a href=\"net.html#class-netsocket\"><code>&#x3C;net.Socket></code></a> instance used by the\nrequest, but in some cases (such as with a request body) it may be a duplex\nstream. If required, you can access the raw connection underlying the request\nvia <a href=\"#requestsocket\"><code>request.socket</code></a>, which is guaranteed to be an instance of <a href=\"net.html#class-netsocket\"><code>&#x3C;net.Socket></code></a>\nunless the user specified another socket type.</p>"
             }
           ],
           "methods": [
@@ -3702,12 +3712,18 @@
             ],
             "changes": [
               {
-                "version": "v25.1.0",
+                "version": [
+                  "v25.1.0",
+                  "v24.12.0"
+                ],
                 "pr-url": "https://github.com/nodejs/node/pull/59778",
                 "description": "Add optimizeEmptyRequests option."
               },
               {
-                "version": "v24.9.0",
+                "version": [
+                  "v24.9.0",
+                  "v22.21.0"
+                ],
                 "pr-url": "https://github.com/nodejs/node/pull/59824",
                 "description": "The `shouldUpgradeCallback` option is now supported."
               },
@@ -4355,7 +4371,8 @@
           "type": "method",
           "meta": {
             "added": [
-              "v25.4.0"
+              "v25.4.0",
+              "v24.14.0"
             ],
             "changes": []
           },
@@ -4389,7 +4406,8 @@
           "type": "module",
           "meta": {
             "added": [
-              "v24.5.0"
+              "v24.5.0",
+              "v22.21.0"
             ],
             "changes": []
           },
