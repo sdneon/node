@@ -807,7 +807,7 @@
                   }
                 }
               ],
-              "desc": "<p>Allocates a new <code>Buffer</code> of <code>size</code> bytes. If <code>size</code> is larger than\n<a href=\"#bufferconstantsmax_length\"><code>buffer.constants.MAX_LENGTH</code></a> or smaller than 0, <a href=\"errors.html#err_out_of_range\"><code>ERR_OUT_OF_RANGE</code></a>\nis thrown. A zero-length <code>Buffer</code> is created if <code>size</code> is 0.</p>\n<p>The underlying memory for <code>Buffer</code> instances created in this way is <em>not\ninitialized</em>. The contents of the newly created <code>Buffer</code> are unknown and\n<em>may contain sensitive data</em>. Use <a href=\"#buffillvalue-offset-end-encoding\"><code>buf.fill(0)</code></a> to initialize\nsuch <code>Buffer</code> instances with zeroes.</p>\n<p>When using <a href=\"#static-method-bufferallocunsafesize\"><code>Buffer.allocUnsafe()</code></a> to allocate new <code>Buffer</code> instances,\nallocations less than <code>Buffer.poolSize >>> 1</code> (4KiB when default poolSize is used) are sliced\nfrom a single pre-allocated <code>Buffer</code>. This allows applications to avoid the\ngarbage collection overhead of creating many individually allocated <code>Buffer</code>\ninstances. This approach improves both performance and memory usage by\neliminating the need to track and clean up as many individual <code>ArrayBuffer</code> objects.</p>\n<p>However, in the case where a developer may need to retain a small chunk of\nmemory from a pool for an indeterminate amount of time, it may be appropriate\nto create an un-pooled <code>Buffer</code> instance using <code>Buffer.allocUnsafeSlow()</code> and\nthen copying out the relevant bits.</p>\n<pre><code class=\"language-mjs\">import { Buffer } from 'node:buffer';\n\n// Need to keep around a few small chunks of memory.\nconst store = [];\n\nsocket.on('readable', () => {\n  let data;\n  while (null !== (data = readable.read())) {\n    // Allocate for retained data.\n    const sb = Buffer.allocUnsafeSlow(10);\n\n    // Copy the data into the new allocation.\n    data.copy(sb, 0, 0, 10);\n\n    store.push(sb);\n  }\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const { Buffer } = require('node:buffer');\n\n// Need to keep around a few small chunks of memory.\nconst store = [];\n\nsocket.on('readable', () => {\n  let data;\n  while (null !== (data = readable.read())) {\n    // Allocate for retained data.\n    const sb = Buffer.allocUnsafeSlow(10);\n\n    // Copy the data into the new allocation.\n    data.copy(sb, 0, 0, 10);\n\n    store.push(sb);\n  }\n});\n</code></pre>\n<p>A <code>TypeError</code> will be thrown if <code>size</code> is not a number.</p>"
+              "desc": "<p>Allocates a new <code>Buffer</code> of <code>size</code> bytes. If <code>size</code> is larger than\n<a href=\"#bufferconstantsmax_length\"><code>buffer.constants.MAX_LENGTH</code></a> or smaller than 0, <a href=\"errors.html#err_out_of_range\"><code>ERR_OUT_OF_RANGE</code></a>\nis thrown. A zero-length <code>Buffer</code> is created if <code>size</code> is 0.</p>\n<p>The underlying memory for <code>Buffer</code> instances created in this way is <em>not\ninitialized</em>. The contents of the newly created <code>Buffer</code> are unknown and\n<em>may contain sensitive data</em>. Use <a href=\"#buffillvalue-offset-end-encoding\"><code>buf.fill(0)</code></a> to initialize\nsuch <code>Buffer</code> instances with zeroes.</p>\n<p>When using <a href=\"#static-method-bufferallocunsafesize\"><code>Buffer.allocUnsafe()</code></a> to allocate new <code>Buffer</code> instances,\nallocations less than <code>Buffer.poolSize >>> 1</code> (32KiB when default poolSize is used) are sliced\nfrom a single pre-allocated <code>Buffer</code>. This allows applications to avoid the\ngarbage collection overhead of creating many individually allocated <code>Buffer</code>\ninstances. This approach improves both performance and memory usage by\neliminating the need to track and clean up as many individual <code>ArrayBuffer</code> objects.</p>\n<p>However, in the case where a developer may need to retain a small chunk of\nmemory from a pool for an indeterminate amount of time, it may be appropriate\nto create an un-pooled <code>Buffer</code> instance using <code>Buffer.allocUnsafeSlow()</code> and\nthen copying out the relevant bits.</p>\n<pre><code class=\"language-mjs\">import { Buffer } from 'node:buffer';\n\n// Need to keep around a few small chunks of memory.\nconst store = [];\n\nsocket.on('readable', () => {\n  let data;\n  while (null !== (data = readable.read())) {\n    // Allocate for retained data.\n    const sb = Buffer.allocUnsafeSlow(10);\n\n    // Copy the data into the new allocation.\n    data.copy(sb, 0, 0, 10);\n\n    store.push(sb);\n  }\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const { Buffer } = require('node:buffer');\n\n// Need to keep around a few small chunks of memory.\nconst store = [];\n\nsocket.on('readable', () => {\n  let data;\n  while (null !== (data = readable.read())) {\n    // Allocate for retained data.\n    const sb = Buffer.allocUnsafeSlow(10);\n\n    // Copy the data into the new allocation.\n    data.copy(sb, 0, 0, 10);\n\n    store.push(sb);\n  }\n});\n</code></pre>\n<p>A <code>TypeError</code> will be thrown if <code>size</code> is not a number.</p>"
             },
             {
               "textRaw": "Static method: `Buffer.byteLength(string[, encoding])`",
@@ -1228,16 +1228,22 @@
           ],
           "properties": [
             {
-              "textRaw": "Type: {integer} **Default:** `8192`",
+              "textRaw": "Type: {integer} **Default:** `65536`",
               "name": "poolSize",
               "type": "integer",
               "meta": {
                 "added": [
                   "v0.11.3"
                 ],
-                "changes": []
+                "changes": [
+                  {
+                    "version": "v26.3.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/63597",
+                    "description": "Default raised from 8192 to 65536."
+                  }
+                ]
               },
-              "default": "`8192`",
+              "default": "`65536`",
               "desc": "<p>This is the size (in bytes) of pre-allocated internal <code>Buffer</code> instances used\nfor pooling. This value may be modified.</p>"
             },
             {

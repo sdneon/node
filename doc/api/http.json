@@ -9,7 +9,7 @@
       "type": "module",
       "stability": 2,
       "stabilityText": "Stable",
-      "desc": "<p>This module, containing both a client and server, can be imported via\n<code>require('node:http')</code> (CommonJS) or <code>import * as http from 'node:http'</code> (ES module).</p>\n<p>The HTTP interfaces in Node.js are designed to support many features\nof the protocol which have been traditionally difficult to use.\nIn particular, large, possibly chunk-encoded, messages. The interface is\ncareful to never buffer entire requests or responses, so the\nuser is able to stream data.</p>\n<p>HTTP message headers are represented by an object like this:</p>\n<pre><code class=\"language-json\">{ \"content-length\": \"123\",\n  \"content-type\": \"text/plain\",\n  \"connection\": \"keep-alive\",\n  \"host\": \"example.com\",\n  \"accept\": \"*/*\" }\n</code></pre>\n<p>Keys are lowercased. Values are not modified.</p>\n<p>In order to support the full spectrum of possible HTTP applications, the Node.js\nHTTP API is very low-level. It deals with stream handling and message\nparsing only. It parses a message into headers and body but it does not\nparse the actual headers or the body.</p>\n<p>See <a href=\"#messageheaders\"><code>message.headers</code></a> for details on how duplicate headers are handled.</p>\n<p>The raw headers as they were received are retained in the <code>rawHeaders</code>\nproperty, which is an array of <code>[key, value, key2, value2, ...]</code>. For\nexample, the previous message header object might have a <code>rawHeaders</code>\nlist like the following:</p>\n<pre><code class=\"language-js\">[ 'ConTent-Length', '123456',\n  'content-LENGTH', '123',\n  'content-type', 'text/plain',\n  'CONNECTION', 'keep-alive',\n  'Host', 'example.com',\n  'accepT', '*/*' ]\n</code></pre>",
+      "desc": "<p>This module, containing both a client and server, can be imported via\n<code>require('node:http')</code> (CommonJS) or <code>import * as http from 'node:http'</code> (ES module).</p>\n<p>The HTTP interfaces in Node.js are designed to support many features\nof the protocol which have been traditionally difficult to use.\nIn particular, large, possibly chunk-encoded, messages. The interface is\ncareful to never buffer entire requests or responses, so the\nuser is able to stream data.</p>\n<p>HTTP message headers are represented by an object like this:</p>\n<pre><code class=\"language-json\">{ \"content-length\": \"123\",\n  \"content-type\": \"text/plain\",\n  \"connection\": \"keep-alive\",\n  \"host\": \"example.com\",\n  \"accept\": \"*/*\" }\n</code></pre>\n<p>Keys are lowercased. Values are not modified.</p>\n<p>In order to support the full spectrum of possible HTTP applications, the Node.js\nHTTP API is very low-level. It deals with stream handling and message\nparsing only. It parses a message into headers and body but it does not\nparse the actual headers or the body.</p>\n<p>See <a href=\"#messageheaders\"><code>message.headers</code></a> for details on how duplicate headers are handled.</p>\n<p>The raw headers as they were received are retained in the <code>rawHeaders</code>\nproperty, which is an array of <code>[key, value, key2, value2, ...]</code>. For\nexample, the previous message header object might have a <code>rawHeaders</code>\nlist like the following:</p>\n<pre><code class=\"language-json\">[ \"ConTent-Length\", \"123456\",\n  \"content-LENGTH\", \"123\",\n  \"content-type\", \"text/plain\",\n  \"CONNECTION\", \"keep-alive\",\n  \"Host\", \"example.com\",\n  \"accepT\", \"*/*\" ]\n</code></pre>",
       "classes": [
         {
           "textRaw": "Class: `http.Agent`",
@@ -1464,7 +1464,7 @@
                   {
                     "version": "v12.0.0",
                     "pr-url": "https://github.com/nodejs/node/pull/25605",
-                    "description": "The default behavior will return a 431 Request Header Fields Too Large if a HPE_HEADER_OVERFLOW error occurs."
+                    "description": "The default behavior will return a 431 Request Header Fields Too Large if an HPE_HEADER_OVERFLOW error occurs."
                   },
                   {
                     "version": "v9.4.0",
@@ -1490,7 +1490,7 @@
                   "type": "stream.Duplex"
                 }
               ],
-              "desc": "<p>If a client connection emits an <code>'error'</code> event, it will be forwarded here.\nListener of this event is responsible for closing/destroying the underlying\nsocket. For example, one may wish to more gracefully close the socket with a\ncustom HTTP response instead of abruptly severing the connection. The socket\n<strong>must be closed or destroyed</strong> before the listener ends.</p>\n<p>This event is guaranteed to be passed an instance of the <a href=\"net.html#class-netsocket\"><code>&#x3C;net.Socket></code></a> class,\na subclass of <a href=\"stream.html#class-streamduplex\"><code>&#x3C;stream.Duplex></code></a>, unless the user specifies a socket\ntype other than <a href=\"net.html#class-netsocket\"><code>&#x3C;net.Socket></code></a>.</p>\n<p>Default behavior is to try close the socket with a HTTP '400 Bad Request',\nor a HTTP '431 Request Header Fields Too Large' in the case of a\n<a href=\"errors.html#hpe_header_overflow\"><code>HPE_HEADER_OVERFLOW</code></a> error. If the socket is not writable or headers\nof the current attached <a href=\"#class-httpserverresponse\"><code>http.ServerResponse</code></a> has been sent, it is\nimmediately destroyed.</p>\n<p><code>socket</code> is the <a href=\"net.html#class-netsocket\"><code>net.Socket</code></a> object that the error originated from.</p>\n<pre><code class=\"language-mjs\">import http from 'node:http';\n\nconst server = http.createServer((req, res) => {\n  res.end();\n});\nserver.on('clientError', (err, socket) => {\n  socket.end('HTTP/1.1 400 Bad Request\\r\\n\\r\\n');\n});\nserver.listen(8000);\n</code></pre>\n<pre><code class=\"language-cjs\">const http = require('node:http');\n\nconst server = http.createServer((req, res) => {\n  res.end();\n});\nserver.on('clientError', (err, socket) => {\n  socket.end('HTTP/1.1 400 Bad Request\\r\\n\\r\\n');\n});\nserver.listen(8000);\n</code></pre>\n<p>When the <code>'clientError'</code> event occurs, there is no <code>request</code> or <code>response</code>\nobject, so any HTTP response sent, including response headers and payload,\n<em>must</em> be written directly to the <code>socket</code> object. Care must be taken to\nensure the response is a properly formatted HTTP response message.</p>\n<p><code>err</code> is an instance of <code>Error</code> with two extra columns:</p>\n<ul>\n<li><code>bytesParsed</code>: the bytes count of request packet that Node.js may have parsed\ncorrectly;</li>\n<li><code>rawPacket</code>: the raw packet of current request.</li>\n</ul>\n<p>In some cases, the client has already received the response and/or the socket\nhas already been destroyed, like in case of <code>ECONNRESET</code> errors. Before\ntrying to send data to the socket, it is better to check that it is still\nwritable.</p>\n<pre><code class=\"language-js\">server.on('clientError', (err, socket) => {\n  if (err.code === 'ECONNRESET' || !socket.writable) {\n    return;\n  }\n\n  socket.end('HTTP/1.1 400 Bad Request\\r\\n\\r\\n');\n});\n</code></pre>"
+              "desc": "<p>If a client connection emits an <code>'error'</code> event, it will be forwarded here.\nListener of this event is responsible for closing/destroying the underlying\nsocket. For example, one may wish to more gracefully close the socket with a\ncustom HTTP response instead of abruptly severing the connection. The socket\n<strong>must be closed or destroyed</strong> before the listener ends.</p>\n<p>This event is guaranteed to be passed an instance of the <a href=\"net.html#class-netsocket\"><code>&#x3C;net.Socket></code></a> class,\na subclass of <a href=\"stream.html#class-streamduplex\"><code>&#x3C;stream.Duplex></code></a>, unless the user specifies a socket\ntype other than <a href=\"net.html#class-netsocket\"><code>&#x3C;net.Socket></code></a>.</p>\n<p>Default behavior is to try close the socket with an HTTP '400 Bad Request',\nor an HTTP '431 Request Header Fields Too Large' in the case of an\n<a href=\"errors.html#hpe_header_overflow\"><code>HPE_HEADER_OVERFLOW</code></a> error. If the socket is not writable or headers\nof the current attached <a href=\"#class-httpserverresponse\"><code>http.ServerResponse</code></a> has been sent, it is\nimmediately destroyed.</p>\n<p><code>socket</code> is the <a href=\"net.html#class-netsocket\"><code>net.Socket</code></a> object that the error originated from.</p>\n<pre><code class=\"language-mjs\">import http from 'node:http';\n\nconst server = http.createServer((req, res) => {\n  res.end();\n});\nserver.on('clientError', (err, socket) => {\n  socket.end('HTTP/1.1 400 Bad Request\\r\\n\\r\\n');\n});\nserver.listen(8000);\n</code></pre>\n<pre><code class=\"language-cjs\">const http = require('node:http');\n\nconst server = http.createServer((req, res) => {\n  res.end();\n});\nserver.on('clientError', (err, socket) => {\n  socket.end('HTTP/1.1 400 Bad Request\\r\\n\\r\\n');\n});\nserver.listen(8000);\n</code></pre>\n<p>When the <code>'clientError'</code> event occurs, there is no <code>request</code> or <code>response</code>\nobject, so any HTTP response sent, including response headers and payload,\n<em>must</em> be written directly to the <code>socket</code> object. Care must be taken to\nensure the response is a properly formatted HTTP response message.</p>\n<p><code>err</code> is an instance of <code>Error</code> with two extra columns:</p>\n<ul>\n<li><code>bytesParsed</code>: the bytes count of request packet that Node.js may have parsed\ncorrectly;</li>\n<li><code>rawPacket</code>: the raw packet of current request.</li>\n</ul>\n<p>In some cases, the client has already received the response and/or the socket\nhas already been destroyed, like in case of <code>ECONNRESET</code> errors. Before\ntrying to send data to the socket, it is better to check that it is still\nwritable.</p>\n<pre><code class=\"language-js\">server.on('clientError', (err, socket) => {\n  if (err.code === 'ECONNRESET' || !socket.writable) {\n    return;\n  }\n\n  socket.end('HTTP/1.1 400 Bad Request\\r\\n\\r\\n');\n});\n</code></pre>"
             },
             {
               "textRaw": "Event: `'close'`",
@@ -2456,6 +2456,44 @@
               "desc": "<p>Sends a response header to the request. The status code is a 3-digit HTTP\nstatus code, like <code>404</code>. The last argument, <code>headers</code>, are the response headers.\nOptionally one can give a human-readable <code>statusMessage</code> as the second\nargument.</p>\n<p><code>headers</code> may be an <code>Array</code> where the keys and values are in the same list.\nIt is <em>not</em> a list of tuples. So, the even-numbered offsets are key values,\nand the odd-numbered offsets are the associated values. The array is in the same\nformat as <code>request.rawHeaders</code>.</p>\n<p>Returns a reference to the <code>ServerResponse</code>, so that calls can be chained.</p>\n<pre><code class=\"language-js\">const body = 'hello world';\nresponse\n  .writeHead(200, {\n    'Content-Length': Buffer.byteLength(body),\n    'Content-Type': 'text/plain',\n  })\n  .end(body);\n</code></pre>\n<p>This method must only be called once on a message and it must\nbe called before <a href=\"#responseenddata-encoding-callback\"><code>response.end()</code></a> is called.</p>\n<p>If <a href=\"#responsewritechunk-encoding-callback\"><code>response.write()</code></a> or <a href=\"#responseenddata-encoding-callback\"><code>response.end()</code></a> are called before calling\nthis, the implicit/mutable headers will be calculated and call this function.</p>\n<p>When headers have been set with <a href=\"#responsesetheadername-value\"><code>response.setHeader()</code></a>, they will be merged\nwith any headers passed to <a href=\"#responsewriteheadstatuscode-statusmessage-headers\"><code>response.writeHead()</code></a>, with the headers passed\nto <a href=\"#responsewriteheadstatuscode-statusmessage-headers\"><code>response.writeHead()</code></a> given precedence.</p>\n<p>If this method is called and <a href=\"#responsesetheadername-value\"><code>response.setHeader()</code></a> has not been called,\nit will directly write the supplied header values onto the network channel\nwithout caching internally, and the <a href=\"#responsegetheadername\"><code>response.getHeader()</code></a> on the header\nwill not yield the expected result. If progressive population of headers is\ndesired with potential future retrieval and modification, use\n<a href=\"#responsesetheadername-value\"><code>response.setHeader()</code></a> instead.</p>\n<pre><code class=\"language-js\">// Returns content-type = text/plain\nconst server = http.createServer((req, res) => {\n  res.setHeader('Content-Type', 'text/html');\n  res.setHeader('X-Foo', 'bar');\n  res.writeHead(200, { 'Content-Type': 'text/plain' });\n  res.end('ok');\n});\n</code></pre>\n<p><code>Content-Length</code> is read in bytes, not characters. Use\n<a href=\"buffer.html#static-method-bufferbytelengthstring-encoding\"><code>Buffer.byteLength()</code></a> to determine the length of the body in bytes. Node.js\nwill check whether <code>Content-Length</code> and the length of the body which has\nbeen transmitted are equal or not.</p>\n<p>Attempting to set a header field name or value that contains invalid characters\nwill result in a <a href=\"errors.html#class-typeerror\"><code>TypeError</code></a> being thrown.</p>"
             },
             {
+              "textRaw": "`response.writeInformation(statusCode[, headers][, callback])`",
+              "name": "writeInformation",
+              "type": "method",
+              "meta": {
+                "added": [
+                  "v26.2.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`statusCode` {number} An HTTP 1xx informational status code, between `100` and `199` inclusive, excluding `101` (Switching Protocols) which is only available through the `'upgrade'` event.",
+                      "name": "statusCode",
+                      "type": "number",
+                      "desc": "An HTTP 1xx informational status code, between `100` and `199` inclusive, excluding `101` (Switching Protocols) which is only available through the `'upgrade'` event."
+                    },
+                    {
+                      "textRaw": "`headers` {Object|Array} An optional set of headers to send with the informational response. Accepts the same shapes as `response.writeHead()`.",
+                      "name": "headers",
+                      "type": "Object|Array",
+                      "desc": "An optional set of headers to send with the informational response. Accepts the same shapes as `response.writeHead()`.",
+                      "optional": true
+                    },
+                    {
+                      "textRaw": "`callback` {Function} Optional, called once the message has been written to the socket.",
+                      "name": "callback",
+                      "type": "Function",
+                      "desc": "Optional, called once the message has been written to the socket.",
+                      "optional": true
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>Sends an arbitrary HTTP/1.1 1xx informational response to the client. This\nis a generic equivalent of <a href=\"#responsewritecontinue\"><code>response.writeContinue()</code></a>,\n<a href=\"#responsewriteprocessing\"><code>response.writeProcessing()</code></a> and <a href=\"#responsewriteearlyhintshints-callback\"><code>response.writeEarlyHints()</code></a>, and\ncan be called multiple times before the final response. After the final\nresponse headers have been sent (via <a href=\"#responsewriteheadstatuscode-statusmessage-headers\"><code>response.writeHead()</code></a> or an\nimplicit header), calling this method throws <code>ERR_HTTP_HEADERS_SENT</code>.</p>\n<p>Clients receive these responses via the <a href=\"#event-information\"><code>'information'</code></a>\nevent on <code>http.ClientRequest</code>.</p>\n<pre><code class=\"language-js\">response.writeInformation(110, { 'X-Progress': '50%' });\n</code></pre>"
+            },
+            {
               "textRaw": "`response.writeProcessing()`",
               "name": "writeProcessing",
               "type": "method",
@@ -2470,7 +2508,7 @@
                   "params": []
                 }
               ],
-              "desc": "<p>Sends a HTTP/1.1 102 Processing message to the client, indicating that\nthe request body should be sent.</p>"
+              "desc": "<p>Sends an HTTP/1.1 102 Processing message to the client, indicating that\nthe request body should be sent.</p>"
             }
           ],
           "properties": [
@@ -3724,6 +3762,11 @@
             ],
             "changes": [
               {
+                "version": "v26.3.0",
+                "pr-url": "https://github.com/nodejs/node/pull/61597",
+                "description": "The `httpValidation` option is supported now."
+              },
+              {
                 "version": [
                   "v25.1.0",
                   "v24.12.0"
@@ -3817,11 +3860,32 @@
                       "desc": "Optionally overrides all `socket`s' `readableHighWaterMark` and `writableHighWaterMark`. This affects `highWaterMark` property of both `IncomingMessage` and `ServerResponse`."
                     },
                     {
-                      "textRaw": "`insecureHTTPParser` {boolean} If set to `true`, it will use a HTTP parser with leniency flags enabled. Using the insecure parser should be avoided. See `--insecure-http-parser` for more information. **Default:** `false`.",
+                      "textRaw": "`httpValidation` {string} Controls HTTP header value validation strictness for incoming requests. Accepted values are:",
+                      "name": "httpValidation",
+                      "type": "string",
+                      "desc": "Controls HTTP header value validation strictness for incoming requests. Accepted values are:",
+                      "options": [
+                        {
+                          "textRaw": "`'strict'`: Strictest validation; rejects any non-ASCII or control characters in header values.",
+                          "desc": "`'strict'`: Strictest validation; rejects any non-ASCII or control characters in header values."
+                        },
+                        {
+                          "textRaw": "`'relaxed'`: Allows a limited set of non-ASCII characters in header values, aligning with the Fetch specification.",
+                          "desc": "`'relaxed'`: Allows a limited set of non-ASCII characters in header values, aligning with the Fetch specification."
+                        },
+                        {
+                          "textRaw": "`'insecure'`: Disables all header value validation (equivalent to `insecureHTTPParser: true`). Cannot be used together with `insecureHTTPParser`. **Default:** `'strict'`.",
+                          "default": "`'strict'`",
+                          "desc": "`'insecure'`: Disables all header value validation (equivalent to `insecureHTTPParser: true`). Cannot be used together with `insecureHTTPParser`."
+                        }
+                      ]
+                    },
+                    {
+                      "textRaw": "`insecureHTTPParser` {boolean} If set to `true`, it will use an HTTP parser with leniency flags enabled. Using the insecure parser should be avoided. See `--insecure-http-parser` for more information. **Default:** `false`.",
                       "name": "insecureHTTPParser",
                       "type": "boolean",
                       "default": "`false`",
-                      "desc": "If set to `true`, it will use a HTTP parser with leniency flags enabled. Using the insecure parser should be avoided. See `--insecure-http-parser` for more information."
+                      "desc": "If set to `true`, it will use an HTTP parser with leniency flags enabled. Using the insecure parser should be avoided. See `--insecure-http-parser` for more information."
                     },
                     {
                       "textRaw": "`IncomingMessage` {http.IncomingMessage} Specifies the `IncomingMessage` class to be used. Useful for extending the original `IncomingMessage`. **Default:** `IncomingMessage`.",
@@ -4034,6 +4098,11 @@
             ],
             "changes": [
               {
+                "version": "v26.3.0",
+                "pr-url": "https://github.com/nodejs/node/pull/61597",
+                "description": "The `httpValidation` option is supported now."
+              },
+              {
                 "version": [
                   "v16.7.0",
                   "v14.18.0"
@@ -4162,11 +4231,32 @@
                       "desc": "Alias for `host`. To support `url.parse()`, `hostname` will be used if both `host` and `hostname` are specified."
                     },
                     {
-                      "textRaw": "`insecureHTTPParser` {boolean} If set to `true`, it will use a HTTP parser with leniency flags enabled. Using the insecure parser should be avoided. See `--insecure-http-parser` for more information. **Default:** `false`",
+                      "textRaw": "`httpValidation` {string} Controls HTTP header value validation strictness for outgoing requests. Accepted values are:",
+                      "name": "httpValidation",
+                      "type": "string",
+                      "desc": "Controls HTTP header value validation strictness for outgoing requests. Accepted values are:",
+                      "options": [
+                        {
+                          "textRaw": "`'strict'`: Strictest validation; rejects any non-ASCII or control characters in header values.",
+                          "desc": "`'strict'`: Strictest validation; rejects any non-ASCII or control characters in header values."
+                        },
+                        {
+                          "textRaw": "`'relaxed'`: Allows a limited set of non-ASCII characters in header values, aligning with the Fetch specification.",
+                          "desc": "`'relaxed'`: Allows a limited set of non-ASCII characters in header values, aligning with the Fetch specification."
+                        },
+                        {
+                          "textRaw": "`'insecure'`: Disables all header value validation (equivalent to `insecureHTTPParser: true`). Cannot be used together with `insecureHTTPParser`. **Default:** `'strict'`.",
+                          "default": "`'strict'`",
+                          "desc": "`'insecure'`: Disables all header value validation (equivalent to `insecureHTTPParser: true`). Cannot be used together with `insecureHTTPParser`."
+                        }
+                      ]
+                    },
+                    {
+                      "textRaw": "`insecureHTTPParser` {boolean} If set to `true`, it will use an HTTP parser with leniency flags enabled. Using the insecure parser should be avoided. See `--insecure-http-parser` for more information. **Default:** `false`",
                       "name": "insecureHTTPParser",
                       "type": "boolean",
                       "default": "`false`",
-                      "desc": "If set to `true`, it will use a HTTP parser with leniency flags enabled. Using the insecure parser should be avoided. See `--insecure-http-parser` for more information."
+                      "desc": "If set to `true`, it will use an HTTP parser with leniency flags enabled. Using the insecure parser should be avoided. See `--insecure-http-parser` for more information."
                     },
                     {
                       "textRaw": "`joinDuplicateHeaders` {boolean} It joins the field line values of multiple headers in a request with `, ` instead of discarding the duplicates. See `message.headers` for more information. **Default:** `false`.",

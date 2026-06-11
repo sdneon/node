@@ -348,7 +348,6 @@
       'src/quic/bindingdata.cc',
       'src/quic/cid.cc',
       'src/quic/data.cc',
-      'src/quic/logstream.cc',
       'src/quic/packet.cc',
       'src/quic/preferredaddress.cc',
       'src/quic/sessionticket.cc',
@@ -357,6 +356,7 @@
       'src/quic/endpoint.cc',
       'src/quic/http3.cc',
       'src/quic/session.cc',
+      'src/quic/session_manager.cc',
       'src/quic/streams.cc',
       'src/quic/tlscontext.cc',
       'src/quic/transportparams.cc',
@@ -366,7 +366,6 @@
       'src/quic/cid.h',
       'src/quic/data.h',
       'src/quic/defs.h',
-      'src/quic/logstream.h',
       'src/quic/packet.h',
       'src/quic/preferredaddress.h',
       'src/quic/sessionticket.h',
@@ -376,6 +375,7 @@
       'src/quic/endpoint.h',
       'src/quic/http3.h',
       'src/quic/session.h',
+      'src/quic/session_manager.h',
       'src/quic/streams.h',
       'src/quic/tlscontext.h',
       'src/quic/guard.h',
@@ -452,6 +452,7 @@
       'test/cctest/test_quic_cid.cc',
       'test/cctest/test_quic_error.cc',
       'test/cctest/test_quic_preferredaddress.cc',
+      'test/cctest/test_quic_tokenbucket.cc',
       'test/cctest/test_quic_tokens.cc',
     ],
     'node_cctest_inspector_sources': [
@@ -1021,11 +1022,6 @@
             'LD_DYLIB_INSTALL_NAME':
               '@rpath/lib<(node_core_target_name).<(shlib_suffix)'
           },
-        }],
-        [ 'node_use_node_code_cache=="true"', {
-          'defines': [
-            'NODE_USE_NODE_CODE_CACHE=1',
-          ],
         }],
         ['node_shared=="true" and OS in "aix os400"', {
           'product_name': 'node_base',

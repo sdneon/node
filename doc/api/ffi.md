@@ -30,15 +30,17 @@ const ffi = require('node:ffi');
 This module is only available under the `node:` scheme in builds with FFI
 support and is gated by the `--experimental-ffi` flag.
 
-Bundled libffi support currently targets:
+Building Node.js with `node:ffi` support is available via the bundled `libffi` on
+platforms where `libffi` provides a compatible static backend, or via a
+shared `libffi` using the `--shared-ffi` configure flag.
+The unofficial GN build does not support `node:ffi`.
 
-* macOS on `arm64` and `x64`
-* Windows on `arm64` and `x64`
-* FreeBSD on `arm`, `arm64`, and `x64`
-* Linux on `arm`, `arm64`, and `x64`
+The following targets are not supported by bundled libffi:
 
-Other targets require building Node.js against a shared libffi with
-`--shared-ffi`. The unofficial GN build does not support `node:ffi`.
+* `s390x`.
+* `mips`, `mipsel`, and `mips64el` on targets other than FreeBSD, Linux, and
+  OpenBSD.
+* `ppc64` on Android, CloudABI, iOS, OpenHarmony, OS/400, Solaris, and Windows.
 
 When using the [Permission Model][], FFI APIs are
 restricted unless the [`--allow-ffi`][] flag is provided.
@@ -122,18 +124,18 @@ such as `0` and `1`; JavaScript `true` and `false` are not accepted.
 
 Functions and callbacks are described with signature objects.
 
-Supported fields:
+Signature objects may contain the following properties, both of which are
+optional:
 
-* `result`, `return`, or `returns` for the return type.
-* `parameters` or `arguments` for the parameter type list.
+* `return` {string} A [type name][type names] specifying the return type of the
+  function or callback. **Default:** `'void'`.
+* `arguments` {string\[]} An array of [type names][] specifying the argument
+  type list of the function or callback. **Default:** `[]`.
 
-Only one return-type field and one parameter-list field may be present in a
-single signature object.
-
-```cjs
+```js
 const signature = {
-  result: 'i32',
-  parameters: ['i32', 'i32'],
+  return: 'i32',
+  arguments: ['i32', 'i32'],
 };
 ```
 
@@ -191,7 +193,7 @@ import { dlopen } from 'node:ffi';
 
 {
   using handle = dlopen('./mylib.so', {
-    add_i32: { parameters: ['i32', 'i32'], result: 'i32' },
+    add_i32: { arguments: ['i32', 'i32'], return: 'i32' },
   });
   console.log(handle.functions.add_i32(20, 22));
 } // handle.lib.close() is invoked automatically here.
@@ -201,8 +203,8 @@ import { dlopen } from 'node:ffi';
 import { dlopen } from 'node:ffi';
 
 const { lib, functions } = dlopen('./mylib.so', {
-  add_i32: { parameters: ['i32', 'i32'], result: 'i32' },
-  string_length: { parameters: ['pointer'], result: 'u64' },
+  add_i32: { arguments: ['i32', 'i32'], return: 'i32' },
+  string_length: { arguments: ['pointer'], return: 'u64' },
 });
 
 console.log(functions.add_i32(20, 22));
@@ -212,8 +214,8 @@ console.log(functions.add_i32(20, 22));
 const { dlopen } = require('node:ffi');
 
 const { lib, functions } = dlopen('./mylib.so', {
-  add_i32: { parameters: ['i32', 'i32'], result: 'i32' },
-  string_length: { parameters: ['pointer'], result: 'u64' },
+  add_i32: { arguments: ['i32', 'i32'], return: 'i32' },
+  string_length: { arguments: ['pointer'], return: 'u64' },
 });
 
 console.log(functions.add_i32(20, 22));
@@ -354,8 +356,8 @@ const { DynamicLibrary } = require('node:ffi');
 
 const lib = new DynamicLibrary('./mylib.so');
 const add = lib.getFunction('add_i32', {
-  parameters: ['i32', 'i32'],
-  result: 'i32',
+  arguments: ['i32', 'i32'],
+  return: 'i32',
 });
 
 console.log(add(20, 22));
@@ -405,7 +407,7 @@ const { DynamicLibrary } = require('node:ffi');
 const lib = new DynamicLibrary('./mylib.so');
 
 const callback = lib.registerCallback(
-  { parameters: ['i32'], result: 'i32' },
+  { arguments: ['i32'], return: 'i32' },
   (value) => value * 2,
 );
 ```
@@ -415,7 +417,7 @@ Callbacks are subject to the following restrictions:
 * They must be invoked on the same system thread where they were created.
 * They must not throw exceptions.
 * They must not return promises.
-* They must return a value compatible with the declared result type.
+* They must return a value compatible with the declared return type.
 * They must not call `library.close()` on their owning library while running.
 * They must not unregister themselves while running.
 
@@ -463,7 +465,7 @@ JavaScript `number` values that match the declared type.
 
 For 64-bit integer types (`i64` and `u64`), pass JavaScript `bigint` values.
 
-For pointer-like parameters:
+For pointer-like arguments:
 
 * `null` and `undefined` are passed as null pointers.
 * `string` values are copied to temporary NUL-terminated UTF-8 strings for the
@@ -725,3 +727,4 @@ and keep callback and pointer lifetimes explicit on the native side.
 [`--allow-ffi`]: cli.md#--allow-ffi
 [`ffi.toBuffer(pointer, length, copy)`]: #ffitobufferpointer-length-copy
 [`using`]: https://tc39.es/proposal-explicit-resource-management/#sec-using-declarations
+[type names]: #type-names

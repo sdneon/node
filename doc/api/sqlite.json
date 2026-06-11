@@ -29,7 +29,7 @@
       },
       "stability": 1.2,
       "stabilityText": "Release candidate.",
-      "desc": "<p>The <code>node:sqlite</code> module facilitates working with SQLite databases.\nTo access it:</p>\n<pre><code class=\"language-mjs\">import sqlite from 'node:sqlite';\n</code></pre>\n<pre><code class=\"language-cjs\">const sqlite = require('node:sqlite');\n</code></pre>\n<p>This module is only available under the <code>node:</code> scheme.</p>\n<p>The following example shows the basic usage of the <code>node:sqlite</code> module to open\nan in-memory database, write data to the database, and then read the data back.</p>\n<pre><code class=\"language-mjs\">import { DatabaseSync } from 'node:sqlite';\nconst database = new DatabaseSync(':memory:');\n\n// Execute SQL statements from strings.\ndatabase.exec(`\n  CREATE TABLE data(\n    key INTEGER PRIMARY KEY,\n    value TEXT\n  ) STRICT\n`);\n// Create a prepared statement to insert data into the database.\nconst insert = database.prepare('INSERT INTO data (key, value) VALUES (?, ?)');\n// Execute the prepared statement with bound values.\ninsert.run(1, 'hello');\ninsert.run(2, 'world');\n// Create a prepared statement to read data from the database.\nconst query = database.prepare('SELECT * FROM data ORDER BY key');\n// Execute the prepared statement and log the result set.\nconsole.log(query.all());\n// Prints: [ { key: 1, value: 'hello' }, { key: 2, value: 'world' } ]\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\nconst { DatabaseSync } = require('node:sqlite');\nconst database = new DatabaseSync(':memory:');\n\n// Execute SQL statements from strings.\ndatabase.exec(`\n  CREATE TABLE data(\n    key INTEGER PRIMARY KEY,\n    value TEXT\n  ) STRICT\n`);\n// Create a prepared statement to insert data into the database.\nconst insert = database.prepare('INSERT INTO data (key, value) VALUES (?, ?)');\n// Execute the prepared statement with bound values.\ninsert.run(1, 'hello');\ninsert.run(2, 'world');\n// Create a prepared statement to read data from the database.\nconst query = database.prepare('SELECT * FROM data ORDER BY key');\n// Execute the prepared statement and log the result set.\nconsole.log(query.all());\n// Prints: [ { key: 1, value: 'hello' }, { key: 2, value: 'world' } ]\n</code></pre>",
+      "desc": "<p>The <code>node:sqlite</code> module facilitates working with SQLite databases.\nTo access it:</p>\n<pre><code class=\"language-mjs\">import sqlite from 'node:sqlite';\n</code></pre>\n<pre><code class=\"language-cjs\">const sqlite = require('node:sqlite');\n</code></pre>\n<p>This module is only available under the <code>node:</code> scheme.</p>\n<p>The following example shows the basic usage of the <code>node:sqlite</code> module to open\nan in-memory database, write data to the database, and then read the data back.</p>\n<pre><code class=\"language-mjs\">import { DatabaseSync } from 'node:sqlite';\nconst database = new DatabaseSync(':memory:');\n\n// Execute SQL statements from strings.\ndatabase.exec(`\n  CREATE TABLE data(\n    key INTEGER PRIMARY KEY,\n    value TEXT\n  ) STRICT\n`);\n// Create a prepared statement to insert data into the database.\nconst insert = database.prepare('INSERT INTO data (key, value) VALUES (?, ?)');\n// Execute the prepared statement with bound values.\ninsert.run(1, 'hello');\ninsert.run(2, 'world');\n// Create a prepared statement to read data from the database.\nconst query = database.prepare('SELECT * FROM data ORDER BY key');\n// Execute the prepared statement and log the result set.\nconsole.log(query.all());\n// Prints: [ { key: 1, value: 'hello' }, { key: 2, value: 'world' } ]\n</code></pre>\n<pre><code class=\"language-cjs\">const { DatabaseSync } = require('node:sqlite');\nconst database = new DatabaseSync(':memory:');\n\n// Execute SQL statements from strings.\ndatabase.exec(`\n  CREATE TABLE data(\n    key INTEGER PRIMARY KEY,\n    value TEXT\n  ) STRICT\n`);\n// Create a prepared statement to insert data into the database.\nconst insert = database.prepare('INSERT INTO data (key, value) VALUES (?, ?)');\n// Execute the prepared statement with bound values.\ninsert.run(1, 'hello');\ninsert.run(2, 'world');\n// Create a prepared statement to read data from the database.\nconst query = database.prepare('SELECT * FROM data ORDER BY key');\n// Execute the prepared statement and log the result set.\nconsole.log(query.all());\n// Prints: [ { key: 1, value: 'hello' }, { key: 2, value: 'world' } ]\n</code></pre>",
       "modules": [
         {
           "textRaw": "Type conversion between JavaScript and SQLite",
@@ -379,7 +379,7 @@
               "desc": "<p>Closes the database connection. An exception is thrown if the database is not\nopen. This method is a wrapper around <a href=\"https://www.sqlite.org/c3ref/close.html\"><code>sqlite3_close_v2()</code></a>.</p>"
             },
             {
-              "textRaw": "`database.loadExtension(path)`",
+              "textRaw": "`database.loadExtension(path[, entryPoint])`",
               "name": "loadExtension",
               "type": "method",
               "meta": {
@@ -397,11 +397,18 @@
                       "name": "path",
                       "type": "string",
                       "desc": "The path to the shared library to load."
+                    },
+                    {
+                      "textRaw": "`entryPoint` {string} The name of the extension's entry-point function. When omitted, SQLite derives the entry point from the shared library's filename; pass this argument explicitly when the derived name does not match.",
+                      "name": "entryPoint",
+                      "type": "string",
+                      "desc": "The name of the extension's entry-point function. When omitted, SQLite derives the entry point from the shared library's filename; pass this argument explicitly when the derived name does not match.",
+                      "optional": true
                     }
                   ]
                 }
               ],
-              "desc": "<p>Loads a shared library into the database connection. This method is a wrapper\naround <a href=\"https://www.sqlite.org/c3ref/load_extension.html\"><code>sqlite3_load_extension()</code></a>. It is required to enable the\n<code>allowExtension</code> option when constructing the <code>DatabaseSync</code> instance.</p>"
+              "desc": "<p>Loads a shared library into the database connection. This method is a wrapper\naround <a href=\"https://www.sqlite.org/c3ref/load_extension.html\"><code>sqlite3_load_extension()</code></a>. It is required to enable the\n<code>allowExtension</code> option when constructing the <code>DatabaseSync</code> instance.</p>\n<pre><code class=\"language-mjs\">import { DatabaseSync } from 'node:sqlite';\nconst database = new DatabaseSync(':memory:', { allowExtension: true });\n\n// Load using the entry point derived from the filename.\ndatabase.loadExtension('./decimal.dylib');\n\n// Override the entry point when the derived name does not match.\ndatabase.loadExtension('./base64.dylib', 'sqlite3_base64_init');\n</code></pre>\n<pre><code class=\"language-cjs\">const { DatabaseSync } = require('node:sqlite');\nconst database = new DatabaseSync(':memory:', { allowExtension: true });\n\n// Load using the entry point derived from the filename.\ndatabase.loadExtension('./decimal.dylib');\n\n// Override the entry point when the derived name does not match.\ndatabase.loadExtension('./base64.dylib', 'sqlite3_base64_init');\n</code></pre>"
             },
             {
               "textRaw": "`database.enableLoadExtension(allow)`",
@@ -863,10 +870,10 @@
                       "desc": "The configuration options for how the changes will be applied.",
                       "options": [
                         {
-                          "textRaw": "`filter` {Function} Skip changes that, when targeted table name is supplied to this function, return a truthy value. By default, all changes are attempted.",
+                          "textRaw": "`filter` {Function} for each table affected by at least one change in the changeset, the `filter` callback is invoked with the table name as the first argument. If the return value is falsy, then no attempt is made to apply any changes to the table. Otherwise, if the return value is truthy or no `filter` callback is provided, all changes related to the table are attempted.",
                           "name": "filter",
                           "type": "Function",
-                          "desc": "Skip changes that, when targeted table name is supplied to this function, return a truthy value. By default, all changes are attempted."
+                          "desc": "for each table affected by at least one change in the changeset, the `filter` callback is invoked with the table name as the first argument. If the return value is falsy, then no attempt is made to apply any changes to the table. Otherwise, if the return value is truthy or no `filter` callback is provided, all changes related to the table are attempted."
                         },
                         {
                           "textRaw": "`onConflict` {Function} A function that determines how to handle conflicts. The function receives one argument, which can be one of the following values:The function should return one of the following values:`SQLITE_CHANGESET_OMIT`: Omit conflicting changes.`SQLITE_CHANGESET_REPLACE`: Replace existing values with conflicting changes (only valid with `SQLITE_CHANGESET_DATA` or `SQLITE_CHANGESET_CONFLICT` conflicts).`SQLITE_CHANGESET_ABORT`: Abort on conflict and roll back the database.When an error is thrown in the conflict handler or when any other value is returned from the handler, applying the changeset is aborted and the database is rolled back.**Default**: A function that returns `SQLITE_CHANGESET_ABORT`.",

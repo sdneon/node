@@ -40,7 +40,7 @@
 
     # Reset this number to 0 on major V8 upgrades.
     # Increment by one for each non-official patch applied to deps/v8.
-    'v8_embedder_string': '-node.19',
+    'v8_embedder_string': '-node.20',
 
     ##### V8 defaults for Node.js #####
 
@@ -269,6 +269,13 @@
                   },
                   'VCLinkerTool': {
                     'AdditionalOptions': ['-flto=thin'],
+                  },
+                },
+              },],
+              ['(enable_thin_lto=="true" or enable_lto=="true") and lto_jobs!=""', {
+                'msvs_settings': {
+                  'VCLinkerTool': {
+                    'AdditionalOptions': ['/opt:lldltojobs=<(lto_jobs)'],
                   },
                 },
               },],
