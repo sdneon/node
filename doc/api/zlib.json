@@ -31,6 +31,655 @@
           "type": "module",
           "desc": "<p>Calling <a href=\"#zlibflushkind-callback\"><code>.flush()</code></a> on a compression stream will make <code>zlib</code> return as much\noutput as currently possible. This may come at the cost of degraded compression\nquality, but can be useful when data needs to be available as soon as possible.</p>\n<p>In the following example, <code>flush()</code> is used to write a compressed partial\nHTTP response to the client:</p>\n<pre><code class=\"language-mjs\">import zlib from 'node:zlib';\nimport http from 'node:http';\nimport { pipeline } from 'node:stream';\n\nhttp.createServer((request, response) => {\n  // For the sake of simplicity, the Accept-Encoding checks are omitted.\n  response.writeHead(200, { 'content-encoding': 'gzip' });\n  const output = zlib.createGzip();\n  let i;\n\n  pipeline(output, response, (err) => {\n    if (err) {\n      // If an error occurs, there's not much we can do because\n      // the server has already sent the 200 response code and\n      // some amount of data has already been sent to the client.\n      // The best we can do is terminate the response immediately\n      // and log the error.\n      clearInterval(i);\n      response.end();\n      console.error('An error occurred:', err);\n    }\n  });\n\n  i = setInterval(() => {\n    output.write(`The current time is ${Date()}\\n`, () => {\n      // The data has been passed to zlib, but the compression algorithm may\n      // have decided to buffer the data for more efficient compression.\n      // Calling .flush() will make the data available as soon as the client\n      // is ready to receive it.\n      output.flush();\n    });\n  }, 1000);\n}).listen(1337);\n</code></pre>\n<pre><code class=\"language-cjs\">const zlib = require('node:zlib');\nconst http = require('node:http');\nconst { pipeline } = require('node:stream');\n\nhttp.createServer((request, response) => {\n  // For the sake of simplicity, the Accept-Encoding checks are omitted.\n  response.writeHead(200, { 'content-encoding': 'gzip' });\n  const output = zlib.createGzip();\n  let i;\n\n  pipeline(output, response, (err) => {\n    if (err) {\n      // If an error occurs, there's not much we can do because\n      // the server has already sent the 200 response code and\n      // some amount of data has already been sent to the client.\n      // The best we can do is terminate the response immediately\n      // and log the error.\n      clearInterval(i);\n      response.end();\n      console.error('An error occurred:', err);\n    }\n  });\n\n  i = setInterval(() => {\n    output.write(`The current time is ${Date()}\\n`, () => {\n      // The data has been passed to zlib, but the compression algorithm may\n      // have decided to buffer the data for more efficient compression.\n      // Calling .flush() will make the data available as soon as the client\n      // is ready to receive it.\n      output.flush();\n    });\n  }, 1000);\n}).listen(1337);\n</code></pre>",
           "displayName": "Flushing"
+        },
+        {
+          "textRaw": "Iterable Compression",
+          "name": "iterable_compression",
+          "type": "module",
+          "meta": {
+            "added": [
+              "v25.9.0"
+            ],
+            "changes": []
+          },
+          "stability": 1,
+          "stabilityText": "Experimental",
+          "desc": "<p>The <code>node:zlib/iter</code> module provides compression and decompression transforms\nfor use with the <a href=\"stream_iter.html\"><code>node:stream/iter</code></a> iterable streams API.</p>\n<p>This module is available only when the <code>--experimental-stream-iter</code> CLI flag\nis enabled.</p>\n<p>Each algorithm has both an async variant (stateful async generator, for use\nwith <a href=\"stream_iter.html#pullsource-transforms-options\"><code>pull()</code></a> and <a href=\"stream_iter.html#pipetosource-transforms-writer-options\"><code>pipeTo()</code></a>) and a sync variant (stateful sync\ngenerator, for use with <code>pullSync()</code> and <code>pipeToSync()</code>).</p>\n<p>The async transforms run compression on the libuv threadpool, overlapping\nI/O with JavaScript execution. The sync transforms run compression directly\non the main thread.</p>\n<blockquote>\n<p>Note: The defaults for these transforms are tuned for streaming throughput,\nand differ from the defaults in <code>node:zlib</code>. In particular, gzip/deflate\ndefault to level 4 (not 6) and memLevel 9 (not 8), and Brotli defaults to\nquality 6 (not 11). These choices match common HTTP server configurations\nand provide significantly faster compression with only a small reduction in\ncompression ratio. All defaults can be overridden via options.</p>\n</blockquote>\n<pre><code class=\"language-mjs\">import { from, pull, bytes, text } from 'node:stream/iter';\nimport { compressGzip, decompressGzip } from 'node:zlib/iter';\n\n// Async round-trip\nconst compressed = await bytes(pull(from('hello'), compressGzip()));\nconst original = await text(pull(from(compressed), decompressGzip()));\nconsole.log(original); // 'hello'\n</code></pre>\n<pre><code class=\"language-cjs\">const { from, pull, bytes, text } = require('node:stream/iter');\nconst { compressGzip, decompressGzip } = require('node:zlib/iter');\n\nasync function run() {\n  const compressed = await bytes(pull(from('hello'), compressGzip()));\n  const original = await text(pull(from(compressed), decompressGzip()));\n  console.log(original); // 'hello'\n}\n\nrun().catch(console.error);\n</code></pre>\n<pre><code class=\"language-mjs\">import { fromSync, pullSync, textSync } from 'node:stream/iter';\nimport { compressGzipSync, decompressGzipSync } from 'node:zlib/iter';\n\n// Sync round-trip\nconst compressed = pullSync(fromSync('hello'), compressGzipSync());\nconst original = textSync(pullSync(compressed, decompressGzipSync()));\nconsole.log(original); // 'hello'\n</code></pre>\n<pre><code class=\"language-cjs\">const { fromSync, pullSync, textSync } = require('node:stream/iter');\nconst { compressGzipSync, decompressGzipSync } = require('node:zlib/iter');\n\nconst compressed = pullSync(fromSync('hello'), compressGzipSync());\nconst original = textSync(pullSync(compressed, decompressGzipSync()));\nconsole.log(original); // 'hello'\n</code></pre>",
+          "methods": [
+            {
+              "textRaw": "`compressBrotli([options])`",
+              "name": "compressBrotli",
+              "type": "method",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "name": "options",
+                      "optional": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "textRaw": "`compressBrotliSync([options])`",
+              "name": "compressBrotliSync",
+              "type": "method",
+              "meta": {
+                "added": [
+                  "v25.9.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`chunkSize` {number} Output buffer size. **Default:** `65536` (64 KB).",
+                          "name": "chunkSize",
+                          "type": "number",
+                          "default": "`65536` (64 KB)",
+                          "desc": "Output buffer size."
+                        },
+                        {
+                          "textRaw": "`params` {Object} Key-value object where keys and values are `zlib.constants` entries. The most important compressor parameters are:",
+                          "name": "params",
+                          "type": "Object",
+                          "desc": "Key-value object where keys and values are `zlib.constants` entries. The most important compressor parameters are:",
+                          "options": [
+                            {
+                              "textRaw": "`BROTLI_PARAM_MODE` -- `BROTLI_MODE_GENERIC` (default), `BROTLI_MODE_TEXT`, or `BROTLI_MODE_FONT`.",
+                              "name": "BROTLI_PARAM_MODE",
+                              "desc": "- `BROTLI_MODE_GENERIC` (default), `BROTLI_MODE_TEXT`, or `BROTLI_MODE_FONT`."
+                            },
+                            {
+                              "textRaw": "`BROTLI_PARAM_QUALITY` -- ranges from `BROTLI_MIN_QUALITY` to `BROTLI_MAX_QUALITY`. **Default:** `6` (not `BROTLI_DEFAULT_QUALITY` which is 11). Quality 6 is appropriate for streaming; quality 11 is intended for offline/build-time compression.",
+                              "name": "BROTLI_PARAM_QUALITY",
+                              "default": "`6` (not `BROTLI_DEFAULT_QUALITY` which is 11). Quality 6 is appropriate for streaming; quality 11 is intended for offline/build-time compression",
+                              "desc": "- ranges from `BROTLI_MIN_QUALITY` to `BROTLI_MAX_QUALITY`."
+                            },
+                            {
+                              "textRaw": "`BROTLI_PARAM_SIZE_HINT` -- expected input size. **Default:** `0` (unknown).",
+                              "name": "BROTLI_PARAM_SIZE_HINT",
+                              "default": "`0` (unknown)",
+                              "desc": "- expected input size."
+                            },
+                            {
+                              "textRaw": "`BROTLI_PARAM_LGWIN` -- window size (log2). **Default:** `20` (1 MB). The Brotli library default is 22 (4 MB); the reduced default saves memory without significant compression impact for streaming workloads.",
+                              "name": "BROTLI_PARAM_LGWIN",
+                              "default": "`20` (1 MB). The Brotli library default is 22 (4 MB); the reduced default saves memory without significant compression impact for streaming workloads",
+                              "desc": "- window size (log2)."
+                            },
+                            {
+                              "textRaw": "`BROTLI_PARAM_LGBLOCK` -- input block size (log2). See the Brotli compressor options in the zlib documentation for the full list.",
+                              "name": "BROTLI_PARAM_LGBLOCK",
+                              "desc": "- input block size (log2). See the Brotli compressor options in the zlib documentation for the full list."
+                            }
+                          ]
+                        },
+                        {
+                          "textRaw": "`dictionary` {Buffer|TypedArray|DataView}",
+                          "name": "dictionary",
+                          "type": "Buffer|TypedArray|DataView"
+                        }
+                      ],
+                      "optional": true
+                    }
+                  ],
+                  "return": {
+                    "textRaw": "Returns: {Object} A stateful transform.",
+                    "name": "return",
+                    "type": "Object",
+                    "desc": "A stateful transform."
+                  }
+                }
+              ],
+              "desc": "<p>Create a Brotli compression transform. Output is compatible with\n<code>zlib.brotliDecompress()</code> and <code>decompressBrotli()</code>/<code>decompressBrotliSync()</code>.</p>"
+            },
+            {
+              "textRaw": "`compressDeflate([options])`",
+              "name": "compressDeflate",
+              "type": "method",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "name": "options",
+                      "optional": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "textRaw": "`compressDeflateSync([options])`",
+              "name": "compressDeflateSync",
+              "type": "method",
+              "meta": {
+                "added": [
+                  "v25.9.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`chunkSize` {number} Output buffer size. **Default:** `65536` (64 KB).",
+                          "name": "chunkSize",
+                          "type": "number",
+                          "default": "`65536` (64 KB)",
+                          "desc": "Output buffer size."
+                        },
+                        {
+                          "textRaw": "`level` {number} Compression level (`0`-`9`). **Default:** `4`.",
+                          "name": "level",
+                          "type": "number",
+                          "default": "`4`",
+                          "desc": "Compression level (`0`-`9`)."
+                        },
+                        {
+                          "textRaw": "`windowBits` {number} **Default:** `Z_DEFAULT_WINDOWBITS` (15).",
+                          "name": "windowBits",
+                          "type": "number",
+                          "default": "`Z_DEFAULT_WINDOWBITS` (15)"
+                        },
+                        {
+                          "textRaw": "`memLevel` {number} **Default:** `9`.",
+                          "name": "memLevel",
+                          "type": "number",
+                          "default": "`9`"
+                        },
+                        {
+                          "textRaw": "`strategy` {number} **Default:** `Z_DEFAULT_STRATEGY`.",
+                          "name": "strategy",
+                          "type": "number",
+                          "default": "`Z_DEFAULT_STRATEGY`"
+                        },
+                        {
+                          "textRaw": "`dictionary` {Buffer|TypedArray|DataView}",
+                          "name": "dictionary",
+                          "type": "Buffer|TypedArray|DataView"
+                        }
+                      ],
+                      "optional": true
+                    }
+                  ],
+                  "return": {
+                    "textRaw": "Returns: {Object} A stateful transform.",
+                    "name": "return",
+                    "type": "Object",
+                    "desc": "A stateful transform."
+                  }
+                }
+              ],
+              "desc": "<p>Create a deflate compression transform. Output is compatible with\n<code>zlib.inflate()</code> and <code>decompressDeflate()</code>/<code>decompressDeflateSync()</code>.</p>"
+            },
+            {
+              "textRaw": "`compressGzip([options])`",
+              "name": "compressGzip",
+              "type": "method",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "name": "options",
+                      "optional": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "textRaw": "`compressGzipSync([options])`",
+              "name": "compressGzipSync",
+              "type": "method",
+              "meta": {
+                "added": [
+                  "v25.9.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`chunkSize` {number} Output buffer size. **Default:** `65536` (64 KB).",
+                          "name": "chunkSize",
+                          "type": "number",
+                          "default": "`65536` (64 KB)",
+                          "desc": "Output buffer size."
+                        },
+                        {
+                          "textRaw": "`level` {number} Compression level (`0`-`9`). **Default:** `4`.",
+                          "name": "level",
+                          "type": "number",
+                          "default": "`4`",
+                          "desc": "Compression level (`0`-`9`)."
+                        },
+                        {
+                          "textRaw": "`windowBits` {number} **Default:** `Z_DEFAULT_WINDOWBITS` (15).",
+                          "name": "windowBits",
+                          "type": "number",
+                          "default": "`Z_DEFAULT_WINDOWBITS` (15)"
+                        },
+                        {
+                          "textRaw": "`memLevel` {number} **Default:** `9`.",
+                          "name": "memLevel",
+                          "type": "number",
+                          "default": "`9`"
+                        },
+                        {
+                          "textRaw": "`strategy` {number} **Default:** `Z_DEFAULT_STRATEGY`.",
+                          "name": "strategy",
+                          "type": "number",
+                          "default": "`Z_DEFAULT_STRATEGY`"
+                        },
+                        {
+                          "textRaw": "`dictionary` {Buffer|TypedArray|DataView}",
+                          "name": "dictionary",
+                          "type": "Buffer|TypedArray|DataView"
+                        }
+                      ],
+                      "optional": true
+                    }
+                  ],
+                  "return": {
+                    "textRaw": "Returns: {Object} A stateful transform.",
+                    "name": "return",
+                    "type": "Object",
+                    "desc": "A stateful transform."
+                  }
+                }
+              ],
+              "desc": "<p>Create a gzip compression transform. Output is compatible with <code>zlib.gunzip()</code>\nand <code>decompressGzip()</code>/<code>decompressGzipSync()</code>.</p>"
+            },
+            {
+              "textRaw": "`compressZstd([options])`",
+              "name": "compressZstd",
+              "type": "method",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "name": "options",
+                      "optional": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "textRaw": "`compressZstdSync([options])`",
+              "name": "compressZstdSync",
+              "type": "method",
+              "meta": {
+                "added": [
+                  "v25.9.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`chunkSize` {number} Output buffer size. **Default:** `65536` (64 KB).",
+                          "name": "chunkSize",
+                          "type": "number",
+                          "default": "`65536` (64 KB)",
+                          "desc": "Output buffer size."
+                        },
+                        {
+                          "textRaw": "`params` {Object} Key-value object where keys and values are `zlib.constants` entries. The most important compressor parameters are:",
+                          "name": "params",
+                          "type": "Object",
+                          "desc": "Key-value object where keys and values are `zlib.constants` entries. The most important compressor parameters are:",
+                          "options": [
+                            {
+                              "textRaw": "`ZSTD_c_compressionLevel` -- **Default:** `ZSTD_CLEVEL_DEFAULT` (3).",
+                              "name": "ZSTD_c_compressionLevel",
+                              "default": "`ZSTD_CLEVEL_DEFAULT` (3)",
+                              "desc": "-"
+                            },
+                            {
+                              "textRaw": "`ZSTD_c_checksumFlag` -- generate a checksum. **Default:** `0`.",
+                              "name": "ZSTD_c_checksumFlag",
+                              "default": "`0`",
+                              "desc": "- generate a checksum."
+                            },
+                            {
+                              "textRaw": "`ZSTD_c_strategy` -- compression strategy. Values include `ZSTD_fast`, `ZSTD_dfast`, `ZSTD_greedy`, `ZSTD_lazy`, `ZSTD_lazy2`, `ZSTD_btlazy2`, `ZSTD_btopt`, `ZSTD_btultra`, `ZSTD_btultra2`. See the Zstd compressor options in the zlib documentation for the full list.",
+                              "name": "ZSTD_c_strategy",
+                              "desc": "- compression strategy. Values include `ZSTD_fast`, `ZSTD_dfast`, `ZSTD_greedy`, `ZSTD_lazy`, `ZSTD_lazy2`, `ZSTD_btlazy2`, `ZSTD_btopt`, `ZSTD_btultra`, `ZSTD_btultra2`. See the Zstd compressor options in the zlib documentation for the full list."
+                            }
+                          ]
+                        },
+                        {
+                          "textRaw": "`pledgedSrcSize` {number} Expected uncompressed size (optional hint).",
+                          "name": "pledgedSrcSize",
+                          "type": "number",
+                          "desc": "Expected uncompressed size (optional hint)."
+                        },
+                        {
+                          "textRaw": "`dictionary` {Buffer|TypedArray|DataView}",
+                          "name": "dictionary",
+                          "type": "Buffer|TypedArray|DataView"
+                        }
+                      ],
+                      "optional": true
+                    }
+                  ],
+                  "return": {
+                    "textRaw": "Returns: {Object} A stateful transform.",
+                    "name": "return",
+                    "type": "Object",
+                    "desc": "A stateful transform."
+                  }
+                }
+              ],
+              "desc": "<p>Create a Zstandard compression transform. Output is compatible with\n<code>zlib.zstdDecompress()</code> and <code>decompressZstd()</code>/<code>decompressZstdSync()</code>.</p>"
+            },
+            {
+              "textRaw": "`decompressBrotli([options])`",
+              "name": "decompressBrotli",
+              "type": "method",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "name": "options",
+                      "optional": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "textRaw": "`decompressBrotliSync([options])`",
+              "name": "decompressBrotliSync",
+              "type": "method",
+              "meta": {
+                "added": [
+                  "v25.9.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`chunkSize` {number} Output buffer size. **Default:** `65536` (64 KB).",
+                          "name": "chunkSize",
+                          "type": "number",
+                          "default": "`65536` (64 KB)",
+                          "desc": "Output buffer size."
+                        },
+                        {
+                          "textRaw": "`params` {Object} Key-value object where keys and values are `zlib.constants` entries. Available decompressor parameters:",
+                          "name": "params",
+                          "type": "Object",
+                          "desc": "Key-value object where keys and values are `zlib.constants` entries. Available decompressor parameters:",
+                          "options": [
+                            {
+                              "textRaw": "`BROTLI_DECODER_PARAM_DISABLE_RING_BUFFER_REALLOCATION` -- boolean flag affecting internal memory allocation.",
+                              "name": "BROTLI_DECODER_PARAM_DISABLE_RING_BUFFER_REALLOCATION",
+                              "desc": "- boolean flag affecting internal memory allocation."
+                            },
+                            {
+                              "textRaw": "`BROTLI_DECODER_PARAM_LARGE_WINDOW` -- boolean flag enabling \"Large Window Brotli\" mode (not compatible with RFC 7932). See the Brotli decompressor options in the zlib documentation for details.",
+                              "name": "BROTLI_DECODER_PARAM_LARGE_WINDOW",
+                              "desc": "- boolean flag enabling \"Large Window Brotli\" mode (not compatible with RFC 7932). See the Brotli decompressor options in the zlib documentation for details."
+                            }
+                          ]
+                        },
+                        {
+                          "textRaw": "`dictionary` {Buffer|TypedArray|DataView}",
+                          "name": "dictionary",
+                          "type": "Buffer|TypedArray|DataView"
+                        }
+                      ],
+                      "optional": true
+                    }
+                  ],
+                  "return": {
+                    "textRaw": "Returns: {Object} A stateful transform.",
+                    "name": "return",
+                    "type": "Object",
+                    "desc": "A stateful transform."
+                  }
+                }
+              ],
+              "desc": "<p>Create a Brotli decompression transform.</p>"
+            },
+            {
+              "textRaw": "`decompressDeflate([options])`",
+              "name": "decompressDeflate",
+              "type": "method",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "name": "options",
+                      "optional": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "textRaw": "`decompressDeflateSync([options])`",
+              "name": "decompressDeflateSync",
+              "type": "method",
+              "meta": {
+                "added": [
+                  "v25.9.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`chunkSize` {number} Output buffer size. **Default:** `65536` (64 KB).",
+                          "name": "chunkSize",
+                          "type": "number",
+                          "default": "`65536` (64 KB)",
+                          "desc": "Output buffer size."
+                        },
+                        {
+                          "textRaw": "`windowBits` {number} **Default:** `Z_DEFAULT_WINDOWBITS` (15).",
+                          "name": "windowBits",
+                          "type": "number",
+                          "default": "`Z_DEFAULT_WINDOWBITS` (15)"
+                        },
+                        {
+                          "textRaw": "`dictionary` {Buffer|TypedArray|DataView}",
+                          "name": "dictionary",
+                          "type": "Buffer|TypedArray|DataView"
+                        }
+                      ],
+                      "optional": true
+                    }
+                  ],
+                  "return": {
+                    "textRaw": "Returns: {Object} A stateful transform.",
+                    "name": "return",
+                    "type": "Object",
+                    "desc": "A stateful transform."
+                  }
+                }
+              ],
+              "desc": "<p>Create a deflate decompression transform.</p>"
+            },
+            {
+              "textRaw": "`decompressGzip([options])`",
+              "name": "decompressGzip",
+              "type": "method",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "name": "options",
+                      "optional": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "textRaw": "`decompressGzipSync([options])`",
+              "name": "decompressGzipSync",
+              "type": "method",
+              "meta": {
+                "added": [
+                  "v25.9.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`chunkSize` {number} Output buffer size. **Default:** `65536` (64 KB).",
+                          "name": "chunkSize",
+                          "type": "number",
+                          "default": "`65536` (64 KB)",
+                          "desc": "Output buffer size."
+                        },
+                        {
+                          "textRaw": "`windowBits` {number} **Default:** `Z_DEFAULT_WINDOWBITS` (15).",
+                          "name": "windowBits",
+                          "type": "number",
+                          "default": "`Z_DEFAULT_WINDOWBITS` (15)"
+                        },
+                        {
+                          "textRaw": "`dictionary` {Buffer|TypedArray|DataView}",
+                          "name": "dictionary",
+                          "type": "Buffer|TypedArray|DataView"
+                        }
+                      ],
+                      "optional": true
+                    }
+                  ],
+                  "return": {
+                    "textRaw": "Returns: {Object} A stateful transform.",
+                    "name": "return",
+                    "type": "Object",
+                    "desc": "A stateful transform."
+                  }
+                }
+              ],
+              "desc": "<p>Create a gzip decompression transform.</p>"
+            },
+            {
+              "textRaw": "`decompressZstd([options])`",
+              "name": "decompressZstd",
+              "type": "method",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "name": "options",
+                      "optional": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "textRaw": "`decompressZstdSync([options])`",
+              "name": "decompressZstdSync",
+              "type": "method",
+              "meta": {
+                "added": [
+                  "v25.9.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`chunkSize` {number} Output buffer size. **Default:** `65536` (64 KB).",
+                          "name": "chunkSize",
+                          "type": "number",
+                          "default": "`65536` (64 KB)",
+                          "desc": "Output buffer size."
+                        },
+                        {
+                          "textRaw": "`params` {Object} Key-value object where keys and values are `zlib.constants` entries. Available decompressor parameters:",
+                          "name": "params",
+                          "type": "Object",
+                          "desc": "Key-value object where keys and values are `zlib.constants` entries. Available decompressor parameters:",
+                          "options": [
+                            {
+                              "textRaw": "`ZSTD_d_windowLogMax` -- maximum window size (log2) the decompressor will allocate. Limits memory usage against malicious input. See the Zstd decompressor options in the zlib documentation for details.",
+                              "name": "ZSTD_d_windowLogMax",
+                              "desc": "- maximum window size (log2) the decompressor will allocate. Limits memory usage against malicious input. See the Zstd decompressor options in the zlib documentation for details."
+                            }
+                          ]
+                        },
+                        {
+                          "textRaw": "`dictionary` {Buffer|TypedArray|DataView}",
+                          "name": "dictionary",
+                          "type": "Buffer|TypedArray|DataView"
+                        }
+                      ],
+                      "optional": true
+                    }
+                  ],
+                  "return": {
+                    "textRaw": "Returns: {Object} A stateful transform.",
+                    "name": "return",
+                    "type": "Object",
+                    "desc": "A stateful transform."
+                  }
+                }
+              ],
+              "desc": "<p>Create a Zstandard decompression transform.</p>"
+            }
+          ],
+          "displayName": "Iterable Compression"
         }
       ],
       "miscs": [
@@ -106,14 +755,14 @@
                   "textRaw": "Compressor options",
                   "name": "compressor_options",
                   "type": "module",
-                  "desc": "<p>There are several options that can be set on Brotli encoders, affecting\ncompression efficiency and speed. Both the keys and the values can be accessed\nas properties of the <code>zlib.constants</code> object.</p>\n<p>The most important options are:</p>\n<ul>\n<li><code>BROTLI_PARAM_MODE</code>\n<ul>\n<li><code>BROTLI_MODE_GENERIC</code> (default)</li>\n<li><code>BROTLI_MODE_TEXT</code>, adjusted for UTF-8 text</li>\n<li><code>BROTLI_MODE_FONT</code>, adjusted for WOFF 2.0 fonts</li>\n</ul>\n</li>\n<li><code>BROTLI_PARAM_QUALITY</code>\n<ul>\n<li>Ranges from <code>BROTLI_MIN_QUALITY</code> to <code>BROTLI_MAX_QUALITY</code>,\nwith a default of <code>BROTLI_DEFAULT_QUALITY</code>.</li>\n</ul>\n</li>\n<li><code>BROTLI_PARAM_SIZE_HINT</code>\n<ul>\n<li>Integer value representing the expected input size;\ndefaults to <code>0</code> for an unknown input size.</li>\n</ul>\n</li>\n</ul>\n<p>The following flags can be set for advanced control over the compression\nalgorithm and memory usage tuning:</p>\n<ul>\n<li><code>BROTLI_PARAM_LGWIN</code>\n<ul>\n<li>Ranges from <code>BROTLI_MIN_WINDOW_BITS</code> to <code>BROTLI_MAX_WINDOW_BITS</code>,\nwith a default of <code>BROTLI_DEFAULT_WINDOW</code>, or up to\n<code>BROTLI_LARGE_MAX_WINDOW_BITS</code> if the <code>BROTLI_PARAM_LARGE_WINDOW</code> flag\nis set.</li>\n</ul>\n</li>\n<li><code>BROTLI_PARAM_LGBLOCK</code>\n<ul>\n<li>Ranges from <code>BROTLI_MIN_INPUT_BLOCK_BITS</code> to <code>BROTLI_MAX_INPUT_BLOCK_BITS</code>.</li>\n</ul>\n</li>\n<li><code>BROTLI_PARAM_DISABLE_LITERAL_CONTEXT_MODELING</code>\n<ul>\n<li>Boolean flag that decreases compression ratio in favour of\ndecompression speed.</li>\n</ul>\n</li>\n<li><code>BROTLI_PARAM_LARGE_WINDOW</code>\n<ul>\n<li>Boolean flag enabling “Large Window Brotli” mode (not compatible with the\nBrotli format as standardized in <a href=\"https://www.rfc-editor.org/rfc/rfc7932.txt\">RFC 7932</a>).</li>\n</ul>\n</li>\n<li><code>BROTLI_PARAM_NPOSTFIX</code>\n<ul>\n<li>Ranges from <code>0</code> to <code>BROTLI_MAX_NPOSTFIX</code>.</li>\n</ul>\n</li>\n<li><code>BROTLI_PARAM_NDIRECT</code>\n<ul>\n<li>Ranges from <code>0</code> to <code>15 &#x3C;&#x3C; NPOSTFIX</code> in steps of <code>1 &#x3C;&#x3C; NPOSTFIX</code>.</li>\n</ul>\n</li>\n</ul>",
+                  "desc": "<p>There are several options that can be set on Brotli encoders, affecting\ncompression efficiency and speed. Both the keys and the values can be accessed\nas properties of the <code>zlib.constants</code> object.</p>\n<p>The most important options are:</p>\n<ul>\n<li><code>BROTLI_PARAM_MODE</code>\n<ul>\n<li><code>BROTLI_MODE_GENERIC</code> (default)</li>\n<li><code>BROTLI_MODE_TEXT</code>, adjusted for UTF-8 text</li>\n<li><code>BROTLI_MODE_FONT</code>, adjusted for WOFF 2.0 fonts</li>\n</ul>\n</li>\n<li><code>BROTLI_PARAM_QUALITY</code>\n<ul>\n<li>Ranges from <code>BROTLI_MIN_QUALITY</code> to <code>BROTLI_MAX_QUALITY</code>,\nwith a default of <code>BROTLI_DEFAULT_QUALITY</code>.</li>\n</ul>\n</li>\n<li><code>BROTLI_PARAM_SIZE_HINT</code>\n<ul>\n<li>Integer value representing the expected input size;\ndefaults to <code>0</code> for an unknown input size.</li>\n</ul>\n</li>\n</ul>\n<p>The following flags can be set for advanced control over the compression\nalgorithm and memory usage tuning:</p>\n<ul>\n<li><code>BROTLI_PARAM_LGWIN</code>\n<ul>\n<li>Ranges from <code>BROTLI_MIN_WINDOW_BITS</code> to <code>BROTLI_MAX_WINDOW_BITS</code>,\nwith a default of <code>BROTLI_DEFAULT_WINDOW</code>, or up to\n<code>BROTLI_LARGE_MAX_WINDOW_BITS</code> if the <code>BROTLI_PARAM_LARGE_WINDOW</code> flag\nis set.</li>\n</ul>\n</li>\n<li><code>BROTLI_PARAM_LGBLOCK</code>\n<ul>\n<li>Ranges from <code>BROTLI_MIN_INPUT_BLOCK_BITS</code> to <code>BROTLI_MAX_INPUT_BLOCK_BITS</code>.</li>\n</ul>\n</li>\n<li><code>BROTLI_PARAM_DISABLE_LITERAL_CONTEXT_MODELING</code>\n<ul>\n<li>Boolean flag that decreases compression ratio in favour of\ndecompression speed.</li>\n</ul>\n</li>\n<li><code>BROTLI_PARAM_LARGE_WINDOW</code>\n<ul>\n<li>Boolean flag enabling “Large Window Brotli” mode (not compatible with the\nBrotli format as standardized in <a href=\"https://www.rfc-editor.org/rfc/rfc7932.html\">RFC 7932</a>).</li>\n</ul>\n</li>\n<li><code>BROTLI_PARAM_NPOSTFIX</code>\n<ul>\n<li>Ranges from <code>0</code> to <code>BROTLI_MAX_NPOSTFIX</code>.</li>\n</ul>\n</li>\n<li><code>BROTLI_PARAM_NDIRECT</code>\n<ul>\n<li>Ranges from <code>0</code> to <code>15 &#x3C;&#x3C; NPOSTFIX</code> in steps of <code>1 &#x3C;&#x3C; NPOSTFIX</code>.</li>\n</ul>\n</li>\n</ul>",
                   "displayName": "Compressor options"
                 },
                 {
                   "textRaw": "Decompressor options",
                   "name": "decompressor_options",
                   "type": "module",
-                  "desc": "<p>These advanced options are available for controlling decompression:</p>\n<ul>\n<li><code>BROTLI_DECODER_PARAM_DISABLE_RING_BUFFER_REALLOCATION</code>\n<ul>\n<li>Boolean flag that affects internal memory allocation patterns.</li>\n</ul>\n</li>\n<li><code>BROTLI_DECODER_PARAM_LARGE_WINDOW</code>\n<ul>\n<li>Boolean flag enabling “Large Window Brotli” mode (not compatible with the\nBrotli format as standardized in <a href=\"https://www.rfc-editor.org/rfc/rfc7932.txt\">RFC 7932</a>).</li>\n</ul>\n</li>\n</ul>",
+                  "desc": "<p>These advanced options are available for controlling decompression:</p>\n<ul>\n<li><code>BROTLI_DECODER_PARAM_DISABLE_RING_BUFFER_REALLOCATION</code>\n<ul>\n<li>Boolean flag that affects internal memory allocation patterns.</li>\n</ul>\n</li>\n<li><code>BROTLI_DECODER_PARAM_LARGE_WINDOW</code>\n<ul>\n<li>Boolean flag enabling “Large Window Brotli” mode (not compatible with the\nBrotli format as standardized in <a href=\"https://www.rfc-editor.org/rfc/rfc7932.html\">RFC 7932</a>).</li>\n</ul>\n</li>\n</ul>",
                   "displayName": "Decompressor options"
                 }
               ],
@@ -208,7 +857,7 @@
               }
             ]
           },
-          "desc": "<p>Each zlib-based class takes an <code>options</code> object. No options are required.</p>\n<p>Some options are only relevant when compressing and are\nignored by the decompression classes.</p>\n<ul>\n<li><code>flush</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;integer></code></a> <strong>Default:</strong> <code>zlib.constants.Z_NO_FLUSH</code></li>\n<li><code>finishFlush</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;integer></code></a> <strong>Default:</strong> <code>zlib.constants.Z_FINISH</code></li>\n<li><code>chunkSize</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;integer></code></a> <strong>Default:</strong> <code>16 * 1024</code></li>\n<li><code>windowBits</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;integer></code></a></li>\n<li><code>level</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;integer></code></a> (compression only)</li>\n<li><code>memLevel</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;integer></code></a> (compression only)</li>\n<li><code>strategy</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;integer></code></a> (compression only)</li>\n<li><code>dictionary</code> <a href=\"buffer.html#class-buffer\"><code>&#x3C;Buffer></code></a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\"><code>&#x3C;TypedArray></code></a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView\"><code>&#x3C;DataView></code></a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer\"><code>&#x3C;ArrayBuffer></code></a> (deflate/inflate only,\nempty dictionary by default)</li>\n<li><code>info</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#boolean_type\"><code>&#x3C;boolean></code></a> (If <code>true</code>, returns an object with <code>buffer</code> and <code>engine</code>.)</li>\n<li><code>maxOutputLength</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;integer></code></a> Limits output size when using <a href=\"#convenience-methods\">convenience methods</a>. <strong>Default:</strong> <a href=\"buffer.html#bufferkmaxlength\"><code>buffer.kMaxLength</code></a></li>\n</ul>\n<p>See the <a href=\"https://zlib.net/manual.html#Advanced\"><code>deflateInit2</code> and <code>inflateInit2</code></a> documentation for more\ninformation.</p>"
+          "desc": "<p>Each zlib-based class takes an <code>options</code> object. No options are required.</p>\n<p>Some options are only relevant when compressing and are\nignored by the decompression classes.</p>\n<ul>\n<li><code>flush</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;integer></code></a> <strong>Default:</strong> <code>zlib.constants.Z_NO_FLUSH</code></li>\n<li><code>finishFlush</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;integer></code></a> <strong>Default:</strong> <code>zlib.constants.Z_FINISH</code></li>\n<li><code>chunkSize</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;integer></code></a> <strong>Default:</strong> <code>16 * 1024</code></li>\n<li><code>windowBits</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;integer></code></a></li>\n<li><code>level</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;integer></code></a> (compression only)</li>\n<li><code>memLevel</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;integer></code></a> (compression only)</li>\n<li><code>strategy</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;integer></code></a> (compression only)</li>\n<li><code>dictionary</code> <a href=\"buffer.html#class-buffer\"><code>&#x3C;Buffer></code></a> | <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\"><code>&#x3C;TypedArray></code></a> | <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/DataView\"><code>&#x3C;DataView></code></a> | <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer\"><code>&#x3C;ArrayBuffer></code></a> (deflate/inflate only,\nempty dictionary by default)</li>\n<li><code>info</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#boolean_type\"><code>&#x3C;boolean></code></a> (If <code>true</code>, returns an object with <code>buffer</code> and <code>engine</code>.)</li>\n<li><code>maxOutputLength</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;integer></code></a> Limits output size when using <a href=\"#convenience-methods\">convenience methods</a>. <strong>Default:</strong> <a href=\"buffer.html#bufferkmaxlength\"><code>buffer.kMaxLength</code></a></li>\n</ul>\n<p>See the <a href=\"https://zlib.net/manual.html#Advanced\"><code>deflateInit2</code> and <code>inflateInit2</code></a> documentation for more\ninformation.</p>"
         },
         {
           "textRaw": "Class: `BrotliOptions`",
@@ -229,7 +878,7 @@
               }
             ]
           },
-          "desc": "<p>Each Brotli-based class takes an <code>options</code> object. All options are optional.</p>\n<ul>\n<li><code>flush</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;integer></code></a> <strong>Default:</strong> <code>zlib.constants.BROTLI_OPERATION_PROCESS</code></li>\n<li><code>finishFlush</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;integer></code></a> <strong>Default:</strong> <code>zlib.constants.BROTLI_OPERATION_FINISH</code></li>\n<li><code>chunkSize</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;integer></code></a> <strong>Default:</strong> <code>16 * 1024</code></li>\n<li><code>params</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a> Key-value object containing indexed <a href=\"#brotli-constants\">Brotli parameters</a>.</li>\n<li><code>maxOutputLength</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;integer></code></a> Limits output size when using <a href=\"#convenience-methods\">convenience methods</a>. <strong>Default:</strong> <a href=\"buffer.html#bufferkmaxlength\"><code>buffer.kMaxLength</code></a></li>\n<li><code>info</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#boolean_type\"><code>&#x3C;boolean></code></a> If <code>true</code>, returns an object with <code>buffer</code> and <code>engine</code>. <strong>Default:</strong> <code>false</code></li>\n</ul>\n<p>For example:</p>\n<pre><code class=\"language-js\">const stream = zlib.createBrotliCompress({\n  chunkSize: 32 * 1024,\n  params: {\n    [zlib.constants.BROTLI_PARAM_MODE]: zlib.constants.BROTLI_MODE_TEXT,\n    [zlib.constants.BROTLI_PARAM_QUALITY]: 4,\n    [zlib.constants.BROTLI_PARAM_SIZE_HINT]: fs.statSync(inputFile).size,\n  },\n});\n</code></pre>"
+          "desc": "<p>Each Brotli-based class takes an <code>options</code> object. All options are optional.</p>\n<ul>\n<li><code>flush</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;integer></code></a> <strong>Default:</strong> <code>zlib.constants.BROTLI_OPERATION_PROCESS</code></li>\n<li><code>finishFlush</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;integer></code></a> <strong>Default:</strong> <code>zlib.constants.BROTLI_OPERATION_FINISH</code></li>\n<li><code>chunkSize</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;integer></code></a> <strong>Default:</strong> <code>16 * 1024</code></li>\n<li><code>params</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a> Key-value object containing indexed <a href=\"#brotli-constants\">Brotli parameters</a>.</li>\n<li><code>maxOutputLength</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;integer></code></a> Limits output size when using <a href=\"#convenience-methods\">convenience methods</a>. <strong>Default:</strong> <a href=\"buffer.html#bufferkmaxlength\"><code>buffer.kMaxLength</code></a></li>\n<li><code>info</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#boolean_type\"><code>&#x3C;boolean></code></a> If <code>true</code>, returns an object with <code>buffer</code> and <code>engine</code>. <strong>Default:</strong> <code>false</code></li>\n</ul>\n<p>For example:</p>\n<pre><code class=\"language-js\">const stream = zlib.createBrotliCompress({\n  chunkSize: 32 * 1024,\n  params: {\n    [zlib.constants.BROTLI_PARAM_MODE]: zlib.constants.BROTLI_MODE_TEXT,\n    [zlib.constants.BROTLI_PARAM_QUALITY]: 4,\n    [zlib.constants.BROTLI_PARAM_SIZE_HINT]: fs.statSync(inputFile).size,\n  },\n});\n</code></pre>"
         },
         {
           "textRaw": "Class: `ZstdOptions`",
@@ -244,13 +893,13 @@
           },
           "stability": 1,
           "stabilityText": "Experimental",
-          "desc": "<p>Each Zstd-based class takes an <code>options</code> object. All options are optional.</p>\n<ul>\n<li><code>flush</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;integer></code></a> <strong>Default:</strong> <code>zlib.constants.ZSTD_e_continue</code></li>\n<li><code>finishFlush</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;integer></code></a> <strong>Default:</strong> <code>zlib.constants.ZSTD_e_end</code></li>\n<li><code>chunkSize</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;integer></code></a> <strong>Default:</strong> <code>16 * 1024</code></li>\n<li><code>params</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a> Key-value object containing indexed <a href=\"#zstd-constants\">Zstd parameters</a>.</li>\n<li><code>maxOutputLength</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;integer></code></a> Limits output size when using <a href=\"#convenience-methods\">convenience methods</a>. <strong>Default:</strong> <a href=\"buffer.html#bufferkmaxlength\"><code>buffer.kMaxLength</code></a></li>\n<li><code>info</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#boolean_type\"><code>&#x3C;boolean></code></a> If <code>true</code>, returns an object with <code>buffer</code> and <code>engine</code>. <strong>Default:</strong> <code>false</code></li>\n<li><code>dictionary</code> <a href=\"buffer.html#class-buffer\"><code>&#x3C;Buffer></code></a> Optional dictionary used to\nimprove compression efficiency when compressing or decompressing data that\nshares common patterns with the dictionary.</li>\n</ul>\n<p>For example:</p>\n<pre><code class=\"language-js\">const stream = zlib.createZstdCompress({\n  chunkSize: 32 * 1024,\n  params: {\n    [zlib.constants.ZSTD_c_compressionLevel]: 10,\n    [zlib.constants.ZSTD_c_checksumFlag]: 1,\n  },\n});\n</code></pre>"
+          "desc": "<p>Each Zstd-based class takes an <code>options</code> object. All options are optional.</p>\n<ul>\n<li><code>flush</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;integer></code></a> <strong>Default:</strong> <code>zlib.constants.ZSTD_e_continue</code></li>\n<li><code>finishFlush</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;integer></code></a> <strong>Default:</strong> <code>zlib.constants.ZSTD_e_end</code></li>\n<li><code>chunkSize</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;integer></code></a> <strong>Default:</strong> <code>16 * 1024</code></li>\n<li><code>params</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a> Key-value object containing indexed <a href=\"#zstd-constants\">Zstd parameters</a>.</li>\n<li><code>maxOutputLength</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;integer></code></a> Limits output size when using <a href=\"#convenience-methods\">convenience methods</a>. <strong>Default:</strong> <a href=\"buffer.html#bufferkmaxlength\"><code>buffer.kMaxLength</code></a></li>\n<li><code>info</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#boolean_type\"><code>&#x3C;boolean></code></a> If <code>true</code>, returns an object with <code>buffer</code> and <code>engine</code>. <strong>Default:</strong> <code>false</code></li>\n<li><code>dictionary</code> <a href=\"buffer.html#class-buffer\"><code>&#x3C;Buffer></code></a> Optional dictionary used to\nimprove compression efficiency when compressing or decompressing data that\nshares common patterns with the dictionary.</li>\n</ul>\n<p>For example:</p>\n<pre><code class=\"language-js\">const stream = zlib.createZstdCompress({\n  chunkSize: 32 * 1024,\n  params: {\n    [zlib.constants.ZSTD_c_compressionLevel]: 10,\n    [zlib.constants.ZSTD_c_checksumFlag]: 1,\n  },\n});\n</code></pre>"
         },
         {
           "textRaw": "Convenience methods",
           "name": "Convenience methods",
           "type": "misc",
-          "desc": "<p>All of these take a <a href=\"buffer.html#class-buffer\"><code>&#x3C;Buffer></code></a>, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\"><code>&#x3C;TypedArray></code></a>, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView\"><code>&#x3C;DataView></code></a>, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer\"><code>&#x3C;ArrayBuffer></code></a>, or string\nas the first argument, an optional second argument\nto supply options to the <code>zlib</code> classes and will call the supplied callback\nwith <code>callback(error, result)</code>.</p>\n<p>Every method has a <code>*Sync</code> counterpart, which accept the same arguments, but\nwithout a callback.</p>",
+          "desc": "<p>All of these take a <a href=\"buffer.html#class-buffer\"><code>&#x3C;Buffer></code></a>, <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\"><code>&#x3C;TypedArray></code></a>, <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/DataView\"><code>&#x3C;DataView></code></a>, <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer\"><code>&#x3C;ArrayBuffer></code></a>, or string\nas the first argument, an optional second argument\nto supply options to the <code>zlib</code> classes and will call the supplied callback\nwith <code>callback(error, result)</code>.</p>\n<p>Every method has a <code>*Sync</code> counterpart, which accept the same arguments, but\nwithout a callback.</p>",
           "methods": [
             {
               "textRaw": "`zlib.brotliCompress(buffer[, options], callback)`",
@@ -1402,7 +2051,7 @@
                   ]
                 }
               ],
-              "desc": "<ul>\n<li><code>kind</code> <strong>Default:</strong> <code>zlib.constants.Z_FULL_FLUSH</code> for zlib-based streams,\n<code>zlib.constants.BROTLI_OPERATION_FLUSH</code> for Brotli-based streams.</li>\n<li><code>callback</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function\"><code>&#x3C;Function></code></a></li>\n</ul>\n<p>Flush pending data. Don't call this frivolously, premature flushes negatively\nimpact the effectiveness of the compression algorithm.</p>\n<p>Calling this only flushes data from the internal <code>zlib</code> state, and does not\nperform flushing of any kind on the streams level. Rather, it behaves like a\nnormal call to <code>.write()</code>, i.e. it will be queued up behind other pending\nwrites and will only produce output when data is being read from the stream.</p>"
+              "desc": "<ul>\n<li><code>kind</code> <strong>Default:</strong> <code>zlib.constants.Z_FULL_FLUSH</code> for zlib-based streams,\n<code>zlib.constants.BROTLI_OPERATION_FLUSH</code> for Brotli-based streams.</li>\n<li><code>callback</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Function\"><code>&#x3C;Function></code></a></li>\n</ul>\n<p>Flush pending data. Don't call this frivolously, premature flushes negatively\nimpact the effectiveness of the compression algorithm.</p>\n<p>Calling this only flushes data from the internal <code>zlib</code> state, and does not\nperform flushing of any kind on the streams level. Rather, it behaves like a\nnormal call to <code>.write()</code>, i.e. it will be queued up behind other pending\nwrites and will only produce output when data is being read from the stream.</p>"
             },
             {
               "textRaw": "`zlib.params(level, strategy, callback)`",

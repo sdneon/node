@@ -12,9 +12,11 @@
     'msvs_multi_core_compile': '0',   # we do enable multicore compiles, but not using the V8 way
     'enable_pgo_generate%': '0',
     'enable_pgo_use%': '0',
+    'clang_profile_lib%': '',
     'python%': 'python',
 
     'node_shared%': 'false',
+    'node_enable_experimentals%': 'false',
     'force_dynamic_crt%': 0,
     'node_use_v8_platform%': 'true',
     'node_use_bundled_v8%': 'true',
@@ -189,7 +191,7 @@
             ['clang==1', {
               'lto': ' -flto ', # Clang
             }, {
-              'lto': ' -flto=4 -fuse-linker-plugin -ffat-lto-objects ', # GCC
+              'lto': ' -flto=4 -ffat-lto-objects ', # GCC
             }],
           ],
         },
@@ -239,6 +241,65 @@
               ['enable_pgo_use=="true"', {
                 'cflags': ['<(pgo_use)'],
                 'ldflags': ['<(pgo_use)'],
+              },],
+            ],
+          },],
+          ['OS=="win"', {
+            'conditions': [
+              ['enable_lto=="true"', {
+                'msvs_settings': {
+                  'VCCLCompilerTool': {
+                    'AdditionalOptions': ['-flto=full'],
+                  },
+                  'VCLibrarianTool': {
+                    'AdditionalOptions': ['-flto=full'],
+                  },
+                  'VCLinkerTool': {
+                    'AdditionalOptions': ['-flto=full'],
+                  },
+                },
+              },],
+              ['enable_thin_lto=="true"', {
+                'msvs_settings': {
+                  'VCCLCompilerTool': {
+                    'AdditionalOptions': ['-flto=thin'],
+                  },
+                  'VCLibrarianTool': {
+                    'AdditionalOptions': ['-flto=thin'],
+                  },
+                  'VCLinkerTool': {
+                    'AdditionalOptions': ['-flto=thin'],
+                  },
+                },
+              },],
+            ],
+            'target_conditions': [
+              ['_toolset=="target"', {
+                'conditions': [
+                  ['enable_pgo_generate=="true"', {
+                    'msvs_settings': {
+                      'VCCLCompilerTool': {
+                        'AdditionalOptions': ['-fprofile-generate'],
+                      },
+                      'VCLinkerTool': {
+                        'AdditionalOptions': [
+                          '/NODEFAULTLIB:clang_rt.profile.lib',
+                          '"<(clang_profile_lib)"',
+                        ],
+                      },
+                    },
+                  },],
+                  ['enable_pgo_use=="true"', {
+                    'msvs_settings': {
+                      'VCCLCompilerTool': {
+                        'AdditionalOptions': ['-fprofile-use=$(SolutionDir)node.profdata'],
+                      },
+                      'VCLinkerTool': {
+                        'AdditionalOptions': ['-fprofile-use=$(SolutionDir)node.profdata'],
+                      },
+                    },
+                  },],
+                ],
               },],
             ],
           },],
@@ -437,6 +498,9 @@
       }],
       # The defines bellow must include all things from the external_v8_defines
       # list in v8/BUILD.gn.
+      ['node_enable_experimentals == "true"', {
+        'defines': ['EXPERIMENTALS_DEFAULT_VALUE=true'],
+      }],
       ['v8_enable_v8_checks == 1', {
         'defines': ['V8_ENABLE_CHECKS'],
       }],

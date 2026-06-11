@@ -5,10 +5,8 @@ This is a *fun* mod of Node.JS that initially embedded a modified version of dco
 
 Thanks to the inspiration from dcodeIO et al =D
 
-## Version 26.0.0
-* Update to Node.JS 26.0.0 baseline.
-  * Requires [rustc with cargo](https://rust-lang.org/) to build new Temporal APIs.
-  * Win 7 compatibility patch: Delay load `api-ms-win-core-synch-l1-2-0.dll` to avoid startup failure.
+## Version 26.1.0
+* Update to Node.JS 26.1.0 baseline.
 
 It embeds:
 * DS v1.2.2.
@@ -228,11 +226,8 @@ From Node.JS 22.x, VS2022 is needed; as VS2019 fails to compile some template sy
 CoffeeScript, TypeScript and Glob are now packed using [Webpack](https://webpack.js.org/).
 
 ### Backward Compatibility for Win 7
-If building for Windows 7, these patches are needed owing to use of APIs not available in Win 7.
-* `deps\uv\src\win\util.c` patch for uv_clock_gettime() to replace use of GetSystemTimePreciseAsFileTime().
-* From v26, delay load `api-ms-win-core-synch-l1-2-0.dll` to avoid startup failure.
-Reason being (3rd party module) `highway`'s `NanoSleep()` and `WakeAll()` uses `WaitOnAddress` and `WakeByAddressAll`.
-  * However, NanoSleep & WakeAll does NOT seem to be in use at all, so shims will not be implemented.
+If building for Windows 7, you'll need the `deps\uv\src\win\util.c` patch for uv_clock_gettime() to replace use of GetSystemTimePreciseAsFileTime() which is only available from Win8 onwards.
+If building for newer versions (>= 8.1), you may omit this patch.
 
 ## Debugging Node.JS Internals
 It appears that `chrome://inspect` & `--inspect-brk` no longer respects breakpoints in Node.JS internals upon startup; i.e. will skip right to beginning of user code.
@@ -636,8 +631,6 @@ For information about the governance of the Node.js project, see
   **Matteo Collina** <<matteo.collina@gmail.com>> (he/him) - [Support me](https://github.com/sponsors/mcollina)
 * [meixg](https://github.com/meixg) -
   **Xuguang Mei** <<meixuguang@gmail.com>> (he/him)
-* [mhdawson](https://github.com/mhdawson) -
-  **Michael Dawson** <<midawson@redhat.com>> (he/him)
 * [MoLow](https://github.com/MoLow) -
   **Moshe Atlow** <<moshe@atlow.co.il>> (he/him)
 * [MrJithil](https://github.com/MrJithil) -
@@ -692,8 +685,6 @@ For information about the governance of the Node.js project, see
   **Ulises Gascón** <<ulisesgascongonzalez@gmail.com>> (he/him)
 * [vmoroz](https://github.com/vmoroz) -
   **Vladimir Morozov** <<vmorozov@microsoft.com>> (he/him)
-* [VoltrexKeyva](https://github.com/VoltrexKeyva) -
-  **Mohammed Keyvanzadeh** <<mohammadkeyvanzade94@gmail.com>> (he/him)
 * [watilde](https://github.com/watilde) -
   **Daijiro Wachi** <<daijiro.wachi@gmail.com>> (he/him)
 * [zcbenz](https://github.com/zcbenz) -
@@ -850,6 +841,8 @@ For information about the governance of the Node.js project, see
   **Matthew Loring** <<mattloring@google.com>>
 * [Mesteery](https://github.com/Mesteery) -
   **Mestery** <<mestery@protonmail.com>> (he/him)
+* [mhdawson](https://github.com/mhdawson) -
+  **Michael Dawson** <<midawson@redhat.com>> (he/him)
 * [micnic](https://github.com/micnic) -
   **Nicu Micleușanu** <<micnic90@gmail.com>> (he/him)
 * [mikeal](https://github.com/mikeal) -
@@ -956,6 +949,8 @@ For information about the governance of the Node.js project, see
   **Vladimir de Turckheim** <<vlad2t@hotmail.com>> (he/him)
 * [vkurchatkin](https://github.com/vkurchatkin) -
   **Vladimir Kurchatkin** <<vladimir.kurchatkin@gmail.com>>
+* [VoltrexKeyva](https://github.com/VoltrexKeyva) -
+  **Mohammed Keyvanzadeh** <<mohammadkeyvanzade94@gmail.com>> (he/him)
 * [vsemozhetbyt](https://github.com/vsemozhetbyt) -
   **Vse Mozhet Byt** <<vsemozhetbyt@gmail.com>> (he/him)
 * [watson](https://github.com/watson) -
@@ -986,8 +981,6 @@ maintaining the Node.js project.
   **Sangchul Lee** <<1ilsang.dev@gmail.com>> (he/him)
 * [atlowChemi](https://github.com/atlowChemi) -
   **Chemi Atlow** <<chemi@atlow.co.il>> (he/him)
-* [Ayase-252](https://github.com/Ayase-252) -
-  **Qingyu Deng** <<i@ayase-lab.com>>
 * [bjohansebas](https://github.com/bjohansebas) -
   **Sebastian Beltran** <<bjohansebas@gmail.com>>
 * [bmuenzenmeyer](https://github.com/bmuenzenmeyer) -
@@ -1012,16 +1005,12 @@ maintaining the Node.js project.
   **Kevin Eady** <<kevin.c.eady@gmail.com>> (he/him)
 * [marsonya](https://github.com/marsonya) -
   **Akhil Marsonya** <<akhil.marsonya27@gmail.com>> (he/him)
-* [meixg](https://github.com/meixg) -
-  **Xuguang Mei** <<meixuguang@gmail.com>> (he/him)
 * [milesguicent](https://github.com/milesguicent) -
   **Miles Guicent** <<guicent@pm.me>> (he/him)
 * [preveen-stack](https://github.com/preveen-stack) -
   **Preveen Padmanabhan** <<wide4head@gmail.com>> (he/him)
 * [RaisinTen](https://github.com/RaisinTen) -
   **Darshan Sen** <<raisinten@gmail.com>> (he/him)
-* [VoltrexKeyva](https://github.com/VoltrexKeyva) -
-  **Mohammed Keyvanzadeh** <<mohammadkeyvanzade94@gmail.com>> (he/him)
 
 Triagers follow the [Triage Guide](./doc/contributing/issues.md#triaging-a-bug-report) when
 responding to new issues.

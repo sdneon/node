@@ -41,7 +41,7 @@
               "textRaw": "Object mode",
               "name": "object_mode",
               "type": "module",
-              "desc": "<p>All streams created by Node.js APIs operate exclusively on strings, <a href=\"buffer.html#class-buffer\"><code>&#x3C;Buffer></code></a>,\n<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\"><code>&#x3C;TypedArray></code></a> and <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView\"><code>&#x3C;DataView></code></a> objects:</p>\n<ul>\n<li><code>Strings</code> and <code>Buffers</code> are the most common types used with streams.</li>\n<li><code>TypedArray</code> and <code>DataView</code> lets you handle binary data with types like\n<code>Int32Array</code> or <code>Uint8Array</code>. When you write a TypedArray or DataView to a\nstream, Node.js processes\nthe raw bytes.</li>\n</ul>\n<p>It is possible, however, for stream\nimplementations to work with other types of JavaScript values (with the\nexception of <code>null</code>, which serves a special purpose within streams).\nSuch streams are considered to operate in \"object mode\".</p>\n<p>Stream instances are switched into object mode using the <code>objectMode</code> option\nwhen the stream is created. Attempting to switch an existing stream into\nobject mode is not safe.</p>",
+              "desc": "<p>All streams created by Node.js APIs operate exclusively on strings, <a href=\"buffer.html#class-buffer\"><code>&#x3C;Buffer></code></a>,\n<a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\"><code>&#x3C;TypedArray></code></a> and <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/DataView\"><code>&#x3C;DataView></code></a> objects:</p>\n<ul>\n<li><code>Strings</code> and <code>Buffers</code> are the most common types used with streams.</li>\n<li><code>TypedArray</code> and <code>DataView</code> lets you handle binary data with types like\n<code>Int32Array</code> or <code>Uint8Array</code>. When you write a TypedArray or DataView to a\nstream, Node.js processes\nthe raw bytes.</li>\n</ul>\n<p>It is possible, however, for stream\nimplementations to work with other types of JavaScript values (with the\nexception of <code>null</code>, which serves a special purpose within streams).\nSuch streams are considered to operate in \"object mode\".</p>\n<p>Stream instances are switched into object mode using the <code>objectMode</code> option\nwhen the stream is created. Attempting to switch an existing stream into\nobject mode is not safe.</p>",
               "displayName": "Object mode"
             }
           ],
@@ -88,9 +88,9 @@
                 {
                   "params": [
                     {
-                      "textRaw": "`source` {Stream|Iterable|AsyncIterable|Function}",
+                      "textRaw": "`source` {Stream|AsyncIterable|Function}",
                       "name": "source",
-                      "type": "Stream|Iterable|AsyncIterable|Function",
+                      "type": "Stream|AsyncIterable|Function",
                       "options": [
                         {
                           "textRaw": "Returns: {Promise|AsyncIterable}",
@@ -1327,6 +1327,31 @@
                         }
                       ],
                       "desc": "<pre><code class=\"language-js\">const fs = require('node:fs');\n\nasync function print(readable) {\n  readable.setEncoding('utf8');\n  let data = '';\n  for await (const chunk of readable) {\n    data += chunk;\n  }\n  console.log(data);\n}\n\nprint(fs.createReadStream('file')).catch(console.error);\n</code></pre>\n<p>If the loop terminates with a <code>break</code>, <code>return</code>, or a <code>throw</code>, the stream will\nbe destroyed. In other terms, iterating over a stream will consume the stream\nfully. The stream will be read in chunks of size equal to the <code>highWaterMark</code>\noption. In the code example above, data will be in a single chunk if the file\nhas less then 64 KiB of data because no <code>highWaterMark</code> option is provided to\n<a href=\"fs.html#fscreatereadstreampath-options\"><code>fs.createReadStream()</code></a>.</p>"
+                    },
+                    {
+                      "textRaw": "`readable[Symbol.for('Stream.toAsyncStreamable')]()`",
+                      "name": "[Symbol.for('Stream.toAsyncStreamable')]",
+                      "type": "method",
+                      "meta": {
+                        "added": [
+                          "v26.1.0"
+                        ],
+                        "changes": []
+                      },
+                      "stability": 1,
+                      "stabilityText": "Experimental",
+                      "signatures": [
+                        {
+                          "params": [],
+                          "return": {
+                            "textRaw": "Returns: {AsyncIterable} An `AsyncIterable<Uint8Array[]>` that yields batched chunks from the stream.",
+                            "name": "return",
+                            "type": "AsyncIterable",
+                            "desc": "An `AsyncIterable<Uint8Array[]>` that yields batched chunks from the stream."
+                          }
+                        }
+                      ],
+                      "desc": "<p>When the <code>--experimental-stream-iter</code> flag is enabled, <code>Readable</code> streams\nimplement the <a href=\"stream_iter.html#streamtoasyncstreamable\"><code>Stream.toAsyncStreamable</code></a> protocol, enabling efficient\nconsumption by the <a href=\"stream_iter.html\"><code>stream/iter</code></a> API.</p>\n<p>This provides a batched async iterator that drains the stream's internal\nbuffer into <code>Uint8Array[]</code> batches, amortizing the per-chunk Promise overhead\nof the standard <code>Symbol.asyncIterator</code> path. For byte-mode streams, chunks\nare yielded directly as <code>Buffer</code> instances (which are <code>Uint8Array</code> subclasses).\nFor object-mode or encoded streams, each chunk is normalized to <code>Uint8Array</code>\nbefore batching.</p>\n<p>The returned iterator is tagged as a validated source, so <a href=\"stream_iter.html#frominput\"><code>from()</code></a>\npasses it through without additional normalization.</p>\n<pre><code class=\"language-mjs\">import { Readable } from 'node:stream';\nimport { text, from } from 'node:stream/iter';\n\nconst readable = new Readable({\n  read() { this.push('hello'); this.push(null); },\n});\n\n// Readable is automatically consumed via toAsyncStreamable\nconsole.log(await text(from(readable))); // 'hello'\n</code></pre>\n<pre><code class=\"language-cjs\">const { Readable } = require('node:stream');\nconst { text, from } = require('node:stream/iter');\n\nasync function run() {\n  const readable = new Readable({\n    read() { this.push('hello'); this.push(null); },\n  });\n\n  console.log(await text(from(readable))); // 'hello'\n}\n\nrun().catch(console.error);\n</code></pre>\n<p>Without the <code>--experimental-stream-iter</code> flag, calling this method throws\n<a href=\"errors.html#err_stream_iter_missing_flag\"><code>ERR_STREAM_ITER_MISSING_FLAG</code></a>.</p>"
                     },
                     {
                       "textRaw": "`readable[Symbol.asyncDispose]()`",
@@ -2680,9 +2705,9 @@
                 {
                   "params": [
                     {
-                      "textRaw": "`streams` {Stream[]|Iterable[]|AsyncIterable[]|Function[]|ReadableStream[]|WritableStream[]|TransformStream[]}",
+                      "textRaw": "`streams` {Stream[]|AsyncIterable[]|Function[]|ReadableStream[]|WritableStream[]|TransformStream[]}",
                       "name": "streams",
-                      "type": "Stream[]|Iterable[]|AsyncIterable[]|Function[]|ReadableStream[]|WritableStream[]|TransformStream[]"
+                      "type": "Stream[]|AsyncIterable[]|Function[]|ReadableStream[]|WritableStream[]|TransformStream[]"
                     },
                     {
                       "textRaw": "`callback` {Function} Called when the pipeline is fully done.",
@@ -2872,27 +2897,16 @@
                 {
                   "params": [
                     {
-                      "textRaw": "`iterable` {Iterable} Object implementing the `Symbol.asyncIterator` or `Symbol.iterator` iterable protocol. Emits an 'error' event if a null value is passed.",
-                      "name": "iterable",
-                      "type": "Iterable",
-                      "desc": "Object implementing the `Symbol.asyncIterator` or `Symbol.iterator` iterable protocol. Emits an 'error' event if a null value is passed."
+                      "name": "iterable"
                     },
                     {
-                      "textRaw": "`options` {Object} Options provided to `new stream.Readable([options])`. By default, `Readable.from()` will set `options.objectMode` to `true`, unless this is explicitly opted out by setting `options.objectMode` to `false`.",
                       "name": "options",
-                      "type": "Object",
-                      "desc": "Options provided to `new stream.Readable([options])`. By default, `Readable.from()` will set `options.objectMode` to `true`, unless this is explicitly opted out by setting `options.objectMode` to `false`.",
                       "optional": true
                     }
-                  ],
-                  "return": {
-                    "textRaw": "Returns: {stream.Readable}",
-                    "name": "return",
-                    "type": "stream.Readable"
-                  }
+                  ]
                 }
               ],
-              "desc": "<p>A utility method for creating readable streams out of iterators.</p>\n<pre><code class=\"language-js\">const { Readable } = require('node:stream');\n\nasync function * generate() {\n  yield 'hello';\n  yield 'streams';\n}\n\nconst readable = Readable.from(generate());\n\nreadable.on('data', (chunk) => {\n  console.log(chunk);\n});\n</code></pre>\n<p>Calling <code>Readable.from(string)</code> or <code>Readable.from(buffer)</code> will not have\nthe strings or buffers be iterated to match the other streams semantics\nfor performance reasons.</p>\n<p>If an <code>Iterable</code> object containing promises is passed as an argument,\nit might result in unhandled rejection.</p>\n<pre><code class=\"language-js\">const { Readable } = require('node:stream');\n\nReadable.from([\n  new Promise((resolve) => setTimeout(resolve('1'), 1500)),\n  new Promise((_, reject) => setTimeout(reject(new Error('2')), 1000)), // Unhandled rejection\n]);\n</code></pre>"
+              "desc": "<ul>\n<li><code>iterable</code> {Iterable} Object implementing the <code>Symbol.asyncIterator</code> or\n<code>Symbol.iterator</code> iterable protocol. Emits an 'error' event if a null\nvalue is passed.</li>\n<li><code>options</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a> Options provided to <code>new stream.Readable([options])</code>.\nBy default, <code>Readable.from()</code> will set <code>options.objectMode</code> to <code>true</code>, unless\nthis is explicitly opted out by setting <code>options.objectMode</code> to <code>false</code>.</li>\n<li>Returns: <a href=\"stream.html#class-streamreadable\"><code>&#x3C;stream.Readable></code></a></li>\n</ul>\n<p>A utility method for creating readable streams out of iterators.</p>\n<pre><code class=\"language-js\">const { Readable } = require('node:stream');\n\nasync function * generate() {\n  yield 'hello';\n  yield 'streams';\n}\n\nconst readable = Readable.from(generate());\n\nreadable.on('data', (chunk) => {\n  console.log(chunk);\n});\n</code></pre>\n<p>Calling <code>Readable.from(string)</code> or <code>Readable.from(buffer)</code> will not have\nthe strings or buffers be iterated to match the other streams semantics\nfor performance reasons.</p>\n<p>If an <code>Iterable</code> object containing promises is passed as an argument,\nit might result in unhandled rejection.</p>\n<pre><code class=\"language-js\">const { Readable } = require('node:stream');\n\nReadable.from([\n  new Promise((resolve) => setTimeout(resolve('1'), 1500)),\n  new Promise((_, reject) => setTimeout(reject(new Error('2')), 1000)), // Unhandled rejection\n]);\n</code></pre>"
             },
             {
               "textRaw": "`stream.Readable.fromWeb(readableStream[, options])`",
@@ -3214,9 +3228,9 @@
                 {
                   "params": [
                     {
-                      "textRaw": "`src` {Stream|Blob|ArrayBuffer|string|Iterable|AsyncIterable|AsyncGeneratorFunction|AsyncFunction|Promise|Object|ReadableStream|WritableStream}",
+                      "textRaw": "`src` {Stream|Blob|ArrayBuffer|string|AsyncIterable|AsyncGeneratorFunction|AsyncFunction|Promise|Object|ReadableStream|WritableStream}",
                       "name": "src",
-                      "type": "Stream|Blob|ArrayBuffer|string|Iterable|AsyncIterable|AsyncGeneratorFunction|AsyncFunction|Promise|Object|ReadableStream|WritableStream"
+                      "type": "Stream|Blob|ArrayBuffer|string|AsyncIterable|AsyncGeneratorFunction|AsyncFunction|Promise|Object|ReadableStream|WritableStream"
                     }
                   ]
                 }
@@ -4054,7 +4068,7 @@
                       }
                     }
                   ],
-                  "desc": "<p>When <code>chunk</code> is a <a href=\"buffer.html#class-buffer\"><code>&#x3C;Buffer></code></a>, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\"><code>&#x3C;TypedArray></code></a>, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView\"><code>&#x3C;DataView></code></a> or <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a>, the <code>chunk</code>\nof data will be added to the internal queue for users of the stream to consume.\nPassing <code>chunk</code> as <code>null</code> signals the end of the stream (EOF), after which no\nmore data can be written.</p>\n<p>When the <code>Readable</code> is operating in paused mode, the data added with\n<code>readable.push()</code> can be read out by calling the\n<a href=\"#readablereadsize\"><code>readable.read()</code></a> method when the <a href=\"#event-readable\"><code>'readable'</code></a> event is\nemitted.</p>\n<p>When the <code>Readable</code> is operating in flowing mode, the data added with\n<code>readable.push()</code> will be delivered by emitting a <code>'data'</code> event.</p>\n<p>The <code>readable.push()</code> method is designed to be as flexible as possible. For\nexample, when wrapping a lower-level source that provides some form of\npause/resume mechanism, and a data callback, the low-level source can be wrapped\nby the custom <code>Readable</code> instance:</p>\n<pre><code class=\"language-js\">// `_source` is an object with readStop() and readStart() methods,\n// and an `ondata` member that gets called when it has data, and\n// an `onend` member that gets called when the data is over.\n\nclass SourceWrapper extends Readable {\n  constructor(options) {\n    super(options);\n\n    this._source = getLowLevelSourceObject();\n\n    // Every time there's data, push it into the internal buffer.\n    this._source.ondata = (chunk) => {\n      // If push() returns false, then stop reading from source.\n      if (!this.push(chunk))\n        this._source.readStop();\n    };\n\n    // When the source ends, push the EOF-signaling `null` chunk.\n    this._source.onend = () => {\n      this.push(null);\n    };\n  }\n  // _read() will be called when the stream wants to pull more data in.\n  // The advisory size argument is ignored in this case.\n  _read(size) {\n    this._source.readStart();\n  }\n}\n</code></pre>\n<p>The <code>readable.push()</code> method is used to push the content\ninto the internal buffer. It can be driven by the <a href=\"#readable_readsize\"><code>readable._read()</code></a> method.</p>\n<p>For streams not operating in object mode, if the <code>chunk</code> parameter of\n<code>readable.push()</code> is <code>undefined</code>, it will be treated as empty string or\nbuffer. See <a href=\"#readablepush\"><code>readable.push('')</code></a> for more information.</p>"
+                  "desc": "<p>When <code>chunk</code> is a <a href=\"buffer.html#class-buffer\"><code>&#x3C;Buffer></code></a>, <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\"><code>&#x3C;TypedArray></code></a>, <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/DataView\"><code>&#x3C;DataView></code></a> or <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a>, the <code>chunk</code>\nof data will be added to the internal queue for users of the stream to consume.\nPassing <code>chunk</code> as <code>null</code> signals the end of the stream (EOF), after which no\nmore data can be written.</p>\n<p>When the <code>Readable</code> is operating in paused mode, the data added with\n<code>readable.push()</code> can be read out by calling the\n<a href=\"#readablereadsize\"><code>readable.read()</code></a> method when the <a href=\"#event-readable\"><code>'readable'</code></a> event is\nemitted.</p>\n<p>When the <code>Readable</code> is operating in flowing mode, the data added with\n<code>readable.push()</code> will be delivered by emitting a <code>'data'</code> event.</p>\n<p>The <code>readable.push()</code> method is designed to be as flexible as possible. For\nexample, when wrapping a lower-level source that provides some form of\npause/resume mechanism, and a data callback, the low-level source can be wrapped\nby the custom <code>Readable</code> instance:</p>\n<pre><code class=\"language-js\">// `_source` is an object with readStop() and readStart() methods,\n// and an `ondata` member that gets called when it has data, and\n// an `onend` member that gets called when the data is over.\n\nclass SourceWrapper extends Readable {\n  constructor(options) {\n    super(options);\n\n    this._source = getLowLevelSourceObject();\n\n    // Every time there's data, push it into the internal buffer.\n    this._source.ondata = (chunk) => {\n      // If push() returns false, then stop reading from source.\n      if (!this.push(chunk))\n        this._source.readStop();\n    };\n\n    // When the source ends, push the EOF-signaling `null` chunk.\n    this._source.onend = () => {\n      this.push(null);\n    };\n  }\n  // _read() will be called when the stream wants to pull more data in.\n  // The advisory size argument is ignored in this case.\n  _read(size) {\n    this._source.readStart();\n  }\n}\n</code></pre>\n<p>The <code>readable.push()</code> method is used to push the content\ninto the internal buffer. It can be driven by the <a href=\"#readable_readsize\"><code>readable._read()</code></a> method.</p>\n<p>For streams not operating in object mode, if the <code>chunk</code> parameter of\n<code>readable.push()</code> is <code>undefined</code>, it will be treated as empty string or\nbuffer. See <a href=\"#readablepush\"><code>readable.push('')</code></a> for more information.</p>"
                 }
               ],
               "modules": [
@@ -4366,7 +4380,7 @@
                   ]
                 }
               ],
-              "desc": "<p>Use of <code>readable.push('')</code> is not recommended.</p>\n<p>Pushing a zero-byte <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a>, <a href=\"buffer.html#class-buffer\"><code>&#x3C;Buffer></code></a>, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\"><code>&#x3C;TypedArray></code></a> or <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView\"><code>&#x3C;DataView></code></a> to a stream\nthat is not in object mode has an interesting side effect.\nBecause it <em>is</em> a call to\n<a href=\"#readablepushchunk-encoding\"><code>readable.push()</code></a>, the call will end the reading process.\nHowever, because the argument is an empty string, no data is added to the\nreadable buffer so there is nothing for a user to consume.</p>"
+              "desc": "<p>Use of <code>readable.push('')</code> is not recommended.</p>\n<p>Pushing a zero-byte <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a>, <a href=\"buffer.html#class-buffer\"><code>&#x3C;Buffer></code></a>, <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\"><code>&#x3C;TypedArray></code></a> or <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/DataView\"><code>&#x3C;DataView></code></a> to a stream\nthat is not in object mode has an interesting side effect.\nBecause it <em>is</em> a call to\n<a href=\"#readablepushchunk-encoding\"><code>readable.push()</code></a>, the call will end the reading process.\nHowever, because the argument is an empty string, no data is added to the\nreadable buffer so there is nothing for a user to consume.</p>"
             }
           ]
         }
@@ -4531,9 +4545,9 @@
             {
               "params": [
                 {
-                  "textRaw": "`streams` {Stream[]|Iterable[]|AsyncIterable[]|Function[]|ReadableStream[]|WritableStream[]|TransformStream[]}",
+                  "textRaw": "`streams` {Stream[]|AsyncIterable[]|Function[]|ReadableStream[]|WritableStream[]|TransformStream[]}",
                   "name": "streams",
-                  "type": "Stream[]|Iterable[]|AsyncIterable[]|Function[]|ReadableStream[]|WritableStream[]|TransformStream[]"
+                  "type": "Stream[]|AsyncIterable[]|Function[]|ReadableStream[]|WritableStream[]|TransformStream[]"
                 },
                 {
                   "textRaw": "`callback` {Function} Called when the pipeline is fully done.",
@@ -4723,27 +4737,16 @@
             {
               "params": [
                 {
-                  "textRaw": "`iterable` {Iterable} Object implementing the `Symbol.asyncIterator` or `Symbol.iterator` iterable protocol. Emits an 'error' event if a null value is passed.",
-                  "name": "iterable",
-                  "type": "Iterable",
-                  "desc": "Object implementing the `Symbol.asyncIterator` or `Symbol.iterator` iterable protocol. Emits an 'error' event if a null value is passed."
+                  "name": "iterable"
                 },
                 {
-                  "textRaw": "`options` {Object} Options provided to `new stream.Readable([options])`. By default, `Readable.from()` will set `options.objectMode` to `true`, unless this is explicitly opted out by setting `options.objectMode` to `false`.",
                   "name": "options",
-                  "type": "Object",
-                  "desc": "Options provided to `new stream.Readable([options])`. By default, `Readable.from()` will set `options.objectMode` to `true`, unless this is explicitly opted out by setting `options.objectMode` to `false`.",
                   "optional": true
                 }
-              ],
-              "return": {
-                "textRaw": "Returns: {stream.Readable}",
-                "name": "return",
-                "type": "stream.Readable"
-              }
+              ]
             }
           ],
-          "desc": "<p>A utility method for creating readable streams out of iterators.</p>\n<pre><code class=\"language-js\">const { Readable } = require('node:stream');\n\nasync function * generate() {\n  yield 'hello';\n  yield 'streams';\n}\n\nconst readable = Readable.from(generate());\n\nreadable.on('data', (chunk) => {\n  console.log(chunk);\n});\n</code></pre>\n<p>Calling <code>Readable.from(string)</code> or <code>Readable.from(buffer)</code> will not have\nthe strings or buffers be iterated to match the other streams semantics\nfor performance reasons.</p>\n<p>If an <code>Iterable</code> object containing promises is passed as an argument,\nit might result in unhandled rejection.</p>\n<pre><code class=\"language-js\">const { Readable } = require('node:stream');\n\nReadable.from([\n  new Promise((resolve) => setTimeout(resolve('1'), 1500)),\n  new Promise((_, reject) => setTimeout(reject(new Error('2')), 1000)), // Unhandled rejection\n]);\n</code></pre>"
+          "desc": "<ul>\n<li><code>iterable</code> {Iterable} Object implementing the <code>Symbol.asyncIterator</code> or\n<code>Symbol.iterator</code> iterable protocol. Emits an 'error' event if a null\nvalue is passed.</li>\n<li><code>options</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a> Options provided to <code>new stream.Readable([options])</code>.\nBy default, <code>Readable.from()</code> will set <code>options.objectMode</code> to <code>true</code>, unless\nthis is explicitly opted out by setting <code>options.objectMode</code> to <code>false</code>.</li>\n<li>Returns: <a href=\"stream.html#class-streamreadable\"><code>&#x3C;stream.Readable></code></a></li>\n</ul>\n<p>A utility method for creating readable streams out of iterators.</p>\n<pre><code class=\"language-js\">const { Readable } = require('node:stream');\n\nasync function * generate() {\n  yield 'hello';\n  yield 'streams';\n}\n\nconst readable = Readable.from(generate());\n\nreadable.on('data', (chunk) => {\n  console.log(chunk);\n});\n</code></pre>\n<p>Calling <code>Readable.from(string)</code> or <code>Readable.from(buffer)</code> will not have\nthe strings or buffers be iterated to match the other streams semantics\nfor performance reasons.</p>\n<p>If an <code>Iterable</code> object containing promises is passed as an argument,\nit might result in unhandled rejection.</p>\n<pre><code class=\"language-js\">const { Readable } = require('node:stream');\n\nReadable.from([\n  new Promise((resolve) => setTimeout(resolve('1'), 1500)),\n  new Promise((_, reject) => setTimeout(reject(new Error('2')), 1000)), // Unhandled rejection\n]);\n</code></pre>"
         },
         {
           "textRaw": "`stream.Readable.fromWeb(readableStream[, options])`",
@@ -5065,9 +5068,9 @@
             {
               "params": [
                 {
-                  "textRaw": "`src` {Stream|Blob|ArrayBuffer|string|Iterable|AsyncIterable|AsyncGeneratorFunction|AsyncFunction|Promise|Object|ReadableStream|WritableStream}",
+                  "textRaw": "`src` {Stream|Blob|ArrayBuffer|string|AsyncIterable|AsyncGeneratorFunction|AsyncFunction|Promise|Object|ReadableStream|WritableStream}",
                   "name": "src",
-                  "type": "Stream|Blob|ArrayBuffer|string|Iterable|AsyncIterable|AsyncGeneratorFunction|AsyncFunction|Promise|Object|ReadableStream|WritableStream"
+                  "type": "Stream|Blob|ArrayBuffer|string|AsyncIterable|AsyncGeneratorFunction|AsyncFunction|Promise|Object|ReadableStream|WritableStream"
                 }
               ]
             }
@@ -5363,7 +5366,7 @@
               ]
             }
           ],
-          "desc": "<p>Use of <code>readable.push('')</code> is not recommended.</p>\n<p>Pushing a zero-byte <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a>, <a href=\"buffer.html#class-buffer\"><code>&#x3C;Buffer></code></a>, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\"><code>&#x3C;TypedArray></code></a> or <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView\"><code>&#x3C;DataView></code></a> to a stream\nthat is not in object mode has an interesting side effect.\nBecause it <em>is</em> a call to\n<a href=\"#readablepushchunk-encoding\"><code>readable.push()</code></a>, the call will end the reading process.\nHowever, because the argument is an empty string, no data is added to the\nreadable buffer so there is nothing for a user to consume.</p>"
+          "desc": "<p>Use of <code>readable.push('')</code> is not recommended.</p>\n<p>Pushing a zero-byte <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a>, <a href=\"buffer.html#class-buffer\"><code>&#x3C;Buffer></code></a>, <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\"><code>&#x3C;TypedArray></code></a> or <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/DataView\"><code>&#x3C;DataView></code></a> to a stream\nthat is not in object mode has an interesting side effect.\nBecause it <em>is</em> a call to\n<a href=\"#readablepushchunk-encoding\"><code>readable.push()</code></a>, the call will end the reading process.\nHowever, because the argument is an empty string, no data is added to the\nreadable buffer so there is nothing for a user to consume.</p>"
         }
       ],
       "displayName": "Stream"

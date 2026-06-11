@@ -687,7 +687,7 @@
                       }
                     }
                   ],
-                  "desc": "<p>Requests the next chunk of data from the underlying <a href=\"webstreams.html#class-readablestream\"><code>&#x3C;ReadableStream></code></a>\nand returns a promise that is fulfilled with the data once it is\navailable.</p>\n<p>Do not pass a pooled <a href=\"buffer.html#class-buffer\"><code>&#x3C;Buffer></code></a> object instance in to this method.\nPooled <code>Buffer</code> objects are created using <code>Buffer.allocUnsafe()</code>,\nor <code>Buffer.from()</code>, or are often returned by various <code>node:fs</code> module\ncallbacks. These types of <code>Buffer</code>s use a shared underlying\n<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer\"><code>&#x3C;ArrayBuffer></code></a> object that contains all of the data from all of\nthe pooled <code>Buffer</code> instances. When a <code>Buffer</code>, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\"><code>&#x3C;TypedArray></code></a>,\nor <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView\"><code>&#x3C;DataView></code></a> is passed in to <code>readableStreamBYOBReader.read()</code>,\nthe view's underlying <code>ArrayBuffer</code> is <em>detached</em>, invalidating\nall existing views that may exist on that <code>ArrayBuffer</code>. This\ncan have disastrous consequences for your application.</p>"
+                  "desc": "<p>Requests the next chunk of data from the underlying <a href=\"webstreams.html#class-readablestream\"><code>&#x3C;ReadableStream></code></a>\nand returns a promise that is fulfilled with the data once it is\navailable.</p>\n<p>Do not pass a pooled <a href=\"buffer.html#class-buffer\"><code>&#x3C;Buffer></code></a> object instance in to this method.\nPooled <code>Buffer</code> objects are created using <code>Buffer.allocUnsafe()</code>,\nor <code>Buffer.from()</code>, or are often returned by various <code>node:fs</code> module\ncallbacks. These types of <code>Buffer</code>s use a shared underlying\n<a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer\"><code>&#x3C;ArrayBuffer></code></a> object that contains all of the data from all of\nthe pooled <code>Buffer</code> instances. When a <code>Buffer</code>, <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\"><code>&#x3C;TypedArray></code></a>,\nor <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/DataView\"><code>&#x3C;DataView></code></a> is passed in to <code>readableStreamBYOBReader.read()</code>,\nthe view's underlying <code>ArrayBuffer</code> is <em>detached</em>, invalidating\nall existing views that may exist on that <code>ArrayBuffer</code>. This\ncan have disastrous consequences for your application.</p>"
                 },
                 {
                   "textRaw": "`readableStreamBYOBReader.releaseLock()`",
@@ -1505,7 +1505,16 @@
                     "added": [
                       "v16.5.0"
                     ],
-                    "changes": []
+                    "changes": [
+                      {
+                        "version": [
+                          "v21.5.0",
+                          "v20.14.0"
+                        ],
+                        "pr-url": "https://github.com/nodejs/node/pull/50126",
+                        "description": "Supports the `cancel` transformer callback."
+                      }
+                    ]
                   },
                   "params": [
                     {
@@ -1564,6 +1573,24 @@
                               "textRaw": "`controller` {TransformStreamDefaultController}",
                               "name": "controller",
                               "type": "TransformStreamDefaultController"
+                            },
+                            {
+                              "textRaw": "Returns: A promise fulfilled with `undefined`.",
+                              "name": "return",
+                              "desc": "A promise fulfilled with `undefined`."
+                            }
+                          ]
+                        },
+                        {
+                          "textRaw": "`cancel` {Function} A user-defined function that is called when either the readable side of the `TransformStream` is canceled or the writable side is aborted.",
+                          "name": "cancel",
+                          "type": "Function",
+                          "desc": "A user-defined function that is called when either the readable side of the `TransformStream` is canceled or the writable side is aborted.",
+                          "options": [
+                            {
+                              "textRaw": "`reason` {any}",
+                              "name": "reason",
+                              "type": "any"
                             },
                             {
                               "textRaw": "Returns: A promise fulfilled with `undefined`.",
@@ -2311,15 +2338,12 @@
                 {
                   "params": [
                     {
-                      "textRaw": "`iterable` {Iterable} Object implementing the `Symbol.asyncIterator` or `Symbol.iterator` iterable protocol.",
-                      "name": "iterable",
-                      "type": "Iterable",
-                      "desc": "Object implementing the `Symbol.asyncIterator` or `Symbol.iterator` iterable protocol."
+                      "name": "iterable"
                     }
                   ]
                 }
               ],
-              "desc": "<p>A utility method that creates a new <a href=\"webstreams.html#class-readablestream\"><code>&#x3C;ReadableStream></code></a> from an iterable.</p>\n<pre><code class=\"language-mjs\">import { ReadableStream } from 'node:stream/web';\n\nasync function* asyncIterableGenerator() {\n  yield 'a';\n  yield 'b';\n  yield 'c';\n}\n\nconst stream = ReadableStream.from(asyncIterableGenerator());\n\nfor await (const chunk of stream)\n  console.log(chunk); // Prints: 'a', 'b', 'c'\n</code></pre>\n<pre><code class=\"language-cjs\">const { ReadableStream } = require('node:stream/web');\n\nasync function* asyncIterableGenerator() {\n  yield 'a';\n  yield 'b';\n  yield 'c';\n}\n\n(async () => {\n  const stream = ReadableStream.from(asyncIterableGenerator());\n\n  for await (const chunk of stream)\n    console.log(chunk); // Prints: 'a', 'b', 'c'\n})();\n</code></pre>\n<p>To pipe the resulting <a href=\"webstreams.html#class-readablestream\"><code>&#x3C;ReadableStream></code></a> into a <a href=\"webstreams.html#class-writablestream\"><code>&#x3C;WritableStream></code></a> the <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols#The_iterable_protocol\"><code>&#x3C;Iterable></code></a>\nshould yield a sequence of <a href=\"buffer.html#class-buffer\"><code>&#x3C;Buffer></code></a>, <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\"><code>&#x3C;TypedArray></code></a>, or <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView\"><code>&#x3C;DataView></code></a> objects.</p>\n<pre><code class=\"language-mjs\">import { ReadableStream } from 'node:stream/web';\nimport { Buffer } from 'node:buffer';\n\nasync function* asyncIterableGenerator() {\n  yield Buffer.from('a');\n  yield Buffer.from('b');\n  yield Buffer.from('c');\n}\n\nconst stream = ReadableStream.from(asyncIterableGenerator());\n\nawait stream.pipeTo(createWritableStreamSomehow());\n</code></pre>\n<pre><code class=\"language-cjs\">const { ReadableStream } = require('node:stream/web');\nconst { Buffer } = require('node:buffer');\n\nasync function* asyncIterableGenerator() {\n  yield Buffer.from('a');\n  yield Buffer.from('b');\n  yield Buffer.from('c');\n}\n\nconst stream = ReadableStream.from(asyncIterableGenerator());\n\n(async () => {\n  await stream.pipeTo(createWritableStreamSomehow());\n})();\n</code></pre>"
+              "desc": "<ul>\n<li><code>iterable</code> {Iterable} Object implementing the <code>Symbol.asyncIterator</code> or\n<code>Symbol.iterator</code> iterable protocol.</li>\n</ul>\n<p>A utility method that creates a new <a href=\"webstreams.html#class-readablestream\"><code>&#x3C;ReadableStream></code></a> from an iterable.</p>\n<pre><code class=\"language-mjs\">import { ReadableStream } from 'node:stream/web';\n\nasync function* asyncIterableGenerator() {\n  yield 'a';\n  yield 'b';\n  yield 'c';\n}\n\nconst stream = ReadableStream.from(asyncIterableGenerator());\n\nfor await (const chunk of stream)\n  console.log(chunk); // Prints: 'a', 'b', 'c'\n</code></pre>\n<pre><code class=\"language-cjs\">const { ReadableStream } = require('node:stream/web');\n\nasync function* asyncIterableGenerator() {\n  yield 'a';\n  yield 'b';\n  yield 'c';\n}\n\n(async () => {\n  const stream = ReadableStream.from(asyncIterableGenerator());\n\n  for await (const chunk of stream)\n    console.log(chunk); // Prints: 'a', 'b', 'c'\n})();\n</code></pre>\n<p>To pipe the resulting <a href=\"webstreams.html#class-readablestream\"><code>&#x3C;ReadableStream></code></a> into a <a href=\"webstreams.html#class-writablestream\"><code>&#x3C;WritableStream></code></a> the {Iterable}\nshould yield a sequence of <a href=\"buffer.html#class-buffer\"><code>&#x3C;Buffer></code></a>, <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\"><code>&#x3C;TypedArray></code></a>, or <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/DataView\"><code>&#x3C;DataView></code></a> objects.</p>\n<pre><code class=\"language-mjs\">import { ReadableStream } from 'node:stream/web';\nimport { Buffer } from 'node:buffer';\n\nasync function* asyncIterableGenerator() {\n  yield Buffer.from('a');\n  yield Buffer.from('b');\n  yield Buffer.from('c');\n}\n\nconst stream = ReadableStream.from(asyncIterableGenerator());\n\nawait stream.pipeTo(createWritableStreamSomehow());\n</code></pre>\n<pre><code class=\"language-cjs\">const { ReadableStream } = require('node:stream/web');\nconst { Buffer } = require('node:buffer');\n\nasync function* asyncIterableGenerator() {\n  yield Buffer.from('a');\n  yield Buffer.from('b');\n  yield Buffer.from('c');\n}\n\nconst stream = ReadableStream.from(asyncIterableGenerator());\n\n(async () => {\n  await stream.pipeTo(createWritableStreamSomehow());\n})();\n</code></pre>"
             }
           ],
           "modules": [

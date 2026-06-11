@@ -70,7 +70,7 @@
             ],
             "changes": []
           },
-          "desc": "<p>This flips the pass/fail reporting for a specific test or suite: a flagged test\ncase must throw in order to pass, and a flagged test case that does not throw\nfails.</p>\n<p>In each of the following, <code>doTheThing()</code> fails to return <code>true</code>, but since the\ntests are flagged <code>expectFailure</code>, they pass.</p>\n<pre><code class=\"language-js\">it.expectFailure('should do the thing', () => {\n  assert.strictEqual(doTheThing(), true);\n});\n\nit('should do the thing', { expectFailure: true }, () => {\n  assert.strictEqual(doTheThing(), true);\n});\n\nit('should do the thing', { expectFailure: 'feature not implemented' }, () => {\n  assert.strictEqual(doTheThing(), true);\n});\n</code></pre>\n<p>If the value of <code>expectFailure</code> is a <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp\"><code>&#x3C;RegExp></code></a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function\"><code>&#x3C;Function></code></a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error\"><code>&#x3C;Error></code></a>\nthe tests will pass only if they throw a matching value.\nSee <a href=\"assert.html#assertthrowsfn-error-message\"><code>assert.throws</code></a> for how each value type is handled.</p>\n<p>Each of the following tests fails <em>despite</em> being flagged <code>expectFailure</code>\nbecause the failure does not match the specific <strong>expected</strong> failure.</p>\n<pre><code class=\"language-js\">it('fails because regex does not match', {\n  expectFailure: /expected message/,\n}, () => {\n  throw new Error('different message');\n});\n\nit('fails because object matcher does not match', {\n  expectFailure: { code: 'ERR_EXPECTED' },\n}, () => {\n  const err = new Error('boom');\n  err.code = 'ERR_ACTUAL';\n  throw err;\n});\n</code></pre>\n<p>To supply both a reason and specific error for <code>expectFailure</code>, use <code>{ label, match }</code>.</p>\n<pre><code class=\"language-js\">it('should fail with specific error and reason', {\n  expectFailure: {\n    label: 'reason for failure',\n    match: /error message/,\n  },\n}, () => {\n  assert.strictEqual(doTheThing(), true);\n});\n</code></pre>\n<p><code>skip</code> and/or <code>todo</code> are mutually exclusive to <code>expectFailure</code>, and <code>skip</code> or <code>todo</code>\nwill \"win\" when both are applied (<code>skip</code> wins against both, and <code>todo</code> wins\nagainst <code>expectFailure</code>).</p>\n<p>These tests will be skipped (and not run):</p>\n<pre><code class=\"language-js\">it.expectFailure('should do the thing', { skip: true }, () => {\n  assert.strictEqual(doTheThing(), true);\n});\n\nit.skip('should do the thing', { expectFailure: true }, () => {\n  assert.strictEqual(doTheThing(), true);\n});\n</code></pre>\n<p>These tests will be marked \"todo\" (silencing errors):</p>\n<pre><code class=\"language-js\">it.expectFailure('should do the thing', { todo: true }, () => {\n  assert.strictEqual(doTheThing(), true);\n});\n\nit.todo('should do the thing', { expectFailure: true }, () => {\n  assert.strictEqual(doTheThing(), true);\n});\n</code></pre>",
+          "desc": "<p>This flips the pass/fail reporting for a specific test or suite: a flagged test\ncase must throw in order to pass, and a flagged test case that does not throw\nfails.</p>\n<p>In each of the following, <code>doTheThing()</code> fails to return <code>true</code>, but since the\ntests are flagged <code>expectFailure</code>, they pass.</p>\n<pre><code class=\"language-js\">it.expectFailure('should do the thing', () => {\n  assert.strictEqual(doTheThing(), true);\n});\n\nit('should do the thing', { expectFailure: true }, () => {\n  assert.strictEqual(doTheThing(), true);\n});\n\nit('should do the thing', { expectFailure: 'feature not implemented' }, () => {\n  assert.strictEqual(doTheThing(), true);\n});\n</code></pre>\n<p>If the value of <code>expectFailure</code> is a <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/RegExp\"><code>&#x3C;RegExp></code></a> | <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Function\"><code>&#x3C;Function></code></a> | <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a> | <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error\"><code>&#x3C;Error></code></a>\nthe tests will pass only if they throw a matching value.\nSee <a href=\"assert.html#assertthrowsfn-error-message\"><code>assert.throws</code></a> for how each value type is handled.</p>\n<p>Each of the following tests fails <em>despite</em> being flagged <code>expectFailure</code>\nbecause the failure does not match the specific <strong>expected</strong> failure.</p>\n<pre><code class=\"language-js\">it('fails because regex does not match', {\n  expectFailure: /expected message/,\n}, () => {\n  throw new Error('different message');\n});\n\nit('fails because object matcher does not match', {\n  expectFailure: { code: 'ERR_EXPECTED' },\n}, () => {\n  const err = new Error('boom');\n  err.code = 'ERR_ACTUAL';\n  throw err;\n});\n</code></pre>\n<p>To supply both a reason and specific error for <code>expectFailure</code>, use <code>{ label, match }</code>.</p>\n<pre><code class=\"language-js\">it('should fail with specific error and reason', {\n  expectFailure: {\n    label: 'reason for failure',\n    match: /error message/,\n  },\n}, () => {\n  assert.strictEqual(doTheThing(), true);\n});\n</code></pre>\n<p><code>skip</code> and/or <code>todo</code> are mutually exclusive to <code>expectFailure</code>, and <code>skip</code> or <code>todo</code>\nwill \"win\" when both are applied (<code>skip</code> wins against both, and <code>todo</code> wins\nagainst <code>expectFailure</code>).</p>\n<p>These tests will be skipped (and not run):</p>\n<pre><code class=\"language-js\">it.expectFailure('should do the thing', { skip: true }, () => {\n  assert.strictEqual(doTheThing(), true);\n});\n\nit.skip('should do the thing', { expectFailure: true }, () => {\n  assert.strictEqual(doTheThing(), true);\n});\n</code></pre>\n<p>These tests will be marked \"todo\" (silencing errors):</p>\n<pre><code class=\"language-js\">it.expectFailure('should do the thing', { todo: true }, () => {\n  assert.strictEqual(doTheThing(), true);\n});\n\nit.todo('should do the thing', { expectFailure: true }, () => {\n  assert.strictEqual(doTheThing(), true);\n});\n</code></pre>",
           "displayName": "Expecting tests to fail"
         },
         {
@@ -129,8 +129,23 @@
           "textRaw": "Running tests from the command line",
           "name": "running_tests_from_the_command_line",
           "type": "module",
-          "desc": "<p>The Node.js test runner can be invoked from the command line by passing the\n<a href=\"cli.html#--test\"><code>--test</code></a> flag:</p>\n<pre><code class=\"language-bash\">node --test\n</code></pre>\n<p>By default, Node.js will run all files matching these patterns:</p>\n<ul>\n<li><code>**/*.test.{cjs,mjs,js}</code></li>\n<li><code>**/*-test.{cjs,mjs,js}</code></li>\n<li><code>**/*_test.{cjs,mjs,js}</code></li>\n<li><code>**/test-*.{cjs,mjs,js}</code></li>\n<li><code>**/test.{cjs,mjs,js}</code></li>\n<li><code>**/test/**/*.{cjs,mjs,js}</code></li>\n</ul>\n<p>Unless <a href=\"cli.html#--no-strip-types\"><code>--no-strip-types</code></a> is supplied, the following\nadditional patterns are also matched:</p>\n<ul>\n<li><code>**/*.test.{cts,mts,ts}</code></li>\n<li><code>**/*-test.{cts,mts,ts}</code></li>\n<li><code>**/*_test.{cts,mts,ts}</code></li>\n<li><code>**/test-*.{cts,mts,ts}</code></li>\n<li><code>**/test.{cts,mts,ts}</code></li>\n<li><code>**/test/**/*.{cts,mts,ts}</code></li>\n</ul>\n<p>Alternatively, one or more glob patterns can be provided as the\nfinal argument(s) to the Node.js command, as shown below.\nGlob patterns follow the behavior of <a href=\"https://man7.org/linux/man-pages/man7/glob.7.html\"><code>glob(7)</code></a>.\nThe glob patterns should be enclosed in double quotes on the command line to\nprevent shell expansion, which can reduce portability across systems.</p>\n<pre><code class=\"language-bash\">node --test \"**/*.test.js\" \"**/*.spec.js\"\n</code></pre>\n<p>Matching files are executed as test files.\nMore information on the test file execution can be found\nin the <a href=\"#test-runner-execution-model\">test runner execution model</a> section.</p>",
+          "desc": "<p>The Node.js test runner can be invoked from the command line by passing the\n<a href=\"cli.html#--test\"><code>--test</code></a> flag:</p>\n<pre><code class=\"language-bash\">node --test\n</code></pre>\n<p>By default, Node.js will run all files matching these patterns:</p>\n<ul>\n<li><code>**/*.test.{cjs,mjs,js}</code></li>\n<li><code>**/*-test.{cjs,mjs,js}</code></li>\n<li><code>**/*_test.{cjs,mjs,js}</code></li>\n<li><code>**/test-*.{cjs,mjs,js}</code></li>\n<li><code>**/test.{cjs,mjs,js}</code></li>\n<li><code>**/test/**/*.{cjs,mjs,js}</code></li>\n</ul>\n<p>Unless <a href=\"cli.html#--no-strip-types\"><code>--no-strip-types</code></a> is supplied, the following\nadditional patterns are also matched:</p>\n<ul>\n<li><code>**/*.test.{cts,mts,ts}</code></li>\n<li><code>**/*-test.{cts,mts,ts}</code></li>\n<li><code>**/*_test.{cts,mts,ts}</code></li>\n<li><code>**/test-*.{cts,mts,ts}</code></li>\n<li><code>**/test.{cts,mts,ts}</code></li>\n<li><code>**/test/**/*.{cts,mts,ts}</code></li>\n</ul>\n<p>Alternatively, one or more glob patterns can be provided as the\nfinal argument(s) to the Node.js command, as shown below.\nGlob patterns follow the behavior of <a href=\"https://man7.org/linux/man-pages/man7/glob.7.html\"><code>glob(7)</code></a>.\nThe glob patterns should be enclosed in double quotes on the command line to\nprevent shell expansion, which can reduce portability across systems.</p>\n<pre><code class=\"language-bash\">node --test \"**/*.test.js\" \"**/*.spec.js\"\n</code></pre>",
           "modules": [
+            {
+              "textRaw": "Randomizing tests execution order",
+              "name": "randomizing_tests_execution_order",
+              "type": "module",
+              "meta": {
+                "added": [
+                  "v26.1.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Early development",
+              "desc": "<p>The test runner can randomize execution order to help detect\norder-dependent tests. When enabled, the runner randomizes both discovered\ntest files and queued tests within each file. Use <code>--test-randomize</code> to\nenable this mode.</p>\n<pre><code class=\"language-bash\">node --test --test-randomize\n</code></pre>\n<p>When randomization is enabled, the test runner prints the seed used for the run\nas a diagnostic message:</p>\n<pre><code class=\"language-text\">Randomized test order seed: 12345\n</code></pre>\n<p>Use <code>--test-random-seed=&#x3C;number></code> to replay the same randomized order\ndeterministically. Supplying <code>--test-random-seed</code> also enables randomization,\nso <code>--test-randomize</code> is optional when a seed is provided:</p>\n<pre><code class=\"language-bash\">node --test --test-random-seed=12345\n</code></pre>\n<p>In most test files, randomization works automatically. One important exception\nis when subtests are awaited one by one. In that pattern, each subtest starts\nonly after the previous one finishes, so the runner keeps declaration order\ninstead of randomizing it.</p>\n<p>Example: this runs sequentially and is <strong>not</strong> randomized.</p>\n<pre><code class=\"language-mjs\">import test from 'node:test';\n\ntest('math', async (t) => {\n  for (const name of ['adds', 'subtracts', 'multiplies']) {\n    // Sequentially awaiting each subtest preserves declaration order.\n    await t.test(name, async () => {});\n  }\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const test = require('node:test');\n\ntest('math', async (t) => {\n  for (const name of ['adds', 'subtracts', 'multiplies']) {\n    // Sequentially awaiting each subtest preserves declaration order.\n    await t.test(name, async () => {});\n  }\n});\n</code></pre>\n<p>Using suite-style APIs such as <code>describe()</code>/<code>it()</code> or <code>suite()</code>/<code>test()</code>\nstill allows randomization, because sibling tests are enqueued together.</p>\n<p>Example: this remains eligible for randomization.</p>\n<pre><code class=\"language-mjs\">import { describe, it } from 'node:test';\n\ndescribe('math', () => {\n  it('adds', () => {});\n  it('subtracts', () => {});\n  it('multiplies', () => {});\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const { describe, it } = require('node:test');\n\ndescribe('math', () => {\n  it('adds', () => {});\n  it('subtracts', () => {});\n  it('multiplies', () => {});\n});\n</code></pre>\n<p><code>--test-randomize</code> and <code>--test-random-seed</code> are not supported with <code>--watch</code> mode.</p>\n<p>Matching files are executed as test files.\nMore information on the test file execution can be found\nin the <a href=\"#test-runner-execution-model\">test runner execution model</a> section.</p>",
+              "displayName": "Randomizing tests execution order"
+            },
             {
               "textRaw": "Test runner execution model",
               "name": "test_runner_execution_model",
@@ -141,7 +156,7 @@
                   "textRaw": "Child process option inheritance",
                   "name": "child_process_option_inheritance",
                   "type": "module",
-                  "desc": "<p>When running tests in process isolation mode (the default), spawned child processes\ninherit Node.js options from the parent process, including those specified in\n<a href=\"cli.html#--experimental-config-fileconfig\">configuration files</a>. However, certain flags are filtered out to enable proper\ntest runner functionality:</p>\n<ul>\n<li><code>--test</code> - Prevented to avoid recursive test execution</li>\n<li><code>--experimental-test-coverage</code> - Managed by the test runner</li>\n<li><code>--watch</code> - Watch mode is handled at the parent level</li>\n<li><code>--experimental-default-config-file</code> - Config file loading is handled by the parent</li>\n<li><code>--test-reporter</code> - Reporting is managed by the parent process</li>\n<li><code>--test-reporter-destination</code> - Output destinations are controlled by the parent</li>\n<li><code>--experimental-config-file</code> - Config file paths are managed by the parent</li>\n</ul>\n<p>All other Node.js options from command line arguments, environment variables,\nand configuration files are inherited by the child processes.</p>",
+                  "desc": "<p>When running tests in process isolation mode (the default), spawned child processes\ninherit Node.js options from the parent process, including those specified in\n<a href=\"cli.html#--experimental-config-filepath---experimental-config-file\">configuration files</a>. However, certain flags are filtered out to enable proper\ntest runner functionality:</p>\n<ul>\n<li><code>--test</code> - Prevented to avoid recursive test execution</li>\n<li><code>--experimental-test-coverage</code> - Managed by the test runner</li>\n<li><code>--watch</code> - Watch mode is handled at the parent level</li>\n<li><code>--experimental-default-config-file</code> - Config file loading is handled by the parent</li>\n<li><code>--test-reporter</code> - Reporting is managed by the parent process</li>\n<li><code>--test-reporter-destination</code> - Output destinations are controlled by the parent</li>\n<li><code>--experimental-config-file</code> - Config file paths are managed by the parent</li>\n<li><code>--test-randomize</code> - Randomization is managed by the parent process and\npropagated to child processes</li>\n<li><code>--test-random-seed</code> - Randomization seed is managed by the parent process and\npropagated to child processes</li>\n</ul>\n<p>All other Node.js options from command line arguments, environment variables,\nand configuration files are inherited by the child processes.</p>",
                   "displayName": "Child process option inheritance"
                 }
               ],
@@ -357,6 +372,58 @@
             }
           ],
           "displayName": "`snapshot`"
+        },
+        {
+          "textRaw": "Test instrumentation and OpenTelemetry",
+          "name": "test_instrumentation_and_opentelemetry",
+          "type": "module",
+          "meta": {
+            "added": [
+              "v26.1.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>The test runner publishes test execution events through the Node.js\n<a href=\"diagnostics_channel.html\"><code>diagnostics_channel</code></a> module, enabling integration with observability tools\nlike OpenTelemetry without requiring changes to the test runner itself.</p>",
+          "modules": [
+            {
+              "textRaw": "Tracing events",
+              "name": "tracing_events",
+              "type": "module",
+              "desc": "<p>The test runner publishes events to the <code>'node.test'</code> tracing channel. Subscribers\ncan use the <a href=\"diagnostics_channel.html#class-tracingchannel\"><code>TracingChannel</code></a> API to bind context or perform custom\ninstrumentation.</p>",
+              "modules": [
+                {
+                  "textRaw": "Channel: `'tracing:node.test:start'`",
+                  "name": "channel:_`'tracing:node.test:start'`",
+                  "type": "module",
+                  "desc": "<ul>\n<li><code>data</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a>\n<ul>\n<li><code>name</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a> The name of the test.</li>\n<li><code>nesting</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;number></code></a> The nesting level of the test.</li>\n<li><code>file</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a> | <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#undefined_type\"><code>&#x3C;undefined></code></a> The path to the test file, or <code>undefined</code> when\nrunning in the REPL.</li>\n<li><code>type</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a> The type of test. Either <code>'test'</code> or <code>'suite'</code>.</li>\n</ul>\n</li>\n</ul>\n<p>Emitted when a test or suite starts execution. The test's span encompasses all\nof its before, beforeEach, and afterEach hooks, as well as the test body.</p>",
+                  "displayName": "Channel: `'tracing:node.test:start'`"
+                },
+                {
+                  "textRaw": "Channel: `'tracing:node.test:end'`",
+                  "name": "channel:_`'tracing:node.test:end'`",
+                  "type": "module",
+                  "desc": "<ul>\n<li><code>data</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a>\n<ul>\n<li><code>name</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a> The name of the test.</li>\n<li><code>nesting</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;number></code></a> The nesting level of the test.</li>\n<li><code>file</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a> | <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#undefined_type\"><code>&#x3C;undefined></code></a> The path to the test file, or <code>undefined</code> when\nrunning in the REPL.</li>\n<li><code>type</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a> The type of test. Either <code>'test'</code> or <code>'suite'</code>.</li>\n</ul>\n</li>\n</ul>\n<p>Emitted when a test or suite finishes execution.</p>",
+                  "displayName": "Channel: `'tracing:node.test:end'`"
+                },
+                {
+                  "textRaw": "Channel: `'tracing:node.test:error'`",
+                  "name": "channel:_`'tracing:node.test:error'`",
+                  "type": "module",
+                  "desc": "<ul>\n<li><code>data</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a>\n<ul>\n<li><code>name</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a> The name of the test.</li>\n<li><code>nesting</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;number></code></a> The nesting level of the test.</li>\n<li><code>file</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a> | <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#undefined_type\"><code>&#x3C;undefined></code></a> The path to the test file, or <code>undefined</code> when\nrunning in the REPL.</li>\n<li><code>type</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a> The type of test. Either <code>'test'</code> or <code>'suite'</code>.</li>\n<li><code>error</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error\"><code>&#x3C;Error></code></a> The error that was thrown.</li>\n</ul>\n</li>\n</ul>\n<p>Emitted when a test or suite throws an error.</p>",
+                  "displayName": "Channel: `'tracing:node.test:error'`"
+                }
+              ],
+              "displayName": "Tracing events"
+            },
+            {
+              "textRaw": "Context propagation with `bindStore()`",
+              "name": "context_propagation_with_`bindstore()`",
+              "type": "module",
+              "desc": "<p>The tracing channel can be used to propagate context through test execution by\nbinding an <code>AsyncLocalStorage</code> instance. This allows context to be automatically\navailable in the test function and all async operations within the test.</p>\n<pre><code class=\"language-mjs\">import dc from 'node:diagnostics_channel';\nimport { AsyncLocalStorage } from 'node:async_hooks';\n\nconst testStorage = new AsyncLocalStorage();\nconst testChannel = dc.tracingChannel('node.test');\n\n// Bind context to test execution — the returned value becomes the store\ntestChannel.start.bindStore(testStorage, (data) => {\n  return { testName: data.name, startTime: Date.now() };\n});\n\n// Optionally handle errors and cleanup\ntestChannel.error.subscribe((data) => {\n  const store = testStorage.getStore();\n  console.log(`Test \"${data.name}\" failed after ${Date.now() - store.startTime}ms`);\n});\n\ntestChannel.end.subscribe((data) => {\n  const store = testStorage.getStore();\n  console.log(`Test \"${data.name}\" completed in ${Date.now() - store.startTime}ms`);\n});\n</code></pre>\n<p>When using <code>bindStore()</code>, the context provided will be automatically propagated\nto the test function and all async operations within the test, without requiring\nany additional instrumentation in the test code.</p>",
+              "displayName": "Context propagation with `bindStore()`"
+            }
+          ],
+          "displayName": "Test instrumentation and OpenTelemetry"
         }
       ],
       "methods": [
@@ -565,6 +632,20 @@
                       ]
                     },
                     {
+                      "textRaw": "`randomize` {boolean} Randomize execution order for test files and queued tests. This option is not supported with `watch: true`. **Default:** `false`.",
+                      "name": "randomize",
+                      "type": "boolean",
+                      "default": "`false`",
+                      "desc": "Randomize execution order for test files and queued tests. This option is not supported with `watch: true`."
+                    },
+                    {
+                      "textRaw": "`randomSeed` {number} Seed used when randomizing execution order. If this option is set, runs can replay the same randomized order deterministically, and setting this option also enables randomization. The value must be an integer between `0` and `4294967295`. **Default:** `undefined`.",
+                      "name": "randomSeed",
+                      "type": "number",
+                      "default": "`undefined`",
+                      "desc": "Seed used when randomizing execution order. If this option is set, runs can replay the same randomized order deterministically, and setting this option also enables randomization. The value must be an integer between `0` and `4294967295`."
+                    },
+                    {
                       "textRaw": "`rerunFailuresFilePath` {string} A file path where the test runner will store the state of the tests to allow rerunning only the failed tests on a next run. see [Rerunning failed tests][] for more information. **Default:** `undefined`.",
                       "name": "rerunFailuresFilePath",
                       "type": "string",
@@ -614,11 +695,11 @@
                       "desc": "Require a minimum percent of covered functions. If code coverage does not reach the threshold specified, the process will exit with code `1`."
                     },
                     {
-                      "textRaw": "`env` {Object} Specify environment variables to be passed along to the test process. This options is not compatible with `isolation='none'`. These variables will override those from the main process, and are not merged with `process.env`. **Default:** `process.env`.",
+                      "textRaw": "`env` {Object} Specify environment variables to be passed along to the test process. This option is not compatible with `isolation='none'`. These variables will override those from the main process, and are not merged with `process.env`. **Default:** `process.env`.",
                       "name": "env",
                       "type": "Object",
                       "default": "`process.env`",
-                      "desc": "Specify environment variables to be passed along to the test process. This options is not compatible with `isolation='none'`. These variables will override those from the main process, and are not merged with `process.env`."
+                      "desc": "Specify environment variables to be passed along to the test process. This option is not compatible with `isolation='none'`. These variables will override those from the main process, and are not merged with `process.env`."
                     }
                   ],
                   "optional": true
@@ -1393,6 +1474,28 @@
             }
           ],
           "desc": "<p>This function creates a hook that runs after each test in the current suite.\nThe <code>afterEach()</code> hook is run even if the test fails.</p>\n<pre><code class=\"language-js\">describe('tests', async () => {\n  afterEach(() => console.log('finished running a test'));\n  it('is a subtest', () => {\n    // Some relevant assertion here\n  });\n});\n</code></pre>"
+        },
+        {
+          "textRaw": "`getTestContext()`",
+          "name": "getTestContext",
+          "type": "method",
+          "meta": {
+            "added": [
+              "v26.1.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [],
+              "return": {
+                "textRaw": "Returns: {undefined}",
+                "name": "return",
+                "type": "undefined"
+              }
+            }
+          ],
+          "desc": "<p>Returns the <a href=\"#class-testcontext\"><code>TestContext</code></a> or <a href=\"#class-suitecontext\"><code>SuiteContext</code></a> object associated with the\ncurrently executing test or suite, or <code>undefined</code> if called outside of a test or\nsuite. This function can be used to access context information from within the\ntest or suite function or any async operations within them.</p>\n<pre><code class=\"language-mjs\">import { getTestContext } from 'node:test';\n\ntest('example test', async () => {\n  const ctx = getTestContext();\n  console.log(`Running test: ${ctx.name}`);\n});\n\ndescribe('example suite', () => {\n  const ctx = getTestContext();\n  console.log(`Running suite: ${ctx.name}`);\n});\n</code></pre>\n<p>When called from a test, returns a <a href=\"#class-testcontext\"><code>TestContext</code></a>.\nWhen called from a suite, returns a <a href=\"#class-suitecontext\"><code>SuiteContext</code></a>.</p>\n<p>If called from outside a test or suite (e.g., at the top level of a module or in\na setTimeout callback after execution has completed), this function returns\n<code>undefined</code>.</p>\n<p>When called from within a hook (before, beforeEach, after, afterEach), this\nfunction returns the context of the test or suite that the hook is associated\nwith.</p>"
         }
       ],
       "classes": [
@@ -1420,7 +1523,7 @@
                 ],
                 "changes": []
               },
-              "desc": "<p>A getter that returns a copy of the internal array used to track calls to the\nmock. Each entry in the array is an object with the following properties.</p>\n<ul>\n<li><code>arguments</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array\"><code>&#x3C;Array></code></a> An array of the arguments passed to the mock function.</li>\n<li><code>error</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types\"><code>&#x3C;any></code></a> If the mocked function threw then this property contains the\nthrown value. <strong>Default:</strong> <code>undefined</code>.</li>\n<li><code>result</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types\"><code>&#x3C;any></code></a> The value returned by the mocked function.</li>\n<li><code>stack</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error\"><code>&#x3C;Error></code></a> An <code>Error</code> object whose stack can be used to determine the\ncallsite of the mocked function invocation.</li>\n<li><code>target</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function\"><code>&#x3C;Function></code></a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#undefined_type\"><code>&#x3C;undefined></code></a> If the mocked function is a constructor, this\nfield contains the class being constructed. Otherwise this will be <code>undefined</code>.</li>\n<li><code>this</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types\"><code>&#x3C;any></code></a> The mocked function's <code>this</code> value.</li>\n</ul>"
+              "desc": "<p>A getter that returns a copy of the internal array used to track calls to the\nmock. Each entry in the array is an object with the following properties.</p>\n<ul>\n<li><code>arguments</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array\"><code>&#x3C;Array></code></a> An array of the arguments passed to the mock function.</li>\n<li><code>error</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#Data_types\"><code>&#x3C;any></code></a> If the mocked function threw then this property contains the\nthrown value. <strong>Default:</strong> <code>undefined</code>.</li>\n<li><code>result</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#Data_types\"><code>&#x3C;any></code></a> The value returned by the mocked function.</li>\n<li><code>stack</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error\"><code>&#x3C;Error></code></a> An <code>Error</code> object whose stack can be used to determine the\ncallsite of the mocked function invocation.</li>\n<li><code>target</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Function\"><code>&#x3C;Function></code></a> | <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#undefined_type\"><code>&#x3C;undefined></code></a> If the mocked function is a constructor, this\nfield contains the class being constructed. Otherwise this will be <code>undefined</code>.</li>\n<li><code>this</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#Data_types\"><code>&#x3C;any></code></a> The mocked function's <code>this</code> value.</li>\n</ul>"
             }
           ],
           "methods": [
@@ -1596,7 +1699,7 @@
               "textRaw": "Type: {Array}",
               "name": "accesses",
               "type": "Array",
-              "desc": "<p>A getter that returns a copy of the internal array used to track accesses (get/set) to\nthe mocked property. Each entry in the array is an object with the following properties:</p>\n<ul>\n<li><code>type</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a> Either <code>'get'</code> or <code>'set'</code>, indicating the type of access.</li>\n<li><code>value</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types\"><code>&#x3C;any></code></a> The value that was read (for <code>'get'</code>) or written (for <code>'set'</code>).</li>\n<li><code>stack</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error\"><code>&#x3C;Error></code></a> An <code>Error</code> object whose stack can be used to determine the\ncallsite of the mocked function invocation.</li>\n</ul>"
+              "desc": "<p>A getter that returns a copy of the internal array used to track accesses (get/set) to\nthe mocked property. Each entry in the array is an object with the following properties:</p>\n<ul>\n<li><code>type</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a> Either <code>'get'</code> or <code>'set'</code>, indicating the type of access.</li>\n<li><code>value</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#Data_types\"><code>&#x3C;any></code></a> The value that was read (for <code>'get'</code>) or written (for <code>'set'</code>).</li>\n<li><code>stack</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error\"><code>&#x3C;Error></code></a> An <code>Error</code> object whose stack can be used to determine the\ncallsite of the mocked function invocation.</li>\n</ul>"
             }
           ],
           "methods": [
@@ -2618,6 +2721,12 @@
                       "desc": "The nesting level of the test."
                     },
                     {
+                      "textRaw": "`testId` {number} A numeric identifier for this test instance, unique within the test file's process. Consistent across all events for the same test instance, enabling reliable correlation in custom reporters.",
+                      "name": "testId",
+                      "type": "number",
+                      "desc": "A numeric identifier for this test instance, unique within the test file's process. Consistent across all events for the same test instance, enabling reliable correlation in custom reporters."
+                    },
+                    {
                       "textRaw": "`testNumber` {number} The ordinal number of the test.",
                       "name": "testNumber",
                       "type": "number",
@@ -2679,6 +2788,12 @@
                       "name": "nesting",
                       "type": "number",
                       "desc": "The nesting level of the test."
+                    },
+                    {
+                      "textRaw": "`testId` {number} A numeric identifier for this test instance, unique within the test file's process. Consistent across all events for the same test instance, enabling reliable correlation in custom reporters.",
+                      "name": "testId",
+                      "type": "number",
+                      "desc": "A numeric identifier for this test instance, unique within the test file's process. Consistent across all events for the same test instance, enabling reliable correlation in custom reporters."
                     },
                     {
                       "textRaw": "`type` {string} The test type. Either `'suite'` or `'test'`.",
@@ -2797,6 +2912,12 @@
                       "desc": "The nesting level of the test."
                     },
                     {
+                      "textRaw": "`testId` {number} A numeric identifier for this test instance, unique within the test file's process. Consistent across all events for the same test instance, enabling reliable correlation in custom reporters.",
+                      "name": "testId",
+                      "type": "number",
+                      "desc": "A numeric identifier for this test instance, unique within the test file's process. Consistent across all events for the same test instance, enabling reliable correlation in custom reporters."
+                    },
+                    {
                       "textRaw": "`type` {string} The test type. Either `'suite'` or `'test'`.",
                       "name": "type",
                       "type": "string",
@@ -2886,6 +3007,12 @@
                       "name": "nesting",
                       "type": "number",
                       "desc": "The nesting level of the test."
+                    },
+                    {
+                      "textRaw": "`testId` {number} A numeric identifier for this test instance, unique within the test file's process. Consistent across all events for the same test instance, enabling reliable correlation in custom reporters.",
+                      "name": "testId",
+                      "type": "number",
+                      "desc": "A numeric identifier for this test instance, unique within the test file's process. Consistent across all events for the same test instance, enabling reliable correlation in custom reporters."
                     },
                     {
                       "textRaw": "`testNumber` {number} The ordinal number of the test.",
@@ -3042,6 +3169,12 @@
                       "desc": "The nesting level of the test."
                     },
                     {
+                      "textRaw": "`testId` {number} A numeric identifier for this test instance, unique within the test file's process. Consistent across all events for the same test instance, enabling reliable correlation in custom reporters.",
+                      "name": "testId",
+                      "type": "number",
+                      "desc": "A numeric identifier for this test instance, unique within the test file's process. Consistent across all events for the same test instance, enabling reliable correlation in custom reporters."
+                    },
+                    {
                       "textRaw": "`testNumber` {number} The ordinal number of the test.",
                       "name": "testNumber",
                       "type": "number",
@@ -3148,6 +3281,12 @@
                       "name": "nesting",
                       "type": "number",
                       "desc": "The nesting level of the test."
+                    },
+                    {
+                      "textRaw": "`testId` {number} A numeric identifier for this test instance, unique within the test file's process. Consistent across all events for the same test instance, enabling reliable correlation in custom reporters.",
+                      "name": "testId",
+                      "type": "number",
+                      "desc": "A numeric identifier for this test instance, unique within the test file's process. Consistent across all events for the same test instance, enabling reliable correlation in custom reporters."
                     }
                   ]
                 }
@@ -4040,7 +4179,7 @@
                 ],
                 "changes": []
               },
-              "desc": "<p>Number of times the test has been attempted.</p>"
+              "desc": "<p>The attempt number of the test. This value is zero-based, so the first attempt is <code>0</code>,\nthe second attempt is <code>1</code>, and so on. This property is useful in conjunction with the\n<code>--test-rerun-failures</code> option to determine which attempt the test is currently running.</p>"
             },
             {
               "textRaw": "Type: {number|undefined}",
@@ -4132,6 +4271,56 @@
                 "changes": []
               },
               "desc": "<p>Can be used to abort test subtasks when the test has been aborted.</p>"
+            },
+            {
+              "textRaw": "Type: {boolean}",
+              "name": "passed",
+              "type": "boolean",
+              "meta": {
+                "added": [
+                  "v26.1.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>Indicates whether the suite and all of its subtests have passed.</p>"
+            },
+            {
+              "textRaw": "Type: {number}",
+              "name": "attempt",
+              "type": "number",
+              "meta": {
+                "added": [
+                  "v26.1.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>The attempt number of the suite. This value is zero-based, so the first attempt is <code>0</code>,\nthe second attempt is <code>1</code>, and so on. This property is useful in conjunction with the\n<code>--test-rerun-failures</code> option to determine the attempt number of the current run.</p>"
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`context.diagnostic(message)`",
+              "name": "diagnostic",
+              "type": "method",
+              "meta": {
+                "added": [
+                  "v26.1.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`message` {string} A diagnostic message to output.",
+                      "name": "message",
+                      "type": "string",
+                      "desc": "A diagnostic message to output."
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>Output a diagnostic message. This is typically used for logging information\nabout the current suite or its tests.</p>\n<pre><code class=\"language-js\">test.describe('my suite', (suite) => {\n  suite.diagnostic('Suite diagnostic message');\n});\n</code></pre>"
             }
           ]
         }

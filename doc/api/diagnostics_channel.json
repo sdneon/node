@@ -214,9 +214,48 @@
                     }
                   ],
                   "desc": "<p>Creates a <a href=\"#class-tracingchannel\"><code>TracingChannel</code></a> wrapper for the given\n<a href=\"#tracingchannel-channels\">TracingChannel Channels</a>. If a name is given, the corresponding tracing\nchannels will be created in the form of <code>tracing:${name}:${eventType}</code> where\n<code>eventType</code> corresponds to the types of <a href=\"#tracingchannel-channels\">TracingChannel Channels</a>.</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\n\nconst channelsByName = diagnostics_channel.tracingChannel('my-channel');\n\n// or...\n\nconst channelsByCollection = diagnostics_channel.tracingChannel({\n  start: diagnostics_channel.channel('tracing:my-channel:start'),\n  end: diagnostics_channel.channel('tracing:my-channel:end'),\n  asyncStart: diagnostics_channel.channel('tracing:my-channel:asyncStart'),\n  asyncEnd: diagnostics_channel.channel('tracing:my-channel:asyncEnd'),\n  error: diagnostics_channel.channel('tracing:my-channel:error'),\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\n\nconst channelsByName = diagnostics_channel.tracingChannel('my-channel');\n\n// or...\n\nconst channelsByCollection = diagnostics_channel.tracingChannel({\n  start: diagnostics_channel.channel('tracing:my-channel:start'),\n  end: diagnostics_channel.channel('tracing:my-channel:end'),\n  asyncStart: diagnostics_channel.channel('tracing:my-channel:asyncStart'),\n  asyncEnd: diagnostics_channel.channel('tracing:my-channel:asyncEnd'),\n  error: diagnostics_channel.channel('tracing:my-channel:error'),\n});\n</code></pre>"
+                },
+                {
+                  "textRaw": "`diagnostics_channel.boundedChannel(nameOrChannels)`",
+                  "name": "boundedChannel",
+                  "type": "method",
+                  "meta": {
+                    "added": [
+                      "v26.1.0"
+                    ],
+                    "changes": []
+                  },
+                  "stability": 1,
+                  "stabilityText": "Experimental",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`nameOrChannels` {string} Channel name or object containing all the BoundedChannel Channels",
+                          "name": "nameOrChannels",
+                          "type": "string",
+                          "desc": "Channel name or object containing all the BoundedChannel Channels"
+                        }
+                      ],
+                      "return": {
+                        "textRaw": "Returns: {BoundedChannel} Collection of channels to trace with",
+                        "name": "return",
+                        "type": "BoundedChannel",
+                        "desc": "Collection of channels to trace with"
+                      }
+                    }
+                  ],
+                  "desc": "<p>Creates a <a href=\"#class-boundedchannel\"><code>BoundedChannel</code></a> wrapper for the given channels. If a name is\ngiven, the corresponding channels will be created in the form of\n<code>tracing:${name}:${eventType}</code> where <code>eventType</code> is <code>start</code> or <code>end</code>.</p>\n<p>A <code>BoundedChannel</code> is a simplified version of <a href=\"#class-tracingchannel\"><code>TracingChannel</code></a> that only\ntraces synchronous operations. It only has <code>start</code> and <code>end</code> events, without\n<code>asyncStart</code>, <code>asyncEnd</code>, or <code>error</code> events, making it suitable for tracing\noperations that don't involve asynchronous continuations or error handling.</p>\n<pre><code class=\"language-mjs\">import { boundedChannel, channel } from 'node:diagnostics_channel';\n\nconst wc = boundedChannel('my-operation');\n\n// or...\n\nconst wc2 = boundedChannel({\n  start: channel('tracing:my-operation:start'),\n  end: channel('tracing:my-operation:end'),\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const { boundedChannel, channel } = require('node:diagnostics_channel');\n\nconst wc = boundedChannel('my-operation');\n\n// or...\n\nconst wc2 = boundedChannel({\n  start: channel('tracing:my-operation:start'),\n  end: channel('tracing:my-operation:end'),\n});\n</code></pre>"
                 }
               ],
               "displayName": "Overview"
+            },
+            {
+              "textRaw": "BoundedChannel Channels",
+              "name": "boundedchannel_channels",
+              "type": "module",
+              "desc": "<p>A <code>BoundedChannel</code> consists of two diagnostics channels representing the\nlifecycle of a scope created with the <code>using</code> syntax:</p>\n<ul>\n<li><code>tracing:${name}:start</code> - Published when the <code>using</code> statement executes (scope creation)</li>\n<li><code>tracing:${name}:end</code> - Published when exiting the block (scope disposal)</li>\n</ul>\n<p>When using the <code>using</code> syntax with [<code>boundedChannel.withScope([context])</code>][], the <code>start</code>\nevent is published immediately when the statement executes, and the <code>end</code> event\nis automatically published when disposal occurs at the end of the block. All\nevents share the same context object, which can be extended with additional\nproperties like <code>result</code> during scope execution.</p>",
+              "displayName": "BoundedChannel Channels"
             },
             {
               "textRaw": "TracingChannel Channels",
@@ -779,8 +818,8 @@
                   "stabilityText": "Experimental",
                   "events": [
                     {
-                      "textRaw": "Event: `'module.require.start'`",
-                      "name": "module.require.start",
+                      "textRaw": "Event: `'tracing:module.require:start'`",
+                      "name": "tracing:module.require:start",
                       "type": "event",
                       "params": [
                         {
@@ -805,8 +844,8 @@
                       "desc": "<p>Emitted when <code>require()</code> is executed. See <a href=\"#startevent\"><code>start</code> event</a>.</p>"
                     },
                     {
-                      "textRaw": "Event: `'module.require.end'`",
-                      "name": "module.require.end",
+                      "textRaw": "Event: `'tracing:module.require:end'`",
+                      "name": "tracing:module.require:end",
                       "type": "event",
                       "params": [
                         {
@@ -831,8 +870,8 @@
                       "desc": "<p>Emitted when a <code>require()</code> call returns. See <a href=\"#endevent\"><code>end</code> event</a>.</p>"
                     },
                     {
-                      "textRaw": "Event: `'module.require.error'`",
-                      "name": "module.require.error",
+                      "textRaw": "Event: `'tracing:module.require:error'`",
+                      "name": "tracing:module.require:error",
                       "type": "event",
                       "params": [
                         {
@@ -862,8 +901,8 @@
                       "desc": "<p>Emitted when a <code>require()</code> throws an error. See <a href=\"#errorevent\"><code>error</code> event</a>.</p>"
                     },
                     {
-                      "textRaw": "Event: `'module.import.asyncStart'`",
-                      "name": "module.import.asyncStart",
+                      "textRaw": "Event: `'tracing:module.import:asyncStart'`",
+                      "name": "tracing:module.import:asyncStart",
                       "type": "event",
                       "params": [
                         {
@@ -888,8 +927,8 @@
                       "desc": "<p>Emitted when <code>import()</code> is invoked. See <a href=\"#asyncstartevent\"><code>asyncStart</code> event</a>.</p>"
                     },
                     {
-                      "textRaw": "Event: `'module.import.asyncEnd'`",
-                      "name": "module.import.asyncEnd",
+                      "textRaw": "Event: `'tracing:module.import:asyncEnd'`",
+                      "name": "tracing:module.import:asyncEnd",
                       "type": "event",
                       "params": [
                         {
@@ -914,8 +953,8 @@
                       "desc": "<p>Emitted when <code>import()</code> has completed. See <a href=\"#asyncendevent\"><code>asyncEnd</code> event</a>.</p>"
                     },
                     {
-                      "textRaw": "Event: `'module.import.error'`",
-                      "name": "module.import.error",
+                      "textRaw": "Event: `'tracing:module.import:error'`",
+                      "name": "tracing:module.import:error",
                       "type": "event",
                       "params": [
                         {
@@ -1079,11 +1118,11 @@
                           "type": "ChildProcess"
                         }
                       ],
-                      "desc": "<p>Emitted when a new process is created.</p>\n<p><code>tracing:child_process.spawn:start</code></p>\n<ul>\n<li><code>process</code> <a href=\"child_process.html#class-childprocess\"><code>&#x3C;ChildProcess></code></a></li>\n<li><code>options</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a></li>\n</ul>\n<p>Emitted when <a href=\"child_process.html#child_processspawncommand-args-options\"><code>child_process.spawn()</code></a> is invoked, before the process is\nactually spawned.</p>\n<p><code>tracing:child_process.spawn:end</code></p>\n<ul>\n<li><code>process</code> <a href=\"child_process.html#class-childprocess\"><code>&#x3C;ChildProcess></code></a></li>\n</ul>\n<p>Emitted when <a href=\"child_process.html#child_processspawncommand-args-options\"><code>child_process.spawn()</code></a> has completed successfully and the\nprocess has been created.</p>\n<p><code>tracing:child_process.spawn:error</code></p>\n<ul>\n<li><code>process</code> <a href=\"child_process.html#class-childprocess\"><code>&#x3C;ChildProcess></code></a></li>\n<li><code>error</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error\"><code>&#x3C;Error></code></a></li>\n</ul>\n<p>Emitted when <a href=\"child_process.html#child_processspawncommand-args-options\"><code>child_process.spawn()</code></a> encounters an error.</p>"
+                      "desc": "<p>Emitted when a new process is created.</p>\n<p><code>tracing:child_process.spawn:start</code></p>\n<ul>\n<li><code>process</code> <a href=\"child_process.html#class-childprocess\"><code>&#x3C;ChildProcess></code></a></li>\n<li><code>options</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a></li>\n</ul>\n<p>Emitted when <a href=\"child_process.html#child_processspawncommand-args-options\"><code>child_process.spawn()</code></a> is invoked, before the process is\nactually spawned.</p>\n<p><code>tracing:child_process.spawn:end</code></p>\n<ul>\n<li><code>process</code> <a href=\"child_process.html#class-childprocess\"><code>&#x3C;ChildProcess></code></a></li>\n</ul>\n<p>Emitted when <a href=\"child_process.html#child_processspawncommand-args-options\"><code>child_process.spawn()</code></a> has completed successfully and the\nprocess has been created.</p>\n<p><code>tracing:child_process.spawn:error</code></p>\n<ul>\n<li><code>process</code> <a href=\"child_process.html#class-childprocess\"><code>&#x3C;ChildProcess></code></a></li>\n<li><code>error</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error\"><code>&#x3C;Error></code></a></li>\n</ul>\n<p>Emitted when <a href=\"child_process.html#child_processspawncommand-args-options\"><code>child_process.spawn()</code></a> encounters an error.</p>"
                     },
                     {
-                      "textRaw": "Event: `'execve'`",
-                      "name": "execve",
+                      "textRaw": "Event: `'process.execve'`",
+                      "name": "process.execve",
                       "type": "event",
                       "params": [
                         {
@@ -1113,7 +1152,7 @@
                   "type": "module",
                   "meta": {
                     "added": [
-                      "v26.0.0"
+                      "v25.9.0"
                     ],
                     "changes": []
                   },
@@ -1536,8 +1575,54 @@
                     }
                   ],
                   "desc": "<p>Applies the given data to any AsyncLocalStorage instances bound to the channel\nfor the duration of the given function, then publishes to the channel within\nthe scope of that data is applied to the stores.</p>\n<p>If a transform function was given to <a href=\"#channelbindstorestore-transform\"><code>channel.bindStore(store)</code></a> it will be\napplied to transform the message data before it becomes the context value for\nthe store. The prior storage context is accessible from within the transform\nfunction in cases where context linking is required.</p>\n<p>The context applied to the store should be accessible in any async code which\ncontinues from execution which began during the given function, however\nthere are some situations in which <a href=\"async_context.html#troubleshooting-context-loss\">context loss</a> may occur.</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\nimport { AsyncLocalStorage } from 'node:async_hooks';\n\nconst store = new AsyncLocalStorage();\n\nconst channel = diagnostics_channel.channel('my-channel');\n\nchannel.bindStore(store, (message) => {\n  const parent = store.getStore();\n  return new Span(message, parent);\n});\nchannel.runStores({ some: 'message' }, () => {\n  store.getStore(); // Span({ some: 'message' })\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\nconst { AsyncLocalStorage } = require('node:async_hooks');\n\nconst store = new AsyncLocalStorage();\n\nconst channel = diagnostics_channel.channel('my-channel');\n\nchannel.bindStore(store, (message) => {\n  const parent = store.getStore();\n  return new Span(message, parent);\n});\nchannel.runStores({ some: 'message' }, () => {\n  store.getStore(); // Span({ some: 'message' })\n});\n</code></pre>"
+                },
+                {
+                  "textRaw": "`channel.withStoreScope(data)`",
+                  "name": "withStoreScope",
+                  "type": "method",
+                  "meta": {
+                    "added": [
+                      "v26.1.0"
+                    ],
+                    "changes": []
+                  },
+                  "stability": 1,
+                  "stabilityText": "Experimental",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`data` {any} Message to bind to stores",
+                          "name": "data",
+                          "type": "any",
+                          "desc": "Message to bind to stores"
+                        }
+                      ],
+                      "return": {
+                        "textRaw": "Returns: {RunStoresScope} Disposable scope object",
+                        "name": "return",
+                        "type": "RunStoresScope",
+                        "desc": "Disposable scope object"
+                      }
+                    }
+                  ],
+                  "desc": "<p>Creates a disposable scope that binds the given data to any AsyncLocalStorage\ninstances bound to the channel and publishes it to subscribers. The scope\nautomatically restores the previous storage contexts when disposed.</p>\n<p>This method enables the use of JavaScript's explicit resource management\n(<code>using</code> syntax with <code>Symbol.dispose</code>) to manage store contexts without\nclosure wrapping.</p>\n<pre><code class=\"language-mjs\">import { channel } from 'node:diagnostics_channel';\nimport { AsyncLocalStorage } from 'node:async_hooks';\n\nconst store = new AsyncLocalStorage();\nconst ch = channel('my-channel');\n\nch.bindStore(store, (message) => {\n  return { ...message, timestamp: Date.now() };\n});\n\n{\n  using scope = ch.withStoreScope({ request: 'data' });\n  // Store is entered, data is published\n  console.log(store.getStore()); // { request: 'data', timestamp: ... }\n}\n// Store is automatically restored on scope exit\n</code></pre>\n<pre><code class=\"language-cjs\">const { channel } = require('node:diagnostics_channel');\nconst { AsyncLocalStorage } = require('node:async_hooks');\n\nconst store = new AsyncLocalStorage();\nconst ch = channel('my-channel');\n\nch.bindStore(store, (message) => {\n  return { ...message, timestamp: Date.now() };\n});\n\n{\n  using scope = ch.withStoreScope({ request: 'data' });\n  // Store is entered, data is published\n  console.log(store.getStore()); // { request: 'data', timestamp: ... }\n}\n// Store is automatically restored on scope exit\n</code></pre>"
                 }
               ]
+            },
+            {
+              "textRaw": "Class: `RunStoresScope`",
+              "name": "RunStoresScope",
+              "type": "class",
+              "meta": {
+                "added": [
+                  "v26.1.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "desc": "<p>The class <code>RunStoresScope</code> represents a disposable scope created by\n<a href=\"#channelwithstorescopedata\"><code>channel.withStoreScope(data)</code></a>. It manages the lifecycle of store\ncontexts and ensures they are properly restored when the scope exits.</p>\n<p>The scope must be used with the <code>using</code> syntax to ensure proper disposal.</p>"
             },
             {
               "textRaw": "Class: `TracingChannel`",
@@ -1782,7 +1867,7 @@
                       }
                     }
                   ],
-                  "desc": "<p>Trace an asynchronous function call which returns a <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise\"><code>&#x3C;Promise></code></a> or <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise#thenables\">thenable object</a>. This will always produce a <a href=\"#startevent\"><code>start</code> event</a> and\n<a href=\"#endevent\"><code>end</code> event</a> around the synchronous portion of the function execution, and\nwill produce an <a href=\"#asyncstartevent\"><code>asyncStart</code> event</a> and <a href=\"#asyncendevent\"><code>asyncEnd</code> event</a> when the\nreturned promise is resolved or rejected. It may also produce an\n<a href=\"#errorevent\"><code>error</code> event</a> if the given function throws an error or the returned promise\nis rejected. This will run the given function using\n<a href=\"#channelrunstorescontext-fn-thisarg-args\"><code>channel.runStores(context, ...)</code></a> on the <code>start</code> channel which ensures all\nevents should have any bound stores set to match this trace context.</p>\n<p>If the value returned by <code>fn</code> is not a Promise or thenable, then it will be\nreturned with a warning, and no <code>asyncStart</code> or <code>asyncEnd</code> events will be\nproduced.</p>\n<p>To ensure only correct trace graphs are formed, events will only be published\nif subscribers are present prior to starting the trace. Subscriptions which are\nadded after the trace begins will not receive future events from that trace,\nonly future traces will be seen.</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\n\nconst channels = diagnostics_channel.tracingChannel('my-channel');\n\nchannels.tracePromise(async () => {\n  // Do something\n}, {\n  some: 'thing',\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\n\nconst channels = diagnostics_channel.tracingChannel('my-channel');\n\nchannels.tracePromise(async () => {\n  // Do something\n}, {\n  some: 'thing',\n});\n</code></pre>"
+                  "desc": "<p>Trace an asynchronous function call which returns a <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise\"><code>&#x3C;Promise></code></a> or <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise#thenables\">thenable object</a>. This will always produce a <a href=\"#startevent\"><code>start</code> event</a> and\n<a href=\"#endevent\"><code>end</code> event</a> around the synchronous portion of the function execution, and\nwill produce an <a href=\"#asyncstartevent\"><code>asyncStart</code> event</a> and <a href=\"#asyncendevent\"><code>asyncEnd</code> event</a> when the\nreturned promise is resolved or rejected. It may also produce an\n<a href=\"#errorevent\"><code>error</code> event</a> if the given function throws an error or the returned promise\nis rejected. This will run the given function using\n<a href=\"#channelrunstorescontext-fn-thisarg-args\"><code>channel.runStores(context, ...)</code></a> on the <code>start</code> channel which ensures all\nevents should have any bound stores set to match this trace context.</p>\n<p>If the value returned by <code>fn</code> is not a Promise or thenable, then it will be\nreturned with a warning, and no <code>asyncStart</code> or <code>asyncEnd</code> events will be\nproduced.</p>\n<p>To ensure only correct trace graphs are formed, events will only be published\nif subscribers are present prior to starting the trace. Subscriptions which are\nadded after the trace begins will not receive future events from that trace,\nonly future traces will be seen.</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\n\nconst channels = diagnostics_channel.tracingChannel('my-channel');\n\nchannels.tracePromise(async () => {\n  // Do something\n}, {\n  some: 'thing',\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\n\nconst channels = diagnostics_channel.tracingChannel('my-channel');\n\nchannels.tracePromise(async () => {\n  // Do something\n}, {\n  some: 'thing',\n});\n</code></pre>"
                 },
                 {
                   "textRaw": "`tracingChannel.traceCallback(fn[, position[, context[, thisArg[, ...args]]]])`",
@@ -1860,6 +1945,214 @@
                   "shortDesc": "`true` if any of the individual channels has a subscriber, `false` if not."
                 }
               ]
+            },
+            {
+              "textRaw": "Class: `BoundedChannel`",
+              "name": "BoundedChannel",
+              "type": "class",
+              "meta": {
+                "added": [
+                  "v26.1.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "desc": "<p>The class <code>BoundedChannel</code> is a simplified version of <a href=\"#class-tracingchannel\"><code>TracingChannel</code></a> that\nonly traces synchronous operations. It consists of two channels (<code>start</code> and\n<code>end</code>) instead of five, omitting the <code>asyncStart</code>, <code>asyncEnd</code>, and <code>error</code>\nevents. This makes it suitable for tracing operations that don't involve\nasynchronous continuations or error handling.</p>\n<p>Like <code>TracingChannel</code>, it is recommended to create and reuse a single\n<code>BoundedChannel</code> at the top-level of the file rather than creating them\ndynamically.</p>",
+              "properties": [
+                {
+                  "textRaw": "Returns: {boolean} `true` if any of the individual channels has a subscriber, `false` if not.",
+                  "name": "hasSubscribers",
+                  "type": "boolean",
+                  "meta": {
+                    "added": [
+                      "v26.1.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>Check if any of the <code>start</code> or <code>end</code> channels have subscribers.</p>\n<pre><code class=\"language-mjs\">import { boundedChannel } from 'node:diagnostics_channel';\n\nconst wc = boundedChannel('my-operation');\n\nif (wc.hasSubscribers) {\n  // There are subscribers, perform traced operation\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const { boundedChannel } = require('node:diagnostics_channel');\n\nconst wc = boundedChannel('my-operation');\n\nif (wc.hasSubscribers) {\n  // There are subscribers, perform traced operation\n}\n</code></pre>",
+                  "shortDesc": "`true` if any of the individual channels has a subscriber, `false` if not."
+                }
+              ],
+              "methods": [
+                {
+                  "textRaw": "`boundedChannel.subscribe(handlers)`",
+                  "name": "subscribe",
+                  "type": "method",
+                  "meta": {
+                    "added": [
+                      "v26.1.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`handlers` {Object} Set of channel subscribers",
+                          "name": "handlers",
+                          "type": "Object",
+                          "desc": "Set of channel subscribers",
+                          "options": [
+                            {
+                              "textRaw": "`start` {Function} The start event subscriber",
+                              "name": "start",
+                              "type": "Function",
+                              "desc": "The start event subscriber"
+                            },
+                            {
+                              "textRaw": "`end` {Function} The end event subscriber",
+                              "name": "end",
+                              "type": "Function",
+                              "desc": "The end event subscriber"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>Subscribe to the bounded channel events. This is equivalent to calling\n<a href=\"#channelsubscribeonmessage\"><code>channel.subscribe(onMessage)</code></a> on each channel individually.</p>\n<pre><code class=\"language-mjs\">import { boundedChannel } from 'node:diagnostics_channel';\n\nconst wc = boundedChannel('my-operation');\n\nwc.subscribe({\n  start(message) {\n    // Handle start\n  },\n  end(message) {\n    // Handle end\n  },\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const { boundedChannel } = require('node:diagnostics_channel');\n\nconst wc = boundedChannel('my-operation');\n\nwc.subscribe({\n  start(message) {\n    // Handle start\n  },\n  end(message) {\n    // Handle end\n  },\n});\n</code></pre>"
+                },
+                {
+                  "textRaw": "`boundedChannel.unsubscribe(handlers)`",
+                  "name": "unsubscribe",
+                  "type": "method",
+                  "meta": {
+                    "added": [
+                      "v26.1.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`handlers` {Object} Set of channel subscribers",
+                          "name": "handlers",
+                          "type": "Object",
+                          "desc": "Set of channel subscribers",
+                          "options": [
+                            {
+                              "textRaw": "`start` {Function} The start event subscriber",
+                              "name": "start",
+                              "type": "Function",
+                              "desc": "The start event subscriber"
+                            },
+                            {
+                              "textRaw": "`end` {Function} The end event subscriber",
+                              "name": "end",
+                              "type": "Function",
+                              "desc": "The end event subscriber"
+                            }
+                          ]
+                        }
+                      ],
+                      "return": {
+                        "textRaw": "Returns: {boolean} `true` if all handlers were successfully unsubscribed, `false` otherwise.",
+                        "name": "return",
+                        "type": "boolean",
+                        "desc": "`true` if all handlers were successfully unsubscribed, `false` otherwise."
+                      }
+                    }
+                  ],
+                  "desc": "<p>Unsubscribe from the bounded channel events. This is equivalent to calling\n<a href=\"#channelunsubscribeonmessage\"><code>channel.unsubscribe(onMessage)</code></a> on each channel individually.</p>\n<pre><code class=\"language-mjs\">import { boundedChannel } from 'node:diagnostics_channel';\n\nconst wc = boundedChannel('my-operation');\n\nconst handlers = {\n  start(message) {},\n  end(message) {},\n};\n\nwc.subscribe(handlers);\nwc.unsubscribe(handlers);\n</code></pre>\n<pre><code class=\"language-cjs\">const { boundedChannel } = require('node:diagnostics_channel');\n\nconst wc = boundedChannel('my-operation');\n\nconst handlers = {\n  start(message) {},\n  end(message) {},\n};\n\nwc.subscribe(handlers);\nwc.unsubscribe(handlers);\n</code></pre>"
+                },
+                {
+                  "textRaw": "`boundedChannel.run(context, fn[, thisArg[, ...args]])`",
+                  "name": "run",
+                  "type": "method",
+                  "meta": {
+                    "added": [
+                      "v26.1.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`context` {Object} Shared object to correlate events through",
+                          "name": "context",
+                          "type": "Object",
+                          "desc": "Shared object to correlate events through"
+                        },
+                        {
+                          "textRaw": "`fn` {Function} Function to wrap a trace around",
+                          "name": "fn",
+                          "type": "Function",
+                          "desc": "Function to wrap a trace around"
+                        },
+                        {
+                          "textRaw": "`thisArg` {any} The receiver to be used for the function call",
+                          "name": "thisArg",
+                          "type": "any",
+                          "desc": "The receiver to be used for the function call",
+                          "optional": true
+                        },
+                        {
+                          "textRaw": "`...args` {any} Optional arguments to pass to the function",
+                          "name": "...args",
+                          "type": "any",
+                          "desc": "Optional arguments to pass to the function",
+                          "optional": true
+                        }
+                      ],
+                      "return": {
+                        "textRaw": "Returns: {any} The return value of the given function",
+                        "name": "return",
+                        "type": "any",
+                        "desc": "The return value of the given function"
+                      }
+                    }
+                  ],
+                  "desc": "<p>Trace a synchronous function call. This will produce a <code>start</code> event and <code>end</code>\nevent around the execution. This runs the given function using\n<a href=\"#channelrunstorescontext-fn-thisarg-args\"><code>channel.runStores(context, ...)</code></a> on the <code>start</code> channel which ensures all\nevents have any bound stores set to match this trace context.</p>\n<pre><code class=\"language-mjs\">import { boundedChannel } from 'node:diagnostics_channel';\n\nconst wc = boundedChannel('my-operation');\n\nconst result = wc.run({ operationId: '123' }, () => {\n  // Perform operation\n  return 42;\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const { boundedChannel } = require('node:diagnostics_channel');\n\nconst wc = boundedChannel('my-operation');\n\nconst result = wc.run({ operationId: '123' }, () => {\n  // Perform operation\n  return 42;\n});\n</code></pre>"
+                },
+                {
+                  "textRaw": "`boundedChannel.withScope([context])`",
+                  "name": "withScope",
+                  "type": "method",
+                  "meta": {
+                    "added": [
+                      "v26.1.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`context` {Object} Shared object to correlate events through",
+                          "name": "context",
+                          "type": "Object",
+                          "desc": "Shared object to correlate events through",
+                          "optional": true
+                        }
+                      ],
+                      "return": {
+                        "textRaw": "Returns: {BoundedChannelScope} Disposable scope object",
+                        "name": "return",
+                        "type": "BoundedChannelScope",
+                        "desc": "Disposable scope object"
+                      }
+                    }
+                  ],
+                  "desc": "<p>Create a disposable scope for tracing a synchronous operation using JavaScript's\nexplicit resource management (<code>using</code> syntax). The scope automatically publishes\n<code>start</code> and <code>end</code> events, enters bound stores, and handles cleanup when disposed.</p>\n<pre><code class=\"language-mjs\">import { boundedChannel } from 'node:diagnostics_channel';\n\nconst wc = boundedChannel('my-operation');\n\nconst context = { operationId: '123' };\n{\n  using scope = wc.withScope(context);\n  // Stores are entered, start event is published\n\n  // Perform work and set result on context\n  context.result = 42;\n}\n// End event is published, stores are restored automatically\n</code></pre>\n<pre><code class=\"language-cjs\">const { boundedChannel } = require('node:diagnostics_channel');\n\nconst wc = boundedChannel('my-operation');\n\nconst context = { operationId: '123' };\n{\n  using scope = wc.withScope(context);\n  // Stores are entered, start event is published\n\n  // Perform work and set result on context\n  context.result = 42;\n}\n// End event is published, stores are restored automatically\n</code></pre>"
+                }
+              ]
+            },
+            {
+              "textRaw": "Class: `BoundedChannelScope`",
+              "name": "BoundedChannelScope",
+              "type": "class",
+              "meta": {
+                "added": [
+                  "v26.1.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "desc": "<p>The class <code>BoundedChannelScope</code> represents a disposable scope created by\n<a href=\"#boundedchannelwithscopecontext\"><code>boundedChannel.withScope(context)</code></a>. It manages the lifecycle of a traced\noperation, automatically publishing events and managing store contexts.</p>\n<p>The scope must be used with the <code>using</code> syntax to ensure proper disposal.</p>\n<pre><code class=\"language-mjs\">import { boundedChannel } from 'node:diagnostics_channel';\n\nconst wc = boundedChannel('my-operation');\n\nconst context = {};\n{\n  using scope = wc.withScope(context);\n  // Start event is published, stores are entered\n  context.result = performOperation();\n  // End event is automatically published at end of block\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const { boundedChannel } = require('node:diagnostics_channel');\n\nconst wc = boundedChannel('my-operation');\n\nconst context = {};\n{\n  using scope = wc.withScope(context);\n  // Start event is published, stores are entered\n  context.result = performOperation();\n  // End event is automatically published at end of block\n}\n</code></pre>"
             }
           ],
           "displayName": "Public API"

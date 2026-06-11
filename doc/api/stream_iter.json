@@ -5,7 +5,7 @@
     {
       "textRaw": "Iterable Streams",
       "name": "iterable_streams",
-      "introduced_in": "v26.0.0",
+      "introduced_in": "v25.9.0",
       "type": "module",
       "stability": 1,
       "stabilityText": "Experimental",
@@ -93,201 +93,201 @@
               "name": "writer_interface",
               "type": "module",
               "desc": "<p>A writer is any object conforming to the Writer interface. Only <code>write()</code> is\nrequired; all other methods are optional.</p>\n<p>Each async method has a synchronous <code>*Sync</code> counterpart designed for a\ntry-fallback pattern: attempt the fast synchronous path first, and fall back\nto the async version only when the synchronous call indicates it could not\ncomplete:</p>\n<pre><code class=\"language-mjs\">if (!writer.writeSync(chunk)) await writer.write(chunk);\nif (!writer.writevSync(chunks)) await writer.writev(chunks);\nif (writer.endSync() &#x3C; 0) await writer.end();\nwriter.fail(err);  // Always synchronous, no fallback needed\n</code></pre>",
+              "properties": [
+                {
+                  "textRaw": "{number|null}",
+                  "name": "desiredSize",
+                  "type": "number|null",
+                  "desc": "<p>The number of buffer slots available before the high water mark is reached.\nReturns <code>null</code> if the writer is closed or the consumer has disconnected.</p>\n<p>The value is always non-negative.</p>"
+                }
+              ],
+              "methods": [
+                {
+                  "textRaw": "`writer.end([options])`",
+                  "name": "end",
+                  "type": "method",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`options` {Object}",
+                          "name": "options",
+                          "type": "Object",
+                          "options": [
+                            {
+                              "textRaw": "`signal` {AbortSignal} Cancel just this operation. The signal cancels only the pending `end()` call; it does not fail the writer itself.",
+                              "name": "signal",
+                              "type": "AbortSignal",
+                              "desc": "Cancel just this operation. The signal cancels only the pending `end()` call; it does not fail the writer itself."
+                            }
+                          ],
+                          "optional": true
+                        }
+                      ],
+                      "return": {
+                        "textRaw": "Returns: {Promise<number>} Total bytes written.",
+                        "name": "return",
+                        "type": "Promise<number>",
+                        "desc": "Total bytes written."
+                      }
+                    }
+                  ],
+                  "desc": "<p>Signal that no more data will be written.</p>"
+                },
+                {
+                  "textRaw": "`writer.endSync()`",
+                  "name": "endSync",
+                  "type": "method",
+                  "signatures": [
+                    {
+                      "params": [],
+                      "return": {
+                        "textRaw": "Returns: {number} Total bytes written, or `-1` if the writer is not open.",
+                        "name": "return",
+                        "type": "number",
+                        "desc": "Total bytes written, or `-1` if the writer is not open."
+                      }
+                    }
+                  ],
+                  "desc": "<p>Synchronous variant of <code>writer.end()</code>. Returns <code>-1</code> if the writer is already\nclosed or errored. Can be used as a try-fallback pattern:</p>\n<pre><code class=\"language-cjs\">const result = writer.endSync();\nif (result &#x3C; 0) {\n  writer.end();\n}\n</code></pre>"
+                },
+                {
+                  "textRaw": "`writer.fail(reason)`",
+                  "name": "fail",
+                  "type": "method",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`reason` {any}",
+                          "name": "reason",
+                          "type": "any"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>Put the writer into a terminal error state. If the writer is already closed\nor errored, this is a no-op. Unlike <code>write()</code> and <code>end()</code>, <code>fail()</code> is\nunconditionally synchronous because failing a writer is a pure state\ntransition with no async work to perform.</p>"
+                },
+                {
+                  "textRaw": "`writer.write(chunk[, options])`",
+                  "name": "write",
+                  "type": "method",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`chunk` {Uint8Array|string}",
+                          "name": "chunk",
+                          "type": "Uint8Array|string"
+                        },
+                        {
+                          "textRaw": "`options` {Object}",
+                          "name": "options",
+                          "type": "Object",
+                          "options": [
+                            {
+                              "textRaw": "`signal` {AbortSignal} Cancel just this write operation. The signal cancels only the pending `write()` call; it does not fail the writer itself.",
+                              "name": "signal",
+                              "type": "AbortSignal",
+                              "desc": "Cancel just this write operation. The signal cancels only the pending `write()` call; it does not fail the writer itself."
+                            }
+                          ],
+                          "optional": true
+                        }
+                      ],
+                      "return": {
+                        "textRaw": "Returns: {Promise<void>}",
+                        "name": "return",
+                        "type": "Promise<void>"
+                      }
+                    }
+                  ],
+                  "desc": "<p>Write a chunk. The promise resolves when buffer space is available.</p>"
+                },
+                {
+                  "textRaw": "`writer.writeSync(chunk)`",
+                  "name": "writeSync",
+                  "type": "method",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`chunk` {Uint8Array|string}",
+                          "name": "chunk",
+                          "type": "Uint8Array|string"
+                        }
+                      ],
+                      "return": {
+                        "textRaw": "Returns: {boolean} `true` if the write was accepted, `false` if the buffer is full.",
+                        "name": "return",
+                        "type": "boolean",
+                        "desc": "`true` if the write was accepted, `false` if the buffer is full."
+                      }
+                    }
+                  ],
+                  "desc": "<p>Synchronous write. Does not block; returns <code>false</code> if backpressure is active.</p>"
+                },
+                {
+                  "textRaw": "`writer.writev(chunks[, options])`",
+                  "name": "writev",
+                  "type": "method",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`chunks` {Uint8Array[]|string[]}",
+                          "name": "chunks",
+                          "type": "Uint8Array[]|string[]"
+                        },
+                        {
+                          "textRaw": "`options` {Object}",
+                          "name": "options",
+                          "type": "Object",
+                          "options": [
+                            {
+                              "textRaw": "`signal` {AbortSignal} Cancel just this write operation. The signal cancels only the pending `writev()` call; it does not fail the writer itself.",
+                              "name": "signal",
+                              "type": "AbortSignal",
+                              "desc": "Cancel just this write operation. The signal cancels only the pending `writev()` call; it does not fail the writer itself."
+                            }
+                          ],
+                          "optional": true
+                        }
+                      ],
+                      "return": {
+                        "textRaw": "Returns: {Promise<void>}",
+                        "name": "return",
+                        "type": "Promise<void>"
+                      }
+                    }
+                  ],
+                  "desc": "<p>Write multiple chunks as a single batch.</p>"
+                },
+                {
+                  "textRaw": "`writer.writevSync(chunks)`",
+                  "name": "writevSync",
+                  "type": "method",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`chunks` {Uint8Array[]|string[]}",
+                          "name": "chunks",
+                          "type": "Uint8Array[]|string[]"
+                        }
+                      ],
+                      "return": {
+                        "textRaw": "Returns: {boolean} `true` if the write was accepted, `false` if the buffer is full.",
+                        "name": "return",
+                        "type": "boolean",
+                        "desc": "`true` if the write was accepted, `false` if the buffer is full."
+                      }
+                    }
+                  ],
+                  "desc": "<p>Synchronous batch write.</p>"
+                }
+              ],
               "displayName": "Writer interface"
-            }
-          ],
-          "properties": [
-            {
-              "textRaw": "{number|null}",
-              "name": "desiredSize",
-              "type": "number|null",
-              "desc": "<p>The number of buffer slots available before the high water mark is reached.\nReturns <code>null</code> if the writer is closed or the consumer has disconnected.</p>\n<p>The value is always non-negative.</p>"
-            }
-          ],
-          "methods": [
-            {
-              "textRaw": "`writer.end([options])`",
-              "name": "end",
-              "type": "method",
-              "signatures": [
-                {
-                  "params": [
-                    {
-                      "textRaw": "`options` {Object}",
-                      "name": "options",
-                      "type": "Object",
-                      "options": [
-                        {
-                          "textRaw": "`signal` {AbortSignal} Cancel just this operation. The signal cancels only the pending `end()` call; it does not fail the writer itself.",
-                          "name": "signal",
-                          "type": "AbortSignal",
-                          "desc": "Cancel just this operation. The signal cancels only the pending `end()` call; it does not fail the writer itself."
-                        }
-                      ],
-                      "optional": true
-                    }
-                  ],
-                  "return": {
-                    "textRaw": "Returns: {Promise<number>} Total bytes written.",
-                    "name": "return",
-                    "type": "Promise<number>",
-                    "desc": "Total bytes written."
-                  }
-                }
-              ],
-              "desc": "<p>Signal that no more data will be written.</p>"
-            },
-            {
-              "textRaw": "`writer.endSync()`",
-              "name": "endSync",
-              "type": "method",
-              "signatures": [
-                {
-                  "params": [],
-                  "return": {
-                    "textRaw": "Returns: {number} Total bytes written, or `-1` if the writer is not open.",
-                    "name": "return",
-                    "type": "number",
-                    "desc": "Total bytes written, or `-1` if the writer is not open."
-                  }
-                }
-              ],
-              "desc": "<p>Synchronous variant of <code>writer.end()</code>. Returns <code>-1</code> if the writer is already\nclosed or errored. Can be used as a try-fallback pattern:</p>\n<pre><code class=\"language-cjs\">const result = writer.endSync();\nif (result &#x3C; 0) {\n  writer.end();\n}\n</code></pre>"
-            },
-            {
-              "textRaw": "`writer.fail(reason)`",
-              "name": "fail",
-              "type": "method",
-              "signatures": [
-                {
-                  "params": [
-                    {
-                      "textRaw": "`reason` {any}",
-                      "name": "reason",
-                      "type": "any"
-                    }
-                  ]
-                }
-              ],
-              "desc": "<p>Put the writer into a terminal error state. If the writer is already closed\nor errored, this is a no-op. Unlike <code>write()</code> and <code>end()</code>, <code>fail()</code> is\nunconditionally synchronous because failing a writer is a pure state\ntransition with no async work to perform.</p>"
-            },
-            {
-              "textRaw": "`writer.write(chunk[, options])`",
-              "name": "write",
-              "type": "method",
-              "signatures": [
-                {
-                  "params": [
-                    {
-                      "textRaw": "`chunk` {Uint8Array|string}",
-                      "name": "chunk",
-                      "type": "Uint8Array|string"
-                    },
-                    {
-                      "textRaw": "`options` {Object}",
-                      "name": "options",
-                      "type": "Object",
-                      "options": [
-                        {
-                          "textRaw": "`signal` {AbortSignal} Cancel just this write operation. The signal cancels only the pending `write()` call; it does not fail the writer itself.",
-                          "name": "signal",
-                          "type": "AbortSignal",
-                          "desc": "Cancel just this write operation. The signal cancels only the pending `write()` call; it does not fail the writer itself."
-                        }
-                      ],
-                      "optional": true
-                    }
-                  ],
-                  "return": {
-                    "textRaw": "Returns: {Promise<void>}",
-                    "name": "return",
-                    "type": "Promise<void>"
-                  }
-                }
-              ],
-              "desc": "<p>Write a chunk. The promise resolves when buffer space is available.</p>"
-            },
-            {
-              "textRaw": "`writer.writeSync(chunk)`",
-              "name": "writeSync",
-              "type": "method",
-              "signatures": [
-                {
-                  "params": [
-                    {
-                      "textRaw": "`chunk` {Uint8Array|string}",
-                      "name": "chunk",
-                      "type": "Uint8Array|string"
-                    }
-                  ],
-                  "return": {
-                    "textRaw": "Returns: {boolean} `true` if the write was accepted, `false` if the buffer is full.",
-                    "name": "return",
-                    "type": "boolean",
-                    "desc": "`true` if the write was accepted, `false` if the buffer is full."
-                  }
-                }
-              ],
-              "desc": "<p>Synchronous write. Does not block; returns <code>false</code> if backpressure is active.</p>"
-            },
-            {
-              "textRaw": "`writer.writev(chunks[, options])`",
-              "name": "writev",
-              "type": "method",
-              "signatures": [
-                {
-                  "params": [
-                    {
-                      "textRaw": "`chunks` {Uint8Array[]|string[]}",
-                      "name": "chunks",
-                      "type": "Uint8Array[]|string[]"
-                    },
-                    {
-                      "textRaw": "`options` {Object}",
-                      "name": "options",
-                      "type": "Object",
-                      "options": [
-                        {
-                          "textRaw": "`signal` {AbortSignal} Cancel just this write operation. The signal cancels only the pending `writev()` call; it does not fail the writer itself.",
-                          "name": "signal",
-                          "type": "AbortSignal",
-                          "desc": "Cancel just this write operation. The signal cancels only the pending `writev()` call; it does not fail the writer itself."
-                        }
-                      ],
-                      "optional": true
-                    }
-                  ],
-                  "return": {
-                    "textRaw": "Returns: {Promise<void>}",
-                    "name": "return",
-                    "type": "Promise<void>"
-                  }
-                }
-              ],
-              "desc": "<p>Write multiple chunks as a single batch.</p>"
-            },
-            {
-              "textRaw": "`writer.writevSync(chunks)`",
-              "name": "writevSync",
-              "type": "method",
-              "signatures": [
-                {
-                  "params": [
-                    {
-                      "textRaw": "`chunks` {Uint8Array[]|string[]}",
-                      "name": "chunks",
-                      "type": "Uint8Array[]|string[]"
-                    }
-                  ],
-                  "return": {
-                    "textRaw": "Returns: {boolean} `true` if the write was accepted, `false` if the buffer is full.",
-                    "name": "return",
-                    "type": "boolean",
-                    "desc": "`true` if the write was accepted, `false` if the buffer is full."
-                  }
-                }
-              ],
-              "desc": "<p>Synchronous batch write.</p>"
             }
           ],
           "displayName": "Concepts"
@@ -310,7 +310,7 @@
               "type": "method",
               "meta": {
                 "added": [
-                  "v26.0.0"
+                  "v25.9.0"
                 ],
                 "changes": []
               },
@@ -318,9 +318,9 @@
                 {
                   "params": [
                     {
-                      "textRaw": "`input` {string|ArrayBuffer|ArrayBufferView|Iterable|AsyncIterable|Object} Must not be `null` or `undefined`.",
+                      "textRaw": "`input` {string|ArrayBuffer|AsyncIterable|Object} Must not be `null` or `undefined`.",
                       "name": "input",
-                      "type": "string|ArrayBuffer|ArrayBufferView|Iterable|AsyncIterable|Object",
+                      "type": "string|ArrayBuffer|AsyncIterable|Object",
                       "desc": "Must not be `null` or `undefined`."
                     }
                   ],
@@ -339,7 +339,7 @@
               "type": "method",
               "meta": {
                 "added": [
-                  "v26.0.0"
+                  "v25.9.0"
                 ],
                 "changes": []
               },
@@ -347,9 +347,9 @@
                 {
                   "params": [
                     {
-                      "textRaw": "`input` {string|ArrayBuffer|ArrayBufferView|Iterable|Object} Must not be `null` or `undefined`.",
+                      "textRaw": "`input` {string|ArrayBuffer|Object} Must not be `null` or `undefined`.",
                       "name": "input",
-                      "type": "string|ArrayBuffer|ArrayBufferView|Iterable|Object",
+                      "type": "string|ArrayBuffer|Object",
                       "desc": "Must not be `null` or `undefined`."
                     }
                   ],
@@ -376,7 +376,7 @@
               "type": "method",
               "meta": {
                 "added": [
-                  "v26.0.0"
+                  "v25.9.0"
                 ],
                 "changes": []
               },
@@ -384,9 +384,9 @@
                 {
                   "params": [
                     {
-                      "textRaw": "`source` {AsyncIterable|Iterable} The data source.",
+                      "textRaw": "`source` {AsyncIterable} The data source.",
                       "name": "source",
-                      "type": "AsyncIterable|Iterable",
+                      "type": "AsyncIterable",
                       "desc": "The data source."
                     },
                     {
@@ -447,7 +447,7 @@
               "type": "method",
               "meta": {
                 "added": [
-                  "v26.0.0"
+                  "v25.9.0"
                 ],
                 "changes": []
               },
@@ -455,54 +455,23 @@
                 {
                   "params": [
                     {
-                      "textRaw": "`source` {Iterable} The sync data source.",
-                      "name": "source",
-                      "type": "Iterable",
-                      "desc": "The sync data source."
+                      "name": "source"
                     },
                     {
-                      "textRaw": "`...transforms` {Function|Object} Zero or more sync transforms.",
                       "name": "...transforms",
-                      "type": "Function|Object",
-                      "desc": "Zero or more sync transforms.",
                       "optional": true
                     },
                     {
-                      "textRaw": "`writer` {Object} Destination with `write(chunk)` method.",
-                      "name": "writer",
-                      "type": "Object",
-                      "desc": "Destination with `write(chunk)` method."
+                      "name": "writer"
                     },
                     {
-                      "textRaw": "`options` {Object}",
                       "name": "options",
-                      "type": "Object",
-                      "options": [
-                        {
-                          "textRaw": "`preventClose` {boolean} **Default:** `false`.",
-                          "name": "preventClose",
-                          "type": "boolean",
-                          "default": "`false`"
-                        },
-                        {
-                          "textRaw": "`preventFail` {boolean} **Default:** `false`.",
-                          "name": "preventFail",
-                          "type": "boolean",
-                          "default": "`false`"
-                        }
-                      ],
                       "optional": true
                     }
-                  ],
-                  "return": {
-                    "textRaw": "Returns: {number} Total bytes written.",
-                    "name": "return",
-                    "type": "number",
-                    "desc": "Total bytes written."
-                  }
+                  ]
                 }
               ],
-              "desc": "<p>Synchronous version of <a href=\"#pipetosource-transforms-writer-options\"><code>pipeTo()</code></a>. The <code>source</code>, all transforms, and the\n<code>writer</code> must be synchronous. Cannot accept async iterables or promises.</p>\n<p>The <code>writer</code> must have the <code>*Sync</code> methods (<code>writeSync</code>, <code>writevSync</code>,\n<code>endSync</code>) and <code>fail()</code> for this to work.</p>"
+              "desc": "<ul>\n<li><code>source</code> {Iterable} The sync data source.</li>\n<li><code>...transforms</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Function\"><code>&#x3C;Function></code></a> | <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a> Zero or more sync transforms.</li>\n<li><code>writer</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a> Destination with <code>write(chunk)</code> method.</li>\n<li><code>options</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a>\n<ul>\n<li><code>preventClose</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#boolean_type\"><code>&#x3C;boolean></code></a> <strong>Default:</strong> <code>false</code>.</li>\n<li><code>preventFail</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#boolean_type\"><code>&#x3C;boolean></code></a> <strong>Default:</strong> <code>false</code>.</li>\n</ul>\n</li>\n<li>Returns: <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;number></code></a> Total bytes written.</li>\n</ul>\n<p>Synchronous version of <a href=\"#pipetosource-transforms-writer-options\"><code>pipeTo()</code></a>. The <code>source</code>, all transforms, and the\n<code>writer</code> must be synchronous. Cannot accept async iterables or promises.</p>\n<p>The <code>writer</code> must have the <code>*Sync</code> methods (<code>writeSync</code>, <code>writevSync</code>,\n<code>endSync</code>) and <code>fail()</code> for this to work.</p>"
             },
             {
               "textRaw": "`pull(source[, ...transforms][, options])`",
@@ -510,7 +479,7 @@
               "type": "method",
               "meta": {
                 "added": [
-                  "v26.0.0"
+                  "v25.9.0"
                 ],
                 "changes": []
               },
@@ -518,9 +487,9 @@
                 {
                   "params": [
                     {
-                      "textRaw": "`source` {AsyncIterable|Iterable} The data source.",
+                      "textRaw": "`source` {AsyncIterable} The data source.",
                       "name": "source",
-                      "type": "AsyncIterable|Iterable",
+                      "type": "AsyncIterable",
                       "desc": "The data source."
                     },
                     {
@@ -560,7 +529,7 @@
               "type": "method",
               "meta": {
                 "added": [
-                  "v26.0.0"
+                  "v25.9.0"
                 ],
                 "changes": []
               },
@@ -568,27 +537,16 @@
                 {
                   "params": [
                     {
-                      "textRaw": "`source` {Iterable} The sync data source.",
-                      "name": "source",
-                      "type": "Iterable",
-                      "desc": "The sync data source."
+                      "name": "source"
                     },
                     {
-                      "textRaw": "`...transforms` {Function|Object} Zero or more sync transforms.",
                       "name": "...transforms",
-                      "type": "Function|Object",
-                      "desc": "Zero or more sync transforms.",
                       "optional": true
                     }
-                  ],
-                  "return": {
-                    "textRaw": "Returns: {Iterable<Uint8Array[]>}",
-                    "name": "return",
-                    "type": "Iterable<Uint8Array[]>"
-                  }
+                  ]
                 }
               ],
-              "desc": "<p>Synchronous version of <a href=\"#pullsource-transforms-options\"><code>pull()</code></a>. All transforms must be synchronous.</p>"
+              "desc": "<ul>\n<li><code>source</code> {Iterable} The sync data source.</li>\n<li><code>...transforms</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Function\"><code>&#x3C;Function></code></a> | <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a> Zero or more sync transforms.</li>\n<li>Returns: {Iterable&#x3C;Uint8Array[]>}</li>\n</ul>\n<p>Synchronous version of <a href=\"#pullsource-transforms-options\"><code>pull()</code></a>. All transforms must be synchronous.</p>"
             }
           ],
           "displayName": "Pipelines"
@@ -604,7 +562,7 @@
               "type": "method",
               "meta": {
                 "added": [
-                  "v26.0.0"
+                  "v25.9.0"
                 ],
                 "changes": []
               },
@@ -684,7 +642,7 @@
               "type": "method",
               "meta": {
                 "added": [
-                  "v26.0.0"
+                  "v25.9.0"
                 ],
                 "changes": []
               },
@@ -780,7 +738,7 @@
               "type": "method",
               "meta": {
                 "added": [
-                  "v26.0.0"
+                  "v25.9.0"
                 ],
                 "changes": []
               },
@@ -797,7 +755,7 @@
                   ]
                 }
               ],
-              "desc": "<ul>\n<li><code>source</code> {AsyncIterable&#x3C;Uint8Array[]>|Iterable&#x3C;Uint8Array[]>}</li>\n<li><code>options</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a>\n<ul>\n<li><code>signal</code> <a href=\"globals.html#class-abortsignal\"><code>&#x3C;AbortSignal></code></a></li>\n<li><code>limit</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;number></code></a> Maximum number of bytes to consume. If the total bytes\ncollected exceeds limit, an <code>ERR_OUT_OF_RANGE</code> error is thrown</li>\n</ul>\n</li>\n<li>Returns: {Promise&#x3C;Uint8Array[]>}</li>\n</ul>\n<p>Collect all chunks as an array of <code>Uint8Array</code> values (without concatenating).</p>"
+              "desc": "<ul>\n<li><code>source</code> {AsyncIterable&#x3C;Uint8Array[]>|Iterable&#x3C;Uint8Array[]>}</li>\n<li><code>options</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a>\n<ul>\n<li><code>signal</code> <a href=\"globals.html#class-abortsignal\"><code>&#x3C;AbortSignal></code></a></li>\n<li><code>limit</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;number></code></a> Maximum number of bytes to consume. If the total bytes\ncollected exceeds limit, an <code>ERR_OUT_OF_RANGE</code> error is thrown</li>\n</ul>\n</li>\n<li>Returns: {Promise&#x3C;Uint8Array[]>}</li>\n</ul>\n<p>Collect all chunks as an array of <code>Uint8Array</code> values (without concatenating).</p>"
             },
             {
               "textRaw": "`arrayBuffer(source[, options])`",
@@ -805,7 +763,7 @@
               "type": "method",
               "meta": {
                 "added": [
-                  "v26.0.0"
+                  "v25.9.0"
                 ],
                 "changes": []
               },
@@ -822,7 +780,7 @@
                   ]
                 }
               ],
-              "desc": "<ul>\n<li><code>source</code> {AsyncIterable&#x3C;Uint8Array[]>|Iterable&#x3C;Uint8Array[]>}</li>\n<li><code>options</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a>\n<ul>\n<li><code>signal</code> <a href=\"globals.html#class-abortsignal\"><code>&#x3C;AbortSignal></code></a></li>\n<li><code>limit</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;number></code></a> Maximum number of bytes to consume. If the total bytes\ncollected exceeds limit, an <code>ERR_OUT_OF_RANGE</code> error is thrown</li>\n</ul>\n</li>\n<li>Returns: {Promise<ArrayBuffer>}</li>\n</ul>\n<p>Collect all bytes into an <code>ArrayBuffer</code>.</p>"
+              "desc": "<ul>\n<li><code>source</code> {AsyncIterable&#x3C;Uint8Array[]>|Iterable&#x3C;Uint8Array[]>}</li>\n<li><code>options</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a>\n<ul>\n<li><code>signal</code> <a href=\"globals.html#class-abortsignal\"><code>&#x3C;AbortSignal></code></a></li>\n<li><code>limit</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;number></code></a> Maximum number of bytes to consume. If the total bytes\ncollected exceeds limit, an <code>ERR_OUT_OF_RANGE</code> error is thrown</li>\n</ul>\n</li>\n<li>Returns: {Promise<ArrayBuffer>}</li>\n</ul>\n<p>Collect all bytes into an <code>ArrayBuffer</code>.</p>"
             },
             {
               "textRaw": "`arrayBufferSync(source[, options])`",
@@ -830,7 +788,7 @@
               "type": "method",
               "meta": {
                 "added": [
-                  "v26.0.0"
+                  "v25.9.0"
                 ],
                 "changes": []
               },
@@ -847,7 +805,7 @@
                   ]
                 }
               ],
-              "desc": "<ul>\n<li><code>source</code> {Iterable&#x3C;Uint8Array[]>}</li>\n<li><code>options</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a>\n<ul>\n<li><code>limit</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;number></code></a> Maximum number of bytes to consume. If the total bytes\ncollected exceeds limit, an <code>ERR_OUT_OF_RANGE</code> error is thrown</li>\n</ul>\n</li>\n<li>Returns: <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer\"><code>&#x3C;ArrayBuffer></code></a></li>\n</ul>\n<p>Synchronous version of <a href=\"#arraybuffersource-options\"><code>arrayBuffer()</code></a>.</p>"
+              "desc": "<ul>\n<li><code>source</code> {Iterable&#x3C;Uint8Array[]>}</li>\n<li><code>options</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a>\n<ul>\n<li><code>limit</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;number></code></a> Maximum number of bytes to consume. If the total bytes\ncollected exceeds limit, an <code>ERR_OUT_OF_RANGE</code> error is thrown</li>\n</ul>\n</li>\n<li>Returns: <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer\"><code>&#x3C;ArrayBuffer></code></a></li>\n</ul>\n<p>Synchronous version of <a href=\"#arraybuffersource-options\"><code>arrayBuffer()</code></a>.</p>"
             },
             {
               "textRaw": "`arraySync(source[, options])`",
@@ -855,7 +813,7 @@
               "type": "method",
               "meta": {
                 "added": [
-                  "v26.0.0"
+                  "v25.9.0"
                 ],
                 "changes": []
               },
@@ -872,7 +830,7 @@
                   ]
                 }
               ],
-              "desc": "<ul>\n<li><code>source</code> {Iterable&#x3C;Uint8Array[]>}</li>\n<li><code>options</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a>\n<ul>\n<li><code>limit</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;number></code></a> Maximum number of bytes to consume. If the total bytes\ncollected exceeds limit, an <code>ERR_OUT_OF_RANGE</code> error is thrown</li>\n</ul>\n</li>\n<li>Returns: <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array\"><code>&#x3C;Uint8Array[]></code></a></li>\n</ul>\n<p>Synchronous version of <a href=\"#arraysource-options\"><code>array()</code></a>.</p>"
+              "desc": "<ul>\n<li><code>source</code> {Iterable&#x3C;Uint8Array[]>}</li>\n<li><code>options</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a>\n<ul>\n<li><code>limit</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;number></code></a> Maximum number of bytes to consume. If the total bytes\ncollected exceeds limit, an <code>ERR_OUT_OF_RANGE</code> error is thrown</li>\n</ul>\n</li>\n<li>Returns: <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array\"><code>&#x3C;Uint8Array[]></code></a></li>\n</ul>\n<p>Synchronous version of <a href=\"#arraysource-options\"><code>array()</code></a>.</p>"
             },
             {
               "textRaw": "`bytes(source[, options])`",
@@ -880,7 +838,7 @@
               "type": "method",
               "meta": {
                 "added": [
-                  "v26.0.0"
+                  "v25.9.0"
                 ],
                 "changes": []
               },
@@ -897,7 +855,7 @@
                   ]
                 }
               ],
-              "desc": "<ul>\n<li><code>source</code> {AsyncIterable&#x3C;Uint8Array[]>|Iterable&#x3C;Uint8Array[]>}</li>\n<li><code>options</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a>\n<ul>\n<li><code>signal</code> <a href=\"globals.html#class-abortsignal\"><code>&#x3C;AbortSignal></code></a></li>\n<li><code>limit</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;number></code></a> Maximum number of bytes to consume. If the total bytes\ncollected exceeds limit, an <code>ERR_OUT_OF_RANGE</code> error is thrown</li>\n</ul>\n</li>\n<li>Returns: {Promise<Uint8Array>}</li>\n</ul>\n<p>Collect all bytes from a stream into a single <code>Uint8Array</code>.</p>\n<pre><code class=\"language-mjs\">import { from, bytes } from 'node:stream/iter';\n\nconst data = await bytes(from('hello'));\nconsole.log(data); // Uint8Array(5) [ 104, 101, 108, 108, 111 ]\n</code></pre>\n<pre><code class=\"language-cjs\">const { from, bytes } = require('node:stream/iter');\n\nasync function run() {\n  const data = await bytes(from('hello'));\n  console.log(data); // Uint8Array(5) [ 104, 101, 108, 108, 111 ]\n}\n\nrun().catch(console.error);\n</code></pre>"
+              "desc": "<ul>\n<li><code>source</code> {AsyncIterable&#x3C;Uint8Array[]>|Iterable&#x3C;Uint8Array[]>}</li>\n<li><code>options</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a>\n<ul>\n<li><code>signal</code> <a href=\"globals.html#class-abortsignal\"><code>&#x3C;AbortSignal></code></a></li>\n<li><code>limit</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;number></code></a> Maximum number of bytes to consume. If the total bytes\ncollected exceeds limit, an <code>ERR_OUT_OF_RANGE</code> error is thrown</li>\n</ul>\n</li>\n<li>Returns: {Promise<Uint8Array>}</li>\n</ul>\n<p>Collect all bytes from a stream into a single <code>Uint8Array</code>.</p>\n<pre><code class=\"language-mjs\">import { from, bytes } from 'node:stream/iter';\n\nconst data = await bytes(from('hello'));\nconsole.log(data); // Uint8Array(5) [ 104, 101, 108, 108, 111 ]\n</code></pre>\n<pre><code class=\"language-cjs\">const { from, bytes } = require('node:stream/iter');\n\nasync function run() {\n  const data = await bytes(from('hello'));\n  console.log(data); // Uint8Array(5) [ 104, 101, 108, 108, 111 ]\n}\n\nrun().catch(console.error);\n</code></pre>"
             },
             {
               "textRaw": "`bytesSync(source[, options])`",
@@ -905,7 +863,7 @@
               "type": "method",
               "meta": {
                 "added": [
-                  "v26.0.0"
+                  "v25.9.0"
                 ],
                 "changes": []
               },
@@ -922,7 +880,7 @@
                   ]
                 }
               ],
-              "desc": "<ul>\n<li><code>source</code> {Iterable&#x3C;Uint8Array[]>}</li>\n<li><code>options</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a>\n<ul>\n<li><code>limit</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;number></code></a> Maximum number of bytes to consume. If the total bytes\ncollected exceeds limit, an <code>ERR_OUT_OF_RANGE</code> error is thrown</li>\n</ul>\n</li>\n<li>Returns: <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array\"><code>&#x3C;Uint8Array></code></a></li>\n</ul>\n<p>Synchronous version of <a href=\"#bytessource-options\"><code>bytes()</code></a>.</p>"
+              "desc": "<ul>\n<li><code>source</code> {Iterable&#x3C;Uint8Array[]>}</li>\n<li><code>options</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a>\n<ul>\n<li><code>limit</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;number></code></a> Maximum number of bytes to consume. If the total bytes\ncollected exceeds limit, an <code>ERR_OUT_OF_RANGE</code> error is thrown</li>\n</ul>\n</li>\n<li>Returns: <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array\"><code>&#x3C;Uint8Array></code></a></li>\n</ul>\n<p>Synchronous version of <a href=\"#bytessource-options\"><code>bytes()</code></a>.</p>"
             },
             {
               "textRaw": "`text(source[, options])`",
@@ -930,7 +888,7 @@
               "type": "method",
               "meta": {
                 "added": [
-                  "v26.0.0"
+                  "v25.9.0"
                 ],
                 "changes": []
               },
@@ -947,7 +905,7 @@
                   ]
                 }
               ],
-              "desc": "<ul>\n<li><code>source</code> {AsyncIterable&#x3C;Uint8Array[]>|Iterable&#x3C;Uint8Array[]>}</li>\n<li><code>options</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a>\n<ul>\n<li><code>encoding</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a> Text encoding. <strong>Default:</strong> <code>'utf-8'</code>.</li>\n<li><code>signal</code> <a href=\"globals.html#class-abortsignal\"><code>&#x3C;AbortSignal></code></a></li>\n<li><code>limit</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;number></code></a> Maximum number of bytes to consume. If the total bytes\ncollected exceeds limit, an <code>ERR_OUT_OF_RANGE</code> error is thrown</li>\n</ul>\n</li>\n<li>Returns: {Promise<string>}</li>\n</ul>\n<p>Collect all bytes and decode as text.</p>\n<pre><code class=\"language-mjs\">import { from, text } from 'node:stream/iter';\n\nconsole.log(await text(from('hello'))); // 'hello'\n</code></pre>\n<pre><code class=\"language-cjs\">const { from, text } = require('node:stream/iter');\n\nasync function run() {\n  console.log(await text(from('hello'))); // 'hello'\n}\n\nrun().catch(console.error);\n</code></pre>"
+              "desc": "<ul>\n<li><code>source</code> {AsyncIterable&#x3C;Uint8Array[]>|Iterable&#x3C;Uint8Array[]>}</li>\n<li><code>options</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a>\n<ul>\n<li><code>encoding</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a> Text encoding. <strong>Default:</strong> <code>'utf-8'</code>.</li>\n<li><code>signal</code> <a href=\"globals.html#class-abortsignal\"><code>&#x3C;AbortSignal></code></a></li>\n<li><code>limit</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;number></code></a> Maximum number of bytes to consume. If the total bytes\ncollected exceeds limit, an <code>ERR_OUT_OF_RANGE</code> error is thrown</li>\n</ul>\n</li>\n<li>Returns: {Promise<string>}</li>\n</ul>\n<p>Collect all bytes and decode as text.</p>\n<pre><code class=\"language-mjs\">import { from, text } from 'node:stream/iter';\n\nconsole.log(await text(from('hello'))); // 'hello'\n</code></pre>\n<pre><code class=\"language-cjs\">const { from, text } = require('node:stream/iter');\n\nasync function run() {\n  console.log(await text(from('hello'))); // 'hello'\n}\n\nrun().catch(console.error);\n</code></pre>"
             },
             {
               "textRaw": "`textSync(source[, options])`",
@@ -955,7 +913,7 @@
               "type": "method",
               "meta": {
                 "added": [
-                  "v26.0.0"
+                  "v25.9.0"
                 ],
                 "changes": []
               },
@@ -972,7 +930,7 @@
                   ]
                 }
               ],
-              "desc": "<ul>\n<li><code>source</code> {Iterable&#x3C;Uint8Array[]>}</li>\n<li><code>options</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a>\n<ul>\n<li><code>encoding</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a> <strong>Default:</strong> <code>'utf-8'</code>.</li>\n<li><code>limit</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;number></code></a> Maximum number of bytes to consume. If the total bytes\ncollected exceeds limit, an <code>ERR_OUT_OF_RANGE</code> error is thrown</li>\n</ul>\n</li>\n<li>Returns: <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a></li>\n</ul>\n<p>Synchronous version of <a href=\"#textsource-options\"><code>text()</code></a>.</p>"
+              "desc": "<ul>\n<li><code>source</code> {Iterable&#x3C;Uint8Array[]>}</li>\n<li><code>options</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a>\n<ul>\n<li><code>encoding</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a> <strong>Default:</strong> <code>'utf-8'</code>.</li>\n<li><code>limit</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;number></code></a> Maximum number of bytes to consume. If the total bytes\ncollected exceeds limit, an <code>ERR_OUT_OF_RANGE</code> error is thrown</li>\n</ul>\n</li>\n<li>Returns: <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a></li>\n</ul>\n<p>Synchronous version of <a href=\"#textsource-options\"><code>text()</code></a>.</p>"
             }
           ],
           "displayName": "Consumers"
@@ -988,7 +946,7 @@
               "type": "method",
               "meta": {
                 "added": [
-                  "v26.0.0"
+                  "v25.9.0"
                 ],
                 "changes": []
               },
@@ -1017,7 +975,7 @@
               "type": "method",
               "meta": {
                 "added": [
-                  "v26.0.0"
+                  "v25.9.0"
                 ],
                 "changes": []
               },
@@ -1034,7 +992,7 @@
                   ]
                 }
               ],
-              "desc": "<ul>\n<li><code>...sources</code> {AsyncIterable&#x3C;Uint8Array[]>|Iterable&#x3C;Uint8Array[]>} Two or more iterables.</li>\n<li><code>options</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a>\n<ul>\n<li><code>signal</code> <a href=\"globals.html#class-abortsignal\"><code>&#x3C;AbortSignal></code></a></li>\n</ul>\n</li>\n<li>Returns: {AsyncIterable&#x3C;Uint8Array[]>}</li>\n</ul>\n<p>Merge multiple async iterables by yielding batches in temporal order\n(whichever source produces data first). All sources are consumed\nconcurrently.</p>\n<pre><code class=\"language-mjs\">import { from, merge, text } from 'node:stream/iter';\n\nconst merged = merge(from('hello '), from('world'));\nconsole.log(await text(merged)); // Order depends on timing\n</code></pre>\n<pre><code class=\"language-cjs\">const { from, merge, text } = require('node:stream/iter');\n\nasync function run() {\n  const merged = merge(from('hello '), from('world'));\n  console.log(await text(merged)); // Order depends on timing\n}\n\nrun().catch(console.error);\n</code></pre>"
+              "desc": "<ul>\n<li><code>...sources</code> {AsyncIterable&#x3C;Uint8Array[]>|Iterable&#x3C;Uint8Array[]>} Two or more iterables.</li>\n<li><code>options</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a>\n<ul>\n<li><code>signal</code> <a href=\"globals.html#class-abortsignal\"><code>&#x3C;AbortSignal></code></a></li>\n</ul>\n</li>\n<li>Returns: {AsyncIterable&#x3C;Uint8Array[]>}</li>\n</ul>\n<p>Merge multiple async iterables by yielding batches in temporal order\n(whichever source produces data first). All sources are consumed\nconcurrently.</p>\n<pre><code class=\"language-mjs\">import { from, merge, text } from 'node:stream/iter';\n\nconst merged = merge(from('hello '), from('world'));\nconsole.log(await text(merged)); // Order depends on timing\n</code></pre>\n<pre><code class=\"language-cjs\">const { from, merge, text } = require('node:stream/iter');\n\nasync function run() {\n  const merged = merge(from('hello '), from('world'));\n  console.log(await text(merged)); // Order depends on timing\n}\n\nrun().catch(console.error);\n</code></pre>"
             },
             {
               "textRaw": "`tap(callback)`",
@@ -1042,7 +1000,7 @@
               "type": "method",
               "meta": {
                 "added": [
-                  "v26.0.0"
+                  "v25.9.0"
                 ],
                 "changes": []
               },
@@ -1072,7 +1030,7 @@
               "type": "method",
               "meta": {
                 "added": [
-                  "v26.0.0"
+                  "v25.9.0"
                 ],
                 "changes": []
               },
@@ -1108,7 +1066,7 @@
               "type": "method",
               "meta": {
                 "added": [
-                  "v26.0.0"
+                  "v25.9.0"
                 ],
                 "changes": []
               },
@@ -1251,7 +1209,7 @@
               "type": "method",
               "meta": {
                 "added": [
-                  "v26.0.0"
+                  "v25.9.0"
                 ],
                 "changes": []
               },
@@ -1259,9 +1217,9 @@
                 {
                   "params": [
                     {
-                      "textRaw": "`input` {AsyncIterable|Iterable}",
+                      "textRaw": "`input` {AsyncIterable}",
                       "name": "input",
-                      "type": "AsyncIterable|Iterable"
+                      "type": "AsyncIterable"
                     },
                     {
                       "textRaw": "`options` {Object} Same as `broadcast()`.",
@@ -1287,7 +1245,7 @@
               "type": "method",
               "meta": {
                 "added": [
-                  "v26.0.0"
+                  "v25.9.0"
                 ],
                 "changes": []
               },
@@ -1419,7 +1377,7 @@
               "type": "method",
               "meta": {
                 "added": [
-                  "v26.0.0"
+                  "v25.9.0"
                 ],
                 "changes": []
               },
@@ -1454,7 +1412,7 @@
               "type": "method",
               "meta": {
                 "added": [
-                  "v26.0.0"
+                  "v25.9.0"
                 ],
                 "changes": []
               },
@@ -1462,41 +1420,16 @@
                 {
                   "params": [
                     {
-                      "textRaw": "`source` {Iterable} The sync source to share.",
-                      "name": "source",
-                      "type": "Iterable",
-                      "desc": "The sync source to share."
+                      "name": "source"
                     },
                     {
-                      "textRaw": "`options` {Object}",
                       "name": "options",
-                      "type": "Object",
-                      "options": [
-                        {
-                          "textRaw": "`highWaterMark` {number} Must be >= 1; values below 1 are clamped to 1. **Default:** `16`.",
-                          "name": "highWaterMark",
-                          "type": "number",
-                          "default": "`16`",
-                          "desc": "Must be >= 1; values below 1 are clamped to 1."
-                        },
-                        {
-                          "textRaw": "`backpressure` {string} **Default:** `'strict'`.",
-                          "name": "backpressure",
-                          "type": "string",
-                          "default": "`'strict'`"
-                        }
-                      ],
                       "optional": true
                     }
-                  ],
-                  "return": {
-                    "textRaw": "Returns: {SyncShare}",
-                    "name": "return",
-                    "type": "SyncShare"
-                  }
+                  ]
                 }
               ],
-              "desc": "<p>Synchronous version of <a href=\"#sharesource-options\"><code>share()</code></a>.</p>"
+              "desc": "<ul>\n<li><code>source</code> {Iterable} The sync source to share.</li>\n<li><code>options</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a>\n<ul>\n<li><code>highWaterMark</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;number></code></a> Must be >= 1; values below 1 are clamped\nto 1. <strong>Default:</strong> <code>16</code>.</li>\n<li><code>backpressure</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a> <strong>Default:</strong> <code>'strict'</code>.</li>\n</ul>\n</li>\n<li>Returns: {SyncShare}</li>\n</ul>\n<p>Synchronous version of <a href=\"#sharesource-options\"><code>share()</code></a>.</p>"
             },
             {
               "textRaw": "`SyncShare.fromSync(input[, options])`",
@@ -1504,7 +1437,7 @@
               "type": "method",
               "meta": {
                 "added": [
-                  "v26.0.0"
+                  "v25.9.0"
                 ],
                 "changes": []
               },
@@ -1512,24 +1445,16 @@
                 {
                   "params": [
                     {
-                      "textRaw": "`input` {Iterable}",
-                      "name": "input",
-                      "type": "Iterable"
+                      "name": "input"
                     },
                     {
-                      "textRaw": "`options` {Object}",
                       "name": "options",
-                      "type": "Object",
                       "optional": true
                     }
-                  ],
-                  "return": {
-                    "textRaw": "Returns: {SyncShare}",
-                    "name": "return",
-                    "type": "SyncShare"
-                  }
+                  ]
                 }
-              ]
+              ],
+              "desc": "<ul>\n<li><code>input</code> {Iterable|SyncShareable}</li>\n<li><code>options</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a></li>\n<li>Returns: {SyncShare}</li>\n</ul>"
             }
           ],
           "displayName": "Multi-consumer"
@@ -1538,8 +1463,224 @@
           "textRaw": "Compression and decompression transforms",
           "name": "compression_and_decompression_transforms",
           "type": "module",
-          "desc": "<p>Compression and decompression transforms for use with <code>pull()</code>, <code>pullSync()</code>,\n<code>pipeTo()</code>, and <code>pipeToSync()</code> are available via the <a href=\"zlib_iter.html\"><code>node:zlib/iter</code></a>\nmodule. See the <a href=\"zlib_iter.html\"><code>node:zlib/iter</code> documentation</a> for details.</p>",
+          "desc": "<p>Compression and decompression transforms for use with <code>pull()</code>, <code>pullSync()</code>,\n<code>pipeTo()</code>, and <code>pipeToSync()</code> are available via the <a href=\"zlib.html#iterable-compression\"><code>node:zlib/iter</code></a>\nmodule. See the <a href=\"zlib.html#iterable-compression\"><code>node:zlib/iter</code> documentation</a> for details.</p>",
           "displayName": "Compression and decompression transforms"
+        },
+        {
+          "textRaw": "Classic stream interop",
+          "name": "classic_stream_interop",
+          "type": "module",
+          "desc": "<p>These utility functions bridge between classic\n<a href=\"stream.html#class-streamreadable\"><code>stream.Readable</code></a>/<a href=\"stream.html#class-streamwritable\"><code>stream.Writable</code></a> streams and the <code>stream/iter</code>\nAPI.</p>\n<p>Both <code>fromReadable()</code> and <code>fromWritable()</code> accept duck-typed objects -- they\ndo not require the input to extend <code>stream.Readable</code> or <code>stream.Writable</code>\ndirectly. The minimum contract is described below for each function.</p>",
+          "methods": [
+            {
+              "textRaw": "`fromReadable(readable)`",
+              "name": "fromReadable",
+              "type": "method",
+              "meta": {
+                "added": [
+                  "v26.1.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`readable` {stream.Readable|Object} A classic Readable stream or any object with `read()` and `on()` methods.",
+                      "name": "readable",
+                      "type": "stream.Readable|Object",
+                      "desc": "A classic Readable stream or any object with `read()` and `on()` methods."
+                    }
+                  ],
+                  "return": {
+                    "textRaw": "Returns: {AsyncIterable<Uint8Array[]>} A stream/iter async iterable source.",
+                    "name": "return",
+                    "type": "AsyncIterable<Uint8Array[]>",
+                    "desc": "A stream/iter async iterable source."
+                  }
+                }
+              ],
+              "desc": "<p>Converts a classic Readable stream (or duck-typed equivalent) into a\nstream/iter async iterable source that can be passed to <a href=\"#frominput\"><code>from()</code></a>,\n<a href=\"#pullsource-transforms-options\"><code>pull()</code></a>, <a href=\"#textsource-options\"><code>text()</code></a>, etc.</p>\n<p>If the object implements the <a href=\"#streamtoasyncstreamable\"><code>toAsyncStreamable</code></a> protocol (as\n<code>stream.Readable</code> does), that protocol is used. Otherwise, the function\nduck-types on <code>read()</code> and <code>on()</code> (EventEmitter) and wraps the stream with\na batched async iterator.</p>\n<p>The result is cached per instance -- calling <code>fromReadable()</code> twice with the\nsame stream returns the same iterable.</p>\n<p>For object-mode or encoded Readable streams, chunks are automatically\nnormalized to <code>Uint8Array</code>.</p>\n<pre><code class=\"language-mjs\">import { Readable } from 'node:stream';\nimport { fromReadable, text } from 'node:stream/iter';\n\nconst readable = new Readable({\n  read() { this.push('hello world'); this.push(null); },\n});\n\nconst result = await text(fromReadable(readable));\nconsole.log(result); // 'hello world'\n</code></pre>\n<pre><code class=\"language-cjs\">const { Readable } = require('node:stream');\nconst { fromReadable, text } = require('node:stream/iter');\n\nconst readable = new Readable({\n  read() { this.push('hello world'); this.push(null); },\n});\n\nasync function run() {\n  const result = await text(fromReadable(readable));\n  console.log(result); // 'hello world'\n}\nrun();\n</code></pre>"
+            },
+            {
+              "textRaw": "`fromWritable(writable[, options])`",
+              "name": "fromWritable",
+              "type": "method",
+              "meta": {
+                "added": [
+                  "v26.1.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`writable` {stream.Writable|Object} A classic Writable stream or any object with `write()` and `on()` methods.",
+                      "name": "writable",
+                      "type": "stream.Writable|Object",
+                      "desc": "A classic Writable stream or any object with `write()` and `on()` methods."
+                    },
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`backpressure` {string} Backpressure policy. **Default:** `'strict'`.",
+                          "name": "backpressure",
+                          "type": "string",
+                          "default": "`'strict'`",
+                          "desc": "Backpressure policy.",
+                          "options": [
+                            {
+                              "textRaw": "`'strict'` -- writes are rejected when the buffer is full. Catches callers that ignore backpressure.",
+                              "desc": "`'strict'` -- writes are rejected when the buffer is full. Catches callers that ignore backpressure."
+                            },
+                            {
+                              "textRaw": "`'block'` -- writes wait for drain when the buffer is full. Recommended for use with `pipeTo()`.",
+                              "desc": "`'block'` -- writes wait for drain when the buffer is full. Recommended for use with `pipeTo()`."
+                            },
+                            {
+                              "textRaw": "`'drop-newest'` -- writes are silently discarded when the buffer is full.",
+                              "desc": "`'drop-newest'` -- writes are silently discarded when the buffer is full."
+                            },
+                            {
+                              "textRaw": "`'drop-oldest'` -- **not supported**. Throws `ERR_INVALID_ARG_VALUE`.",
+                              "desc": "`'drop-oldest'` -- **not supported**. Throws `ERR_INVALID_ARG_VALUE`."
+                            }
+                          ]
+                        }
+                      ],
+                      "optional": true
+                    }
+                  ],
+                  "return": {
+                    "textRaw": "Returns: {Object} A stream/iter Writer adapter.",
+                    "name": "return",
+                    "type": "Object",
+                    "desc": "A stream/iter Writer adapter."
+                  }
+                }
+              ],
+              "desc": "<p>Creates a stream/iter Writer adapter from a classic Writable stream (or\nduck-typed equivalent). The adapter can be passed to <a href=\"#pipetosource-transforms-writer-options\"><code>pipeTo()</code></a> as a\ndestination.</p>\n<p>Since all writes on a classic Writable are fundamentally asynchronous,\nthe synchronous Writer methods (<code>writeSync</code>, <code>writevSync</code>, <code>endSync</code>) always\nreturn <code>false</code> or <code>-1</code>, deferring to the async path. The per-write\n<code>options.signal</code> parameter from the Writer interface is also ignored.</p>\n<p>The result is cached per instance -- calling <code>fromWritable()</code> twice with the\nsame stream returns the same Writer.</p>\n<p>For duck-typed streams that do not expose <code>writableHighWaterMark</code>,\n<code>writableLength</code>, or similar properties, sensible defaults are used.\nObject-mode writables (if detectable) are rejected since the Writer\ninterface is bytes-only.</p>\n<pre><code class=\"language-mjs\">import { Writable } from 'node:stream';\nimport { from, fromWritable, pipeTo } from 'node:stream/iter';\n\nconst writable = new Writable({\n  write(chunk, encoding, cb) { console.log(chunk.toString()); cb(); },\n});\n\nawait pipeTo(from('hello world'),\n             fromWritable(writable, { backpressure: 'block' }));\n</code></pre>\n<pre><code class=\"language-cjs\">const { Writable } = require('node:stream');\nconst { from, fromWritable, pipeTo } = require('node:stream/iter');\n\nasync function run() {\n  const writable = new Writable({\n    write(chunk, encoding, cb) { console.log(chunk.toString()); cb(); },\n  });\n\n  await pipeTo(from('hello world'),\n               fromWritable(writable, { backpressure: 'block' }));\n}\nrun();\n</code></pre>"
+            },
+            {
+              "textRaw": "`toReadable(source[, options])`",
+              "name": "toReadable",
+              "type": "method",
+              "meta": {
+                "added": [
+                  "v26.1.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`source` {AsyncIterable} An `AsyncIterable<Uint8Array[]>` source, such as the return value of `pull()` or `from()`.",
+                      "name": "source",
+                      "type": "AsyncIterable",
+                      "desc": "An `AsyncIterable<Uint8Array[]>` source, such as the return value of `pull()` or `from()`."
+                    },
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`highWaterMark` {number} The internal buffer size in bytes before backpressure is applied. **Default:** `65536` (64 KB).",
+                          "name": "highWaterMark",
+                          "type": "number",
+                          "default": "`65536` (64 KB)",
+                          "desc": "The internal buffer size in bytes before backpressure is applied."
+                        },
+                        {
+                          "textRaw": "`signal` {AbortSignal} An optional signal to abort the readable.",
+                          "name": "signal",
+                          "type": "AbortSignal",
+                          "desc": "An optional signal to abort the readable."
+                        }
+                      ],
+                      "optional": true
+                    }
+                  ],
+                  "return": {
+                    "textRaw": "Returns: {stream.Readable}",
+                    "name": "return",
+                    "type": "stream.Readable"
+                  }
+                }
+              ],
+              "desc": "<p>Creates a byte-mode <a href=\"stream.html#class-streamreadable\"><code>stream.Readable</code></a> from an <code>AsyncIterable&#x3C;Uint8Array[]></code>\n(the native batch format used by the stream/iter API). Each <code>Uint8Array</code> in a\nyielded batch is pushed as a separate chunk into the Readable.</p>\n<pre><code class=\"language-mjs\">import { createWriteStream } from 'node:fs';\nimport { from, pull, toReadable } from 'node:stream/iter';\nimport { compressGzip } from 'node:zlib/iter';\n\nconst source = pull(from('hello world'), compressGzip());\nconst readable = toReadable(source);\n\nreadable.pipe(createWriteStream('output.gz'));\n</code></pre>\n<pre><code class=\"language-cjs\">const { createWriteStream } = require('node:fs');\nconst { from, pull, toReadable } = require('node:stream/iter');\nconst { compressGzip } = require('node:zlib/iter');\n\nconst source = pull(from('hello world'), compressGzip());\nconst readable = toReadable(source);\n\nreadable.pipe(createWriteStream('output.gz'));\n</code></pre>"
+            },
+            {
+              "textRaw": "`toReadableSync(source[, options])`",
+              "name": "toReadableSync",
+              "type": "method",
+              "meta": {
+                "added": [
+                  "v26.1.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "name": "source"
+                    },
+                    {
+                      "name": "options",
+                      "optional": true
+                    }
+                  ]
+                }
+              ],
+              "desc": "<ul>\n<li><code>source</code> {Iterable} An <code>Iterable&#x3C;Uint8Array[]></code> source, such as the\nreturn value of <a href=\"#pullsyncsource-transforms-options\"><code>pullSync()</code></a> or <a href=\"#fromsyncinput\"><code>fromSync()</code></a>.</li>\n<li><code>options</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a>\n<ul>\n<li><code>highWaterMark</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;number></code></a> The internal buffer size in bytes before\nbackpressure is applied. <strong>Default:</strong> <code>65536</code> (64 KB).</li>\n</ul>\n</li>\n<li>Returns: <a href=\"stream.html#class-streamreadable\"><code>&#x3C;stream.Readable></code></a></li>\n</ul>\n<p>Creates a byte-mode <a href=\"stream.html#class-streamreadable\"><code>stream.Readable</code></a> from a synchronous\n<code>Iterable&#x3C;Uint8Array[]></code>. The <code>_read()</code> method pulls from the iterator\nsynchronously, so data is available immediately via <code>readable.read()</code>.</p>\n<pre><code class=\"language-mjs\">import { fromSync, toReadableSync } from 'node:stream/iter';\n\nconst source = fromSync('hello world');\nconst readable = toReadableSync(source);\n\nconsole.log(readable.read().toString()); // 'hello world'\n</code></pre>\n<pre><code class=\"language-cjs\">const { fromSync, toReadableSync } = require('node:stream/iter');\n\nconst source = fromSync('hello world');\nconst readable = toReadableSync(source);\n\nconsole.log(readable.read().toString()); // 'hello world'\n</code></pre>"
+            },
+            {
+              "textRaw": "`toWritable(writer)`",
+              "name": "toWritable",
+              "type": "method",
+              "meta": {
+                "added": [
+                  "v26.1.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`writer` {Object} A stream/iter Writer. Only the `write()` method is required; `end()`, `fail()`, `writeSync()`, `writevSync()`, `endSync()`, and `writev()` are optional.",
+                      "name": "writer",
+                      "type": "Object",
+                      "desc": "A stream/iter Writer. Only the `write()` method is required; `end()`, `fail()`, `writeSync()`, `writevSync()`, `endSync()`, and `writev()` are optional."
+                    }
+                  ],
+                  "return": {
+                    "textRaw": "Returns: {stream.Writable}",
+                    "name": "return",
+                    "type": "stream.Writable"
+                  }
+                }
+              ],
+              "desc": "<p>Creates a classic <a href=\"stream.html#class-streamwritable\"><code>stream.Writable</code></a> backed by a stream/iter Writer.</p>\n<p>Each <code>_write()</code> / <code>_writev()</code> call attempts the Writer's synchronous method\nfirst (<code>writeSync</code> / <code>writevSync</code>), falling back to the async method if the\nsync path returns <code>false</code> or throws. Similarly, <code>_final()</code> tries <code>endSync()</code>\nbefore <code>end()</code>. When the sync path succeeds, the callback is deferred via\n<code>queueMicrotask</code> to preserve the async resolution contract.</p>\n<p>The Writable's <code>highWaterMark</code> is set to <code>Number.MAX_SAFE_INTEGER</code> to\neffectively disable its internal buffering, allowing the underlying Writer\nto manage backpressure directly.</p>\n<pre><code class=\"language-mjs\">import { push, toWritable } from 'node:stream/iter';\n\nconst { writer, readable } = push();\nconst writable = toWritable(writer);\n\nwritable.write('hello');\nwritable.end();\n</code></pre>\n<pre><code class=\"language-cjs\">const { push, toWritable } = require('node:stream/iter');\n\nconst { writer, readable } = push();\nconst writable = toWritable(writer);\n\nwritable.write('hello');\nwritable.end();\n</code></pre>"
+            }
+          ],
+          "displayName": "Classic stream interop"
         },
         {
           "textRaw": "Protocol symbols",
@@ -1563,7 +1704,7 @@
               "textRaw": "`Stream.shareProtocol`",
               "name": "shareProtocol",
               "type": "property",
-              "desc": "<ul>\n<li>Value: <code>Symbol.for('Stream.shareProtocol')</code></li>\n</ul>\n<p>The value must be a function. When called by <code>Share.from()</code>, it receives the\noptions passed to <code>Share.from()</code> and must return an object conforming the the\n{Share} interface. The implementation is fully custom -- it can manage the shared\nsource, consumers, buffering, and backpressure however it wants.</p>\n<pre><code class=\"language-mjs\">import { share, Share, text } from 'node:stream/iter';\n\n// This example defers to the built-in share(), but a custom\n// implementation could use any mechanism.\nclass DataPool {\n  #share;\n\n  constructor(source) {\n    this.#share = share(source);\n  }\n\n  [Symbol.for('Stream.shareProtocol')](options) {\n    return this.#share;\n  }\n}\n\nconst pool = new DataPool(\n  (async function* () {\n    yield 'hello';\n  })(),\n);\n\nconst shared = Share.from(pool);\nconst consumer = shared.pull();\nconsole.log(await text(consumer)); // 'hello'\n</code></pre>\n<pre><code class=\"language-cjs\">const { share, Share, text } = require('node:stream/iter');\n\n// This example defers to the built-in share(), but a custom\n// implementation could use any mechanism.\nclass DataPool {\n  #share;\n\n  constructor(source) {\n    this.#share = share(source);\n  }\n\n  [Symbol.for('Stream.shareProtocol')](options) {\n    return this.#share;\n  }\n}\n\nconst pool = new DataPool(\n  (async function* () {\n    yield 'hello';\n  })(),\n);\n\nconst shared = Share.from(pool);\nconst consumer = shared.pull();\ntext(consumer).then(console.log); // 'hello'\n</code></pre>"
+              "desc": "<ul>\n<li>Value: <code>Symbol.for('Stream.shareProtocol')</code></li>\n</ul>\n<p>The value must be a function. When called by <code>Share.from()</code>, it receives the\noptions passed to <code>Share.from()</code> and must return an object conforming to the\n{Share} interface. The implementation is fully custom -- it can manage the shared\nsource, consumers, buffering, and backpressure however it wants.</p>\n<pre><code class=\"language-mjs\">import { share, Share, text } from 'node:stream/iter';\n\n// This example defers to the built-in share(), but a custom\n// implementation could use any mechanism.\nclass DataPool {\n  #share;\n\n  constructor(source) {\n    this.#share = share(source);\n  }\n\n  [Symbol.for('Stream.shareProtocol')](options) {\n    return this.#share;\n  }\n}\n\nconst pool = new DataPool(\n  (async function* () {\n    yield 'hello';\n  })(),\n);\n\nconst shared = Share.from(pool);\nconst consumer = shared.pull();\nconsole.log(await text(consumer)); // 'hello'\n</code></pre>\n<pre><code class=\"language-cjs\">const { share, Share, text } = require('node:stream/iter');\n\n// This example defers to the built-in share(), but a custom\n// implementation could use any mechanism.\nclass DataPool {\n  #share;\n\n  constructor(source) {\n    this.#share = share(source);\n  }\n\n  [Symbol.for('Stream.shareProtocol')](options) {\n    return this.#share;\n  }\n}\n\nconst pool = new DataPool(\n  (async function* () {\n    yield 'hello';\n  })(),\n);\n\nconst shared = Share.from(pool);\nconst consumer = shared.pull();\ntext(consumer).then(console.log); // 'hello'\n</code></pre>"
             },
             {
               "textRaw": "`Stream.shareSyncProtocol`",

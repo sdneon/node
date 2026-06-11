@@ -854,7 +854,7 @@
                   }
                 }
               ],
-              "desc": "<p>Destroy the request. Optionally emit an <code>'error'</code> event,\nand emit a <code>'close'</code> event. Calling this will cause remaining data\nin the response to be dropped and the socket to be destroyed.</p>\n<p>See <a href=\"stream.html#writabledestroyerror\"><code>writable.destroy()</code></a> for further details.</p>",
+              "desc": "<p>Destroy the request. Optionally emit an <code>'error'</code> event,\nand emit a <code>'close'</code> event. Calling this will cause remaining data\nin the response to be dropped, and the socket to be destroyed if used,\nor returned to the corresponding Agent pool otherwise if possible.</p>\n<p>See <a href=\"stream.html#writabledestroyerror\"><code>writable.destroy()</code></a> for further details.</p>",
               "properties": [
                 {
                   "textRaw": "Type: {boolean}",
@@ -2823,6 +2823,18 @@
               "desc": "<p>The raw request/response trailer keys and values exactly as they were\nreceived. Only populated at the <code>'end'</code> event.</p>"
             },
             {
+              "textRaw": "Type: {AbortSignal}",
+              "name": "signal",
+              "type": "AbortSignal",
+              "meta": {
+                "added": [
+                  "v26.1.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>An <a href=\"globals.html#class-abortsignal\"><code>&#x3C;AbortSignal></code></a> that is aborted when the underlying socket closes or the\nrequest is destroyed. The signal is created lazily on first access — no\n<a href=\"globals.html#class-abortcontroller\"><code>&#x3C;AbortController></code></a> is allocated for requests that never use this property.</p>\n<p>This is useful for cancelling downstream asynchronous work such as database\nqueries or <code>fetch</code> calls when a client disconnects mid-request.</p>\n<pre><code class=\"language-mjs\">import http from 'node:http';\n\nhttp.createServer(async (req, res) => {\n  try {\n    const data = await fetch('https://example.com/api', { signal: req.signal });\n    res.end(JSON.stringify(await data.json()));\n  } catch (err) {\n    if (err.name === 'AbortError') return;\n    res.statusCode = 500;\n    res.end('Internal Server Error');\n  }\n}).listen(3000);\n</code></pre>\n<pre><code class=\"language-cjs\">const http = require('node:http');\n\nhttp.createServer(async (req, res) => {\n  try {\n    const data = await fetch('https://example.com/api', { signal: req.signal });\n    res.end(JSON.stringify(await data.json()));\n  } catch (err) {\n    if (err.name === 'AbortError') return;\n    res.statusCode = 500;\n    res.end('Internal Server Error');\n  }\n}).listen(3000);\n</code></pre>"
+            },
+            {
               "textRaw": "Type: {stream.Duplex}",
               "name": "socket",
               "type": "stream.Duplex",
@@ -3639,7 +3651,7 @@
             ],
             "changes": []
           },
-          "desc": "<p>A browser-compatible implementation of <a href=\"https://developer.mozilla.org/en-US/docs/Web//API/WebSocket\"><code>&#x3C;WebSocket></code></a>.</p>"
+          "desc": "<p>A browser-compatible implementation of <a href=\"https://developer.mozilla.org/docs/Web/API/WebSocket\"><code>&#x3C;WebSocket></code></a>.</p>"
         }
       ],
       "properties": [
