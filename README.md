@@ -231,7 +231,8 @@ CoffeeScript, TypeScript and Glob are now packed using [Webpack](https://webpack
 If building for Windows 7, these patches are needed owing to use of APIs not available in Win 7.
 * `deps\uv\src\win\util.c` patch for uv_clock_gettime() to replace use of GetSystemTimePreciseAsFileTime().
 * From v26, delay load `api-ms-win-core-synch-l1-2-0.dll` to avoid startup failure.
-Reason being highway (3rd party module) uses `WaitOnAddress` and `WakeByAddressAll`.
+Reason being (3rd party module) `highway`'s `NanoSleep()` and `WakeAll()` uses `WaitOnAddress` and `WakeByAddressAll`.
+  * However, NanoSleep & WakeAll does NOT seem to be in use at all, so shims will not be implemented.
 
 ## Debugging Node.JS Internals
 It appears that `chrome://inspect` & `--inspect-brk` no longer respects breakpoints in Node.JS internals upon startup; i.e. will skip right to beginning of user code.
