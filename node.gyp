@@ -602,6 +602,7 @@
           # across platforms and to support the few use cases that require large
           # amounts of stack memory, without having to modify the node binary.
           'StackReserveSize': 0x800000,
+          'DelayLoadDLLs': ['api-ms-win-core-synch-l1-2-0.dll']
         },
       },
 

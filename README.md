@@ -8,6 +8,7 @@ Thanks to the inspiration from dcodeIO et al =D
 ## Version 26.0.0
 * Update to Node.JS 26.0.0 baseline.
   * Requires [rustc with cargo](https://rust-lang.org/) to build new Temporal APIs.
+  * Win 7 compatibility patch: Delay load `api-ms-win-core-synch-l1-2-0.dll` to avoid startup failure.
 
 It embeds:
 * DS v1.2.2.
@@ -227,8 +228,10 @@ From Node.JS 22.x, VS2022 is needed; as VS2019 fails to compile some template sy
 CoffeeScript, TypeScript and Glob are now packed using [Webpack](https://webpack.js.org/).
 
 ### Backward Compatibility for Win 7
-If building for Windows 7, you'll need the `deps\uv\src\win\util.c` patch for uv_clock_gettime() to replace use of GetSystemTimePreciseAsFileTime() which is only available from Win8 onwards.
-If building for newer versions (>= 8.1), you may omit this patch.
+If building for Windows 7, these patches are needed owing to use of APIs not available in Win 7.
+* `deps\uv\src\win\util.c` patch for uv_clock_gettime() to replace use of GetSystemTimePreciseAsFileTime().
+* From v26, delay load `api-ms-win-core-synch-l1-2-0.dll` to avoid startup failure.
+Reason being highway (3rd party module) uses `WaitOnAddress` and `WakeByAddressAll`.
 
 ## Debugging Node.JS Internals
 It appears that `chrome://inspect` & `--inspect-brk` no longer respects breakpoints in Node.JS internals upon startup; i.e. will skip right to beginning of user code.
