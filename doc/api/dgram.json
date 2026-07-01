@@ -328,6 +328,51 @@
               "desc": "<p>For UDP sockets, causes the <code>dgram.Socket</code> to listen for datagram\nmessages on a named <code>port</code> and optional <code>address</code> that are passed as\nproperties of an <code>options</code> object passed as the first argument. If\n<code>port</code> is not specified or is <code>0</code>, the operating system will attempt\nto bind to a random port. If <code>address</code> is not specified, the operating\nsystem will attempt to listen on all addresses. Once binding is\ncomplete, a <code>'listening'</code> event is emitted and the optional <code>callback</code>\nfunction is called.</p>\n<p>The <code>options</code> object may contain a <code>fd</code> property. When a <code>fd</code> greater\nthan <code>0</code> is set, it will wrap around an existing socket with the given\nfile descriptor. In this case, the properties of <code>port</code> and <code>address</code>\nwill be ignored.</p>\n<p>Specifying both a <code>'listening'</code> event listener and passing a\n<code>callback</code> to the <code>socket.bind()</code> method is not harmful but not very\nuseful.</p>\n<p>The <code>options</code> object may contain an additional <code>exclusive</code> property that is\nused when using <code>dgram.Socket</code> objects with the <a href=\"cluster.html\"><code>cluster</code></a> module. When\n<code>exclusive</code> is set to <code>false</code> (the default), cluster workers will use the same\nunderlying socket handle allowing connection handling duties to be shared.\nWhen <code>exclusive</code> is <code>true</code>, however, the handle is not shared and attempted\nport sharing results in an error. Creating a <code>dgram.Socket</code> with the <code>reusePort</code>\noption set to <code>true</code> causes <code>exclusive</code> to always be <code>true</code> when <code>socket.bind()</code>\nis called.</p>\n<p>A bound datagram socket keeps the Node.js process running to receive\ndatagram messages.</p>\n<p>If binding fails, an <code>'error'</code> event is generated. In rare case (e.g.\nattempting to bind with a closed socket), an <a href=\"errors.html#class-error\"><code>Error</code></a> may be thrown.</p>\n<p>An example socket listening on an exclusive port is shown below.</p>\n<pre><code class=\"language-js\">socket.bind({\n  address: 'localhost',\n  port: 8000,\n  exclusive: true,\n});\n</code></pre>"
             },
             {
+              "textRaw": "`socket.bindSync([options])`",
+              "name": "bindSync",
+              "type": "method",
+              "meta": {
+                "added": [
+                  "v26.4.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`port` {integer} If omitted or `0`, the operating system will assign an arbitrary unused port. **Default:** `0`.",
+                          "name": "port",
+                          "type": "integer",
+                          "default": "`0`",
+                          "desc": "If omitted or `0`, the operating system will assign an arbitrary unused port."
+                        },
+                        {
+                          "textRaw": "`address` {string} A numeric IP address to bind to. Unlike `socket.bind()`, no DNS resolution is performed, so a host name is not accepted. If omitted, the operating system binds to all addresses (`'0.0.0.0'` for `udp4` sockets, `'::'` for `udp6`).",
+                          "name": "address",
+                          "type": "string",
+                          "desc": "A numeric IP address to bind to. Unlike `socket.bind()`, no DNS resolution is performed, so a host name is not accepted. If omitted, the operating system binds to all addresses (`'0.0.0.0'` for `udp4` sockets, `'::'` for `udp6`)."
+                        }
+                      ],
+                      "optional": true
+                    }
+                  ],
+                  "return": {
+                    "textRaw": "Returns: {Object} The bound address as returned by `socket.address()`.",
+                    "name": "return",
+                    "type": "Object",
+                    "desc": "The bound address as returned by `socket.address()`."
+                  }
+                }
+              ],
+              "desc": "<p>The synchronous counterpart of <a href=\"#socketbindport-address-callback\"><code>socket.bind()</code></a>. <code>bind(2)</code> is a local,\nnon-blocking system call, so the bind is performed inline and the resolved\naddress is returned immediately, including the operating-system-assigned\nephemeral port when <code>port</code> is <code>0</code>:</p>\n<pre><code class=\"language-js\">const dgram = require('node:dgram');\n\nconst socket = dgram.createSocket('udp4');\nconst address = socket.bindSync({ address: '0.0.0.0', port: 0 });\nconsole.log(address); // e.g. { address: '0.0.0.0', family: 'IPv4', port: 53124 }\n</code></pre>\n<p>A bind failure such as <code>EADDRINUSE</code> is thrown synchronously rather than emitted\nas an <code>'error'</code> event. After <code>bindSync()</code> returns, <a href=\"#socketaddress\"><code>socket.address()</code></a> is\nvalid synchronously and the <code>'listening'</code> event is emitted on the next tick.</p>\n<p><code>address</code> must be a numeric IP literal; <code>bindSync()</code> never performs DNS\nresolution (asynchronous name resolution being the only genuinely blocking part\nof binding). Incoming datagrams continue to be delivered asynchronously via the\n<a href=\"#event-message\"><code>'message'</code></a> event. <code>bindSync()</code> always binds the socket's own handle and\ndoes not participate in <a href=\"cluster.html\"><code>cluster</code></a> handle sharing.</p>"
+            },
+            {
               "textRaw": "`socket.close([callback])`",
               "name": "close",
               "type": "method",
@@ -411,6 +456,36 @@
                 }
               ],
               "desc": "<p>Associates the <code>dgram.Socket</code> to a remote address and port. Every\nmessage sent by this handle is automatically sent to that destination. Also,\nthe socket will only receive messages from that remote peer.\nTrying to call <code>connect()</code> on an already connected socket will result\nin an <a href=\"errors.html#err_socket_dgram_is_connected\"><code>ERR_SOCKET_DGRAM_IS_CONNECTED</code></a> exception. If <code>address</code> is not\nprovided, <code>'127.0.0.1'</code> (for <code>udp4</code> sockets) or <code>'::1'</code> (for <code>udp6</code> sockets)\nwill be used by default. Once the connection is complete, a <code>'connect'</code> event\nis emitted and the optional <code>callback</code> function is called. In case of failure,\nthe <code>callback</code> is called or, failing this, an <code>'error'</code> event is emitted.</p>"
+            },
+            {
+              "textRaw": "`socket.connectSync(port[, address])`",
+              "name": "connectSync",
+              "type": "method",
+              "meta": {
+                "added": [
+                  "v26.4.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`port` {integer}",
+                      "name": "port",
+                      "type": "integer"
+                    },
+                    {
+                      "textRaw": "`address` {string} A numeric IP address to connect to. Unlike `socket.connect()`, no DNS resolution is performed, so a host name is not accepted. If omitted, `'127.0.0.1'` (for `udp4` sockets) or `'::1'` (for `udp6` sockets) is used.",
+                      "name": "address",
+                      "type": "string",
+                      "desc": "A numeric IP address to connect to. Unlike `socket.connect()`, no DNS resolution is performed, so a host name is not accepted. If omitted, `'127.0.0.1'` (for `udp4` sockets) or `'::1'` (for `udp6` sockets) is used.",
+                      "optional": true
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>The synchronous counterpart of <a href=\"#socketconnectport-address-callback\"><code>socket.connect()</code></a>. For a UDP socket\n<code>connect(2)</code> only records the default peer address and is a local, non-blocking\nsystem call, so the association is performed inline. Any error raised by the\ncall itself (for example <code>EAFNOSUPPORT</code> for a mismatched address family) is\nthrown synchronously rather than reported via the <code>'error'</code> event. Because\n<code>connect(2)</code> does not probe reachability, errors such as <code>ECONNREFUSED</code> are\nstill surfaced asynchronously on a later send or receive, exactly as for\n<a href=\"#socketconnectport-address-callback\"><code>socket.connect()</code></a>:</p>\n<pre><code class=\"language-js\">const dgram = require('node:dgram');\n\nconst socket = dgram.createSocket('udp4');\nsocket.connectSync(41234, '127.0.0.1');\nconsole.log(socket.remoteAddress()); // { address: '127.0.0.1', family: 'IPv4', port: 41234 }\n</code></pre>\n<p>If the socket is still unbound it is bound synchronously first. After\n<code>connectSync()</code> returns, <a href=\"#socketremoteaddress\"><code>socket.remoteAddress()</code></a> is valid synchronously\nand the <code>'connect'</code> event is emitted on the next tick. Trying to call\n<code>connectSync()</code> on an already connected socket throws an\n<a href=\"errors.html#err_socket_dgram_is_connected\"><code>ERR_SOCKET_DGRAM_IS_CONNECTED</code></a> exception, and calling it while an\nasynchronous <a href=\"#socketbindport-address-callback\"><code>socket.bind()</code></a> is still in progress throws an\n<a href=\"errors.html#err_socket_already_bound\"><code>ERR_SOCKET_ALREADY_BOUND</code></a> exception.</p>\n<p><code>address</code> must be a numeric IP literal; <code>connectSync()</code> never performs DNS\nresolution (asynchronous name resolution being the only genuinely blocking part\nof connecting).</p>"
             },
             {
               "textRaw": "`socket.disconnect()`",

@@ -5,8 +5,8 @@ This is a *fun* mod of Node.JS that initially embedded a modified version of dco
 
 Thanks to the inspiration from dcodeIO et al =D
 
-## Version 26.3.0
-* Update to Node.JS 26.3.0 baseline.
+## Version 26.4.0
+* Update to Node.JS 26.4.0 baseline.
 
 It embeds:
 * DS v1.2.2.

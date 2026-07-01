@@ -7,6 +7,23 @@
       "name": "worker_threads",
       "introduced_in": "v10.5.0",
       "type": "module",
+      "meta": {
+        "added": [
+          "v10.5.0"
+        ],
+        "changes": [
+          {
+            "version": "v12.11.0",
+            "pr-url": "https://github.com/nodejs/node/pull/29512",
+            "description": "This API is no longer experimental."
+          },
+          {
+            "version": "v11.7.0",
+            "pr-url": "https://github.com/nodejs/node/pull/25361",
+            "description": "This API is no longer behind the `--experimental-worker` CLI flag."
+          }
+        ]
+      },
       "stability": 2,
       "stabilityText": "Stable",
       "desc": "<p>The <code>node:worker_threads</code> module enables the use of threads that execute\nJavaScript in parallel. To access it:</p>\n<pre><code class=\"language-mjs\">import worker_threads from 'node:worker_threads';\n</code></pre>\n<pre><code class=\"language-cjs\">const worker_threads = require('node:worker_threads');\n</code></pre>\n<p>Workers (threads) are useful for performing CPU-intensive JavaScript operations.\nThey do not help much with I/O-intensive work. The Node.js built-in\nasynchronous I/O operations are more efficient than Workers can be.</p>\n<p>Unlike <code>child_process</code> or <code>cluster</code>, <code>worker_threads</code> can share memory. They do\nso by transferring <code>ArrayBuffer</code> instances or sharing <code>SharedArrayBuffer</code>\ninstances.</p>\n<pre><code class=\"language-mjs\">import {\n  Worker,\n  isMainThread,\n  parentPort,\n  workerData,\n} from 'node:worker_threads';\n\nif (!isMainThread) {\n  const { parse } = await import('some-js-parsing-library');\n  const script = workerData;\n  parentPort.postMessage(parse(script));\n}\n\nexport default function parseJSAsync(script) {\n  return new Promise((resolve, reject) => {\n    const worker = new Worker(new URL(import.meta.url), {\n      workerData: script,\n    });\n    worker.on('message', resolve);\n    worker.once('error', reject);\n    worker.once('exit', (code) => {\n      if (code !== 0)\n        reject(new Error(`Worker stopped with exit code ${code}`));\n    });\n  });\n};\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  Worker,\n  isMainThread,\n  parentPort,\n  workerData,\n} = require('node:worker_threads');\n\nif (isMainThread) {\n  module.exports = function parseJSAsync(script) {\n    return new Promise((resolve, reject) => {\n      const worker = new Worker(__filename, {\n        workerData: script,\n      });\n      worker.on('message', resolve);\n      worker.once('error', reject);\n      worker.once('exit', (code) => {\n        if (code !== 0)\n          reject(new Error(`Worker stopped with exit code ${code}`));\n      });\n    });\n  };\n} else {\n  const { parse } = require('some-js-parsing-library');\n  const script = workerData;\n  parentPort.postMessage(parse(script));\n}\n</code></pre>\n<p>The above example spawns a Worker thread for each <code>parseJSAsync()</code> call. In\npractice, use a pool of Workers for these kinds of tasks. Otherwise, the\noverhead of creating Workers would likely exceed their benefit.</p>\n<p>When implementing a worker pool, use the <a href=\"async_hooks.html#class-asyncresource\"><code>AsyncResource</code></a> API to inform\ndiagnostic tools (e.g. to provide asynchronous stack traces) about the\ncorrelation between tasks and their outcomes. See\n<a href=\"async_context.html#using-asyncresource-for-a-worker-thread-pool\">\"Using <code>AsyncResource</code> for a <code>Worker</code> thread pool\"</a>\nin the <code>async_hooks</code> documentation for an example implementation.</p>\n<p>Worker threads inherit non-process-specific options by default. Refer to\n<a href=\"#new-workerfilename-options\"><code>Worker constructor options</code></a> to know how to customize worker thread options,\nspecifically <code>argv</code> and <code>execArgv</code> options.</p>",
@@ -193,10 +210,10 @@
                   "desc": "The value to send."
                 },
                 {
-                  "textRaw": "`transferList` {Object[]} If one or more `MessagePort`-like objects are passed in `value`, a `transferList` is required for those items or `ERR_MISSING_MESSAGE_PORT_IN_TRANSFER_LIST` is thrown. See `port.postMessage()` for more information.",
+                  "textRaw": "`transferList` {Object}[] If one or more `MessagePort`-like objects are passed in `value`, a `transferList` is required for those items or `ERR_MISSING_MESSAGE_PORT_IN_TRANSFER_LIST` is thrown. See `port.postMessage()` for more information.",
                   "name": "transferList",
-                  "type": "Object[]",
-                  "desc": "If one or more `MessagePort`-like objects are passed in `value`, a `transferList` is required for those items or `ERR_MISSING_MESSAGE_PORT_IN_TRANSFER_LIST` is thrown. See `port.postMessage()` for more information.",
+                  "type": "Object",
+                  "desc": "[] If one or more `MessagePort`-like objects are passed in `value`, a `transferList` is required for those items or `ERR_MISSING_MESSAGE_PORT_IN_TRANSFER_LIST` is thrown. See `port.postMessage()` for more information.",
                   "optional": true
                 },
                 {
@@ -890,9 +907,10 @@
                       "type": "any"
                     },
                     {
-                      "textRaw": "`transferList` {Object[]}",
+                      "textRaw": "`transferList` {Object}[]",
                       "name": "transferList",
-                      "type": "Object[]",
+                      "type": "Object",
+                      "desc": "[]",
                       "optional": true
                     }
                   ]
@@ -1095,10 +1113,10 @@
                   "type": "Object",
                   "options": [
                     {
-                      "textRaw": "`argv` {any[]} List of arguments which would be stringified and appended to `process.argv` in the worker. This is mostly similar to the `workerData` but the values are available on the global `process.argv` as if they were passed as CLI options to the script.",
+                      "textRaw": "`argv` {any}[] List of arguments which would be stringified and appended to `process.argv` in the worker. This is mostly similar to the `workerData` but the values are available on the global `process.argv` as if they were passed as CLI options to the script.",
                       "name": "argv",
-                      "type": "any[]",
-                      "desc": "List of arguments which would be stringified and appended to `process.argv` in the worker. This is mostly similar to the `workerData` but the values are available on the global `process.argv` as if they were passed as CLI options to the script."
+                      "type": "any",
+                      "desc": "[] List of arguments which would be stringified and appended to `process.argv` in the worker. This is mostly similar to the `workerData` but the values are available on the global `process.argv` as if they were passed as CLI options to the script."
                     },
                     {
                       "textRaw": "`env` {Object} If set, specifies the initial value of `process.env` inside the Worker thread. As a special value, `worker.SHARE_ENV` may be used to specify that the parent thread and the child thread should share their environment variables; in that case, changes to one thread's `process.env` object affect the other thread as well. **Default:** `process.env`.",
@@ -1114,10 +1132,10 @@
                       "desc": "If `true` and the first argument is a `string`, interpret the first argument to the constructor as a script that is executed once the worker is online."
                     },
                     {
-                      "textRaw": "`execArgv` {string[]} List of node CLI options passed to the worker. V8 options (such as `--max-old-space-size`) and options that affect the process (such as `--title`) are not supported. If set, this is provided as `process.execArgv` inside the worker. By default, options are inherited from the parent thread.",
+                      "textRaw": "`execArgv` {string}[] List of node CLI options passed to the worker. V8 options (such as `--max-old-space-size`) and options that affect the process (such as `--title`) are not supported. If set, this is provided as `process.execArgv` inside the worker. By default, options are inherited from the parent thread.",
                       "name": "execArgv",
-                      "type": "string[]",
-                      "desc": "List of node CLI options passed to the worker. V8 options (such as `--max-old-space-size`) and options that affect the process (such as `--title`) are not supported. If set, this is provided as `process.execArgv` inside the worker. By default, options are inherited from the parent thread."
+                      "type": "string",
+                      "desc": "[] List of node CLI options passed to the worker. V8 options (such as `--max-old-space-size`) and options that affect the process (such as `--title`) are not supported. If set, this is provided as `process.execArgv` inside the worker. By default, options are inherited from the parent thread."
                     },
                     {
                       "textRaw": "`stdin` {boolean} If this is set to `true`, then `worker.stdin` provides a writable stream whose contents appear as `process.stdin` inside the Worker. By default, no data is provided.",
@@ -1151,10 +1169,10 @@
                       "desc": "If this is set to `true`, then the Worker tracks raw file descriptors managed through `fs.open()` and `fs.close()`, and closes them when the Worker exits, similar to other resources like network sockets or file descriptors managed through the `FileHandle` API. This option is automatically inherited by all nested `Worker`s."
                     },
                     {
-                      "textRaw": "`transferList` {Object[]} If one or more `MessagePort`-like objects are passed in `workerData`, a `transferList` is required for those items or `ERR_MISSING_MESSAGE_PORT_IN_TRANSFER_LIST` is thrown. See `port.postMessage()` for more information.",
+                      "textRaw": "`transferList` {Object}[] If one or more `MessagePort`-like objects are passed in `workerData`, a `transferList` is required for those items or `ERR_MISSING_MESSAGE_PORT_IN_TRANSFER_LIST` is thrown. See `port.postMessage()` for more information.",
                       "name": "transferList",
-                      "type": "Object[]",
-                      "desc": "If one or more `MessagePort`-like objects are passed in `workerData`, a `transferList` is required for those items or `ERR_MISSING_MESSAGE_PORT_IN_TRANSFER_LIST` is thrown. See `port.postMessage()` for more information."
+                      "type": "Object",
+                      "desc": "[] If one or more `MessagePort`-like objects are passed in `workerData`, a `transferList` is required for those items or `ERR_MISSING_MESSAGE_PORT_IN_TRANSFER_LIST` is thrown. See `port.postMessage()` for more information."
                     },
                     {
                       "textRaw": "`resourceLimits` {Object} An optional set of resource limits for the new JS engine instance. Reaching these limits leads to termination of the `Worker` instance. These limits only affect the JS engine, and no external data, including no `ArrayBuffer`s. Even if these limits are set, the process may still abort if it encounters a global out-of-memory situation.",
@@ -1420,9 +1438,10 @@
                       "type": "any"
                     },
                     {
-                      "textRaw": "`transferList` {Object[]}",
+                      "textRaw": "`transferList` {Object}[]",
                       "name": "transferList",
-                      "type": "Object[]",
+                      "type": "Object",
+                      "desc": "[]",
                       "optional": true
                     }
                   ]

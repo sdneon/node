@@ -33,7 +33,7 @@
           "textRaw": "All together",
           "name": "All together",
           "type": "misc",
-          "desc": "<p>To get the exact filename that will be loaded when <code>require()</code> is called, use\nthe <code>require.resolve()</code> function.</p>\n<p>Putting together all of the above, here is the high-level algorithm\nin pseudocode of what <code>require()</code> does:</p>\n<pre><code class=\"language-text\">require(X) from module at path Y\n1. If X is a core module,\n   a. return the core module\n   b. STOP\n2. If X begins with '/'\n   a. set Y to the file system root\n3. If X is equal to '.', or X begins with './', '/' or '../'\n   a. LOAD_AS_FILE(Y + X)\n   b. LOAD_AS_DIRECTORY(Y + X)\n   c. THROW \"not found\"\n4. If X begins with '#'\n   a. LOAD_PACKAGE_IMPORTS(X, dirname(Y))\n5. LOAD_PACKAGE_SELF(X, dirname(Y))\n6. LOAD_NODE_MODULES(X, dirname(Y))\n7. THROW \"not found\"\n\nMAYBE_DETECT_AND_LOAD(X)\n1. If X parses as a CommonJS module, load X as a CommonJS module. STOP.\n2. Else, if the source code of X can be parsed as ECMAScript module using\n  DETECT_MODULE_SYNTAX defined in the ESM resolver,\n  a. Load X as an ECMAScript module. STOP.\n3. THROW the SyntaxError from attempting to parse X as CommonJS in 1. STOP.\n\nLOAD_AS_FILE(X)\n1. If X is a file, load X as its file extension format. STOP\n2. If X.js is a file,\n    a. Find the closest package scope SCOPE to X.\n    b. If no scope was found\n      1. MAYBE_DETECT_AND_LOAD(X.js)\n    c. If the SCOPE/package.json contains \"type\" field,\n      1. If the \"type\" field is \"module\", load X.js as an ECMAScript module. STOP.\n      2. If the \"type\" field is \"commonjs\", load X.js as a CommonJS module. STOP.\n    d. MAYBE_DETECT_AND_LOAD(X.js)\n3. If X.json is a file, load X.json to a JavaScript Object. STOP\n4. If X.node is a file, load X.node as binary addon. STOP\n\nLOAD_INDEX(X)\n1. If X/index.js is a file\n    a. Find the closest package scope SCOPE to X.\n    b. If no scope was found, load X/index.js as a CommonJS module. STOP.\n    c. If the SCOPE/package.json contains \"type\" field,\n      1. If the \"type\" field is \"module\", load X/index.js as an ECMAScript module. STOP.\n      2. Else, load X/index.js as a CommonJS module. STOP.\n2. If X/index.json is a file, parse X/index.json to a JavaScript object. STOP\n3. If X/index.node is a file, load X/index.node as binary addon. STOP\n\nLOAD_AS_DIRECTORY(X)\n1. If X/package.json is a file,\n   a. Parse X/package.json, and look for \"main\" field.\n   b. If \"main\" is a falsy value, GOTO 2.\n   c. let M = X + (json main field)\n   d. LOAD_AS_FILE(M)\n   e. LOAD_INDEX(M)\n   f. LOAD_INDEX(X) DEPRECATED\n   g. THROW \"not found\"\n2. LOAD_INDEX(X)\n\nLOAD_NODE_MODULES(X, START)\n1. let DIRS = NODE_MODULES_PATHS(START)\n2. for each DIR in DIRS:\n   a. LOAD_PACKAGE_EXPORTS(X, DIR)\n   b. LOAD_AS_FILE(DIR/X)\n   c. LOAD_AS_DIRECTORY(DIR/X)\n\nNODE_MODULES_PATHS(START)\n1. let PARTS = path split(START)\n2. let I = count of PARTS - 1\n3. let DIRS = []\n4. while I >= 0,\n   a. if PARTS[I] = \"node_modules\", GOTO d.\n   b. DIR = path join(PARTS[0 .. I] + \"node_modules\")\n   c. DIRS = DIRS + DIR\n   d. let I = I - 1\n5. return DIRS + GLOBAL_FOLDERS\n\nLOAD_PACKAGE_IMPORTS(X, DIR)\n1. Find the closest package scope SCOPE to DIR.\n2. If no scope was found, return.\n3. If the SCOPE/package.json \"imports\" is null or undefined, return.\n4. If `--no-require-module` is not enabled\n  a. let CONDITIONS = [\"node\", \"require\", \"module-sync\"]\n  b. Else, let CONDITIONS = [\"node\", \"require\"]\n5. let MATCH = PACKAGE_IMPORTS_RESOLVE(X, pathToFileURL(SCOPE),\n  CONDITIONS) defined in the ESM resolver.\n6. RESOLVE_ESM_MATCH(MATCH).\n\nLOAD_PACKAGE_EXPORTS(X, DIR)\n1. Try to interpret X as a combination of NAME and SUBPATH where the name\n   may have a @scope/ prefix and the subpath begins with a slash (`/`).\n2. If X does not match this pattern or DIR/NAME/package.json is not a file,\n   return.\n3. Parse DIR/NAME/package.json, and look for \"exports\" field.\n4. If \"exports\" is null or undefined, return.\n5. If `--no-require-module` is not enabled\n  a. let CONDITIONS = [\"node\", \"require\", \"module-sync\"]\n  b. Else, let CONDITIONS = [\"node\", \"require\"]\n6. let MATCH = PACKAGE_EXPORTS_RESOLVE(pathToFileURL(DIR/NAME), \".\" + SUBPATH,\n   `package.json` \"exports\", CONDITIONS) defined in the ESM resolver.\n7. RESOLVE_ESM_MATCH(MATCH)\n\nLOAD_PACKAGE_SELF(X, DIR)\n1. Find the closest package scope SCOPE to DIR.\n2. If no scope was found, return.\n3. If the SCOPE/package.json \"exports\" is null or undefined, return.\n4. If the SCOPE/package.json \"name\" is not the first segment of X, return.\n5. let MATCH = PACKAGE_EXPORTS_RESOLVE(pathToFileURL(SCOPE),\n   \".\" + X.slice(\"name\".length), `package.json` \"exports\", [\"node\", \"require\"])\n   defined in the ESM resolver.\n6. RESOLVE_ESM_MATCH(MATCH)\n\nRESOLVE_ESM_MATCH(MATCH)\n1. let RESOLVED_PATH = fileURLToPath(MATCH)\n2. If the file at RESOLVED_PATH exists, load RESOLVED_PATH as its extension\n   format. STOP\n3. THROW \"not found\"\n</code></pre>\n<p>The \"ESM resolver\" is defined <a href=\"esm.html#resolver-algorithm-specification\">in the ESM documentation</a>.</p>"
+          "desc": "<p>To get the exact filename that will be loaded when <code>require()</code> is called, use\nthe <code>require.resolve()</code> function.</p>\n<p>Putting together all of the above, here is the high-level algorithm\nin pseudocode of what <code>require()</code> does:</p>\n<pre><code class=\"language-text\">require(X) from module at path Y\n1. If X is a core module,\n   a. return the core module\n   b. STOP\n2. If X begins with '/'\n   a. set Y to the file system root\n3. If X is equal to '.', or X begins with './', '/' or '../'\n   a. LOAD_AS_FILE(Y + X)\n   b. LOAD_AS_DIRECTORY(Y + X)\n   c. THROW \"not found\"\n4. If X begins with '#'\n   a. LOAD_PACKAGE_IMPORTS(X, dirname(Y))\n5. LOAD_PACKAGE_SELF(X, dirname(Y))\n6. If a package map PACKAGE_MAP exists,\n   a. Find the package ID for the package owning Y\n        1. Let PARENT_PACKAGE_ID be FIND_PACKAGE_ID(dirname(Y), PACKAGE_MAP)\n   b. LOAD_PACKAGE_MAP(X, PARENT_PACKAGE_ID, PACKAGE_MAP)\n7. LOAD_NODE_MODULES(X, dirname(Y))\n8. THROW \"not found\"\n\nMAYBE_DETECT_AND_LOAD(X)\n1. If X parses as a CommonJS module, load X as a CommonJS module. STOP.\n2. Else, if the source code of X can be parsed as ECMAScript module using\n  DETECT_MODULE_SYNTAX defined in the ESM resolver,\n  a. Load X as an ECMAScript module. STOP.\n3. THROW the SyntaxError from attempting to parse X as CommonJS in 1. STOP.\n\nLOAD_AS_FILE(X)\n1. If X is a file, load X as its file extension format. STOP\n2. If X.js is a file,\n    a. Find the closest package scope SCOPE to X.\n    b. If no scope was found\n      1. MAYBE_DETECT_AND_LOAD(X.js)\n    c. If the SCOPE/package.json contains \"type\" field,\n      1. If the \"type\" field is \"module\", load X.js as an ECMAScript module. STOP.\n      2. If the \"type\" field is \"commonjs\", load X.js as a CommonJS module. STOP.\n    d. MAYBE_DETECT_AND_LOAD(X.js)\n3. If X.json is a file, load X.json to a JavaScript Object. STOP\n4. If X.node is a file, load X.node as binary addon. STOP\n\nLOAD_INDEX(X)\n1. If X/index.js is a file\n    a. Find the closest package scope SCOPE to X.\n    b. If no scope was found, load X/index.js as a CommonJS module. STOP.\n    c. If the SCOPE/package.json contains \"type\" field,\n      1. If the \"type\" field is \"module\", load X/index.js as an ECMAScript module. STOP.\n      2. Else, load X/index.js as a CommonJS module. STOP.\n2. If X/index.json is a file, parse X/index.json to a JavaScript object. STOP\n3. If X/index.node is a file, load X/index.node as binary addon. STOP\n\nLOAD_AS_DIRECTORY(X)\n1. If X/package.json is a file,\n   a. Parse X/package.json, and look for \"main\" field.\n   b. If \"main\" is a falsy value, GOTO 2.\n   c. let M = X + (json main field)\n   d. LOAD_AS_FILE(M)\n   e. LOAD_INDEX(M)\n   f. LOAD_INDEX(X) DEPRECATED\n   g. THROW \"not found\"\n2. LOAD_INDEX(X)\n\nLOAD_NODE_MODULES(X, START)\n1. Try to interpret X as a combination of NAME and SUBPATH where the name\n   may have a @scope/ prefix and the subpath begins with a slash (`/`).\n2. let DIRS = NODE_MODULES_PATHS(START)\n3. for each DIR in DIRS:\n   a. LOAD_PACKAGE_EXPORTS(SUBPATH, DIR/NAME)\n   b. LOAD_AS_FILE(DIR/X)\n   c. LOAD_AS_DIRECTORY(DIR/X)\n\nNODE_MODULES_PATHS(START)\n1. let PARTS = path split(START)\n2. let I = count of PARTS - 1\n3. let DIRS = []\n4. while I >= 0,\n   a. if PARTS[I] = \"node_modules\", GOTO d.\n   b. DIR = path join(PARTS[0 .. I] + \"node_modules\")\n   c. DIRS = DIRS + DIR\n   d. let I = I - 1\n5. return DIRS + GLOBAL_FOLDERS\n\nFIND_PACKAGE_ID(PATH, PACKAGE_MAP)\n1. Find the PACKAGE_ID for the entry whose \"path\" is a parent directory of PATH\n2. If multiple entries are found, THROW \"ambiguous resolution\"\n3. If no entry was found, THROW \"external file\".\n4. return PACKAGE_ID\n\nLOAD_PACKAGE_MAP(X, PARENT_PACKAGE_ID, PACKAGE_MAP)\n1. Try to interpret X as a combination of NAME and SUBPATH where the name\n   may have a @scope/ prefix and the subpath begins with a slash (`/`).\n2. Find the package map entry for key PARENT_PACKAGE_ID\n3. Look up NAME in the entry's \"dependencies\" map.\n4. If NAME is not found, THROW \"not found\".\n5. Let TARGET be PACKAGE_MAP.packages[dependencies[name]]\n6. Let PACKAGE_PATH be the resolved path of TARGET.\n7. LOAD_PACKAGE_EXPORTS(SUBPATH, PACKAGE_PATH)\n8. LOAD_AS_FILE(PACKAGE_PATH/SUBPATH)\n9. LOAD_AS_DIRECTORY(PACKAGE_PATH/SUBPATH)\n10. THROW \"not found\"\n\nLOAD_PACKAGE_IMPORTS(X, DIR)\n1. Find the closest package scope SCOPE to DIR.\n2. If no scope was found, return.\n3. If the SCOPE/package.json \"imports\" is null or undefined, return.\n4. If `--no-require-module` is not enabled\n  a. let CONDITIONS = [\"node\", \"require\", \"module-sync\"]\n  b. Else, let CONDITIONS = [\"node\", \"require\"]\n5. let MATCH = PACKAGE_IMPORTS_RESOLVE(X, pathToFileURL(SCOPE),\n  CONDITIONS) defined in the ESM resolver.\n6. RESOLVE_ESM_MATCH(MATCH).\n\nLOAD_PACKAGE_EXPORTS(SUBPATH, PACKAGE_DIR)\n1. Parse PACKAGE_DIR/package.json, and look for \"exports\" field.\n2. If \"exports\" is null or undefined, return.\n3. If `--no-require-module` is not enabled\n  a. let CONDITIONS = [\"node\", \"require\", \"module-sync\"]\n  b. Else, let CONDITIONS = [\"node\", \"require\"]\n4. let MATCH = PACKAGE_EXPORTS_RESOLVE(pathToFileURL(PACKAGE_DIR), \".\" + SUBPATH,\n   `package.json` \"exports\", CONDITIONS) defined in the ESM resolver.\n5. RESOLVE_ESM_MATCH(MATCH)\n\nLOAD_PACKAGE_SELF(X, DIR)\n1. Find the closest package scope SCOPE to DIR.\n2. If no scope was found, return.\n3. If the SCOPE/package.json \"exports\" is null or undefined, return.\n4. If the SCOPE/package.json \"name\" is not the first segment of X, return.\n5. let MATCH = PACKAGE_EXPORTS_RESOLVE(pathToFileURL(SCOPE),\n   \".\" + X.slice(\"name\".length), `package.json` \"exports\", [\"node\", \"require\"])\n   defined in the ESM resolver.\n6. RESOLVE_ESM_MATCH(MATCH)\n\nRESOLVE_ESM_MATCH(MATCH)\n1. let RESOLVED_PATH = fileURLToPath(MATCH)\n2. If the file at RESOLVED_PATH exists, load RESOLVED_PATH as its extension\n   format. STOP\n3. THROW \"not found\"\n</code></pre>\n<p>The \"ESM resolver\" is defined <a href=\"esm.html#resolver-algorithm-specification\">in the ESM documentation</a>.</p>"
         },
         {
           "textRaw": "Caching",
@@ -327,10 +327,10 @@
                           "type": "Object",
                           "options": [
                             {
-                              "textRaw": "`paths` {string[]} Paths to resolve module location from. If present, these paths are used instead of the default resolution paths, with the exception of GLOBAL_FOLDERS like `$HOME/.node_modules`, which are always included. Each of these paths is used as a starting point for the module resolution algorithm, meaning that the `node_modules` hierarchy is checked from this location.",
+                              "textRaw": "`paths` {string}[] Paths to resolve module location from. If present, these paths are used instead of the default resolution paths, with the exception of GLOBAL_FOLDERS like `$HOME/.node_modules`, which are always included. Each of these paths is used as a starting point for the module resolution algorithm, meaning that the `node_modules` hierarchy is checked from this location.",
                               "name": "paths",
-                              "type": "string[]",
-                              "desc": "Paths to resolve module location from. If present, these paths are used instead of the default resolution paths, with the exception of GLOBAL_FOLDERS like `$HOME/.node_modules`, which are always included. Each of these paths is used as a starting point for the module resolution algorithm, meaning that the `node_modules` hierarchy is checked from this location."
+                              "type": "string",
+                              "desc": "[] Paths to resolve module location from. If present, these paths are used instead of the default resolution paths, with the exception of GLOBAL_FOLDERS like `$HOME/.node_modules`, which are always included. Each of these paths is used as a starting point for the module resolution algorithm, meaning that the `node_modules` hierarchy is checked from this location."
                             }
                           ],
                           "optional": true
@@ -366,9 +366,10 @@
                             }
                           ],
                           "return": {
-                            "textRaw": "Returns: {string[]|null}",
+                            "textRaw": "Returns: {string}[] | {null}",
                             "name": "return",
-                            "type": "string[]|null"
+                            "type": "string",
+                            "desc": "[] | {null}"
                           }
                         }
                       ],
@@ -392,19 +393,22 @@
             "changes": []
           },
           "desc": "<ul>\n<li>Type: <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a></li>\n</ul>\n<p>In each module, the <code>module</code> free variable is a reference to the object\nrepresenting the current module. For convenience, <code>module.exports</code> is\nalso accessible via the <code>exports</code> module-global. <code>module</code> is not actually\na global but rather local to each module.</p>",
-          "properties": [
+          "modules": [
             {
-              "textRaw": "Type: {module[]}",
-              "name": "children",
-              "type": "module[]",
+              "textRaw": "Type: {module}[]",
+              "name": "type:_{module}[]",
+              "type": "module",
               "meta": {
                 "added": [
                   "v0.1.16"
                 ],
                 "changes": []
               },
-              "desc": "<p>The module objects required for the first time by this one.</p>"
-            },
+              "desc": "<p>The module objects required for the first time by this one.</p>",
+              "shortDesc": "[]"
+            }
+          ],
+          "properties": [
             {
               "textRaw": "Type: {Object}",
               "name": "exports",
@@ -512,16 +516,17 @@
               "desc": "<p>The directory name of the module. This is usually the same as the\n<a href=\"path.html#pathdirnamepath\"><code>path.dirname()</code></a> of the <a href=\"#moduleid\"><code>module.id</code></a>.</p>"
             },
             {
-              "textRaw": "Type: {string[]}",
+              "textRaw": "Type: {string}[]",
               "name": "paths",
-              "type": "string[]",
+              "type": "string",
               "meta": {
                 "added": [
                   "v0.4.0"
                 ],
                 "changes": []
               },
-              "desc": "<p>The search paths for the module.</p>"
+              "desc": "<p>The search paths for the module.</p>",
+              "shortDesc": "[]"
             }
           ],
           "methods": [

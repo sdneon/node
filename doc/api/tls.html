@@ -1,4 +1,4 @@
-<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content="width=device-width"><link rel=icon href=https://nodejs.org/favicon.ico><meta name=nodejs.org:node-version content=v26.3.0><title>TLS (SSL) | Node.js v26.3.0 Documentation</title><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback"><link rel=stylesheet href=assets/style.css><link rel=canonical href=https://nodejs.org/api/tls.html><script async defer src=assets/api.js></script><script>("dark"===localStorage.getItem("theme")||null===localStorage.getItem("theme")&&window.matchMedia?.("(prefers-color-scheme: dark)").matches)&&document.documentElement.classList.add("dark-mode")</script><body class="alt apidoc" id=api-section-tls><a href=#apicontent class=skip-to-content>Skip to content</a>
+<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content="width=device-width"><link rel=icon href=https://nodejs.org/favicon.ico><meta name=nodejs.org:node-version content=v26.4.0><title>TLS (SSL) | Node.js v26.4.0 Documentation</title><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback"><link rel=stylesheet href=assets/style.css><link rel=canonical href=https://nodejs.org/api/tls.html><script async defer src=assets/api.js></script><script>("dark"===localStorage.getItem("theme")||null===localStorage.getItem("theme")&&window.matchMedia?.("(prefers-color-scheme: dark)").matches)&&document.documentElement.classList.add("dark-mode")</script><body class="alt apidoc" id=api-section-tls><a href=#apicontent class=skip-to-content>Skip to content</a>
     <div id=content class=clearfix>
       <div role=navigation id=column2 class=interior>
         <div id=intro class=interior>
@@ -66,6 +66,7 @@
 <li><a class=nav-url href=url.html>URL</a></li>
 <li><a class=nav-util href=util.html>Utilities</a></li>
 <li><a class=nav-v8 href=v8.html>V8</a></li>
+<li><a class=nav-vfs href=vfs.html>Virtual File System</a></li>
 <li><a class=nav-vm href=vm.html>VM</a></li>
 <li><a class=nav-wasi href=wasi.html>WASI</a></li>
 <li><a class=nav-webcrypto href=webcrypto.html>Web Crypto API</a></li>
@@ -83,7 +84,7 @@
       <div id=column1 data-id=tls class=interior>
         <header class=header>
           <div class=header-container>
-            <h1>Node.js v26.3.0 documentation</h1>
+            <h1>Node.js v26.4.0 documentation</h1>
             <button class=theme-toggle-btn id=theme-toggle-btn title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
               <svg class="dark-icon icon" height=24 width=24>
                 <path fill=none d="M0 0h24v24H0z"/>
@@ -98,7 +99,7 @@
           </div>
           <div id=gtoc>
             <ul>
-              <li class=pinned-header>Node.js v26.3.0</li>
+              <li class=pinned-header>Node.js v26.4.0</li>
               <li class=picker-header><a href=#toc-picker aria-controls=toc-picker><span class=picker-arrow></span>Table of contents</a><div class=picker><div class=toc tabindex=-1><ul id=toc-picker>
 <li><span class=stability_2><a href=tls.html#tls-ssl>TLS (SSL)</a></span>
 <ul>
@@ -194,6 +195,7 @@
 <li><a href=tls.html#tlssetdefaultcacertificatescerts><code>tls.setDefaultCACertificates(certs)</code></a></li>
 <li><a href=tls.html#tlsgetcacertificatestype><code>tls.getCACertificates([type])</code></a></li>
 <li><a href=tls.html#tlsgetciphers><code>tls.getCiphers()</code></a></li>
+<li><a href=tls.html#tlsgetcertificatecompressionalgorithms><code>tls.getCertificateCompressionAlgorithms()</code></a></li>
 <li><a href=tls.html#tlsrootcertificates><code>tls.rootCertificates</code></a></li>
 <li><a href=tls.html#tlsdefault_ecdh_curve><code>tls.DEFAULT_ECDH_CURVE</code></a></li>
 <li><a href=tls.html#tlsdefault_max_version><code>tls.DEFAULT_MAX_VERSION</code></a></li>
@@ -262,6 +264,7 @@
 <li><a class=nav-url href=url.html>URL</a></li>
 <li><a class=nav-util href=util.html>Utilities</a></li>
 <li><a class=nav-v8 href=v8.html>V8</a></li>
+<li><a class=nav-vfs href=vfs.html>Virtual File System</a></li>
 <li><a class=nav-vm href=vm.html>VM</a></li>
 <li><a class=nav-wasi href=wasi.html>WASI</a></li>
 <li><a class=nav-webcrypto href=webcrypto.html>Web Crypto API</a></li>
@@ -385,6 +388,7 @@
 <li><a href=tls.html#tlssetdefaultcacertificatescerts><code>tls.setDefaultCACertificates(certs)</code></a></li>
 <li><a href=tls.html#tlsgetcacertificatestype><code>tls.getCACertificates([type])</code></a></li>
 <li><a href=tls.html#tlsgetciphers><code>tls.getCiphers()</code></a></li>
+<li><a href=tls.html#tlsgetcertificatecompressionalgorithms><code>tls.getCertificateCompressionAlgorithms()</code></a></li>
 <li><a href=tls.html#tlsrootcertificates><code>tls.rootCertificates</code></a></li>
 <li><a href=tls.html#tlsdefault_ecdh_curve><code>tls.DEFAULT_ECDH_CURVE</code></a></li>
 <li><a href=tls.html#tlsdefault_max_version><code>tls.DEFAULT_MAX_VERSION</code></a></li>
@@ -1283,7 +1287,7 @@ verified against the list of supplied CAs. An <code>'error'</code> event is emit
 verification fails; <code>err.code</code> contains the OpenSSL error code. <strong>Default:</strong>
 <code>true</code>.</li>
 <li><code>pskCallback</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Function><code>&lt;Function></code></a> For TLS-PSK negotiation, see <a href=#pre-shared-keys>Pre-shared keys</a>.</li>
-<li><code>ALPNProtocols</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string[]></code></a> | <a href=buffer.html#class-buffer><code>&lt;Buffer></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypedArray><code>&lt;TypedArray></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/DataView><code>&lt;DataView></code></a> An array of strings,
+<li><code>ALPNProtocols</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a>[] | <a href=buffer.html#class-buffer><code>&lt;Buffer></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypedArray><code>&lt;TypedArray></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/DataView><code>&lt;DataView></code></a> An array of strings,
 or a single <code>Buffer</code>, <code>TypedArray</code>, or <code>DataView</code> containing the supported
 ALPN protocols. Buffers should have the format <code>[len][name][len][name]...</code>
 e.g. <code>'\x08http/1.1\x08http/1.0'</code>, where the <code>len</code> byte is the length of the
@@ -1413,12 +1417,12 @@ as an argument instead of an option.<p>A path option, if specified, will take pr
 </ul><p>Same as <a href=#tlsconnectoptions-callback><code>tls.connect()</code></a> except that <code>port</code> and <code>host</code> can be provided
 as arguments instead of options.<p>A port or host option, if specified, will take precedence over any port or host
 argument.</section>
-<section><h3><code>tls.createSecureContext([options])</code><span><a id=tls_tls_createsecurecontext_options></a></span><span><a class=mark id=tlscreatesecurecontextoptions href=#tlscreatesecurecontextoptions>#</a></span></h3><div class=api_metadata><span>Added in: v0.11.13</span><details class=changelog><summary>History</summary><table><thead><tr><th>Version<th>Changes<tbody><tr><td>v22.9.0, v20.18.0<td><p>The <code>allowPartialTrustChain</code> option has been added.<tr><td>v22.4.0, v20.16.0<td><p>The <code>clientCertEngine</code>, <code>privateKeyEngine</code> and <code>privateKeyIdentifier</code> options depend on custom engine support in OpenSSL which is deprecated in OpenSSL 3.<tr><td>v19.8.0, v18.16.0<td><p>The <code>dhparam</code> option can now be set to <code>'auto'</code> to enable DHE with appropriate well-known parameters.<tr><td>v12.12.0<td><p>Added <code>privateKeyIdentifier</code> and <code>privateKeyEngine</code> options to get private key from an OpenSSL engine.<tr><td>v12.11.0<td><p>Added <code>sigalgs</code> option to override supported signature algorithms.<tr><td>v12.0.0<td><p>TLSv1.3 support added.<tr><td>v11.5.0<td><p>The <code>ca:</code> option now supports <code>BEGIN TRUSTED CERTIFICATE</code>.<tr><td>v11.4.0, v10.16.0<td><p>The <code>minVersion</code> and <code>maxVersion</code> can be used to restrict the allowed TLS protocol versions.<tr><td>v10.0.0<td><p>The <code>ecdhCurve</code> cannot be set to <code>false</code> anymore due to a change in OpenSSL.<tr><td>v9.3.0<td><p>The <code>options</code> parameter can now include <code>clientCertEngine</code>.<tr><td>v9.0.0<td><p>The <code>ecdhCurve</code> option can now be multiple <code>':'</code> separated curve names or <code>'auto'</code>.<tr><td>v7.3.0<td><p>If the <code>key</code> option is an array, individual entries do not need a <code>passphrase</code> property anymore. <code>Array</code> entries can also just be <code>string</code>s or <code>Buffer</code>s now.<tr><td>v5.2.0<td><p>The <code>ca</code> option can now be a single string containing multiple CA certificates.</table></details></div><ul>
+<section><h3><code>tls.createSecureContext([options])</code><span><a id=tls_tls_createsecurecontext_options></a></span><span><a class=mark id=tlscreatesecurecontextoptions href=#tlscreatesecurecontextoptions>#</a></span></h3><div class=api_metadata><span>Added in: v0.11.13</span><details class=changelog><summary>History</summary><table><thead><tr><th>Version<th>Changes<tbody><tr><td>v26.4.0<td><p>The <code>certificateCompression</code> option has been added.<tr><td>v22.9.0, v20.18.0<td><p>The <code>allowPartialTrustChain</code> option has been added.<tr><td>v22.4.0, v20.16.0<td><p>The <code>clientCertEngine</code>, <code>privateKeyEngine</code> and <code>privateKeyIdentifier</code> options depend on custom engine support in OpenSSL which is deprecated in OpenSSL 3.<tr><td>v19.8.0, v18.16.0<td><p>The <code>dhparam</code> option can now be set to <code>'auto'</code> to enable DHE with appropriate well-known parameters.<tr><td>v12.12.0<td><p>Added <code>privateKeyIdentifier</code> and <code>privateKeyEngine</code> options to get private key from an OpenSSL engine.<tr><td>v12.11.0<td><p>Added <code>sigalgs</code> option to override supported signature algorithms.<tr><td>v12.0.0<td><p>TLSv1.3 support added.<tr><td>v11.5.0<td><p>The <code>ca:</code> option now supports <code>BEGIN TRUSTED CERTIFICATE</code>.<tr><td>v11.4.0, v10.16.0<td><p>The <code>minVersion</code> and <code>maxVersion</code> can be used to restrict the allowed TLS protocol versions.<tr><td>v10.0.0<td><p>The <code>ecdhCurve</code> cannot be set to <code>false</code> anymore due to a change in OpenSSL.<tr><td>v9.3.0<td><p>The <code>options</code> parameter can now include <code>clientCertEngine</code>.<tr><td>v9.0.0<td><p>The <code>ecdhCurve</code> option can now be multiple <code>':'</code> separated curve names or <code>'auto'</code>.<tr><td>v7.3.0<td><p>If the <code>key</code> option is an array, individual entries do not need a <code>passphrase</code> property anymore. <code>Array</code> entries can also just be <code>string</code>s or <code>Buffer</code>s now.<tr><td>v5.2.0<td><p>The <code>ca</code> option can now be a single string containing multiple CA certificates.</table></details></div><ul>
 <li><code>options</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object><code>&lt;Object></code></a>
 <ul>
 <li><code>allowPartialTrustChain</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#boolean_type><code>&lt;boolean></code></a> Treat intermediate (non-self-signed)
 certificates in the trust CA certificate list as trusted.</li>
-<li><code>ca</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string[]></code></a> | <a href=buffer.html#class-buffer><code>&lt;Buffer></code></a> | <a href=buffer.html#class-buffer><code>&lt;Buffer[]></code></a> Optionally override the trusted CA
+<li><code>ca</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a>[] | <a href=buffer.html#class-buffer><code>&lt;Buffer></code></a> | <a href=buffer.html#class-buffer><code>&lt;Buffer></code></a>[] Optionally override the trusted CA
 certificates. If not specified, the CA certificates trusted by default are
 the same as the ones returned by <a href=#tlsgetcacertificatestype><code>tls.getCACertificates()</code></a> using the
 <code>default</code> type.  If specified, the default list would be completely replaced
@@ -1439,7 +1443,7 @@ For self-signed certificates, the certificate is its own CA, and must be
 provided.
 For PEM encoded certificates, supported types are "TRUSTED CERTIFICATE",
 "X509 CERTIFICATE", and "CERTIFICATE".</li>
-<li><code>cert</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string[]></code></a> | <a href=buffer.html#class-buffer><code>&lt;Buffer></code></a> | <a href=buffer.html#class-buffer><code>&lt;Buffer[]></code></a> Cert chains in PEM format. One
+<li><code>cert</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a>[] | <a href=buffer.html#class-buffer><code>&lt;Buffer></code></a> | <a href=buffer.html#class-buffer><code>&lt;Buffer></code></a>[] Cert chains in PEM format. One
 cert chain should be provided per private key. Each cert chain should
 consist of the PEM formatted certificate for a provided private <code>key</code>,
 followed by the PEM formatted intermediate certificates (if any), in order,
@@ -1448,6 +1452,11 @@ see <code>ca</code>). When providing multiple cert chains, they do not have to b
 the same order as their private keys in <code>key</code>. If the intermediate
 certificates are not provided, the peer will not be able to validate the
 certificate, and the handshake will fail.</li>
+<li><code>certificateCompression</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a>[] An array of supported certificate
+compression algorithm names, in preference order. Supported values are <code>'zlib'</code>, <code>'brotli'</code>, and <code>'zstd'</code>. When set, enables TLS certificate
+compression (<a href=https://tools.ietf.org/html/rfc8879>RFC 8879</a>) which compresses certificates during the TLS
+handshake, reducing handshake size. Only effective with TLSv1.3.
+<strong>Default:</strong> <code>[]</code> (disabled).</li>
 <li><code>sigalgs</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> Colon-separated list of supported signature algorithms.
 The list can contain digest algorithms (<code>SHA256</code>, <code>MD5</code> etc.), public key
 algorithms (<code>RSA-PSS</code>, <code>ECDSA</code> etc.), combination of both (e.g
@@ -1460,7 +1469,7 @@ ciphers can be obtained via <a href=#tlsgetciphers><code>tls.getCiphers()</code>
 uppercased in order for OpenSSL to accept them.</li>
 <li><code>clientCertEngine</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> Name of an OpenSSL engine which can provide the
 client certificate. <strong>Deprecated.</strong></li>
-<li><code>crl</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string[]></code></a> | <a href=buffer.html#class-buffer><code>&lt;Buffer></code></a> | <a href=buffer.html#class-buffer><code>&lt;Buffer[]></code></a> PEM formatted CRLs (Certificate
+<li><code>crl</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a>[] | <a href=buffer.html#class-buffer><code>&lt;Buffer></code></a> | <a href=buffer.html#class-buffer><code>&lt;Buffer></code></a>[] PEM formatted CRLs (Certificate
 Revocation Lists).</li>
 <li><code>dhparam</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> | <a href=buffer.html#class-buffer><code>&lt;Buffer></code></a> <code>'auto'</code> or custom Diffie-Hellman parameters,
 required for non-ECDHE <a href=#perfect-forward-secrecy>perfect forward secrecy</a>. If omitted or invalid,
@@ -1477,7 +1486,7 @@ will also display the name and description of each available elliptic curve.
 preferences instead of the client's. When <code>true</code>, causes
 <code>SSL_OP_CIPHER_SERVER_PREFERENCE</code> to be set in <code>secureOptions</code>, see
 <a href=crypto.html#openssl-options>OpenSSL Options</a> for more information.</li>
-<li><code>key</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string[]></code></a> | <a href=buffer.html#class-buffer><code>&lt;Buffer></code></a> | <a href=buffer.html#class-buffer><code>&lt;Buffer[]></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object><code>&lt;Object[]></code></a> Private keys in PEM
+<li><code>key</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a>[] | <a href=buffer.html#class-buffer><code>&lt;Buffer></code></a> | <a href=buffer.html#class-buffer><code>&lt;Buffer></code></a>[] | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object><code>&lt;Object></code></a>[] Private keys in PEM
 format. PEM allows the option of private keys being encrypted. Encrypted
 keys will be decrypted with <code>options.passphrase</code>. Multiple keys using
 different algorithms can be provided either as an array of unencrypted key
@@ -1504,7 +1513,7 @@ interoperability. Versions before TLSv1.2 may require downgrading the <a href=#o
 <strong>Default:</strong> <a href=#tlsdefault_min_version><code>tls.DEFAULT_MIN_VERSION</code></a>.</li>
 <li><code>passphrase</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> Shared passphrase used for a single private key and/or
 a PFX.</li>
-<li><code>pfx</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string[]></code></a> | <a href=buffer.html#class-buffer><code>&lt;Buffer></code></a> | <a href=buffer.html#class-buffer><code>&lt;Buffer[]></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object><code>&lt;Object[]></code></a> PFX or PKCS12 encoded
+<li><code>pfx</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a>[] | <a href=buffer.html#class-buffer><code>&lt;Buffer></code></a> | <a href=buffer.html#class-buffer><code>&lt;Buffer></code></a>[] | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object><code>&lt;Object></code></a>[] PFX or PKCS12 encoded
 private key and certificate chain. <code>pfx</code> is an alternative to providing
 <code>key</code> and <code>cert</code> individually. PFX is usually encrypted, if it is,
 <code>passphrase</code> will be used to decrypt it. Multiple PFX can be provided either
@@ -1550,7 +1559,7 @@ permissible, use 2048 bits or larger for stronger security.</section>
 <section><h3><code>tls.createServer([options][, secureConnectionListener])</code><span><a id=tls_tls_createserver_options_secureconnectionlistener></a></span><span><a class=mark id=tlscreateserveroptions-secureconnectionlistener href=#tlscreateserveroptions-secureconnectionlistener>#</a></span></h3><div class=api_metadata><span>Added in: v0.3.2</span><details class=changelog><summary>History</summary><table><thead><tr><th>Version<th>Changes<tbody><tr><td>v22.4.0, v20.16.0<td><p>The <code>clientCertEngine</code> option depends on custom engine support in OpenSSL which is deprecated in OpenSSL 3.<tr><td>v20.4.0, v18.19.0<td><p>The <code>options</code> parameter can now include <code>ALPNCallback</code>.<tr><td>v19.0.0<td><p>If <code>ALPNProtocols</code> is set, incoming connections that send an ALPN extension with no supported protocols are terminated with a fatal <code>no_application_protocol</code> alert.<tr><td>v12.3.0<td><p>The <code>options</code> parameter now supports <code>net.createServer()</code> options.<tr><td>v9.3.0<td><p>The <code>options</code> parameter can now include <code>clientCertEngine</code>.<tr><td>v8.0.0<td><p>The <code>ALPNProtocols</code> option can be a <code>TypedArray</code> or <code>DataView</code> now.<tr><td>v5.0.0<td><p>ALPN options are supported now.</table></details></div><ul>
 <li><code>options</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object><code>&lt;Object></code></a>
 <ul>
-<li><code>ALPNProtocols</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string[]></code></a> | <a href=buffer.html#class-buffer><code>&lt;Buffer></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypedArray><code>&lt;TypedArray></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/DataView><code>&lt;DataView></code></a> An array of strings,
+<li><code>ALPNProtocols</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a>[] | <a href=buffer.html#class-buffer><code>&lt;Buffer></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypedArray><code>&lt;TypedArray></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/DataView><code>&lt;DataView></code></a> An array of strings,
 or a single <code>Buffer</code>, <code>TypedArray</code>, or <code>DataView</code> containing the supported
 ALPN protocols. Buffers should have the format <code>[len][name][len][name]...</code>
 e.g. <code>0x05hello0x05world</code>, where the first byte is the length of the next
@@ -1666,7 +1675,7 @@ workers.<p>The following illustrates a simple echo server:<pre style=background-
 <span class=line></span></code><div class=code-toolbar><span class=code-language>bash</span><button class=copy-button>copy</button></div></pre><p>The server can be tested by connecting to it using the example client from
 <a href=#tlsconnectoptions-callback><code>tls.connect()</code></a>.</section>
 <section><h3><code>tls.setDefaultCACertificates(certs)</code><span><a id=tls_tls_setdefaultcacertificates_certs></a></span><span><a class=mark id=tlssetdefaultcacertificatescerts href=#tlssetdefaultcacertificatescerts>#</a></span></h3><div class=api_metadata><span>Added in: v24.5.0, v22.19.0</span></div><ul>
-<li><code>certs</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string[]></code></a> An array of CA certificates in PEM format.</li>
+<li><code>certs</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a>[] | <code>&lt;ArrayBufferView[]></code> An array of CA certificates in PEM format.</li>
 </ul><p>Sets the default CA certificates used by Node.js TLS clients. If the provided
 certificates are parsed successfully, they will become the default CA
 certificate list returned by <a href=#tlsgetcacertificatestype><code>tls.getCACertificates()</code></a> and used
@@ -1692,7 +1701,7 @@ certificates to the existing defaults, get the current certificates and append t
 <li><code>type</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#undefined_type><code>&lt;undefined></code></a> The type of CA certificates that will be returned. Valid values
 are <code>"default"</code>, <code>"system"</code>, <code>"bundled"</code> and <code>"extra"</code>.
 <strong>Default:</strong> <code>"default"</code>.</li>
-<li>Returns: <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string[]></code></a> An array of PEM-encoded certificates. The array may contain duplicates
+<li>Returns: <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a>[] An array of PEM-encoded certificates. The array may contain duplicates
 if the same certificate is repeatedly stored in multiple sources.</li>
 </ul><p>Returns an array containing the CA certificates from various sources, depending on <code>type</code>:<ul>
 <li><code>"default"</code>: return the CA certificates that will be used by the Node.js TLS clients by default.
@@ -1714,15 +1723,22 @@ as <a href=#tlsrootcertificates><code>tls.rootCertificates</code></a>.</li>
 <a href=cli.html#node_extra_ca_certsfile><code>NODE_EXTRA_CA_CERTS</code></a> is not set.</li>
 </ul></section>
 <section><h3><code>tls.getCiphers()</code><span><a id=tls_tls_getciphers></a></span><span><a class=mark id=tlsgetciphers href=#tlsgetciphers>#</a></span></h3><div class=api_metadata><span>Added in: v0.10.2</span></div><ul>
-<li>Returns: <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string[]></code></a></li>
+<li>Returns: <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a>[]</li>
 </ul><p>Returns an array with the names of the supported TLS ciphers. The names are
 lower-case for historical reasons, but must be uppercased to be used in
 the <code>ciphers</code> option of <a href=#tlscreatesecurecontextoptions><code>tls.createSecureContext()</code></a>.<p>Not all supported ciphers are enabled by default. See
 <a href=#modifying-the-default-tls-cipher-suite>Modifying the default TLS cipher suite</a>.<p>Cipher names that start with <code>'tls_'</code> are for TLSv1.3, all the others are for
 TLSv1.2 and below.<pre class="catppuccin-latte catppuccin-mocha language-js shiki shiki-themes" style=background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4 tabindex=0><code><span class=line><span style=color:#4C4F69;--shiki-dark:#CDD6F4>console</span><span style=color:#179299;--shiki-dark:#94E2D5>.</span><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic>log</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>(tls</span><span style=color:#179299;--shiki-dark:#94E2D5>.</span><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic>getCiphers</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>())</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span><span style=color:#7C7F93;--shiki-light-font-style:italic;--shiki-dark:#9399B2;--shiki-dark-font-style:italic> // ['aes128-gcm-sha256', 'aes128-sha', ...]</span></span>
 <span class=line></span></code><div class=code-toolbar><span class=code-language>js</span><button class=copy-button>copy</button></div></pre></section>
+<section><h3><code>tls.getCertificateCompressionAlgorithms()</code><span><a id=tls_tls_getcertificatecompressionalgorithms></a></span><span><a class=mark id=tlsgetcertificatecompressionalgorithms href=#tlsgetcertificatecompressionalgorithms>#</a></span></h3><div class=api_metadata><span>Added in: v26.4.0</span></div><ul>
+<li>Returns: <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a>[]</li>
+</ul><p>Returns an array with the names of the RFC 8879 certificate compression
+algorithms supported by the current OpenSSL build, suitable for use in the
+<code>certificateCompression</code> option of <a href=#tlscreatesecurecontextoptions><code>tls.createSecureContext()</code></a>. Possible
+values include <code>'zlib'</code>, <code>'brotli'</code>, and <code>'zstd'</code>.<p>The array is empty when certificate compression is unavailable.<pre class="catppuccin-latte catppuccin-mocha language-js shiki shiki-themes" style=background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4 tabindex=0><code><span class=line><span style=color:#4C4F69;--shiki-dark:#CDD6F4>console</span><span style=color:#179299;--shiki-dark:#94E2D5>.</span><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic>log</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>(tls</span><span style=color:#179299;--shiki-dark:#94E2D5>.</span><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic>getCertificateCompressionAlgorithms</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>())</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span><span style=color:#7C7F93;--shiki-light-font-style:italic;--shiki-dark:#9399B2;--shiki-dark-font-style:italic> // ['zlib', 'brotli', 'zstd']</span></span>
+<span class=line></span></code><div class=code-toolbar><span class=code-language>js</span><button class=copy-button>copy</button></div></pre></section>
 <section><h3><code>tls.rootCertificates</code><span><a id=tls_tls_rootcertificates></a></span><span><a class=mark id=tlsrootcertificates href=#tlsrootcertificates>#</a></span></h3><div class=api_metadata><span>Added in: v12.3.0</span></div><ul>
-<li>Type: <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string[]></code></a></li>
+<li>Type: <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a>[]</li>
 </ul><p>An immutable array of strings representing the root certificates (in PEM format)
 from the bundled Mozilla CA store as supplied by the current Node.js version.<p>The bundled CA store, as supplied by Node.js, is a snapshot of Mozilla CA store
 that is fixed at release time. It is identical on all supported platforms.<p>To get the actual CA certificates used by the current Node.js instance, which

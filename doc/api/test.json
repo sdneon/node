@@ -245,7 +245,7 @@
               "textRaw": "Dates",
               "name": "dates",
               "type": "module",
-              "desc": "<p>The mock timers API also allows the mocking of the <code>Date</code> object. This is a\nuseful feature for testing time-dependent functionality, or to simulate\ninternal calendar functions such as <code>Date.now()</code>.</p>\n<p>The dates implementation is also part of the <a href=\"#class-mocktimers\"><code>MockTimers</code></a> class. Refer to it\nfor a full list of methods and features.</p>\n<p><strong>Note:</strong> Dates and timers are dependent when mocked together. This means that\nif you have both the <code>Date</code> and <code>setTimeout</code> mocked, advancing the time will\nalso advance the mocked date as they simulate a single internal clock.</p>\n<p>The example below show how to mock the <code>Date</code> object and obtain the current\n<code>Date.now()</code> value.</p>\n<pre><code class=\"language-mjs\">import assert from 'node:assert';\nimport { test } from 'node:test';\n\ntest('mocks the Date object', (context) => {\n  // Optionally choose what to mock\n  context.mock.timers.enable({ apis: ['Date'] });\n  // If not specified, the initial date will be based on 0 in the UNIX epoch\n  assert.strictEqual(Date.now(), 0);\n\n  // Advance in time will also advance the date\n  context.mock.timers.tick(9999);\n  assert.strictEqual(Date.now(), 9999);\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const assert = require('node:assert');\nconst { test } = require('node:test');\n\ntest('mocks the Date object', (context) => {\n  // Optionally choose what to mock\n  context.mock.timers.enable({ apis: ['Date'] });\n  // If not specified, the initial date will be based on 0 in the UNIX epoch\n  assert.strictEqual(Date.now(), 0);\n\n  // Advance in time will also advance the date\n  context.mock.timers.tick(9999);\n  assert.strictEqual(Date.now(), 9999);\n});\n</code></pre>\n<p>If there is no initial epoch set, the initial date will be based on 0 in the\nUnix epoch. This is January 1st, 1970, 00:00:00 UTC. You can set an initial date\nby passing a <code>now</code> property to the <code>.enable()</code> method. This value will be used\nas the initial date for the mocked <code>Date</code> object. It can either be a positive\ninteger, or another Date object.</p>\n<pre><code class=\"language-mjs\">import assert from 'node:assert';\nimport { test } from 'node:test';\n\ntest('mocks the Date object with initial time', (context) => {\n  // Optionally choose what to mock\n  context.mock.timers.enable({ apis: ['Date'], now: 100 });\n  assert.strictEqual(Date.now(), 100);\n\n  // Advance in time will also advance the date\n  context.mock.timers.tick(200);\n  assert.strictEqual(Date.now(), 300);\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const assert = require('node:assert');\nconst { test } = require('node:test');\n\ntest('mocks the Date object with initial time', (context) => {\n  // Optionally choose what to mock\n  context.mock.timers.enable({ apis: ['Date'], now: 100 });\n  assert.strictEqual(Date.now(), 100);\n\n  // Advance in time will also advance the date\n  context.mock.timers.tick(200);\n  assert.strictEqual(Date.now(), 300);\n});\n</code></pre>\n<p>You can use the <code>.setTime()</code> method to manually move the mocked date to another\ntime. This method only accepts a positive integer.</p>\n<p><strong>Note:</strong> This method will <strong>not</strong> execute any mocked timers that are in the past\nfrom the new time.</p>\n<p>In the below example we are setting a new time for the mocked date.</p>\n<pre><code class=\"language-mjs\">import assert from 'node:assert';\nimport { test } from 'node:test';\n\ntest('sets the time of a date object', (context) => {\n  // Optionally choose what to mock\n  context.mock.timers.enable({ apis: ['Date'], now: 100 });\n  assert.strictEqual(Date.now(), 100);\n\n  // Advance in time will also advance the date\n  context.mock.timers.setTime(1000);\n  context.mock.timers.tick(200);\n  assert.strictEqual(Date.now(), 1200);\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const assert = require('node:assert');\nconst { test } = require('node:test');\n\ntest('sets the time of a date object', (context) => {\n  // Optionally choose what to mock\n  context.mock.timers.enable({ apis: ['Date'], now: 100 });\n  assert.strictEqual(Date.now(), 100);\n\n  // Advance in time will also advance the date\n  context.mock.timers.setTime(1000);\n  context.mock.timers.tick(200);\n  assert.strictEqual(Date.now(), 1200);\n});\n</code></pre>\n<p>Timers scheduled in the past will <strong>not</strong> run when you call <code>setTime()</code>. To execute those timers, you can use\nthe <code>.tick()</code> method to move forward from the new time.</p>\n<pre><code class=\"language-mjs\">import assert from 'node:assert';\nimport { test } from 'node:test';\n\ntest('setTime does not execute timers', (context) => {\n  // Optionally choose what to mock\n  context.mock.timers.enable({ apis: ['setTimeout', 'Date'] });\n  const fn = context.mock.fn();\n  setTimeout(fn, 1000);\n\n  context.mock.timers.setTime(800);\n  // Timer is not executed as the time is not yet reached\n  assert.strictEqual(fn.mock.callCount(), 0);\n  assert.strictEqual(Date.now(), 800);\n\n  context.mock.timers.setTime(1200);\n  // Timer is still not executed\n  assert.strictEqual(fn.mock.callCount(), 0);\n  // Advance in time to execute the timer\n  context.mock.timers.tick(0);\n  assert.strictEqual(fn.mock.callCount(), 1);\n  assert.strictEqual(Date.now(), 1200);\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const assert = require('node:assert');\nconst { test } = require('node:test');\n\ntest('runs timers as setTime passes ticks', (context) => {\n  // Optionally choose what to mock\n  context.mock.timers.enable({ apis: ['setTimeout', 'Date'] });\n  const fn = context.mock.fn();\n  setTimeout(fn, 1000);\n\n  context.mock.timers.setTime(800);\n  // Timer is not executed as the time is not yet reached\n  assert.strictEqual(fn.mock.callCount(), 0);\n  assert.strictEqual(Date.now(), 800);\n\n  context.mock.timers.setTime(1200);\n  // Timer is executed as the time is now reached\n  assert.strictEqual(fn.mock.callCount(), 1);\n  assert.strictEqual(Date.now(), 1200);\n});\n</code></pre>\n<p>Using <code>.runAll()</code> will execute all timers that are currently in the queue. This\nwill also advance the mocked date to the time of the last timer that was\nexecuted as if the time has passed.</p>\n<pre><code class=\"language-mjs\">import assert from 'node:assert';\nimport { test } from 'node:test';\n\ntest('runs timers as setTime passes ticks', (context) => {\n  // Optionally choose what to mock\n  context.mock.timers.enable({ apis: ['setTimeout', 'Date'] });\n  const fn = context.mock.fn();\n  setTimeout(fn, 1000);\n  setTimeout(fn, 2000);\n  setTimeout(fn, 3000);\n\n  context.mock.timers.runAll();\n  // All timers are executed as the time is now reached\n  assert.strictEqual(fn.mock.callCount(), 3);\n  assert.strictEqual(Date.now(), 3000);\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const assert = require('node:assert');\nconst { test } = require('node:test');\n\ntest('runs timers as setTime passes ticks', (context) => {\n  // Optionally choose what to mock\n  context.mock.timers.enable({ apis: ['setTimeout', 'Date'] });\n  const fn = context.mock.fn();\n  setTimeout(fn, 1000);\n  setTimeout(fn, 2000);\n  setTimeout(fn, 3000);\n\n  context.mock.timers.runAll();\n  // All timers are executed as the time is now reached\n  assert.strictEqual(fn.mock.callCount(), 3);\n  assert.strictEqual(Date.now(), 3000);\n});\n</code></pre>",
+              "desc": "<p>The mock timers API also allows the mocking of the <code>Date</code> object. This is a\nuseful feature for testing time-dependent functionality, or to simulate\ninternal calendar functions such as <code>Date.now()</code>.</p>\n<p>The dates implementation is also part of the <a href=\"#class-mocktimers\"><code>MockTimers</code></a> class. Refer to it\nfor a full list of methods and features.</p>\n<p><strong>Note:</strong> Dates and timers are dependent when mocked together. This means that\nif you have both the <code>Date</code> and <code>setTimeout</code> mocked, advancing the time will\nalso advance the mocked date as they simulate a single internal clock.</p>\n<p>The example below show how to mock the <code>Date</code> object and obtain the current\n<code>Date.now()</code> value.</p>\n<pre><code class=\"language-mjs\">import assert from 'node:assert';\nimport { test } from 'node:test';\n\ntest('mocks the Date object', (context) => {\n  // Optionally choose what to mock\n  context.mock.timers.enable({ apis: ['Date'] });\n  // If not specified, the initial date will be based on 0 in the UNIX epoch\n  assert.strictEqual(Date.now(), 0);\n\n  // Advance in time will also advance the date\n  context.mock.timers.tick(9999);\n  assert.strictEqual(Date.now(), 9999);\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const assert = require('node:assert');\nconst { test } = require('node:test');\n\ntest('mocks the Date object', (context) => {\n  // Optionally choose what to mock\n  context.mock.timers.enable({ apis: ['Date'] });\n  // If not specified, the initial date will be based on 0 in the UNIX epoch\n  assert.strictEqual(Date.now(), 0);\n\n  // Advance in time will also advance the date\n  context.mock.timers.tick(9999);\n  assert.strictEqual(Date.now(), 9999);\n});\n</code></pre>\n<p>If there is no initial epoch set, the initial date will be based on 0 in the\nUnix epoch. This is January 1st, 1970, 00:00:00 UTC. You can set an initial date\nby passing a <code>now</code> property to the <code>.enable()</code> method. This value will be used\nas the initial date for the mocked <code>Date</code> object. It can either be a positive\ninteger, or another Date object.</p>\n<pre><code class=\"language-mjs\">import assert from 'node:assert';\nimport { test } from 'node:test';\n\ntest('mocks the Date object with initial time', (context) => {\n  // Optionally choose what to mock\n  context.mock.timers.enable({ apis: ['Date'], now: 100 });\n  assert.strictEqual(Date.now(), 100);\n\n  // Advance in time will also advance the date\n  context.mock.timers.tick(200);\n  assert.strictEqual(Date.now(), 300);\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const assert = require('node:assert');\nconst { test } = require('node:test');\n\ntest('mocks the Date object with initial time', (context) => {\n  // Optionally choose what to mock\n  context.mock.timers.enable({ apis: ['Date'], now: 100 });\n  assert.strictEqual(Date.now(), 100);\n\n  // Advance in time will also advance the date\n  context.mock.timers.tick(200);\n  assert.strictEqual(Date.now(), 300);\n});\n</code></pre>\n<p>You can use the <code>.setTime()</code> method to manually move the mocked date to another\ntime. This method only accepts a positive integer.</p>\n<p><strong>Note:</strong> This method will <strong>not</strong> execute any mocked timers that are in the past\nfrom the new time.</p>\n<p>In the below example we are setting a new time for the mocked date.</p>\n<pre><code class=\"language-mjs\">import assert from 'node:assert';\nimport { test } from 'node:test';\n\ntest('sets the time of a date object', (context) => {\n  // Optionally choose what to mock\n  context.mock.timers.enable({ apis: ['Date'], now: 100 });\n  assert.strictEqual(Date.now(), 100);\n\n  // Advance in time will also advance the date\n  context.mock.timers.setTime(1000);\n  context.mock.timers.tick(200);\n  assert.strictEqual(Date.now(), 1200);\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const assert = require('node:assert');\nconst { test } = require('node:test');\n\ntest('sets the time of a date object', (context) => {\n  // Optionally choose what to mock\n  context.mock.timers.enable({ apis: ['Date'], now: 100 });\n  assert.strictEqual(Date.now(), 100);\n\n  // Advance in time will also advance the date\n  context.mock.timers.setTime(1000);\n  context.mock.timers.tick(200);\n  assert.strictEqual(Date.now(), 1200);\n});\n</code></pre>\n<p>Timers scheduled in the past will <strong>not</strong> run when you call <code>setTime()</code>. To execute those timers, you can use\nthe <code>.tick()</code> method to move forward from the new time.</p>\n<pre><code class=\"language-mjs\">import assert from 'node:assert';\nimport { test } from 'node:test';\n\ntest('setTime does not execute timers', (context) => {\n  // Optionally choose what to mock\n  context.mock.timers.enable({ apis: ['setTimeout', 'Date'] });\n  const fn = context.mock.fn();\n  setTimeout(fn, 1000);\n\n  context.mock.timers.setTime(800);\n  // Timer is not executed as the time is not yet reached\n  assert.strictEqual(fn.mock.callCount(), 0);\n  assert.strictEqual(Date.now(), 800);\n\n  context.mock.timers.setTime(1200);\n  // Timer is still not executed\n  assert.strictEqual(fn.mock.callCount(), 0);\n  // Advance in time to execute the timer\n  context.mock.timers.tick(0);\n  assert.strictEqual(fn.mock.callCount(), 1);\n  assert.strictEqual(Date.now(), 1200);\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const assert = require('node:assert');\nconst { test } = require('node:test');\n\ntest('setTime does not execute timers', (context) => {\n  // Optionally choose what to mock\n  context.mock.timers.enable({ apis: ['setTimeout', 'Date'] });\n  const fn = context.mock.fn();\n  setTimeout(fn, 1000);\n\n  context.mock.timers.setTime(800);\n  // Timer is not executed as the time is not yet reached\n  assert.strictEqual(fn.mock.callCount(), 0);\n  assert.strictEqual(Date.now(), 800);\n\n  context.mock.timers.setTime(1200);\n  // Timer is still not executed\n  assert.strictEqual(fn.mock.callCount(), 0);\n  // Advance in time to execute the timer\n  context.mock.timers.tick(0);\n  assert.strictEqual(fn.mock.callCount(), 1);\n  assert.strictEqual(Date.now(), 1200);\n});\n</code></pre>\n<p>Using <code>.runAll()</code> will execute all timers that are currently in the queue. This\nwill also advance the mocked date to the time of the last timer that was\nexecuted as if the time has passed.</p>\n<pre><code class=\"language-mjs\">import assert from 'node:assert';\nimport { test } from 'node:test';\n\ntest('runs timers as setTime passes ticks', (context) => {\n  // Optionally choose what to mock\n  context.mock.timers.enable({ apis: ['setTimeout', 'Date'] });\n  const fn = context.mock.fn();\n  setTimeout(fn, 1000);\n  setTimeout(fn, 2000);\n  setTimeout(fn, 3000);\n\n  context.mock.timers.runAll();\n  // All timers are executed as the time is now reached\n  assert.strictEqual(fn.mock.callCount(), 3);\n  assert.strictEqual(Date.now(), 3000);\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const assert = require('node:assert');\nconst { test } = require('node:test');\n\ntest('runs timers as setTime passes ticks', (context) => {\n  // Optionally choose what to mock\n  context.mock.timers.enable({ apis: ['setTimeout', 'Date'] });\n  const fn = context.mock.fn();\n  setTimeout(fn, 1000);\n  setTimeout(fn, 2000);\n  setTimeout(fn, 3000);\n\n  context.mock.timers.runAll();\n  // All timers are executed as the time is now reached\n  assert.strictEqual(fn.mock.callCount(), 3);\n  assert.strictEqual(Date.now(), 3000);\n});\n</code></pre>",
               "displayName": "Dates"
             }
           ],
@@ -647,11 +647,11 @@
                       "desc": "A String, RegExp or a RegExp Array, that can be used to exclude running tests whose name matches the provided pattern. Test name patterns are interpreted as JavaScript regular expressions. For each test that is executed, any corresponding test hooks, such as `beforeEach()`, are also run."
                     },
                     {
-                      "textRaw": "`testTagFilters` {string|string[]} A tag name, or an array of tag names, used to filter tests by their declared tags. Tests must contain every listed tag to run. Equivalent to passing `--experimental-test-tag-filter` on the command line. See Test tags. **Default:** `undefined`.",
+                      "textRaw": "`testTagFilters` {string|string}[] A tag name, or an array of tag names, used to filter tests by their declared tags. Tests must contain every listed tag to run. Equivalent to passing `--experimental-test-tag-filter` on the command line. See Test tags. **Default:** `undefined`.",
                       "name": "testTagFilters",
-                      "type": "string|string[]",
+                      "type": "string|string",
                       "default": "`undefined`",
-                      "desc": "A tag name, or an array of tag names, used to filter tests by their declared tags. Tests must contain every listed tag to run. Equivalent to passing `--experimental-test-tag-filter` on the command line. See Test tags."
+                      "desc": "[] A tag name, or an array of tag names, used to filter tests by their declared tags. Tests must contain every listed tag to run. Equivalent to passing `--experimental-test-tag-filter` on the command line. See Test tags."
                     },
                     {
                       "textRaw": "`timeout` {number} A number of milliseconds the test execution will fail after. If unspecified, subtests inherit this value from their parent. **Default:** `Infinity`.",
@@ -1005,11 +1005,11 @@
                       "desc": "If truthy, the test is skipped. If a string is provided, that string is displayed in the test results as the reason for skipping the test."
                     },
                     {
-                      "textRaw": "`tags` {string[]} An array of string labels associated with the test. Used together with `--experimental-test-tag-filter` to filter which tests run. Tags inherit from suites to nested tests by union. See Test tags. **Default:** `[]`.",
+                      "textRaw": "`tags` {string}[] An array of string labels associated with the test. Used together with `--experimental-test-tag-filter` to filter which tests run. Tags inherit from suites to nested tests by union. See Test tags. **Default:** `[]`.",
                       "name": "tags",
-                      "type": "string[]",
+                      "type": "string",
                       "default": "`[]`",
-                      "desc": "An array of string labels associated with the test. Used together with `--experimental-test-tag-filter` to filter which tests run. Tags inherit from suites to nested tests by union. See Test tags."
+                      "desc": "[] An array of string labels associated with the test. Used together with `--experimental-test-tag-filter` to filter which tests run. Tags inherit from suites to nested tests by union. See Test tags."
                     },
                     {
                       "textRaw": "`todo` {boolean|string} If truthy, the test marked as `TODO`. If a string is provided, that string is displayed in the test results as the reason why the test is `TODO`. **Default:** `false`.",
@@ -1558,9 +1558,9 @@
             {
               "params": [],
               "return": {
-                "textRaw": "Returns: {undefined}",
+                "textRaw": "Returns: {TestContext|SuiteContext|undefined}",
                 "name": "return",
-                "type": "undefined"
+                "type": "TestContext|SuiteContext|undefined"
               }
             }
           ],
@@ -2118,7 +2118,7 @@
                   }
                 }
               ],
-              "desc": "<p>This function is used to mock the exports of ECMAScript modules, CommonJS modules, JSON modules, and\nNode.js builtin modules. Any references to the original module prior to mocking are not impacted. In\norder to enable module mocking, Node.js must be started with the\n<a href=\"cli.html#--experimental-test-module-mocks\"><code>--experimental-test-module-mocks</code></a> command-line flag.</p>\n<p><strong>Note</strong>: <a href=\"module.html#customization-hooks\">module customization hooks</a> registered via the <strong>synchronous</strong> API effect resolution of\nthe <code>specifier</code> provided to <code>mock.module</code>. Customization hooks registered via the <strong>asynchronous</strong>\nAPI are currently ignored (because the test runner's loader is synchronous, and node does not\nsupport multi-chain / cross-chain loading).</p>\n<p>The following example demonstrates how a mock is created for a module.</p>\n<pre><code class=\"language-js\">test('mocks a builtin module in both module systems', async (t) => {\n  // Create a mock of 'node:readline' with a named export named 'foo', which\n  // does not exist in the original 'node:readline' module.\n  const mock = t.mock.module('node:readline', {\n    exports: { foo: () => 42 },\n  });\n\n  let esmImpl = await import('node:readline');\n  let cjsImpl = require('node:readline');\n\n  // cursorTo() is an export of the original 'node:readline' module.\n  assert.strictEqual(esmImpl.cursorTo, undefined);\n  assert.strictEqual(cjsImpl.cursorTo, undefined);\n  assert.strictEqual(esmImpl.fn(), 42);\n  assert.strictEqual(cjsImpl.fn(), 42);\n\n  mock.restore();\n\n  // The mock is restored, so the original builtin module is returned.\n  esmImpl = await import('node:readline');\n  cjsImpl = require('node:readline');\n\n  assert.strictEqual(typeof esmImpl.cursorTo, 'function');\n  assert.strictEqual(typeof cjsImpl.cursorTo, 'function');\n  assert.strictEqual(esmImpl.fn, undefined);\n  assert.strictEqual(cjsImpl.fn, undefined);\n});\n</code></pre>"
+              "desc": "<p>This function is used to mock the exports of ECMAScript modules, CommonJS modules, JSON modules, and\nNode.js builtin modules. Any references to the original module prior to mocking are not impacted. In\norder to enable module mocking, Node.js must be started with the\n<a href=\"cli.html#--experimental-test-module-mocks\"><code>--experimental-test-module-mocks</code></a> command-line flag.</p>\n<p><strong>Note</strong>: <a href=\"module.html#customization-hooks\">module customization hooks</a> registered via the <strong>synchronous</strong> API effect resolution of\nthe <code>specifier</code> provided to <code>mock.module</code>. Customization hooks registered via the <strong>asynchronous</strong>\nAPI are currently ignored (because the test runner's loader is synchronous, and node does not\nsupport multi-chain / cross-chain loading).</p>\n<p>The following example demonstrates how a mock is created for a module.</p>\n<pre><code class=\"language-js\">test('mocks a builtin module in both module systems', async (t) => {\n  // Create a mock of 'node:readline' with a named export named 'foo', which\n  // does not exist in the original 'node:readline' module.\n  const mock = t.mock.module('node:readline', {\n    exports: { foo: () => 42 },\n  });\n\n  let esmImpl = await import('node:readline');\n  let cjsImpl = require('node:readline');\n\n  // cursorTo() is an export of the original 'node:readline' module.\n  assert.strictEqual(esmImpl.cursorTo, undefined);\n  assert.strictEqual(cjsImpl.cursorTo, undefined);\n  assert.strictEqual(esmImpl.foo(), 42);\n  assert.strictEqual(cjsImpl.foo(), 42);\n\n  mock.restore();\n\n  // The mock is restored, so the original builtin module is returned.\n  esmImpl = await import('node:readline');\n  cjsImpl = require('node:readline');\n\n  assert.strictEqual(typeof esmImpl.cursorTo, 'function');\n  assert.strictEqual(typeof cjsImpl.cursorTo, 'function');\n  assert.strictEqual(esmImpl.foo, undefined);\n  assert.strictEqual(cjsImpl.foo, undefined);\n});\n</code></pre>"
             },
             {
               "textRaw": "`mock.property(object, propertyName[, value])`",
@@ -2801,10 +2801,10 @@
                       "desc": "The `testId` of the enclosing test, or `undefined` for top-level tests. Lets custom reporters track lineage when concurrent siblings at the same nesting level interleave."
                     },
                     {
-                      "textRaw": "`tags` {string[]} The flattened lowercased tags declared on the test and its ancestor suites, in declaration order. Empty for untagged tests. See Test tags.",
+                      "textRaw": "`tags` {string}[] The flattened lowercased tags declared on the test and its ancestor suites, in declaration order. Empty for untagged tests. See Test tags.",
                       "name": "tags",
-                      "type": "string[]",
-                      "desc": "The flattened lowercased tags declared on the test and its ancestor suites, in declaration order. Empty for untagged tests. See Test tags."
+                      "type": "string",
+                      "desc": "[] The flattened lowercased tags declared on the test and its ancestor suites, in declaration order. Empty for untagged tests. See Test tags."
                     },
                     {
                       "textRaw": "`testId` {number} A numeric identifier for this test instance, unique within the test file's process. Consistent across all events for the same test instance, enabling reliable correlation in custom reporters.",
@@ -2882,10 +2882,10 @@
                       "desc": "The `testId` of the enclosing test, or `undefined` for top-level tests. Lets custom reporters track lineage when concurrent siblings at the same nesting level interleave."
                     },
                     {
-                      "textRaw": "`tags` {string[]} The flattened lowercased tags declared on the test and its ancestor suites, in declaration order. Empty for untagged tests. See Test tags.",
+                      "textRaw": "`tags` {string}[] The flattened lowercased tags declared on the test and its ancestor suites, in declaration order. Empty for untagged tests. See Test tags.",
                       "name": "tags",
-                      "type": "string[]",
-                      "desc": "The flattened lowercased tags declared on the test and its ancestor suites, in declaration order. Empty for untagged tests. See Test tags."
+                      "type": "string",
+                      "desc": "[] The flattened lowercased tags declared on the test and its ancestor suites, in declaration order. Empty for untagged tests. See Test tags."
                     },
                     {
                       "textRaw": "`testId` {number} A numeric identifier for this test instance, unique within the test file's process. Consistent across all events for the same test instance, enabling reliable correlation in custom reporters.",
@@ -3016,10 +3016,10 @@
                       "desc": "The `testId` of the enclosing test, or `undefined` for top-level tests. Lets custom reporters track lineage when concurrent siblings at the same nesting level interleave."
                     },
                     {
-                      "textRaw": "`tags` {string[]} The flattened lowercased tags declared on the test and its ancestor suites, in declaration order. Empty for untagged tests. See Test tags.",
+                      "textRaw": "`tags` {string}[] The flattened lowercased tags declared on the test and its ancestor suites, in declaration order. Empty for untagged tests. See Test tags.",
                       "name": "tags",
-                      "type": "string[]",
-                      "desc": "The flattened lowercased tags declared on the test and its ancestor suites, in declaration order. Empty for untagged tests. See Test tags."
+                      "type": "string",
+                      "desc": "[] The flattened lowercased tags declared on the test and its ancestor suites, in declaration order. Empty for untagged tests. See Test tags."
                     },
                     {
                       "textRaw": "`testId` {number} A numeric identifier for this test instance, unique within the test file's process. Consistent across all events for the same test instance, enabling reliable correlation in custom reporters.",
@@ -3125,10 +3125,10 @@
                       "desc": "The `testId` of the enclosing test, or `undefined` for top-level tests. Lets custom reporters track lineage when concurrent siblings at the same nesting level interleave."
                     },
                     {
-                      "textRaw": "`tags` {string[]} The flattened lowercased tags declared on the test and its ancestor suites, in declaration order. Empty for untagged tests. See Test tags.",
+                      "textRaw": "`tags` {string}[] The flattened lowercased tags declared on the test and its ancestor suites, in declaration order. Empty for untagged tests. See Test tags.",
                       "name": "tags",
-                      "type": "string[]",
-                      "desc": "The flattened lowercased tags declared on the test and its ancestor suites, in declaration order. Empty for untagged tests. See Test tags."
+                      "type": "string",
+                      "desc": "[] The flattened lowercased tags declared on the test and its ancestor suites, in declaration order. Empty for untagged tests. See Test tags."
                     },
                     {
                       "textRaw": "`testId` {number} A numeric identifier for this test instance, unique within the test file's process. Consistent across all events for the same test instance, enabling reliable correlation in custom reporters.",
@@ -3297,10 +3297,10 @@
                       "desc": "The `testId` of the enclosing test, or `undefined` for top-level tests. Lets custom reporters track lineage when concurrent siblings at the same nesting level interleave."
                     },
                     {
-                      "textRaw": "`tags` {string[]} The flattened lowercased tags declared on the test and its ancestor suites, in declaration order. Empty for untagged tests. See Test tags.",
+                      "textRaw": "`tags` {string}[] The flattened lowercased tags declared on the test and its ancestor suites, in declaration order. Empty for untagged tests. See Test tags.",
                       "name": "tags",
-                      "type": "string[]",
-                      "desc": "The flattened lowercased tags declared on the test and its ancestor suites, in declaration order. Empty for untagged tests. See Test tags."
+                      "type": "string",
+                      "desc": "[] The flattened lowercased tags declared on the test and its ancestor suites, in declaration order. Empty for untagged tests. See Test tags."
                     },
                     {
                       "textRaw": "`testId` {number} A numeric identifier for this test instance, unique within the test file's process. Consistent across all events for the same test instance, enabling reliable correlation in custom reporters.",
@@ -3423,10 +3423,10 @@
                       "desc": "The `testId` of the enclosing test, or `undefined` for top-level tests. Lets custom reporters track lineage when concurrent siblings at the same nesting level interleave."
                     },
                     {
-                      "textRaw": "`tags` {string[]} The flattened lowercased tags declared on the test and its ancestor suites, in declaration order. Empty for untagged tests. See Test tags.",
+                      "textRaw": "`tags` {string}[] The flattened lowercased tags declared on the test and its ancestor suites, in declaration order. Empty for untagged tests. See Test tags.",
                       "name": "tags",
-                      "type": "string[]",
-                      "desc": "The flattened lowercased tags declared on the test and its ancestor suites, in declaration order. Empty for untagged tests. See Test tags."
+                      "type": "string",
+                      "desc": "[] The flattened lowercased tags declared on the test and its ancestor suites, in declaration order. Empty for untagged tests. See Test tags."
                     },
                     {
                       "textRaw": "`testId` {number} A numeric identifier for this test instance, unique within the test file's process. Consistent across all events for the same test instance, enabling reliable correlation in custom reporters.",
@@ -4054,11 +4054,11 @@
                           "desc": "If truthy, the test is skipped. If a string is provided, that string is displayed in the test results as the reason for skipping the test."
                         },
                         {
-                          "textRaw": "`tags` {string[]} An array of string labels associated with the subtest. Used together with `--experimental-test-tag-filter` to filter which tests run. Tags inherit from the parent test or suite by union. See Test tags. **Default:** `[]`.",
+                          "textRaw": "`tags` {string}[] An array of string labels associated with the subtest. Used together with `--experimental-test-tag-filter` to filter which tests run. Tags inherit from the parent test or suite by union. See Test tags. **Default:** `[]`.",
                           "name": "tags",
-                          "type": "string[]",
+                          "type": "string",
                           "default": "`[]`",
-                          "desc": "An array of string labels associated with the subtest. Used together with `--experimental-test-tag-filter` to filter which tests run. Tags inherit from the parent test or suite by union. See Test tags."
+                          "desc": "[] An array of string labels associated with the subtest. Used together with `--experimental-test-tag-filter` to filter which tests run. Tags inherit from the parent test or suite by union. See Test tags."
                         },
                         {
                           "textRaw": "`todo` {boolean|string} If truthy, the test marked as `TODO`. If a string is provided, that string is displayed in the test results as the reason why the test is `TODO`. **Default:** `false`.",
@@ -4340,9 +4340,9 @@
               "desc": "<p>The attempt number of the test. This value is zero-based, so the first attempt is <code>0</code>,\nthe second attempt is <code>1</code>, and so on. This property is useful in conjunction with the\n<code>--test-rerun-failures</code> option to determine which attempt the test is currently running.</p>"
             },
             {
-              "textRaw": "Type: {string[]}",
+              "textRaw": "Type: {string}[]",
               "name": "tags",
-              "type": "string[]",
+              "type": "string",
               "meta": {
                 "added": [
                   "v26.2.0"
@@ -4351,7 +4351,8 @@
               },
               "stability": 1,
               "stabilityText": "Early development",
-              "desc": "<p>A frozen array of the test's flattened lowercased tags, in declaration\norder, including any tags inherited from ancestor suites. Empty when the\ntest has no tags. See <a href=\"#test-tags\">Test tags</a>.</p>"
+              "desc": "<p>A frozen array of the test's flattened lowercased tags, in declaration\norder, including any tags inherited from ancestor suites. Empty when the\ntest has no tags. See <a href=\"#test-tags\">Test tags</a>.</p>",
+              "shortDesc": "[]"
             },
             {
               "textRaw": "Type: {number|undefined}",

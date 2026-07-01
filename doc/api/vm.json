@@ -495,7 +495,7 @@
                   }
                 }
               ],
-              "desc": "<p>Evaluate the module and its depenendencies. Corresponds to the <a href=\"https://tc39.es/ecma262/#sec-moduleevaluation\">Evaluate() concrete method</a> field of\n<a href=\"https://tc39.es/ecma262/#sec-cyclic-module-records\">Cyclic Module Record</a>s in the ECMAScript specification.</p>\n<p>If the module is a <code>vm.SourceTextModule</code>, <code>evaluate()</code> must be called after the module has been instantiated;\notherwise <code>evaluate()</code> will return a rejected promise.</p>\n<p>For a <code>vm.SourceTextModule</code>, the promise returned by <code>evaluate()</code> may be fulfilled either\nsynchronously or asynchronously:</p>\n<ol>\n<li>If the <code>vm.SourceTextModule</code> has no top-level <code>await</code> in itself or any of its dependencies, the promise will be\nfulfilled <em>synchronously</em> after the module and all its dependencies have been evaluated.\n<ol>\n<li>If the evaluation succeeds, the promise will be <em>synchronously</em> resolved to <code>undefined</code>.</li>\n<li>If the evaluation results in an exception, the promise will be <em>synchronously</em> rejected with the exception\nthat causes the evaluation to fail, which is the same as <code>module.error</code>.</li>\n</ol>\n</li>\n<li>If the <code>vm.SourceTextModule</code> has top-level <code>await</code> in itself or any of its dependencies, the promise will be\nfulfilled <em>asynchronously</em> after the module and all its dependencies have been evaluated.\n<ol>\n<li>If the evaluation succeeds, the promise will be <em>asynchronously</em> resolved to <code>undefined</code>.</li>\n<li>If the evaluation results in an exception, the promise will be <em>asynchronously</em> rejected with the exception\nthat causes the evaluation to fail.</li>\n</ol>\n</li>\n</ol>\n<p>If the module is a <code>vm.SyntheticModule</code>, <code>evaluate()</code> always returns a promise that fulfills synchronously, see\nthe specification of <a href=\"https://tc39.es/ecma262/#sec-smr-Evaluate\">Evaluate() of a Synthetic Module Record</a>:</p>\n<ol>\n<li>If the <code>evaluateCallback</code> passed to its constructor throws an exception synchronously, <code>evaluate()</code> returns\na promise that will be synchronously rejected with that exception.</li>\n<li>If the <code>evaluateCallback</code> does not throw an exception, <code>evaluate()</code> returns a promise that will be\nsynchronously resolved to <code>undefined</code>.</li>\n</ol>\n<p>The <code>evaluateCallback</code> of a <code>vm.SyntheticModule</code> is executed synchronously within the <code>evaluate()</code> call, and its\nreturn value is discarded. This means if <code>evaluateCallback</code> is an asynchronous function, the promise returned by\n<code>evaluate()</code> will not reflect its asynchronous behavior, and any rejections from an asynchronous\n<code>evaluateCallback</code> will be lost.</p>\n<p><code>evaluate()</code> could also be called again after the module has already been evaluated, in which case:</p>\n<ol>\n<li>If the initial evaluation ended in success (<code>module.status</code> is <code>'evaluated'</code>), it will do nothing\nand return a promise that resolves to <code>undefined</code>.</li>\n<li>If the initial evaluation resulted in an exception (<code>module.status</code> is <code>'errored'</code>), it will re-reject\nthe exception that the initial evaluation resulted in.</li>\n</ol>\n<p>This method cannot be called while the module is being evaluated (<code>module.status</code> is <code>'evaluating'</code>).</p>"
+              "desc": "<p>Evaluate the module and its dependencies. Corresponds to the <a href=\"https://tc39.es/ecma262/#sec-moduleevaluation\">Evaluate() concrete method</a> field of\n<a href=\"https://tc39.es/ecma262/#sec-cyclic-module-records\">Cyclic Module Record</a>s in the ECMAScript specification.</p>\n<p>If the module is a <code>vm.SourceTextModule</code>, <code>evaluate()</code> must be called after the module has been instantiated;\notherwise <code>evaluate()</code> will return a rejected promise.</p>\n<p>For a <code>vm.SourceTextModule</code>, the promise returned by <code>evaluate()</code> may be fulfilled either\nsynchronously or asynchronously:</p>\n<ol>\n<li>If the <code>vm.SourceTextModule</code> has no top-level <code>await</code> in itself or any of its dependencies, the promise will be\nfulfilled <em>synchronously</em> after the module and all its dependencies have been evaluated.\n<ol>\n<li>If the evaluation succeeds, the promise will be <em>synchronously</em> resolved to <code>undefined</code>.</li>\n<li>If the evaluation results in an exception, the promise will be <em>synchronously</em> rejected with the exception\nthat causes the evaluation to fail, which is the same as <code>module.error</code>.</li>\n</ol>\n</li>\n<li>If the <code>vm.SourceTextModule</code> has top-level <code>await</code> in itself or any of its dependencies, the promise will be\nfulfilled <em>asynchronously</em> after the module and all its dependencies have been evaluated.\n<ol>\n<li>If the evaluation succeeds, the promise will be <em>asynchronously</em> resolved to <code>undefined</code>.</li>\n<li>If the evaluation results in an exception, the promise will be <em>asynchronously</em> rejected with the exception\nthat causes the evaluation to fail.</li>\n</ol>\n</li>\n</ol>\n<p>If the module is a <code>vm.SyntheticModule</code>, <code>evaluate()</code> always returns a promise that fulfills synchronously, see\nthe specification of <a href=\"https://tc39.es/ecma262/#sec-smr-Evaluate\">Evaluate() of a Synthetic Module Record</a>:</p>\n<ol>\n<li>If the <code>evaluateCallback</code> passed to its constructor throws an exception synchronously, <code>evaluate()</code> returns\na promise that will be synchronously rejected with that exception.</li>\n<li>If the <code>evaluateCallback</code> does not throw an exception, <code>evaluate()</code> returns a promise that will be\nsynchronously resolved to <code>undefined</code>.</li>\n</ol>\n<p>The <code>evaluateCallback</code> of a <code>vm.SyntheticModule</code> is executed synchronously within the <code>evaluate()</code> call, and its\nreturn value is discarded. This means if <code>evaluateCallback</code> is an asynchronous function, the promise returned by\n<code>evaluate()</code> will not reflect its asynchronous behavior, and any rejections from an asynchronous\n<code>evaluateCallback</code> will be lost.</p>\n<p><code>evaluate()</code> could also be called again after the module has already been evaluated, in which case:</p>\n<ol>\n<li>If the initial evaluation ended in success (<code>module.status</code> is <code>'evaluated'</code>), it will do nothing\nand return a promise that resolves to <code>undefined</code>.</li>\n<li>If the initial evaluation resulted in an exception (<code>module.status</code> is <code>'errored'</code>), it will re-reject\nthe exception that the initial evaluation resulted in.</li>\n</ol>\n<p>This method cannot be called while the module is being evaluated (<code>module.status</code> is <code>'evaluating'</code>).</p>"
             },
             {
               "textRaw": "`module.link(linker)`",
@@ -783,10 +783,10 @@
                 {
                   "params": [
                     {
-                      "textRaw": "`modules` {vm.Module[]} Array of `vm.Module` objects that this module depends on. The order of the modules in the array is the order of `sourceTextModule.moduleRequests`.",
+                      "textRaw": "`modules` {vm.Module}[] Array of `vm.Module` objects that this module depends on. The order of the modules in the array is the order of `sourceTextModule.moduleRequests`.",
                       "name": "modules",
-                      "type": "vm.Module[]",
-                      "desc": "Array of `vm.Module` objects that this module depends on. The order of the modules in the array is the order of `sourceTextModule.moduleRequests`."
+                      "type": "vm.Module",
+                      "desc": "[] Array of `vm.Module` objects that this module depends on. The order of the modules in the array is the order of `sourceTextModule.moduleRequests`."
                     }
                   ],
                   "return": {
@@ -801,9 +801,9 @@
           ],
           "properties": [
             {
-              "textRaw": "Type: {string[]}",
+              "textRaw": "Type: {string}[]",
               "name": "dependencySpecifiers",
-              "type": "string[]",
+              "type": "string",
               "meta": {
                 "changes": [
                   {
@@ -818,12 +818,13 @@
               },
               "stability": 0,
               "stabilityText": "Deprecated: Use `sourceTextModule.moduleRequests` instead.",
-              "desc": "<p>The specifiers of all dependencies of this module. The returned array is frozen\nto disallow any changes to it.</p>\n<p>Corresponds to the <code>[[RequestedModules]]</code> field of <a href=\"https://tc39.es/ecma262/#sec-cyclic-module-records\">Cyclic Module Record</a>s in\nthe ECMAScript specification.</p>"
+              "desc": "<p>The specifiers of all dependencies of this module. The returned array is frozen\nto disallow any changes to it.</p>\n<p>Corresponds to the <code>[[RequestedModules]]</code> field of <a href=\"https://tc39.es/ecma262/#sec-cyclic-module-records\">Cyclic Module Record</a>s in\nthe ECMAScript specification.</p>",
+              "shortDesc": "[]"
             },
             {
-              "textRaw": "Type: {ModuleRequest[]} Dependencies of this module.",
+              "textRaw": "Type: {ModuleRequest}[] Dependencies of this module.",
               "name": "moduleRequests",
-              "type": "ModuleRequest[]",
+              "type": "ModuleRequest",
               "meta": {
                 "added": [
                   "v24.4.0",
@@ -832,7 +833,7 @@
                 "changes": []
               },
               "desc": "<p>The requested import dependencies of this module. The returned array is frozen\nto disallow any changes to it.</p>\n<p>For example, given a source text:</p>\n<pre><code class=\"language-mjs\">import foo from 'foo';\nimport fooAlias from 'foo';\nimport bar from './bar.js';\nimport withAttrs from '../with-attrs.ts' with { arbitraryAttr: 'attr-val' };\nimport source Module from 'wasm-mod.wasm';\n</code></pre>\n<p>The value of the <code>sourceTextModule.moduleRequests</code> will be:</p>\n<pre><code class=\"language-js\">[\n  {\n    specifier: 'foo',\n    attributes: {},\n    phase: 'evaluation',\n  },\n  {\n    specifier: 'foo',\n    attributes: {},\n    phase: 'evaluation',\n  },\n  {\n    specifier: './bar.js',\n    attributes: {},\n    phase: 'evaluation',\n  },\n  {\n    specifier: '../with-attrs.ts',\n    attributes: { arbitraryAttr: 'attr-val' },\n    phase: 'evaluation',\n  },\n  {\n    specifier: 'wasm-mod.wasm',\n    attributes: {},\n    phase: 'source',\n  },\n];\n</code></pre>",
-              "shortDesc": "Dependencies of this module."
+              "shortDesc": "[] Dependencies of this module."
             }
           ]
         },
@@ -864,10 +865,10 @@
               },
               "params": [
                 {
-                  "textRaw": "`exportNames` {string[]} Array of names that will be exported from the module.",
+                  "textRaw": "`exportNames` {string}[] Array of names that will be exported from the module.",
                   "name": "exportNames",
-                  "type": "string[]",
-                  "desc": "Array of names that will be exported from the module."
+                  "type": "string",
+                  "desc": "[] Array of names that will be exported from the module."
                 },
                 {
                   "textRaw": "`evaluateCallback` {Function} Called when the module is evaluated.",
@@ -1091,10 +1092,10 @@
                   "desc": "The body of the function to compile."
                 },
                 {
-                  "textRaw": "`params` {string[]} An array of strings containing all parameters for the function.",
+                  "textRaw": "`params` {string}[] An array of strings containing all parameters for the function.",
                   "name": "params",
-                  "type": "string[]",
-                  "desc": "An array of strings containing all parameters for the function.",
+                  "type": "string",
+                  "desc": "[] An array of strings containing all parameters for the function.",
                   "optional": true
                 },
                 {
@@ -1143,11 +1144,11 @@
                       "desc": "The contextified object in which the said function should be compiled in."
                     },
                     {
-                      "textRaw": "`contextExtensions` {Object[]} An array containing a collection of context extensions (objects wrapping the current scope) to be applied while compiling. **Default:** `[]`.",
+                      "textRaw": "`contextExtensions` {Object}[] An array containing a collection of context extensions (objects wrapping the current scope) to be applied while compiling. **Default:** `[]`.",
                       "name": "contextExtensions",
-                      "type": "Object[]",
+                      "type": "Object",
                       "default": "`[]`",
-                      "desc": "An array containing a collection of context extensions (objects wrapping the current scope) to be applied while compiling."
+                      "desc": "[] An array containing a collection of context extensions (objects wrapping the current scope) to be applied while compiling."
                     },
                     {
                       "textRaw": "`importModuleDynamically` {Function|vm.constants.USE_MAIN_CONTEXT_DEFAULT_LOADER} Used to specify the how the modules should be loaded during the evaluation of this function when `import()` is called. This option is part of the experimental modules API. We do not recommend using it in a production environment. For detailed information, see Support of dynamic `import()` in compilation APIs.",

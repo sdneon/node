@@ -69,7 +69,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>Dbghelp.lib;winmm.lib;Ws2_32.lib;gdi32.lib;crypt32.lib;$(OutDir)obj\global_intermediate\$(Platform)\release\node_crates.lib;ntdll.lib;AdvAPI32.lib;User32.lib;advapi32.lib;dbghelp.lib;ole32.lib;iphlpapi.lib;psapi.lib;shell32.lib;user32.lib;userenv.lib;uuid.lib;ws2_32.lib</AdditionalDependencies>
-      <AdditionalOptions>/WHOLEARCHIVE:$(OutDir)lib/libnode.lib /WHOLEARCHIVE:$(OutDir)lib/v8_base_without_compiler.lib -flto=thin /WHOLEARCHIVE:$(OutDir)lib/zlib.lib /WHOLEARCHIVE:$(OutDir)lib/libuv.lib /WHOLEARCHIVE:$(OutDir)lib/openssl.lib %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/WHOLEARCHIVE:$(OutDir)lib/node_base.lib /WHOLEARCHIVE:$(OutDir)lib/v8_base_without_compiler.lib -flto=thin /WHOLEARCHIVE:$(OutDir)lib/zlib.lib /WHOLEARCHIVE:$(OutDir)lib/libuv.lib /WHOLEARCHIVE:$(OutDir)lib/openssl.lib %(AdditionalOptions)</AdditionalOptions>
       <AllowIsolation>true</AllowIsolation>
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <DelayLoadDLLs>api-ms-win-core-synch-l1-2-0.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
@@ -124,7 +124,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>Dbghelp.lib;winmm.lib;Ws2_32.lib;gdi32.lib;crypt32.lib;$(OutDir)obj\global_intermediate\$(Platform)\release\node_crates.lib;ntdll.lib;AdvAPI32.lib;User32.lib;advapi32.lib;dbghelp.lib;ole32.lib;iphlpapi.lib;psapi.lib;shell32.lib;user32.lib;userenv.lib;uuid.lib;ws2_32.lib</AdditionalDependencies>
-      <AdditionalOptions>/WHOLEARCHIVE:$(OutDir)lib/libnode.lib /WHOLEARCHIVE:$(OutDir)lib/v8_base_without_compiler.lib -flto=thin /WHOLEARCHIVE:$(OutDir)lib/zlib.lib /WHOLEARCHIVE:$(OutDir)lib/libuv.lib /WHOLEARCHIVE:$(OutDir)lib/openssl.lib %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/WHOLEARCHIVE:$(OutDir)lib/node_base.lib /WHOLEARCHIVE:$(OutDir)lib/v8_base_without_compiler.lib -flto=thin /WHOLEARCHIVE:$(OutDir)lib/zlib.lib /WHOLEARCHIVE:$(OutDir)lib/libuv.lib /WHOLEARCHIVE:$(OutDir)lib/openssl.lib %(AdditionalOptions)</AdditionalOptions>
       <AllowIsolation>true</AllowIsolation>
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <DelayLoadDLLs>api-ms-win-core-synch-l1-2-0.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
@@ -165,20 +165,11 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <ObjectFileName>$(IntDir)\tools\msvs\pch\node_pch.obj</ObjectFileName>
     </ClCompile>
-    <ClCompile Include="$(OutDir)\obj\global_intermediate\node_snapshot.cc">
-      <ObjectFileName>$(IntDir)\obj\global_intermediate\node_snapshot.obj</ObjectFileName>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="src\res\node.rc"/>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="$(OutDir)\node_mksnapshot.exe">
-      <FileType>Document</FileType>
-      <Command>call call &quot;$(OutDir)node_mksnapshot.exe&quot; &quot;$(OutDir)obj/global_intermediate/node_snapshot.cc&quot;&#xD;&#xA;if %errorlevel% neq 0 exit /b %errorlevel%</Command>
-      <Message>node_mksnapshot</Message>
-      <Outputs>$(OutDir)\obj\global_intermediate\node_snapshot.cc</Outputs>
-    </CustomBuild>
     <CustomBuild Include="deps\openssl\nodejs-openssl.cnf">
       <FileType>Document</FileType>
       <Command>call call python &quot;tools/copyfile.py&quot; &quot;deps/openssl/nodejs-openssl.cnf&quot; &quot;$(OutDir)obj/deps/openssl/openssl.cnf&quot;&#xD;&#xA;if %errorlevel% neq 0 exit /b %errorlevel%</Command>
@@ -187,16 +178,12 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="deps\histogram\histogram.vcxproj">
-      <Project>{0C478E30-DD77-A796-921E-5AC9615C6893}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
     <ProjectReference Include="libnode.vcxproj">
       <Project>{5440ED0A-3FFA-EDD6-58D3-2EABD269AFC2}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="node_mksnapshot.vcxproj">
-      <Project>{D9D47E4A-8C8C-1BE6-03D7-F2E362B5B620}</Project>
+    <ProjectReference Include="deps\histogram\histogram.vcxproj">
+      <Project>{0C478E30-DD77-A796-921E-5AC9615C6893}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="tools\v8_gypfiles\v8_snapshot.vcxproj">
@@ -279,6 +266,10 @@
       <Project>{21D888B2-15AC-898B-EA33-9C73445681C1}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+    <ProjectReference Include="node_base.vcxproj">
+      <Project>{E84A3433-C063-AC44-4A83-E256B07B0BE4}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
     <ProjectReference Include="tools\v8_gypfiles\abseil.vcxproj">
       <Project>{299A4D73-7E18-B8BB-6FF2-7C960A1D82FA}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
@@ -301,6 +292,14 @@
     </ProjectReference>
     <ProjectReference Include="deps\ncrypto\ncrypto.vcxproj">
       <Project>{BC6DBAAA-4733-6453-3129-111265C81DC9}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="deps\zlib\zlib_data_chunk_simd.vcxproj">
+      <Project>{50F1E594-792E-F1B2-89DF-1B820143636C}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="deps\zlib\zlib_adler32_simd.vcxproj">
+      <Project>{75E802C5-BE72-298C-3E76-8417B297FF4C}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="deps\LIEF\liblief.vcxproj">
@@ -441,14 +440,6 @@
     </ProjectReference>
     <ProjectReference Include="tools\v8_gypfiles\torque_generated_initializers.vcxproj">
       <Project>{971EBCDA-FFEA-05B1-08AA-AE3CAB93BC4F}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="deps\zlib\zlib_data_chunk_simd.vcxproj">
-      <Project>{50F1E594-792E-F1B2-89DF-1B820143636C}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="deps\zlib\zlib_adler32_simd.vcxproj">
-      <Project>{75E802C5-BE72-298C-3E76-8417B297FF4C}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
   </ItemGroup>

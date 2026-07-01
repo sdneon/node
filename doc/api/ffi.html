@@ -1,4 +1,4 @@
-<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content="width=device-width"><link rel=icon href=https://nodejs.org/favicon.ico><meta name=nodejs.org:node-version content=v26.3.0><title>FFI | Node.js v26.3.0 Documentation</title><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback"><link rel=stylesheet href=assets/style.css><link rel=canonical href=https://nodejs.org/api/ffi.html><script async defer src=assets/api.js></script><script>("dark"===localStorage.getItem("theme")||null===localStorage.getItem("theme")&&window.matchMedia?.("(prefers-color-scheme: dark)").matches)&&document.documentElement.classList.add("dark-mode")</script><body class="alt apidoc" id=api-section-ffi><a href=#apicontent class=skip-to-content>Skip to content</a>
+<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content="width=device-width"><link rel=icon href=https://nodejs.org/favicon.ico><meta name=nodejs.org:node-version content=v26.4.0><title>FFI | Node.js v26.4.0 Documentation</title><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback"><link rel=stylesheet href=assets/style.css><link rel=canonical href=https://nodejs.org/api/ffi.html><script async defer src=assets/api.js></script><script>("dark"===localStorage.getItem("theme")||null===localStorage.getItem("theme")&&window.matchMedia?.("(prefers-color-scheme: dark)").matches)&&document.documentElement.classList.add("dark-mode")</script><body class="alt apidoc" id=api-section-ffi><a href=#apicontent class=skip-to-content>Skip to content</a>
     <div id=content class=clearfix>
       <div role=navigation id=column2 class=interior>
         <div id=intro class=interior>
@@ -66,6 +66,7 @@
 <li><a class=nav-url href=url.html>URL</a></li>
 <li><a class=nav-util href=util.html>Utilities</a></li>
 <li><a class=nav-v8 href=v8.html>V8</a></li>
+<li><a class=nav-vfs href=vfs.html>Virtual File System</a></li>
 <li><a class=nav-vm href=vm.html>VM</a></li>
 <li><a class=nav-wasi href=wasi.html>WASI</a></li>
 <li><a class=nav-webcrypto href=webcrypto.html>Web Crypto API</a></li>
@@ -83,7 +84,7 @@
       <div id=column1 data-id=ffi class=interior>
         <header class=header>
           <div class=header-container>
-            <h1>Node.js v26.3.0 documentation</h1>
+            <h1>Node.js v26.4.0 documentation</h1>
             <button class=theme-toggle-btn id=theme-toggle-btn title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
               <svg class="dark-icon icon" height=24 width=24>
                 <path fill=none d="M0 0h24v24H0z"/>
@@ -98,7 +99,7 @@
           </div>
           <div id=gtoc>
             <ul>
-              <li class=pinned-header>Node.js v26.3.0</li>
+              <li class=pinned-header>Node.js v26.4.0</li>
               <li class=picker-header><a href=#toc-picker aria-controls=toc-picker><span class=picker-arrow></span>Table of contents</a><div class=picker><div class=toc tabindex=-1><ul id=toc-picker>
 <li><span class=stability_1><a href=ffi.html#ffi>FFI</a></span>
 <ul>
@@ -201,6 +202,7 @@
 <li><a class=nav-url href=url.html>URL</a></li>
 <li><a class=nav-util href=util.html>Utilities</a></li>
 <li><a class=nav-v8 href=v8.html>V8</a></li>
+<li><a class=nav-vfs href=vfs.html>Virtual File System</a></li>
 <li><a class=nav-vm href=vm.html>VM</a></li>
 <li><a class=nav-wasi href=wasi.html>WASI</a></li>
 <li><a class=nav-webcrypto href=webcrypto.html>Web Crypto API</a></li>
@@ -342,12 +344,16 @@ invalidate that backing store while the native call is active, including
 through reentrant JavaScript such as FFI callbacks. Doing so may crash the
 process, produce incorrect output, or corrupt memory.<p>The <code>char</code> type follows the platform C ABI. On platforms where plain C <code>char</code>
 is signed it behaves like <code>i8</code>; otherwise it behaves like <code>u8</code>.<p>The <code>bool</code> type is marshaled as an 8-bit unsigned integer. Pass numeric values
-such as <code>0</code> and <code>1</code>; JavaScript <code>true</code> and <code>false</code> are not accepted.</section>
+such as <code>0</code> and <code>1</code>; JavaScript <code>true</code> and <code>false</code> are not accepted.<p>On optimized Fast FFI calls, <code>pointer</code>, <code>ptr</code>, and <code>function</code> parameters accept
+raw pointer <code>bigint</code> values. For pointer-like parameters, <code>null</code>, <code>undefined</code>,
+strings, <code>Buffer</code>, typed array, <code>DataView</code>, and <code>ArrayBuffer</code> values are
+converted on the JavaScript side before calling the optimized native wrapper.<p>Optimized Fast FFI calls support at most 8 function arguments. Functions with
+more than 7 arguments use the generic FFI call path instead.</section>
 <section><h3>Signature objects<span><a id=ffi_signature_objects></a></span><span><a class=mark id=signature-objects href=#signature-objects>#</a></span></h3><div class=api_metadata></div><p>Functions and callbacks are described with signature objects.<p>Signature objects may contain the following properties, both of which are
 optional:<ul>
 <li><code>return</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> A <a href=#type-names>type name</a> specifying the return type of the
 function or callback. <strong>Default:</strong> <code>'void'</code>.</li>
-<li><code>arguments</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string[]></code></a> An array of <a href=#type-names>type names</a> specifying the argument
+<li><code>arguments</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a>[] An array of <a href=#type-names>type names</a> specifying the argument
 type list of the function or callback. <strong>Default:</strong> <code>[]</code>.</li>
 </ul><pre class="catppuccin-latte catppuccin-mocha language-js shiki shiki-themes" style=background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4 tabindex=0><code><span class=line><span style=color:#8839EF;--shiki-dark:#CBA6F7>const</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> signature </span><span style=color:#179299;--shiki-dark:#94E2D5>=</span><span style=color:#7C7F93;--shiki-dark:#9399B2> {</span></span>
 <span class=line><span style=color:#4C4F69;--shiki-dark:#CDD6F4>  return</span><span style=color:#179299;--shiki-dark:#94E2D5>:</span><span style=color:#40A02B;--shiki-dark:#A6E3A1> 'i32'</span><span style=color:#7C7F93;--shiki-dark:#9399B2>,</span></span>
@@ -639,7 +645,7 @@ available storage. This function does not allocate memory on its own.</section>
 </ul><p>Copies bytes from an <code>ArrayBufferView</code> into native memory.<p><code>length</code> must be at least <code>arrayBufferView.byteLength</code>.<p><code>pointer</code> must refer to writable native memory with at least <code>length</code> bytes of
 available storage. This function does not allocate memory on its own.</section>
 <section><h3><code>ffi.getRawPointer(source)</code><span><a id=ffi_ffi_getrawpointer_source></a></span><span><a class=mark id=ffigetrawpointersource href=#ffigetrawpointersource>#</a></span></h3><div class=api_metadata><span>Added in: v26.1.0</span></div><ul>
-<li><code>source</code> <a href=buffer.html#class-buffer><code>&lt;Buffer></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer><code>&lt;ArrayBuffer></code></a></li>
+<li><code>source</code> <a href=buffer.html#class-buffer><code>&lt;Buffer></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer><code>&lt;ArrayBuffer></code></a> | <code>&lt;ArrayBufferView></code></li>
 <li>Returns: <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#bigint_type><code>&lt;bigint></code></a></li>
 </ul><p>Returns the raw memory address of JavaScript-managed byte storage.<p>This is unsafe and dangerous. The returned pointer can become invalid if the
 underlying memory is detached, resized, transferred, or otherwise invalidated.

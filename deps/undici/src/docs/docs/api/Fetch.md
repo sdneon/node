@@ -15,7 +15,7 @@ same implementation. Use the built-in global `FormData` with the built-in
 global `fetch()`, and use `undici`'s `FormData` with `undici.fetch()`.
 
 If you want the installed `undici` package to provide the globals, call
-[`install()`](/docs/api/GlobalInstallation.md) so `fetch`, `Headers`,
+[`install()`](/docs/docs/api/GlobalInstallation.md) so `fetch`, `Headers`,
 `Response`, `Request`, and `FormData` are installed together as a matching set.
 
 ## Response
@@ -26,7 +26,7 @@ This API is implemented as per the standard, you can find documentation on [MDN]
 
 This API is implemented as per the standard, you can find documentation on [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Request)
 
-## Header
+## Headers
 
 This API is implemented as per the standard, you can find documentation on [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Headers)
 
@@ -41,7 +41,9 @@ This API is implemented as per the standard, you can find documentation on [MDN]
 - [`.json()`](https://fetch.spec.whatwg.org/#dom-body-json)
 - [`.text()`](https://fetch.spec.whatwg.org/#dom-body-text)
 
-There is an ongoing discussion regarding `.formData()` and its usefulness and performance in server environments. It is recommended to use a dedicated library for parsing `multipart/form-data` bodies, such as [Busboy](https://www.npmjs.com/package/busboy) or [@fastify/busboy](https://www.npmjs.com/package/@fastify/busboy).
+There is an ongoing discussion regarding `body.formData()` and its usefulness, performance, and security in server environments. Calling `body.formData()` causes undici to buffer and parse the entire body. Because multipart parsing has inherent security risks, `body.formData()` must only be called on responses from trusted servers.
+
+For responses from untrusted or user-controlled servers, use a dedicated streaming library for parsing `multipart/form-data` bodies, such as [Busboy](https://www.npmjs.com/package/busboy) or [@fastify/busboy](https://www.npmjs.com/package/@fastify/busboy), and apply application-specific limits.
 
 These libraries can be interfaced with fetch with the following example code:
 

@@ -1,4 +1,4 @@
-<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content="width=device-width"><link rel=icon href=https://nodejs.org/favicon.ico><meta name=nodejs.org:node-version content=v26.3.0><title>Inspector | Node.js v26.3.0 Documentation</title><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback"><link rel=stylesheet href=assets/style.css><link rel=canonical href=https://nodejs.org/api/inspector.html><script async defer src=assets/api.js></script><script>("dark"===localStorage.getItem("theme")||null===localStorage.getItem("theme")&&window.matchMedia?.("(prefers-color-scheme: dark)").matches)&&document.documentElement.classList.add("dark-mode")</script><body class="alt apidoc" id=api-section-inspector><a href=#apicontent class=skip-to-content>Skip to content</a>
+<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content="width=device-width"><link rel=icon href=https://nodejs.org/favicon.ico><meta name=nodejs.org:node-version content=v26.4.0><title>Inspector | Node.js v26.4.0 Documentation</title><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback"><link rel=stylesheet href=assets/style.css><link rel=canonical href=https://nodejs.org/api/inspector.html><script async defer src=assets/api.js></script><script>("dark"===localStorage.getItem("theme")||null===localStorage.getItem("theme")&&window.matchMedia?.("(prefers-color-scheme: dark)").matches)&&document.documentElement.classList.add("dark-mode")</script><body class="alt apidoc" id=api-section-inspector><a href=#apicontent class=skip-to-content>Skip to content</a>
     <div id=content class=clearfix>
       <div role=navigation id=column2 class=interior>
         <div id=intro class=interior>
@@ -66,6 +66,7 @@
 <li><a class=nav-url href=url.html>URL</a></li>
 <li><a class=nav-util href=util.html>Utilities</a></li>
 <li><a class=nav-v8 href=v8.html>V8</a></li>
+<li><a class=nav-vfs href=vfs.html>Virtual File System</a></li>
 <li><a class=nav-vm href=vm.html>VM</a></li>
 <li><a class=nav-wasi href=wasi.html>WASI</a></li>
 <li><a class=nav-webcrypto href=webcrypto.html>Web Crypto API</a></li>
@@ -83,7 +84,7 @@
       <div id=column1 data-id=inspector class=interior>
         <header class=header>
           <div class=header-container>
-            <h1>Node.js v26.3.0 documentation</h1>
+            <h1>Node.js v26.4.0 documentation</h1>
             <button class=theme-toggle-btn id=theme-toggle-btn title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
               <svg class="dark-icon icon" height=24 width=24>
                 <path fill=none d="M0 0h24v24H0z"/>
@@ -98,7 +99,7 @@
           </div>
           <div id=gtoc>
             <ul>
-              <li class=pinned-header>Node.js v26.3.0</li>
+              <li class=pinned-header>Node.js v26.4.0</li>
               <li class=picker-header><a href=#toc-picker aria-controls=toc-picker><span class=picker-arrow></span>Table of contents</a><div class=picker><div class=toc tabindex=-1><ul id=toc-picker>
 <li><span class=stability_2><a href=inspector.html#inspector>Inspector</a></span>
 <ul>
@@ -236,6 +237,7 @@
 <li><a class=nav-url href=url.html>URL</a></li>
 <li><a class=nav-util href=util.html>Utilities</a></li>
 <li><a class=nav-v8 href=v8.html>V8</a></li>
+<li><a class=nav-vfs href=vfs.html>Virtual File System</a></li>
 <li><a class=nav-vm href=vm.html>VM</a></li>
 <li><a class=nav-wasi href=wasi.html>WASI</a></li>
 <li><a class=nav-webcrypto href=webcrypto.html>Web Crypto API</a></li>
@@ -535,8 +537,8 @@ protocol.</section>
 <span class=line><span style=color:#7C7F93;--shiki-dark:#9399B2>}</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>)</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
 <span class=line></span></code><div class=code-toolbar><span class=code-language>js</span><button class=copy-button>copy</button></div></pre></section>
 <section><h3>Common Objects<span><a id=inspector_common_objects></a></span><span><a class=mark id=common-objects href=#common-objects>#</a></span></h3><div class=api_metadata></div></section>
-<section><h4><code>inspector.close()</code><span><a id=inspector_inspector_close></a></span><span><a class=mark id=inspectorclose href=#inspectorclose>#</a></span></h4><div class=api_metadata><span>Added in: v9.0.0</span><details class=changelog><summary>History</summary><table><thead><tr><th>Version<th>Changes<tbody><tr><td>v18.10.0<td><p>The API is exposed in the worker threads.</table></details></div><p>Attempts to close all remaining connections, blocking the event loop until all
-are closed. Once all connections are closed, deactivates the inspector.</section>
+<section><h4><code>inspector.close()</code><span><a id=inspector_inspector_close></a></span><span><a class=mark id=inspectorclose href=#inspectorclose>#</a></span></h4><div class=api_metadata><span>Added in: v9.0.0</span><details class=changelog><summary>History</summary><table><thead><tr><th>Version<th>Changes<tbody><tr><td>v18.10.0<td><p>The API is exposed in the worker threads.</table></details></div><p>Deactivates the inspector. If there are active connections, they are forcibly
+terminated. Blocks until the inspector server has fully stopped.</section>
 <section><h4><code>inspector.console</code><span><a id=inspector_inspector_console></a></span><span><a class=mark id=inspectorconsole href=#inspectorconsole>#</a></span></h4><div class=api_metadata></div><ul>
 <li>Type: <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object><code>&lt;Object></code></a> An object to send messages to the remote inspector console.</li>
 </ul><pre class="catppuccin-latte catppuccin-mocha language-js shiki shiki-themes" style=background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4 tabindex=0><code><span class=line><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic>require</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>(</span><span style=color:#40A02B;--shiki-dark:#A6E3A1>'node:inspector'</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>)</span><span style=color:#179299;--shiki-dark:#94E2D5>.</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>console</span><span style=color:#179299;--shiki-dark:#94E2D5>.</span><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic>log</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>(</span><span style=color:#40A02B;--shiki-dark:#A6E3A1>'a message'</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>)</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>

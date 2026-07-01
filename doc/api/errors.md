@@ -1756,6 +1756,17 @@ added: v15.14.0
 The limit of acceptable invalid HTTP/2 protocol frames sent by the peer,
 as specified through the `maxSessionInvalidFrames` option, has been exceeded.
 
+<a id="ERR_HTTP2_TOO_MANY_ORIGINS"></a>
+
+### `ERR_HTTP2_TOO_MANY_ORIGINS`
+
+<!-- YAML
+added: v26.3.1
+-->
+
+The number of uniq origin sent by the server has exceeded the value defined in
+`options.maxOriginSetSize`.
+
 <a id="ERR_HTTP2_TRAILERS_ALREADY_SENT"></a>
 
 ### `ERR_HTTP2_TRAILERS_ALREADY_SENT`
@@ -2526,6 +2537,77 @@ A given value is out of the accepted range.
 The `package.json` [`"imports"`][] field does not define the given internal
 package specifier mapping.
 
+<a id="ERR_PACKAGE_MAP_EXTERNAL_FILE"></a>
+
+### `ERR_PACKAGE_MAP_EXTERNAL_FILE`
+
+<!-- YAML
+added: v26.4.0
+-->
+
+A module attempted to resolve a bare specifier using the [package map][], but
+the importing file is not located within any package defined in the map.
+
+```console
+$ node --experimental-package-map=./package-map.json /tmp/script.js
+Error [ERR_PACKAGE_MAP_EXTERNAL_FILE]: Cannot resolve "dep-a" from "/tmp/script.js": file is not within any package defined in /path/to/package-map.json
+```
+
+To fix this error, ensure the importing file is inside one of the package
+directories listed in the package map, or add a new package entry whose `url`
+covers the importing file.
+
+<a id="ERR_PACKAGE_MAP_INVALID"></a>
+
+### `ERR_PACKAGE_MAP_INVALID`
+
+<!-- YAML
+added: v26.4.0
+-->
+
+The [package map][] configuration file is invalid. This can occur when:
+
+* The file does not exist at the specified path.
+* The file contains invalid JSON.
+* The file is missing the required `packages` object.
+* A package entry is missing the required `url` field.
+* Two package entries have the same `url` value.
+
+```console
+$ node --experimental-package-map=./missing.json app.js
+Error [ERR_PACKAGE_MAP_INVALID]: Invalid package map at "./missing.json": file not found
+```
+
+<a id="ERR_PACKAGE_MAP_KEY_NOT_FOUND"></a>
+
+### `ERR_PACKAGE_MAP_KEY_NOT_FOUND`
+
+<!-- YAML
+added: v26.4.0
+-->
+
+A package's `dependencies` object in the [package map][] references a package
+key that is not defined in the `packages` object.
+
+```json
+{
+  "packages": {
+    "app": {
+      "url": "./app",
+      "dependencies": {
+        "foo": "nonexistent"
+      }
+    }
+  }
+}
+```
+
+In this example, `"nonexistent"` is referenced as a dependency target but not
+defined in `packages`, which will throw this error.
+
+To fix this error, ensure all package keys referenced in `dependencies` values
+are defined in the `packages` object.
+
 <a id="ERR_PACKAGE_PATH_NOT_EXPORTED"></a>
 
 ### `ERR_PACKAGE_PATH_NOT_EXPORTED`
@@ -2889,6 +2971,14 @@ disconnected socket.
 ### `ERR_SOCKET_DGRAM_NOT_RUNNING`
 
 A call was made and the UDP subsystem was not running.
+
+<a id="ERR_SOCKET_HANDLE_ADOPTED"></a>
+
+### `ERR_SOCKET_HANDLE_ADOPTED`
+
+An operation was attempted on a [`BoundSocket`][] that had already been adopted
+by a [`net.Server`][] or [`net.Socket`][]. Once a bound socket is adopted, its
+`address()` and `close()` methods can no longer be used.
 
 <a id="ERR_SOURCE_MAP_CORRUPT"></a>
 
@@ -4470,6 +4560,7 @@ An error occurred trying to allocate memory. This should never happen.
 [`--force-fips`]: cli.md#--force-fips
 [`--no-addons`]: cli.md#--no-addons
 [`--unhandled-rejections`]: cli.md#--unhandled-rejectionsmode
+[`BoundSocket`]: net.md#class-netboundsocket
 [`Class: assert.AssertionError`]: assert.md#class-assertassertionerror
 [`ERR_INCOMPATIBLE_OPTION_PAIR`]: #err_incompatible_option_pair
 [`ERR_INVALID_ARG_TYPE`]: #err_invalid_arg_type
@@ -4513,7 +4604,9 @@ An error occurred trying to allocate memory. This should never happen.
 [`http`]: http.md
 [`https`]: https.md
 [`libuv Error handling`]: https://docs.libuv.org/en/v1.x/errors.html
+[`net.Server`]: net.md#class-netserver
 [`net.Socket.write()`]: net.md#socketwritedata-encoding-callback
+[`net.Socket`]: net.md#class-netsocket
 [`net`]: net.md
 [`new URL(input)`]: url.md#new-urlinput-base
 [`new URLPattern(input)`]: url.md#new-urlpatternstring-baseurl-options
@@ -4548,6 +4641,7 @@ An error occurred trying to allocate memory. This should never happen.
 [domains]: domain.md
 [event emitter-based]: events.md#class-eventemitter
 [file descriptors]: https://en.wikipedia.org/wiki/File_descriptor
+[package map]: packages.md#package-maps
 [relative URL]: https://url.spec.whatwg.org/#relative-url-string
 [self-reference a package using its name]: packages.md#self-referencing-a-package-using-its-name
 [special scheme]: https://url.spec.whatwg.org/#special-scheme

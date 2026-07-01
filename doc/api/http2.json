@@ -474,16 +474,17 @@
                   "desc": "<p>A prototype-less object describing the current local settings of this\n<code>Http2Session</code>. The local settings are local to <em>this</em> <code>Http2Session</code> instance.</p>"
                 },
                 {
-                  "textRaw": "Type: {string[]|undefined}",
+                  "textRaw": "Type: {string}[] | {undefined}",
                   "name": "originSet",
-                  "type": "string[]|undefined",
+                  "type": "string",
                   "meta": {
                     "added": [
                       "v9.4.0"
                     ],
                     "changes": []
                   },
-                  "desc": "<p>If the <code>Http2Session</code> is connected to a <code>TLSSocket</code>, the <code>originSet</code> property\nwill return an <code>Array</code> of origins for which the <code>Http2Session</code> may be\nconsidered authoritative.</p>\n<p>The <code>originSet</code> property is only available when using a secure TLS connection.</p>"
+                  "desc": "<p>If the <code>Http2Session</code> is connected to a <code>TLSSocket</code>, the <code>originSet</code> property\nwill return an <code>Array</code> of origins for which the <code>Http2Session</code> may be\nconsidered authoritative.</p>\n<p>The <code>originSet</code> property is only available when using a secure TLS connection.</p>",
+                  "shortDesc": "[] | {undefined}"
                 },
                 {
                   "textRaw": "Type: {boolean}",
@@ -1015,9 +1016,10 @@
                   },
                   "params": [
                     {
-                      "textRaw": "`origins` {string[]}",
+                      "textRaw": "`origins` {string}[]",
                       "name": "origins",
-                      "type": "string[]"
+                      "type": "string",
+                      "desc": "[]"
                     }
                   ],
                   "desc": "<p>The <code>'origin'</code> event is emitted whenever an <code>ORIGIN</code> frame is received by\nthe client. The event is emitted with an array of <code>origin</code> strings. The\n<code>http2session.originSet</code> will be updated to include the received\norigins.</p>\n<pre><code class=\"language-mjs\">import { connect } from 'node:http2';\nconst client = connect('https://example.org');\n\nclient.on('origin', (origins) => {\n  for (let n = 0; n &#x3C; origins.length; n++)\n    console.log(origins[n]);\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const http2 = require('node:http2');\nconst client = http2.connect('https://example.org');\n\nclient.on('origin', (origins) => {\n  for (let n = 0; n &#x3C; origins.length; n++)\n    console.log(origins[n]);\n});\n</code></pre>\n<p>The <code>'origin'</code> event is only emitted when using a secure TLS connection.</p>"
@@ -1061,9 +1063,9 @@
                     {
                       "params": [
                         {
-                          "textRaw": "`headers` {HTTP/2 Headers Object}",
+                          "textRaw": "`headers` {HTTP/2 Headers Object|HTTP/2 Raw Headers}",
                           "name": "headers",
-                          "type": "HTTP/2 Headers Object"
+                          "type": "HTTP/2 Headers Object|HTTP/2 Raw Headers"
                         },
                         {
                           "textRaw": "`options` {Object}",
@@ -1411,16 +1413,17 @@
                   "desc": "<p>An object containing the outbound headers sent for this <code>Http2Stream</code>.</p>"
                 },
                 {
-                  "textRaw": "Type: {HTTP/2 Headers Object[]}",
+                  "textRaw": "Type: {HTTP/2 Headers Object}[]",
                   "name": "sentInfoHeaders",
-                  "type": "HTTP/2 Headers Object[]",
+                  "type": "HTTP/2 Headers Object",
                   "meta": {
                     "added": [
                       "v9.5.0"
                     ],
                     "changes": []
                   },
-                  "desc": "<p>An array of objects containing the outbound informational (additional) headers\nsent for this <code>Http2Stream</code>.</p>"
+                  "desc": "<p>An array of objects containing the outbound informational (additional) headers\nsent for this <code>Http2Stream</code>.</p>",
+                  "shortDesc": "[]"
                 },
                 {
                   "textRaw": "Type: {HTTP/2 Headers Object}",
@@ -1899,9 +1902,9 @@
                     {
                       "params": [
                         {
-                          "textRaw": "`headers` {HTTP/2 Headers Object}",
+                          "textRaw": "`headers` {HTTP/2 Headers Object|HTTP/2 Raw Headers}",
                           "name": "headers",
-                          "type": "HTTP/2 Headers Object",
+                          "type": "HTTP/2 Headers Object|HTTP/2 Raw Headers",
                           "optional": true
                         },
                         {
@@ -1927,7 +1930,7 @@
                       ]
                     }
                   ],
-                  "desc": "<pre><code class=\"language-mjs\">import { createServer } from 'node:http2';\nconst server = createServer();\nserver.on('stream', (stream) => {\n  stream.respond({ ':status': 200 });\n  stream.end('some data');\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const http2 = require('node:http2');\nconst server = http2.createServer();\nserver.on('stream', (stream) => {\n  stream.respond({ ':status': 200 });\n  stream.end('some data');\n});\n</code></pre>\n<p>Initiates a response. When the <code>options.waitForTrailers</code> option is set, the\n<code>'wantTrailers'</code> event will be emitted immediately after queuing the last chunk\nof payload data to be sent. The <code>http2stream.sendTrailers()</code> method can then be\nused to sent trailing header fields to the peer.</p>\n<p>When <code>options.waitForTrailers</code> is set, the <code>Http2Stream</code> will not automatically\nclose when the final <code>DATA</code> frame is transmitted. User code must call either\n<code>http2stream.sendTrailers()</code> or <code>http2stream.close()</code> to close the\n<code>Http2Stream</code>.</p>\n<pre><code class=\"language-mjs\">import { createServer } from 'node:http2';\nconst server = createServer();\nserver.on('stream', (stream) => {\n  stream.respond({ ':status': 200 }, { waitForTrailers: true });\n  stream.on('wantTrailers', () => {\n    stream.sendTrailers({ ABC: 'some value to send' });\n  });\n  stream.end('some data');\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const http2 = require('node:http2');\nconst server = http2.createServer();\nserver.on('stream', (stream) => {\n  stream.respond({ ':status': 200 }, { waitForTrailers: true });\n  stream.on('wantTrailers', () => {\n    stream.sendTrailers({ ABC: 'some value to send' });\n  });\n  stream.end('some data');\n});\n</code></pre>"
+                  "desc": "<pre><code class=\"language-mjs\">import { createServer } from 'node:http2';\nconst server = createServer();\nserver.on('stream', (stream) => {\n  stream.respond({ ':status': 200 });\n  stream.end('some data');\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const http2 = require('node:http2');\nconst server = http2.createServer();\nserver.on('stream', (stream) => {\n  stream.respond({ ':status': 200 });\n  stream.end('some data');\n});\n</code></pre>\n<p>Initiates a response. When the <code>options.waitForTrailers</code> option is set, the\n<code>'wantTrailers'</code> event will be emitted immediately after queuing the last chunk\nof payload data to be sent. The <code>http2stream.sendTrailers()</code> method can then be\nused to send trailing header fields to the peer.</p>\n<p>When <code>options.waitForTrailers</code> is set, the <code>Http2Stream</code> will not automatically\nclose when the final <code>DATA</code> frame is transmitted. User code must call either\n<code>http2stream.sendTrailers()</code> or <code>http2stream.close()</code> to close the\n<code>Http2Stream</code>.</p>\n<pre><code class=\"language-mjs\">import { createServer } from 'node:http2';\nconst server = createServer();\nserver.on('stream', (stream) => {\n  stream.respond({ ':status': 200 }, { waitForTrailers: true });\n  stream.on('wantTrailers', () => {\n    stream.sendTrailers({ ABC: 'some value to send' });\n  });\n  stream.end('some data');\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const http2 = require('node:http2');\nconst server = http2.createServer();\nserver.on('stream', (stream) => {\n  stream.respond({ ':status': 200 }, { waitForTrailers: true });\n  stream.on('wantTrailers', () => {\n    stream.sendTrailers({ ABC: 'some value to send' });\n  });\n  stream.end('some data');\n});\n</code></pre>"
                 },
                 {
                   "textRaw": "`http2stream.respondWithFD(fd[, headers[, options]])`",
@@ -2007,7 +2010,7 @@
                       ]
                     }
                   ],
-                  "desc": "<p>Initiates a response whose data is read from the given file descriptor. No\nvalidation is performed on the given file descriptor. If an error occurs while\nattempting to read data using the file descriptor, the <code>Http2Stream</code> will be\nclosed using an <code>RST_STREAM</code> frame using the standard <code>INTERNAL_ERROR</code> code.</p>\n<p>When used, the <code>Http2Stream</code> object's <code>Duplex</code> interface will be closed\nautomatically.</p>\n<pre><code class=\"language-mjs\">import { createServer } from 'node:http2';\nimport { openSync, fstatSync, closeSync } from 'node:fs';\n\nconst server = createServer();\nserver.on('stream', (stream) => {\n  const fd = openSync('/some/file', 'r');\n\n  const stat = fstatSync(fd);\n  const headers = {\n    'content-length': stat.size,\n    'last-modified': stat.mtime.toUTCString(),\n    'content-type': 'text/plain; charset=utf-8',\n  };\n  stream.respondWithFD(fd, headers);\n  stream.on('close', () => closeSync(fd));\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const http2 = require('node:http2');\nconst fs = require('node:fs');\n\nconst server = http2.createServer();\nserver.on('stream', (stream) => {\n  const fd = fs.openSync('/some/file', 'r');\n\n  const stat = fs.fstatSync(fd);\n  const headers = {\n    'content-length': stat.size,\n    'last-modified': stat.mtime.toUTCString(),\n    'content-type': 'text/plain; charset=utf-8',\n  };\n  stream.respondWithFD(fd, headers);\n  stream.on('close', () => fs.closeSync(fd));\n});\n</code></pre>\n<p>The optional <code>options.statCheck</code> function may be specified to give user code\nan opportunity to set additional content headers based on the <code>fs.Stat</code> details\nof the given fd. If the <code>statCheck</code> function is provided, the\n<code>http2stream.respondWithFD()</code> method will perform an <code>fs.fstat()</code> call to\ncollect details on the provided file descriptor.</p>\n<p>The <code>offset</code> and <code>length</code> options may be used to limit the response to a\nspecific range subset. This can be used, for instance, to support HTTP Range\nrequests.</p>\n<p>The file descriptor or <code>FileHandle</code> is not closed when the stream is closed,\nso it will need to be closed manually once it is no longer needed.\nUsing the same file descriptor concurrently for multiple streams\nis not supported and may result in data loss. Re-using a file descriptor\nafter a stream has finished is supported.</p>\n<p>When the <code>options.waitForTrailers</code> option is set, the <code>'wantTrailers'</code> event\nwill be emitted immediately after queuing the last chunk of payload data to be\nsent. The <code>http2stream.sendTrailers()</code> method can then be used to sent trailing\nheader fields to the peer.</p>\n<p>When <code>options.waitForTrailers</code> is set, the <code>Http2Stream</code> will not automatically\nclose when the final <code>DATA</code> frame is transmitted. User code <em>must</em> call either\n<code>http2stream.sendTrailers()</code> or <code>http2stream.close()</code> to close the\n<code>Http2Stream</code>.</p>\n<pre><code class=\"language-mjs\">import { createServer } from 'node:http2';\nimport { openSync, fstatSync, closeSync } from 'node:fs';\n\nconst server = createServer();\nserver.on('stream', (stream) => {\n  const fd = openSync('/some/file', 'r');\n\n  const stat = fstatSync(fd);\n  const headers = {\n    'content-length': stat.size,\n    'last-modified': stat.mtime.toUTCString(),\n    'content-type': 'text/plain; charset=utf-8',\n  };\n  stream.respondWithFD(fd, headers, { waitForTrailers: true });\n  stream.on('wantTrailers', () => {\n    stream.sendTrailers({ ABC: 'some value to send' });\n  });\n\n  stream.on('close', () => closeSync(fd));\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const http2 = require('node:http2');\nconst fs = require('node:fs');\n\nconst server = http2.createServer();\nserver.on('stream', (stream) => {\n  const fd = fs.openSync('/some/file', 'r');\n\n  const stat = fs.fstatSync(fd);\n  const headers = {\n    'content-length': stat.size,\n    'last-modified': stat.mtime.toUTCString(),\n    'content-type': 'text/plain; charset=utf-8',\n  };\n  stream.respondWithFD(fd, headers, { waitForTrailers: true });\n  stream.on('wantTrailers', () => {\n    stream.sendTrailers({ ABC: 'some value to send' });\n  });\n\n  stream.on('close', () => fs.closeSync(fd));\n});\n</code></pre>"
+                  "desc": "<p>Initiates a response whose data is read from the given file descriptor. No\nvalidation is performed on the given file descriptor. If an error occurs while\nattempting to read data using the file descriptor, the <code>Http2Stream</code> will be\nclosed using an <code>RST_STREAM</code> frame using the standard <code>INTERNAL_ERROR</code> code.</p>\n<p>When used, the <code>Http2Stream</code> object's <code>Duplex</code> interface will be closed\nautomatically.</p>\n<pre><code class=\"language-mjs\">import { createServer } from 'node:http2';\nimport { openSync, fstatSync, closeSync } from 'node:fs';\n\nconst server = createServer();\nserver.on('stream', (stream) => {\n  const fd = openSync('/some/file', 'r');\n\n  const stat = fstatSync(fd);\n  const headers = {\n    'content-length': stat.size,\n    'last-modified': stat.mtime.toUTCString(),\n    'content-type': 'text/plain; charset=utf-8',\n  };\n  stream.respondWithFD(fd, headers);\n  stream.on('close', () => closeSync(fd));\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const http2 = require('node:http2');\nconst fs = require('node:fs');\n\nconst server = http2.createServer();\nserver.on('stream', (stream) => {\n  const fd = fs.openSync('/some/file', 'r');\n\n  const stat = fs.fstatSync(fd);\n  const headers = {\n    'content-length': stat.size,\n    'last-modified': stat.mtime.toUTCString(),\n    'content-type': 'text/plain; charset=utf-8',\n  };\n  stream.respondWithFD(fd, headers);\n  stream.on('close', () => fs.closeSync(fd));\n});\n</code></pre>\n<p>The optional <code>options.statCheck</code> function may be specified to give user code\nan opportunity to set additional content headers based on the <code>fs.Stat</code> details\nof the given fd. If the <code>statCheck</code> function is provided, the\n<code>http2stream.respondWithFD()</code> method will perform an <code>fs.fstat()</code> call to\ncollect details on the provided file descriptor.</p>\n<p>The <code>offset</code> and <code>length</code> options may be used to limit the response to a\nspecific range subset. This can be used, for instance, to support HTTP Range\nrequests.</p>\n<p>The file descriptor or <code>FileHandle</code> is not closed when the stream is closed,\nso it will need to be closed manually once it is no longer needed.\nUsing the same file descriptor concurrently for multiple streams\nis not supported and may result in data loss. Re-using a file descriptor\nafter a stream has finished is supported.</p>\n<p>When the <code>options.waitForTrailers</code> option is set, the <code>'wantTrailers'</code> event\nwill be emitted immediately after queuing the last chunk of payload data to be\nsent. The <code>http2stream.sendTrailers()</code> method can then be used to send trailing\nheader fields to the peer.</p>\n<p>When <code>options.waitForTrailers</code> is set, the <code>Http2Stream</code> will not automatically\nclose when the final <code>DATA</code> frame is transmitted. User code <em>must</em> call either\n<code>http2stream.sendTrailers()</code> or <code>http2stream.close()</code> to close the\n<code>Http2Stream</code>.</p>\n<pre><code class=\"language-mjs\">import { createServer } from 'node:http2';\nimport { openSync, fstatSync, closeSync } from 'node:fs';\n\nconst server = createServer();\nserver.on('stream', (stream) => {\n  const fd = openSync('/some/file', 'r');\n\n  const stat = fstatSync(fd);\n  const headers = {\n    'content-length': stat.size,\n    'last-modified': stat.mtime.toUTCString(),\n    'content-type': 'text/plain; charset=utf-8',\n  };\n  stream.respondWithFD(fd, headers, { waitForTrailers: true });\n  stream.on('wantTrailers', () => {\n    stream.sendTrailers({ ABC: 'some value to send' });\n  });\n\n  stream.on('close', () => closeSync(fd));\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const http2 = require('node:http2');\nconst fs = require('node:fs');\n\nconst server = http2.createServer();\nserver.on('stream', (stream) => {\n  const fd = fs.openSync('/some/file', 'r');\n\n  const stat = fs.fstatSync(fd);\n  const headers = {\n    'content-length': stat.size,\n    'last-modified': stat.mtime.toUTCString(),\n    'content-type': 'text/plain; charset=utf-8',\n  };\n  stream.respondWithFD(fd, headers, { waitForTrailers: true });\n  stream.on('wantTrailers', () => {\n    stream.sendTrailers({ ABC: 'some value to send' });\n  });\n\n  stream.on('close', () => fs.closeSync(fd));\n});\n</code></pre>"
                 },
                 {
                   "textRaw": "`http2stream.respondWithFile(path[, headers[, options]])`",
@@ -2087,7 +2090,7 @@
                       ]
                     }
                   ],
-                  "desc": "<p>Sends a regular file as the response. The <code>path</code> must specify a regular file\nor an <code>'error'</code> event will be emitted on the <code>Http2Stream</code> object.</p>\n<p>When used, the <code>Http2Stream</code> object's <code>Duplex</code> interface will be closed\nautomatically.</p>\n<p>The optional <code>options.statCheck</code> function may be specified to give user code\nan opportunity to set additional content headers based on the <code>fs.Stat</code> details\nof the given file:</p>\n<p>If an error occurs while attempting to read the file data, the <code>Http2Stream</code>\nwill be closed using an <code>RST_STREAM</code> frame using the standard <code>INTERNAL_ERROR</code>\ncode. If the <code>onError</code> callback is defined, then it will be called. Otherwise\nthe stream will be destroyed.</p>\n<p>Example using a file path:</p>\n<pre><code class=\"language-mjs\">import { createServer } from 'node:http2';\nconst server = createServer();\nserver.on('stream', (stream) => {\n  function statCheck(stat, headers) {\n    headers['last-modified'] = stat.mtime.toUTCString();\n  }\n\n  function onError(err) {\n    // stream.respond() can throw if the stream has been destroyed by\n    // the other side.\n    try {\n      if (err.code === 'ENOENT') {\n        stream.respond({ ':status': 404 });\n      } else {\n        stream.respond({ ':status': 500 });\n      }\n    } catch (err) {\n      // Perform actual error handling.\n      console.error(err);\n    }\n    stream.end();\n  }\n\n  stream.respondWithFile('/some/file',\n                         { 'content-type': 'text/plain; charset=utf-8' },\n                         { statCheck, onError });\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const http2 = require('node:http2');\nconst server = http2.createServer();\nserver.on('stream', (stream) => {\n  function statCheck(stat, headers) {\n    headers['last-modified'] = stat.mtime.toUTCString();\n  }\n\n  function onError(err) {\n    // stream.respond() can throw if the stream has been destroyed by\n    // the other side.\n    try {\n      if (err.code === 'ENOENT') {\n        stream.respond({ ':status': 404 });\n      } else {\n        stream.respond({ ':status': 500 });\n      }\n    } catch (err) {\n      // Perform actual error handling.\n      console.error(err);\n    }\n    stream.end();\n  }\n\n  stream.respondWithFile('/some/file',\n                         { 'content-type': 'text/plain; charset=utf-8' },\n                         { statCheck, onError });\n});\n</code></pre>\n<p>The <code>options.statCheck</code> function may also be used to cancel the send operation\nby returning <code>false</code>. For instance, a conditional request may check the stat\nresults to determine if the file has been modified to return an appropriate\n<code>304</code> response:</p>\n<pre><code class=\"language-mjs\">import { createServer } from 'node:http2';\nconst server = createServer();\nserver.on('stream', (stream) => {\n  function statCheck(stat, headers) {\n    // Check the stat here...\n    stream.respond({ ':status': 304 });\n    return false; // Cancel the send operation\n  }\n  stream.respondWithFile('/some/file',\n                         { 'content-type': 'text/plain; charset=utf-8' },\n                         { statCheck });\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const http2 = require('node:http2');\nconst server = http2.createServer();\nserver.on('stream', (stream) => {\n  function statCheck(stat, headers) {\n    // Check the stat here...\n    stream.respond({ ':status': 304 });\n    return false; // Cancel the send operation\n  }\n  stream.respondWithFile('/some/file',\n                         { 'content-type': 'text/plain; charset=utf-8' },\n                         { statCheck });\n});\n</code></pre>\n<p>The <code>content-length</code> header field will be automatically set.</p>\n<p>The <code>offset</code> and <code>length</code> options may be used to limit the response to a\nspecific range subset. This can be used, for instance, to support HTTP Range\nrequests.</p>\n<p>The <code>options.onError</code> function may also be used to handle all the errors\nthat could happen before the delivery of the file is initiated. The\ndefault behavior is to destroy the stream.</p>\n<p>When the <code>options.waitForTrailers</code> option is set, the <code>'wantTrailers'</code> event\nwill be emitted immediately after queuing the last chunk of payload data to be\nsent. The <code>http2stream.sendTrailers()</code> method can then be used to sent trailing\nheader fields to the peer.</p>\n<p>When <code>options.waitForTrailers</code> is set, the <code>Http2Stream</code> will not automatically\nclose when the final <code>DATA</code> frame is transmitted. User code must call either\n<code>http2stream.sendTrailers()</code> or <code>http2stream.close()</code> to close the\n<code>Http2Stream</code>.</p>\n<pre><code class=\"language-mjs\">import { createServer } from 'node:http2';\nconst server = createServer();\nserver.on('stream', (stream) => {\n  stream.respondWithFile('/some/file',\n                         { 'content-type': 'text/plain; charset=utf-8' },\n                         { waitForTrailers: true });\n  stream.on('wantTrailers', () => {\n    stream.sendTrailers({ ABC: 'some value to send' });\n  });\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const http2 = require('node:http2');\nconst server = http2.createServer();\nserver.on('stream', (stream) => {\n  stream.respondWithFile('/some/file',\n                         { 'content-type': 'text/plain; charset=utf-8' },\n                         { waitForTrailers: true });\n  stream.on('wantTrailers', () => {\n    stream.sendTrailers({ ABC: 'some value to send' });\n  });\n});\n</code></pre>"
+                  "desc": "<p>Sends a regular file as the response. The <code>path</code> must specify a regular file\nor an <code>'error'</code> event will be emitted on the <code>Http2Stream</code> object.</p>\n<p>When used, the <code>Http2Stream</code> object's <code>Duplex</code> interface will be closed\nautomatically.</p>\n<p>The optional <code>options.statCheck</code> function may be specified to give user code\nan opportunity to set additional content headers based on the <code>fs.Stat</code> details\nof the given file:</p>\n<p>If an error occurs while attempting to read the file data, the <code>Http2Stream</code>\nwill be closed using an <code>RST_STREAM</code> frame using the standard <code>INTERNAL_ERROR</code>\ncode. If the <code>onError</code> callback is defined, then it will be called. Otherwise\nthe stream will be destroyed.</p>\n<p>Example using a file path:</p>\n<pre><code class=\"language-mjs\">import { createServer } from 'node:http2';\nconst server = createServer();\nserver.on('stream', (stream) => {\n  function statCheck(stat, headers) {\n    headers['last-modified'] = stat.mtime.toUTCString();\n  }\n\n  function onError(err) {\n    // stream.respond() can throw if the stream has been destroyed by\n    // the other side.\n    try {\n      if (err.code === 'ENOENT') {\n        stream.respond({ ':status': 404 });\n      } else {\n        stream.respond({ ':status': 500 });\n      }\n    } catch (err) {\n      // Perform actual error handling.\n      console.error(err);\n    }\n    stream.end();\n  }\n\n  stream.respondWithFile('/some/file',\n                         { 'content-type': 'text/plain; charset=utf-8' },\n                         { statCheck, onError });\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const http2 = require('node:http2');\nconst server = http2.createServer();\nserver.on('stream', (stream) => {\n  function statCheck(stat, headers) {\n    headers['last-modified'] = stat.mtime.toUTCString();\n  }\n\n  function onError(err) {\n    // stream.respond() can throw if the stream has been destroyed by\n    // the other side.\n    try {\n      if (err.code === 'ENOENT') {\n        stream.respond({ ':status': 404 });\n      } else {\n        stream.respond({ ':status': 500 });\n      }\n    } catch (err) {\n      // Perform actual error handling.\n      console.error(err);\n    }\n    stream.end();\n  }\n\n  stream.respondWithFile('/some/file',\n                         { 'content-type': 'text/plain; charset=utf-8' },\n                         { statCheck, onError });\n});\n</code></pre>\n<p>The <code>options.statCheck</code> function may also be used to cancel the send operation\nby returning <code>false</code>. For instance, a conditional request may check the stat\nresults to determine if the file has been modified to return an appropriate\n<code>304</code> response:</p>\n<pre><code class=\"language-mjs\">import { createServer } from 'node:http2';\nconst server = createServer();\nserver.on('stream', (stream) => {\n  function statCheck(stat, headers) {\n    // Check the stat here...\n    stream.respond({ ':status': 304 });\n    return false; // Cancel the send operation\n  }\n  stream.respondWithFile('/some/file',\n                         { 'content-type': 'text/plain; charset=utf-8' },\n                         { statCheck });\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const http2 = require('node:http2');\nconst server = http2.createServer();\nserver.on('stream', (stream) => {\n  function statCheck(stat, headers) {\n    // Check the stat here...\n    stream.respond({ ':status': 304 });\n    return false; // Cancel the send operation\n  }\n  stream.respondWithFile('/some/file',\n                         { 'content-type': 'text/plain; charset=utf-8' },\n                         { statCheck });\n});\n</code></pre>\n<p>The <code>content-length</code> header field will be automatically set.</p>\n<p>The <code>offset</code> and <code>length</code> options may be used to limit the response to a\nspecific range subset. This can be used, for instance, to support HTTP Range\nrequests.</p>\n<p>The <code>options.onError</code> function may also be used to handle all the errors\nthat could happen before the delivery of the file is initiated. The\ndefault behavior is to destroy the stream.</p>\n<p>When the <code>options.waitForTrailers</code> option is set, the <code>'wantTrailers'</code> event\nwill be emitted immediately after queuing the last chunk of payload data to be\nsent. The <code>http2stream.sendTrailers()</code> method can then be used to send trailing\nheader fields to the peer.</p>\n<p>When <code>options.waitForTrailers</code> is set, the <code>Http2Stream</code> will not automatically\nclose when the final <code>DATA</code> frame is transmitted. User code must call either\n<code>http2stream.sendTrailers()</code> or <code>http2stream.close()</code> to close the\n<code>Http2Stream</code>.</p>\n<pre><code class=\"language-mjs\">import { createServer } from 'node:http2';\nconst server = createServer();\nserver.on('stream', (stream) => {\n  stream.respondWithFile('/some/file',\n                         { 'content-type': 'text/plain; charset=utf-8' },\n                         { waitForTrailers: true });\n  stream.on('wantTrailers', () => {\n    stream.sendTrailers({ ABC: 'some value to send' });\n  });\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const http2 = require('node:http2');\nconst server = http2.createServer();\nserver.on('stream', (stream) => {\n  stream.respondWithFile('/some/file',\n                         { 'content-type': 'text/plain; charset=utf-8' },\n                         { waitForTrailers: true });\n  stream.on('wantTrailers', () => {\n    stream.sendTrailers({ ABC: 'some value to send' });\n  });\n});\n</code></pre>"
                 }
               ],
               "properties": [
@@ -2871,11 +2874,11 @@
                           "desc": "Sets the maximum number of settings entries per `SETTINGS` frame. The minimum value allowed is `1`."
                         },
                         {
-                          "textRaw": "`maxSessionMemory`{number} Sets the maximum memory that the `Http2Session` is permitted to use. The value is expressed in terms of number of megabytes, e.g. `1` equal 1 megabyte. The minimum value allowed is `1`. This is a credit based limit, existing `Http2Stream`s may cause this limit to be exceeded, but new `Http2Stream` instances will be rejected while this limit is exceeded. The current number of `Http2Stream` sessions, the current memory use of the header compression tables, current data queued to be sent, and unacknowledged `PING` and `SETTINGS` frames are all counted towards the current limit. **Default:** `10`.",
+                          "textRaw": "`maxSessionMemory`{number} Sets the maximum memory that the `Http2Session` is permitted to use. The value is expressed in terms of number of megabytes, e.g. `1` equal 1 megabyte. The minimum value allowed is `1`. This is a credit based limit, existing `Http2Stream`s may cause this limit to be exceeded, but new `Http2Stream` instances will be rejected while this limit is exceeded. The current number of `Http2Stream` sessions, the current memory use of the header compression tables, header blocks retained by open streams, current data queued to be sent, and unacknowledged `PING` and `SETTINGS` frames are all counted towards the current limit. **Default:** `10`.",
                           "name": "maxSessionMemory",
                           "type": "number",
                           "default": "`10`",
-                          "desc": "Sets the maximum memory that the `Http2Session` is permitted to use. The value is expressed in terms of number of megabytes, e.g. `1` equal 1 megabyte. The minimum value allowed is `1`. This is a credit based limit, existing `Http2Stream`s may cause this limit to be exceeded, but new `Http2Stream` instances will be rejected while this limit is exceeded. The current number of `Http2Stream` sessions, the current memory use of the header compression tables, current data queued to be sent, and unacknowledged `PING` and `SETTINGS` frames are all counted towards the current limit."
+                          "desc": "Sets the maximum memory that the `Http2Session` is permitted to use. The value is expressed in terms of number of megabytes, e.g. `1` equal 1 megabyte. The minimum value allowed is `1`. This is a credit based limit, existing `Http2Stream`s may cause this limit to be exceeded, but new `Http2Stream` instances will be rejected while this limit is exceeded. The current number of `Http2Stream` sessions, the current memory use of the header compression tables, header blocks retained by open streams, current data queued to be sent, and unacknowledged `PING` and `SETTINGS` frames are all counted towards the current limit."
                         },
                         {
                           "textRaw": "`maxHeaderListPairs` {number} Sets the maximum number of header entries. This is similar to `server.maxHeadersCount` or `request.maxHeadersCount` in the `node:http` module. The minimum value is `4`. **Default:** `128`.",
@@ -3171,11 +3174,11 @@
                           "desc": "Sets the maximum number of settings entries per `SETTINGS` frame. The minimum value allowed is `1`."
                         },
                         {
-                          "textRaw": "`maxSessionMemory`{number} Sets the maximum memory that the `Http2Session` is permitted to use. The value is expressed in terms of number of megabytes, e.g. `1` equal 1 megabyte. The minimum value allowed is `1`. This is a credit based limit, existing `Http2Stream`s may cause this limit to be exceeded, but new `Http2Stream` instances will be rejected while this limit is exceeded. The current number of `Http2Stream` sessions, the current memory use of the header compression tables, current data queued to be sent, and unacknowledged `PING` and `SETTINGS` frames are all counted towards the current limit. **Default:** `10`.",
+                          "textRaw": "`maxSessionMemory`{number} Sets the maximum memory that the `Http2Session` is permitted to use. The value is expressed in terms of number of megabytes, e.g. `1` equal 1 megabyte. The minimum value allowed is `1`. This is a credit based limit, existing `Http2Stream`s may cause this limit to be exceeded, but new `Http2Stream` instances will be rejected while this limit is exceeded. The current number of `Http2Stream` sessions, the current memory use of the header compression tables, header blocks retained by open streams, current data queued to be sent, and unacknowledged `PING` and `SETTINGS` frames are all counted towards the current limit. **Default:** `10`.",
                           "name": "maxSessionMemory",
                           "type": "number",
                           "default": "`10`",
-                          "desc": "Sets the maximum memory that the `Http2Session` is permitted to use. The value is expressed in terms of number of megabytes, e.g. `1` equal 1 megabyte. The minimum value allowed is `1`. This is a credit based limit, existing `Http2Stream`s may cause this limit to be exceeded, but new `Http2Stream` instances will be rejected while this limit is exceeded. The current number of `Http2Stream` sessions, the current memory use of the header compression tables, current data queued to be sent, and unacknowledged `PING` and `SETTINGS` frames are all counted towards the current limit."
+                          "desc": "Sets the maximum memory that the `Http2Session` is permitted to use. The value is expressed in terms of number of megabytes, e.g. `1` equal 1 megabyte. The minimum value allowed is `1`. This is a credit based limit, existing `Http2Stream`s may cause this limit to be exceeded, but new `Http2Stream` instances will be rejected while this limit is exceeded. The current number of `Http2Stream` sessions, the current memory use of the header compression tables, header blocks retained by open streams, current data queued to be sent, and unacknowledged `PING` and `SETTINGS` frames are all counted towards the current limit."
                         },
                         {
                           "textRaw": "`maxHeaderListPairs` {number} Sets the maximum number of header entries. This is similar to `server.maxHeadersCount` or `request.maxHeadersCount` in the `node:http` module. The minimum value is `4`. **Default:** `128`.",
@@ -3267,10 +3270,10 @@
                           "desc": "Any `tls.createServer()` options can be provided. For servers, the identity options (`pfx` or `key`/`cert`) are usually required."
                         },
                         {
-                          "textRaw": "`origins` {string[]} An array of origin strings to send within an `ORIGIN` frame immediately following creation of a new server `Http2Session`.",
+                          "textRaw": "`origins` {string}[] An array of origin strings to send within an `ORIGIN` frame immediately following creation of a new server `Http2Session`.",
                           "name": "origins",
-                          "type": "string[]",
-                          "desc": "An array of origin strings to send within an `ORIGIN` frame immediately following creation of a new server `Http2Session`."
+                          "type": "string",
+                          "desc": "[] An array of origin strings to send within an `ORIGIN` frame immediately following creation of a new server `Http2Session`."
                         },
                         {
                           "textRaw": "`unknownProtocolTimeout` {number} Specifies a timeout in milliseconds that a server should wait when an `'unknownProtocol'` event is emitted. If the socket has not been destroyed by that time the server will destroy it. **Default:** `10000`.",
@@ -3416,11 +3419,11 @@
                           "desc": "Sets the maximum number of settings entries per `SETTINGS` frame. The minimum value allowed is `1`."
                         },
                         {
-                          "textRaw": "`maxSessionMemory`{number} Sets the maximum memory that the `Http2Session` is permitted to use. The value is expressed in terms of number of megabytes, e.g. `1` equal 1 megabyte. The minimum value allowed is `1`. This is a credit based limit, existing `Http2Stream`s may cause this limit to be exceeded, but new `Http2Stream` instances will be rejected while this limit is exceeded. The current number of `Http2Stream` sessions, the current memory use of the header compression tables, current data queued to be sent, and unacknowledged `PING` and `SETTINGS` frames are all counted towards the current limit. **Default:** `10`.",
+                          "textRaw": "`maxSessionMemory`{number} Sets the maximum memory that the `Http2Session` is permitted to use. The value is expressed in terms of number of megabytes, e.g. `1` equal 1 megabyte. The minimum value allowed is `1`. This is a credit based limit, existing `Http2Stream`s may cause this limit to be exceeded, but new `Http2Stream` instances will be rejected while this limit is exceeded. The current number of `Http2Stream` sessions, the current memory use of the header compression tables, header blocks retained by open streams, current data queued to be sent, and unacknowledged `PING` and `SETTINGS` frames are all counted towards the current limit. **Default:** `10`.",
                           "name": "maxSessionMemory",
                           "type": "number",
                           "default": "`10`",
-                          "desc": "Sets the maximum memory that the `Http2Session` is permitted to use. The value is expressed in terms of number of megabytes, e.g. `1` equal 1 megabyte. The minimum value allowed is `1`. This is a credit based limit, existing `Http2Stream`s may cause this limit to be exceeded, but new `Http2Stream` instances will be rejected while this limit is exceeded. The current number of `Http2Stream` sessions, the current memory use of the header compression tables, current data queued to be sent, and unacknowledged `PING` and `SETTINGS` frames are all counted towards the current limit."
+                          "desc": "Sets the maximum memory that the `Http2Session` is permitted to use. The value is expressed in terms of number of megabytes, e.g. `1` equal 1 megabyte. The minimum value allowed is `1`. This is a credit based limit, existing `Http2Stream`s may cause this limit to be exceeded, but new `Http2Stream` instances will be rejected while this limit is exceeded. The current number of `Http2Stream` sessions, the current memory use of the header compression tables, header blocks retained by open streams, current data queued to be sent, and unacknowledged `PING` and `SETTINGS` frames are all counted towards the current limit."
                         },
                         {
                           "textRaw": "`maxHeaderListPairs` {number} Sets the maximum number of header entries. This is similar to `server.maxHeadersCount` or `request.maxHeadersCount` in the `node:http` module. The minimum value is `1`. **Default:** `128`.",
@@ -3428,6 +3431,13 @@
                           "type": "number",
                           "default": "`128`",
                           "desc": "Sets the maximum number of header entries. This is similar to `server.maxHeadersCount` or `request.maxHeadersCount` in the `node:http` module. The minimum value is `1`."
+                        },
+                        {
+                          "textRaw": "`maxOriginSetSize` {number} Sets the maximum number of uniq origin the sever can send via ORIGIN frames. **Default:** `128`.",
+                          "name": "maxOriginSetSize",
+                          "type": "number",
+                          "default": "`128`",
+                          "desc": "Sets the maximum number of uniq origin the sever can send via ORIGIN frames."
                         },
                         {
                           "textRaw": "`maxOutstandingPings` {number} Sets the maximum number of outstanding, unacknowledged pings. **Default:** `10`.",
@@ -3856,16 +3866,17 @@
                   "desc": "<p>The raw request/response headers list exactly as they were received.</p>\n<pre><code class=\"language-js\">// Prints something like:\n//\n// [ 'user-agent',\n//   'this is invalid because there can be only one',\n//   'User-Agent',\n//   'curl/7.22.0',\n//   'Host',\n//   '127.0.0.1:8000',\n//   'ACCEPT',\n//   '*/*' ]\nconsole.log(request.rawHeaders);\n</code></pre>"
                 },
                 {
-                  "textRaw": "Type: {string[]}",
+                  "textRaw": "Type: {string}[]",
                   "name": "rawTrailers",
-                  "type": "string[]",
+                  "type": "string",
                   "meta": {
                     "added": [
                       "v8.4.0"
                     ],
                     "changes": []
                   },
-                  "desc": "<p>The raw request/response trailer keys and values exactly as they were\nreceived. Only populated at the <code>'end'</code> event.</p>"
+                  "desc": "<p>The raw request/response trailer keys and values exactly as they were\nreceived. Only populated at the <code>'end'</code> event.</p>",
+                  "shortDesc": "[]"
                 },
                 {
                   "textRaw": "Type: {string}",
@@ -4071,9 +4082,10 @@
                           "type": "string"
                         },
                         {
-                          "textRaw": "`value` {string|string[]}",
+                          "textRaw": "`value` {string|string}[]",
                           "name": "value",
-                          "type": "string|string[]"
+                          "type": "string|string",
+                          "desc": "[]"
                         }
                       ]
                     }
@@ -4218,9 +4230,10 @@
                     {
                       "params": [],
                       "return": {
-                        "textRaw": "Returns: {string[]}",
+                        "textRaw": "Returns: {string}[]",
                         "name": "return",
-                        "type": "string[]"
+                        "type": "string",
+                        "desc": "[]"
                       }
                     }
                   ],
@@ -4318,9 +4331,10 @@
                           "type": "string"
                         },
                         {
-                          "textRaw": "`value` {string|string[]}",
+                          "textRaw": "`value` {string|string}[]",
                           "name": "value",
-                          "type": "string|string[]"
+                          "type": "string|string",
+                          "desc": "[]"
                         }
                       ]
                     }
@@ -4506,9 +4520,9 @@
                           "optional": true
                         },
                         {
-                          "textRaw": "`headers` {HTTP/2 Headers Object}",
+                          "textRaw": "`headers` {HTTP/2 Headers Object|HTTP/2 Raw Headers}",
                           "name": "headers",
-                          "type": "HTTP/2 Headers Object",
+                          "type": "HTTP/2 Headers Object|HTTP/2 Raw Headers",
                           "optional": true
                         }
                       ],

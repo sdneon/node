@@ -1,4 +1,4 @@
-<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content="width=device-width"><link rel=icon href=https://nodejs.org/favicon.ico><meta name=nodejs.org:node-version content=v26.3.0><title>Modules: CommonJS modules | Node.js v26.3.0 Documentation</title><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback"><link rel=stylesheet href=assets/style.css><link rel=canonical href=https://nodejs.org/api/modules.html><script async defer src=assets/api.js></script><script>("dark"===localStorage.getItem("theme")||null===localStorage.getItem("theme")&&window.matchMedia?.("(prefers-color-scheme: dark)").matches)&&document.documentElement.classList.add("dark-mode")</script><body class="alt apidoc" id=api-section-modules><a href=#apicontent class=skip-to-content>Skip to content</a>
+<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content="width=device-width"><link rel=icon href=https://nodejs.org/favicon.ico><meta name=nodejs.org:node-version content=v26.4.0><title>Modules: CommonJS modules | Node.js v26.4.0 Documentation</title><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback"><link rel=stylesheet href=assets/style.css><link rel=canonical href=https://nodejs.org/api/modules.html><script async defer src=assets/api.js></script><script>("dark"===localStorage.getItem("theme")||null===localStorage.getItem("theme")&&window.matchMedia?.("(prefers-color-scheme: dark)").matches)&&document.documentElement.classList.add("dark-mode")</script><body class="alt apidoc" id=api-section-modules><a href=#apicontent class=skip-to-content>Skip to content</a>
     <div id=content class=clearfix>
       <div role=navigation id=column2 class=interior>
         <div id=intro class=interior>
@@ -66,6 +66,7 @@
 <li><a class=nav-url href=url.html>URL</a></li>
 <li><a class=nav-util href=util.html>Utilities</a></li>
 <li><a class=nav-v8 href=v8.html>V8</a></li>
+<li><a class=nav-vfs href=vfs.html>Virtual File System</a></li>
 <li><a class=nav-vm href=vm.html>VM</a></li>
 <li><a class=nav-wasi href=wasi.html>WASI</a></li>
 <li><a class=nav-webcrypto href=webcrypto.html>Web Crypto API</a></li>
@@ -83,7 +84,7 @@
       <div id=column1 data-id=modules class=interior>
         <header class=header>
           <div class=header-container>
-            <h1>Node.js v26.3.0 documentation</h1>
+            <h1>Node.js v26.4.0 documentation</h1>
             <button class=theme-toggle-btn id=theme-toggle-btn title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
               <svg class="dark-icon icon" height=24 width=24>
                 <path fill=none d="M0 0h24v24H0z"/>
@@ -98,7 +99,7 @@
           </div>
           <div id=gtoc>
             <ul>
-              <li class=pinned-header>Node.js v26.3.0</li>
+              <li class=pinned-header>Node.js v26.4.0</li>
               <li class=picker-header><a href=#toc-picker aria-controls=toc-picker><span class=picker-arrow></span>Table of contents</a><div class=picker><div class=toc tabindex=-1><ul id=toc-picker>
 <li><span class=stability_2><a href=modules.html#modules-commonjs-modules>Modules: CommonJS modules</a></span>
 <ul>
@@ -226,6 +227,7 @@
 <li><a class=nav-url href=url.html>URL</a></li>
 <li><a class=nav-util href=util.html>Utilities</a></li>
 <li><a class=nav-v8 href=v8.html>V8</a></li>
+<li><a class=nav-vfs href=vfs.html>Virtual File System</a></li>
 <li><a class=nav-vm href=vm.html>VM</a></li>
 <li><a class=nav-wasi href=wasi.html>WASI</a></li>
 <li><a class=nav-webcrypto href=webcrypto.html>Web Crypto API</a></li>
@@ -516,8 +518,12 @@ in pseudocode of what <code>require()</code> does:<pre class="catppuccin-latte c
 <span class=line><span>4. If X begins with '#'</span></span>
 <span class=line><span>   a. LOAD_PACKAGE_IMPORTS(X, dirname(Y))</span></span>
 <span class=line><span>5. LOAD_PACKAGE_SELF(X, dirname(Y))</span></span>
-<span class=line><span>6. LOAD_NODE_MODULES(X, dirname(Y))</span></span>
-<span class=line><span>7. THROW "not found"</span></span>
+<span class=line><span>6. If a package map PACKAGE_MAP exists,</span></span>
+<span class=line><span>   a. Find the package ID for the package owning Y</span></span>
+<span class=line><span>        1. Let PARENT_PACKAGE_ID be FIND_PACKAGE_ID(dirname(Y), PACKAGE_MAP)</span></span>
+<span class=line><span>   b. LOAD_PACKAGE_MAP(X, PARENT_PACKAGE_ID, PACKAGE_MAP)</span></span>
+<span class=line><span>7. LOAD_NODE_MODULES(X, dirname(Y))</span></span>
+<span class=line><span>8. THROW "not found"</span></span>
 <span class=line><span></span></span>
 <span class=line><span>MAYBE_DETECT_AND_LOAD(X)</span></span>
 <span class=line><span>1. If X parses as a CommonJS module, load X as a CommonJS module. STOP.</span></span>
@@ -561,9 +567,11 @@ in pseudocode of what <code>require()</code> does:<pre class="catppuccin-latte c
 <span class=line><span>2. LOAD_INDEX(X)</span></span>
 <span class=line><span></span></span>
 <span class=line><span>LOAD_NODE_MODULES(X, START)</span></span>
-<span class=line><span>1. let DIRS = NODE_MODULES_PATHS(START)</span></span>
-<span class=line><span>2. for each DIR in DIRS:</span></span>
-<span class=line><span>   a. LOAD_PACKAGE_EXPORTS(X, DIR)</span></span>
+<span class=line><span>1. Try to interpret X as a combination of NAME and SUBPATH where the name</span></span>
+<span class=line><span>   may have a @scope/ prefix and the subpath begins with a slash (`/`).</span></span>
+<span class=line><span>2. let DIRS = NODE_MODULES_PATHS(START)</span></span>
+<span class=line><span>3. for each DIR in DIRS:</span></span>
+<span class=line><span>   a. LOAD_PACKAGE_EXPORTS(SUBPATH, DIR/NAME)</span></span>
 <span class=line><span>   b. LOAD_AS_FILE(DIR/X)</span></span>
 <span class=line><span>   c. LOAD_AS_DIRECTORY(DIR/X)</span></span>
 <span class=line><span></span></span>
@@ -578,6 +586,25 @@ in pseudocode of what <code>require()</code> does:<pre class="catppuccin-latte c
 <span class=line><span>   d. let I = I - 1</span></span>
 <span class=line><span>5. return DIRS + GLOBAL_FOLDERS</span></span>
 <span class=line><span></span></span>
+<span class=line><span>FIND_PACKAGE_ID(PATH, PACKAGE_MAP)</span></span>
+<span class=line><span>1. Find the PACKAGE_ID for the entry whose "path" is a parent directory of PATH</span></span>
+<span class=line><span>2. If multiple entries are found, THROW "ambiguous resolution"</span></span>
+<span class=line><span>3. If no entry was found, THROW "external file".</span></span>
+<span class=line><span>4. return PACKAGE_ID</span></span>
+<span class=line><span></span></span>
+<span class=line><span>LOAD_PACKAGE_MAP(X, PARENT_PACKAGE_ID, PACKAGE_MAP)</span></span>
+<span class=line><span>1. Try to interpret X as a combination of NAME and SUBPATH where the name</span></span>
+<span class=line><span>   may have a @scope/ prefix and the subpath begins with a slash (`/`).</span></span>
+<span class=line><span>2. Find the package map entry for key PARENT_PACKAGE_ID</span></span>
+<span class=line><span>3. Look up NAME in the entry's "dependencies" map.</span></span>
+<span class=line><span>4. If NAME is not found, THROW "not found".</span></span>
+<span class=line><span>5. Let TARGET be PACKAGE_MAP.packages[dependencies[name]]</span></span>
+<span class=line><span>6. Let PACKAGE_PATH be the resolved path of TARGET.</span></span>
+<span class=line><span>7. LOAD_PACKAGE_EXPORTS(SUBPATH, PACKAGE_PATH)</span></span>
+<span class=line><span>8. LOAD_AS_FILE(PACKAGE_PATH/SUBPATH)</span></span>
+<span class=line><span>9. LOAD_AS_DIRECTORY(PACKAGE_PATH/SUBPATH)</span></span>
+<span class=line><span>10. THROW "not found"</span></span>
+<span class=line><span></span></span>
 <span class=line><span>LOAD_PACKAGE_IMPORTS(X, DIR)</span></span>
 <span class=line><span>1. Find the closest package scope SCOPE to DIR.</span></span>
 <span class=line><span>2. If no scope was found, return.</span></span>
@@ -589,19 +616,15 @@ in pseudocode of what <code>require()</code> does:<pre class="catppuccin-latte c
 <span class=line><span>  CONDITIONS) defined in the ESM resolver.</span></span>
 <span class=line><span>6. RESOLVE_ESM_MATCH(MATCH).</span></span>
 <span class=line><span></span></span>
-<span class=line><span>LOAD_PACKAGE_EXPORTS(X, DIR)</span></span>
-<span class=line><span>1. Try to interpret X as a combination of NAME and SUBPATH where the name</span></span>
-<span class=line><span>   may have a @scope/ prefix and the subpath begins with a slash (`/`).</span></span>
-<span class=line><span>2. If X does not match this pattern or DIR/NAME/package.json is not a file,</span></span>
-<span class=line><span>   return.</span></span>
-<span class=line><span>3. Parse DIR/NAME/package.json, and look for "exports" field.</span></span>
-<span class=line><span>4. If "exports" is null or undefined, return.</span></span>
-<span class=line><span>5. If `--no-require-module` is not enabled</span></span>
+<span class=line><span>LOAD_PACKAGE_EXPORTS(SUBPATH, PACKAGE_DIR)</span></span>
+<span class=line><span>1. Parse PACKAGE_DIR/package.json, and look for "exports" field.</span></span>
+<span class=line><span>2. If "exports" is null or undefined, return.</span></span>
+<span class=line><span>3. If `--no-require-module` is not enabled</span></span>
 <span class=line><span>  a. let CONDITIONS = ["node", "require", "module-sync"]</span></span>
 <span class=line><span>  b. Else, let CONDITIONS = ["node", "require"]</span></span>
-<span class=line><span>6. let MATCH = PACKAGE_EXPORTS_RESOLVE(pathToFileURL(DIR/NAME), "." + SUBPATH,</span></span>
+<span class=line><span>4. let MATCH = PACKAGE_EXPORTS_RESOLVE(pathToFileURL(PACKAGE_DIR), "." + SUBPATH,</span></span>
 <span class=line><span>   `package.json` "exports", CONDITIONS) defined in the ESM resolver.</span></span>
-<span class=line><span>7. RESOLVE_ESM_MATCH(MATCH)</span></span>
+<span class=line><span>5. RESOLVE_ESM_MATCH(MATCH)</span></span>
 <span class=line><span></span></span>
 <span class=line><span>LOAD_PACKAGE_SELF(X, DIR)</span></span>
 <span class=line><span>1. Find the closest package scope SCOPE to DIR.</span></span>
@@ -875,7 +898,7 @@ See <a href=#accessing-the-main-module>"Accessing the main module"</a>.<p>In <co
 <li><code>request</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> The module path to resolve.</li>
 <li><code>options</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object><code>&lt;Object></code></a>
 <ul>
-<li><code>paths</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string[]></code></a> Paths to resolve module location from. If present, these
+<li><code>paths</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a>[] Paths to resolve module location from. If present, these
 paths are used instead of the default resolution paths, with the exception
 of <a href=#loading-from-the-global-folders>GLOBAL_FOLDERS</a> like <code>$HOME/.node_modules</code>, which are
 always included. Each of these paths is used as a starting point for
@@ -888,7 +911,7 @@ is checked from this location.</li>
 but rather than loading the module, just return the resolved filename.<p>If the module can not be found, a <code>MODULE_NOT_FOUND</code> error is thrown.</section>
 <section><h6><code>require.resolve.paths(request)</code><span><a id=modules_require_resolve_paths_request></a></span><span><a class=mark id=requireresolvepathsrequest href=#requireresolvepathsrequest>#</a></span></h6><div class=api_metadata><span>Added in: v8.9.0</span></div><ul>
 <li><code>request</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> The module path whose lookup paths are being retrieved.</li>
-<li>Returns: <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string[]></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#null_type><code>&lt;null></code></a></li>
+<li>Returns: <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a>[] | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#null_type><code>&lt;null></code></a></li>
 </ul><p>Returns an array containing the paths searched during resolution of <code>request</code> or
 <code>null</code> if the <code>request</code> string references a core module, for example <code>http</code> or
 <code>fs</code>.</section>
@@ -899,7 +922,7 @@ representing the current module. For convenience, <code>module.exports</code> is
 also accessible via the <code>exports</code> module-global. <code>module</code> is not actually
 a global but rather local to each module.</section>
 <section><h4><code>module.children</code><span><a id=modules_module_children></a></span><span><a class=mark id=modulechildren href=#modulechildren>#</a></span></h4><div class=api_metadata><span>Added in: v0.1.16</span></div><ul>
-<li>Type: <a href=modules.html#the-module-object><code>&lt;module[]></code></a></li>
+<li>Type: <a href=modules.html#the-module-object><code>&lt;module></code></a>[]</li>
 </ul><p>The module objects required for the first time by this one.</section>
 <section><h4><code>module.exports</code><span><a id=modules_module_exports></a></span><span><a class=mark id=moduleexports href=#moduleexports>#</a></span></h4><div class=api_metadata><span>Added in: v0.1.16</span></div><ul>
 <li>Type: <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object><code>&lt;Object></code></a></li>
@@ -978,7 +1001,7 @@ something that is not a CommonJS module (E.G.: REPL or <code>import</code>).</se
 </ul><p>The directory name of the module. This is usually the same as the
 <a href=path.html#pathdirnamepath><code>path.dirname()</code></a> of the <a href=#moduleid><code>module.id</code></a>.</section>
 <section><h4><code>module.paths</code><span><a id=modules_module_paths></a></span><span><a class=mark id=modulepaths href=#modulepaths>#</a></span></h4><div class=api_metadata><span>Added in: v0.4.0</span></div><ul>
-<li>Type: <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string[]></code></a></li>
+<li>Type: <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a>[]</li>
 </ul><p>The search paths for the module.</section>
 <section><h4><code>module.require(id)</code><span><a id=modules_module_require_id></a></span><span><a class=mark id=modulerequireid href=#modulerequireid>#</a></span></h4><div class=api_metadata><span>Added in: v0.5.1</span></div><ul>
 <li><code>id</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a></li>

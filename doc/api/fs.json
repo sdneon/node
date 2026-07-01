@@ -126,9 +126,9 @@
                     {
                       "params": [
                         {
-                          "textRaw": "`data` {string|Buffer|TypedArray|DataView|AsyncIterable|Stream}",
+                          "textRaw": "`data` {string|Buffer|TypedArray|DataView|AsyncIterable|Iterable|Stream}",
                           "name": "data",
-                          "type": "string|Buffer|TypedArray|DataView|AsyncIterable|Stream"
+                          "type": "string|Buffer|TypedArray|DataView|AsyncIterable|Iterable|Stream"
                         },
                         {
                           "textRaw": "`options` {Object|string}",
@@ -487,9 +487,10 @@
                         }
                       ],
                       "return": {
-                        "textRaw": "Returns: {AsyncIterable<Uint8Array[]>}",
+                        "textRaw": "Returns: {AsyncIterable}<{Uint8Array}[]>",
                         "name": "return",
-                        "type": "AsyncIterable<Uint8Array[]>"
+                        "type": "AsyncIterable",
+                        "desc": "<{Uint8Array}[]>"
                       }
                     }
                   ],
@@ -555,9 +556,10 @@
                         }
                       ],
                       "return": {
-                        "textRaw": "Returns: {Iterable<Uint8Array[]>}",
+                        "textRaw": "Returns: {Iterable}<{Uint8Array}[]>",
                         "name": "return",
-                        "type": "Iterable<Uint8Array[]>"
+                        "type": "Iterable",
+                        "desc": "<{Uint8Array}[]>"
                       }
                     }
                   ],
@@ -866,7 +868,13 @@
                     "added": [
                       "v10.0.0"
                     ],
-                    "changes": []
+                    "changes": [
+                      {
+                        "version": "v26.4.0",
+                        "pr-url": "https://github.com/nodejs/node/pull/63634",
+                        "description": "Added support for the `buffer` option."
+                      }
+                    ]
                   },
                   "signatures": [
                     {
@@ -887,6 +895,12 @@
                               "name": "signal",
                               "type": "AbortSignal",
                               "desc": "allows aborting an in-progress readFile"
+                            },
+                            {
+                              "textRaw": "`buffer` {Buffer|TypedArray|DataView|Function} A buffer to read into, or a function called with the file size that returns the buffer.",
+                              "name": "buffer",
+                              "type": "Buffer|TypedArray|DataView|Function",
+                              "desc": "A buffer to read into, or a function called with the file size that returns the buffer."
                             }
                           ]
                         }
@@ -899,7 +913,7 @@
                       }
                     }
                   ],
-                  "desc": "<p>Asynchronously reads the entire contents of a file.</p>\n<p>If <code>options</code> is a string, then it specifies the <code>encoding</code>.</p>\n<p>The <a href=\"fs.html#class-filehandle\"><code>&#x3C;FileHandle></code></a> has to support reading.</p>\n<p>If one or more <code>filehandle.read()</code> calls are made on a file handle and then a\n<code>filehandle.readFile()</code> call is made, the data will be read from the current\nposition till the end of the file. It doesn't always read from the beginning\nof the file.</p>"
+                  "desc": "<p>Asynchronously reads the entire contents of a file.</p>\n<p>If <code>options</code> is a string, then it specifies the <code>encoding</code>.</p>\n<p>If <code>buffer</code> is provided and no encoding is specified, the returned <a href=\"buffer.html#class-buffer\"><code>&#x3C;Buffer></code></a> is\na view over the supplied buffer containing only the bytes read. If the\nsupplied buffer is too small to contain the entire file, the operation will\nfail.</p>\n<p>The <a href=\"fs.html#class-filehandle\"><code>&#x3C;FileHandle></code></a> has to support reading.</p>\n<p>If one or more <code>filehandle.read()</code> calls are made on a file handle and then a\n<code>filehandle.readFile()</code> call is made, the data will be read from the current\nposition till the end of the file. It doesn't always read from the beginning\nof the file.</p>\n<p>An example using the <code>buffer</code> option with a pre-allocated buffer:</p>\n<pre><code class=\"language-mjs\">import { Buffer } from 'node:buffer';\nimport { open } from 'node:fs/promises';\n\nconst file = await open('./some/file/to/read');\ntry {\n  const buf = Buffer.alloc(16384);\n  const contents = await file.readFile({ buffer: buf });\n  console.log(contents); // A view over `buf` containing only the bytes read\n} finally {\n  await file.close();\n}\n</code></pre>\n<p>An example using the <code>buffer</code> option with a function returning a buffer:</p>\n<pre><code class=\"language-mjs\">import { Buffer } from 'node:buffer';\nimport { open } from 'node:fs/promises';\n\nconst file = await open('./some/file/to/read');\ntry {\n  const contents = await file.readFile({\n    buffer: (size) => Buffer.alloc(size),\n  });\n  console.log(contents);\n} finally {\n  await file.close();\n}\n</code></pre>"
                 },
                 {
                   "textRaw": "`filehandle.readLines([options])`",
@@ -982,9 +996,10 @@
                     {
                       "params": [
                         {
-                          "textRaw": "`buffers` {Buffer[]|TypedArray[]|DataView[]}",
+                          "textRaw": "`buffers` {Buffer}[] | {TypedArray}[] | {DataView}[]",
                           "name": "buffers",
-                          "type": "Buffer[]|TypedArray[]|DataView[]"
+                          "type": "Buffer",
+                          "desc": "[] | {TypedArray}[] | {DataView}[]"
                         },
                         {
                           "textRaw": "`position` {integer|null} The offset from the beginning of the file where the data should be read from. If `position` is not a `number`, the data will be read from the current position. **Default:** `null`",
@@ -1008,10 +1023,10 @@
                             "desc": "the number of bytes read"
                           },
                           {
-                            "textRaw": "`buffers` {Buffer[]|TypedArray[]|DataView[]} property containing a reference to the `buffers` input.",
+                            "textRaw": "`buffers` {Buffer}[] | {TypedArray}[] | {DataView}[] property containing a reference to the `buffers` input.",
                             "name": "buffers",
-                            "type": "Buffer[]|TypedArray[]|DataView[]",
-                            "desc": "property containing a reference to the `buffers` input."
+                            "type": "Buffer",
+                            "desc": "[] | {TypedArray}[] | {DataView}[] property containing a reference to the `buffers` input."
                           }
                         ]
                       }
@@ -1350,9 +1365,9 @@
                     {
                       "params": [
                         {
-                          "textRaw": "`data` {string|Buffer|TypedArray|DataView|AsyncIterable|Stream}",
+                          "textRaw": "`data` {string|Buffer|TypedArray|DataView|AsyncIterable|Iterable|Stream}",
                           "name": "data",
-                          "type": "string|Buffer|TypedArray|DataView|AsyncIterable|Stream"
+                          "type": "string|Buffer|TypedArray|DataView|AsyncIterable|Iterable|Stream"
                         },
                         {
                           "textRaw": "`options` {Object|string}",
@@ -1399,9 +1414,10 @@
                     {
                       "params": [
                         {
-                          "textRaw": "`buffers` {Buffer[]|TypedArray[]|DataView[]}",
+                          "textRaw": "`buffers` {Buffer}[] | {TypedArray}[] | {DataView}[]",
                           "name": "buffers",
-                          "type": "Buffer[]|TypedArray[]|DataView[]"
+                          "type": "Buffer",
+                          "desc": "[] | {TypedArray}[] | {DataView}[]"
                         },
                         {
                           "textRaw": "`position` {integer|null} The offset from the beginning of the file where the data from `buffers` should be written. If `position` is not a `number`, the data will be written at the current position. **Default:** `null`",
@@ -1419,7 +1435,7 @@
                       }
                     }
                   ],
-                  "desc": "<p>Write an array of {ArrayBufferView}s to the file.</p>\n<p>The promise is fulfilled with an object containing a two properties:</p>\n<ul>\n<li><code>bytesWritten</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;integer></code></a> the number of bytes written</li>\n<li><code>buffers</code> <a href=\"buffer.html#class-buffer\"><code>&#x3C;Buffer[]></code></a> | <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\"><code>&#x3C;TypedArray[]></code></a> | <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/DataView\"><code>&#x3C;DataView[]></code></a> a reference to the <code>buffers</code>\ninput.</li>\n</ul>\n<p>It is unsafe to call <code>writev()</code> multiple times on the same file without waiting\nfor the promise to be fulfilled (or rejected).</p>\n<p>On Linux, positional writes don't work when the file is opened in append mode.\nThe kernel ignores the position argument and always appends the data to\nthe end of the file.</p>"
+                  "desc": "<p>Write an array of {ArrayBufferView}s to the file.</p>\n<p>The promise is fulfilled with an object containing a two properties:</p>\n<ul>\n<li><code>bytesWritten</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;integer></code></a> the number of bytes written</li>\n<li><code>buffers</code> <a href=\"buffer.html#class-buffer\"><code>&#x3C;Buffer></code></a>[] | <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\"><code>&#x3C;TypedArray></code></a>[] | <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/DataView\"><code>&#x3C;DataView></code></a>[] a reference to the <code>buffers</code>\ninput.</li>\n</ul>\n<p>It is unsafe to call <code>writev()</code> multiple times on the same file without waiting\nfor the promise to be fulfilled (or rejected).</p>\n<p>On Linux, positional writes don't work when the file is opened in append mode.\nThe kernel ignores the position argument and always appends the data to\nthe end of the file.</p>"
                 },
                 {
                   "textRaw": "`filehandle.writer([options])`",
@@ -1474,10 +1490,10 @@
                         }
                       ],
                       "return": {
-                        "textRaw": "Returns: {Object}`write(chunk[, options])` {Function} Returns {Promise}. Accepts `Uint8Array`, `Buffer`, or string (UTF-8 encoded).`chunk` {Buffer|TypedArray|DataView|string}`options` {Object}`signal` {AbortSignal} If the signal is already aborted, the write rejects with `AbortError` without performing I/O.`writev(chunks[, options])` {Function} Returns {Promise}. Uses scatter/gather I/O via a single `writev()` syscall. Accepts mixed `Uint8Array`/string arrays.`chunks` {Buffer[]|TypedArray[]|DataView[]|string[]}`options` {Object}`signal` {AbortSignal} If the signal is already aborted, the write rejects with `AbortError` without performing I/O.`writeSync(chunk)` {Function} Returns {boolean}. Attempts a synchronous write. Returns `true` if the write succeeded, `false` if the caller should fall back to async `write()`. Returns `false` when: the writer is closed/errored, an async operation is in flight, the chunk exceeds `chunkSize`, or the write would exceed `limit`.`chunk` {Buffer|TypedArray|DataView|string}`writevSync(chunks)` {Function} Returns {boolean}. Synchronous batch write. Same fallback semantics as `writeSync()`.`chunks` {Buffer[]|TypedArray[]|DataView[]|string[]}`end([options])` {Function} Returns {Promise}, fulfills with the total number of bytes written. Idempotent: returns `totalBytesWritten` if already closed, returns the pending promise if already closing. Rejects if the writer is in an errored state.`options` {Object}`signal` {AbortSignal} If the signal is already aborted, `end()` rejects with `AbortError` and the writer remains open.`endSync()` {Function} Returns {number|number} total bytes written on success, `-1` if the writer is errored or an async operation is in flight. Idempotent when already closed.`fail(reason)` {Function} Puts the writer into a terminal error state. Synchronous. If the writer is already closed or errored, this is a no-op. If `autoClose` is true, closes the file handle synchronously.",
+                        "textRaw": "Returns: {Object}`write(chunk[, options])` {Function} Returns {Promise}. Accepts `Uint8Array`, `Buffer`, or string (UTF-8 encoded).`chunk` {Buffer|TypedArray|DataView|string}`options` {Object}`signal` {AbortSignal} If the signal is already aborted, the write rejects with `AbortError` without performing I/O.`writev(chunks[, options])` {Function} Returns {Promise}. Uses scatter/gather I/O via a single `writev()` syscall. Accepts mixed `Uint8Array`/string arrays.`chunks` {Buffer}[] | {TypedArray}[] | {DataView}[] | {string}[]`options` {Object}`signal` {AbortSignal} If the signal is already aborted, the write rejects with `AbortError` without performing I/O.`writeSync(chunk)` {Function} Returns {boolean}. Attempts a synchronous write. Returns `true` if the write succeeded, `false` if the caller should fall back to async `write()`. Returns `false` when: the writer is closed/errored, an async operation is in flight, the chunk exceeds `chunkSize`, or the write would exceed `limit`.`chunk` {Buffer|TypedArray|DataView|string}`writevSync(chunks)` {Function} Returns {boolean}. Synchronous batch write. Same fallback semantics as `writeSync()`.`chunks` {Buffer}[] | {TypedArray}[] | {DataView}[] | {string}[]`end([options])` {Function} Returns {Promise}, fulfills with the total number of bytes written. Idempotent: returns `totalBytesWritten` if already closed, returns the pending promise if already closing. Rejects if the writer is in an errored state.`options` {Object}`signal` {AbortSignal} If the signal is already aborted, `end()` rejects with `AbortError` and the writer remains open.`endSync()` {Function} Returns {number|number} total bytes written on success, `-1` if the writer is errored or an async operation is in flight. Idempotent when already closed.`fail(reason)` {Function} Puts the writer into a terminal error state. Synchronous. If the writer is already closed or errored, this is a no-op. If `autoClose` is true, closes the file handle synchronously.",
                         "name": "return",
                         "type": "Object",
-                        "desc": "`write(chunk[, options])` {Function} Returns {Promise}. Accepts `Uint8Array`, `Buffer`, or string (UTF-8 encoded).`chunk` {Buffer|TypedArray|DataView|string}`options` {Object}`signal` {AbortSignal} If the signal is already aborted, the write rejects with `AbortError` without performing I/O.`writev(chunks[, options])` {Function} Returns {Promise}. Uses scatter/gather I/O via a single `writev()` syscall. Accepts mixed `Uint8Array`/string arrays.`chunks` {Buffer[]|TypedArray[]|DataView[]|string[]}`options` {Object}`signal` {AbortSignal} If the signal is already aborted, the write rejects with `AbortError` without performing I/O.`writeSync(chunk)` {Function} Returns {boolean}. Attempts a synchronous write. Returns `true` if the write succeeded, `false` if the caller should fall back to async `write()`. Returns `false` when: the writer is closed/errored, an async operation is in flight, the chunk exceeds `chunkSize`, or the write would exceed `limit`.`chunk` {Buffer|TypedArray|DataView|string}`writevSync(chunks)` {Function} Returns {boolean}. Synchronous batch write. Same fallback semantics as `writeSync()`.`chunks` {Buffer[]|TypedArray[]|DataView[]|string[]}`end([options])` {Function} Returns {Promise}, fulfills with the total number of bytes written. Idempotent: returns `totalBytesWritten` if already closed, returns the pending promise if already closing. Rejects if the writer is in an errored state.`options` {Object}`signal` {AbortSignal} If the signal is already aborted, `end()` rejects with `AbortError` and the writer remains open.`endSync()` {Function} Returns {number|number} total bytes written on success, `-1` if the writer is errored or an async operation is in flight. Idempotent when already closed.`fail(reason)` {Function} Puts the writer into a terminal error state. Synchronous. If the writer is already closed or errored, this is a no-op. If `autoClose` is true, closes the file handle synchronously."
+                        "desc": "`write(chunk[, options])` {Function} Returns {Promise}. Accepts `Uint8Array`, `Buffer`, or string (UTF-8 encoded).`chunk` {Buffer|TypedArray|DataView|string}`options` {Object}`signal` {AbortSignal} If the signal is already aborted, the write rejects with `AbortError` without performing I/O.`writev(chunks[, options])` {Function} Returns {Promise}. Uses scatter/gather I/O via a single `writev()` syscall. Accepts mixed `Uint8Array`/string arrays.`chunks` {Buffer}[] | {TypedArray}[] | {DataView}[] | {string}[]`options` {Object}`signal` {AbortSignal} If the signal is already aborted, the write rejects with `AbortError` without performing I/O.`writeSync(chunk)` {Function} Returns {boolean}. Attempts a synchronous write. Returns `true` if the write succeeded, `false` if the caller should fall back to async `write()`. Returns `false` when: the writer is closed/errored, an async operation is in flight, the chunk exceeds `chunkSize`, or the write would exceed `limit`.`chunk` {Buffer|TypedArray|DataView|string}`writevSync(chunks)` {Function} Returns {boolean}. Synchronous batch write. Same fallback semantics as `writeSync()`.`chunks` {Buffer}[] | {TypedArray}[] | {DataView}[] | {string}[]`end([options])` {Function} Returns {Promise}, fulfills with the total number of bytes written. Idempotent: returns `totalBytesWritten` if already closed, returns the pending promise if already closing. Rejects if the writer is in an errored state.`options` {Object}`signal` {AbortSignal} If the signal is already aborted, `end()` rejects with `AbortError` and the writer remains open.`endSync()` {Function} Returns {number|number} total bytes written on success, `-1` if the writer is errored or an async operation is in flight. Idempotent when already closed.`fail(reason)` {Function} Puts the writer into a terminal error state. Synchronous. If the writer is already closed or errored, this is a no-op. If `autoClose` is true, closes the file handle synchronously."
                       }
                     }
                   ],
@@ -1970,9 +1986,10 @@
                 {
                   "params": [
                     {
-                      "textRaw": "`pattern` {string|string[]}",
+                      "textRaw": "`pattern` {string|string}[]",
                       "name": "pattern",
-                      "type": "string|string[]"
+                      "type": "string|string",
+                      "desc": "[]"
                     },
                     {
                       "textRaw": "`options` {Object}",
@@ -1987,11 +2004,11 @@
                           "desc": "current working directory."
                         },
                         {
-                          "textRaw": "`exclude` {Function|string[]} Function to filter out files/directories or a list of glob patterns to be excluded. If a function is provided, return `true` to exclude the item, `false` to include it. **Default:** `undefined`. If a string array is provided, each string should be a glob pattern that specifies paths to exclude. Note: Negation patterns (e.g., '!foo.js') are not supported.",
+                          "textRaw": "`exclude` {Function|string}[] Function to filter out files/directories or a list of glob patterns to be excluded. If a function is provided, return `true` to exclude the item, `false` to include it. **Default:** `undefined`. If a string array is provided, each string should be a glob pattern that specifies paths to exclude. Note: Negation patterns (e.g., '!foo.js') are not supported.",
                           "name": "exclude",
-                          "type": "Function|string[]",
+                          "type": "Function|string",
                           "default": "`undefined`. If a string array is provided, each string should be a glob pattern that specifies paths to exclude. Note: Negation patterns (e.g., '!foo.js') are not supported",
-                          "desc": "Function to filter out files/directories or a list of glob patterns to be excluded. If a function is provided, return `true` to exclude the item, `false` to include it."
+                          "desc": "[] Function to filter out files/directories or a list of glob patterns to be excluded. If a function is provided, return `true` to exclude the item, `false` to include it."
                         },
                         {
                           "textRaw": "`followSymlinks` {boolean} When `true`, symbolic links to directories are followed while expanding `**` patterns. **Default:** `false`.",
@@ -2603,6 +2620,11 @@
                 ],
                 "changes": [
                   {
+                    "version": "v26.4.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/63634",
+                    "description": "Added support for the `buffer` option."
+                  },
+                  {
                     "version": [
                       "v15.2.0",
                       "v14.17.0"
@@ -2644,6 +2666,12 @@
                           "name": "signal",
                           "type": "AbortSignal",
                           "desc": "allows aborting an in-progress readFile"
+                        },
+                        {
+                          "textRaw": "`buffer` {Buffer|TypedArray|DataView|Function} A buffer to read into, or a function called with the file size that returns the buffer.",
+                          "name": "buffer",
+                          "type": "Buffer|TypedArray|DataView|Function",
+                          "desc": "A buffer to read into, or a function called with the file size that returns the buffer."
                         }
                       ],
                       "optional": true
@@ -2657,7 +2685,7 @@
                   }
                 }
               ],
-              "desc": "<p>Asynchronously reads the entire contents of a file.</p>\n<p>If no encoding is specified (using <code>options.encoding</code>), the data is returned\nas a <a href=\"buffer.html#class-buffer\"><code>&#x3C;Buffer></code></a> object. Otherwise, the data will be a string.</p>\n<p>If <code>options</code> is a string, then it specifies the encoding.</p>\n<p>When the <code>path</code> is a directory, the behavior of <code>fsPromises.readFile()</code> is\nplatform-specific. On macOS, Linux, and Windows, the promise will be rejected\nwith an error. On FreeBSD, a representation of the directory's contents will be\nreturned.</p>\n<p>An example of reading a <code>package.json</code> file located in the same directory of the\nrunning code:</p>\n<pre><code class=\"language-mjs\">import { readFile } from 'node:fs/promises';\ntry {\n  const filePath = new URL('./package.json', import.meta.url);\n  const contents = await readFile(filePath, { encoding: 'utf8' });\n  console.log(contents);\n} catch (err) {\n  console.error(err.message);\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const { readFile } = require('node:fs/promises');\nconst { resolve } = require('node:path');\nasync function logFile() {\n  try {\n    const filePath = resolve('./package.json');\n    const contents = await readFile(filePath, { encoding: 'utf8' });\n    console.log(contents);\n  } catch (err) {\n    console.error(err.message);\n  }\n}\nlogFile();\n</code></pre>\n<p>It is possible to abort an ongoing <code>readFile</code> using an <a href=\"globals.html#class-abortsignal\"><code>&#x3C;AbortSignal></code></a>. If a\nrequest is aborted the promise returned is rejected with an <code>AbortError</code>:</p>\n<pre><code class=\"language-mjs\">import { readFile } from 'node:fs/promises';\n\ntry {\n  const controller = new AbortController();\n  const { signal } = controller;\n  const promise = readFile(fileName, { signal });\n\n  // Abort the request before the promise settles.\n  controller.abort();\n\n  await promise;\n} catch (err) {\n  // When a request is aborted - err is an AbortError\n  console.error(err);\n}\n</code></pre>\n<p>Aborting an ongoing request does not abort individual operating\nsystem requests but rather the internal buffering <code>fs.readFile</code> performs.</p>\n<p>Any specified <a href=\"fs.html#class-filehandle\"><code>&#x3C;FileHandle></code></a> has to support reading.</p>"
+              "desc": "<p>Asynchronously reads the entire contents of a file.</p>\n<p>If no encoding is specified (using <code>options.encoding</code>), the data is returned\nas a <a href=\"buffer.html#class-buffer\"><code>&#x3C;Buffer></code></a> object. Otherwise, the data will be a string.</p>\n<p>If <code>options</code> is a string, then it specifies the encoding.</p>\n<p>If <code>buffer</code> is provided and no encoding is specified, the returned <a href=\"buffer.html#class-buffer\"><code>&#x3C;Buffer></code></a> is\na view over the supplied buffer containing only the bytes read. If the\nsupplied buffer is too small to contain the entire file, the promise will be\nrejected.</p>\n<p>When the <code>path</code> is a directory, the behavior of <code>fsPromises.readFile()</code> is\nplatform-specific. On macOS, Linux, and Windows, the promise will be rejected\nwith an error. On FreeBSD, a representation of the directory's contents will be\nreturned.</p>\n<p>An example of reading a <code>package.json</code> file located in the same directory of the\nrunning code:</p>\n<pre><code class=\"language-mjs\">import { readFile } from 'node:fs/promises';\ntry {\n  const filePath = new URL('./package.json', import.meta.url);\n  const contents = await readFile(filePath, { encoding: 'utf8' });\n  console.log(contents);\n} catch (err) {\n  console.error(err.message);\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const { readFile } = require('node:fs/promises');\nconst { resolve } = require('node:path');\nasync function logFile() {\n  try {\n    const filePath = resolve('./package.json');\n    const contents = await readFile(filePath, { encoding: 'utf8' });\n    console.log(contents);\n  } catch (err) {\n    console.error(err.message);\n  }\n}\nlogFile();\n</code></pre>\n<p>It is possible to abort an ongoing <code>readFile</code> using an <a href=\"globals.html#class-abortsignal\"><code>&#x3C;AbortSignal></code></a>. If a\nrequest is aborted the promise returned is rejected with an <code>AbortError</code>:</p>\n<pre><code class=\"language-mjs\">import { readFile } from 'node:fs/promises';\n\ntry {\n  const controller = new AbortController();\n  const { signal } = controller;\n  const promise = readFile(fileName, { signal });\n\n  // Abort the request before the promise settles.\n  controller.abort();\n\n  await promise;\n} catch (err) {\n  // When a request is aborted - err is an AbortError\n  console.error(err);\n}\n</code></pre>\n<p>Aborting an ongoing request does not abort individual operating\nsystem requests but rather the internal buffering <code>fs.readFile</code> performs.</p>\n<p>Any specified <a href=\"fs.html#class-filehandle\"><code>&#x3C;FileHandle></code></a> has to support reading.</p>\n<p>An example using the <code>buffer</code> option with a pre-allocated buffer:</p>\n<pre><code class=\"language-mjs\">import { Buffer } from 'node:buffer';\nimport { readFile } from 'node:fs/promises';\n\nconst buf = Buffer.alloc(16384);\nconst contents = await readFile('/path/to/file', { buffer: buf });\nconsole.log(contents); // A view over `buf` containing only the bytes read\n</code></pre>\n<p>An example using the <code>buffer</code> option with a function returning a buffer:</p>\n<pre><code class=\"language-mjs\">import { Buffer } from 'node:buffer';\nimport { readFile } from 'node:fs/promises';\n\nconst contents = await readFile('/path/to/file', {\n  buffer: (size) => Buffer.alloc(size),\n});\nconsole.log(contents);\n</code></pre>"
             },
             {
               "textRaw": "`fsPromises.readlink(path[, options])`",
@@ -3325,9 +3353,9 @@
                       "desc": "filename or `FileHandle`"
                     },
                     {
-                      "textRaw": "`data` {string|Buffer|TypedArray|DataView|AsyncIterable|Stream}",
+                      "textRaw": "`data` {string|Buffer|TypedArray|DataView|AsyncIterable|Iterable|Stream}",
                       "name": "data",
-                      "type": "string|Buffer|TypedArray|DataView|AsyncIterable|Stream"
+                      "type": "string|Buffer|TypedArray|DataView|AsyncIterable|Iterable|Stream"
                     },
                     {
                       "textRaw": "`options` {Object|string}",
@@ -4845,9 +4873,10 @@
                 {
                   "params": [
                     {
-                      "textRaw": "`pattern` {string|string[]}",
+                      "textRaw": "`pattern` {string|string}[]",
                       "name": "pattern",
-                      "type": "string|string[]"
+                      "type": "string|string",
+                      "desc": "[]"
                     },
                     {
                       "textRaw": "`options` {Object}",
@@ -4862,11 +4891,11 @@
                           "desc": "current working directory."
                         },
                         {
-                          "textRaw": "`exclude` {Function|string[]} Function to filter out files/directories or a list of glob patterns to be excluded. If a function is provided, return `true` to exclude the item, `false` to include it. **Default:** `undefined`.",
+                          "textRaw": "`exclude` {Function|string}[] Function to filter out files/directories or a list of glob patterns to be excluded. If a function is provided, return `true` to exclude the item, `false` to include it. **Default:** `undefined`.",
                           "name": "exclude",
-                          "type": "Function|string[]",
+                          "type": "Function|string",
                           "default": "`undefined`",
-                          "desc": "Function to filter out files/directories or a list of glob patterns to be excluded. If a function is provided, return `true` to exclude the item, `false` to include it."
+                          "desc": "[] Function to filter out files/directories or a list of glob patterns to be excluded. If a function is provided, return `true` to exclude the item, `false` to include it."
                         },
                         {
                           "textRaw": "`followSymlinks` {boolean} When `true`, symbolic links to directories are followed while expanding `**` patterns. **Default:** `false`.",
@@ -5980,9 +6009,10 @@
                           "type": "Error"
                         },
                         {
-                          "textRaw": "`files` {string[]|Buffer[]|fs.Dirent[]}",
+                          "textRaw": "`files` {string}[] | {Buffer}[] | {fs.Dirent}[]",
                           "name": "files",
-                          "type": "string[]|Buffer[]|fs.Dirent[]"
+                          "type": "string",
+                          "desc": "[] | {Buffer}[] | {fs.Dirent}[]"
                         }
                       ]
                     }
@@ -6000,6 +6030,11 @@
                   "v0.1.29"
                 ],
                 "changes": [
+                  {
+                    "version": "v26.4.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/63634",
+                    "description": "Added support for the `buffer` option."
+                  },
                   {
                     "version": "v18.0.0",
                     "pr-url": "https://github.com/nodejs/node/pull/41678",
@@ -6077,6 +6112,12 @@
                           "name": "signal",
                           "type": "AbortSignal",
                           "desc": "allows aborting an in-progress readFile"
+                        },
+                        {
+                          "textRaw": "`buffer` {Buffer|TypedArray|DataView|Function} A buffer to read into, or a function called with the file size that returns the buffer.",
+                          "name": "buffer",
+                          "type": "Buffer|TypedArray|DataView|Function",
+                          "desc": "A buffer to read into, or a function called with the file size that returns the buffer."
                         }
                       ],
                       "optional": true
@@ -6101,7 +6142,7 @@
                   ]
                 }
               ],
-              "desc": "<p>Asynchronously reads the entire contents of a file.</p>\n<pre><code class=\"language-mjs\">import { readFile } from 'node:fs';\n\nreadFile('/etc/passwd', (err, data) => {\n  if (err) throw err;\n  console.log(data);\n});\n</code></pre>\n<p>The callback is passed two arguments <code>(err, data)</code>, where <code>data</code> is the\ncontents of the file.</p>\n<p>If no encoding is specified, then the raw buffer is returned.</p>\n<p>If <code>options</code> is a string, then it specifies the encoding:</p>\n<pre><code class=\"language-mjs\">import { readFile } from 'node:fs';\n\nreadFile('/etc/passwd', 'utf8', callback);\n</code></pre>\n<p>When the path is a directory, the behavior of <code>fs.readFile()</code> and\n<a href=\"#fsreadfilesyncpath-options\"><code>fs.readFileSync()</code></a> is platform-specific. On macOS, Linux, and Windows, an\nerror will be returned. On FreeBSD, a representation of the directory's contents\nwill be returned.</p>\n<pre><code class=\"language-mjs\">import { readFile } from 'node:fs';\n\n// macOS, Linux, and Windows\nreadFile('&#x3C;directory>', (err, data) => {\n  // => [Error: EISDIR: illegal operation on a directory, read &#x3C;directory>]\n});\n\n//  FreeBSD\nreadFile('&#x3C;directory>', (err, data) => {\n  // => null, &#x3C;data>\n});\n</code></pre>\n<p>It is possible to abort an ongoing request using an <code>AbortSignal</code>. If a\nrequest is aborted the callback is called with an <code>AbortError</code>:</p>\n<pre><code class=\"language-mjs\">import { readFile } from 'node:fs';\n\nconst controller = new AbortController();\nconst signal = controller.signal;\nreadFile(fileInfo[0].name, { signal }, (err, buf) => {\n  // ...\n});\n// When you want to abort the request\ncontroller.abort();\n</code></pre>\n<p>The <code>fs.readFile()</code> function buffers the entire file. To minimize memory costs,\nwhen possible prefer streaming via <code>fs.createReadStream()</code>.</p>\n<p>Aborting an ongoing request does not abort individual operating\nsystem requests but rather the internal buffering <code>fs.readFile</code> performs.</p>",
+              "desc": "<p>Asynchronously reads the entire contents of a file.</p>\n<pre><code class=\"language-mjs\">import { readFile } from 'node:fs';\n\nreadFile('/etc/passwd', (err, data) => {\n  if (err) throw err;\n  console.log(data);\n});\n</code></pre>\n<p>The callback is passed two arguments <code>(err, data)</code>, where <code>data</code> is the\ncontents of the file.</p>\n<p>If no encoding is specified, then the raw buffer is returned.</p>\n<p>If <code>buffer</code> is provided and no encoding is specified, the returned <a href=\"buffer.html#class-buffer\"><code>&#x3C;Buffer></code></a> is\na view over the supplied buffer containing only the bytes read. If the\nsupplied buffer is too small to contain the entire file, the callback is\ncalled with an error.</p>\n<p>If <code>options</code> is a string, then it specifies the encoding:</p>\n<pre><code class=\"language-mjs\">import { readFile } from 'node:fs';\n\nreadFile('/etc/passwd', 'utf8', callback);\n</code></pre>\n<p>When the path is a directory, the behavior of <code>fs.readFile()</code> and\n<a href=\"#fsreadfilesyncpath-options\"><code>fs.readFileSync()</code></a> is platform-specific. On macOS, Linux, and Windows, an\nerror will be returned. On FreeBSD, a representation of the directory's contents\nwill be returned.</p>\n<pre><code class=\"language-mjs\">import { readFile } from 'node:fs';\n\n// macOS, Linux, and Windows\nreadFile('&#x3C;directory>', (err, data) => {\n  // => [Error: EISDIR: illegal operation on a directory, read &#x3C;directory>]\n});\n\n//  FreeBSD\nreadFile('&#x3C;directory>', (err, data) => {\n  // => null, &#x3C;data>\n});\n</code></pre>\n<p>It is possible to abort an ongoing request using an <code>AbortSignal</code>. If a\nrequest is aborted the callback is called with an <code>AbortError</code>:</p>\n<pre><code class=\"language-mjs\">import { readFile } from 'node:fs';\n\nconst controller = new AbortController();\nconst signal = controller.signal;\nreadFile(fileInfo[0].name, { signal }, (err, buf) => {\n  // ...\n});\n// When you want to abort the request\ncontroller.abort();\n</code></pre>\n<p>The <code>fs.readFile()</code> function buffers the entire file. To minimize memory costs,\nwhen possible prefer streaming via <code>fs.createReadStream()</code>.</p>\n<p>Aborting an ongoing request does not abort individual operating\nsystem requests but rather the internal buffering <code>fs.readFile</code> performs.</p>\n<p>An example using the <code>buffer</code> option with a pre-allocated buffer:</p>\n<pre><code class=\"language-mjs\">import { Buffer } from 'node:buffer';\nimport { readFile } from 'node:fs';\n\nconst buf = Buffer.alloc(16384);\nreadFile('/path/to/file', { buffer: buf }, (err, data) => {\n  if (err) throw err;\n  console.log(data); // A view over `buf` containing only the bytes read\n});\n</code></pre>\n<p>An example using the <code>buffer</code> option with a function returning a buffer:</p>\n<pre><code class=\"language-mjs\">import { Buffer } from 'node:buffer';\nimport { readFile } from 'node:fs';\n\nreadFile('/path/to/file', {\n  buffer: (size) => Buffer.alloc(size),\n}, (err, data) => {\n  if (err) throw err;\n  console.log(data);\n});\n</code></pre>",
               "modules": [
                 {
                   "textRaw": "File descriptors",
@@ -8543,9 +8584,10 @@
                 {
                   "params": [
                     {
-                      "textRaw": "`pattern` {string|string[]}",
+                      "textRaw": "`pattern` {string|string}[]",
                       "name": "pattern",
-                      "type": "string|string[]"
+                      "type": "string|string",
+                      "desc": "[]"
                     },
                     {
                       "textRaw": "`options` {Object}",
@@ -8560,11 +8602,11 @@
                           "desc": "current working directory."
                         },
                         {
-                          "textRaw": "`exclude` {Function|string[]} Function to filter out files/directories or a list of glob patterns to be excluded. If a function is provided, return `true` to exclude the item, `false` to include it. **Default:** `undefined`.",
+                          "textRaw": "`exclude` {Function|string}[] Function to filter out files/directories or a list of glob patterns to be excluded. If a function is provided, return `true` to exclude the item, `false` to include it. **Default:** `undefined`.",
                           "name": "exclude",
-                          "type": "Function|string[]",
+                          "type": "Function|string",
                           "default": "`undefined`",
-                          "desc": "Function to filter out files/directories or a list of glob patterns to be excluded. If a function is provided, return `true` to exclude the item, `false` to include it."
+                          "desc": "[] Function to filter out files/directories or a list of glob patterns to be excluded. If a function is provided, return `true` to exclude the item, `false` to include it."
                         },
                         {
                           "textRaw": "`followSymlinks` {boolean} When `true`, symbolic links to directories are followed while expanding `**` patterns. **Default:** `false`.",
@@ -8585,10 +8627,10 @@
                     }
                   ],
                   "return": {
-                    "textRaw": "Returns: {string[]} paths of files that match the pattern.",
+                    "textRaw": "Returns: {string}[] paths of files that match the pattern.",
                     "name": "return",
-                    "type": "string[]",
-                    "desc": "paths of files that match the pattern."
+                    "type": "string",
+                    "desc": "[] paths of files that match the pattern."
                   }
                 }
               ],
@@ -9189,9 +9231,10 @@
                     }
                   ],
                   "return": {
-                    "textRaw": "Returns: {string[]|Buffer[]|fs.Dirent[]}",
+                    "textRaw": "Returns: {string}[] | {Buffer}[] | {fs.Dirent}[]",
                     "name": "return",
-                    "type": "string[]|Buffer[]|fs.Dirent[]"
+                    "type": "string",
+                    "desc": "[] | {Buffer}[] | {fs.Dirent}[]"
                   }
                 }
               ],
@@ -9206,6 +9249,11 @@
                   "v0.1.8"
                 ],
                 "changes": [
+                  {
+                    "version": "v26.4.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/63634",
+                    "description": "Added support for the `buffer` option."
+                  },
                   {
                     "version": "v7.6.0",
                     "pr-url": "https://github.com/nodejs/node/pull/10739",
@@ -9244,6 +9292,12 @@
                           "type": "string",
                           "default": "`'r'`",
                           "desc": "See support of file system `flags`."
+                        },
+                        {
+                          "textRaw": "`buffer` {Buffer|TypedArray|DataView|Function} A buffer to read into, or a function called with the file size that returns the buffer.",
+                          "name": "buffer",
+                          "type": "Buffer|TypedArray|DataView|Function",
+                          "desc": "A buffer to read into, or a function called with the file size that returns the buffer."
                         }
                       ],
                       "optional": true
@@ -9256,7 +9310,7 @@
                   }
                 }
               ],
-              "desc": "<p>Returns the contents of the <code>path</code>.</p>\n<p>For detailed information, see the documentation of the asynchronous version of\nthis API: <a href=\"#fsreadfilepath-options-callback\"><code>fs.readFile()</code></a>.</p>\n<p>If the <code>encoding</code> option is specified then this function returns a\nstring. Otherwise it returns a buffer.</p>\n<p>Similar to <a href=\"#fsreadfilepath-options-callback\"><code>fs.readFile()</code></a>, when the path is a directory, the behavior of\n<code>fs.readFileSync()</code> is platform-specific.</p>\n<pre><code class=\"language-mjs\">import { readFileSync } from 'node:fs';\n\n// macOS, Linux, and Windows\nreadFileSync('&#x3C;directory>');\n// => [Error: EISDIR: illegal operation on a directory, read &#x3C;directory>]\n\n//  FreeBSD\nreadFileSync('&#x3C;directory>'); // => &#x3C;data>\n</code></pre>"
+              "desc": "<p>Returns the contents of the <code>path</code>.</p>\n<p>For detailed information, see the documentation of the asynchronous version of\nthis API: <a href=\"#fsreadfilepath-options-callback\"><code>fs.readFile()</code></a>.</p>\n<p>If the <code>encoding</code> option is specified then this function returns a\nstring. Otherwise it returns a buffer.</p>\n<p>If <code>buffer</code> is provided and no encoding is specified, the returned <a href=\"buffer.html#class-buffer\"><code>&#x3C;Buffer></code></a> is\na view over the supplied buffer containing only the bytes read. If the\nsupplied buffer is too small to contain the entire file, an error will be\nthrown.</p>\n<p>Similar to <a href=\"#fsreadfilepath-options-callback\"><code>fs.readFile()</code></a>, when the path is a directory, the behavior of\n<code>fs.readFileSync()</code> is platform-specific.</p>\n<pre><code class=\"language-mjs\">import { readFileSync } from 'node:fs';\n\n// macOS, Linux, and Windows\nreadFileSync('&#x3C;directory>');\n// => [Error: EISDIR: illegal operation on a directory, read &#x3C;directory>]\n\n//  FreeBSD\nreadFileSync('&#x3C;directory>'); // => &#x3C;data>\n</code></pre>"
             },
             {
               "textRaw": "`fs.readlinkSync(path[, options])`",

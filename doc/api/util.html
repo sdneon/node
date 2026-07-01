@@ -1,4 +1,4 @@
-<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content="width=device-width"><link rel=icon href=https://nodejs.org/favicon.ico><meta name=nodejs.org:node-version content=v26.3.0><title>Util | Node.js v26.3.0 Documentation</title><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback"><link rel=stylesheet href=assets/style.css><link rel=canonical href=https://nodejs.org/api/util.html><script async defer src=assets/api.js></script><script>("dark"===localStorage.getItem("theme")||null===localStorage.getItem("theme")&&window.matchMedia?.("(prefers-color-scheme: dark)").matches)&&document.documentElement.classList.add("dark-mode")</script><body class="alt apidoc" id=api-section-util><a href=#apicontent class=skip-to-content>Skip to content</a>
+<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content="width=device-width"><link rel=icon href=https://nodejs.org/favicon.ico><meta name=nodejs.org:node-version content=v26.4.0><title>Util | Node.js v26.4.0 Documentation</title><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback"><link rel=stylesheet href=assets/style.css><link rel=canonical href=https://nodejs.org/api/util.html><script async defer src=assets/api.js></script><script>("dark"===localStorage.getItem("theme")||null===localStorage.getItem("theme")&&window.matchMedia?.("(prefers-color-scheme: dark)").matches)&&document.documentElement.classList.add("dark-mode")</script><body class="alt apidoc" id=api-section-util><a href=#apicontent class=skip-to-content>Skip to content</a>
     <div id=content class=clearfix>
       <div role=navigation id=column2 class=interior>
         <div id=intro class=interior>
@@ -66,6 +66,7 @@
 <li><a class=nav-url href=url.html>URL</a></li>
 <li><a class="active nav-util" href=util.html>Utilities</a></li>
 <li><a class=nav-v8 href=v8.html>V8</a></li>
+<li><a class=nav-vfs href=vfs.html>Virtual File System</a></li>
 <li><a class=nav-vm href=vm.html>VM</a></li>
 <li><a class=nav-wasi href=wasi.html>WASI</a></li>
 <li><a class=nav-webcrypto href=webcrypto.html>Web Crypto API</a></li>
@@ -83,7 +84,7 @@
       <div id=column1 data-id=util class=interior>
         <header class=header>
           <div class=header-container>
-            <h1>Node.js v26.3.0 documentation</h1>
+            <h1>Node.js v26.4.0 documentation</h1>
             <button class=theme-toggle-btn id=theme-toggle-btn title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
               <svg class="dark-icon icon" height=24 width=24>
                 <path fill=none d="M0 0h24v24H0z"/>
@@ -98,7 +99,7 @@
           </div>
           <div id=gtoc>
             <ul>
-              <li class=pinned-header>Node.js v26.3.0</li>
+              <li class=pinned-header>Node.js v26.4.0</li>
               <li class=picker-header><a href=#toc-picker aria-controls=toc-picker><span class=picker-arrow></span>Table of contents</a><div class=picker><div class=toc tabindex=-1><ul id=toc-picker>
 <li><span class=stability_2><a href=util.html#util>Util</a></span>
 <ul>
@@ -318,6 +319,7 @@
 <li><a class=nav-url href=url.html>URL</a></li>
 <li><a class="active nav-util" href=util.html>Utilities</a></li>
 <li><a class=nav-v8 href=v8.html>V8</a></li>
+<li><a class=nav-vfs href=vfs.html>Virtual File System</a></li>
 <li><a class=nav-vm href=vm.html>VM</a></li>
 <li><a class=nav-wasi href=wasi.html>WASI</a></li>
 <li><a class=nav-webcrypto href=webcrypto.html>Web Crypto API</a></li>
@@ -799,7 +801,7 @@ with options <code>{ depth: 0, colors: false, compact: 3 }</code>.</li>
 <code>Symbol</code>.</li>
 <li><code>%i</code>: <code>parseInt(value, 10)</code> is used for all values except <code>BigInt</code> and
 <code>Symbol</code>.</li>
-<li><code>%f</code>: <code>parseFloat(value)</code> is used for all values expect <code>Symbol</code>.</li>
+<li><code>%f</code>: <code>parseFloat(value)</code> is used for all values except <code>Symbol</code>.</li>
 <li><code>%j</code>: JSON. Replaced with the string <code>'[Circular]'</code> if the argument contains
 circular references.</li>
 <li><code>%o</code>: <code>Object</code>. A string representation of an object with generic JavaScript
@@ -845,7 +847,7 @@ an <code>inspectOptions</code> argument which specifies options that are passed 
 Enabled by default with the flag <code>--enable-source-maps</code>.</li>
 </ul>
 </li>
-<li>Returns: <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object><code>&lt;Object[]></code></a> An array of call site objects
+<li>Returns: <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object><code>&lt;Object></code></a>[] An array of call site objects
 <ul>
 <li><code>functionName</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> Returns the name of the function associated with this call site.</li>
 <li><code>scriptName</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> Returns the name of the resource that contains the script for the
@@ -1520,7 +1522,7 @@ by <code>util.inspect()</code>.<pre style=background-color:#eff1f5;--shiki-dark-
 </ul><p>In addition to being accessible through <code>util.inspect.custom</code>, this
 symbol is <a href=https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol/for>registered globally</a> and can be
 accessed in any environment as <code>Symbol.for('nodejs.util.inspect.custom')</code>.<p>Using this allows code to be written in a portable fashion, so that the custom
-inspect function is used in an Node.js environment and ignored in the browser.
+inspect function is used in a Node.js environment and ignored in the browser.
 The <code>util.inspect()</code> function itself is passed as third argument to the custom
 inspect function to allow further portability.<pre class="catppuccin-latte catppuccin-mocha language-js shiki shiki-themes" style=background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4 tabindex=0><code><span class=line><span style=color:#8839EF;--shiki-dark:#CBA6F7>const</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> customInspectSymbol </span><span style=color:#179299;--shiki-dark:#94E2D5>=</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> Symbol</span><span style=color:#179299;--shiki-dark:#94E2D5>.</span><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic>for</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>(</span><span style=color:#40A02B;--shiki-dark:#A6E3A1>'nodejs.util.inspect.custom'</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>)</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
 <span class=line></span>
@@ -1814,7 +1816,7 @@ set the first such pair's value to <code>value</code>.<pre style=background-colo
 <p><code>config</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object><code>&lt;Object></code></a> Used to provide arguments for parsing and to configure
 the parser. <code>config</code> supports the following properties:</p>
 <ul>
-<li><code>args</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string[]></code></a> array of argument strings. <strong>Default:</strong> <code>process.argv</code>
+<li><code>args</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a>[] array of argument strings. <strong>Default:</strong> <code>process.argv</code>
 with <code>execPath</code> and <code>filename</code> removed.</li>
 <li><code>options</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object><code>&lt;Object></code></a> Used to describe arguments known to the parser.
 Keys of <code>options</code> are the long names of options and values are an
@@ -1825,7 +1827,7 @@ Keys of <code>options</code> are the long names of options and values are an
 times. If <code>true</code>, all values will be collected in an array. If
 <code>false</code>, values for the option are last-wins. <strong>Default:</strong> <code>false</code>.</li>
 <li><code>short</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> A single character alias for the option.</li>
-<li><code>default</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#boolean_type><code>&lt;boolean></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string[]></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#boolean_type><code>&lt;boolean[]></code></a> The value to assign to
+<li><code>default</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#boolean_type><code>&lt;boolean></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a>[] | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#boolean_type><code>&lt;boolean></code></a>[] The value to assign to
 the option if it does not appear in the arguments to be parsed. The value
 must match the type specified by the <code>type</code> property. If <code>multiple</code> is
 <code>true</code>, it must be an array. No default value is applied when the option
@@ -1851,8 +1853,8 @@ the tokens in different ways. <strong>Default:</strong> <code>false</code>.</li
 <ul>
 <li><code>values</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object><code>&lt;Object></code></a> A mapping of parsed option names with their <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a>
 or <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#boolean_type><code>&lt;boolean></code></a> values.</li>
-<li><code>positionals</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string[]></code></a> Positional arguments.</li>
-<li><code>tokens</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object><code>&lt;Object[]></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#undefined_type><code>&lt;undefined></code></a> See <a href=#parseargs-tokens>parseArgs tokens</a>
+<li><code>positionals</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a>[] Positional arguments.</li>
+<li><code>tokens</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object><code>&lt;Object></code></a>[] | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#undefined_type><code>&lt;undefined></code></a> See <a href=#parseargs-tokens>parseArgs tokens</a>
 section. Only returned if <code>config</code> includes <code>tokens: true</code>.</li>
 </ul>
 </li>

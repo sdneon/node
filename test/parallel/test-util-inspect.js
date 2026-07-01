@@ -3793,6 +3793,7 @@ assert.strictEqual(
   assert.strictEqual(util.inspect(NaN), 'NaN');
   assert.strictEqual(util.inspect(Infinity), 'Infinity');
   assert.strictEqual(util.inspect(-Infinity), '-Infinity');
+  assert.strictEqual(util.inspect(-0), '-0');
 
   assert.strictEqual(
     util.inspect(new Float64Array([100_000_000])),
@@ -3824,6 +3825,9 @@ assert.strictEqual(
     '-123_456_789.123_456_78'
   );
 
+  // -0 should be formatted as '-0' even with numericSeparator enabled
+  assert.strictEqual(util.inspect(-0, { numericSeparator: true }), '-0');
+
   // Regression test for https://github.com/nodejs/node/issues/59376
   // numericSeparator should work correctly for negative fractional numbers
   {
@@ -3844,6 +3848,12 @@ assert.strictEqual(
       '-0.123_45'
     );
   }
+
+  // Numbers in scientific notation should not get malformed separators
+  assert.strictEqual(util.inspect(1e-7, { numericSeparator: true }), '1e-7');
+  assert.strictEqual(util.inspect(1.5e-10, { numericSeparator: true }), '1.5e-10');
+  assert.strictEqual(util.inspect(1.23e-100, { numericSeparator: true }), '1.23e-100');
+  assert.strictEqual(util.inspect(1.23456789e-12, { numericSeparator: true }), '1.23456789e-12');
 }
 
 // Regression test for https://github.com/nodejs/node/issues/41244

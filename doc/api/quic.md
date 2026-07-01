@@ -529,6 +529,21 @@ with either a `QuicEndpoint` or `EndpointOptions` as the argument.
 At most, any single `QuicEndpoint` can only be configured to listen as
 a server once.
 
+## `quic.listEndpoints([options])`
+
+<!-- YAML
+added: v26.4.0
+-->
+
+* `options` {object}
+  * `active` {boolean} If `true` (the default), only returns endpoints that are
+    active (not destroyed, not closing, and not busy). If `false` returns all
+    endpoints.
+* Returns: {quic.QuicEndpoint\[]}
+
+Returns the list of all `QuicEndpoint` instances. By default, only active
+endpoints are returned.
+
 ## `quic.constants`
 
 <!-- YAML
@@ -917,6 +932,8 @@ added: v26.3.0
 The current application-level options for this session. These include settings
 that are specific to the negotiated application protocol (e.g. HTTP/3) and may
 be negotiated separately from the transport parameters. Read only.
+You can use the callback [`session.onapplication`][] to be informed, when settings
+from the remote arrive.
 
 ### `session.close([options])`
 
@@ -1048,6 +1065,16 @@ added: v23.8.0
 
 The endpoint that created this session. Returns `null` if the session
 has been destroyed. Read only.
+
+### `session.onapplication`
+
+<!-- YAML
+added: v26.4.0
+-->
+
+* Type: {quic.OnApplicationCallback}
+
+The callback to invoke when new application options, e.g. HTTP/3 settings arrived.
 
 ### `session.onerror`
 
@@ -1395,11 +1422,12 @@ what this endpoint advertises to the peer as its own maximum.
 added: v26.2.0
 -->
 
-* Type: {Object|undefined}
+* Type: {crypto.X509Certificate|undefined}
 
-The local certificate as an object with properties such as `subject`,
-`issuer`, `valid_from`, `valid_to`, `fingerprint`, etc. Returns `undefined`
-if the session is destroyed or no certificate is available.
+The local certificate as a [`crypto.X509Certificate`][] instance. Server
+sessions return the certificate configured for the negotiated SNI host.
+Client sessions return `undefined` unless a client certificate was sent.
+Returns `undefined` if the session is destroyed.
 
 ### `session.peerCertificate`
 
@@ -1407,11 +1435,11 @@ if the session is destroyed or no certificate is available.
 added: v26.2.0
 -->
 
-* Type: {Object|undefined}
+* Type: {crypto.X509Certificate|undefined}
 
-The peer's certificate as an object with properties such as `subject`,
-`issuer`, `valid_from`, `valid_to`, `fingerprint`, etc. Returns `undefined`
-if the session is destroyed or the peer did not present a certificate.
+The peer's certificate as a [`crypto.X509Certificate`][] instance. Returns
+`undefined` if the peer did not present a certificate or the session is
+destroyed.
 
 ### `session.ephemeralKeyInfo`
 
@@ -3502,11 +3530,11 @@ with that error:
 
 * Stream callbacks (`onblocked`, `onreset`, `onheaders`, `ontrailers`,
   `oninfo`, `onwanttrailers`): the stream is destroyed.
-* Session callbacks (`onstream`, `ondatagram`, `ondatagramstatus`,
-  `onpathvalidation`, `onsessionticket`, `onnewtoken`,
-  `onversionnegotiation`, `onorigin`, `ongoaway`, `onhandshake`,
-  `onkeylog`, `onqlog`): the session is destroyed along with all of its
-  streams.
+* Session callbacks (`onapplication`, `onstream`, `ondatagram`,
+  `ondatagramstatus`, `onpathvalidation`, `onsessionticket`,
+  `onnewtoken`, `onversionnegotiation`, `onorigin`, `ongoaway`,
+  `onhandshake`, `onkeylog`, `onqlog`): the session is destroyed along
+  with all of its streams.
 
 Before destruction, the optional [`session.onerror`][] or
 [`stream.onerror`][] callback is invoked (if set), giving the application a
@@ -3559,6 +3587,19 @@ added: v23.8.0
   datagram was sent but the network lost it. `'abandoned'` means the
   datagram was never sent on the wire (dropped due to queue overflow,
   send attempt limit exceeded, or frame size rejection).
+
+### Callback: `OnApplicationCallback`
+
+<!-- YAML
+added: v23.8.0
+-->
+
+* `this` {quic.QuicSession}
+* `applicationoption` {quic.QuicSession}
+
+The callback function that is invoked when application options change.
+E.g. for http/3 settings are included in applications options and
+may arrive after the connection is established.
 
 ### Callback: `OnPathValidationCallback`
 
@@ -4034,6 +4075,17 @@ added: v23.8.0
 
 Published when an endpoint's busy state changes.
 
+### Channel: `quic.session.application`
+
+<!-- YAML
+added: v23.8.0
+-->
+
+* `applicationoptions` {quic.ApplicationOptions} Current application options.
+* `session` {quic.QuicSession}
+
+Published when a locally-initiated stream is opened.
+
 ### Channel: `quic.session.created.client`
 
 <!-- YAML
@@ -4391,6 +4443,7 @@ throughput issues caused by flow control.
 [`application.enableConnectProtocol`]: #sessionoptionsapplication
 [`application.enableDatagrams`]: #sessionoptionsapplication
 [`application.qpackMaxDTableCapacity`]: #sessionoptionsapplication
+[`crypto.X509Certificate`]: crypto.md#class-x509certificate
 [`endpoint.busy`]: #endpointbusy
 [`endpoint.maxConnectionsPerHost`]: #endpointmaxconnectionsperhost
 [`endpoint.maxConnectionsTotal`]: #endpointmaxconnectionstotal
@@ -4417,6 +4470,7 @@ throughput issues caused by flow control.
 [`session.createUnidirectionalStream()`]: #sessioncreateunidirectionalstreamoptions
 [`session.destroy()`]: #sessiondestroyerror-options
 [`session.maxPendingDatagrams`]: #sessionmaxpendingdatagrams
+[`session.onapplication`]: #sessiononapplication
 [`session.ondatagram`]: #sessionondatagram
 [`session.ondatagramstatus`]: #sessionondatagramstatus
 [`session.onearlyrejected`]: #sessiononearlyrejected

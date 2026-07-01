@@ -1,4 +1,4 @@
-<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content="width=device-width"><link rel=icon href=https://nodejs.org/favicon.ico><meta name=nodejs.org:node-version content=v26.3.0><title>Debugger | Node.js v26.3.0 Documentation</title><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback"><link rel=stylesheet href=assets/style.css><link rel=canonical href=https://nodejs.org/api/debugger.html><script async defer src=assets/api.js></script><script>("dark"===localStorage.getItem("theme")||null===localStorage.getItem("theme")&&window.matchMedia?.("(prefers-color-scheme: dark)").matches)&&document.documentElement.classList.add("dark-mode")</script><body class="alt apidoc" id=api-section-debugger><a href=#apicontent class=skip-to-content>Skip to content</a>
+<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content="width=device-width"><link rel=icon href=https://nodejs.org/favicon.ico><meta name=nodejs.org:node-version content=v26.4.0><title>Debugger | Node.js v26.4.0 Documentation</title><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback"><link rel=stylesheet href=assets/style.css><link rel=canonical href=https://nodejs.org/api/debugger.html><script async defer src=assets/api.js></script><script>("dark"===localStorage.getItem("theme")||null===localStorage.getItem("theme")&&window.matchMedia?.("(prefers-color-scheme: dark)").matches)&&document.documentElement.classList.add("dark-mode")</script><body class="alt apidoc" id=api-section-debugger><a href=#apicontent class=skip-to-content>Skip to content</a>
     <div id=content class=clearfix>
       <div role=navigation id=column2 class=interior>
         <div id=intro class=interior>
@@ -66,6 +66,7 @@
 <li><a class=nav-url href=url.html>URL</a></li>
 <li><a class=nav-util href=util.html>Utilities</a></li>
 <li><a class=nav-v8 href=v8.html>V8</a></li>
+<li><a class=nav-vfs href=vfs.html>Virtual File System</a></li>
 <li><a class=nav-vm href=vm.html>VM</a></li>
 <li><a class=nav-wasi href=wasi.html>WASI</a></li>
 <li><a class=nav-webcrypto href=webcrypto.html>Web Crypto API</a></li>
@@ -83,7 +84,7 @@
       <div id=column1 data-id=debugger class=interior>
         <header class=header>
           <div class=header-container>
-            <h1>Node.js v26.3.0 documentation</h1>
+            <h1>Node.js v26.4.0 documentation</h1>
             <button class=theme-toggle-btn id=theme-toggle-btn title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
               <svg class="dark-icon icon" height=24 width=24>
                 <path fill=none d="M0 0h24v24H0z"/>
@@ -98,7 +99,7 @@
           </div>
           <div id=gtoc>
             <ul>
-              <li class=pinned-header>Node.js v26.3.0</li>
+              <li class=pinned-header>Node.js v26.4.0</li>
               <li class=picker-header><a href=#toc-picker aria-controls=toc-picker><span class=picker-arrow></span>Table of contents</a><div class=picker><div class=toc tabindex=-1><ul id=toc-picker>
 <li><span class=stability_2><a href=debugger.html#debugger>Debugger</a></span>
 <ul>
@@ -195,6 +196,7 @@
 <li><a class=nav-url href=url.html>URL</a></li>
 <li><a class=nav-util href=util.html>Utilities</a></li>
 <li><a class=nav-v8 href=v8.html>V8</a></li>
+<li><a class=nav-vfs href=vfs.html>Virtual File System</a></li>
 <li><a class=nav-vm href=vm.html>VM</a></li>
 <li><a class=nav-wasi href=wasi.html>WASI</a></li>
 <li><a class=nav-webcrypto href=webcrypto.html>Web Crypto API</a></li>
@@ -442,15 +444,15 @@ and save to disk as JSON</li>
 <li><code>scripts</code>: List all loaded scripts</li>
 <li><code>version</code>: Display V8's version</li>
 </ul></section>
-<section><h3>Probe mode<span><a id=debugger_probe_mode></a></span><span><a class=mark id=probe-mode href=#probe-mode>#</a></span></h3><div class=api_metadata><span>Added in: v26.1.0</span><details class=changelog><summary>History</summary><table><thead><tr><th>Version<th>Changes<tbody><tr><td>v26.3.0<td><p>Add <code>probe_failure</code> terminal <code>error</code> event for inspector-side mid-session failures, and <code>error.details</code> for additional context on per-hit and terminal errors.<tr><td>v26.2.0<td><p>JSON report schema bumped to v2. Probe <code>target</code> is now <code>{ suffix, line, column? }</code> instead of an array. Each "hit" event carries a <code>location</code> field reporting the actual evaluation location.  When the probe does not specify a column, it binds to the first executable column instead of defaulting to 1.</table></details></div><div class="api_stability api_stability_1"><p>Stability: 1 - Experimental</div><p><code>node inspect</code> supports a non-interactive probe mode for inspecting runtime values
+<section><h3>Probe mode<span><a id=debugger_probe_mode></a></span><span><a class=mark id=probe-mode href=#probe-mode>#</a></span></h3><div class=api_metadata><span>Added in: v26.1.0</span><details class=changelog><summary>History</summary><table><thead><tr><th>Version<th>Changes<tbody><tr><td>v26.4.0<td><p>Add per-probe <code>--max-hit &lt;n></code> option to limit evaluated hits and finish with a <code>completed</code> terminal event as soon as any probe reaches its limit.<tr><td>v26.3.0<td><p>Add <code>probe_failure</code> terminal <code>error</code> event for inspector-side mid-session failures, and <code>error.details</code> for additional context on per-hit and terminal errors.<tr><td>v26.2.0<td><p>JSON report schema bumped to v2. Probe <code>target</code> is now <code>{ suffix, line, column? }</code> instead of an array. Each "hit" event carries a <code>location</code> field reporting the actual evaluation location.  When the probe does not specify a column, it binds to the first executable column instead of defaulting to 1.</table></details></div><div class="api_stability api_stability_1"><p>Stability: 1 - Experimental</div><p><code>node inspect</code> supports a non-interactive probe mode for inspecting runtime values
 in an application via the flag <code>--probe</code>.<p>Currently, probe mode only supports launching a new process from the entry point
 script specified on the command line.<p>The probe mode sets one or more source breakpoints, evaluates specified
 expressions whenever the execution reaches a breakpoint, and prints one
 final report of all the evaluated expressions when the session ends
 (either on normal completion, error, or timeout). This allows developers to perform
 printf-style debugging without having to modify the application code and
-clean up afterwards. It also supports structured JSON output for tool use.<pre class="catppuccin-latte catppuccin-mocha language-console shiki shiki-themes" style=background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4 tabindex=0><code><span class=line><span style=color:#7C7F93;--shiki-dark:#9399B2>$</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> node inspect --probe </span><span style=color:#179299;--shiki-dark:#94E2D5>&lt;</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>file</span><span style=color:#179299;--shiki-dark:#94E2D5>></span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>:</span><span style=color:#179299;--shiki-dark:#94E2D5>&lt;</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>line</span><span style=color:#179299;--shiki-dark:#94E2D5>></span><span style=color:#7C7F93;--shiki-dark:#9399B2>[</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>:</span><span style=color:#179299;--shiki-dark:#94E2D5>&lt;</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>col</span><span style=color:#179299;--shiki-dark:#94E2D5>></span><span style=color:#7C7F93;--shiki-dark:#9399B2>]</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> --expr </span><span style=color:#179299;--shiki-dark:#94E2D5>&lt;</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>expr</span><span style=color:#179299;--shiki-dark:#94E2D5>></span></span>
-<span class=line><span style=color:#4C4F69;--shiki-dark:#CDD6F4>              [--probe &lt;file>:&lt;line>[:&lt;col>] --expr &lt;expr> ...]</span></span>
+clean up afterwards. It also supports structured JSON output for tool use.<pre class="catppuccin-latte catppuccin-mocha language-console shiki shiki-themes" style=background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4 tabindex=0><code><span class=line><span style=color:#7C7F93;--shiki-dark:#9399B2>$</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> node inspect --probe </span><span style=color:#179299;--shiki-dark:#94E2D5>&lt;</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>file</span><span style=color:#179299;--shiki-dark:#94E2D5>></span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>:</span><span style=color:#179299;--shiki-dark:#94E2D5>&lt;</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>line</span><span style=color:#179299;--shiki-dark:#94E2D5>></span><span style=color:#7C7F93;--shiki-dark:#9399B2>[</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>:</span><span style=color:#179299;--shiki-dark:#94E2D5>&lt;</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>col</span><span style=color:#179299;--shiki-dark:#94E2D5>></span><span style=color:#7C7F93;--shiki-dark:#9399B2>]</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> --expr </span><span style=color:#179299;--shiki-dark:#94E2D5>&lt;</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>expr</span><span style=color:#179299;--shiki-dark:#94E2D5>></span><span style=color:#7C7F93;--shiki-dark:#9399B2> [</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>--max-hit </span><span style=color:#179299;--shiki-dark:#94E2D5>&lt;</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>n</span><span style=color:#179299;--shiki-dark:#94E2D5>></span><span style=color:#7C7F93;--shiki-dark:#9399B2>]</span></span>
+<span class=line><span style=color:#4C4F69;--shiki-dark:#CDD6F4>              [--probe &lt;file>:&lt;line>[:&lt;col>] --expr &lt;expr> [--max-hit &lt;n>] ...]</span></span>
 <span class=line><span style=color:#4C4F69;--shiki-dark:#CDD6F4>              [--json] [--preview] [--timeout=&lt;ms>] [--port=&lt;port>]</span></span>
 <span class=line><span style=color:#4C4F69;--shiki-dark:#CDD6F4>              [--] [&lt;node-option> ...] &lt;script> [&lt;script-args> ...]</span></span>
 <span class=line></span></code><div class=code-toolbar><span class=code-language>console</span><button class=copy-button>copy</button></div></pre><ul>
@@ -462,6 +464,11 @@ binds to the first executable column on the line.</li>
 <li><code>--expr &lt;expr></code>: JavaScript expression to evaluate whenever execution reaches
 the location specified by the preceding <code>--probe</code>.
 Must immediately follow the <code>--probe</code> it belongs to.</li>
+<li><code>--max-hit &lt;n></code>: An optional per-probe limit on the number of times the probe
+can be hit. When not specified, there's no hit limit. When any probe reaches
+its hit limit, the probing process will detach and report the results. The process
+being probed will continue to run. If any other probe is never reached by the time
+the session ends, it will be reported as a missed probe.</li>
 <li><code>--timeout=&lt;ms></code>: A global wall-clock deadline for the entire probe session.
 The default is <code>30000</code>. This can be used to probe a long-running application
 that can be terminated externally.</li>
@@ -474,6 +481,10 @@ will listen. Defaults to <code>0</code>, which requests a random port.</li>
 </ul><p>Additional rules about the <code>--probe</code> and <code>--expr</code> arguments:<ul>
 <li><code>--probe &lt;file>:&lt;line>[:&lt;col>]</code> and <code>--expr &lt;expr></code> are strict pairs. Each
 <code>--probe</code> must be followed immediately by exactly one <code>--expr</code>.</li>
+<li><code>--max-hit &lt;n></code> is an optional per-probe option that applies to the most recent
+<code>--probe</code>/<code>--expr</code> pair. It may not appear before the first <code>--probe</code> or
+between a <code>--probe</code> and its matching <code>--expr</code>, and may be given at most once
+per probe.</li>
 <li><code>--timeout</code>, <code>--json</code>, <code>--preview</code>, and <code>--port</code> are global probe options
 for the whole probe session. They may appear before or between probe pairs,
 but not between a <code>--probe</code> and its matching <code>--expr</code>.</li>
@@ -519,6 +530,7 @@ in <code>JSON.stringify(...)</code> or <code>util.inspect(...)</code>.<p>When <c
 <span class=line><span style=color:#7C7F93;--shiki-dark:#9399B2>        "</span><span style=color:#1E66F5;--shiki-dark:#89B4FA>suffix</span><span style=color:#7C7F93;--shiki-dark:#9399B2>"</span><span style=color:#7C7F93;--shiki-dark:#9399B2>:</span><span style=color:#40A02B;--shiki-dark:#A6E3A1> "cli.js"</span><span style=color:#7C7F93;--shiki-dark:#9399B2>,</span></span>
 <span class=line><span style=color:#7C7F93;--shiki-dark:#9399B2>        "</span><span style=color:#1E66F5;--shiki-dark:#89B4FA>line</span><span style=color:#7C7F93;--shiki-dark:#9399B2>"</span><span style=color:#7C7F93;--shiki-dark:#9399B2>:</span><span style=color:#FE640B;--shiki-dark:#FAB387> 5</span></span>
 <span class=line><span style=color:#7C7F93;--shiki-dark:#9399B2>      }</span></span>
+<span class=line><span style=color:#7C7F93;--shiki-light-font-style:italic;--shiki-dark:#9399B2;--shiki-dark-font-style:italic>      // `maxHit` is present only when the probe was given a --max-hit limit.</span></span>
 <span class=line><span style=color:#7C7F93;--shiki-dark:#9399B2>    }</span></span>
 <span class=line><span style=color:#7C7F93;--shiki-dark:#9399B2>  ],</span></span>
 <span class=line><span style=color:#7C7F93;--shiki-dark:#9399B2>  "</span><span style=color:#1E66F5;--shiki-dark:#89B4FA>results</span><span style=color:#7C7F93;--shiki-dark:#9399B2>"</span><span style=color:#7C7F93;--shiki-dark:#9399B2>:</span><span style=color:#7C7F93;--shiki-dark:#9399B2> [</span></span>
