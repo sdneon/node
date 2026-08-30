@@ -131,31 +131,26 @@ static void RunMain(const FunctionCallbackInfo<Value>& args) {
 
   //purge script, so that it can re-run
   Local<Object> require = Local<Object>::Cast(
-                    global->Get(ctx, JS_STRING("require")).ToLocalChecked()),
-                cache = Local<Object>::Cast(
-                    require->Get(ctx, JS_STRING("cache")).ToLocalChecked());
-  Local<Function> resolve = Local<Function>::Cast(
-      require->Get(ctx, JS_STRING("resolve")).ToLocalChecked());
-  if (!cache.IsEmpty())
+      global->Get(ctx, JS_STRING("require")).ToLocalChecked());
+  if (!require->IsNullOrUndefined())
   {
-    Local<Value> params[] = {args[0]};
-    MaybeLocal<Value> _path = resolve->Call(ctx, v8::Null(pIso), 1, params);
-    if (!_path.IsEmpty())
+    Local<Object> cache = Local<Object>::Cast(
+        require->Get(ctx, JS_STRING("cache")).ToLocalChecked());
+    if (!cache->IsNullOrUndefined() && !cache.IsEmpty())
     {
-      Local<Value> path = _path.ToLocalChecked();
-      if (cache->Has(ctx, path).ToChecked()) {
-        cache->Delete(ctx, path);
+      Local<Function> resolve = Local<Function>::Cast(
+          require->Get(ctx, JS_STRING("resolve")).ToLocalChecked());
+      if (resolve->IsFunction()) {
+        Local<Value> params[] = {args[0]};
+        MaybeLocal<Value> _path = resolve->Call(ctx, v8::Null(pIso), 1, params);
+        if (!_path.IsEmpty()) {
+          Local<Value> path = _path.ToLocalChecked();
+          if (cache->Has(ctx, path).ToChecked()) {
+            cache->Delete(ctx, path);
+          }
+        }
       }
     }
-  }
-
-  //shutdown REPL if active
-  Local<Object> process = Local<Object>::Cast(global->Get(ctx, JS_STRING("process")).ToLocalChecked());
-  MaybeLocal<Value> _closeRepl = process->Get(ctx, JS_STRING("closeRepl"));
-  if (!_closeRepl.IsEmpty())
-  {
-    Local<Function> closeRepl = Local<Function>::Cast(_closeRepl.ToLocalChecked());
-    closeRepl->Call(ctx, v8::Null(pIso), 0, 0).ToLocalChecked();
   }
 
   global->Set(ctx, JS_STRING("skipInit"), v8::True(pIso));
@@ -257,7 +252,7 @@ MaybeLocal<Object> CreateProcessObject(Realm* realm) {
   // available from the beginning for debugging purposes
   SetMethod(context, process, "_rawDebug", RawDebug);
 
-  SetMethod(context, process, "runMain", RunMain);
+  SetMethod(context, process, "_runMain", RunMain);
   SetMethod(context, process, "runRepl", RunRepl);
 
   return scope.Escape(process);

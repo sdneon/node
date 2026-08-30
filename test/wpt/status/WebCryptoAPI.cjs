@@ -1,10 +1,6 @@
 'use strict';
 
-const os = require('node:os');
-
 const { hasOpenSSL } = require('../../common/crypto.js');
-
-const s390x = os.arch() === 's390x';
 
 const conditionalFileSkips = {};
 const conditionalSubtestSkips = {};
@@ -89,11 +85,14 @@ if (process.features.openssl_is_boringssl) {
     ['encap_decap/encap_decap_keys.tentative.https.any.js', /ml-kem-512/i],
     ['generateKey/failures_ML-KEM.tentative.https.any.js', /ml-kem-512/i],
     ['generateKey/successes_ML-KEM.tentative.https.any.js', /ml-kem-512/i],
-    ['getPublicKey.tentative.https.any.js', /ml-kem-512/i],
+    ['getPublicKey.tentative.https.any.js', /(?:ed448|x448|ml-kem-512)/i],
     ['import_export/ML-KEM_importKey.tentative.https.any.js', /ml-kem-512/i],
     ['serialization/mlkem.tentative.https.any.js', /ml-kem-512/i],
     ['supports-modern.tentative.https.any.js', /ml-kem-512/i]);
 }
+
+skipSubtests(
+  ['digest/kangarootwelve.tentative.https.any.js', /C=(?:\d{4,}|5(?:1[3-9]|[2-9]\d)|[6-9]\d{2}) bytes/]);
 
 function assertNoOverlap(fileSkips, subtestSkips) {
   const subtestSkipFiles = new Set(Object.keys(subtestSkips));
@@ -114,20 +113,5 @@ module.exports = {
   },
   'historical.any.js': {
     'skip': 'Not relevant in Node.js context',
-  },
-  'sign_verify/eddsa_small_order_points.https.any.js': {
-    'fail': {
-      'note': 'see https://github.com/nodejs/node/issues/54572',
-      'expected': [
-        'Ed25519 Verification checks with small-order key of order - Test 1',
-        'Ed25519 Verification checks with small-order key of order - Test 2',
-        'Ed25519 Verification checks with small-order key of order - Test 12',
-        'Ed25519 Verification checks with small-order key of order - Test 13',
-        ...(s390x ? [] : [
-          'Ed25519 Verification checks with small-order key of order - Test 0',
-          'Ed25519 Verification checks with small-order key of order - Test 11',
-        ]),
-      ],
-    },
   },
 };

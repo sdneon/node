@@ -69,3 +69,67 @@ test('fast FFI buffer arguments reject invalid values', () => {
     lib.close();
   }
 });
+
+test('fast FFI string buffers survive reentrant callbacks', {
+  // Bundled libffi callbacks crash on SmartOS.
+  skip: common.isSunOS,
+}, () => {
+  const { lib, functions } = ffi.dlopen(libraryPath, {
+    safe_strlen: { arguments: ['string'], return: 'i32' },
+    string_survives_callback: {
+      arguments: ['string', 'pointer'],
+      return: 'i32',
+    },
+  });
+  let nestedLength;
+  const callback = lib.registerCallback(() => {
+    nestedLength = functions.safe_strlen('inner string');
+  });
+
+  try {
+    assert.strictEqual(
+      functions.string_survives_callback('outer string', callback), 1);
+    assert.strictEqual(nestedLength, 12);
+  } finally {
+    lib.unregisterCallback(callback);
+    lib.close();
+  }
+});
+
+test('optimized buffer signatures preserve pointer-like conversions', () => {
+  const lib = new ffi.DynamicLibrary(libraryPath);
+  const asBuffer = lib.getFunction('pointer_to_usize', {
+    arguments: ['buffer'],
+    return: 'u64',
+  });
+  const asArrayBuffer = lib.getFunction('pointer_to_usize', {
+    arguments: ['arraybuffer'],
+    return: 'u64',
+  });
+
+  function callBuffer(value) {
+    return asBuffer(value);
+  }
+
+  function callArrayBuffer(value) {
+    return asArrayBuffer(value);
+  }
+
+  try {
+    for (let i = 0; i < 100_000; i++) {
+      assert.strictEqual(callBuffer(0n), 0n);
+      assert.strictEqual(callArrayBuffer(0n), 0n);
+    }
+
+    for (const call of [callBuffer, callArrayBuffer]) {
+      assert.strictEqual(call(null), 0n);
+      assert.strictEqual(call(undefined), 0n);
+      assert.notStrictEqual(call('ffi'), 0n);
+
+      const bytes = Buffer.alloc(1);
+      assert.strictEqual(call(bytes), ffi.getRawPointer(bytes));
+    }
+  } finally {
+    lib.close();
+  }
+});

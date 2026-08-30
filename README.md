@@ -5,8 +5,9 @@ This is a *fun* mod of Node.JS that initially embedded a modified version of dco
 
 Thanks to the inspiration from dcodeIO et al =D
 
-## Version 26.4.0
-* Update to Node.JS 26.4.0 baseline.
+## Version 26.7.0
+* Update to Node.JS 26.7.0 baseline.
+* From this version, Claude Code helps with merging (mod codes into baseline).
 
 It embeds:
 * DS v1.2.2.
@@ -204,7 +205,7 @@ Usually when Node.JS launches, it gets locked into one of many modes, such as SE
   console.log('End of main script, switching to REPL...');
   process.runRepl();
   ```
-* process.`runMain(scriptPath, ...argv)`: Switch to 'run main module' mode.
+* process.`runMain(scriptPath, ...argv)`: Switch to 'run main module' mode, after a brief interaval (`process.__RUN_MAIN_DELAY_MS__` = 200 ms).
   *  Inputs:
      * scriptPath: path to main script to run. It will be purged (if it exists; i.e. was loaded before) from require.cache and re-run.
      * argv: optional input argument strings.
@@ -217,6 +218,7 @@ Usually when Node.JS launches, it gets locked into one of many modes, such as SE
   * The different modes are script in `lib/internal/main/*.js`.
     * Some codes in them have to be skipped to avoid crashing. For example, prepareMainThreadExecution() & markBootstrapComplete().
     * For REPL, `internal/repl` is modded to have a "Don't Exit" flag when closing REPL. The corresponding `process.closeRepl()` method added let's us to know if REPL mode is active, and is used to close the REPL without exiting Node.JS.
+      * Extra delay added before runMain executes the new main script, so as to let REPL close properly. Otherwise, if the script uses readline, it terminates unexpectedly.
   * Tested OK switching back and forth between runRepl & runMain, and from SEA mode.
     * As noted, main module/script has to be purged from require.cache so as to let it be re-loaded and run again.
 
@@ -234,6 +236,7 @@ It appears that `chrome://inspect` & `--inspect-brk` no longer respects breakpoi
 Thus, you'll need to add `debugger;` statement (and build the EXE) to force a break to debug the internals!
 
 # Original README
+
 Node.js is an open-source, cross-platform JavaScript runtime environment.
 
 For information on using Node.js, see the [Node.js website][].
@@ -553,8 +556,6 @@ For information about the governance of the Node.js project, see
   **Dario Piotrowicz** <<dario.piotrowicz@gmail.com>> (he/him)
 * [deokjinkim](https://github.com/deokjinkim) -
   **Deokjin Kim** <<deokjin81.kim@gmail.com>> (he/him)
-* [edsadr](https://github.com/edsadr) -
-  **Adrian Estrada** <<edsadr@gmail.com>> (he/him)
 * [ErickWendel](https://github.com/ErickWendel) -
   **Erick Wendel** <<erick.workspace@gmail.com>> (he/him)
 * [Ethan-Arrowood](https://github.com/Ethan-Arrowood) -
@@ -627,6 +628,8 @@ For information about the governance of the Node.js project, see
   **Matteo Collina** <<matteo.collina@gmail.com>> (he/him) - [Support me](https://github.com/sponsors/mcollina)
 * [meixg](https://github.com/meixg) -
   **Xuguang Mei** <<meixuguang@gmail.com>> (he/him)
+* [MikeMcC399](https://github.com/MikeMcC399) -
+  **Mike McCready** <<66998419+MikeMcC399@users.noreply.github.com>> (he/him)
 * [MoLow](https://github.com/MoLow) -
   **Moshe Atlow** <<moshe@atlow.co.il>> (he/him)
 * [MrJithil](https://github.com/MrJithil) -
@@ -639,8 +642,6 @@ For information about the governance of the Node.js project, see
   **Tim Perry** <<pimterry@gmail.com>> (he/him)
 * [pmarchini](https://github.com/pmarchini) -
   **Pietro Marchini** <<pietro.marchini94@gmail.com>> (he/him)
-* [puskin](https://github.com/puskin) -
-  **Giovanni Bucci** <<github@puskin.it>> (he/him)
 * [Qard](https://github.com/Qard) -
   **Stephen Belanger** <<admin@stephenbelanger.com>> (he/him)
 * [RafaelGSS](https://github.com/RafaelGSS) -
@@ -749,6 +750,8 @@ For information about the governance of the Node.js project, see
   **Xu Meng** <<dmabupt@gmail.com>> (he/him)
 * [dnlup](https://github.com/dnlup) -
   **dnlup** <<dnlup.dev@gmail.com>>
+* [edsadr](https://github.com/edsadr) -
+  **Adrian Estrada** <<edsadr@gmail.com>> (he/him)
 * [eljefedelrodeodeljefe](https://github.com/eljefedelrodeodeljefe) -
   **Robert Jefe Lindstaedt** <<robert.lindstaedt@gmail.com>>
 * [estliberitas](https://github.com/estliberitas) -
@@ -887,6 +890,8 @@ For information about the governance of the Node.js project, see
   **Prince John Wesley** <<princejohnwesley@gmail.com>>
 * [psmarshall](https://github.com/psmarshall) -
   **Peter Marshall** <<petermarshall@chromium.org>> (he/him)
+* [puskin](https://github.com/puskin) -
+  **Giovanni Bucci** <<github@puskin.it>> (he/him)
 * [puzpuzpuz](https://github.com/puzpuzpuz) -
   **Andrey Pechkurov** <<apechkurov@gmail.com>> (he/him)
 * [refack](https://github.com/refack) -
@@ -1019,6 +1024,8 @@ Primary GPG keys for Node.js Releasers (some Releasers sign with subkeys):
   `C82FA3AE1CBEDC6BE46B9360C43CEC45C17AB93C`
 * **Ruy Adorno** <<ruyadorno@hotmail.com>>
   `108F52B48DB57BB0CC439B2997B01419BD92F80A`
+* **Stewart X Addison** <<sxa@ibm.com>>
+  `655F3B5C1FB3FA8D1A0CA6BDE4A7D232B936D2FD`
 * **Ulises Gascón** <<ulisesgascongonzalez@gmail.com>>
   `A363A499291CBBC940DD62E41F10027AF002F8B0`
 
@@ -1036,6 +1043,7 @@ gpg --keyserver hkps://keys.openpgp.org --recv-keys 8FCCA13FEF1D0C2E91008E09770F
 gpg --keyserver hkps://keys.openpgp.org --recv-keys 890C08DB8579162FEE0DF9DB8BEAB4DFCF555EF4 # Rafael Gonzaga
 gpg --keyserver hkps://keys.openpgp.org --recv-keys C82FA3AE1CBEDC6BE46B9360C43CEC45C17AB93C # Richard Lau
 gpg --keyserver hkps://keys.openpgp.org --recv-keys 108F52B48DB57BB0CC439B2997B01419BD92F80A # Ruy Adorno
+gpg --keyserver hkps://keys.openpgp.org --recv-keys 655F3B5C1FB3FA8D1A0CA6BDE4A7D232B936D2FD # Stewart X Addison
 gpg --keyserver hkps://keys.openpgp.org --recv-keys A363A499291CBBC940DD62E41F10027AF002F8B0 # Ulises Gascón
 ```
 

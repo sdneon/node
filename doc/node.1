@@ -147,7 +147,7 @@ The valid arguments for the \fB--allow-fs-read\fR flag are:
 \fB*\fR - To allow all \fBFileSystemRead\fR operations.
 .It
 Multiple paths can be allowed using multiple \fB--allow-fs-read\fR flags.
-Example \fB--allow-fs-read=/folder1/ --allow-fs-read=/folder1/\fR
+Example \fB--allow-fs-read=/folder1/ --allow-fs-read=/folder2/\fR
 .El
 Examples can be found in the File System Permissions documentation.
 The initializer module and custom \fB--require\fR modules has a implicit
@@ -175,7 +175,7 @@ The valid arguments for the \fB--allow-fs-write\fR flag are:
 \fB*\fR - To allow all \fBFileSystemWrite\fR operations.
 .It
 Multiple paths can be allowed using multiple \fB--allow-fs-write\fR flags.
-Example \fB--allow-fs-write=/folder1/ --allow-fs-write=/folder1/\fR
+Example \fB--allow-fs-write=/folder1/ --allow-fs-write=/folder2/\fR
 .El
 Paths delimited by comma (\fB,\fR) are no longer allowed.
 When passing a single flag with a comma a warning will be displayed.
@@ -221,6 +221,17 @@ Error: connect ERR_ACCESS_DENIED Access to this API has been restricted. Use --a
   code: 'ERR_ACCESS_DENIED',
 }
 .Ed
+.
+.It Fl -allow-openssl-store
+When using the Permission Model, the process will not be able to use
+OpenSSL STORE loaders by default, for example to load a private key from a
+\fB<URL>\fR passed to \fBcrypto.createPrivateKey()\fR. Attempts to do so will throw
+an \fBERR_ACCESS_DENIED\fR unless the user explicitly passes the
+\fB--allow-openssl-store\fR flag. This permission can be dropped at runtime via
+\fBpermission.drop()\fR.
+This flag grants broad authority to configured OpenSSL STORE loaders. A loader
+may access files, devices, tokens, or the network. Access performed by a loader
+is not constrained by the \fBfs.read\fR, \fBfs.write\fR, or \fBnet\fR permission scopes.
 .
 .It Fl -allow-wasi
 When using the Permission Model, the process will not be capable of creating
@@ -741,6 +752,10 @@ Enable experimental \fBimport.meta.resolve()\fR parent URL support, which allows
 passing a second \fBparentURL\fR argument for contextual resolution.
 Previously gated the entire \fBimport.meta.resolve\fR feature.
 .
+.It Fl -experimental-import-text
+Enable experimental support for importing modules with
+\fBwith { type: 'text' }\fR.
+.
 .It Fl -experimental-inspector-network-resource
 Enable experimental support for inspector network resources.
 .
@@ -764,9 +779,8 @@ See Package maps for details on the configuration file format and
 resolution algorithm.
 .
 .It Fl -experimental-print-required-tla
-If the ES module being \fBrequire()\fR'd contains top-level \fBawait\fR, this flag
-allows Node.js to evaluate the module, try to locate the
-top-level awaits, and print their location to help users find them.
+If the ES module graph cannot be \fBrequire()\fR'd because it contains any top-level \fBawait\fR,
+this flag allows Node.js to locate and print their locations.
 .
 .It Fl -experimental-quic
 Enable experimental support for the QUIC protocol.
@@ -1062,9 +1076,6 @@ node --max-old-space-size-percentage=50 index.js
 node --max-old-space-size-percentage=75 index.js
 .Ed
 .
-.It Fl -napi-modules
-This option is a no-op. It is kept for compatibility.
-.
 .It Fl -network-family-autoselection-attempt-timeout
 Sets the default value for the network family autoselection attempt timeout.
 For more information, see \fBnet.getDefaultAutoSelectFamilyAttemptTimeout()\fR.
@@ -1165,6 +1176,7 @@ developers may leverage to detect deprecated API usage.
 .It Fl -permission
 Enable the Permission Model for current process. When enabled, the
 following permissions are restricted:
+
 .Bl -bullet
 .It
 File System - manageable through
@@ -1181,12 +1193,24 @@ WASI - manageable through \fB--allow-wasi\fR flag
 Addons - manageable through \fB--allow-addons\fR flag
 .It
 FFI - manageable through \fB--allow-ffi\fR flag
+.It
+OpenSSL STORE loaders - manageable through \fB--allow-openssl-store\fR flag
 .El
 .
 .It Fl -permission-audit
-Enable audit only for the permission model. When enabled, permission checks
-are performed but access is not denied. Instead, a warning is emitted for
-each permission violation via diagnostics channel.
+Enable audit mode for the permission model. When enabled, permission checks
+are performed but access is \fBnot\fR denied — no \fBERR_ACCESS_DENIED\fR error is
+thrown. Instead, each permission violation is published through the
+\fBnode:diagnostics_channel\fR module, and execution continues normally.
+This flag does not require \fB--permission\fR to be specified. The
+\fB--allow-*\fR flags are not needed in audit mode, since no
+access is denied.
+Audit mode is useful for discovering what permissions your application
+requires before deploying with \fB--permission\fR. See the
+Permission Model documentation for the list of diagnostics channel names
+and the message format.
+If both \fB--permission\fR and \fB--permission-audit\fR are specified,
+\fB--permission\fR takes precedence and the Permission Model runs in enforce mode.
 .
 .It Fl -preserve-symlinks
 Instructs the module loader to preserve symbolic links when resolving and
@@ -1398,6 +1422,13 @@ both absolute and relative file paths.
 This option may be specified multiple times to include multiple glob patterns.
 If both \fB--test-coverage-exclude\fR and \fB--test-coverage-include\fR are provided,
 files must meet \fBboth\fR criteria to be included in the coverage report.
+.
+.It Fl -test-coverage-include-all
+Includes source files that were never loaded by the test run in the coverage
+report, where they are reported as having zero coverage.
+Candidate files are searched for in the current working directory, and are
+subject to the same \fB--test-coverage-include\fR and \fB--test-coverage-exclude\fR
+filtering as the rest of the report.
 .
 .It Fl -test-coverage-lines Ns = Ns Ar threshold
 Require a minimum percent of covered lines. If code coverage does not reach
@@ -1648,8 +1679,12 @@ See \fBSSL_CERT_DIR\fR and \fBSSL_CERT_FILE\fR.
 .
 .It Fl -use-env-proxy
 When enabled, Node.js parses the \fBHTTP_PROXY\fR, \fBHTTPS_PROXY\fR and \fBNO_PROXY\fR
-environment variables during startup, and tunnels requests over the
+environment variables during startup, and routes requests through the
 specified proxy.
+Use this only with proxies that are trusted and authorized for the deployment.
+Proxy support is intended for reaching external networks through authorized
+proxy servers, for example when a firewall requires one. It is not for hiding
+traffic or evading network policy. See Built-in Proxy Support.
 This is equivalent to setting the \fBNODE_USE_ENV_PROXY=1\fR environment variable.
 When both are set, \fB--use-env-proxy\fR takes precedence.
 .
@@ -1906,6 +1941,8 @@ one is included in the list below.
 .It
 \fB--allow-net\fR
 .It
+\fB--allow-openssl-store\fR
+.It
 \fB--allow-wasi\fR
 .It
 \fB--allow-worker\fR
@@ -1951,6 +1988,8 @@ one is included in the list below.
 \fB--experimental-ffi\fR
 .It
 \fB--experimental-import-meta-resolve\fR
+.It
+\fB--experimental-import-text\fR
 .It
 \fB--experimental-json-modules\fR
 .It
@@ -2027,8 +2066,6 @@ one is included in the list below.
 \fB--max-http-header-size\fR
 .It
 \fB--max-old-space-size-percentage\fR
-.It
-\fB--napi-modules\fR
 .It
 \fB--network-family-autoselection-attempt-timeout\fR
 .It
@@ -2119,6 +2156,8 @@ one is included in the list below.
 \fB--test-coverage-exclude\fR
 .It
 \fB--test-coverage-functions\fR
+.It
+\fB--test-coverage-include-all\fR
 .It
 \fB--test-coverage-include\fR
 .It
@@ -2310,8 +2349,12 @@ variable is strongly discouraged.
 .It Ev NODE_USE_ENV_PROXY Ar 1
 
 When enabled, Node.js parses the \fBHTTP_PROXY\fR, \fBHTTPS_PROXY\fR and \fBNO_PROXY\fR
-environment variables during startup, and tunnels requests over the
+environment variables during startup, and routes requests through the
 specified proxy.
+Use this only with proxies that are trusted and authorized for the deployment.
+Proxy support is intended for reaching external networks through authorized
+proxy servers, for example when a firewall requires one. It is not for hiding
+traffic or evading network policy. See Built-in Proxy Support.
 This can also be enabled using the \fB--use-env-proxy\fR command-line flag.
 When both are set, \fB--use-env-proxy\fR takes precedence.
 .

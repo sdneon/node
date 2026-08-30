@@ -178,6 +178,7 @@
       'src/node_zlib.cc',
       'src/path.cc',
       'src/permission/child_process_permission.cc',
+      'src/permission/openssl_store_permission.cc',
       'src/permission/ffi_permission.cc',
       'src/permission/fs_permission.cc',
       'src/permission/inspector_permission.cc',
@@ -199,9 +200,7 @@
       'src/timers.cc',
       'src/timer_wrap.cc',
       'src/tracing/agent.cc',
-      'src/tracing/node_trace_buffer.cc',
-      'src/tracing/node_trace_writer.cc',
-      'src/tracing/trace_event.cc',
+      'src/tracing/trace_event_helper.cc',
       'src/tracing/traced_value.cc',
       'src/tty_wrap.cc',
       'src/udp_wrap.cc',
@@ -315,6 +314,7 @@
       'src/node_worker.h',
       'src/path.h',
       'src/permission/child_process_permission.h',
+      'src/permission/openssl_store_permission.h',
       'src/permission/ffi_permission.h',
       'src/permission/fs_permission.h',
       'src/permission/inspector_permission.h',
@@ -337,10 +337,8 @@
       'src/tcp_wrap.h',
       'src/timers.h',
       'src/tracing/agent.h',
-      'src/tracing/node_trace_buffer.h',
-      'src/tracing/node_trace_writer.h',
+      'src/tracing/trace_event_helper.h',
       'src/tracing/trace_event.h',
-      'src/tracing/trace_event_common.h',
       'src/tracing/traced_value.h',
       'src/timer_wrap.h',
       'src/timer_wrap-inl.h',
@@ -446,6 +444,22 @@
       'src/crypto/crypto_x509.h',
       'src/node_crypto.cc',
       'src/node_crypto.h',
+    ],
+    'node_tracing_perfetto_sources': [
+      'src/tracing/agent_perfetto.cc',
+      'src/tracing/agent_perfetto.h',
+      'src/tracing/trace_event_perfetto.cc',
+      'src/tracing/trace_event_perfetto.h',
+    ],
+    'node_tracing_legacy_sources': [
+      'src/tracing/agent_legacy.cc',
+      'src/tracing/agent_legacy.h',
+      'src/tracing/node_trace_buffer.cc',
+      'src/tracing/node_trace_buffer.h',
+      'src/tracing/node_trace_writer.cc',
+      'src/tracing/node_trace_writer.h',
+      'src/tracing/trace_event_legacy_inl.h',
+      'src/tracing/trace_event_legacy.h',
     ],
     'node_cctest_openssl_sources': [
       'test/cctest/test_crypto_clienthello.cc',
@@ -629,6 +643,7 @@
           # across platforms and to support the few use cases that require large
           # amounts of stack memory, without having to modify the node binary.
           'StackReserveSize': 0x800000,
+          'DelayLoadDLLs': ['api-ms-win-core-synch-l1-2-0.dll']
         },
       },
 
@@ -950,6 +965,18 @@
             }],
           ],
         }],
+        [ 'v8_use_perfetto==1', {
+          'sources': [
+            '<@(node_tracing_perfetto_sources)',
+          ],
+          'dependencies': [
+            'deps/perfetto/perfetto.gyp:perfetto_sdk',
+          ],
+        }, {
+          'sources': [
+            '<@(node_tracing_legacy_sources)',
+          ],
+        }],
         [ 'v8_enable_inspector==1', {
           'includes' : [ 'src/inspector/node_inspector.gypi' ],
         }, {
@@ -1073,6 +1100,7 @@
             '<(SHARED_INTERMEDIATE_DIR)/node_javascript.cc',
           ],
           'action': [
+            '<@(emulator)',
             '<(node_js2c_exec)',
             '<@(_outputs)',
             'lib',
@@ -1139,6 +1167,7 @@
                     '<(SHARED_INTERMEDIATE_DIR)/node_snapshot.cc',
                   ],
                   'action': [
+                    '<@(emulator)',
                     '<(node_mksnapshot_exec)',
                     '--build-snapshot',
                     '<(node_snapshot_main)',
@@ -1158,6 +1187,7 @@
                     '<(SHARED_INTERMEDIATE_DIR)/node_snapshot.cc',
                   ],
                   'action': [
+                    '<@(emulator)',
                     '<@(_inputs)',
                     '<@(_outputs)',
                   ],
@@ -1213,6 +1243,11 @@
         [ 'node_shared=="true" and OS=="win"', {
           'sources': [
             'src/res/node.rc',
+          ],
+          'libraries': [
+            'Dbghelp.lib',
+            'winmm.lib',
+            'Ws2_32.lib',
           ],
         }],
       ],
@@ -1437,6 +1472,11 @@
           ],
         }, {
           'sources!': [ '<@(node_cctest_quic_sources)' ],
+        }],
+        [ 'v8_use_perfetto==1', {
+          'dependencies': [
+            'deps/perfetto/perfetto.gyp:perfetto_sdk',
+          ],
         }],
         ['v8_enable_inspector==1', {
           'defines': [
@@ -1721,6 +1761,10 @@
 
       'defines': [ 'NODE_WANT_INTERNALS=1' ],
 
+      # node_mksnapshot statically links node_base; it must not use the
+      # dllimport path meant for executables that load the libnode DLL.
+      'defines!': [ 'BUILDING_NODE_EXTENSION' ],
+
       'sources': [
         'src/node_snapshot_stub.cc',
         'tools/snapshot/node_mksnapshot.cc',
@@ -1757,6 +1801,11 @@
         [ 'node_use_node_code_cache=="true"', {
           'defines': [
             'NODE_USE_NODE_CODE_CACHE=1',
+          ],
+        }],
+        [ 'v8_use_perfetto==1', {
+          'dependencies': [
+            'deps/perfetto/perfetto.gyp:perfetto_sdk',
           ],
         }],
         ['v8_enable_inspector==1', {
@@ -1798,12 +1847,26 @@
          'sources': [
            'tools/gen_node_def.cc'
          ],
+         'conditions': [
+           # When cross-compiling, build this tool for the host so it can
+           # run during the build. The MSVS generator expects it to be
+           # named gen_node_def_host.exe in that case.
+           ['want_separate_host_toolset', {
+             'toolsets': ['host'],
+           }],
+         ],
        },
        {
          'target_name': 'generate_node_def',
          'dependencies': [
-           'gen_node_def',
            '<(node_lib_target_name)',
+         ],
+         'conditions': [
+           ['want_separate_host_toolset', {
+             'dependencies': ['gen_node_def#host'],
+           }, {
+             'dependencies': ['gen_node_def'],
+           }],
          ],
          'type': 'none',
          'actions': [
@@ -1816,6 +1879,7 @@
                '<(PRODUCT_DIR)/<(node_core_target_name).def',
              ],
              'action': [
+               '<@(emulator)',
                '<(PRODUCT_DIR)/gen_node_def.exe',
                '<@(_inputs)',
                '<@(_outputs)',

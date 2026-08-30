@@ -104,25 +104,25 @@ Node.js does not support a platform version if a vendor has expired support
 for it. In other words, Node.js does not support running on End-of-Life (EoL)
 platforms. This is true regardless of entries in the table below.
 
-| Operating System | Architectures    | Versions                          | Support Type | Notes                                          |
-| ---------------- | ---------------- | --------------------------------- | ------------ | ---------------------------------------------- |
-| GNU/Linux        | x64              | kernel >= 4.18[^1], glibc >= 2.28 | Tier 1       | e.g. Ubuntu 20.04, Debian 10, RHEL 8           |
-| GNU/Linux        | x64              | kernel >= 3.10, musl >= 1.1.19    | Experimental | e.g. Alpine 3.8                                |
-| GNU/Linux        | x86              | kernel >= 3.10, glibc >= 2.17     | Experimental | Downgraded as of Node.js 10                    |
-| GNU/Linux        | arm64            | kernel >= 4.18[^1], glibc >= 2.28 | Tier 1       | e.g. Ubuntu 20.04, Debian 10, RHEL 8           |
-| GNU/Linux        | armv7            | kernel >= 4.18[^1], glibc >= 2.28 | Experimental | Downgraded as of Node.js 24                    |
-| GNU/Linux        | ppc64le >=power9 | kernel >= 4.18[^1], glibc >= 2.28 | Tier 2       | e.g. Ubuntu 20.04, RHEL 8                      |
-| GNU/Linux        | s390x >=z14      | kernel >= 4.18[^1], glibc >= 2.28 | Tier 2       | e.g. RHEL 8                                    |
-| GNU/Linux        | loong64          | kernel >= 5.19, glibc >= 2.36     | Experimental |                                                |
-| GNU/Linux        | riscv64          | kernel >= 5.19, glibc >= 2.36     | Experimental | GCC >= 14 or Clang >= 19 for native builds[^7] |
-| Windows          | x64              | >= Windows 10/Server 2016         | Tier 1       | [^2],[^3]                                      |
-| Windows          | arm64            | >= Windows 10                     | Tier 2       |                                                |
-| macOS            | x64              | >= 13.5                           | Tier 2       | For notes about compilation see [^4]           |
-| macOS            | arm64            | >= 13.5                           | Tier 1       |                                                |
-| SmartOS          | x64              | >= 18                             | Tier 2       |                                                |
-| AIX              | ppc64be >=power9 | >= 7.2 TL04                       | Tier 2       |                                                |
-| FreeBSD          | x64              | >= 13.2                           | Experimental |                                                |
-| OpenHarmony      | arm64            | >= 5.0                            | Experimental |                                                |
+| Operating System | Architectures    | Versions                          | Support Type | Notes                                                      |
+| ---------------- | ---------------- | --------------------------------- | ------------ | ---------------------------------------------------------- |
+| GNU/Linux        | x64              | kernel >= 4.18[^1], glibc >= 2.28 | Tier 1       | e.g. Ubuntu 20.04, Debian 10, RHEL 8                       |
+| GNU/Linux        | x64              | kernel >= 3.10, musl >= 1.1.19    | Experimental | e.g. Alpine 3.8                                            |
+| GNU/Linux        | x86              | kernel >= 3.10, glibc >= 2.17     | Experimental | Downgraded as of Node.js 10                                |
+| GNU/Linux        | arm64            | kernel >= 4.18[^1], glibc >= 2.28 | Tier 1       | e.g. Ubuntu 20.04, Debian 10, RHEL 8                       |
+| GNU/Linux        | armv7            | kernel >= 4.18[^1], glibc >= 2.28 | Experimental | Downgraded as of Node.js 24                                |
+| GNU/Linux        | ppc64le >=power9 | kernel >= 4.18[^1], glibc >= 2.28 | Tier 2       | e.g. Ubuntu 20.04, RHEL 8                                  |
+| GNU/Linux        | s390x >=z14      | kernel >= 4.18[^1], glibc >= 2.28 | Tier 2       | e.g. RHEL 8                                                |
+| GNU/Linux        | loong64          | kernel >= 5.19, glibc >= 2.36     | Experimental |                                                            |
+| GNU/Linux        | riscv64          | kernel >= 5.19, glibc >= 2.36     | Experimental | GCC >= 14 or Clang >= 19 for native builds[^5]             |
+| Windows          | x64              | >= Windows 10/Server 2016         | Tier 1       | [^2],[^3]                                                  |
+| Windows          | arm64            | >= Windows 10                     | Tier 2       |                                                            |
+| macOS            | x64              | >= 13.5                           | Tier 2       | Until early 2028[^8]. For notes about compilation see [^4] |
+| macOS            | arm64            | >= 13.5                           | Tier 1       |                                                            |
+| SmartOS          | x64              | >= 18                             | Tier 2       |                                                            |
+| AIX              | ppc64be >=power9 | >= 7.2 TL04                       | Tier 2       |                                                            |
+| FreeBSD          | x64              | >= 13.2                           | Experimental |                                                            |
+| OpenHarmony      | arm64            | >= 5.0                            | Experimental |                                                            |
 
 <!--lint disable final-definition-->
 
@@ -147,12 +147,20 @@ platforms. This is true regardless of entries in the table below.
 [^4]: Our macOS Binaries are compiled with 13.5 as a target. Xcode 16 is
     required to compile.
 
-[^7]: Native riscv64 builds need GCC >= 14 or Clang >= 19 because V8
+[^5]: Native riscv64 builds need GCC >= 14 or Clang >= 19 because V8
     includes `<riscv_vector.h>` and uses `target("arch=+v")` in
     `deps/v8/src/base/cpu.cc`. GCC 13's `riscv_vector.h` errors out without
     `-march=rv64gcv` and doesn't support the `target` attribute at all.
     Cross-compilation from x64 is unaffected (the code is behind
     `V8_HOST_ARCH_RISCV64`).
+
+[^8]: Our macOS testing infrastructure provider has announced end of support for
+    Intel-based architecture for early 2028 at which time that platform will move to
+    experimental status as the Node.js project will no longer be able to test changes on any
+    Intel-based macOS version. When this change occurs the project intends to continue
+    creating universal binaries for versions of Node.js which are still in support which will
+    be compatible with both Apple Silicon-based and Intel-based macOS versions but
+    they will be untested.
 
 <!--lint enable final-definition-->
 
@@ -172,7 +180,7 @@ Binaries at <https://nodejs.org/download/release/> are produced on:
 
 | Binary package          | Platform and Toolchain                                        |
 | ----------------------- | ------------------------------------------------------------- |
-| aix-ppc64               | AIX 7.2 TL04 on PPC64BE with GCC 12[^5]                       |
+| aix-ppc64               | AIX 7.2 TL04 on PPC64BE with Clang 20.1                       |
 | darwin-x64              | macOS 15, Xcode 16 with -mmacosx-version-min=13.5             |
 | darwin-arm64 (and .pkg) | macOS 15 (arm64), Xcode 16 with -mmacosx-version-min=13.5     |
 | linux-arm64             | RHEL 8 with Clang 20.1 and gcc-toolset-14-libatomic-devel[^6] |
@@ -188,9 +196,6 @@ The package name for the `libatomic` runtime is typically `libatomic` or `libato
 on your Linux distribution.
 
 <!--lint disable final-definition-->
-
-[^5]: Binaries produced on these systems require libstdc++12, available
-    from the [AIX toolbox][].
 
 [^6]: Binaries produced on these systems are compatible with glibc >= 2.28
     and libstdc++ >= 6.0.25 (`GLIBCXX_3.4.25`). These are available on
@@ -1052,8 +1057,8 @@ Node.js supports the [Temporal](https://github.com/tc39/proposal-temporal) APIs,
 linking statically or dynamically with a version of [temporal\_rs](https://github.com/boa-dev/temporal).
 Building it requires a Rust toolchain:
 
-* rustc >= 1.82 (with LLVM >= 19)
-* cargo >= 1.82
+* rustc >= 1.86 (with LLVM >= 19)
+* cargo >= 1.86
 
 Refer to [Install Rust](https://rust-lang.org/tools/install/) for instructions.
 Individual packages such as `rust` and `cargo` in some operating system distributions may be considered
@@ -1152,7 +1157,6 @@ version of a dependency), please reserve and use a custom `NODE_MODULE_VERSION`
 by opening a pull request against the registry available at
 <https://github.com/nodejs/node/blob/HEAD/doc/abi_version_registry.json>.
 
-[AIX toolbox]: https://www.ibm.com/support/pages/aix-toolbox-open-source-software-overview
 [Developer Mode]: https://learn.microsoft.com/en-us/windows/advanced-settings/developer-mode
 [Python downloads]: https://www.python.org/downloads/
 [Python versions]: https://devguide.python.org/versions/

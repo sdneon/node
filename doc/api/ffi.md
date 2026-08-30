@@ -62,16 +62,17 @@ FFI signatures use string type names.
 Supported type names:
 
 * `void`
+* `char`
 * `i8`, `int8`
-* `u8`, `uint8`, `bool`, `char`
+* `u8`, `uint8`, `bool`
 * `i16`, `int16`
 * `u16`, `uint16`
 * `i32`, `int32`
 * `u32`, `uint32`
 * `i64`, `int64`
 * `u64`, `uint64`
-* `f32`, `float`
-* `f64`, `double`
+* `f32`, `float`, `float32`
+* `f64`, `double`, `float64`
 * `pointer`, `ptr`
 * `string`, `str`
 * `buffer`
@@ -125,8 +126,13 @@ raw pointer `bigint` values. For pointer-like parameters, `null`, `undefined`,
 strings, `Buffer`, typed array, `DataView`, and `ArrayBuffer` values are
 converted on the JavaScript side before calling the optimized native wrapper.
 
-Optimized Fast FFI calls support at most 8 function arguments. Functions with
-more than 7 arguments use the generic FFI call path instead.
+Optimized Fast FFI calls support at most 8 function arguments, but the exact
+limit depends on the architecture and on the argument types, because each
+argument must fit in the registers used by the platform trampoline. Integer
+and pointer arguments are limited to 7 on AArch64 and to 6 on x86-64, while
+floating-point arguments can use up to 8 on both. Functions that exceed these
+limits, including any function with more than 8 arguments, use the generic FFI
+call path instead.
 
 ## Signature objects
 
@@ -197,10 +203,10 @@ so it can be used with the [`using`][] declaration. Disposing the returned
 object closes the library handle.
 
 ```mjs
-import { dlopen } from 'node:ffi';
+import { dlopen, suffix } from 'node:ffi';
 
 {
-  using handle = dlopen('./mylib.so', {
+  using handle = dlopen(`./mylib.${suffix}`, {
     add_i32: { arguments: ['i32', 'i32'], return: 'i32' },
   });
   console.log(handle.functions.add_i32(20, 22));
@@ -208,9 +214,9 @@ import { dlopen } from 'node:ffi';
 ```
 
 ```mjs
-import { dlopen } from 'node:ffi';
+import { dlopen, suffix } from 'node:ffi';
 
-const { lib, functions } = dlopen('./mylib.so', {
+const { lib, functions } = dlopen(`./mylib.${suffix}`, {
   add_i32: { arguments: ['i32', 'i32'], return: 'i32' },
   string_length: { arguments: ['pointer'], return: 'u64' },
 });
@@ -219,9 +225,9 @@ console.log(functions.add_i32(20, 22));
 ```
 
 ```cjs
-const { dlopen } = require('node:ffi');
+const { dlopen, suffix } = require('node:ffi');
 
-const { lib, functions } = dlopen('./mylib.so', {
+const { lib, functions } = dlopen(`./mylib.${suffix}`, {
   add_i32: { arguments: ['i32', 'i32'], return: 'i32' },
   string_length: { arguments: ['pointer'], return: 'u64' },
 });
@@ -273,9 +279,9 @@ Loads the dynamic library without resolving any functions eagerly.
 On Windows passing `null` is not supported.
 
 ```cjs
-const { DynamicLibrary } = require('node:ffi');
+const { DynamicLibrary, suffix } = require('node:ffi');
 
-const lib = new DynamicLibrary('./mylib.so');
+const lib = new DynamicLibrary(`./mylib.${suffix}`);
 ```
 
 ### `library.path`
@@ -305,10 +311,10 @@ library instance can be managed with the [`using`][] declaration. Leaving the
 enclosing scope invokes `library.close()` automatically.
 
 ```mjs
-import { DynamicLibrary } from 'node:ffi';
+import { DynamicLibrary, suffix } from 'node:ffi';
 
 {
-  using lib = new DynamicLibrary('./mylib.so');
+  using lib = new DynamicLibrary(`./mylib.${suffix}`);
   // Use `lib` here; `lib.close()` is called when the block exits.
 }
 ```
@@ -360,9 +366,9 @@ If the same symbol has already been resolved, requesting it again with a
 different signature throws.
 
 ```cjs
-const { DynamicLibrary } = require('node:ffi');
+const { DynamicLibrary, suffix } = require('node:ffi');
 
-const lib = new DynamicLibrary('./mylib.so');
+const lib = new DynamicLibrary(`./mylib.${suffix}`);
 const add = lib.getFunction('add_i32', {
   arguments: ['i32', 'i32'],
   return: 'i32',
@@ -410,9 +416,9 @@ The return value is the callback pointer address as a `bigint`. It can be
 passed to native functions expecting a callback pointer.
 
 ```cjs
-const { DynamicLibrary } = require('node:ffi');
+const { DynamicLibrary, suffix } = require('node:ffi');
 
-const lib = new DynamicLibrary('./mylib.so');
+const lib = new DynamicLibrary(`./mylib.${suffix}`);
 
 const callback = lib.registerCallback(
   { arguments: ['i32'], return: 'i32' },
@@ -454,6 +460,10 @@ memory.
 
 Keeps the callback strongly referenced by JavaScript.
 
+Throws `ERR_INVALID_ARG_VALUE` if the callback function has already been
+garbage collected after a previous `library.unrefCallback(pointer)` call, since
+a collected function cannot be referenced again.
+
 ### `library.unrefCallback(pointer)`
 
 * `pointer` {bigint}
@@ -463,6 +473,9 @@ Allows the callback to become weakly referenced by JavaScript.
 If the callback function is later garbage collected, subsequent native
 invocations become a no-op. Non-void return values are zero-initialized before
 returning to native code.
+
+Throws `ERR_INVALID_ARG_VALUE` if the callback function has already been
+garbage collected.
 
 ## Calling native functions
 
@@ -709,6 +722,25 @@ Returns the raw memory address of JavaScript-managed byte storage.
 This is unsafe and dangerous. The returned pointer can become invalid if the
 underlying memory is detached, resized, transferred, or otherwise invalidated.
 Using stale pointers can cause memory corruption or process crashes.
+
+## `ffi.getCurrentEventLoop()`
+
+<!-- YAML
+added: v26.6.0
+-->
+
+* Returns: {bigint}
+
+Returns the address of the current thread's `uv_loop_t` as a `bigint`.
+
+The returned address is for the current Node.js environment. In the main thread,
+this is the main thread event loop. In a worker thread, this is that worker's
+event loop.
+
+This is unsafe and dangerous. The returned pointer is only valid for the lifetime
+of the current environment. Using it after the environment exits, or from native
+code that assumes a different thread or lifetime, can crash the process or
+corrupt memory.
 
 ## Safety notes
 

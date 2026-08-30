@@ -2001,7 +2001,7 @@ If the loop terminates with a `break`, `return`, or a `throw`, the stream will
 be destroyed. In other terms, iterating over a stream will consume the stream
 fully. The stream will be read in chunks of size equal to the `highWaterMark`
 option. In the code example above, data will be in a single chunk if the file
-has less then 64 KiB of data because no `highWaterMark` option is provided to
+has less than 64 KiB of data because no `highWaterMark` option is provided to
 [`fs.createReadStream()`][].
 
 ##### `readable[Symbol.for('Stream.toAsyncStreamable')]()`
@@ -3034,8 +3034,6 @@ changes:
     description: Added support for webstreams.
 -->
 
-> Stability: 2 - Stable
-
 * `streams` {Stream\[]|Iterable\[]|AsyncIterable\[]|Function\[]|
   ReadableStream\[]|WritableStream\[]|TransformStream\[]|Duplex\[]|Function}
 * Returns: {stream.Duplex}
@@ -3121,6 +3119,19 @@ console.log(res); // prints 'HELLOWORLD'
 
 For convenience, the [`readable.compose(stream)`][] method is available on
 {Readable} and {Duplex} streams as a wrapper for this function.
+
+### `stream.isDestroyed(stream)`
+
+<!-- YAML
+added:
+  - v19.9.0
+  - v18.17.0
+-->
+
+* `stream` {Readable|Writable|Duplex}
+* Returns: {boolean|null} - Only returns `null` if `stream` is not a valid `Readable`, `Writable` or `Duplex`.
+
+Returns whether the stream has been destroyed.
 
 ### `stream.isErrored(stream)`
 
@@ -3552,7 +3563,7 @@ changes:
 * `stream` {Stream|ReadableStream|WritableStream} A stream to attach a signal
   to.
 
-Attaches an AbortSignal to a readable or writeable stream. This lets code
+Attaches an AbortSignal to a readable or writable stream. This lets code
 control stream destruction using an `AbortController`.
 
 Calling `abort` on the `AbortController` corresponding to the passed
@@ -3844,7 +3855,7 @@ const myWritable = new Writable({
 
 Calling `abort` on the `AbortController` corresponding to the passed
 `AbortSignal` will behave the same way as calling `.destroy(new AbortError())`
-on the writeable stream.
+on the writable stream.
 
 ```js
 const { Writable } = require('node:stream');

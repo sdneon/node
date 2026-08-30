@@ -44,6 +44,9 @@ let
         ../../tools/v8_gypfiles/toolchain.gypi
         ../../tools/v8_gypfiles/v8.gyp
       ]
+      ++ lib.optionals (builtins.elem "--with-perfetto" configureFlags) [
+        ../../deps/perfetto
+      ]
       ++ lib.optionals (icu != null) [
         ../../tools/icu/icu_versions.json
         ../../tools/icu/icu-system.gyp
@@ -69,7 +72,7 @@ let
       trackedFiles =
         ({
           # This line is being modified by Makefile $(TARBALL) target, any change to it should be sync
-          fileset = (fileset.unions files);
+          fileset = fileset.intersection (fileset.gitTracked root) (fileset.unions files);
         }).fileset;
     in
     fileset.toSource {
