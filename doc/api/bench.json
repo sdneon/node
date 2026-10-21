@@ -1,0 +1,878 @@
+{
+  "type": "module",
+  "source": "doc/api/bench.md",
+  "modules": [
+    {
+      "textRaw": "Benchmark runner",
+      "name": "benchmark_runner",
+      "introduced_in": "v26.9.0",
+      "type": "module",
+      "meta": {
+        "added": [
+          "v26.9.0"
+        ],
+        "changes": []
+      },
+      "stability": 1,
+      "stabilityText": "Early Development",
+      "desc": "<p>The <code>node:bench</code> module supports defining and running JavaScript benchmarks in\nthe current process, and running one benchmark file in a fresh child process.\nThe module is only available when Node.js is started with the\n<code>--experimental-bench</code> flag and can only be imported with the <code>node:</code> scheme:</p>\n<pre><code class=\"language-mjs\">import { bench, suite } from 'node:bench';\n</code></pre>\n<pre><code class=\"language-cjs\">const { bench, suite } = require('node:bench');\n</code></pre>",
+      "modules": [
+        {
+          "textRaw": "Example benchmark",
+          "name": "example_benchmark",
+          "type": "module",
+          "desc": "<p>Save the following as <code>benchmark.mjs</code>:</p>\n<pre><code class=\"language-mjs\">import { bench, suite } from 'node:bench';\n\nsuite('URL', () => {\n  const input = 'https://example.com/a?b=c';\n\n  bench('construct', {\n    samples: 30,\n    params: { input: 'short' },\n  }, (b) => {\n    const operations = 10_000;\n    let totalLength = 0;\n\n    b.start();\n    for (let i = 0; i &#x3C; operations; i++) {\n      totalLength += new URL(input).href.length;\n    }\n    b.end(operations);\n\n    if (totalLength !== operations * input.length) {\n      throw new Error('Unexpected URL result');\n    }\n  });\n});\n</code></pre>\n<p>Run the benchmark from the command line:</p>\n<pre><code class=\"language-console\">node --experimental-bench --bench benchmark.mjs\n</code></pre>\n<p>Benchmarks are executed serially in declaration order. Declared benchmarks are\nscheduled automatically. Call <code>run()</code> during the same turn as the declarations\nto consume the event stream or configure filtering.\nIf a benchmark run started automatically or through the module-level <code>run()</code>\nfails, the process exit code is set to <code>1</code> unless <code>process.exitCode</code> has\nalready been set. Runners created with <a href=\"#createrunneroptions\"><code>createRunner()</code></a> leave the exit code\nto their caller.</p>",
+          "displayName": "Example benchmark"
+        },
+        {
+          "textRaw": "Measurement model",
+          "name": "measurement_model",
+          "type": "module",
+          "desc": "<p>Each warmup and measured sample invokes the benchmark function once with a\nfresh {BenchContext}. The function must either call <code>context.start()</code> and\n<code>context.end(operations)</code> exactly once, or call <code>context.record(sample)</code> exactly\nonce to provide an externally measured sample. Setup before <code>start()</code> and\ncleanup after <code>end()</code> are outside the measured region. Promise-returning\nfunctions are awaited.</p>\n<p>By default, ten unreported warmup invocations run before the measured samples\nso that early samples are less likely to be taken before the measured code has\nbeen optimized. A fixed warmup count does not guarantee a stable optimization\nstate; inspect raw <code>samples</code> and increase <code>warmup</code> when early samples are\nconsistently slower. Set <code>warmup</code> to <code>0</code> to measure from the first invocation.</p>\n<p>By default, an event loop turn occurs between sample invocations. An embedded\nrunner can disable this using <code>yieldBetweenSamples</code>. The runner executes\nbenchmarks serially, but it does not provide process isolation. Other work in\nthe process, JIT compilation, garbage collection, CPU frequency changes, and\nsystem load can all affect results. Keep raw samples when comparing results and\ninvestigate noisy or skewed distributions rather than treating a confidence\ninterval as a pass/fail threshold.</p>",
+          "modules": [
+            {
+              "textRaw": "Measurement integrity",
+              "name": "measurement_integrity",
+              "type": "module",
+              "desc": "<p>A statistically consistent result does not prove that a benchmark measured the\nintended work. An optimizing runtime can remove work whose result is unused or\nspecialize it more narrowly than the workload being modeled. Framework and loop\noverhead can also dominate operations that are too short. To reduce these risks:</p>\n<ul>\n<li>Make values produced by measured work observable outside the measured\ninterval, for example by validating an aggregate derived from every result.\nPassing them only through unused local computations is insufficient.</li>\n<li>Perform enough operations in each sample to amortize fixed timer reads and\ncalls to <code>context.start()</code> and <code>context.end()</code>. If loop bookkeeping is material\nrelative to one operation, batch multiple operations per iteration and report\nthe total operation count.</li>\n<li>Inspect raw <code>samples</code> for trends that indicate insufficient warmup or\noptimization tiering, pauses consistent with garbage collection, and\nmultimodal distributions.</li>\n<li>Validate surprising results with an independent benchmark shape that performs\nthe same intended work differently.</li>\n</ul>\n<p><code>node:bench</code> does not force a particular optimization state or infer whether an\nengine eliminated work. Such controls and diagnostics are runtime-specific and\nheuristic, and do not replace validating the benchmark workload.</p>",
+              "displayName": "Measurement integrity"
+            },
+            {
+              "textRaw": "Dynamic sampling and variable batches",
+              "name": "dynamic_sampling_and_variable_batches",
+              "type": "module",
+              "desc": "<p>Calling <code>context.done()</code> during a measured sample completes the benchmark after\nthat sample. This allows a higher-level tool to treat <code>samples</code> as a maximum and\nimplement a dynamic sampling policy.</p>\n<p>The number of operations can differ between samples. Summary statistics treat\neach sample's <code>rate</code> as one equally weighted observation. In particular,\n<code>summary.mean</code> is the arithmetic mean of the per-sample rates. It is not the\npooled throughput calculated as:</p>\n<pre><code class=\"language-text\">1_000_000_000 * sum(sample.operations) / sum(sample.duration_ns)\n</code></pre>\n<p>The two values can differ when sample durations vary because pooled throughput\nweights each per-sample rate by its duration. A higher-level tool that varies\nbatch sizes should choose the aggregation that matches its analysis. It can\ncalculate pooled throughput from the raw <code>samples</code>; operation counts should be\nsummed as <code>bigint</code> values because their total can exceed\n<code>Number.MAX_SAFE_INTEGER</code> even though each count cannot.</p>",
+              "displayName": "Dynamic sampling and variable batches"
+            },
+            {
+              "textRaw": "Comparing benchmark results",
+              "name": "comparing_benchmark_results",
+              "type": "module",
+              "desc": "<p><code>node:bench</code> does not designate a benchmark as a baseline or produce a pass/fail\ncomparison between runs. It exposes raw samples, stable benchmark identities,\nparameters, and tags so that comparison policy can remain in higher-level\ntools. A tool can use <code>benchId</code> to match the same declaration and parameters\nacross compatible source layouts, and use a tag or its own metadata to identify\na baseline.</p>\n<p>Comparison tools should retain the raw sample rates and verify that execution\nplans and relevant environment details are comparable. The appropriate analysis\ndepends on the experimental design and distribution. For example, independent\nsamples might use Welch's t-test or a rank-based test, while observations that\nwere deliberately paired require paired analysis. Tools should also consider\neffect sizes, uncertainty, and correction when testing multiple benchmarks.\nThe general-purpose <a href=\"perf_hooks.html#class-histogram\"><code>&#x3C;Histogram></code></a> statistics in <code>node:perf_hooks</code> can support such\nanalysis, but the runner does not select a method or significance threshold.</p>",
+              "displayName": "Comparing benchmark results"
+            }
+          ],
+          "displayName": "Measurement model"
+        },
+        {
+          "textRaw": "Reusable runners",
+          "name": "reusable_runners",
+          "type": "module",
+          "desc": "<p>The module-level declaration functions use a shared runner and schedule it\nautomatically. Higher-level tools can create isolated, explicitly started\nrunners instead:</p>\n<pre><code class=\"language-mjs\">import { createRunner } from 'node:bench';\n\nconst runner = createRunner({ yieldBetweenSamples: false });\n\nrunner.bench('example', { samples: 100 }, (b) => {\n  const operations = chooseOperationCount();\n  b.start();\n  runOperations(operations);\n  const sample = b.end(operations);\n\n  if (hasEnoughData(sample)) b.done();\n});\n\nfor await (const record of runner.run()) {\n  // Consume structured benchmark records.\n}\n</code></pre>\n<p>Each runner has independent declarations, hooks, filtering, and output. Unlike\nthe module-level declarations, creating a benchmark on an explicit runner does\nnot schedule execution. This allows packages to collect declarations and start\nthem later. Calling the explicit runner's <code>run()</code> function prevents additional\ndeclarations and a second call to <code>run()</code> is an error.</p>",
+          "displayName": "Reusable runners"
+        },
+        {
+          "textRaw": "Command-line runner",
+          "name": "command-line_runner",
+          "type": "module",
+          "desc": "<p>The <code>--bench</code> flag runs one or more explicit benchmark files or glob patterns:</p>\n<pre><code class=\"language-console\">node --experimental-bench --bench benchmark.mjs\nnode --experimental-bench --bench --bench-reporter=json 'benchmarks/**/*.js'\n</code></pre>\n<p>Files are sorted and executed serially. The default\n<code>--bench-isolation=process</code> mode runs each file in a separate child process and\nemits one aggregate summary. Structured events are transferred to the parent\nwithout JSON conversion, preserving BigInt durations, errors, and parameter\nvalues. Child writes to stdout and stderr are emitted as diagnostic records so\nthey do not corrupt reporter output.</p>\n<p><code>--bench-isolation=none</code> imports all files into the runner process. This mode\nhas lower startup overhead, but module, heap, and process state carry between\nfiles, and user writes share stdout and stderr with reporters.</p>\n<p>Worker-thread isolation is not a CLI mode. Each newly constructed <a href=\"worker_threads.html#class-worker\"><code>&#x3C;Worker></code></a> has a\nseparate V8 isolate, JavaScript heap, and event loop, typically with lower\nstartup cost than a child process. Reusing a worker preserves its module and heap\nstate. Workers also share libuv's process-wide thread pool and can share\nprocess-global native or addon state, so they do not provide the same boundary\nas process isolation.</p>\n<p>Higher-level tools can experiment with worker isolation by loading benchmark\ncode inside a worker, measuring there, transferring structured sample data, and\npassing it to <a href=\"#contextrecordsample\"><code>context.record()</code></a>. The reported <code>duration_ns</code> can exclude\nmessage transport when the worker captures both timestamps. Tools should\nidentify worker modules and workloads explicitly. They should not stringify\narbitrary functions or closures to move them between isolates, because closures\ncannot be reconstructed with their original lexical environment.</p>\n<p>Benchmark files passed to <code>--bench</code> should declare benchmarks but must not call\n<code>run()</code>. The CLI supports <code>--bench-name-pattern</code>, <code>--bench-samples</code>,\n<code>--bench-warmup</code>, <code>--bench-reporter</code>, and <code>--bench-reporter-destination</code>. See\nthe <a href=\"cli.html#--bench\">command-line options documentation</a> for details.</p>\n<p>Preload modules passed through <code>--require</code> or <code>--import</code> should not declare\nbenchmarks. Such declarations are not associated with an entry file and have\nan <code>entryFile</code> value of <code>null</code>. Their <code>fileRunId</code> identifies the runner or child\nexecution in which they occurred. With process isolation, a preload is evaluated\nand its declarations run once for every benchmark child process.</p>",
+          "displayName": "Command-line runner"
+        },
+        {
+          "textRaw": "Benchmark reporters",
+          "name": "benchmark_reporters",
+          "type": "module",
+          "desc": "<p>The built-in reporters are available from the scheme-only\n<code>node:bench/reporters</code> module:</p>\n<pre><code class=\"language-mjs\">import { json, spec } from 'node:bench/reporters';\n</code></pre>\n<pre><code class=\"language-cjs\">const { json, spec } = require('node:bench/reporters');\n</code></pre>\n<p>Reporter values can be passed directly to <code>stream.compose()</code>:</p>\n<pre><code class=\"language-mjs\">import { bench, run } from 'node:bench';\nimport { spec } from 'node:bench/reporters';\nimport process from 'node:process';\n\nbench('example', (b) => {\n  b.start();\n  doWork();\n  b.end(1);\n});\n\nrun().compose(spec).pipe(process.stdout);\n</code></pre>\n<p>The <code>spec</code> reporter buffers results and outputs a concise table containing the\nsample count, mean rate, 95% confidence interval for the mean, median rate, and\nwarnings. A coefficient of variation above 5% is reported as <code>noisy</code>, and an\nabsolute skewness above 1 is reported as <code>skewed</code>. The exact human-readable\nformat is subject to change.</p>\n<p>The <code>json</code> reporter emits every lifecycle record as newline-delimited JSON.\nBigInt values, including <code>duration_ns</code>, are encoded as decimal strings. Errors\nare represented using their <code>name</code>, <code>message</code>, <code>stack</code>, <code>code</code>, <code>cause</code>, and\n<code>errors</code> properties. As required by JSON, non-finite numbers are encoded as\n<code>null</code>.</p>\n<p>Custom reporters use the same composition contract. They can be transforms or\nfunctions accepted by <code>stream.compose()</code>. The composed readable can be piped to\nany writable destination:</p>\n<pre><code class=\"language-mjs\">import { run } from 'node:bench';\nimport process from 'node:process';\n\nasync function* names(source) {\n  for await (const { type, data } of source) {\n    if (type === 'bench:complete') {\n      yield `${data.name}\\n`;\n    }\n  }\n}\n\nrun().compose(names).pipe(process.stdout);\n</code></pre>",
+          "displayName": "Benchmark reporters"
+        },
+        {
+          "textRaw": "Sample result",
+          "name": "sample_result",
+          "type": "module",
+          "desc": "<p>Each measured sample has the following properties:</p>\n<ul>\n<li><code>operations</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;number></code></a> The positive operation count passed to <code>context.end()</code> or <code>context.record()</code>.</li>\n<li><code>duration_ns</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#bigint_type\"><code>&#x3C;bigint></code></a> The measured duration in nanoseconds.</li>\n<li><code>rate</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;number></code></a> Operations per second.</li>\n<li><code>detail</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#Data_types\"><code>&#x3C;any></code></a> The optional cloned sample detail.</li>\n</ul>",
+          "displayName": "Sample result"
+        },
+        {
+          "textRaw": "Benchmark result",
+          "name": "benchmark_result",
+          "type": "module",
+          "desc": "<p>A completed benchmark result contains:</p>\n<ul>\n<li><code>runId</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a> The opaque logical run identity.</li>\n<li><code>fileRunId</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a> The opaque file runner or child execution identity.</li>\n<li><code>entryFile</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a> | <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#null_type\"><code>&#x3C;null></code></a> The top-level file that caused this declaration.</li>\n<li><code>benchId</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a> The stable declaration identity within the same source\nlayout.</li>\n<li><code>parentId</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a> | <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#null_type\"><code>&#x3C;null></code></a> The stable containing suite identity.</li>\n<li><code>name</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a> The benchmark name.</li>\n<li><code>namePath</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a>[] The hierarchical suite and benchmark names.</li>\n<li><code>file</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a> The declaration source file.</li>\n<li><code>line</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;number></code></a> The source line.</li>\n<li><code>column</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;number></code></a> The source column.</li>\n<li><code>tags</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a>[] The inherited canonical tags.</li>\n<li><code>params</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a> The canonical parameter metadata.</li>\n<li><code>samples</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a>[] The exact measured samples in measurement invocation\norder.</li>\n<li><code>summary</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a>\n<ul>\n<li><code>mean</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;number></code></a> The equally weighted arithmetic mean of per-sample rates,\nnot pooled throughput across all operations and durations.</li>\n<li><code>median</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;number></code></a> The median per-sample rate.</li>\n<li><code>min</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;number></code></a> The minimum per-sample rate.</li>\n<li><code>max</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;number></code></a> The maximum per-sample rate.</li>\n<li><code>stddev</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;number></code></a> The population standard deviation of rates.</li>\n<li><code>coefficientOfVariation</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;number></code></a> <code>stddev / mean</code>.</li>\n<li><code>confidenceInterval</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a> The 95% Student's t confidence interval for\nthe mean rate, with <code>lower</code> and <code>upper</code> properties.</li>\n<li><code>medianConfidenceInterval</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a> The 95% nonparametric confidence\ninterval for the median rate, with <code>lower</code> and <code>upper</code> properties.</li>\n<li><code>skewness</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;number></code></a> The skewness of the scaled rate histogram.</li>\n</ul>\n</li>\n</ul>",
+          "displayName": "Benchmark result"
+        }
+      ],
+      "methods": [
+        {
+          "textRaw": "`createRunner([options])`",
+          "name": "createRunner",
+          "type": "method",
+          "meta": {
+            "added": [
+              "v26.9.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`options` {Object}",
+                  "name": "options",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`yieldBetweenSamples` {boolean} Schedule an event loop turn between sample callbacks. Disabling this also prevents timer-based abort signals from firing between synchronous callbacks. Benchmark timeouts continue to be checked against a monotonic deadline. **Default:** `true`.",
+                      "name": "yieldBetweenSamples",
+                      "type": "boolean",
+                      "default": "`true`",
+                      "desc": "Schedule an event loop turn between sample callbacks. Disabling this also prevents timer-based abort signals from firing between synchronous callbacks. Benchmark timeouts continue to be checked against a monotonic deadline."
+                    }
+                  ],
+                  "optional": true
+                }
+              ],
+              "return": {
+                "textRaw": "Returns: {Object} An isolated benchmark runner with bound `after`, `afterEach`, `before`, `beforeEach`, `bench`, `describe`, `run`, and `suite` functions.",
+                "name": "return",
+                "type": "Object",
+                "desc": "An isolated benchmark runner with bound `after`, `afterEach`, `before`, `beforeEach`, `bench`, `describe`, `run`, and `suite` functions."
+              }
+            }
+          ],
+          "desc": "<p>Creates an explicitly started benchmark runner. Declarations made through one\nrunner do not interact with declarations made through another runner or through\nthe module-level functions. Call the returned <code>run()</code> function to start the\nrunner and obtain its {BenchmarksStream}.</p>\n<p>Each runner can be started once. Its <code>run()</code> function accepts the same options\nas the module-level <a href=\"#runoptions\"><code>run()</code></a>. <code>run({ yieldBetweenSamples })</code> overrides the\nvalue passed to <code>createRunner()</code>. Unlike the module-level runner, a failed\nbenchmark in an explicit runner does not change the process exit code.</p>"
+        },
+        {
+          "textRaw": "`bench([name][, options], fn)`",
+          "name": "bench",
+          "type": "method",
+          "meta": {
+            "added": [
+              "v26.9.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`name` {string} The benchmark name. **Default:** The `name` property of `fn`, or `'<anonymous>'` when `fn` has no name.",
+                  "name": "name",
+                  "type": "string",
+                  "default": "The `name` property of `fn`, or `'<anonymous>'` when `fn` has no name",
+                  "desc": "The benchmark name.",
+                  "optional": true
+                },
+                {
+                  "textRaw": "`options` {Object}",
+                  "name": "options",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`diagnosticChannels` {Array} String diagnostics channel names, deduplicated and inherited from containing suites by union. Symbol values in the array are silently ignored. **Default:** `[]`.",
+                      "name": "diagnosticChannels",
+                      "type": "Array",
+                      "default": "`[]`",
+                      "desc": "String diagnostics channel names, deduplicated and inherited from containing suites by union. Symbol values in the array are silently ignored."
+                    },
+                    {
+                      "textRaw": "`only` {boolean} When any benchmark or containing suite has `only` set, benchmarks without `only` in their hierarchy are skipped. **Default:** `false`.",
+                      "name": "only",
+                      "type": "boolean",
+                      "default": "`false`",
+                      "desc": "When any benchmark or containing suite has `only` set, benchmarks without `only` in their hierarchy are skipped."
+                    },
+                    {
+                      "textRaw": "`params` {Object} String, finite number, or boolean metadata identifying this benchmark configuration. Parameter keys are sorted when constructing the stable benchmark identity. **Default:** An empty object.",
+                      "name": "params",
+                      "type": "Object",
+                      "default": "An empty object",
+                      "desc": "String, finite number, or boolean metadata identifying this benchmark configuration. Parameter keys are sorted when constructing the stable benchmark identity."
+                    },
+                    {
+                      "textRaw": "`samples` {number} The maximum number of measured callback invocations. Must be a positive 32-bit unsigned integer. The benchmark may finish earlier by calling `context.done()`. **Default:** `30`.",
+                      "name": "samples",
+                      "type": "number",
+                      "default": "`30`",
+                      "desc": "The maximum number of measured callback invocations. Must be a positive 32-bit unsigned integer. The benchmark may finish earlier by calling `context.done()`."
+                    },
+                    {
+                      "textRaw": "`signal` {AbortSignal} Allows aborting this benchmark.",
+                      "name": "signal",
+                      "type": "AbortSignal",
+                      "desc": "Allows aborting this benchmark."
+                    },
+                    {
+                      "textRaw": "`skip` {boolean|string} If truthy, the benchmark is skipped. A string is included in the result as the skip reason. **Default:** `false`.",
+                      "name": "skip",
+                      "type": "boolean|string",
+                      "default": "`false`",
+                      "desc": "If truthy, the benchmark is skipped. A string is included in the result as the skip reason."
+                    },
+                    {
+                      "textRaw": "`tags` {string}[] Labels associated with the benchmark. Tags are lowercased, deduplicated, and inherited from containing suites by union. **Default:** `[]`.",
+                      "name": "tags",
+                      "type": "string",
+                      "default": "`[]`",
+                      "desc": "[] Labels associated with the benchmark. Tags are lowercased, deduplicated, and inherited from containing suites by union."
+                    },
+                    {
+                      "textRaw": "`timeout` {number} The number of milliseconds after which the benchmark fails. **Default:** `Infinity`.",
+                      "name": "timeout",
+                      "type": "number",
+                      "default": "`Infinity`",
+                      "desc": "The number of milliseconds after which the benchmark fails."
+                    },
+                    {
+                      "textRaw": "`warmup` {number} The number of unreported callback invocations before measured samples. Must be a 32-bit unsigned integer. **Default:** `10`.",
+                      "name": "warmup",
+                      "type": "number",
+                      "default": "`10`",
+                      "desc": "The number of unreported callback invocations before measured samples. Must be a 32-bit unsigned integer."
+                    }
+                  ],
+                  "optional": true
+                },
+                {
+                  "textRaw": "`fn` {Function|AsyncFunction} The benchmark function. It receives a {BenchContext}.",
+                  "name": "fn",
+                  "type": "Function|AsyncFunction",
+                  "desc": "The benchmark function. It receives a {BenchContext}."
+                }
+              ],
+              "return": {
+                "textRaw": "Returns: {Promise} Fulfilled with the benchmark result after a top-level benchmark finishes, or with `undefined` immediately when declared in a suite.",
+                "name": "return",
+                "type": "Promise",
+                "desc": "Fulfilled with the benchmark result after a top-level benchmark finishes, or with `undefined` immediately when declared in a suite."
+              }
+            }
+          ],
+          "desc": "<p>Warmup invocations use the same callback and timing contract as measured\nsamples, but their samples are discarded. An exception, rejection, timeout,\nabort, missing timing call, or duplicate timing call stops the current\nbenchmark. Later benchmarks continue to run.</p>\n<p>After a timeout or abort, the runner briefly waits for asynchronous benchmark\nwork to settle before continuing. If it remains pending, all later benchmarks\nthat were selected to run fail without running so that their measurements\ncannot overlap with that work.</p>\n<p>For each warmup and measured callback, the runner subscribes to the configured\ndiagnostics channels. Each publication queues a context diagnostic whose\n<code>message</code> is <code>{ name, message }</code>, containing the string channel name and the\npublished message. Subscriptions are removed when the callback settles or is\naborted.</p>\n<p>A timeout or abort cannot interrupt synchronous JavaScript and does not forcibly\ncancel asynchronous work that ignores <code>context.signal</code>.</p>\n<p>The <code>benchId</code> is based on the declaration source file, hierarchical suite and\nbenchmark names, and canonicalized parameters. It is stable for repeated runs\nfrom the same source location, but the embedded source value is not normalized\nacross checkout roots, module formats, operating systems, or path casing.</p>\n<p>Execution scope is represented separately. A <code>runId</code> identifies one logical\nrun, while <code>fileRunId</code> identifies a file runner or child execution within that\nrun. The <code>entryFile</code> field records which entry-file import caused a declaration\nand is <code>null</code> for declarations made by preload modules.\nThe same <code>benchId</code> can therefore occur under multiple <code>fileRunId</code> values when\nentry files use a shared declaration helper. Declaring the same <code>benchId</code> more\nthan once within one file execution scope reports an error rather than merging\nthe samples.</p>",
+          "methods": [
+            {
+              "textRaw": "`bench.skip([name][, options], fn)`",
+              "name": "skip",
+              "type": "method",
+              "meta": {
+                "added": [
+                  "v26.9.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "name": "name",
+                      "optional": true
+                    },
+                    {
+                      "name": "options",
+                      "optional": true
+                    },
+                    {
+                      "name": "fn"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>Shorthand for <code>bench(name, { ...options, skip: true }, fn)</code>.</p>"
+            },
+            {
+              "textRaw": "`bench.only([name][, options], fn)`",
+              "name": "only",
+              "type": "method",
+              "meta": {
+                "added": [
+                  "v26.9.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "name": "name",
+                      "optional": true
+                    },
+                    {
+                      "name": "options",
+                      "optional": true
+                    },
+                    {
+                      "name": "fn"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>Shorthand for <code>bench(name, { ...options, only: true }, fn)</code>.</p>"
+            }
+          ]
+        },
+        {
+          "textRaw": "`suite([name][, options], fn)`",
+          "name": "suite",
+          "type": "method",
+          "meta": {
+            "added": [
+              "v26.9.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`name` {string} The suite name. **Default:** The `name` property of `fn`, or `'<anonymous>'` when `fn` has no name.",
+                  "name": "name",
+                  "type": "string",
+                  "default": "The `name` property of `fn`, or `'<anonymous>'` when `fn` has no name",
+                  "desc": "The suite name.",
+                  "optional": true
+                },
+                {
+                  "textRaw": "`options` {Object}",
+                  "name": "options",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`diagnosticChannels` {Array} String diagnostics channel names inherited by nested suites and benchmarks. Symbol values in the array are silently ignored. **Default:** `[]`.",
+                      "name": "diagnosticChannels",
+                      "type": "Array",
+                      "default": "`[]`",
+                      "desc": "String diagnostics channel names inherited by nested suites and benchmarks. Symbol values in the array are silently ignored."
+                    },
+                    {
+                      "textRaw": "`only` {boolean} Selects all benchmarks nested in this suite. **Default:** `false`.",
+                      "name": "only",
+                      "type": "boolean",
+                      "default": "`false`",
+                      "desc": "Selects all benchmarks nested in this suite."
+                    },
+                    {
+                      "textRaw": "`skip` {boolean|string} Skips all benchmarks nested in this suite. **Default:** `false`.",
+                      "name": "skip",
+                      "type": "boolean|string",
+                      "default": "`false`",
+                      "desc": "Skips all benchmarks nested in this suite."
+                    },
+                    {
+                      "textRaw": "`tags` {string}[] Labels inherited by nested suites and benchmarks. **Default:** `[]`.",
+                      "name": "tags",
+                      "type": "string",
+                      "default": "`[]`",
+                      "desc": "[] Labels inherited by nested suites and benchmarks."
+                    }
+                  ],
+                  "optional": true
+                },
+                {
+                  "textRaw": "`fn` {Function|AsyncFunction} A function that declares nested suites, benchmarks, and hooks.",
+                  "name": "fn",
+                  "type": "Function|AsyncFunction",
+                  "desc": "A function that declares nested suites, benchmarks, and hooks."
+                }
+              ],
+              "return": {
+                "textRaw": "Returns: {Promise} Fulfilled when a top-level suite finishes, or with `undefined` immediately when declared in another suite.",
+                "name": "return",
+                "type": "Promise",
+                "desc": "Fulfilled when a top-level suite finishes, or with `undefined` immediately when declared in another suite."
+              }
+            }
+          ],
+          "desc": "<p>Suite functions run while declarations are collected. Promise-returning suite\nfunctions are awaited before benchmark execution begins.</p>"
+        },
+        {
+          "textRaw": "`describe([name][, options], fn)`",
+          "name": "describe",
+          "type": "method",
+          "meta": {
+            "added": [
+              "v26.9.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "name": "name",
+                  "optional": true
+                },
+                {
+                  "name": "options",
+                  "optional": true
+                },
+                {
+                  "name": "fn"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>Alias for <code>suite()</code>.</p>"
+        },
+        {
+          "textRaw": "`before(fn)`",
+          "name": "before",
+          "type": "method",
+          "meta": {
+            "added": [
+              "v26.9.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`fn` {Function|AsyncFunction} The hook function.",
+                  "name": "fn",
+                  "type": "Function|AsyncFunction",
+                  "desc": "The hook function."
+                }
+              ]
+            }
+          ],
+          "desc": "<p>Registers a hook that runs once before the benchmarks in the current suite.</p>"
+        },
+        {
+          "textRaw": "`after(fn)`",
+          "name": "after",
+          "type": "method",
+          "meta": {
+            "added": [
+              "v26.9.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`fn` {Function|AsyncFunction} The hook function.",
+                  "name": "fn",
+                  "type": "Function|AsyncFunction",
+                  "desc": "The hook function."
+                }
+              ]
+            }
+          ],
+          "desc": "<p>Registers a hook that runs once after the benchmarks in the current suite.</p>"
+        },
+        {
+          "textRaw": "`beforeEach(fn)`",
+          "name": "beforeEach",
+          "type": "method",
+          "meta": {
+            "added": [
+              "v26.9.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`fn` {Function|AsyncFunction} The hook function. It receives an object with the benchmark's `name`, `params`, and `signal`.",
+                  "name": "fn",
+                  "type": "Function|AsyncFunction",
+                  "desc": "The hook function. It receives an object with the benchmark's `name`, `params`, and `signal`."
+                }
+              ]
+            }
+          ],
+          "desc": "<p>Registers a hook that runs once before each complete logical benchmark in the\ncurrent suite. It does not run before every sample. Per-sample setup belongs in\nthe benchmark function before <code>context.start()</code> or <code>context.record()</code>.</p>"
+        },
+        {
+          "textRaw": "`afterEach(fn)`",
+          "name": "afterEach",
+          "type": "method",
+          "meta": {
+            "added": [
+              "v26.9.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`fn` {Function|AsyncFunction} The hook function. It receives an object with the benchmark's `name`, `params`, and `signal`.",
+                  "name": "fn",
+                  "type": "Function|AsyncFunction",
+                  "desc": "The hook function. It receives an object with the benchmark's `name`, `params`, and `signal`."
+                }
+              ]
+            }
+          ],
+          "desc": "<p>Registers a hook that runs once after each complete logical benchmark in the\ncurrent suite. It does not run after every sample. Per-sample cleanup belongs\nin the benchmark function after <code>context.end()</code> or <code>context.record()</code>.</p>"
+        },
+        {
+          "textRaw": "`run([options])`",
+          "name": "run",
+          "type": "method",
+          "meta": {
+            "added": [
+              "v26.9.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`options` {Object}",
+                  "name": "options",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`namePattern` {string|RegExp} Only runs benchmarks whose full hierarchical name matches the pattern. String values are interpreted as JavaScript regular expressions.",
+                      "name": "namePattern",
+                      "type": "string|RegExp",
+                      "desc": "Only runs benchmarks whose full hierarchical name matches the pattern. String values are interpreted as JavaScript regular expressions."
+                    },
+                    {
+                      "textRaw": "`samples` {number} Overrides the maximum number of measured callback invocations for every benchmark. Must be a positive 32-bit unsigned integer.",
+                      "name": "samples",
+                      "type": "number",
+                      "desc": "Overrides the maximum number of measured callback invocations for every benchmark. Must be a positive 32-bit unsigned integer."
+                    },
+                    {
+                      "textRaw": "`signal` {AbortSignal} Allows aborting in-progress benchmark execution.",
+                      "name": "signal",
+                      "type": "AbortSignal",
+                      "desc": "Allows aborting in-progress benchmark execution."
+                    },
+                    {
+                      "textRaw": "`warmup` {number} Overrides the number of unreported warmup callback invocations for every benchmark. Must be a 32-bit unsigned integer.",
+                      "name": "warmup",
+                      "type": "number",
+                      "desc": "Overrides the number of unreported warmup callback invocations for every benchmark. Must be a 32-bit unsigned integer."
+                    },
+                    {
+                      "textRaw": "`yieldBetweenSamples` {boolean} Schedule an event loop turn between sample callbacks. **Default:** `true`, or the value passed to `createRunner()` for an explicit runner.",
+                      "name": "yieldBetweenSamples",
+                      "type": "boolean",
+                      "default": "`true`, or the value passed to `createRunner()` for an explicit runner",
+                      "desc": "Schedule an event loop turn between sample callbacks."
+                    }
+                  ],
+                  "optional": true
+                }
+              ],
+              "return": {
+                "textRaw": "Returns: {BenchmarksStream}",
+                "name": "return",
+                "type": "BenchmarksStream"
+              }
+            }
+          ],
+          "desc": "<p>Returns the object-mode event stream for the in-process benchmark run. Call\n<code>run()</code> during the same turn in which benchmarks are declared, before automatic\nexecution begins. Calling <code>run()</code> is optional when the returned stream is not\nneeded. An explicit runner created by <code>createRunner()</code> does not run\nautomatically, so its <code>run()</code> function may be called later.</p>\n<p>If any benchmark fails, the process exit code is set to <code>1</code> once the run\nfinishes, unless <code>process.exitCode</code> has already been set.</p>\n<pre><code class=\"language-mjs\">import { bench, run } from 'node:bench';\n\nbench('example', { samples: 3 }, (b) => {\n  b.start();\n  doWork();\n  b.end(1);\n});\n\nfor await (const { type, data } of run()) {\n  if (type === 'bench:complete' &#x26;&#x26; data.error === undefined) {\n    console.log(data.name, data.summary.mean);\n  }\n}\n</code></pre>"
+        },
+        {
+          "textRaw": "`runFile(path[, options])`",
+          "name": "runFile",
+          "type": "method",
+          "meta": {
+            "added": [
+              "v26.9.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`path` {string|Buffer|URL} The path of one benchmark module.",
+                  "name": "path",
+                  "type": "string|Buffer|URL",
+                  "desc": "The path of one benchmark module."
+                },
+                {
+                  "textRaw": "`options` {Object}",
+                  "name": "options",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`env` {Object} The child process environment. Property values must be strings or `undefined`. This replaces, rather than extends, the parent environment. **Default:** A snapshot of `process.env`.",
+                      "name": "env",
+                      "type": "Object",
+                      "default": "A snapshot of `process.env`",
+                      "desc": "The child process environment. Property values must be strings or `undefined`. This replaces, rather than extends, the parent environment."
+                    },
+                    {
+                      "textRaw": "`execArgv` {string}[] Node.js command-line options for the child process. This replaces, rather than extends, inherited options. Benchmark runner options, positional arguments, and options that select another execution mode are not allowed. **Default:** Compatible options inherited from the current process.",
+                      "name": "execArgv",
+                      "type": "string",
+                      "default": "Compatible options inherited from the current process",
+                      "desc": "[] Node.js command-line options for the child process. This replaces, rather than extends, inherited options. Benchmark runner options, positional arguments, and options that select another execution mode are not allowed."
+                    },
+                    {
+                      "textRaw": "`signal` {AbortSignal} Terminates the child process when aborted.",
+                      "name": "signal",
+                      "type": "AbortSignal",
+                      "desc": "Terminates the child process when aborted."
+                    }
+                  ],
+                  "optional": true
+                }
+              ],
+              "return": {
+                "textRaw": "Returns: {BenchmarksStream}",
+                "name": "return",
+                "type": "BenchmarksStream"
+              }
+            }
+          ],
+          "desc": "<p>Runs exactly one benchmark module in a fresh child process and returns its\nobject-mode event stream. A relative <code>path</code> is resolved from the current working\ndirectory when <code>runFile()</code> is called. <code>path</code> is not interpreted as a glob.\nUnless the signal is aborted or the stream is destroyed before startup, every\ncall uses a new child. Input discovery, ordering, concurrency, retries, and\nmulti-file scheduling remain the caller's responsibility.</p>\n<p>When the Permission Model is enabled, the caller must have file system read\naccess to <code>path</code> and permission to create child processes.</p>\n<p>Records use advanced child process serialization, preserving supported\nstructured values such as <code>bigint</code> and errors. Child writes to stdout and stderr\nbecome <code>'bench:diagnostic'</code> records. A permission failure, module loading error,\nabnormal child exit, or cancellation also emits an error diagnostic and produces\na terminal <code>'bench:summary'</code> whose <code>success</code> property is <code>false</code>; these execution\nfailures do not error the stream. If module evaluation fails after declaring\nbenchmarks, those declarations still run before the unsuccessful summary.</p>\n<p><code>env</code>, effective inherited options, and an explicitly provided <code>execArgv</code> are\ncopied when <code>runFile()</code> is called. The runner removes <code>NODE_OPTIONS</code>, replaces\nIPC-related environment variables, and sets its private child-context, run\nidentity, and file identity variables, overriding properties with those names\nin <code>env</code>. Pass child Node.js options through <code>execArgv</code>, not <code>NODE_OPTIONS</code>.\nStandard <code>child_process</code> environment propagation still applies, including\n<code>NODE_V8_COVERAGE</code>, permission-model options, and required z/OS variables.\nAborting <code>signal</code> before the child starts produces an <code>AbortError</code> diagnostic\nwithout spawning it. Aborting during execution sends <code>SIGTERM</code> to the child and\nescalates to <code>SIGKILL</code> if it does not exit. Destroying the returned stream\nfollows the same termination procedure.</p>"
+        }
+      ],
+      "classes": [
+        {
+          "textRaw": "Class: `BenchContext`",
+          "name": "BenchContext",
+          "type": "class",
+          "desc": "<p>An instance of <code>BenchContext</code> is passed to every benchmark invocation. A new\ninstance is created for every warmup and measured sample.</p>",
+          "properties": [
+            {
+              "textRaw": "{number}",
+              "name": "index",
+              "type": "number",
+              "meta": {
+                "added": [
+                  "v26.9.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>The zero-based invocation index within the current <code>context.phase</code>. Warmup and\nmeasured samples have separate index sequences.</p>"
+            },
+            {
+              "textRaw": "{string}",
+              "name": "name",
+              "type": "string",
+              "meta": {
+                "added": [
+                  "v26.9.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>The benchmark name.</p>"
+            },
+            {
+              "textRaw": "{Object}",
+              "name": "params",
+              "type": "Object",
+              "meta": {
+                "added": [
+                  "v26.9.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>The benchmark's canonicalized parameter metadata.</p>"
+            },
+            {
+              "textRaw": "{string}",
+              "name": "phase",
+              "type": "string",
+              "meta": {
+                "added": [
+                  "v26.9.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>The current sample phase. It is <code>'warmup'</code> for an unreported warmup invocation\nand <code>'measurement'</code> for a measured invocation.</p>"
+            },
+            {
+              "textRaw": "{AbortSignal}",
+              "name": "signal",
+              "type": "AbortSignal",
+              "meta": {
+                "added": [
+                  "v26.9.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>An abort signal that is triggered when the benchmark is aborted, times out, or\nfinishes.</p>"
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`context.start()`",
+              "name": "start",
+              "type": "method",
+              "meta": {
+                "added": [
+                  "v26.9.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>Starts the measured region using <code>process.hrtime.bigint()</code>. Calling <code>start()</code>\nmore than once is an error.</p>"
+            },
+            {
+              "textRaw": "`context.end(operations[, options])`",
+              "name": "end",
+              "type": "method",
+              "meta": {
+                "added": [
+                  "v26.9.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`operations` {number} The number of completed operations. Must be a positive safe integer.",
+                      "name": "operations",
+                      "type": "number",
+                      "desc": "The number of completed operations. Must be a positive safe integer."
+                    },
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`detail` {any} Additional structured-cloneable sample data. With CLI process isolation, it must also be supported by advanced child process serialization.",
+                          "name": "detail",
+                          "type": "any",
+                          "desc": "Additional structured-cloneable sample data. With CLI process isolation, it must also be supported by advanced child process serialization."
+                        }
+                      ],
+                      "optional": true
+                    }
+                  ],
+                  "return": {
+                    "textRaw": "Returns: {Object} The sample's `operations`, `duration_ns`, computed `rate`, and optional cloned `detail`.",
+                    "name": "return",
+                    "type": "Object",
+                    "desc": "The sample's `operations`, `duration_ns`, computed `rate`, and optional cloned `detail`."
+                  }
+                }
+              ],
+              "desc": "<p>Ends the measured region. The end timestamp is captured before <code>operations</code> is\nvalidated. Calling <code>end()</code> before <code>start()</code>, calling it more than once, or\nrecording a zero-duration sample is an error. When provided, <code>detail</code> is cloned\nafter the end timestamp is captured, so cloning time is outside the measured\nregion.</p>"
+            },
+            {
+              "textRaw": "`context.record(sample)`",
+              "name": "record",
+              "type": "method",
+              "meta": {
+                "added": [
+                  "v26.9.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`sample` {Object}",
+                      "name": "sample",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`operations` {number} The number of completed operations. Must be a positive safe integer.",
+                          "name": "operations",
+                          "type": "number",
+                          "desc": "The number of completed operations. Must be a positive safe integer."
+                        },
+                        {
+                          "textRaw": "`duration_ns` {bigint} An externally measured positive duration in nanoseconds no greater than `Number.MAX_SAFE_INTEGER`.",
+                          "name": "duration_ns",
+                          "type": "bigint",
+                          "desc": "An externally measured positive duration in nanoseconds no greater than `Number.MAX_SAFE_INTEGER`."
+                        },
+                        {
+                          "textRaw": "`detail` {any} Additional structured-cloneable sample data. With CLI process isolation, it must also be supported by advanced child process serialization.",
+                          "name": "detail",
+                          "type": "any",
+                          "desc": "Additional structured-cloneable sample data. With CLI process isolation, it must also be supported by advanced child process serialization."
+                        }
+                      ]
+                    }
+                  ],
+                  "return": {
+                    "textRaw": "Returns: {Object} The normalized sample, including its computed `rate` and optional cloned `detail`.",
+                    "name": "return",
+                    "type": "Object",
+                    "desc": "The normalized sample, including its computed `rate` and optional cloned `detail`."
+                  }
+                }
+              ],
+              "desc": "<p>Records a measurement made by another clock or execution environment. This is\nuseful when a higher-level tool measures work in a worker and needs to exclude\nmessage transport from the duration. <code>record()</code> is mutually exclusive with\n<code>start()</code> and <code>end()</code> within one callback and must be called exactly once.</p>"
+            },
+            {
+              "textRaw": "`context.diagnostic(message[, options])`",
+              "name": "diagnostic",
+              "type": "method",
+              "meta": {
+                "added": [
+                  "v26.9.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`message` {any} A structured-cloneable diagnostic value. With CLI process isolation, it must also be supported by advanced child process serialization.",
+                      "name": "message",
+                      "type": "any",
+                      "desc": "A structured-cloneable diagnostic value. With CLI process isolation, it must also be supported by advanced child process serialization."
+                    },
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`level` {string} Either `'info'` or `'warning'`. **Default:** `'info'`.",
+                          "name": "level",
+                          "type": "string",
+                          "default": "`'info'`",
+                          "desc": "Either `'info'` or `'warning'`."
+                        },
+                        {
+                          "textRaw": "`detail` {any} Additional structured-cloneable diagnostic data. With CLI process isolation, it must also be supported by advanced child process serialization.",
+                          "name": "detail",
+                          "type": "any",
+                          "desc": "Additional structured-cloneable diagnostic data. With CLI process isolation, it must also be supported by advanced child process serialization."
+                        }
+                      ],
+                      "optional": true
+                    }
+                  ],
+                  "return": {
+                    "textRaw": "Returns: {undefined}",
+                    "name": "return",
+                    "type": "undefined"
+                  }
+                }
+              ],
+              "desc": "<p>Queues a diagnostic associated with the current benchmark, phase, and sample\nindex. Multiple diagnostics preserve call order. They are emitted after the\nsample callback settles and before that sample's <code>'bench:sample'</code> event. Warmup\ndiagnostics are emitted even though warmup samples are not. Diagnostics queued\nbefore a callback failure are emitted before the failed <code>'bench:complete'</code>\nevent and do not themselves cause the benchmark to fail. If a timeout or abort\nwins before the callback settles, queued diagnostics might not be emitted.</p>\n<p>The message and detail are cloned synchronously. Options are also validated\nsynchronously. Calling <code>diagnostic()</code> between <code>context.start()</code> and\n<code>context.end()</code> therefore includes that work in the measured duration. Invalid\narguments or an uncloneable message or detail violate the sample contract.</p>"
+            },
+            {
+              "textRaw": "`context.done()`",
+              "name": "done",
+              "type": "method",
+              "meta": {
+                "added": [
+                  "v26.9.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>Requests successful benchmark completion after the current measured sample.\nThe callback must still call either <code>start()</code> and <code>end()</code>, or <code>record()</code>.\nCalling <code>done()</code> during a warmup invocation is an error. The configured\n<code>samples</code> value remains the maximum number of measured invocations if <code>done()</code>\nis not called.</p>"
+            }
+          ]
+        },
+        {
+          "textRaw": "Class: `BenchmarksStream`",
+          "name": "BenchmarksStream",
+          "type": "class",
+          "desc": "<p><code>BenchmarksStream</code> is an object-mode <a href=\"stream.html#class-streamreadable\"><code>&#x3C;stream.Readable></code></a>. Each lifecycle record is\nboth emitted as a named event and made available on the stream as <code>{ type, data }</code>.</p>\n<p>The events are emitted in execution order:</p>\n<ul>\n<li><code>'bench:plan'</code></li>\n<li><code>'bench:start'</code></li>\n<li><code>'bench:sample'</code></li>\n<li><code>'bench:complete'</code></li>\n<li><code>'bench:diagnostic'</code></li>\n<li><code>'bench:summary'</code></li>\n</ul>\n<p>Named event payloads, readable records, and benchmark completion values are\nindependent snapshots. Mutating a value received through one delivery mechanism\ndoes not change values received through the others. As with other\n<a href=\"events.html#class-eventemitter\"><code>&#x3C;EventEmitter></code></a> events, multiple listeners for the same named event receive the\nsame event payload. Memory referenced through a <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer\"><code>&#x3C;SharedArrayBuffer></code></a> remains\nshared, following structured clone semantics.</p>\n<p>Once a consumer starts reading, the runner honors the stream's object-mode\nhigh-water mark and waits between records when the consumer is slower than the\nproducer. These waits occur after sample timing has ended, and records are not\ndropped. Snapshot creation and delivery waits are excluded from benchmark\ntimeout accounting. Before readable consumption starts, records accumulate in\nthe standard readable buffer and are included in <code>readableLength</code>. This keeps an\nunread stream and a consumer using only named events from deadlocking, but the\nbuffer can grow without bound. A named-event-only consumer that does not need\nreadable records should call <code>stream.resume()</code> to discard them. Destroying the\nstream stops readable delivery but does not cancel benchmark execution, so\nbenchmark completion promises still settle. Automatically scheduled\nmodule-level runs drain their stream internally.</p>\n<p>With process isolation, each record sent by a child is acknowledged only after\nthe parent has accepted it. A child sends no additional record until it receives\nthat acknowledgement, bounding the IPC relay when a reporter is slow.</p>\n<p>Every benchmark-scoped event contains <code>runId</code>, <code>fileRunId</code>, <code>entryFile</code>,\n<code>benchId</code>, <code>parentId</code>, and <code>namePath</code>. <code>runId</code> and <code>fileRunId</code> are opaque and\nchange between runs. <code>entryFile</code> identifies the top-level benchmark file whose\nloading caused the declaration, while <code>file</code> identifies the source location of\nthe declaration itself. <code>parentId</code> is based on the containing suite's source\nfile and hierarchical name path.</p>\n<p>After asynchronous suite declarations settle, an in-process runner emits one\n<code>'bench:plan'</code> event for every benchmark it collected, in declaration order.\nAll plans from that runner are emitted before its suite hooks or benchmark\ncallbacks run. With process isolation, files run in separate children, so plans\nfor a later file are emitted after an earlier child has completed. With no\nisolation, all files share one runner and their plans are emitted before any\nbenchmark executes. Plan data contains the benchmark-scoped identity, location,\ntags, and parameters described in <a href=\"#benchmark-result\">benchmark result</a>, together with:</p>\n<ul>\n<li><code>diagnosticChannels</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a>[] The inherited string channel names\nsubscribed to during each callback.</li>\n<li><code>samples</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;number></code></a> The effective maximum number of measured callback\ninvocations after run-level overrides.</li>\n<li><code>warmup</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;number></code></a> The effective number of unreported warmup callback\ninvocations after run-level overrides.</li>\n<li><code>timeout</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type\"><code>&#x3C;number></code></a> | <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#null_type\"><code>&#x3C;null></code></a> The timeout in milliseconds, or <code>null</code> when no timeout\nis configured.</li>\n<li><code>yieldBetweenSamples</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#boolean_type\"><code>&#x3C;boolean></code></a> Whether an event loop turn is scheduled between\nsample callbacks.</li>\n<li><code>selected</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#boolean_type\"><code>&#x3C;boolean></code></a> Whether the benchmark is eligible to run after applying <code>skip</code>, <code>only</code>, and <code>namePattern</code> selection. Execution can still be prevented\nby a duplicate declaration, suite build, hook, abort, or other runtime failure.</li>\n<li><code>skip</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#boolean_type\"><code>&#x3C;boolean></code></a> | <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a> When <code>selected</code> is <code>false</code>, the explicit skip value or\nthe selection reason, such as <code>'only'</code> or <code>'name pattern'</code>.</li>\n</ul>\n<p>The plan contains execution settings known to the runner. Runtime version,\noperating system, processor, and other environment metadata are intentionally\nleft for reporters and higher-level tools to collect.</p>\n<p><code>'bench:complete'</code> data contains a <a href=\"#benchmark-result\">benchmark result</a>. A failed result has an\nadditional <code>error</code> property and may contain samples recorded before the error.\nA skipped result has an additional <code>skip</code> property and an empty <code>samples</code>\narray. <code>'bench:diagnostic'</code> reports loading, suite, and hook errors as well as\npublic context diagnostics. A context diagnostic contains the benchmark-scoped\nidentity fields, <code>phase</code>, <code>index</code>, <code>message</code>, <code>level</code>, source location, and\noptional <code>detail</code>. <code>'bench:summary'</code> contains overall <code>runId</code>, <code>fileRunId</code>,\n<code>entryFile</code>, <code>success</code>, <code>counts</code>, <code>duration_ns</code>, and <code>file</code> properties.\n<code>fileRunId</code>, <code>entryFile</code>, and <code>file</code> are <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a> | <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#null_type\"><code>&#x3C;null></code></a>; they are <code>null</code> when the\nsummary aggregates multiple files.</p>"
+        }
+      ],
+      "displayName": "Benchmark runner"
+    }
+  ]
+}

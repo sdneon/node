@@ -1,0 +1,857 @@
+<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content="width=device-width"><link rel=icon href=https://nodejs.org/favicon.ico><meta name=nodejs.org:node-version content=v26.12.0><title>Benchmark runner | Node.js v26.12.0 Documentation</title><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback"><link rel=stylesheet href=assets/style.css><link rel=canonical href=https://nodejs.org/api/bench.html><script async defer src=assets/api.js></script><script>("dark"===localStorage.getItem("theme")||null===localStorage.getItem("theme")&&window.matchMedia?.("(prefers-color-scheme: dark)").matches)&&document.documentElement.classList.add("dark-mode")</script><body class="alt apidoc" id=api-section-bench><a href=#apicontent class=skip-to-content>Skip to content</a>
+    <div id=content class=clearfix>
+      <div role=navigation id=column2 class=interior>
+        <div id=intro class=interior>
+          <a href=/ title="Go back to the home page"> Node.js </a>
+        </div>
+        <hr class=line>
+        <ul>
+<li><a class=nav-documentation href=documentation.html>About this documentation</a></li>
+<li><a class=nav-synopsis href=synopsis.html>Usage and example</a></li>
+<li><a class=nav-assert href=assert.html>Assertion testing</a></li>
+<li><a class=nav-async_context href=async_context.html>Asynchronous context tracking</a></li>
+<li><a class=nav-async_hooks href=async_hooks.html>Async hooks</a></li>
+<li><a class="active nav-bench" href=bench.html>Benchmark runner</a></li>
+<li><a class=nav-buffer href=buffer.html>Buffer</a></li>
+<li><a class=nav-addons href=addons.html>C++ addons</a></li>
+<li><a class=nav-n-api href=n-api.html>C/C++ addons with Node-API</a></li>
+<li><a class=nav-embedding href=embedding.html>C++ embedder API</a></li>
+<li><a class=nav-child_process href=child_process.html>Child processes</a></li>
+<li><a class=nav-cluster href=cluster.html>Cluster</a></li>
+<li><a class=nav-cli href=cli.html>Command-line options</a></li>
+<li><a class=nav-console href=console.html>Console</a></li>
+<li><a class=nav-crypto href=crypto.html>Crypto</a></li>
+<li><a class=nav-debugger href=debugger.html>Debugger</a></li>
+<li><a class=nav-deprecations href=deprecations.html>Deprecated APIs</a></li>
+<li><a class=nav-diagnostics_channel href=diagnostics_channel.html>Diagnostics Channel</a></li>
+<li><a class=nav-dns href=dns.html>DNS</a></li>
+<li><a class=nav-domain href=domain.html>Domain</a></li>
+<li><a class=nav-environment_variables href=environment_variables.html>Environment Variables</a></li>
+<li><a class=nav-errors href=errors.html>Errors</a></li>
+<li><a class=nav-events href=events.html>Events</a></li>
+<li><a class=nav-fs href=fs.html>File system</a></li>
+<li><a class=nav-ffi href=ffi.html>FFI</a></li>
+<li><a class=nav-globals href=globals.html>Globals</a></li>
+<li><a class=nav-http href=http.html>HTTP</a></li>
+<li><a class=nav-http2 href=http2.html>HTTP/2</a></li>
+<li><a class=nav-https href=https.html>HTTPS</a></li>
+<li><a class=nav-inspector href=inspector.html>Inspector</a></li>
+<li><a class=nav-intl href=intl.html>Internationalization</a></li>
+<li><a class=nav-stream_iter href=stream_iter.html>Iterable Streams API</a></li>
+<li><a class=nav-modules href=modules.html>Modules: CommonJS modules</a></li>
+<li><a class=nav-esm href=esm.html>Modules: ECMAScript modules</a></li>
+<li><a class=nav-module href=module.html>Modules: <code>node:module</code> API</a></li>
+<li><a class=nav-packages href=packages.html>Modules: Packages</a></li>
+<li><a class=nav-typescript href=typescript.html>Modules: TypeScript</a></li>
+<li><a class=nav-net href=net.html>Net</a></li>
+<li><a class=nav-os href=os.html>OS</a></li>
+<li><a class=nav-path href=path.html>Path</a></li>
+<li><a class=nav-perf_hooks href=perf_hooks.html>Performance hooks</a></li>
+<li><a class=nav-permissions href=permissions.html>Permissions</a></li>
+<li><a class=nav-process href=process.html>Process</a></li>
+<li><a class=nav-punycode href=punycode.html>Punycode</a></li>
+<li><a class=nav-querystring href=querystring.html>Query strings</a></li>
+<li><a class=nav-readline href=readline.html>Readline</a></li>
+<li><a class=nav-repl href=repl.html>REPL</a></li>
+<li><a class=nav-report href=report.html>Report</a></li>
+<li><a class=nav-single-executable-applications href=single-executable-applications.html>Single executable applications</a></li>
+<li><a class=nav-sqlite href=sqlite.html>SQLite</a></li>
+<li><a class=nav-stream href=stream.html>Stream</a></li>
+<li><a class=nav-string_decoder href=string_decoder.html>String decoder</a></li>
+<li><a class=nav-test href=test.html>Test runner</a></li>
+<li><a class=nav-timers href=timers.html>Timers</a></li>
+<li><a class=nav-tls href=tls.html>TLS/SSL</a></li>
+<li><a class=nav-tracing href=tracing.html>Trace events</a></li>
+<li><a class=nav-tty href=tty.html>TTY</a></li>
+<li><a class=nav-dgram href=dgram.html>UDP/datagram</a></li>
+<li><a class=nav-url href=url.html>URL</a></li>
+<li><a class=nav-util href=util.html>Utilities</a></li>
+<li><a class=nav-v8 href=v8.html>V8</a></li>
+<li><a class=nav-vfs href=vfs.html>Virtual File System</a></li>
+<li><a class=nav-vm href=vm.html>VM</a></li>
+<li><a class=nav-wasi href=wasi.html>WASI</a></li>
+<li><a class=nav-webcrypto href=webcrypto.html>Web Crypto API</a></li>
+<li><a class=nav-webstreams href=webstreams.html>Web Streams API</a></li>
+<li><a class=nav-worker_threads href=worker_threads.html>Worker threads</a></li>
+<li><a class=nav-zlib href=zlib.html>Zlib</a></li>
+</ul>
+        <hr class=line>
+        <ul>
+          <li>
+            <a href=https://github.com/nodejs/node class=nav-https-github-com-nodejs-node>Code repository and issue tracker</a>
+          </li>
+        </ul>
+      </div>
+      <div id=column1 data-id=bench class=interior>
+        <header class=header>
+          <div class=header-container>
+            <h1>Node.js v26.12.0 documentation</h1>
+            <button class=theme-toggle-btn id=theme-toggle-btn title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
+              <svg class="dark-icon icon" height=24 width=24>
+                <path fill=none d="M0 0h24v24H0z"/>
+                <path d="M11.1 12.08c-2.33-4.51-.5-8.48.53-10.07C6.27 2.2 1.98 6.59 1.98 12c0 .14.02.28.02.42.62-.27 1.29-.42 2-.42 1.66 0 3.18.83 4.1 2.15A4.01 4.01 0 0111 18c0 1.52-.87 2.83-2.12 3.51.98.32 2.03.5 3.11.5 3.5 0 6.58-1.8 8.37-4.52-2.36.23-6.98-.97-9.26-5.41z"/>
+                <path d="M7 16h-.18C6.4 14.84 5.3 14 4 14c-1.66 0-3 1.34-3 3s1.34 3 3 3h3c1.1 0 2-.9 2-2s-.9-2-2-2z"/>
+              </svg>
+              <svg class="icon light-icon" height=24 width=24>
+                <path d="M0 0h24v24H0z" fill=none />
+                <path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/>
+              </svg>
+            </button>
+          </div>
+          <div id=gtoc>
+            <ul>
+              <li class=pinned-header>Node.js v26.12.0</li>
+              <li class=picker-header><a href=#toc-picker aria-controls=toc-picker><span class=picker-arrow></span>Table of contents</a><div class=picker><div class=toc tabindex=-1><ul id=toc-picker>
+<li><span class=stability_1><a href=bench.html#benchmark-runner>Benchmark runner</a></span>
+<ul>
+<li><a href=bench.html#example-benchmark>Example benchmark</a></li>
+<li><a href=bench.html#measurement-model>Measurement model</a>
+<ul>
+<li><a href=bench.html#measurement-integrity>Measurement integrity</a></li>
+<li><a href=bench.html#dynamic-sampling-and-variable-batches>Dynamic sampling and variable batches</a></li>
+<li><a href=bench.html#comparing-benchmark-results>Comparing benchmark results</a></li>
+</ul>
+</li>
+<li><a href=bench.html#reusable-runners>Reusable runners</a></li>
+<li><a href=bench.html#command-line-runner>Command-line runner</a></li>
+<li><a href=bench.html#benchmark-reporters>Benchmark reporters</a></li>
+<li><a href=bench.html#createrunneroptions><code>createRunner([options])</code></a></li>
+<li><a href=bench.html#benchname-options-fn><code>bench([name][, options], fn)</code></a>
+<ul>
+<li><a href=bench.html#benchskipname-options-fn><code>bench.skip([name][, options], fn)</code></a></li>
+<li><a href=bench.html#benchonlyname-options-fn><code>bench.only([name][, options], fn)</code></a></li>
+</ul>
+</li>
+<li><a href=bench.html#suitename-options-fn><code>suite([name][, options], fn)</code></a></li>
+<li><a href=bench.html#describename-options-fn><code>describe([name][, options], fn)</code></a></li>
+<li><a href=bench.html#beforefn><code>before(fn)</code></a></li>
+<li><a href=bench.html#afterfn><code>after(fn)</code></a></li>
+<li><a href=bench.html#beforeeachfn><code>beforeEach(fn)</code></a></li>
+<li><a href=bench.html#aftereachfn><code>afterEach(fn)</code></a></li>
+<li><a href=bench.html#runoptions><code>run([options])</code></a></li>
+<li><a href=bench.html#runfilepath-options><code>runFile(path[, options])</code></a></li>
+<li><a href=bench.html#class-benchcontext>Class: <code>BenchContext</code></a>
+<ul>
+<li><a href=bench.html#contextindex><code>context.index</code></a></li>
+<li><a href=bench.html#contextname><code>context.name</code></a></li>
+<li><a href=bench.html#contextparams><code>context.params</code></a></li>
+<li><a href=bench.html#contextphase><code>context.phase</code></a></li>
+<li><a href=bench.html#contextsignal><code>context.signal</code></a></li>
+<li><a href=bench.html#contextstart><code>context.start()</code></a></li>
+<li><a href=bench.html#contextendoperations-options><code>context.end(operations[, options])</code></a></li>
+<li><a href=bench.html#contextrecordsample><code>context.record(sample)</code></a></li>
+<li><a href=bench.html#contextdiagnosticmessage-options><code>context.diagnostic(message[, options])</code></a></li>
+<li><a href=bench.html#contextdone><code>context.done()</code></a></li>
+</ul>
+</li>
+<li><a href=bench.html#class-benchmarksstream>Class: <code>BenchmarksStream</code></a></li>
+<li><a href=bench.html#sample-result>Sample result</a></li>
+<li><a href=bench.html#benchmark-result>Benchmark result</a></li>
+</ul>
+</li>
+</ul></div></div></li> <li class=picker-header><a href=#gtoc-picker aria-controls=gtoc-picker><span class=picker-arrow></span>Index</a><div class=picker tabindex=-1 id=gtoc-picker><ul><li><a href=index.html>Index</a></ul><hr class=line><ul>
+<li><a class=nav-documentation href=documentation.html>About this documentation</a></li>
+<li><a class=nav-synopsis href=synopsis.html>Usage and example</a></li>
+<li><a class=nav-assert href=assert.html>Assertion testing</a></li>
+<li><a class=nav-async_context href=async_context.html>Asynchronous context tracking</a></li>
+<li><a class=nav-async_hooks href=async_hooks.html>Async hooks</a></li>
+<li><a class="active nav-bench" href=bench.html>Benchmark runner</a></li>
+<li><a class=nav-buffer href=buffer.html>Buffer</a></li>
+<li><a class=nav-addons href=addons.html>C++ addons</a></li>
+<li><a class=nav-n-api href=n-api.html>C/C++ addons with Node-API</a></li>
+<li><a class=nav-embedding href=embedding.html>C++ embedder API</a></li>
+<li><a class=nav-child_process href=child_process.html>Child processes</a></li>
+<li><a class=nav-cluster href=cluster.html>Cluster</a></li>
+<li><a class=nav-cli href=cli.html>Command-line options</a></li>
+<li><a class=nav-console href=console.html>Console</a></li>
+<li><a class=nav-crypto href=crypto.html>Crypto</a></li>
+<li><a class=nav-debugger href=debugger.html>Debugger</a></li>
+<li><a class=nav-deprecations href=deprecations.html>Deprecated APIs</a></li>
+<li><a class=nav-diagnostics_channel href=diagnostics_channel.html>Diagnostics Channel</a></li>
+<li><a class=nav-dns href=dns.html>DNS</a></li>
+<li><a class=nav-domain href=domain.html>Domain</a></li>
+<li><a class=nav-environment_variables href=environment_variables.html>Environment Variables</a></li>
+<li><a class=nav-errors href=errors.html>Errors</a></li>
+<li><a class=nav-events href=events.html>Events</a></li>
+<li><a class=nav-fs href=fs.html>File system</a></li>
+<li><a class=nav-ffi href=ffi.html>FFI</a></li>
+<li><a class=nav-globals href=globals.html>Globals</a></li>
+<li><a class=nav-http href=http.html>HTTP</a></li>
+<li><a class=nav-http2 href=http2.html>HTTP/2</a></li>
+<li><a class=nav-https href=https.html>HTTPS</a></li>
+<li><a class=nav-inspector href=inspector.html>Inspector</a></li>
+<li><a class=nav-intl href=intl.html>Internationalization</a></li>
+<li><a class=nav-stream_iter href=stream_iter.html>Iterable Streams API</a></li>
+<li><a class=nav-modules href=modules.html>Modules: CommonJS modules</a></li>
+<li><a class=nav-esm href=esm.html>Modules: ECMAScript modules</a></li>
+<li><a class=nav-module href=module.html>Modules: <code>node:module</code> API</a></li>
+<li><a class=nav-packages href=packages.html>Modules: Packages</a></li>
+<li><a class=nav-typescript href=typescript.html>Modules: TypeScript</a></li>
+<li><a class=nav-net href=net.html>Net</a></li>
+<li><a class=nav-os href=os.html>OS</a></li>
+<li><a class=nav-path href=path.html>Path</a></li>
+<li><a class=nav-perf_hooks href=perf_hooks.html>Performance hooks</a></li>
+<li><a class=nav-permissions href=permissions.html>Permissions</a></li>
+<li><a class=nav-process href=process.html>Process</a></li>
+<li><a class=nav-punycode href=punycode.html>Punycode</a></li>
+<li><a class=nav-querystring href=querystring.html>Query strings</a></li>
+<li><a class=nav-readline href=readline.html>Readline</a></li>
+<li><a class=nav-repl href=repl.html>REPL</a></li>
+<li><a class=nav-report href=report.html>Report</a></li>
+<li><a class=nav-single-executable-applications href=single-executable-applications.html>Single executable applications</a></li>
+<li><a class=nav-sqlite href=sqlite.html>SQLite</a></li>
+<li><a class=nav-stream href=stream.html>Stream</a></li>
+<li><a class=nav-string_decoder href=string_decoder.html>String decoder</a></li>
+<li><a class=nav-test href=test.html>Test runner</a></li>
+<li><a class=nav-timers href=timers.html>Timers</a></li>
+<li><a class=nav-tls href=tls.html>TLS/SSL</a></li>
+<li><a class=nav-tracing href=tracing.html>Trace events</a></li>
+<li><a class=nav-tty href=tty.html>TTY</a></li>
+<li><a class=nav-dgram href=dgram.html>UDP/datagram</a></li>
+<li><a class=nav-url href=url.html>URL</a></li>
+<li><a class=nav-util href=util.html>Utilities</a></li>
+<li><a class=nav-v8 href=v8.html>V8</a></li>
+<li><a class=nav-vfs href=vfs.html>Virtual File System</a></li>
+<li><a class=nav-vm href=vm.html>VM</a></li>
+<li><a class=nav-wasi href=wasi.html>WASI</a></li>
+<li><a class=nav-webcrypto href=webcrypto.html>Web Crypto API</a></li>
+<li><a class=nav-webstreams href=webstreams.html>Web Streams API</a></li>
+<li><a class=nav-worker_threads href=worker_threads.html>Worker threads</a></li>
+<li><a class=nav-zlib href=zlib.html>Zlib</a></li>
+</ul></div></li> <li class=picker-header><a href=#alt-docs aria-controls=alt-docs><span class=picker-arrow></span>Other versions</a><div class=picker tabindex=-1><ol id=alt-docs><li><a href=https://nodejs.org/docs/latest-v26.x/api/bench.html>26.x </a></ol></div></li>
+              <li class=picker-header>
+                <a href=#options-picker aria-controls=options-picker>
+                  <span class=picker-arrow></span>
+                  Options
+                </a>
+                <div class=picker tabindex=-1>
+                  <ul id=options-picker>
+                    <li>
+                      <a href=all.html>View on single page</a>
+                    </li>
+                    <li>
+                      <a href=bench.json>View as JSON</a>
+                    </li>
+                    <li class=edit_on_github><a href=https://github.com/nodejs/node/edit/main/doc/api/bench.md>Edit on GitHub</a></li>
+                  </ul>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <hr>
+        </header>
+        <details role=navigation id=toc open><summary>Table of contents</summary><ul>
+<li><span class=stability_1><a href=bench.html#benchmark-runner>Benchmark runner</a></span>
+<ul>
+<li><a href=bench.html#example-benchmark>Example benchmark</a></li>
+<li><a href=bench.html#measurement-model>Measurement model</a>
+<ul>
+<li><a href=bench.html#measurement-integrity>Measurement integrity</a></li>
+<li><a href=bench.html#dynamic-sampling-and-variable-batches>Dynamic sampling and variable batches</a></li>
+<li><a href=bench.html#comparing-benchmark-results>Comparing benchmark results</a></li>
+</ul>
+</li>
+<li><a href=bench.html#reusable-runners>Reusable runners</a></li>
+<li><a href=bench.html#command-line-runner>Command-line runner</a></li>
+<li><a href=bench.html#benchmark-reporters>Benchmark reporters</a></li>
+<li><a href=bench.html#createrunneroptions><code>createRunner([options])</code></a></li>
+<li><a href=bench.html#benchname-options-fn><code>bench([name][, options], fn)</code></a>
+<ul>
+<li><a href=bench.html#benchskipname-options-fn><code>bench.skip([name][, options], fn)</code></a></li>
+<li><a href=bench.html#benchonlyname-options-fn><code>bench.only([name][, options], fn)</code></a></li>
+</ul>
+</li>
+<li><a href=bench.html#suitename-options-fn><code>suite([name][, options], fn)</code></a></li>
+<li><a href=bench.html#describename-options-fn><code>describe([name][, options], fn)</code></a></li>
+<li><a href=bench.html#beforefn><code>before(fn)</code></a></li>
+<li><a href=bench.html#afterfn><code>after(fn)</code></a></li>
+<li><a href=bench.html#beforeeachfn><code>beforeEach(fn)</code></a></li>
+<li><a href=bench.html#aftereachfn><code>afterEach(fn)</code></a></li>
+<li><a href=bench.html#runoptions><code>run([options])</code></a></li>
+<li><a href=bench.html#runfilepath-options><code>runFile(path[, options])</code></a></li>
+<li><a href=bench.html#class-benchcontext>Class: <code>BenchContext</code></a>
+<ul>
+<li><a href=bench.html#contextindex><code>context.index</code></a></li>
+<li><a href=bench.html#contextname><code>context.name</code></a></li>
+<li><a href=bench.html#contextparams><code>context.params</code></a></li>
+<li><a href=bench.html#contextphase><code>context.phase</code></a></li>
+<li><a href=bench.html#contextsignal><code>context.signal</code></a></li>
+<li><a href=bench.html#contextstart><code>context.start()</code></a></li>
+<li><a href=bench.html#contextendoperations-options><code>context.end(operations[, options])</code></a></li>
+<li><a href=bench.html#contextrecordsample><code>context.record(sample)</code></a></li>
+<li><a href=bench.html#contextdiagnosticmessage-options><code>context.diagnostic(message[, options])</code></a></li>
+<li><a href=bench.html#contextdone><code>context.done()</code></a></li>
+</ul>
+</li>
+<li><a href=bench.html#class-benchmarksstream>Class: <code>BenchmarksStream</code></a></li>
+<li><a href=bench.html#sample-result>Sample result</a></li>
+<li><a href=bench.html#benchmark-result>Benchmark result</a></li>
+</ul>
+</li>
+</ul></details>
+        <div role=main id=apicontent>
+          <section><h2>Benchmark runner<span><a id=bench_benchmark_runner></a></span><span><a class=mark id=benchmark-runner href=#benchmark-runner>#</a></span></h2><div class=api_metadata><span><b>Source Code: </b><a href=https://github.com/nodejs/node/blob/main/lib/bench.js>lib/bench.js</a></span><span>Added in: v26.9.0</span></div><div class="api_stability api_stability_1"><p><a href=documentation.html#stability-index>Stability: 1.0</a> - Early Development</div><p>The <code>node:bench</code> module supports defining and running JavaScript benchmarks in
+the current process, and running one benchmark file in a fresh child process.
+The module is only available when Node.js is started with the
+<code>--experimental-bench</code> flag and can only be imported with the <code>node:</code> scheme:<pre style=background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4 class=shiki><input class=js-flavor-toggle type=checkbox><code class="catppuccin-latte catppuccin-mocha language-mjs mjs shiki shiki-themes" style=background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4 language=mjs><span class=line><span style=color:#8839EF;--shiki-dark:#CBA6F7>import</span><span style=color:#7C7F93;--shiki-dark:#9399B2> {</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> bench</span><span style=color:#7C7F93;--shiki-dark:#9399B2>,</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> suite </span><span style=color:#7C7F93;--shiki-dark:#9399B2>}</span><span style=color:#8839EF;--shiki-dark:#CBA6F7> from</span><span style=color:#40A02B;--shiki-dark:#A6E3A1> 'node:bench'</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line></span></code><code class="catppuccin-latte catppuccin-mocha cjs language-cjs shiki shiki-themes" style=background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4 language=cjs><span class=line><span style=color:#8839EF;--shiki-dark:#CBA6F7>const</span><span style=color:#7C7F93;--shiki-dark:#9399B2> {</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> bench</span><span style=color:#7C7F93;--shiki-dark:#9399B2>,</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> suite </span><span style=color:#7C7F93;--shiki-dark:#9399B2>}</span><span style=color:#179299;--shiki-dark:#94E2D5> =</span><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic> require</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>(</span><span style=color:#40A02B;--shiki-dark:#A6E3A1>'node:bench'</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>)</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line></span></code><div class=code-toolbar><span class=code-language>javascript</span><button class=copy-button>copy</button></div></pre></section>
+<section><h3>Example benchmark<span><a id=bench_example_benchmark></a></span><span><a class=mark id=example-benchmark href=#example-benchmark>#</a></span></h3><div class=api_metadata></div><p>Save the following as <code>benchmark.mjs</code>:<pre class="catppuccin-latte catppuccin-mocha language-mjs shiki shiki-themes" style=background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4 tabindex=0><code class="catppuccin-latte catppuccin-mocha language-mjs mjs shiki shiki-themes" style=background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4 language=mjs><span class=line><span style=color:#8839EF;--shiki-dark:#CBA6F7>import</span><span style=color:#7C7F93;--shiki-dark:#9399B2> {</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> bench</span><span style=color:#7C7F93;--shiki-dark:#9399B2>,</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> suite </span><span style=color:#7C7F93;--shiki-dark:#9399B2>}</span><span style=color:#8839EF;--shiki-dark:#CBA6F7> from</span><span style=color:#40A02B;--shiki-dark:#A6E3A1> 'node:bench'</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line></span>
+<span class=line><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic>suite</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>(</span><span style=color:#40A02B;--shiki-dark:#A6E3A1>'URL'</span><span style=color:#7C7F93;--shiki-dark:#9399B2>,</span><span style=color:#7C7F93;--shiki-dark:#9399B2> ()</span><span style=color:#8839EF;--shiki-dark:#CBA6F7> =></span><span style=color:#7C7F93;--shiki-dark:#9399B2> {</span></span>
+<span class=line><span style=color:#8839EF;--shiki-dark:#CBA6F7>  const</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> input </span><span style=color:#179299;--shiki-dark:#94E2D5>=</span><span style=color:#40A02B;--shiki-dark:#A6E3A1> 'https://example.com/a?b=c'</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line></span>
+<span class=line><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic>  bench</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>(</span><span style=color:#40A02B;--shiki-dark:#A6E3A1>'construct'</span><span style=color:#7C7F93;--shiki-dark:#9399B2>,</span><span style=color:#7C7F93;--shiki-dark:#9399B2> {</span></span>
+<span class=line><span style=color:#4C4F69;--shiki-dark:#CDD6F4>    samples</span><span style=color:#179299;--shiki-dark:#94E2D5>:</span><span style=color:#FE640B;--shiki-dark:#FAB387> 30</span><span style=color:#7C7F93;--shiki-dark:#9399B2>,</span></span>
+<span class=line><span style=color:#4C4F69;--shiki-dark:#CDD6F4>    params</span><span style=color:#179299;--shiki-dark:#94E2D5>:</span><span style=color:#7C7F93;--shiki-dark:#9399B2> {</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> input</span><span style=color:#179299;--shiki-dark:#94E2D5>:</span><span style=color:#40A02B;--shiki-dark:#A6E3A1> 'short'</span><span style=color:#7C7F93;--shiki-dark:#9399B2> },</span></span>
+<span class=line><span style=color:#7C7F93;--shiki-dark:#9399B2>  },</span><span style=color:#7C7F93;--shiki-dark:#9399B2> (</span><span style=color:#E64553;--shiki-light-font-style:italic;--shiki-dark:#EBA0AC;--shiki-dark-font-style:italic>b</span><span style=color:#7C7F93;--shiki-dark:#9399B2>)</span><span style=color:#8839EF;--shiki-dark:#CBA6F7> =></span><span style=color:#7C7F93;--shiki-dark:#9399B2> {</span></span>
+<span class=line><span style=color:#8839EF;--shiki-dark:#CBA6F7>    const</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> operations </span><span style=color:#179299;--shiki-dark:#94E2D5>=</span><span style=color:#FE640B;--shiki-dark:#FAB387> 10_000</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line><span style=color:#8839EF;--shiki-dark:#CBA6F7>    let</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> totalLength </span><span style=color:#179299;--shiki-dark:#94E2D5>=</span><span style=color:#FE640B;--shiki-dark:#FAB387> 0</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line></span>
+<span class=line><span style=color:#4C4F69;--shiki-dark:#CDD6F4>    b</span><span style=color:#179299;--shiki-dark:#94E2D5>.</span><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic>start</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>()</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line><span style=color:#8839EF;--shiki-dark:#CBA6F7>    for</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> (</span><span style=color:#8839EF;--shiki-dark:#CBA6F7>let</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> i </span><span style=color:#179299;--shiki-dark:#94E2D5>=</span><span style=color:#FE640B;--shiki-dark:#FAB387> 0</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> i </span><span style=color:#179299;--shiki-dark:#94E2D5>&lt;</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> operations</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> i</span><span style=color:#179299;--shiki-dark:#94E2D5>++</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>) </span><span style=color:#7C7F93;--shiki-dark:#9399B2>{</span></span>
+<span class=line><span style=color:#4C4F69;--shiki-dark:#CDD6F4>      totalLength </span><span style=color:#179299;--shiki-dark:#94E2D5>+=</span><span style=color:#8839EF;--shiki-light-font-weight:bold;--shiki-dark:#CBA6F7;--shiki-dark-font-weight:bold> new</span><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic> URL</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>(input)</span><span style=color:#179299;--shiki-dark:#94E2D5>.</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>href</span><span style=color:#179299;--shiki-dark:#94E2D5>.</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>length</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line><span style=color:#7C7F93;--shiki-dark:#9399B2>    }</span></span>
+<span class=line><span style=color:#4C4F69;--shiki-dark:#CDD6F4>    b</span><span style=color:#179299;--shiki-dark:#94E2D5>.</span><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic>end</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>(operations)</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line></span>
+<span class=line><span style=color:#8839EF;--shiki-dark:#CBA6F7>    if</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> (totalLength </span><span style=color:#179299;--shiki-dark:#94E2D5>!==</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> operations </span><span style=color:#179299;--shiki-dark:#94E2D5>*</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> input</span><span style=color:#179299;--shiki-dark:#94E2D5>.</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>length) </span><span style=color:#7C7F93;--shiki-dark:#9399B2>{</span></span>
+<span class=line><span style=color:#8839EF;--shiki-dark:#CBA6F7>      throw</span><span style=color:#8839EF;--shiki-light-font-weight:bold;--shiki-dark:#CBA6F7;--shiki-dark-font-weight:bold> new</span><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic> Error</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>(</span><span style=color:#40A02B;--shiki-dark:#A6E3A1>'Unexpected URL result'</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>)</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line><span style=color:#7C7F93;--shiki-dark:#9399B2>    }</span></span>
+<span class=line><span style=color:#7C7F93;--shiki-dark:#9399B2>  }</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>)</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line><span style=color:#7C7F93;--shiki-dark:#9399B2>}</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>)</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line></span></code><div class=code-toolbar><span class=code-language>mjs</span><button class=copy-button>copy</button></div></pre><p>Run the benchmark from the command line:<pre class="catppuccin-latte catppuccin-mocha language-console shiki shiki-themes" style=background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4 tabindex=0><code><span class=line><span style=color:#4C4F69;--shiki-dark:#CDD6F4>node --experimental-bench --bench benchmark.mjs</span></span>
+<span class=line></span></code><div class=code-toolbar><span class=code-language>console</span><button class=copy-button>copy</button></div></pre><p>Benchmarks are executed serially in declaration order. Declared benchmarks are
+scheduled automatically. Call <code>run()</code> during the same turn as the declarations
+to consume the event stream or configure filtering.
+If a benchmark run started automatically or through the module-level <code>run()</code>
+fails, the process exit code is set to <code>1</code> unless <code>process.exitCode</code> has
+already been set. Runners created with <a href=#createrunneroptions><code>createRunner()</code></a> leave the exit code
+to their caller.</section>
+<section><h3>Measurement model<span><a id=bench_measurement_model></a></span><span><a class=mark id=measurement-model href=#measurement-model>#</a></span></h3><div class=api_metadata></div><p>Each warmup and measured sample invokes the benchmark function once with a
+fresh {BenchContext}. The function must either call <code>context.start()</code> and
+<code>context.end(operations)</code> exactly once, or call <code>context.record(sample)</code> exactly
+once to provide an externally measured sample. Setup before <code>start()</code> and
+cleanup after <code>end()</code> are outside the measured region. Promise-returning
+functions are awaited.<p>By default, ten unreported warmup invocations run before the measured samples
+so that early samples are less likely to be taken before the measured code has
+been optimized. A fixed warmup count does not guarantee a stable optimization
+state; inspect raw <code>samples</code> and increase <code>warmup</code> when early samples are
+consistently slower. Set <code>warmup</code> to <code>0</code> to measure from the first invocation.<p>By default, an event loop turn occurs between sample invocations. An embedded
+runner can disable this using <code>yieldBetweenSamples</code>. The runner executes
+benchmarks serially, but it does not provide process isolation. Other work in
+the process, JIT compilation, garbage collection, CPU frequency changes, and
+system load can all affect results. Keep raw samples when comparing results and
+investigate noisy or skewed distributions rather than treating a confidence
+interval as a pass/fail threshold.</section>
+<section><h4>Measurement integrity<span><a id=bench_measurement_integrity></a></span><span><a class=mark id=measurement-integrity href=#measurement-integrity>#</a></span></h4><div class=api_metadata></div><p>A statistically consistent result does not prove that a benchmark measured the
+intended work. An optimizing runtime can remove work whose result is unused or
+specialize it more narrowly than the workload being modeled. Framework and loop
+overhead can also dominate operations that are too short. To reduce these risks:<ul>
+<li>Make values produced by measured work observable outside the measured
+interval, for example by validating an aggregate derived from every result.
+Passing them only through unused local computations is insufficient.</li>
+<li>Perform enough operations in each sample to amortize fixed timer reads and
+calls to <code>context.start()</code> and <code>context.end()</code>. If loop bookkeeping is material
+relative to one operation, batch multiple operations per iteration and report
+the total operation count.</li>
+<li>Inspect raw <code>samples</code> for trends that indicate insufficient warmup or
+optimization tiering, pauses consistent with garbage collection, and
+multimodal distributions.</li>
+<li>Validate surprising results with an independent benchmark shape that performs
+the same intended work differently.</li>
+</ul><p><code>node:bench</code> does not force a particular optimization state or infer whether an
+engine eliminated work. Such controls and diagnostics are runtime-specific and
+heuristic, and do not replace validating the benchmark workload.</section>
+<section><h4>Dynamic sampling and variable batches<span><a id=bench_dynamic_sampling_and_variable_batches></a></span><span><a class=mark id=dynamic-sampling-and-variable-batches href=#dynamic-sampling-and-variable-batches>#</a></span></h4><div class=api_metadata></div><p>Calling <code>context.done()</code> during a measured sample completes the benchmark after
+that sample. This allows a higher-level tool to treat <code>samples</code> as a maximum and
+implement a dynamic sampling policy.<p>The number of operations can differ between samples. Summary statistics treat
+each sample's <code>rate</code> as one equally weighted observation. In particular,
+<code>summary.mean</code> is the arithmetic mean of the per-sample rates. It is not the
+pooled throughput calculated as:<pre class="catppuccin-latte catppuccin-mocha language-text shiki shiki-themes" style=background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4 tabindex=0><code><span class=line><span>1_000_000_000 * sum(sample.operations) / sum(sample.duration_ns)</span></span>
+<span class=line><span></span></span></code><div class=code-toolbar><span class=code-language>text</span><button class=copy-button>copy</button></div></pre><p>The two values can differ when sample durations vary because pooled throughput
+weights each per-sample rate by its duration. A higher-level tool that varies
+batch sizes should choose the aggregation that matches its analysis. It can
+calculate pooled throughput from the raw <code>samples</code>; operation counts should be
+summed as <code>bigint</code> values because their total can exceed
+<code>Number.MAX_SAFE_INTEGER</code> even though each count cannot.</section>
+<section><h4>Comparing benchmark results<span><a id=bench_comparing_benchmark_results></a></span><span><a class=mark id=comparing-benchmark-results href=#comparing-benchmark-results>#</a></span></h4><div class=api_metadata></div><p><code>node:bench</code> does not designate a benchmark as a baseline or produce a pass/fail
+comparison between runs. It exposes raw samples, stable benchmark identities,
+parameters, and tags so that comparison policy can remain in higher-level
+tools. A tool can use <code>benchId</code> to match the same declaration and parameters
+across compatible source layouts, and use a tag or its own metadata to identify
+a baseline.<p>Comparison tools should retain the raw sample rates and verify that execution
+plans and relevant environment details are comparable. The appropriate analysis
+depends on the experimental design and distribution. For example, independent
+samples might use Welch's t-test or a rank-based test, while observations that
+were deliberately paired require paired analysis. Tools should also consider
+effect sizes, uncertainty, and correction when testing multiple benchmarks.
+The general-purpose <a href=perf_hooks.html#class-histogram><code>&lt;Histogram></code></a> statistics in <code>node:perf_hooks</code> can support such
+analysis, but the runner does not select a method or significance threshold.</section>
+<section><h3>Reusable runners<span><a id=bench_reusable_runners></a></span><span><a class=mark id=reusable-runners href=#reusable-runners>#</a></span></h3><div class=api_metadata></div><p>The module-level declaration functions use a shared runner and schedule it
+automatically. Higher-level tools can create isolated, explicitly started
+runners instead:<pre class="catppuccin-latte catppuccin-mocha language-mjs shiki shiki-themes" style=background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4 tabindex=0><code class="catppuccin-latte catppuccin-mocha language-mjs mjs shiki shiki-themes" style=background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4 language=mjs><span class=line><span style=color:#8839EF;--shiki-dark:#CBA6F7>import</span><span style=color:#7C7F93;--shiki-dark:#9399B2> {</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> createRunner </span><span style=color:#7C7F93;--shiki-dark:#9399B2>}</span><span style=color:#8839EF;--shiki-dark:#CBA6F7> from</span><span style=color:#40A02B;--shiki-dark:#A6E3A1> 'node:bench'</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line></span>
+<span class=line><span style=color:#8839EF;--shiki-dark:#CBA6F7>const</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> runner </span><span style=color:#179299;--shiki-dark:#94E2D5>=</span><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic> createRunner</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>(</span><span style=color:#7C7F93;--shiki-dark:#9399B2>{</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> yieldBetweenSamples</span><span style=color:#179299;--shiki-dark:#94E2D5>:</span><span style=color:#FE640B;--shiki-dark:#FAB387> false</span><span style=color:#7C7F93;--shiki-dark:#9399B2> }</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>)</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line></span>
+<span class=line><span style=color:#4C4F69;--shiki-dark:#CDD6F4>runner</span><span style=color:#179299;--shiki-dark:#94E2D5>.</span><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic>bench</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>(</span><span style=color:#40A02B;--shiki-dark:#A6E3A1>'example'</span><span style=color:#7C7F93;--shiki-dark:#9399B2>,</span><span style=color:#7C7F93;--shiki-dark:#9399B2> {</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> samples</span><span style=color:#179299;--shiki-dark:#94E2D5>:</span><span style=color:#FE640B;--shiki-dark:#FAB387> 100</span><span style=color:#7C7F93;--shiki-dark:#9399B2> },</span><span style=color:#7C7F93;--shiki-dark:#9399B2> (</span><span style=color:#E64553;--shiki-light-font-style:italic;--shiki-dark:#EBA0AC;--shiki-dark-font-style:italic>b</span><span style=color:#7C7F93;--shiki-dark:#9399B2>)</span><span style=color:#8839EF;--shiki-dark:#CBA6F7> =></span><span style=color:#7C7F93;--shiki-dark:#9399B2> {</span></span>
+<span class=line><span style=color:#8839EF;--shiki-dark:#CBA6F7>  const</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> operations </span><span style=color:#179299;--shiki-dark:#94E2D5>=</span><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic> chooseOperationCount</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>()</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line><span style=color:#4C4F69;--shiki-dark:#CDD6F4>  b</span><span style=color:#179299;--shiki-dark:#94E2D5>.</span><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic>start</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>()</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic>  runOperations</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>(operations)</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line><span style=color:#8839EF;--shiki-dark:#CBA6F7>  const</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> sample </span><span style=color:#179299;--shiki-dark:#94E2D5>=</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> b</span><span style=color:#179299;--shiki-dark:#94E2D5>.</span><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic>end</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>(operations)</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line></span>
+<span class=line><span style=color:#8839EF;--shiki-dark:#CBA6F7>  if</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> (</span><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic>hasEnoughData</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>(sample)) b</span><span style=color:#179299;--shiki-dark:#94E2D5>.</span><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic>done</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>()</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line><span style=color:#7C7F93;--shiki-dark:#9399B2>}</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>)</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line></span>
+<span class=line><span style=color:#8839EF;--shiki-dark:#CBA6F7>for</span><span style=color:#8839EF;--shiki-dark:#CBA6F7> await</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> (</span><span style=color:#8839EF;--shiki-dark:#CBA6F7>const</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> record </span><span style=color:#8839EF;--shiki-dark:#CBA6F7>of</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> runner</span><span style=color:#179299;--shiki-dark:#94E2D5>.</span><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic>run</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>()) </span><span style=color:#7C7F93;--shiki-dark:#9399B2>{</span></span>
+<span class=line><span style=color:#7C7F93;--shiki-light-font-style:italic;--shiki-dark:#9399B2;--shiki-dark-font-style:italic>  // Consume structured benchmark records.</span></span>
+<span class=line><span style=color:#7C7F93;--shiki-dark:#9399B2>}</span></span>
+<span class=line></span></code><div class=code-toolbar><span class=code-language>mjs</span><button class=copy-button>copy</button></div></pre><p>Each runner has independent declarations, hooks, filtering, and output. Unlike
+the module-level declarations, creating a benchmark on an explicit runner does
+not schedule execution. This allows packages to collect declarations and start
+them later. Calling the explicit runner's <code>run()</code> function prevents additional
+declarations and a second call to <code>run()</code> is an error.</section>
+<section><h3>Command-line runner<span><a id=bench_command_line_runner></a></span><span><a class=mark id=command-line-runner href=#command-line-runner>#</a></span></h3><div class=api_metadata></div><p>The <code>--bench</code> flag runs one or more explicit benchmark files or glob patterns:<pre class="catppuccin-latte catppuccin-mocha language-console shiki shiki-themes" style=background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4 tabindex=0><code><span class=line><span style=color:#4C4F69;--shiki-dark:#CDD6F4>node --experimental-bench --bench benchmark.mjs</span></span>
+<span class=line><span style=color:#4C4F69;--shiki-dark:#CDD6F4>node --experimental-bench --bench --bench-reporter=json 'benchmarks/**/*.js'</span></span>
+<span class=line></span></code><div class=code-toolbar><span class=code-language>console</span><button class=copy-button>copy</button></div></pre><p>Files are sorted and executed serially. The default
+<code>--bench-isolation=process</code> mode runs each file in a separate child process and
+emits one aggregate summary. Structured events are transferred to the parent
+without JSON conversion, preserving BigInt durations, errors, and parameter
+values. Child writes to stdout and stderr are emitted as diagnostic records so
+they do not corrupt reporter output.<p><code>--bench-isolation=none</code> imports all files into the runner process. This mode
+has lower startup overhead, but module, heap, and process state carry between
+files, and user writes share stdout and stderr with reporters.<p>Worker-thread isolation is not a CLI mode. Each newly constructed <a href=worker_threads.html#class-worker><code>&lt;Worker></code></a> has a
+separate V8 isolate, JavaScript heap, and event loop, typically with lower
+startup cost than a child process. Reusing a worker preserves its module and heap
+state. Workers also share libuv's process-wide thread pool and can share
+process-global native or addon state, so they do not provide the same boundary
+as process isolation.<p>Higher-level tools can experiment with worker isolation by loading benchmark
+code inside a worker, measuring there, transferring structured sample data, and
+passing it to <a href=#contextrecordsample><code>context.record()</code></a>. The reported <code>duration_ns</code> can exclude
+message transport when the worker captures both timestamps. Tools should
+identify worker modules and workloads explicitly. They should not stringify
+arbitrary functions or closures to move them between isolates, because closures
+cannot be reconstructed with their original lexical environment.<p>Benchmark files passed to <code>--bench</code> should declare benchmarks but must not call
+<code>run()</code>. The CLI supports <code>--bench-name-pattern</code>, <code>--bench-samples</code>,
+<code>--bench-warmup</code>, <code>--bench-reporter</code>, and <code>--bench-reporter-destination</code>. See
+the <a href=cli.html#--bench>command-line options documentation</a> for details.<p>Preload modules passed through <code>--require</code> or <code>--import</code> should not declare
+benchmarks. Such declarations are not associated with an entry file and have
+an <code>entryFile</code> value of <code>null</code>. Their <code>fileRunId</code> identifies the runner or child
+execution in which they occurred. With process isolation, a preload is evaluated
+and its declarations run once for every benchmark child process.</section>
+<section><h3>Benchmark reporters<span><a id=bench_benchmark_reporters></a></span><span><a class=mark id=benchmark-reporters href=#benchmark-reporters>#</a></span></h3><div class=api_metadata></div><p>The built-in reporters are available from the scheme-only
+<code>node:bench/reporters</code> module:<pre style=background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4 class=shiki><input class=js-flavor-toggle type=checkbox><code class="catppuccin-latte catppuccin-mocha language-mjs mjs shiki shiki-themes" style=background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4 language=mjs><span class=line><span style=color:#8839EF;--shiki-dark:#CBA6F7>import</span><span style=color:#7C7F93;--shiki-dark:#9399B2> {</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> json</span><span style=color:#7C7F93;--shiki-dark:#9399B2>,</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> spec </span><span style=color:#7C7F93;--shiki-dark:#9399B2>}</span><span style=color:#8839EF;--shiki-dark:#CBA6F7> from</span><span style=color:#40A02B;--shiki-dark:#A6E3A1> 'node:bench/reporters'</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line></span></code><code class="catppuccin-latte catppuccin-mocha cjs language-cjs shiki shiki-themes" style=background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4 language=cjs><span class=line><span style=color:#8839EF;--shiki-dark:#CBA6F7>const</span><span style=color:#7C7F93;--shiki-dark:#9399B2> {</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> json</span><span style=color:#7C7F93;--shiki-dark:#9399B2>,</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> spec </span><span style=color:#7C7F93;--shiki-dark:#9399B2>}</span><span style=color:#179299;--shiki-dark:#94E2D5> =</span><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic> require</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>(</span><span style=color:#40A02B;--shiki-dark:#A6E3A1>'node:bench/reporters'</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>)</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line></span></code><div class=code-toolbar><span class=code-language>javascript</span><button class=copy-button>copy</button></div></pre><p>Reporter values can be passed directly to <code>stream.compose()</code>:<pre class="catppuccin-latte catppuccin-mocha language-mjs shiki shiki-themes" style=background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4 tabindex=0><code class="catppuccin-latte catppuccin-mocha language-mjs mjs shiki shiki-themes" style=background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4 language=mjs><span class=line><span style=color:#8839EF;--shiki-dark:#CBA6F7>import</span><span style=color:#7C7F93;--shiki-dark:#9399B2> {</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> bench</span><span style=color:#7C7F93;--shiki-dark:#9399B2>,</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> run </span><span style=color:#7C7F93;--shiki-dark:#9399B2>}</span><span style=color:#8839EF;--shiki-dark:#CBA6F7> from</span><span style=color:#40A02B;--shiki-dark:#A6E3A1> 'node:bench'</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line><span style=color:#8839EF;--shiki-dark:#CBA6F7>import</span><span style=color:#7C7F93;--shiki-dark:#9399B2> {</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> spec </span><span style=color:#7C7F93;--shiki-dark:#9399B2>}</span><span style=color:#8839EF;--shiki-dark:#CBA6F7> from</span><span style=color:#40A02B;--shiki-dark:#A6E3A1> 'node:bench/reporters'</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line><span style=color:#8839EF;--shiki-dark:#CBA6F7>import</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> process </span><span style=color:#8839EF;--shiki-dark:#CBA6F7>from</span><span style=color:#40A02B;--shiki-dark:#A6E3A1> 'node:process'</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line></span>
+<span class=line><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic>bench</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>(</span><span style=color:#40A02B;--shiki-dark:#A6E3A1>'example'</span><span style=color:#7C7F93;--shiki-dark:#9399B2>,</span><span style=color:#7C7F93;--shiki-dark:#9399B2> (</span><span style=color:#E64553;--shiki-light-font-style:italic;--shiki-dark:#EBA0AC;--shiki-dark-font-style:italic>b</span><span style=color:#7C7F93;--shiki-dark:#9399B2>)</span><span style=color:#8839EF;--shiki-dark:#CBA6F7> =></span><span style=color:#7C7F93;--shiki-dark:#9399B2> {</span></span>
+<span class=line><span style=color:#4C4F69;--shiki-dark:#CDD6F4>  b</span><span style=color:#179299;--shiki-dark:#94E2D5>.</span><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic>start</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>()</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic>  doWork</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>()</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line><span style=color:#4C4F69;--shiki-dark:#CDD6F4>  b</span><span style=color:#179299;--shiki-dark:#94E2D5>.</span><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic>end</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>(</span><span style=color:#FE640B;--shiki-dark:#FAB387>1</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>)</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line><span style=color:#7C7F93;--shiki-dark:#9399B2>}</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>)</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line></span>
+<span class=line><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic>run</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>()</span><span style=color:#179299;--shiki-dark:#94E2D5>.</span><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic>compose</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>(spec)</span><span style=color:#179299;--shiki-dark:#94E2D5>.</span><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic>pipe</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>(process</span><span style=color:#179299;--shiki-dark:#94E2D5>.</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>stdout)</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line></span></code><div class=code-toolbar><span class=code-language>mjs</span><button class=copy-button>copy</button></div></pre><p>The <code>spec</code> reporter buffers results and outputs a concise table containing the
+sample count, mean rate, 95% confidence interval for the mean, median rate, and
+warnings. A coefficient of variation above 5% is reported as <code>noisy</code>, and an
+absolute skewness above 1 is reported as <code>skewed</code>. The exact human-readable
+format is subject to change.<p>The <code>json</code> reporter emits every lifecycle record as newline-delimited JSON.
+BigInt values, including <code>duration_ns</code>, are encoded as decimal strings. Errors
+are represented using their <code>name</code>, <code>message</code>, <code>stack</code>, <code>code</code>, <code>cause</code>, and
+<code>errors</code> properties. As required by JSON, non-finite numbers are encoded as
+<code>null</code>.<p>Custom reporters use the same composition contract. They can be transforms or
+functions accepted by <code>stream.compose()</code>. The composed readable can be piped to
+any writable destination:<pre class="catppuccin-latte catppuccin-mocha language-mjs shiki shiki-themes" style=background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4 tabindex=0><code class="catppuccin-latte catppuccin-mocha language-mjs mjs shiki shiki-themes" style=background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4 language=mjs><span class=line><span style=color:#8839EF;--shiki-dark:#CBA6F7>import</span><span style=color:#7C7F93;--shiki-dark:#9399B2> {</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> run </span><span style=color:#7C7F93;--shiki-dark:#9399B2>}</span><span style=color:#8839EF;--shiki-dark:#CBA6F7> from</span><span style=color:#40A02B;--shiki-dark:#A6E3A1> 'node:bench'</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line><span style=color:#8839EF;--shiki-dark:#CBA6F7>import</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> process </span><span style=color:#8839EF;--shiki-dark:#CBA6F7>from</span><span style=color:#40A02B;--shiki-dark:#A6E3A1> 'node:process'</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line></span>
+<span class=line><span style=color:#8839EF;--shiki-dark:#CBA6F7>async</span><span style=color:#8839EF;--shiki-dark:#CBA6F7> function*</span><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic> names</span><span style=color:#7C7F93;--shiki-dark:#9399B2>(</span><span style=color:#E64553;--shiki-light-font-style:italic;--shiki-dark:#EBA0AC;--shiki-dark-font-style:italic>source</span><span style=color:#7C7F93;--shiki-dark:#9399B2>)</span><span style=color:#7C7F93;--shiki-dark:#9399B2> {</span></span>
+<span class=line><span style=color:#8839EF;--shiki-dark:#CBA6F7>  for</span><span style=color:#8839EF;--shiki-dark:#CBA6F7> await</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> (</span><span style=color:#8839EF;--shiki-dark:#CBA6F7>const</span><span style=color:#7C7F93;--shiki-dark:#9399B2> {</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> type</span><span style=color:#7C7F93;--shiki-dark:#9399B2>,</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> data </span><span style=color:#7C7F93;--shiki-dark:#9399B2>}</span><span style=color:#8839EF;--shiki-dark:#CBA6F7> of</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> source) </span><span style=color:#7C7F93;--shiki-dark:#9399B2>{</span></span>
+<span class=line><span style=color:#8839EF;--shiki-dark:#CBA6F7>    if</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> (type </span><span style=color:#179299;--shiki-dark:#94E2D5>===</span><span style=color:#40A02B;--shiki-dark:#A6E3A1> 'bench:complete'</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>) </span><span style=color:#7C7F93;--shiki-dark:#9399B2>{</span></span>
+<span class=line><span style=color:#8839EF;--shiki-dark:#CBA6F7>      yield</span><span style=color:#40A02B;--shiki-dark:#A6E3A1> `</span><span style=color:#7C7F93;--shiki-dark:#9399B2>${</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>data</span><span style=color:#179299;--shiki-dark:#94E2D5>.</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>name</span><span style=color:#7C7F93;--shiki-dark:#9399B2>}</span><span style=color:#EA76CB;--shiki-dark:#F5C2E7>\n</span><span style=color:#40A02B;--shiki-dark:#A6E3A1>`</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line><span style=color:#7C7F93;--shiki-dark:#9399B2>    }</span></span>
+<span class=line><span style=color:#7C7F93;--shiki-dark:#9399B2>  }</span></span>
+<span class=line><span style=color:#7C7F93;--shiki-dark:#9399B2>}</span></span>
+<span class=line></span>
+<span class=line><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic>run</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>()</span><span style=color:#179299;--shiki-dark:#94E2D5>.</span><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic>compose</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>(names)</span><span style=color:#179299;--shiki-dark:#94E2D5>.</span><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic>pipe</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>(process</span><span style=color:#179299;--shiki-dark:#94E2D5>.</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>stdout)</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line></span></code><div class=code-toolbar><span class=code-language>mjs</span><button class=copy-button>copy</button></div></pre></section>
+<section><h3><code>createRunner([options])</code><span><a id=bench_createrunner_options></a></span><span><a class=mark id=createrunneroptions href=#createrunneroptions>#</a></span></h3><div class=api_metadata><span>Added in: v26.9.0</span></div><ul>
+<li><code>options</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object><code>&lt;Object></code></a>
+<ul>
+<li><code>yieldBetweenSamples</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#boolean_type><code>&lt;boolean></code></a> Schedule an event loop turn between sample
+callbacks. Disabling this also prevents timer-based abort signals from
+firing between synchronous callbacks. Benchmark timeouts continue to be
+checked against a monotonic deadline. <strong>Default:</strong> <code>true</code>.</li>
+</ul>
+</li>
+<li>Returns: <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object><code>&lt;Object></code></a> An isolated benchmark runner with bound <code>after</code>, <code>afterEach</code>,
+<code>before</code>, <code>beforeEach</code>, <code>bench</code>, <code>describe</code>, <code>run</code>, and <code>suite</code> functions.</li>
+</ul><p>Creates an explicitly started benchmark runner. Declarations made through one
+runner do not interact with declarations made through another runner or through
+the module-level functions. Call the returned <code>run()</code> function to start the
+runner and obtain its {BenchmarksStream}.<p>Each runner can be started once. Its <code>run()</code> function accepts the same options
+as the module-level <a href=#runoptions><code>run()</code></a>. <code>run({ yieldBetweenSamples })</code> overrides the
+value passed to <code>createRunner()</code>. Unlike the module-level runner, a failed
+benchmark in an explicit runner does not change the process exit code.</section>
+<section><h3><code>bench([name][, options], fn)</code><span><a id=bench_bench_name_options_fn></a></span><span><a class=mark id=benchname-options-fn href=#benchname-options-fn>#</a></span></h3><div class=api_metadata><span>Added in: v26.9.0</span></div><ul>
+<li><code>name</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> The benchmark name. <strong>Default:</strong> The <code>name</code> property of <code>fn</code>,
+or <code>'&lt;anonymous>'</code> when <code>fn</code> has no name.</li>
+<li><code>options</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object><code>&lt;Object></code></a>
+<ul>
+<li><code>diagnosticChannels</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array><code>&lt;Array></code></a> String diagnostics channel names, deduplicated
+and inherited from containing suites by union. Symbol values in the array
+are silently ignored. <strong>Default:</strong> <code>[]</code>.</li>
+<li><code>only</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#boolean_type><code>&lt;boolean></code></a> When any benchmark or containing suite has <code>only</code> set,
+benchmarks without <code>only</code> in their hierarchy are skipped. <strong>Default:</strong>
+<code>false</code>.</li>
+<li><code>params</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object><code>&lt;Object></code></a> String, finite number, or boolean metadata identifying
+this benchmark configuration. Parameter keys are sorted when constructing
+the stable benchmark identity. <strong>Default:</strong> An empty object.</li>
+<li><code>samples</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type><code>&lt;number></code></a> The maximum number of measured callback invocations.
+Must be a positive 32-bit unsigned integer. The benchmark may finish earlier
+by calling <code>context.done()</code>. <strong>Default:</strong> <code>30</code>.</li>
+<li><code>signal</code> <a href=globals.html#class-abortsignal><code>&lt;AbortSignal></code></a> Allows aborting this benchmark.</li>
+<li><code>skip</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#boolean_type><code>&lt;boolean></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> If truthy, the benchmark is skipped. A string is
+included in the result as the skip reason. <strong>Default:</strong> <code>false</code>.</li>
+<li><code>tags</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a>[] Labels associated with the benchmark. Tags are
+lowercased, deduplicated, and inherited from containing suites by union. <strong>Default:</strong> <code>[]</code>.</li>
+<li><code>timeout</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type><code>&lt;number></code></a> The number of milliseconds after which the benchmark
+fails. <strong>Default:</strong> <code>Infinity</code>.</li>
+<li><code>warmup</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type><code>&lt;number></code></a> The number of unreported callback invocations before
+measured samples. Must be a 32-bit unsigned integer. <strong>Default:</strong> <code>10</code>.</li>
+</ul>
+</li>
+<li><code>fn</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Function><code>&lt;Function></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/AsyncFunction><code>&lt;AsyncFunction></code></a> The benchmark function. It receives a
+{BenchContext}.</li>
+<li>Returns: <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise><code>&lt;Promise></code></a> Fulfilled with the benchmark result after a top-level
+benchmark finishes, or with <code>undefined</code> immediately when declared in a
+suite.</li>
+</ul><p>Warmup invocations use the same callback and timing contract as measured
+samples, but their samples are discarded. An exception, rejection, timeout,
+abort, missing timing call, or duplicate timing call stops the current
+benchmark. Later benchmarks continue to run.<p>After a timeout or abort, the runner briefly waits for asynchronous benchmark
+work to settle before continuing. If it remains pending, all later benchmarks
+that were selected to run fail without running so that their measurements
+cannot overlap with that work.<p>For each warmup and measured callback, the runner subscribes to the configured
+diagnostics channels. Each publication queues a context diagnostic whose
+<code>message</code> is <code>{ name, message }</code>, containing the string channel name and the
+published message. Subscriptions are removed when the callback settles or is
+aborted.<p>A timeout or abort cannot interrupt synchronous JavaScript and does not forcibly
+cancel asynchronous work that ignores <code>context.signal</code>.<p>The <code>benchId</code> is based on the declaration source file, hierarchical suite and
+benchmark names, and canonicalized parameters. It is stable for repeated runs
+from the same source location, but the embedded source value is not normalized
+across checkout roots, module formats, operating systems, or path casing.<p>Execution scope is represented separately. A <code>runId</code> identifies one logical
+run, while <code>fileRunId</code> identifies a file runner or child execution within that
+run. The <code>entryFile</code> field records which entry-file import caused a declaration
+and is <code>null</code> for declarations made by preload modules.
+The same <code>benchId</code> can therefore occur under multiple <code>fileRunId</code> values when
+entry files use a shared declaration helper. Declaring the same <code>benchId</code> more
+than once within one file execution scope reports an error rather than merging
+the samples.</section>
+<section><h4><code>bench.skip([name][, options], fn)</code><span><a id=bench_bench_skip_name_options_fn></a></span><span><a class=mark id=benchskipname-options-fn href=#benchskipname-options-fn>#</a></span></h4><div class=api_metadata><span>Added in: v26.9.0</span></div><p>Shorthand for <code>bench(name, { ...options, skip: true }, fn)</code>.</section>
+<section><h4><code>bench.only([name][, options], fn)</code><span><a id=bench_bench_only_name_options_fn></a></span><span><a class=mark id=benchonlyname-options-fn href=#benchonlyname-options-fn>#</a></span></h4><div class=api_metadata><span>Added in: v26.9.0</span></div><p>Shorthand for <code>bench(name, { ...options, only: true }, fn)</code>.</section>
+<section><h3><code>suite([name][, options], fn)</code><span><a id=bench_suite_name_options_fn></a></span><span><a class=mark id=suitename-options-fn href=#suitename-options-fn>#</a></span></h3><div class=api_metadata><span>Added in: v26.9.0</span></div><ul>
+<li><code>name</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> The suite name. <strong>Default:</strong> The <code>name</code> property of <code>fn</code>, or
+<code>'&lt;anonymous>'</code> when <code>fn</code> has no name.</li>
+<li><code>options</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object><code>&lt;Object></code></a>
+<ul>
+<li><code>diagnosticChannels</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array><code>&lt;Array></code></a> String diagnostics channel names inherited by
+nested suites and benchmarks. Symbol values in the array are silently
+ignored. <strong>Default:</strong> <code>[]</code>.</li>
+<li><code>only</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#boolean_type><code>&lt;boolean></code></a> Selects all benchmarks nested in this suite. <strong>Default:</strong>
+<code>false</code>.</li>
+<li><code>skip</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#boolean_type><code>&lt;boolean></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> Skips all benchmarks nested in this suite. <strong>Default:</strong> <code>false</code>.</li>
+<li><code>tags</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a>[] Labels inherited by nested suites and benchmarks. <strong>Default:</strong> <code>[]</code>.</li>
+</ul>
+</li>
+<li><code>fn</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Function><code>&lt;Function></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/AsyncFunction><code>&lt;AsyncFunction></code></a> A function that declares nested suites,
+benchmarks, and hooks.</li>
+<li>Returns: <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise><code>&lt;Promise></code></a> Fulfilled when a top-level suite finishes, or with <code>undefined</code> immediately when declared in another suite.</li>
+</ul><p>Suite functions run while declarations are collected. Promise-returning suite
+functions are awaited before benchmark execution begins.</section>
+<section><h3><code>describe([name][, options], fn)</code><span><a id=bench_describe_name_options_fn></a></span><span><a class=mark id=describename-options-fn href=#describename-options-fn>#</a></span></h3><div class=api_metadata><span>Added in: v26.9.0</span></div><p>Alias for <code>suite()</code>.</section>
+<section><h3><code>before(fn)</code><span><a id=bench_before_fn></a></span><span><a class=mark id=beforefn href=#beforefn>#</a></span></h3><div class=api_metadata><span>Added in: v26.9.0</span></div><ul>
+<li><code>fn</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Function><code>&lt;Function></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/AsyncFunction><code>&lt;AsyncFunction></code></a> The hook function.</li>
+</ul><p>Registers a hook that runs once before the benchmarks in the current suite.</section>
+<section><h3><code>after(fn)</code><span><a id=bench_after_fn></a></span><span><a class=mark id=afterfn href=#afterfn>#</a></span></h3><div class=api_metadata><span>Added in: v26.9.0</span></div><ul>
+<li><code>fn</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Function><code>&lt;Function></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/AsyncFunction><code>&lt;AsyncFunction></code></a> The hook function.</li>
+</ul><p>Registers a hook that runs once after the benchmarks in the current suite.</section>
+<section><h3><code>beforeEach(fn)</code><span><a id=bench_beforeeach_fn></a></span><span><a class=mark id=beforeeachfn href=#beforeeachfn>#</a></span></h3><div class=api_metadata><span>Added in: v26.9.0</span></div><ul>
+<li><code>fn</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Function><code>&lt;Function></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/AsyncFunction><code>&lt;AsyncFunction></code></a> The hook function. It receives an object with
+the benchmark's <code>name</code>, <code>params</code>, and <code>signal</code>.</li>
+</ul><p>Registers a hook that runs once before each complete logical benchmark in the
+current suite. It does not run before every sample. Per-sample setup belongs in
+the benchmark function before <code>context.start()</code> or <code>context.record()</code>.</section>
+<section><h3><code>afterEach(fn)</code><span><a id=bench_aftereach_fn></a></span><span><a class=mark id=aftereachfn href=#aftereachfn>#</a></span></h3><div class=api_metadata><span>Added in: v26.9.0</span></div><ul>
+<li><code>fn</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Function><code>&lt;Function></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/AsyncFunction><code>&lt;AsyncFunction></code></a> The hook function. It receives an object with
+the benchmark's <code>name</code>, <code>params</code>, and <code>signal</code>.</li>
+</ul><p>Registers a hook that runs once after each complete logical benchmark in the
+current suite. It does not run after every sample. Per-sample cleanup belongs
+in the benchmark function after <code>context.end()</code> or <code>context.record()</code>.</section>
+<section><h3><code>run([options])</code><span><a id=bench_run_options></a></span><span><a class=mark id=runoptions href=#runoptions>#</a></span></h3><div class=api_metadata><span>Added in: v26.9.0</span></div><ul>
+<li><code>options</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object><code>&lt;Object></code></a>
+<ul>
+<li><code>namePattern</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/RegExp><code>&lt;RegExp></code></a> Only runs benchmarks whose full hierarchical
+name matches the pattern. String values are interpreted as JavaScript
+regular expressions.</li>
+<li><code>samples</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type><code>&lt;number></code></a> Overrides the maximum number of measured callback
+invocations for every benchmark. Must be a positive 32-bit unsigned integer.</li>
+<li><code>signal</code> <a href=globals.html#class-abortsignal><code>&lt;AbortSignal></code></a> Allows aborting in-progress benchmark execution.</li>
+<li><code>warmup</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type><code>&lt;number></code></a> Overrides the number of unreported warmup callback
+invocations for every benchmark. Must be a 32-bit unsigned integer.</li>
+<li><code>yieldBetweenSamples</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#boolean_type><code>&lt;boolean></code></a> Schedule an event loop turn between sample
+callbacks. <strong>Default:</strong> <code>true</code>, or the value passed to <code>createRunner()</code> for
+an explicit runner.</li>
+</ul>
+</li>
+<li>Returns: {BenchmarksStream}</li>
+</ul><p>Returns the object-mode event stream for the in-process benchmark run. Call
+<code>run()</code> during the same turn in which benchmarks are declared, before automatic
+execution begins. Calling <code>run()</code> is optional when the returned stream is not
+needed. An explicit runner created by <code>createRunner()</code> does not run
+automatically, so its <code>run()</code> function may be called later.<p>If any benchmark fails, the process exit code is set to <code>1</code> once the run
+finishes, unless <code>process.exitCode</code> has already been set.<pre class="catppuccin-latte catppuccin-mocha language-mjs shiki shiki-themes" style=background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4 tabindex=0><code class="catppuccin-latte catppuccin-mocha language-mjs mjs shiki shiki-themes" style=background-color:#eff1f5;--shiki-dark-bg:#1e1e2e;color:#4c4f69;--shiki-dark:#cdd6f4 language=mjs><span class=line><span style=color:#8839EF;--shiki-dark:#CBA6F7>import</span><span style=color:#7C7F93;--shiki-dark:#9399B2> {</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> bench</span><span style=color:#7C7F93;--shiki-dark:#9399B2>,</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> run </span><span style=color:#7C7F93;--shiki-dark:#9399B2>}</span><span style=color:#8839EF;--shiki-dark:#CBA6F7> from</span><span style=color:#40A02B;--shiki-dark:#A6E3A1> 'node:bench'</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line></span>
+<span class=line><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic>bench</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>(</span><span style=color:#40A02B;--shiki-dark:#A6E3A1>'example'</span><span style=color:#7C7F93;--shiki-dark:#9399B2>,</span><span style=color:#7C7F93;--shiki-dark:#9399B2> {</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> samples</span><span style=color:#179299;--shiki-dark:#94E2D5>:</span><span style=color:#FE640B;--shiki-dark:#FAB387> 3</span><span style=color:#7C7F93;--shiki-dark:#9399B2> },</span><span style=color:#7C7F93;--shiki-dark:#9399B2> (</span><span style=color:#E64553;--shiki-light-font-style:italic;--shiki-dark:#EBA0AC;--shiki-dark-font-style:italic>b</span><span style=color:#7C7F93;--shiki-dark:#9399B2>)</span><span style=color:#8839EF;--shiki-dark:#CBA6F7> =></span><span style=color:#7C7F93;--shiki-dark:#9399B2> {</span></span>
+<span class=line><span style=color:#4C4F69;--shiki-dark:#CDD6F4>  b</span><span style=color:#179299;--shiki-dark:#94E2D5>.</span><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic>start</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>()</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic>  doWork</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>()</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line><span style=color:#4C4F69;--shiki-dark:#CDD6F4>  b</span><span style=color:#179299;--shiki-dark:#94E2D5>.</span><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic>end</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>(</span><span style=color:#FE640B;--shiki-dark:#FAB387>1</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>)</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line><span style=color:#7C7F93;--shiki-dark:#9399B2>}</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>)</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line></span>
+<span class=line><span style=color:#8839EF;--shiki-dark:#CBA6F7>for</span><span style=color:#8839EF;--shiki-dark:#CBA6F7> await</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> (</span><span style=color:#8839EF;--shiki-dark:#CBA6F7>const</span><span style=color:#7C7F93;--shiki-dark:#9399B2> {</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> type</span><span style=color:#7C7F93;--shiki-dark:#9399B2>,</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> data </span><span style=color:#7C7F93;--shiki-dark:#9399B2>}</span><span style=color:#8839EF;--shiki-dark:#CBA6F7> of</span><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic> run</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>()) </span><span style=color:#7C7F93;--shiki-dark:#9399B2>{</span></span>
+<span class=line><span style=color:#8839EF;--shiki-dark:#CBA6F7>  if</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> (type </span><span style=color:#179299;--shiki-dark:#94E2D5>===</span><span style=color:#40A02B;--shiki-dark:#A6E3A1> 'bench:complete'</span><span style=color:#179299;--shiki-dark:#94E2D5> &&</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> data</span><span style=color:#179299;--shiki-dark:#94E2D5>.</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>error </span><span style=color:#179299;--shiki-dark:#94E2D5>===</span><span style=color:#8839EF;--shiki-dark:#CBA6F7> undefined</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>) </span><span style=color:#7C7F93;--shiki-dark:#9399B2>{</span></span>
+<span class=line><span style=color:#4C4F69;--shiki-dark:#CDD6F4>    console</span><span style=color:#179299;--shiki-dark:#94E2D5>.</span><span style=color:#1E66F5;--shiki-light-font-style:italic;--shiki-dark:#89B4FA;--shiki-dark-font-style:italic>log</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>(data</span><span style=color:#179299;--shiki-dark:#94E2D5>.</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>name</span><span style=color:#7C7F93;--shiki-dark:#9399B2>,</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4> data</span><span style=color:#179299;--shiki-dark:#94E2D5>.</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>summary</span><span style=color:#179299;--shiki-dark:#94E2D5>.</span><span style=color:#4C4F69;--shiki-dark:#CDD6F4>mean)</span><span style=color:#7C7F93;--shiki-dark:#9399B2>;</span></span>
+<span class=line><span style=color:#7C7F93;--shiki-dark:#9399B2>  }</span></span>
+<span class=line><span style=color:#7C7F93;--shiki-dark:#9399B2>}</span></span>
+<span class=line></span></code><div class=code-toolbar><span class=code-language>mjs</span><button class=copy-button>copy</button></div></pre></section>
+<section><h3><code>runFile(path[, options])</code><span><a id=bench_runfile_path_options></a></span><span><a class=mark id=runfilepath-options href=#runfilepath-options>#</a></span></h3><div class=api_metadata><span>Added in: v26.9.0</span></div><ul>
+<li><code>path</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> | <a href=buffer.html#class-buffer><code>&lt;Buffer></code></a> | <a href=url.html#the-whatwg-url-api><code>&lt;URL></code></a> The path of one benchmark module.</li>
+<li><code>options</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object><code>&lt;Object></code></a>
+<ul>
+<li><code>env</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object><code>&lt;Object></code></a> The child process environment. Property values must be
+strings or <code>undefined</code>. This replaces, rather than extends, the parent
+environment. <strong>Default:</strong> A snapshot of <code>process.env</code>.</li>
+<li><code>execArgv</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a>[] Node.js command-line options for the child process.
+This replaces, rather than extends, inherited options. Benchmark runner
+options, positional arguments, and options that select another execution
+mode are not allowed. <strong>Default:</strong> Compatible options inherited from the
+current process.</li>
+<li><code>signal</code> <a href=globals.html#class-abortsignal><code>&lt;AbortSignal></code></a> Terminates the child process when aborted.</li>
+</ul>
+</li>
+<li>Returns: {BenchmarksStream}</li>
+</ul><p>Runs exactly one benchmark module in a fresh child process and returns its
+object-mode event stream. A relative <code>path</code> is resolved from the current working
+directory when <code>runFile()</code> is called. <code>path</code> is not interpreted as a glob.
+Unless the signal is aborted or the stream is destroyed before startup, every
+call uses a new child. Input discovery, ordering, concurrency, retries, and
+multi-file scheduling remain the caller's responsibility.<p>When the Permission Model is enabled, the caller must have file system read
+access to <code>path</code> and permission to create child processes.<p>Records use advanced child process serialization, preserving supported
+structured values such as <code>bigint</code> and errors. Child writes to stdout and stderr
+become <code>'bench:diagnostic'</code> records. A permission failure, module loading error,
+abnormal child exit, or cancellation also emits an error diagnostic and produces
+a terminal <code>'bench:summary'</code> whose <code>success</code> property is <code>false</code>; these execution
+failures do not error the stream. If module evaluation fails after declaring
+benchmarks, those declarations still run before the unsuccessful summary.<p><code>env</code>, effective inherited options, and an explicitly provided <code>execArgv</code> are
+copied when <code>runFile()</code> is called. The runner removes <code>NODE_OPTIONS</code>, replaces
+IPC-related environment variables, and sets its private child-context, run
+identity, and file identity variables, overriding properties with those names
+in <code>env</code>. Pass child Node.js options through <code>execArgv</code>, not <code>NODE_OPTIONS</code>.
+Standard <code>child_process</code> environment propagation still applies, including
+<code>NODE_V8_COVERAGE</code>, permission-model options, and required z/OS variables.
+Aborting <code>signal</code> before the child starts produces an <code>AbortError</code> diagnostic
+without spawning it. Aborting during execution sends <code>SIGTERM</code> to the child and
+escalates to <code>SIGKILL</code> if it does not exit. Destroying the returned stream
+follows the same termination procedure.</section>
+<section><h3>Class: <code>BenchContext</code><span><a id=bench_class_benchcontext></a></span><span><a class=mark id=class-benchcontext href=#class-benchcontext>#</a></span></h3><div class=api_metadata></div><p>An instance of <code>BenchContext</code> is passed to every benchmark invocation. A new
+instance is created for every warmup and measured sample.</section>
+<section><h4><code>context.index</code><span><a id=bench_context_index></a></span><span><a class=mark id=contextindex href=#contextindex>#</a></span></h4><div class=api_metadata><span>Added in: v26.9.0</span></div><ul>
+<li><a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type><code>&lt;number></code></a></li>
+</ul><p>The zero-based invocation index within the current <code>context.phase</code>. Warmup and
+measured samples have separate index sequences.</section>
+<section><h4><code>context.name</code><span><a id=bench_context_name></a></span><span><a class=mark id=contextname href=#contextname>#</a></span></h4><div class=api_metadata><span>Added in: v26.9.0</span></div><ul>
+<li><a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a></li>
+</ul><p>The benchmark name.</section>
+<section><h4><code>context.params</code><span><a id=bench_context_params></a></span><span><a class=mark id=contextparams href=#contextparams>#</a></span></h4><div class=api_metadata><span>Added in: v26.9.0</span></div><ul>
+<li><a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object><code>&lt;Object></code></a></li>
+</ul><p>The benchmark's canonicalized parameter metadata.</section>
+<section><h4><code>context.phase</code><span><a id=bench_context_phase></a></span><span><a class=mark id=contextphase href=#contextphase>#</a></span></h4><div class=api_metadata><span>Added in: v26.9.0</span></div><ul>
+<li><a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a></li>
+</ul><p>The current sample phase. It is <code>'warmup'</code> for an unreported warmup invocation
+and <code>'measurement'</code> for a measured invocation.</section>
+<section><h4><code>context.signal</code><span><a id=bench_context_signal></a></span><span><a class=mark id=contextsignal href=#contextsignal>#</a></span></h4><div class=api_metadata><span>Added in: v26.9.0</span></div><ul>
+<li><a href=globals.html#class-abortsignal><code>&lt;AbortSignal></code></a></li>
+</ul><p>An abort signal that is triggered when the benchmark is aborted, times out, or
+finishes.</section>
+<section><h4><code>context.start()</code><span><a id=bench_context_start></a></span><span><a class=mark id=contextstart href=#contextstart>#</a></span></h4><div class=api_metadata><span>Added in: v26.9.0</span></div><p>Starts the measured region using <code>process.hrtime.bigint()</code>. Calling <code>start()</code>
+more than once is an error.</section>
+<section><h4><code>context.end(operations[, options])</code><span><a id=bench_context_end_operations_options></a></span><span><a class=mark id=contextendoperations-options href=#contextendoperations-options>#</a></span></h4><div class=api_metadata><span>Added in: v26.9.0</span></div><ul>
+<li><code>operations</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type><code>&lt;number></code></a> The number of completed operations. Must be a positive
+safe integer.</li>
+<li><code>options</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object><code>&lt;Object></code></a>
+<ul>
+<li><code>detail</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#Data_types><code>&lt;any></code></a> Additional structured-cloneable sample data. With CLI process
+isolation, it must also be supported by advanced child process
+serialization.</li>
+</ul>
+</li>
+<li>Returns: <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object><code>&lt;Object></code></a> The sample's <code>operations</code>, <code>duration_ns</code>, computed <code>rate</code>,
+and optional cloned <code>detail</code>.</li>
+</ul><p>Ends the measured region. The end timestamp is captured before <code>operations</code> is
+validated. Calling <code>end()</code> before <code>start()</code>, calling it more than once, or
+recording a zero-duration sample is an error. When provided, <code>detail</code> is cloned
+after the end timestamp is captured, so cloning time is outside the measured
+region.</section>
+<section><h4><code>context.record(sample)</code><span><a id=bench_context_record_sample></a></span><span><a class=mark id=contextrecordsample href=#contextrecordsample>#</a></span></h4><div class=api_metadata><span>Added in: v26.9.0</span></div><ul>
+<li><code>sample</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object><code>&lt;Object></code></a>
+<ul>
+<li><code>operations</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type><code>&lt;number></code></a> The number of completed operations. Must be a positive
+safe integer.</li>
+<li><code>duration_ns</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#bigint_type><code>&lt;bigint></code></a> An externally measured positive duration in
+nanoseconds no greater than <code>Number.MAX_SAFE_INTEGER</code>.</li>
+<li><code>detail</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#Data_types><code>&lt;any></code></a> Additional structured-cloneable sample data. With CLI process
+isolation, it must also be supported by advanced child process
+serialization.</li>
+</ul>
+</li>
+<li>Returns: <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object><code>&lt;Object></code></a> The normalized sample, including its computed <code>rate</code> and
+optional cloned <code>detail</code>.</li>
+</ul><p>Records a measurement made by another clock or execution environment. This is
+useful when a higher-level tool measures work in a worker and needs to exclude
+message transport from the duration. <code>record()</code> is mutually exclusive with
+<code>start()</code> and <code>end()</code> within one callback and must be called exactly once.</section>
+<section><h4><code>context.diagnostic(message[, options])</code><span><a id=bench_context_diagnostic_message_options></a></span><span><a class=mark id=contextdiagnosticmessage-options href=#contextdiagnosticmessage-options>#</a></span></h4><div class=api_metadata><span>Added in: v26.9.0</span></div><ul>
+<li><code>message</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#Data_types><code>&lt;any></code></a> A structured-cloneable diagnostic value. With CLI process
+isolation, it must also be supported by advanced child process serialization.</li>
+<li><code>options</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object><code>&lt;Object></code></a>
+<ul>
+<li><code>level</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> Either <code>'info'</code> or <code>'warning'</code>. <strong>Default:</strong> <code>'info'</code>.</li>
+<li><code>detail</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#Data_types><code>&lt;any></code></a> Additional structured-cloneable diagnostic data. With CLI
+process isolation, it must also be supported by advanced child process
+serialization.</li>
+</ul>
+</li>
+<li>Returns: <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#undefined_type><code>&lt;undefined></code></a></li>
+</ul><p>Queues a diagnostic associated with the current benchmark, phase, and sample
+index. Multiple diagnostics preserve call order. They are emitted after the
+sample callback settles and before that sample's <code>'bench:sample'</code> event. Warmup
+diagnostics are emitted even though warmup samples are not. Diagnostics queued
+before a callback failure are emitted before the failed <code>'bench:complete'</code>
+event and do not themselves cause the benchmark to fail. If a timeout or abort
+wins before the callback settles, queued diagnostics might not be emitted.<p>The message and detail are cloned synchronously. Options are also validated
+synchronously. Calling <code>diagnostic()</code> between <code>context.start()</code> and
+<code>context.end()</code> therefore includes that work in the measured duration. Invalid
+arguments or an uncloneable message or detail violate the sample contract.</section>
+<section><h4><code>context.done()</code><span><a id=bench_context_done></a></span><span><a class=mark id=contextdone href=#contextdone>#</a></span></h4><div class=api_metadata><span>Added in: v26.9.0</span></div><p>Requests successful benchmark completion after the current measured sample.
+The callback must still call either <code>start()</code> and <code>end()</code>, or <code>record()</code>.
+Calling <code>done()</code> during a warmup invocation is an error. The configured
+<code>samples</code> value remains the maximum number of measured invocations if <code>done()</code>
+is not called.</section>
+<section><h3>Class: <code>BenchmarksStream</code><span><a id=bench_class_benchmarksstream></a></span><span><a class=mark id=class-benchmarksstream href=#class-benchmarksstream>#</a></span></h3><div class=api_metadata></div><p><code>BenchmarksStream</code> is an object-mode <a href=stream.html#class-streamreadable><code>&lt;stream.Readable></code></a>. Each lifecycle record is
+both emitted as a named event and made available on the stream as <code>{ type, data }</code>.<p>The events are emitted in execution order:<ul>
+<li><code>'bench:plan'</code></li>
+<li><code>'bench:start'</code></li>
+<li><code>'bench:sample'</code></li>
+<li><code>'bench:complete'</code></li>
+<li><code>'bench:diagnostic'</code></li>
+<li><code>'bench:summary'</code></li>
+</ul><p>Named event payloads, readable records, and benchmark completion values are
+independent snapshots. Mutating a value received through one delivery mechanism
+does not change values received through the others. As with other
+<a href=events.html#class-eventemitter><code>&lt;EventEmitter></code></a> events, multiple listeners for the same named event receive the
+same event payload. Memory referenced through a <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer><code>&lt;SharedArrayBuffer></code></a> remains
+shared, following structured clone semantics.<p>Once a consumer starts reading, the runner honors the stream's object-mode
+high-water mark and waits between records when the consumer is slower than the
+producer. These waits occur after sample timing has ended, and records are not
+dropped. Snapshot creation and delivery waits are excluded from benchmark
+timeout accounting. Before readable consumption starts, records accumulate in
+the standard readable buffer and are included in <code>readableLength</code>. This keeps an
+unread stream and a consumer using only named events from deadlocking, but the
+buffer can grow without bound. A named-event-only consumer that does not need
+readable records should call <code>stream.resume()</code> to discard them. Destroying the
+stream stops readable delivery but does not cancel benchmark execution, so
+benchmark completion promises still settle. Automatically scheduled
+module-level runs drain their stream internally.<p>With process isolation, each record sent by a child is acknowledged only after
+the parent has accepted it. A child sends no additional record until it receives
+that acknowledgement, bounding the IPC relay when a reporter is slow.<p>Every benchmark-scoped event contains <code>runId</code>, <code>fileRunId</code>, <code>entryFile</code>,
+<code>benchId</code>, <code>parentId</code>, and <code>namePath</code>. <code>runId</code> and <code>fileRunId</code> are opaque and
+change between runs. <code>entryFile</code> identifies the top-level benchmark file whose
+loading caused the declaration, while <code>file</code> identifies the source location of
+the declaration itself. <code>parentId</code> is based on the containing suite's source
+file and hierarchical name path.<p>After asynchronous suite declarations settle, an in-process runner emits one
+<code>'bench:plan'</code> event for every benchmark it collected, in declaration order.
+All plans from that runner are emitted before its suite hooks or benchmark
+callbacks run. With process isolation, files run in separate children, so plans
+for a later file are emitted after an earlier child has completed. With no
+isolation, all files share one runner and their plans are emitted before any
+benchmark executes. Plan data contains the benchmark-scoped identity, location,
+tags, and parameters described in <a href=#benchmark-result>benchmark result</a>, together with:<ul>
+<li><code>diagnosticChannels</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a>[] The inherited string channel names
+subscribed to during each callback.</li>
+<li><code>samples</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type><code>&lt;number></code></a> The effective maximum number of measured callback
+invocations after run-level overrides.</li>
+<li><code>warmup</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type><code>&lt;number></code></a> The effective number of unreported warmup callback
+invocations after run-level overrides.</li>
+<li><code>timeout</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type><code>&lt;number></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#null_type><code>&lt;null></code></a> The timeout in milliseconds, or <code>null</code> when no timeout
+is configured.</li>
+<li><code>yieldBetweenSamples</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#boolean_type><code>&lt;boolean></code></a> Whether an event loop turn is scheduled between
+sample callbacks.</li>
+<li><code>selected</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#boolean_type><code>&lt;boolean></code></a> Whether the benchmark is eligible to run after applying <code>skip</code>, <code>only</code>, and <code>namePattern</code> selection. Execution can still be prevented
+by a duplicate declaration, suite build, hook, abort, or other runtime failure.</li>
+<li><code>skip</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#boolean_type><code>&lt;boolean></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> When <code>selected</code> is <code>false</code>, the explicit skip value or
+the selection reason, such as <code>'only'</code> or <code>'name pattern'</code>.</li>
+</ul><p>The plan contains execution settings known to the runner. Runtime version,
+operating system, processor, and other environment metadata are intentionally
+left for reporters and higher-level tools to collect.<p><code>'bench:complete'</code> data contains a <a href=#benchmark-result>benchmark result</a>. A failed result has an
+additional <code>error</code> property and may contain samples recorded before the error.
+A skipped result has an additional <code>skip</code> property and an empty <code>samples</code>
+array. <code>'bench:diagnostic'</code> reports loading, suite, and hook errors as well as
+public context diagnostics. A context diagnostic contains the benchmark-scoped
+identity fields, <code>phase</code>, <code>index</code>, <code>message</code>, <code>level</code>, source location, and
+optional <code>detail</code>. <code>'bench:summary'</code> contains overall <code>runId</code>, <code>fileRunId</code>,
+<code>entryFile</code>, <code>success</code>, <code>counts</code>, <code>duration_ns</code>, and <code>file</code> properties.
+<code>fileRunId</code>, <code>entryFile</code>, and <code>file</code> are <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#null_type><code>&lt;null></code></a>; they are <code>null</code> when the
+summary aggregates multiple files.</section>
+<section><h3>Sample result<span><a id=bench_sample_result></a></span><span><a class=mark id=sample-result href=#sample-result>#</a></span></h3><div class=api_metadata></div><p>Each measured sample has the following properties:<ul>
+<li><code>operations</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type><code>&lt;number></code></a> The positive operation count passed to <code>context.end()</code> or <code>context.record()</code>.</li>
+<li><code>duration_ns</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#bigint_type><code>&lt;bigint></code></a> The measured duration in nanoseconds.</li>
+<li><code>rate</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type><code>&lt;number></code></a> Operations per second.</li>
+<li><code>detail</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#Data_types><code>&lt;any></code></a> The optional cloned sample detail.</li>
+</ul></section>
+<section><h3>Benchmark result<span><a id=bench_benchmark_result></a></span><span><a class=mark id=benchmark-result href=#benchmark-result>#</a></span></h3><div class=api_metadata></div><p>A completed benchmark result contains:<ul>
+<li><code>runId</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> The opaque logical run identity.</li>
+<li><code>fileRunId</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> The opaque file runner or child execution identity.</li>
+<li><code>entryFile</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#null_type><code>&lt;null></code></a> The top-level file that caused this declaration.</li>
+<li><code>benchId</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> The stable declaration identity within the same source
+layout.</li>
+<li><code>parentId</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> | <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#null_type><code>&lt;null></code></a> The stable containing suite identity.</li>
+<li><code>name</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> The benchmark name.</li>
+<li><code>namePath</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a>[] The hierarchical suite and benchmark names.</li>
+<li><code>file</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a> The declaration source file.</li>
+<li><code>line</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type><code>&lt;number></code></a> The source line.</li>
+<li><code>column</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type><code>&lt;number></code></a> The source column.</li>
+<li><code>tags</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type><code>&lt;string></code></a>[] The inherited canonical tags.</li>
+<li><code>params</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object><code>&lt;Object></code></a> The canonical parameter metadata.</li>
+<li><code>samples</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object><code>&lt;Object></code></a>[] The exact measured samples in measurement invocation
+order.</li>
+<li><code>summary</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object><code>&lt;Object></code></a>
+<ul>
+<li><code>mean</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type><code>&lt;number></code></a> The equally weighted arithmetic mean of per-sample rates,
+not pooled throughput across all operations and durations.</li>
+<li><code>median</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type><code>&lt;number></code></a> The median per-sample rate.</li>
+<li><code>min</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type><code>&lt;number></code></a> The minimum per-sample rate.</li>
+<li><code>max</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type><code>&lt;number></code></a> The maximum per-sample rate.</li>
+<li><code>stddev</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type><code>&lt;number></code></a> The population standard deviation of rates.</li>
+<li><code>coefficientOfVariation</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type><code>&lt;number></code></a> <code>stddev / mean</code>.</li>
+<li><code>confidenceInterval</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object><code>&lt;Object></code></a> The 95% Student's t confidence interval for
+the mean rate, with <code>lower</code> and <code>upper</code> properties.</li>
+<li><code>medianConfidenceInterval</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object><code>&lt;Object></code></a> The 95% nonparametric confidence
+interval for the median rate, with <code>lower</code> and <code>upper</code> properties.</li>
+<li><code>skewness</code> <a href=https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#number_type><code>&lt;number></code></a> The skewness of the scaled rate histogram.</li>
+</ul>
+</li>
+</ul></section>
+          
+        </div>
+      </div>
+    </div>

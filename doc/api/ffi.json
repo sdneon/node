@@ -1,0 +1,763 @@
+{
+  "type": "module",
+  "source": "doc/api/ffi.md",
+  "modules": [
+    {
+      "textRaw": "FFI",
+      "name": "ffi",
+      "introduced_in": "v26.1.0",
+      "type": "module",
+      "meta": {
+        "added": [
+          "v26.1.0"
+        ],
+        "changes": []
+      },
+      "stability": 1,
+      "stabilityText": "Experimental",
+      "desc": "<p>The <code>node:ffi</code> module provides an experimental foreign function interface for\nloading dynamic libraries and calling native symbols from JavaScript.</p>\n<p>This API is unsafe. Passing invalid pointers, using an incorrect symbol\nsignature, or accessing memory after it has been freed can crash the process\nor corrupt memory.</p>\n<p>To access it:</p>\n<pre><code class=\"language-mjs\">import ffi from 'node:ffi';\n</code></pre>\n<pre><code class=\"language-cjs\">const ffi = require('node:ffi');\n</code></pre>\n<p>This module is only available under the <code>node:</code> scheme in builds with FFI\nsupport. It can be disabled with the <code>--no-experimental-ffi</code> flag.</p>\n<p>Building Node.js with <code>node:ffi</code> support is available via the bundled <code>libffi</code> on\nplatforms where <code>libffi</code> provides a compatible static backend, or via a\nshared <code>libffi</code> using the <code>--shared-ffi</code> configure flag.\nThe unofficial GN build does not support <code>node:ffi</code>.</p>\n<p>The following targets are not supported by bundled libffi:</p>\n<ul>\n<li><code>s390x</code>.</li>\n<li><code>mips</code>, <code>mipsel</code>, and <code>mips64el</code> on targets other than FreeBSD, Linux, and\nOpenBSD.</li>\n<li><code>ppc64</code> on Android, CloudABI, iOS, OpenHarmony, OS/400, Solaris, and Windows.</li>\n</ul>\n<p>When using the <a href=\"permissions.html#permission-model\">Permission Model</a>, FFI APIs are\nrestricted unless the <a href=\"cli.html#--allow-ffi\"><code>--allow-ffi</code></a> flag is provided.</p>\n<p>Some FFI operations require runtime allocation of executable memory. If an\notherwise eligible Fast API function cannot be created because executable memory\nis unavailable, creation throws\n<a href=\"errors.html#err_rx_memory_not_supported\"><code>ERR_RX_MEMORY_NOT_SUPPORTED</code></a> rather than\nselecting another call path. Callback allocation can also report this error.\nLoading the module or a library does not itself require generated trampolines.</p>",
+      "modules": [
+        {
+          "textRaw": "Overview",
+          "name": "overview",
+          "type": "module",
+          "desc": "<p>The <code>node:ffi</code> module exposes two groups of APIs:</p>\n<ul>\n<li>Dynamic library APIs for loading libraries, resolving symbols, and creating\ncallable JavaScript wrappers.</li>\n<li>Raw memory helpers for reading and writing primitive values through pointers,\nconverting pointers to JavaScript strings, <code>Buffer</code> instances, and\n<code>ArrayBuffer</code> instances, and for copying data back into native memory.</li>\n</ul>",
+          "displayName": "Overview"
+        },
+        {
+          "textRaw": "Type names",
+          "name": "type_names",
+          "type": "module",
+          "desc": "<p>FFI signatures use string type names.</p>\n<p>Supported type names:</p>\n<ul>\n<li><code>void</code></li>\n<li><code>char</code></li>\n<li><code>int8</code></li>\n<li><code>uint8</code></li>\n<li><code>int16</code></li>\n<li><code>uint16</code></li>\n<li><code>int32</code></li>\n<li><code>uint32</code></li>\n<li><code>int64</code></li>\n<li><code>uint64</code></li>\n<li><code>float32</code></li>\n<li><code>float64</code></li>\n<li><code>pointer</code></li>\n<li><code>string</code></li>\n<li><code>buffer</code></li>\n<li><code>arraybuffer</code></li>\n<li><code>function</code></li>\n</ul>\n<details>\n<summary>Alternative spellings</summary>\n<ul>\n<li><code>i8</code> for <code>int8</code></li>\n<li><code>u8</code> and <code>bool</code> for <code>uint8</code></li>\n<li><code>i16</code> for <code>int16</code></li>\n<li><code>u16</code> for <code>uint16</code></li>\n<li><code>i32</code> for <code>int32</code></li>\n<li><code>u32</code> for <code>uint32</code></li>\n<li><code>i64</code> for <code>int64</code></li>\n<li><code>u64</code> for <code>uint64</code></li>\n<li><code>f32</code> and <code>float</code> for <code>float32</code></li>\n<li><code>f64</code> and <code>double</code> for <code>float64</code></li>\n<li><code>ptr</code> for <code>pointer</code></li>\n<li><code>str</code> for <code>string</code></li>\n</ul>\n</details>\n<p>These type names are also exposed as constants on <code>ffi.types</code>:</p>\n<ul>\n<li><code>ffi.types.VOID</code> = <code>'void'</code></li>\n<li><code>ffi.types.POINTER</code> = <code>'pointer'</code></li>\n<li><code>ffi.types.BUFFER</code> = <code>'buffer'</code></li>\n<li><code>ffi.types.ARRAY_BUFFER</code> = <code>'arraybuffer'</code></li>\n<li><code>ffi.types.FUNCTION</code> = <code>'function'</code></li>\n<li><code>ffi.types.BOOL</code> = <code>'bool'</code></li>\n<li><code>ffi.types.CHAR</code> = <code>'char'</code></li>\n<li><code>ffi.types.STRING</code> = <code>'string'</code></li>\n<li><code>ffi.types.FLOAT</code> = <code>'float'</code></li>\n<li><code>ffi.types.DOUBLE</code> = <code>'double'</code></li>\n<li><code>ffi.types.INT_8</code> = <code>'int8'</code></li>\n<li><code>ffi.types.UINT_8</code> = <code>'uint8'</code></li>\n<li><code>ffi.types.INT_16</code> = <code>'int16'</code></li>\n<li><code>ffi.types.UINT_16</code> = <code>'uint16'</code></li>\n<li><code>ffi.types.INT_32</code> = <code>'int32'</code></li>\n<li><code>ffi.types.UINT_32</code> = <code>'uint32'</code></li>\n<li><code>ffi.types.INT_64</code> = <code>'int64'</code></li>\n<li><code>ffi.types.UINT_64</code> = <code>'uint64'</code></li>\n<li><code>ffi.types.FLOAT_32</code> = <code>'float32'</code></li>\n<li><code>ffi.types.FLOAT_64</code> = <code>'float64'</code></li>\n</ul>\n<p>Pointer-like types (<code>pointer</code>, <code>string</code>, <code>buffer</code>, <code>arraybuffer</code>, and\n<code>function</code>) are all passed through the native layer as pointers.</p>\n<p>When <code>Buffer</code>, <code>ArrayBuffer</code>, or typed array values are passed as pointer-like\narguments, Node.js borrows a raw pointer to their backing memory for the\nduration of the native call. The caller must ensure that backing store remains\nvalid and stable for the entire call.</p>\n<p>It is unsupported and dangerous to resize, transfer, detach, or otherwise\ninvalidate that backing store while the native call is active, including\nthrough reentrant JavaScript such as FFI callbacks. Doing so may crash the\nprocess, produce incorrect output, or corrupt memory.</p>\n<p>The <code>char</code> type follows the platform C ABI. On platforms where plain C <code>char</code>\nis signed it behaves like <code>int8</code>; otherwise it behaves like <code>uint8</code>.</p>\n<p>The <code>bool</code> type is marshaled as an 8-bit unsigned integer. Pass numeric values\nsuch as <code>0</code> and <code>1</code>; JavaScript <code>true</code> and <code>false</code> are not accepted.</p>\n<p>On optimized Fast FFI calls, <code>pointer</code> and <code>function</code> parameters accept raw\npointer <code>bigint</code> values. For pointer-like parameters, <code>null</code>, <code>undefined</code>,\nstrings, <code>Buffer</code>, typed array, <code>DataView</code>, and <code>ArrayBuffer</code> values are converted\non the JavaScript side before calling the optimized native wrapper.</p>\n<p>Optimized Fast FFI calls fall back to another <a href=\"#call-paths\">call path</a> when a\nfunction's arguments or return type do not fit the platform-specific fast\ntrampoline. Fast FFI calls support at most 8 total arguments, and the\nregister and argument limits differ per architecture:</p>\n<table>\n<thead>\n<tr>\n<th>Architecture</th>\n<th>Max integer/pointer args</th>\n<th>Max floating-point args</th>\n<th>Buffer-shaped args</th>\n<th>Buffer-shaped + FP together</th>\n<th>Narrow (8/16-bit) return</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>AArch64</td>\n<td>7 (6 when a buffer-shaped arg is present)</td>\n<td>8</td>\n<td>Supported</td>\n<td>Not supported</td>\n<td>Supported</td>\n</tr>\n<tr>\n<td>x86-64, Linux/macOS (SysV)</td>\n<td>6 (4 when a buffer-shaped arg is present)</td>\n<td>8</td>\n<td>Supported</td>\n<td>Not supported</td>\n<td>Supported</td>\n</tr>\n<tr>\n<td>x86-64, Windows (Win64)</td>\n<td>3 (total arguments also capped at 3)</td>\n<td>3</td>\n<td>Not supported</td>\n<td>N/A</td>\n<td>Supported</td>\n</tr>\n<tr>\n<td>s390x</td>\n<td>4</td>\n<td>4</td>\n<td>Not supported</td>\n<td>N/A</td>\n<td>Not supported</td>\n</tr>\n<tr>\n<td>PPC64LE</td>\n<td>7</td>\n<td>8</td>\n<td>Not supported</td>\n<td>N/A</td>\n<td>Not supported</td>\n</tr>\n<tr>\n<td>LoongArch64</td>\n<td>7</td>\n<td>8</td>\n<td>Not supported</td>\n<td>N/A</td>\n<td>Not supported</td>\n</tr>\n<tr>\n<td>RISC-V (64-bit)</td>\n<td>7</td>\n<td>8</td>\n<td>Not supported</td>\n<td>N/A</td>\n<td>Not supported</td>\n</tr>\n</tbody>\n</table>\n<p>PPC64BE has no fast-call trampoline and always uses the generic call path.\n\"Buffer-shaped args\" means <code>Buffer</code>, typed array, <code>DataView</code>, or <code>ArrayBuffer</code>\nvalues passed as pointer-like arguments. Functions whose argument or return\ntypes exceed the limits for the current platform use one of the other\n<a href=\"#call-paths\">call paths</a> instead.</p>",
+          "displayName": "Type names"
+        },
+        {
+          "textRaw": "Signature objects",
+          "name": "signature_objects",
+          "type": "module",
+          "desc": "<p>Functions and callbacks are described with signature objects.</p>\n<p>Signature objects may contain the following properties, both of which are\noptional:</p>\n<ul>\n<li><code>return</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a> A <a href=\"#type-names\">type name</a> specifying the return type of the\nfunction or callback. <strong>Default:</strong> <code>'void'</code>.</li>\n<li><code>arguments</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#string_type\"><code>&#x3C;string></code></a>[] An array of <a href=\"#type-names\">type names</a> specifying the argument\ntype list of the function or callback. <strong>Default:</strong> <code>[]</code>.</li>\n</ul>\n<pre><code class=\"language-js\">const signature = {\n  return: 'int32',\n  arguments: ['int32', 'int32'],\n};\n</code></pre>",
+          "displayName": "Signature objects"
+        },
+        {
+          "textRaw": "Calling native functions",
+          "name": "calling_native_functions",
+          "type": "module",
+          "desc": "<p>Argument conversion depends on the declared FFI type.</p>\n<p>For 8-, 16-, and 32-bit integer types and for floating-point types, pass\nJavaScript <code>number</code> values that match the declared type.</p>\n<p>For 64-bit integer types (<code>int64</code> and <code>uint64</code>), pass JavaScript <code>bigint</code>\nvalues within the declared type's range or safe integer <code>number</code> values.\nFor <code>int64</code>, numbers must be between <code>Number.MIN_SAFE_INTEGER</code> and\n<code>Number.MAX_SAFE_INTEGER</code>, inclusive. For <code>uint64</code>, numbers must be between\n<code>0</code> and <code>Number.MAX_SAFE_INTEGER</code>, inclusive. This allows buffer lengths such\nas <code>buffer.byteLength</code> to be passed without an explicit <code>BigInt()</code> conversion.\nUse <code>bigint</code> for integers outside JavaScript's safe integer range.</p>\n<p>Invalid arguments, including fractional numbers, <code>NaN</code>, infinities, and values\noutside these ranges, throw <code>ERR_INVALID_ARG_VALUE</code>. Return values for 64-bit\ninteger types are always exposed as <code>bigint</code> values.</p>\n<p>For pointer-like arguments:</p>\n<ul>\n<li><code>null</code> and <code>undefined</code> are passed as null pointers.</li>\n<li><code>string</code> values are copied to temporary NUL-terminated UTF-8 strings for the\nduration of the call.</li>\n<li><code>Buffer</code>, typed arrays, and <code>DataView</code> instances pass a pointer to their\nbacking memory.</li>\n<li><code>ArrayBuffer</code> passes a pointer to its backing memory.</li>\n<li><code>bigint</code> values are passed as raw pointer addresses.</li>\n</ul>\n<p>Pointer return values are exposed as <code>bigint</code> addresses.</p>",
+          "displayName": "Calling native functions"
+        },
+        {
+          "textRaw": "Call paths",
+          "name": "call_paths",
+          "type": "module",
+          "desc": "<p>When a symbol is resolved through <a href=\"#ffidlopenpath-definitions\"><code>ffi.dlopen()</code></a>,\n<a href=\"#librarygetfunctionname-signature\"><code>library.getFunction()</code></a>, or <a href=\"#librarygetfunctionsdefinitions\"><code>library.getFunctions()</code></a>, Node.js selects\none of three native call paths for the returned wrapper. The selection is based\non the declared signature, on the current platform, and on the capabilities of\nthe current process. It is made once when the function is created, cannot be\nconfigured, and is not observable from JavaScript.</p>\n<p>The call paths are designed to accept the same JavaScript values for each\n<a href=\"#type-names\">type name</a>, to perform the same validation, and to throw the same\nerrors, so that applications do not need to know which call path a particular\nfunction uses. They differ in how much work is done per call. The paths exist\nso that common signatures can be called with as little overhead as possible\nwhile every supported signature keeps working.</p>\n<p>Node.js tries the call paths in the following order and uses the first one that\nsupports the signature:</p>\n<ol>\n<li>The <a href=\"#fast-api-call-path\">Fast API call path</a>, which lets optimized JavaScript call the native\nsymbol directly through a generated per-signature trampoline.</li>\n<li>The <a href=\"#shared-buffer-call-path\">shared buffer call path</a>, which passes arguments through a\npreallocated buffer instead of converting each argument across the\nJavaScript and C++ boundary on every call.</li>\n<li>The <a href=\"#generic-call-path\">generic call path</a>, which converts each argument in C++ and calls the\nsymbol through <code>libffi</code>. This path supports every signature.</li>\n</ol>\n<p>The contributor guide <a href=\"https://github.com/nodejs/node/blob/HEAD/doc/contributing/ffi-fast-api-internals.md\">FFI Fast API internals</a> describes the implementation of\nthese call paths in detail.</p>",
+          "modules": [
+            {
+              "textRaw": "Fast API call path",
+              "name": "fast_api_call_path",
+              "type": "module",
+              "desc": "<p>The Fast API call path binds the wrapper as a V8 Fast API function. When\nJavaScript code calling the wrapper is optimized by V8, the call goes from the\noptimized code straight into a small native trampoline that Node.js generates\nfor the exact signature when the function is created. The trampoline moves the\narguments into the registers expected by the native symbol and calls it. For\nthe scalar entry point, there is no intermediate argument conversion in C++.</p>\n<p>Functions on this path keep a conventional native entry point as well. Calls\nfrom code that V8 has not optimized, or that V8 deoptimizes, use that entry\npoint, which behaves like the <a href=\"#generic-call-path\">generic call path</a>. This is transparent to the\ncaller.</p>\n<p>Pointer-like arguments are prepared in JavaScript before the trampoline runs:</p>\n<ul>\n<li><code>null</code> and <code>undefined</code> become null pointers.</li>\n<li><code>string</code> values are copied into temporary NUL-terminated UTF-8 buffers for\nthe duration of the call.</li>\n<li><code>Buffer</code>, typed array, <code>DataView</code>, and <code>ArrayBuffer</code> values are converted to\nraw pointer <code>bigint</code> values, unless the alternate entry point described below\nhandles them.</li>\n<li><code>bigint</code> values are passed through unchanged.</li>\n</ul>\n<p>For signatures with a single <code>pointer</code>, <code>buffer</code>, or <code>arraybuffer</code> argument,\nNode.js also creates an alternate Fast API entry point that receives <code>Buffer</code>,\ntyped array, <code>DataView</code>, and <code>ArrayBuffer</code> values directly. The JavaScript\nwrapper dispatches to it when the argument is such a value, and a native helper\nextracts the pointer from the backing store instead of converting the value in\nJavaScript.</p>\n<p>A function uses this call path only when all of the following conditions are\nmet:</p>\n<ul>\n<li>The process runs on a supported 64-bit architecture: AArch64, x86-64,\nPPC64LE, LoongArch64, RISC-V 64, or s390x. 32-bit platforms and big-endian\nPPC64 always use another call path.</li>\n<li>The process can allocate executable memory. Node.js checks once per process\nwhether it can allocate memory and mark it executable. If that check fails,\ncreating an otherwise eligible function throws\n<a href=\"errors.html#err_rx_memory_not_supported\"><code>ERR_RX_MEMORY_NOT_SUPPORTED</code></a>.</li>\n<li>Neither the return type nor any argument type is <code>function</code>.</li>\n<li>The signature has at most 8 arguments, and every argument fits in the\nargument registers available to the trampoline on the current platform.\nArguments that would have to be passed on the native stack are not supported.</li>\n</ul>\n<p>The register limits are platform-specific. Integer and pointer-like arguments\nshare one set of registers, and floating-point arguments share another. The\nlimits for each architecture are listed in <a href=\"#type-names\">Type names</a>.</p>\n<p>A signature that is unsupported by the Fast API types, argument limits, or\nplatform is not an error. The function is created on the next call path that\nsupports it. Missing executable-memory support is checked only after signature\nand platform eligibility and does not select another call path.</p>",
+              "displayName": "Fast API call path"
+            },
+            {
+              "textRaw": "Shared buffer call path",
+              "name": "shared_buffer_call_path",
+              "type": "module",
+              "desc": "<p>The shared buffer call path is used for signatures that the Fast API call path\ndoes not support. When the function is created, Node.js allocates a small\nper-function buffer with one 8-byte slot for the return value and one 8-byte\nslot for each argument. On every call, the JavaScript wrapper validates the\narguments, writes them into their slots, invokes the native symbol through\n<code>libffi</code> without passing any JavaScript arguments, and then reads the return\nvalue back from the buffer. This avoids converting each argument individually\nacross the JavaScript and C++ boundary.</p>\n<p>A function uses this call path when all of the following conditions are met:</p>\n<ul>\n<li>The Fast API call path is not available for the signature.</li>\n<li>The host is little-endian.</li>\n<li>The signature has at least one argument. Zero-argument functions gain nothing\nfrom the shared buffer and use another call path instead.</li>\n</ul>\n<p>All type names are supported on this path, and there is no limit on the number\nof arguments.</p>\n<p>Pointer-like arguments (<code>pointer</code>, <code>string</code>, <code>buffer</code>, <code>arraybuffer</code>, and\n<code>function</code>) are written to the shared buffer only when the value is a <code>bigint</code>,\n<code>null</code>, or <code>undefined</code>. When a call passes a string, <code>Buffer</code>, typed array,\n<code>DataView</code>, or <code>ArrayBuffer</code> to a pointer-like parameter, that individual call\nis handed off to the <a href=\"#generic-call-path\">generic call path</a>, which performs the conversion in\nC++. The function itself stays on the shared buffer call path for later calls.</p>\n<p>The shared buffer is private to each function. Reentrant calls to the same\nfunction, for example from an FFI callback, are safe because the native side\ncopies the arguments out of the buffer before invoking the symbol.</p>",
+              "displayName": "Shared buffer call path"
+            },
+            {
+              "textRaw": "Generic call path",
+              "name": "generic_call_path",
+              "type": "module",
+              "desc": "<p>The generic call path converts each JavaScript argument to its native\nrepresentation in C++ and calls the symbol through <code>libffi</code>. It supports every\nsignature that <code>node:ffi</code> accepts and is the reference implementation for the\nargument validation and error behavior that the other call paths reproduce.</p>\n<p>A function is created directly on this call path when the Fast API call path\nis unavailable and either the host is big-endian or the signature has no\narguments.</p>\n<p>The generic call path also serves individual calls handed off by the other call\npaths, such as unoptimized or deoptimized call sites of a Fast API function and\nshared buffer calls that pass non-<code>bigint</code> pointer-like values.</p>\n<p>Callbacks created with <a href=\"#libraryregistercallbacksignature-callback\"><code>library.registerCallback()</code></a> are always implemented\nwith <code>libffi</code> closures. They are independent of the call path used by any\nfunction.</p>",
+              "displayName": "Generic call path"
+            }
+          ],
+          "displayName": "Call paths"
+        },
+        {
+          "textRaw": "Primitive memory access helpers",
+          "name": "primitive_memory_access_helpers",
+          "type": "module",
+          "desc": "<p>The following helpers read and write primitive values at a native pointer,\noptionally with a byte offset:</p>\n<ul>\n<li><code>ffi.getInt8(pointer[, offset])</code></li>\n<li><code>ffi.getUint8(pointer[, offset])</code></li>\n<li><code>ffi.getInt16(pointer[, offset])</code></li>\n<li><code>ffi.getUint16(pointer[, offset])</code></li>\n<li><code>ffi.getInt32(pointer[, offset])</code></li>\n<li><code>ffi.getUint32(pointer[, offset])</code></li>\n<li><code>ffi.getInt64(pointer[, offset])</code></li>\n<li><code>ffi.getUint64(pointer[, offset])</code></li>\n<li><code>ffi.getFloat32(pointer[, offset])</code></li>\n<li><code>ffi.getFloat64(pointer[, offset])</code></li>\n<li><code>ffi.setInt8(pointer, offset, value)</code></li>\n<li><code>ffi.setUint8(pointer, offset, value)</code></li>\n<li><code>ffi.setInt16(pointer, offset, value)</code></li>\n<li><code>ffi.setUint16(pointer, offset, value)</code></li>\n<li><code>ffi.setInt32(pointer, offset, value)</code></li>\n<li><code>ffi.setUint32(pointer, offset, value)</code></li>\n<li><code>ffi.setInt64(pointer, offset, value)</code></li>\n<li><code>ffi.setUint64(pointer, offset, value)</code></li>\n<li><code>ffi.setFloat32(pointer, offset, value)</code></li>\n<li><code>ffi.setFloat64(pointer, offset, value)</code></li>\n</ul>\n<p>These helpers perform direct memory reads and writes. <code>pointer</code> must be a\n<code>bigint</code> referring to valid readable or writable native memory. <code>offset</code>, when\nprovided, is interpreted as a byte offset from <code>pointer</code>.</p>\n<p>The getter helpers return JavaScript <code>number</code> values for 8-, 16-, and 32-bit\ninteger types and for floating-point types. They return <code>bigint</code> values for\n64-bit integer types.</p>\n<p>The setter helpers require an explicit byte offset and validate the supplied\nJavaScript value against the target native type before writing it into memory.\nFor <code>setInt64()</code> and <code>setUint64()</code>, <code>bigint</code> values are accepted directly;\nnumeric inputs must be integers within JavaScript's safe integer range.</p>\n<pre><code class=\"language-cjs\">const {\n  getInt32,\n  setInt32,\n} = require('node:ffi');\n\nsetInt32(ptr, 0, 42);\nconsole.log(getInt32(ptr, 0));\n</code></pre>\n<p>Like the other raw memory helpers in this module, these APIs do not track\nownership, bounds, or lifetime. Passing an invalid pointer, using the wrong\noffset, or writing through a stale pointer can corrupt memory or crash the\nprocess.</p>",
+          "displayName": "Primitive memory access helpers"
+        },
+        {
+          "textRaw": "Safety notes",
+          "name": "safety_notes",
+          "type": "module",
+          "desc": "<p>The <code>node:ffi</code> module does not track pointer validity, memory ownership, or\nnative object lifetimes.</p>\n<p>In particular:</p>\n<ul>\n<li>Do not read from or write to freed memory.</li>\n<li>Do not use zero-copy views after the native memory has been released.</li>\n<li>Do not declare incorrect signatures for native symbols.</li>\n<li>Do not unregister callbacks while native code may still call them.</li>\n<li>Do not call callback pointers after <code>library.close()</code> or\n<code>library.unregisterCallback(pointer)</code>.</li>\n<li>Assume undefined callback behavior can crash the process, produce incorrect\noutput, or corrupt memory.</li>\n<li>Do not assume pointer return values imply ownership; whether the caller must\nfree the returned address depends entirely on the native API.</li>\n</ul>\n<p>As a general rule, prefer copied values unless zero-copy access is required,\nand keep callback and pointer lifetimes explicit on the native side.</p>",
+          "displayName": "Safety notes"
+        }
+      ],
+      "properties": [
+        {
+          "textRaw": "{string}",
+          "name": "suffix",
+          "type": "string",
+          "meta": {
+            "added": [
+              "v26.1.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>The native shared library suffix for the current platform:</p>\n<ul>\n<li><code>'dylib'</code> on macOS</li>\n<li><code>'so'</code> on Unix-like platforms</li>\n<li><code>'dll'</code> on Windows</li>\n</ul>\n<p>This can be used to build portable library paths:</p>\n<pre><code class=\"language-cjs\">const { suffix } = require('node:ffi');\n\nconst path = `libsqlite3.${suffix}`;\n</code></pre>"
+        }
+      ],
+      "methods": [
+        {
+          "textRaw": "`ffi.dlopen(path[, definitions])`",
+          "name": "dlopen",
+          "type": "method",
+          "meta": {
+            "added": [
+              "v26.1.0"
+            ],
+            "changes": [
+              {
+                "version": "v26.10.0",
+                "pr-url": "https://github.com/nodejs/node/pull/65909",
+                "description": "Library paths inside a mounted virtual file system are now supported."
+              }
+            ]
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`path` {string|null} Path to a dynamic library, or `null` to resolve symbols from the current process image.",
+                  "name": "path",
+                  "type": "string|null",
+                  "desc": "Path to a dynamic library, or `null` to resolve symbols from the current process image."
+                },
+                {
+                  "textRaw": "`definitions` {Object} Symbol definitions to resolve immediately.",
+                  "name": "definitions",
+                  "type": "Object",
+                  "desc": "Symbol definitions to resolve immediately.",
+                  "optional": true
+                }
+              ],
+              "return": {
+                "textRaw": "Returns: {Object}",
+                "name": "return",
+                "type": "Object"
+              }
+            }
+          ],
+          "desc": "<p>Loads a dynamic library and resolves the requested function definitions.</p>\n<p>On Windows passing <code>null</code> is not supported.</p>\n<p>A <code>path</code> inside a mounted <a href=\"vfs.html\">virtual file system</a> is supported: the\noperating system's dynamic loader cannot open a virtual path, so the\nlibrary's bytes are read from the VFS and loaded from a private,\nself-cleaning temporary image instead, while <code>lib.path</code> keeps reporting\nthe virtual path. Libraries on the real file system are unaffected and\nload directly.</p>\n<p>When <code>definitions</code> is omitted, <code>functions</code> is returned as an empty object until\nsymbols are resolved explicitly.</p>\n<p>The returned object contains:</p>\n<ul>\n<li><code>lib</code> <a href=\"ffi.html#class-dynamiclibrary\"><code>&#x3C;DynamicLibrary></code></a> The loaded library handle.</li>\n<li><code>functions</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object\"><code>&#x3C;Object></code></a> Callable wrappers for the requested symbols.</li>\n</ul>\n<p>The returned object also implements the explicit resource management protocol,\nso it can be used with the <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/using\"><code>using</code></a> declaration. Disposing the returned\nobject closes the library handle.</p>\n<pre><code class=\"language-mjs\">import { dlopen, suffix } from 'node:ffi';\n\n{\n  using handle = dlopen(`./mylib.${suffix}`, {\n    add_i32: { arguments: ['int32', 'int32'], return: 'int32' },\n  });\n  console.log(handle.functions.add_i32(20, 22));\n} // handle.lib.close() is invoked automatically here.\n</code></pre>\n<pre><code class=\"language-mjs\">import { dlopen, suffix } from 'node:ffi';\n\nconst { lib, functions } = dlopen(`./mylib.${suffix}`, {\n  add_i32: { arguments: ['int32', 'int32'], return: 'int32' },\n  string_length: { arguments: ['pointer'], return: 'uint64' },\n});\n\nconsole.log(functions.add_i32(20, 22));\n</code></pre>\n<pre><code class=\"language-cjs\">const { dlopen, suffix } = require('node:ffi');\n\nconst { lib, functions } = dlopen(`./mylib.${suffix}`, {\n  add_i32: { arguments: ['int32', 'int32'], return: 'int32' },\n  string_length: { arguments: ['pointer'], return: 'uint64' },\n});\n\nconsole.log(functions.add_i32(20, 22));\n</code></pre>"
+        },
+        {
+          "textRaw": "`ffi.dlclose(handle)`",
+          "name": "dlclose",
+          "type": "method",
+          "meta": {
+            "added": [
+              "v26.1.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`handle` {DynamicLibrary}",
+                  "name": "handle",
+                  "type": "DynamicLibrary"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>Closes a dynamic library.</p>\n<p>This is equivalent to calling <code>handle.close()</code>.</p>"
+        },
+        {
+          "textRaw": "`ffi.dlsym(handle, symbol)`",
+          "name": "dlsym",
+          "type": "method",
+          "meta": {
+            "added": [
+              "v26.1.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`handle` {DynamicLibrary}",
+                  "name": "handle",
+                  "type": "DynamicLibrary"
+                },
+                {
+                  "textRaw": "`symbol` {string}",
+                  "name": "symbol",
+                  "type": "string"
+                }
+              ],
+              "return": {
+                "textRaw": "Returns: {bigint}",
+                "name": "return",
+                "type": "bigint"
+              }
+            }
+          ],
+          "desc": "<p>Resolves a symbol address from a loaded library.</p>\n<p>This is equivalent to calling <code>handle.getSymbol(symbol)</code>.</p>"
+        },
+        {
+          "textRaw": "`ffi.toString(pointer)`",
+          "name": "toString",
+          "type": "method",
+          "meta": {
+            "added": [
+              "v26.1.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`pointer` {bigint}",
+                  "name": "pointer",
+                  "type": "bigint"
+                }
+              ],
+              "return": {
+                "textRaw": "Returns: {string|null}",
+                "name": "return",
+                "type": "string|null"
+              }
+            }
+          ],
+          "desc": "<p>Reads a NUL-terminated UTF-8 string from native memory.</p>\n<p>If <code>pointer</code> is <code>0n</code>, <code>null</code> is returned.</p>\n<p>This function does not validate that <code>pointer</code> refers to readable memory or\nthat the pointed-to data is terminated with <code>\\0</code>. Passing an invalid pointer,\na pointer to freed memory, or a pointer to bytes without a terminating NUL can\nread unrelated memory, crash the process, or produce truncated or garbled\noutput.</p>\n<pre><code class=\"language-cjs\">const { toString } = require('node:ffi');\n\nconst value = toString(ptr);\n</code></pre>"
+        },
+        {
+          "textRaw": "`ffi.toBuffer(pointer, length[, copy])`",
+          "name": "toBuffer",
+          "type": "method",
+          "meta": {
+            "added": [
+              "v26.1.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`pointer` {bigint}",
+                  "name": "pointer",
+                  "type": "bigint"
+                },
+                {
+                  "textRaw": "`length` {number}",
+                  "name": "length",
+                  "type": "number"
+                },
+                {
+                  "textRaw": "`copy` {boolean} When `false`, creates a zero-copy view. **Default:** `true`.",
+                  "name": "copy",
+                  "type": "boolean",
+                  "default": "`true`",
+                  "desc": "When `false`, creates a zero-copy view.",
+                  "optional": true
+                }
+              ],
+              "return": {
+                "textRaw": "Returns: {Buffer}",
+                "name": "return",
+                "type": "Buffer"
+              }
+            }
+          ],
+          "desc": "<p>Creates a <code>Buffer</code> from native memory.</p>\n<p>When <code>copy</code> is <code>true</code>, the returned <code>Buffer</code> owns its own copied memory.\nWhen <code>copy</code> is <code>false</code>, the returned <code>Buffer</code> references the original native\nmemory directly.</p>\n<p>Using <code>copy: false</code> is a zero-copy escape hatch. The returned <code>Buffer</code> is a\nwritable view onto foreign memory, so writes in JavaScript update the original\nnative memory directly. The caller must guarantee that:</p>\n<ul>\n<li><code>pointer</code> remains valid for the entire lifetime of the returned <code>Buffer</code>.</li>\n<li><code>length</code> stays within the allocated native region.</li>\n<li>no native code frees or repurposes that memory while JavaScript still uses\nthe <code>Buffer</code>.</li>\n<li>Memory protection is observed. For example, read-only memory pages must not\nbe written to.</li>\n</ul>\n<p>If these guarantees are not met, reading or writing the <code>Buffer</code> can corrupt\nmemory or crash the process.</p>"
+        },
+        {
+          "textRaw": "`ffi.toArrayBuffer(pointer, length[, copy])`",
+          "name": "toArrayBuffer",
+          "type": "method",
+          "meta": {
+            "added": [
+              "v26.1.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`pointer` {bigint}",
+                  "name": "pointer",
+                  "type": "bigint"
+                },
+                {
+                  "textRaw": "`length` {number}",
+                  "name": "length",
+                  "type": "number"
+                },
+                {
+                  "textRaw": "`copy` {boolean} When `false`, creates a zero-copy view. **Default:** `true`.",
+                  "name": "copy",
+                  "type": "boolean",
+                  "default": "`true`",
+                  "desc": "When `false`, creates a zero-copy view.",
+                  "optional": true
+                }
+              ],
+              "return": {
+                "textRaw": "Returns: {ArrayBuffer}",
+                "name": "return",
+                "type": "ArrayBuffer"
+              }
+            }
+          ],
+          "desc": "<p>Creates an <code>ArrayBuffer</code> from native memory.</p>\n<p>When <code>copy</code> is <code>true</code>, the returned <code>ArrayBuffer</code> contains copied bytes.\nWhen <code>copy</code> is <code>false</code>, the returned <code>ArrayBuffer</code> references the original\nnative memory directly.</p>\n<p>The same lifetime and bounds requirements described for\n<a href=\"#ffitobufferpointer-length-copy\"><code>ffi.toBuffer(pointer, length, copy)</code></a> apply\nhere. With <code>copy: false</code>, the\nreturned <code>ArrayBuffer</code> is a zero-copy view of foreign memory and is only safe\nwhile that memory remains allocated, unchanged in layout, and valid for the\nentire exposed range.</p>"
+        },
+        {
+          "textRaw": "`ffi.exportString(string, pointer, length[, encoding])`",
+          "name": "exportString",
+          "type": "method",
+          "meta": {
+            "added": [
+              "v26.1.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`string` {string}",
+                  "name": "string",
+                  "type": "string"
+                },
+                {
+                  "textRaw": "`pointer` {bigint}",
+                  "name": "pointer",
+                  "type": "bigint"
+                },
+                {
+                  "textRaw": "`length` {number}",
+                  "name": "length",
+                  "type": "number"
+                },
+                {
+                  "textRaw": "`encoding` {string} **Default:** `'utf8'`.",
+                  "name": "encoding",
+                  "type": "string",
+                  "default": "`'utf8'`",
+                  "optional": true
+                }
+              ]
+            }
+          ],
+          "desc": "<p>Copies a JavaScript string into native memory and appends a trailing NUL\nterminator.</p>\n<p><code>length</code> must be large enough to hold the full encoded string plus the trailing\nNUL terminator. For UTF-16 and UCS-2 encodings, the trailing terminator uses\ntwo zero bytes.</p>\n<p><code>pointer</code> must refer to writable native memory with at least <code>length</code> bytes of\navailable storage. This function does not allocate memory on its own.</p>\n<p><code>string</code> must be a JavaScript string. <code>encoding</code> must be a string.</p>"
+        },
+        {
+          "textRaw": "`ffi.exportBuffer(buffer, pointer, length)`",
+          "name": "exportBuffer",
+          "type": "method",
+          "meta": {
+            "added": [
+              "v26.1.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`buffer` {Buffer}",
+                  "name": "buffer",
+                  "type": "Buffer"
+                },
+                {
+                  "textRaw": "`pointer` {bigint}",
+                  "name": "pointer",
+                  "type": "bigint"
+                },
+                {
+                  "textRaw": "`length` {number}",
+                  "name": "length",
+                  "type": "number"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>Copies bytes from a <code>Buffer</code> into native memory.</p>\n<p><code>length</code> must be at least <code>buffer.length</code>.</p>\n<p><code>pointer</code> must refer to writable native memory with at least <code>length</code> bytes of\navailable storage. This function does not allocate memory on its own.</p>\n<p><code>buffer</code> must be a Node.js <code>Buffer</code>.</p>"
+        },
+        {
+          "textRaw": "`ffi.exportArrayBuffer(arrayBuffer, pointer, length)`",
+          "name": "exportArrayBuffer",
+          "type": "method",
+          "meta": {
+            "added": [
+              "v26.1.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`arrayBuffer` {ArrayBuffer}",
+                  "name": "arrayBuffer",
+                  "type": "ArrayBuffer"
+                },
+                {
+                  "textRaw": "`pointer` {bigint}",
+                  "name": "pointer",
+                  "type": "bigint"
+                },
+                {
+                  "textRaw": "`length` {number}",
+                  "name": "length",
+                  "type": "number"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>Copies bytes from an <code>ArrayBuffer</code> into native memory.</p>\n<p><code>length</code> must be at least <code>arrayBuffer.byteLength</code>.</p>\n<p><code>pointer</code> must refer to writable native memory with at least <code>length</code> bytes of\navailable storage. This function does not allocate memory on its own.</p>"
+        },
+        {
+          "textRaw": "`ffi.exportArrayBufferView(arrayBufferView, pointer, length)`",
+          "name": "exportArrayBufferView",
+          "type": "method",
+          "meta": {
+            "added": [
+              "v26.1.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`arrayBufferView` {ArrayBufferView}",
+                  "name": "arrayBufferView",
+                  "type": "ArrayBufferView"
+                },
+                {
+                  "textRaw": "`pointer` {bigint}",
+                  "name": "pointer",
+                  "type": "bigint"
+                },
+                {
+                  "textRaw": "`length` {number}",
+                  "name": "length",
+                  "type": "number"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>Copies bytes from an <code>ArrayBufferView</code> into native memory.</p>\n<p><code>length</code> must be at least <code>arrayBufferView.byteLength</code>.</p>\n<p><code>pointer</code> must refer to writable native memory with at least <code>length</code> bytes of\navailable storage. This function does not allocate memory on its own.</p>"
+        },
+        {
+          "textRaw": "`ffi.getRawPointer(source)`",
+          "name": "getRawPointer",
+          "type": "method",
+          "meta": {
+            "added": [
+              "v26.1.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`source` {Buffer|ArrayBuffer|SharedArrayBuffer|ArrayBufferView}",
+                  "name": "source",
+                  "type": "Buffer|ArrayBuffer|SharedArrayBuffer|ArrayBufferView"
+                }
+              ],
+              "return": {
+                "textRaw": "Returns: {bigint}",
+                "name": "return",
+                "type": "bigint"
+              }
+            }
+          ],
+          "desc": "<p>Returns the raw memory address of JavaScript-managed byte storage.</p>\n<p>This is unsafe and dangerous. The returned pointer can become invalid if the\nunderlying memory is detached, resized, transferred, or otherwise invalidated.\nUsing stale pointers can cause memory corruption or process crashes.</p>"
+        },
+        {
+          "textRaw": "`ffi.getCurrentEventLoop()`",
+          "name": "getCurrentEventLoop",
+          "type": "method",
+          "meta": {
+            "added": [
+              "v26.6.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [],
+              "return": {
+                "textRaw": "Returns: {bigint}",
+                "name": "return",
+                "type": "bigint"
+              }
+            }
+          ],
+          "desc": "<p>Returns the address of the current thread's <code>uv_loop_t</code> as a <code>bigint</code>.</p>\n<p>The returned address is for the current Node.js environment. In the main thread,\nthis is the main thread event loop. In a worker thread, this is that worker's\nevent loop.</p>\n<p>This is unsafe and dangerous. The returned pointer is only valid for the lifetime\nof the current environment. Using it after the environment exits, or from native\ncode that assumes a different thread or lifetime, can crash the process or\ncorrupt memory.</p>"
+        }
+      ],
+      "classes": [
+        {
+          "textRaw": "Class: `DynamicLibrary`",
+          "name": "DynamicLibrary",
+          "type": "class",
+          "meta": {
+            "added": [
+              "v26.1.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>Represents a loaded dynamic library.</p>",
+          "signatures": [
+            {
+              "textRaw": "`new DynamicLibrary(path)`",
+              "name": "DynamicLibrary",
+              "type": "ctor",
+              "meta": {
+                "changes": [
+                  {
+                    "version": "v26.10.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/65909",
+                    "description": "Library paths inside a mounted virtual file system are now supported."
+                  }
+                ]
+              },
+              "params": [
+                {
+                  "textRaw": "`path` {string|null} Path to a dynamic library, or `null` to resolve symbols from the current process image.",
+                  "name": "path",
+                  "type": "string|null",
+                  "desc": "Path to a dynamic library, or `null` to resolve symbols from the current process image."
+                }
+              ],
+              "desc": "<p>Loads the dynamic library without resolving any functions eagerly.</p>\n<p>On Windows passing <code>null</code> is not supported.</p>\n<p>A <code>path</code> inside a mounted <a href=\"vfs.html\">virtual file system</a> loads the same way as\nwith <a href=\"#ffidlopenpath-definitions\"><code>ffi.dlopen()</code></a>.</p>\n<pre><code class=\"language-cjs\">const { DynamicLibrary, suffix } = require('node:ffi');\n\nconst lib = new DynamicLibrary(`./mylib.${suffix}`);\n</code></pre>"
+            }
+          ],
+          "properties": [
+            {
+              "textRaw": "{string}",
+              "name": "path",
+              "type": "string",
+              "desc": "<p>The path used to load the library.</p>"
+            },
+            {
+              "textRaw": "{Object}",
+              "name": "functions",
+              "type": "Object",
+              "desc": "<p>An object containing previously resolved function wrappers.</p>"
+            },
+            {
+              "textRaw": "{Object}",
+              "name": "symbols",
+              "type": "Object",
+              "desc": "<p>An object containing previously resolved symbol addresses as <code>bigint</code> values.</p>"
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`library.close()`",
+              "name": "close",
+              "type": "method",
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>Closes the library handle.</p>\n<p><code>DynamicLibrary</code> implements the explicit resource management protocol, so a\nlibrary instance can be managed with the <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/using\"><code>using</code></a> declaration. Leaving the\nenclosing scope invokes <code>library.close()</code> automatically.</p>\n<pre><code class=\"language-mjs\">import { DynamicLibrary, suffix } from 'node:ffi';\n\n{\n  using lib = new DynamicLibrary(`./mylib.${suffix}`);\n  // Use `lib` here; `lib.close()` is called when the block exits.\n}\n</code></pre>\n<p>Calling <code>library.close()</code> (or disposing the library) more than once is a no-op.</p>\n<p>After a library has been closed:</p>\n<ul>\n<li>Resolved function wrappers become invalid.</li>\n<li>Further symbol and function resolution throws.</li>\n<li>Registered callbacks are invalidated.</li>\n</ul>\n<p>Closing a library does not make previously exported callback pointers safe to\nreuse. Node.js does not track or revoke callback pointers that have already\nbeen handed to native code.</p>\n<p>If native code still holds a callback pointer after <code>library.close()</code> or after\n<code>library.unregisterCallback(pointer)</code>, invoking that pointer has undefined\nbehavior, is not allowed, and is dangerous: it can crash the process, produce\nincorrect output, or corrupt memory. Native code must stop using callback\naddresses before the library is closed or before the callback is unregistered.</p>\n<p>Calling <code>library.close()</code> from one of the library's active callbacks is\nunsupported and dangerous. The callback must return before the library is\nclosed.</p>"
+            },
+            {
+              "textRaw": "`library[Symbol.dispose]()`",
+              "name": "[Symbol.dispose]",
+              "type": "method",
+              "meta": {
+                "added": [
+                  "v26.1.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>Calls <code>library.close()</code>. This allows <code>DynamicLibrary</code> instances to be used with\nthe <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/using\"><code>using</code></a> declaration for automatic cleanup when the enclosing scope\nexits. It is a no-op on a library that has already been closed.</p>"
+            },
+            {
+              "textRaw": "`library.getFunction(name, signature)`",
+              "name": "getFunction",
+              "type": "method",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`name` {string}",
+                      "name": "name",
+                      "type": "string"
+                    },
+                    {
+                      "textRaw": "`signature` {Object}",
+                      "name": "signature",
+                      "type": "Object"
+                    }
+                  ],
+                  "return": {
+                    "textRaw": "Returns: {Function}",
+                    "name": "return",
+                    "type": "Function"
+                  }
+                }
+              ],
+              "desc": "<p>Resolves a symbol and returns a callable JavaScript wrapper.</p>\n<p>The returned function has a <code>.pointer</code> property containing the native function\naddress as a <code>bigint</code>.</p>\n<p>If the same symbol has already been resolved, requesting it again with a\ndifferent signature throws. Requesting it again with the same signature returns\nthe same function, as does reading it from <a href=\"#libraryfunctions\"><code>library.functions</code></a>.</p>\n<pre><code class=\"language-cjs\">const { DynamicLibrary, suffix } = require('node:ffi');\n\nconst lib = new DynamicLibrary(`./mylib.${suffix}`);\nconst add = lib.getFunction('add_i32', {\n  arguments: ['int32', 'int32'],\n  return: 'int32',\n});\n\nconsole.log(add(20, 22));\nconsole.log(add.pointer);\n</code></pre>"
+            },
+            {
+              "textRaw": "`library.getFunctions([definitions])`",
+              "name": "getFunctions",
+              "type": "method",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`definitions` {Object}",
+                      "name": "definitions",
+                      "type": "Object",
+                      "optional": true
+                    }
+                  ],
+                  "return": {
+                    "textRaw": "Returns: {Object}",
+                    "name": "return",
+                    "type": "Object"
+                  }
+                }
+              ],
+              "desc": "<p>When <code>definitions</code> is provided, resolves each named symbol and returns an\nobject containing callable wrappers.</p>\n<p>When <code>definitions</code> is omitted, returns wrappers for all functions that have\nalready been resolved on the library.</p>"
+            },
+            {
+              "textRaw": "`library.getSymbol(name)`",
+              "name": "getSymbol",
+              "type": "method",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`name` {string}",
+                      "name": "name",
+                      "type": "string"
+                    }
+                  ],
+                  "return": {
+                    "textRaw": "Returns: {bigint}",
+                    "name": "return",
+                    "type": "bigint"
+                  }
+                }
+              ],
+              "desc": "<p>Resolves a symbol and returns its native address as a <code>bigint</code>.</p>"
+            },
+            {
+              "textRaw": "`library.getSymbols()`",
+              "name": "getSymbols",
+              "type": "method",
+              "signatures": [
+                {
+                  "params": [],
+                  "return": {
+                    "textRaw": "Returns: {Object}",
+                    "name": "return",
+                    "type": "Object"
+                  }
+                }
+              ],
+              "desc": "<p>Returns an object containing all previously resolved symbol addresses.</p>"
+            },
+            {
+              "textRaw": "`library.registerCallback([signature,] callback)`",
+              "name": "registerCallback",
+              "type": "method",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`signature` {Object}",
+                      "name": "signature",
+                      "type": "Object",
+                      "optional": true
+                    },
+                    {
+                      "name": " callback"
+                    }
+                  ],
+                  "return": {
+                    "textRaw": "Returns: {bigint}",
+                    "name": "return",
+                    "type": "bigint"
+                  }
+                }
+              ],
+              "desc": "<p>Creates a native callback pointer backed by a JavaScript function.</p>\n<p>If libffi cannot allocate a closure and executable memory is unavailable, this\nmethod throws <a href=\"errors.html#err_rx_memory_not_supported\"><code>ERR_RX_MEMORY_NOT_SUPPORTED</code></a>.\nOther closure allocation failures throw <code>ERR_FFI_CALL_FAILED</code>. Platform-specific\nlibffi implementations may provide callbacks without dynamically generated code.</p>\n<p>When <code>signature</code> is omitted, the callback uses a default <code>void ()</code> signature.</p>\n<p>The return value is the callback pointer address as a <code>bigint</code>. It can be\npassed to native functions expecting a callback pointer.</p>\n<pre><code class=\"language-cjs\">const { DynamicLibrary, suffix } = require('node:ffi');\n\nconst lib = new DynamicLibrary(`./mylib.${suffix}`);\n\nconst callback = lib.registerCallback(\n  { arguments: ['int32'], return: 'int32' },\n  (value) => value * 2,\n);\n</code></pre>\n<p>Callbacks are subject to the following restrictions:</p>\n<ul>\n<li>They must be invoked on the same system thread where they were created.</li>\n<li>They must not throw exceptions.</li>\n<li>They must not return promises.</li>\n<li>They must return a value compatible with the declared return type.</li>\n<li>They must not call <code>library.close()</code> on their owning library while running.</li>\n<li>They must not unregister themselves while running.</li>\n</ul>\n<p>Closing the owning library or unregistering the currently executing callback\nfrom inside the callback is unsupported and dangerous. Doing so may crash the\nprocess, produce incorrect output, or corrupt memory.</p>\n<p>If the thread running a callback is stopped while the callback executes, for\nexample by <code>worker.terminate()</code>, by <code>process.exit()</code> in a Worker, or by the\nmain thread exiting, only that thread stops. The callback returns to native\ncode without a value: non-void return values are zero-initialized, so native\ncode receives <code>0</code>, <code>false</code>, or a null pointer. Native code that does not\nhandle such a value, for example by dereferencing a returned null pointer, can\ncrash the process.</p>"
+            },
+            {
+              "textRaw": "`library.unregisterCallback(pointer)`",
+              "name": "unregisterCallback",
+              "type": "method",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`pointer` {bigint}",
+                      "name": "pointer",
+                      "type": "bigint"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>Releases a callback previously created with <code>library.registerCallback()</code>.</p>\n<p>Calling <code>library.unregisterCallback(pointer)</code> for a callback that is currently\nexecuting is unsupported and dangerous. The callback must return before it is\nunregistered.</p>\n<p>After <code>library.unregisterCallback(pointer)</code> returns, invoking that callback\npointer from native code has undefined behavior, is not allowed, and is\ndangerous: it can crash the process, produce incorrect output, or corrupt\nmemory.</p>"
+            },
+            {
+              "textRaw": "`library.refCallback(pointer)`",
+              "name": "refCallback",
+              "type": "method",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`pointer` {bigint}",
+                      "name": "pointer",
+                      "type": "bigint"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>Keeps the callback strongly referenced by JavaScript.</p>\n<p>Throws <code>ERR_INVALID_ARG_VALUE</code> if the callback function has already been\ngarbage collected after a previous <code>library.unrefCallback(pointer)</code> call, since\na collected function cannot be referenced again.</p>"
+            },
+            {
+              "textRaw": "`library.unrefCallback(pointer)`",
+              "name": "unrefCallback",
+              "type": "method",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`pointer` {bigint}",
+                      "name": "pointer",
+                      "type": "bigint"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>Allows the callback to become weakly referenced by JavaScript.</p>\n<p>If the callback function is later garbage collected, subsequent native\ninvocations become a no-op. Non-void return values are zero-initialized before\nreturning to native code.</p>\n<p>Throws <code>ERR_INVALID_ARG_VALUE</code> if the callback function has already been\ngarbage collected.</p>"
+            }
+          ]
+        }
+      ],
+      "displayName": "FFI"
+    }
+  ]
+}

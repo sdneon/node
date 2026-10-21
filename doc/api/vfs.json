@@ -1,0 +1,565 @@
+{
+  "type": "module",
+  "source": "doc/api/vfs.md",
+  "modules": [
+    {
+      "textRaw": "Virtual File System",
+      "name": "virtual_file_system",
+      "introduced_in": "v26.4.0",
+      "type": "module",
+      "meta": {
+        "added": [
+          "v26.4.0"
+        ],
+        "changes": []
+      },
+      "stability": 1,
+      "stabilityText": "Experimental",
+      "desc": "<p>The <code>node:vfs</code> module provides a virtual file system with a <code>node:fs</code>-like API.\nIt is useful for tests, fixtures, embedded assets, and other scenarios where you\nneed a self-contained file system without touching the actual file-system.</p>\n<p>To access it:</p>\n<pre><code class=\"language-mjs\">import vfs from 'node:vfs';\n</code></pre>\n<pre><code class=\"language-cjs\">const vfs = require('node:vfs');\n</code></pre>\n<p>This module is only available under the <code>node:</code> scheme, and only when Node.js\nis started with the <code>--experimental-vfs</code> flag.</p>",
+      "modules": [
+        {
+          "textRaw": "Security",
+          "name": "security",
+          "type": "module",
+          "desc": "<p>The VFS API is not a sandbox, permission system, or access-control mechanism.\nIt does not isolate untrusted code from the host file system or from other\nNode.js capabilities. Code that can access a <a href=\"#class-virtualfilesystem\"><code>VirtualFileSystem</code></a> instance,\nmount it, select its provider, or pass paths to it is trusted application code.</p>\n<p>Mounting a VFS only redirects supported <a href=\"fs.html\"><code>node:fs</code></a> calls whose resolved paths\nare under the mount point. It does not prevent code from using other paths or\nother Node.js APIs to access resources available to the process.\n<a href=\"#class-realfsprovider\"><code>RealFSProvider</code></a> maps VFS paths under its configured root and rejects paths\nthat resolve outside that root, but that check is not a security boundary.\n<a href=\"#class-zipprovider\"><code>ZipProvider</code></a> has no real file-system paths of its own to escape; its\nentries only ever exist within the archive's own namespace. Do not rely on VFS\nto run untrusted code; use operating-system-level isolation, such as separate\nusers, containers, or platform sandboxes, when a security boundary is\nrequired.</p>",
+          "displayName": "Security"
+        },
+        {
+          "textRaw": "Basic usage",
+          "name": "basic_usage",
+          "type": "module",
+          "desc": "<pre><code class=\"language-cjs\">const vfs = require('node:vfs');\n\nconst myVfs = vfs.create();\nmyVfs.mkdirSync('/dir', { recursive: true });\nmyVfs.writeFileSync('/dir/hello.txt', 'Hello, VFS!');\n\nconsole.log(myVfs.readFileSync('/dir/hello.txt', 'utf8')); // 'Hello, VFS!'\n</code></pre>\n<p><code>vfs.create()</code> returns a <a href=\"#class-virtualfilesystem\"><code>VirtualFileSystem</code></a> instance backed by a\n<a href=\"#class-memoryprovider\"><code>MemoryProvider</code></a> by default. The instance exposes synchronous,\ncallback-based, and promise-based file system methods that mirror the\nshape of the <a href=\"fs.html\"><code>node:fs</code></a> API. All paths are POSIX-style and absolute\n(starting with <code>/</code>).</p>\n<p>By default, the file tree is private to the VFS instance. To expose\nit through the global <code>node:fs</code> module, <code>require()</code>, and <code>import</code>,\ncall <a href=\"#vfsmount\"><code>vfs.mount()</code></a>; call <a href=\"#vfsunmount\"><code>vfs.unmount()</code></a> (or rely on a\n<code>using</code> declaration) to detach again.</p>",
+          "displayName": "Basic usage"
+        },
+        {
+          "textRaw": "The reserved root directory",
+          "name": "the_reserved_root_directory",
+          "type": "module",
+          "desc": "<p>While any virtual file system is mounted, the directory that holds the mount\npoints can be read through <a href=\"fs.html\"><code>node:fs</code></a>. <a href=\"#vfsvfsbase\"><code>vfs.vfsBase()</code></a> returns its path,\n<code>path.join(os.devNull, 'vfs')</code>. It contains a directory for every mounted file\nsystem, named like the last segment of its <a href=\"#vfsmountpoint\"><code>vfs.mountPoint</code></a>.</p>\n<pre><code class=\"language-cjs\">const vfs = require('node:vfs');\nconst fs = require('node:fs');\nconst path = require('node:path');\n\nconst root = vfs.vfsBase();\nconst assets = vfs.create();\nassets.writeFileSync('/logo.svg', '&#x3C;svg/>');\nconst mountPoint = assets.mount();\n\nconst name = path.basename(mountPoint);\nfs.readdirSync(root); // [ name ]\nfs.readdirSync(root, { recursive: true }); // [ name, `${name}/logo.svg` ]\n</code></pre>\n<p>The root directory itself is read-only. Creating, removing, or changing its\nentries fails with <code>EROFS</code>, while the file systems its entries lead to can be\nwritten to as usual. When nothing is mounted, the root directory does not exist.</p>",
+          "displayName": "The reserved root directory"
+        },
+        {
+          "textRaw": "Module loader integration",
+          "name": "module_loader_integration",
+          "type": "module",
+          "desc": "<p>Once a <code>VirtualFileSystem</code> is mounted, paths under the mount point\nparticipate in module resolution and loading. The <a href=\"modules.html#all-together\">CommonJS\nresolution algorithm</a> used by <a href=\"modules.html#requireid\"><code>require()</code></a> and\n<a href=\"modules.html#requireresolverequest-options\"><code>require.resolve()</code></a> and the <a href=\"esm.html#resolution-algorithm\">ES modules resolution algorithm</a>\nused by <code>import</code> and <a href=\"esm.html#importmetaresolvespecifier\"><code>import.meta.resolve()</code></a> are unchanged;\ninstead, every file system operation those algorithms perform is\ndispatched on the path being probed: paths under a mount point are\nserved by the owning VFS, and all other paths are served by the real\nfile system. Files served from the VFS therefore behave as\nfirst-class modules.</p>\n<p>Because mounted paths live in a reserved namespace that cannot exist\non disk, any given path is served either by exactly one VFS or by\nthe real file system, never both. There is no search order or\nfallback between the two: if a path under a mount point does not\nexist in the VFS, resolution fails with <code>ENOENT</code> without consulting\nthe disk, and a mounted layer never shadows a real directory.</p>\n<p>For resolution purposes the mount point behaves as a file system\nroot: <code>package.json</code> scope lookups and <a href=\"modules.html#loading-from-node_modules-folders\">loading from <code>node_modules</code>\nfolders</a> stop at the mount point. For example, when\n<code>${mountPoint}/foo/bar/main.cjs</code> calls <code>require('baz')</code>, the lookup\ngoes through:</p>\n<ul>\n<li><code>${mountPoint}/foo/bar/node_modules/baz</code></li>\n<li><code>${mountPoint}/foo/node_modules/baz</code></li>\n<li><code>${mountPoint}/node_modules/baz</code></li>\n<li>If <code>$NODE_PATH</code> is set, the folders listed in <code>$NODE_PATH</code></li>\n<li><code>$HOME/.node_modules/baz</code></li>\n<li><code>$HOME/.node_libraries/baz</code></li>\n<li><code>$PREFIX/lib/node/baz</code></li>\n</ul>\n<p>The last four entries are <a href=\"modules.html#loading-from-the-global-folders\">the global folders</a>, which are legacy\nCommonJS behavior and do not apply to <code>import</code>. Absolute specifiers\nmay cross the boundary in either direction: a module on the real\nfile system can <code>require()</code> a mounted path, and a virtual module can\n<code>require()</code> a real one.</p>\n<pre><code class=\"language-cjs\">const vfs = require('node:vfs');\n\nconst myVfs = vfs.create();\nmyVfs.mkdirSync('/lib');\nmyVfs.writeFileSync('/lib/greet.js', 'module.exports = () => \"hi\";');\nmyVfs.writeFileSync(\n  '/lib/package.json', '{\"main\": \"./greet.js\"}');\nconst mountPoint = myVfs.mount();\n\nconst greet = require(`${mountPoint}/lib`);\nconsole.log(greet()); // 'hi'\n\nmyVfs.unmount();\n</code></pre>\n<p>For ECMAScript modules, use <code>file:</code> URLs when passing mounted paths\nto dynamic <code>import()</code>. <a href=\"#vfsmountpointurl\"><code>vfs.mountPointURL</code></a> provides the mount\npoint in that form; this keeps VFS imports portable on Windows,\nwhere mounted paths use Windows path syntax.</p>\n<pre><code class=\"language-mjs\">import vfs from 'node:vfs';\n\nconst myVfs = vfs.create();\nmyVfs.writeFileSync('/mod.mjs', 'export const value = 42;');\nmyVfs.mount();\n\nconst { value } = await import(`${myVfs.mountPointURL}/mod.mjs`);\nconsole.log(value); // 42\n\nmyVfs.unmount();\n</code></pre>\n<p>CommonJS modules loaded from a mounted VFS are identified by their VFS paths\nthat start with the mount point. This is reflected in, for example, <code>__filename</code> and\n<code>__dirname</code> in the module, or the errors stack traces involving functions from\nthe VFS modules. ES modules in the VFS are similarly identified by the <code>file:</code> URL of\ntheir VFS paths and this is reflected in e.g. <code>import.meta.url</code>.</p>\n<p>Like modules loaded from the real file system, modules loaded from the VFS are\ncached on the first load. When <code>require()</code> or <code>import()</code> is used to load an absolute\npath or URL that falls under the mounted VFS multiple times, the module is only loaded\nonce and subsequent calls return the same instance.</p>\n<p>Calling <a href=\"#vfsunmount\"><code>vfs.unmount()</code></a> invalidates the modules that were loaded\nfrom the mount point: a subsequent <code>require()</code> or <code>import</code> of a path\nunder a re-created mount re-reads the file from the newly mounted\nVFS rather than returning a stale module. Modules loaded from other\nVFS instances or from the real file system are unaffected.</p>\n<p>Mounting and unmounting do not stop any module execution that is\nalready started, or invalidate any objects materialized from VFS\nmodules that are already executed. As with modules in the real file\nsystem, the callers are responsible for avoiding removal or\ninvalidation of modules in the virtual file system while they are\nbeing loaded.</p>\n<p>Native addons (<code>.node</code> files) stored in a mounted VFS can be <code>require()</code>d as\nwell. The operating system's dynamic loader cannot open a virtual path, so the\naddon's bytes are read from the VFS and loaded from a private, self-cleaning\ntemporary image instead. Addons on the real file system are unaffected and\nload directly.</p>\n<p>Shared libraries opened through <a href=\"ffi.html#ffidlopenpath-definitions\"><code>ffi.dlopen()</code></a> (or\n<a href=\"ffi.html#new-dynamiclibrarypath\"><code>new ffi.DynamicLibrary()</code></a>) work the same way: a library path inside a\nmounted VFS is detected, its bytes are read from the VFS, and the library is\nloaded from a private, self-cleaning image while <code>library.path</code> keeps\nreporting the virtual path. Libraries on the real file system load directly.</p>",
+          "displayName": "Module loader integration"
+        },
+        {
+          "textRaw": "Use with Single Executable Applications",
+          "name": "use_with_single_executable_applications",
+          "type": "module",
+          "desc": "<p>When running as a <a href=\"single-executable-applications.html\">Single Executable Application</a> built with\n<code>\"useVfs\": true</code> in the SEA configuration, the bundled assets are\nautomatically mounted as a read-only virtual file system and the injected\nmain script is executed from the root of the mount. No additional setup is\nrequired. Since the mount point is reserved and chosen at runtime, bundled\ncode accesses the assets through <code>__dirname</code>-relative paths and relative\n<code>require()</code> calls rather than through a fixed path:</p>\n<pre><code class=\"language-cjs\">// In the SEA main script, __dirname is the root of the mounted assets.\nconst fs = require('node:fs');\nconst path = require('node:path');\n\nconst config = JSON.parse(\n  fs.readFileSync(path.join(__dirname, 'config.json'), 'utf8'));\nconst template = fs.readFileSync(\n  path.join(__dirname, 'templates/index.html'), 'utf8');\n</code></pre>\n<p>ESM entry points (<code>\"mainFormat\": \"module\"</code>) are supported: the main module\nis loaded from inside the mount through the ESM loader, and\n<code>import.meta.dirname</code> points at the mount root.</p>\n<p><code>\"useVfs\"</code> cannot be used together with <code>\"useSnapshot\"</code> or <code>\"useCodeCache\"</code>.\nThe SEA configuration parser will error if either combination is detected.</p>\n<p>Instead of listing individual <code>\"assets\"</code>, the SEA configuration can point\n<code>\"vfsArchive\"</code> at a prebuilt ZIP archive; the mount is then backed by a\n<a href=\"#class-zipprovider\"><code>ZipProvider</code></a> over the embedded archive, and each file is inflated when\nit is read. See <a href=\"single-executable-applications.html#serving-the-assets-from-a-zip-archive-with-vfsarchive\">Serving the assets from a ZIP archive</a> for details.</p>\n<p>See the <a href=\"single-executable-applications.html\">Single Executable Application</a> documentation for more information\non creating SEA builds with assets.</p>",
+          "displayName": "Use with Single Executable Applications"
+        },
+        {
+          "textRaw": "Implementation details",
+          "name": "implementation_details",
+          "type": "module",
+          "modules": [
+            {
+              "textRaw": "`Stats` objects",
+              "name": "`stats`_objects",
+              "type": "module",
+              "desc": "<p>VFS <code>Stats</code> objects are real instances of <a href=\"fs.html#class-fsstats\"><code>fs.Stats</code></a> (or\n<a href=\"fs.html#class-fsstats\"><code>fs.BigIntStats</code></a> when <code>{ bigint: true }</code> is requested). Their\nfields use synthetic but stable values:</p>\n<ul>\n<li><code>dev</code> is <code>4085</code> (the VFS device id).</li>\n<li><code>ino</code> is monotonically increasing per process.</li>\n<li><code>blksize</code> is <code>4096</code>.</li>\n<li><code>blocks</code> is <code>Math.ceil(size / 512)</code>.</li>\n<li>Times default to the moment the entry was created/last modified.</li>\n</ul>",
+              "displayName": "`Stats` objects"
+            }
+          ],
+          "displayName": "Implementation details"
+        }
+      ],
+      "methods": [
+        {
+          "textRaw": "`vfs.create([provider][, options])`",
+          "name": "create",
+          "type": "method",
+          "meta": {
+            "added": [
+              "v26.4.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`provider` {VirtualProvider} The provider to use. **Default:** `new MemoryProvider()`.",
+                  "name": "provider",
+                  "type": "VirtualProvider",
+                  "default": "`new MemoryProvider()`",
+                  "desc": "The provider to use.",
+                  "optional": true
+                },
+                {
+                  "textRaw": "`options` {Object}",
+                  "name": "options",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`emitExperimentalWarning` {boolean} Whether to emit the experimental warning when the instance is created. **Default:** `true`.",
+                      "name": "emitExperimentalWarning",
+                      "type": "boolean",
+                      "default": "`true`",
+                      "desc": "Whether to emit the experimental warning when the instance is created."
+                    }
+                  ],
+                  "optional": true
+                }
+              ],
+              "return": {
+                "textRaw": "Returns: {VirtualFileSystem}",
+                "name": "return",
+                "type": "VirtualFileSystem"
+              }
+            }
+          ],
+          "desc": "<p>Convenience factory equivalent to <code>new VirtualFileSystem(provider, options)</code>.</p>\n<pre><code class=\"language-cjs\">const vfs = require('node:vfs');\n\n// Default in-memory provider\nconst memoryVfs = vfs.create();\n\n// Explicit provider\nconst realVfs = vfs.create(new vfs.RealFSProvider('/tmp/vfs-root'));\n</code></pre>"
+        },
+        {
+          "textRaw": "`vfs.registerProvider(entry)`",
+          "name": "registerProvider",
+          "type": "method",
+          "meta": {
+            "added": [
+              "v26.10.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`entry` {Object}",
+                  "name": "entry",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`name` {string} A short identifier, used in diagnostics.",
+                      "name": "name",
+                      "type": "string",
+                      "desc": "A short identifier, used in diagnostics."
+                    },
+                    {
+                      "textRaw": "`canHandle` {Function} Called with the resolved path and its `fs.Stats`. Returns `true` if this provider should back the source.",
+                      "name": "canHandle",
+                      "type": "Function",
+                      "desc": "Called with the resolved path and its `fs.Stats`. Returns `true` if this provider should back the source."
+                    },
+                    {
+                      "textRaw": "`create` {Function} Called with the resolved path and its `fs.Stats`. Returns the {VirtualProvider} backing the source.",
+                      "name": "create",
+                      "type": "Function",
+                      "desc": "Called with the resolved path and its `fs.Stats`. Returns the {VirtualProvider} backing the source."
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "desc": "<p>Registers a provider that <a href=\"cli.html#--vfs-loadsource\"><code>--vfs-load</code></a> can select for a source it\nrecognizes, so a file format Node.js has no built-in provider for can still be\nmounted.</p>\n<p>A source is claimed by the first provider whose <code>canHandle()</code> returns <code>true</code>.\nRegistered providers are consulted before the built-in ones, newest\nregistration first, and are offered directories as well as files, so a\nregistered provider can back, wrap, or vet any source. If none claims the\nsource, the built-in providers handle it: a directory with\n<a href=\"#class-realfsprovider\"><code>RealFSProvider</code></a>, and a file whose bytes are a ZIP archive with\n<a href=\"#class-zipprovider\"><code>ZipProvider</code></a>.</p>\n<p>Providers must be registered before the source is mounted. Register from a\nmodule preloaded with <a href=\"cli.html#-r---require-module\"><code>--require</code></a> or <a href=\"cli.html#--importmodule\"><code>--import</code></a>:</p>\n<pre><code class=\"language-cjs\">// provider.js, preloaded with --require\nconst fs = require('node:fs');\nconst vfs = require('node:vfs');\n\nconst MAGIC = Buffer.from('CUSTOMFMT');\n\nvfs.registerProvider({\n  name: 'customfmt',\n  canHandle(path, stats) {\n    if (!stats.isFile()) return false;\n    const head = Buffer.alloc(MAGIC.length);\n    const fd = fs.openSync(path, 'r');\n    try {\n      fs.readSync(fd, head, 0, MAGIC.length, 0);\n    } finally {\n      fs.closeSync(fd);\n    }\n    return head.equals(MAGIC);\n  },\n  create(path) {\n    return new MyCustomProvider(path);\n  },\n});\n</code></pre>\n<pre><code class=\"language-console\">$ node --experimental-vfs --require ./provider.js \\\n       --vfs-load archive.customfmt\n</code></pre>"
+        },
+        {
+          "textRaw": "`vfs.vfsBase()`",
+          "name": "vfsBase",
+          "type": "method",
+          "meta": {
+            "added": [
+              "v26.11.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [],
+              "return": {
+                "textRaw": "Returns: {string} The absolute path of the reserved root directory.",
+                "name": "return",
+                "type": "string",
+                "desc": "The absolute path of the reserved root directory."
+              }
+            }
+          ],
+          "desc": "<p>Returns the directory that holds the mount points of every mounted virtual file\nsystem, which is <code>path.join(os.devNull, 'vfs')</code>. Reading it lists what is\nmounted; see <a href=\"#the-reserved-root-directory\">The reserved root directory</a>.</p>\n<pre><code class=\"language-cjs\">const vfs = require('node:vfs');\nconst fs = require('node:fs');\n\nconst myVfs = vfs.create();\nconst mountPoint = myVfs.mount();\n\nfs.readdirSync(vfs.vfsBase()); // The name of every mount point in it\nmountPoint.startsWith(vfs.vfsBase()); // true\n</code></pre>"
+        }
+      ],
+      "classes": [
+        {
+          "textRaw": "Class: `VirtualFileSystem`",
+          "name": "VirtualFileSystem",
+          "type": "class",
+          "meta": {
+            "added": [
+              "v26.4.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>A <code>VirtualFileSystem</code> wraps a <a href=\"#class-virtualprovider\"><code>VirtualProvider</code></a> and exposes a\n<code>node:fs</code>-like API. Each instance maintains its own file tree.</p>",
+          "signatures": [
+            {
+              "textRaw": "`new VirtualFileSystem([provider][, options])`",
+              "name": "VirtualFileSystem",
+              "type": "ctor",
+              "meta": {
+                "added": [
+                  "v26.4.0"
+                ],
+                "changes": []
+              },
+              "params": [
+                {
+                  "textRaw": "`provider` {VirtualProvider} The provider to use. **Default:** `new MemoryProvider()`.",
+                  "name": "provider",
+                  "type": "VirtualProvider",
+                  "default": "`new MemoryProvider()`",
+                  "desc": "The provider to use.",
+                  "optional": true
+                },
+                {
+                  "textRaw": "`options` {Object}",
+                  "name": "options",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`emitExperimentalWarning` {boolean} Whether to emit the experimental warning. **Default:** `true`.",
+                      "name": "emitExperimentalWarning",
+                      "type": "boolean",
+                      "default": "`true`",
+                      "desc": "Whether to emit the experimental warning."
+                    }
+                  ],
+                  "optional": true
+                }
+              ]
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`vfs.mount()`",
+              "name": "mount",
+              "type": "method",
+              "meta": {
+                "added": [
+                  "v26.9.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [],
+                  "return": {
+                    "textRaw": "Returns: {string} The absolute mount point.",
+                    "name": "return",
+                    "type": "string",
+                    "desc": "The absolute mount point."
+                  }
+                }
+              ],
+              "desc": "<p>Mounts the virtual file system and returns the resulting mount point.\nAfter mounting, files in the VFS can be accessed through the\n<code>node:fs</code> module and resolved through <code>require()</code> and <code>import</code>\nusing paths under the returned mount point.</p>\n<p>Mount points always live inside a reserved namespace that cannot have child file system entries,\nso virtual paths never conflate with (or shadow) real paths. A mount point is obtained from what\n<code>vfs.mount()</code> returns or from <a href=\"#vfsmountpoint\"><code>vfs.mountPoint</code></a>, and the mount points of all mounted file\nsystems can be listed by reading the <a href=\"#the-reserved-root-directory\">reserved root directory</a>, whose path <a href=\"#vfsvfsbase\"><code>vfs.vfsBase()</code></a>\nreturns. The name of a mount point within that directory is assigned at runtime, so it is not\nsomething to construct or hard-code.</p>\n<pre><code class=\"language-cjs\">const vfs = require('node:vfs');\nconst fs = require('node:fs');\n\nconst myVfs = vfs.create();\nmyVfs.writeFileSync('/data.txt', 'Hello');\nconst mountPoint = myVfs.mount();\n// e.g. '/dev/null/vfs/0'\n\nfs.readFileSync(`${mountPoint}/data.txt`, 'utf8'); // 'Hello'\n</code></pre>\n<p>Like any mount point, the mount point cannot be removed or renamed, nor\nreplaced by renaming something else onto it: <a href=\"fs.html#fsrmdirpath-options-callback\"><code>fs.rmdir()</code></a> and\n<a href=\"fs.html#fsrenameoldpath-newpath-callback\"><code>fs.rename()</code></a> fail with <code>EBUSY</code>. A recursive <a href=\"fs.html#fsrmpath-options-callback\"><code>fs.rm()</code></a> of the mount\npoint empties the file system before failing the same way.</p>\n<p>Each <code>VirtualFileSystem</code> instance may be mounted at most once at a\ntime. Attempting to mount an already-mounted instance throws\n<code>ERR_INVALID_STATE</code>. Because each instance mounts inside its own\nper-layer namespace, mounts from different instances can never\noverlap.</p>\n<p>The VFS supports the <a href=\"https://github.com/tc39/proposal-explicit-resource-management\">Explicit Resource Management</a> proposal. Use\na <code>using</code> declaration to unmount automatically when leaving scope:</p>\n<pre><code class=\"language-cjs\">const vfs = require('node:vfs');\nconst fs = require('node:fs');\n\nlet mountPoint;\n{\n  using myVfs = vfs.create();\n  myVfs.writeFileSync('/data.txt', 'Hello');\n  mountPoint = myVfs.mount();\n\n  fs.readFileSync(`${mountPoint}/data.txt`, 'utf8'); // 'Hello'\n} // VFS is automatically unmounted here\n\nfs.existsSync(`${mountPoint}/data.txt`); // false\n</code></pre>"
+            },
+            {
+              "textRaw": "`vfs.unmount()`",
+              "name": "unmount",
+              "type": "method",
+              "meta": {
+                "added": [
+                  "v26.9.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>Unmounts the virtual file system. After unmounting, virtual files\nare no longer reachable through <code>node:fs</code>, <code>require()</code>, or <code>import</code>.\nThe same instance may be mounted again by calling <code>mount()</code>.</p>\n<p>This method is idempotent: calling <code>unmount()</code> on a VFS that is not\ncurrently mounted has no effect.</p>"
+            }
+          ],
+          "properties": [
+            {
+              "textRaw": "{boolean}",
+              "name": "mounted",
+              "type": "boolean",
+              "meta": {
+                "added": [
+                  "v26.9.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p><code>true</code> while the VFS is mounted; <code>false</code> otherwise.</p>"
+            },
+            {
+              "textRaw": "{string|null}",
+              "name": "mountPoint",
+              "type": "string|null",
+              "meta": {
+                "added": [
+                  "v26.9.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>The current mount point as an absolute string (the value returned by\nthe last <a href=\"#vfsmount\"><code>vfs.mount()</code></a> call), or <code>null</code> when the VFS is not\nmounted.</p>"
+            },
+            {
+              "textRaw": "{string|null}",
+              "name": "mountPointURL",
+              "type": "string|null",
+              "meta": {
+                "added": [
+                  "v26.9.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>The current mount point as a <code>file:</code> URL string (the <a href=\"#vfsmountpoint\"><code>vfs.mountPoint</code></a>\npath converted with <a href=\"url.html#urlpathtofileurlpath-options\"><code>url.pathToFileURL()</code></a>), or <code>null</code> when the VFS\nis not mounted.</p>\n<p>This is a convenience for addressing mounted files with URL-based\nAPIs such as dynamic <code>import()</code>:</p>\n<pre><code class=\"language-mjs\">import vfs from 'node:vfs';\n\nconst myVfs = vfs.create();\nmyVfs.writeFileSync('/mod.mjs', 'export const value = 42;');\nmyVfs.mount();\n\nconst { value } = await import(`${myVfs.mountPointURL}/mod.mjs`);\nconsole.log(value); // 42\n\nmyVfs.unmount();\n</code></pre>"
+            },
+            {
+              "textRaw": "{VirtualProvider}",
+              "name": "provider",
+              "type": "VirtualProvider",
+              "meta": {
+                "added": [
+                  "v26.4.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>The provider backing this VFS instance.</p>"
+            },
+            {
+              "textRaw": "{boolean}",
+              "name": "readonly",
+              "type": "boolean",
+              "meta": {
+                "added": [
+                  "v26.4.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p><code>true</code> when the underlying provider is read-only.</p>"
+            }
+          ],
+          "modules": [
+            {
+              "textRaw": "APIs",
+              "name": "apis",
+              "type": "module",
+              "desc": "<p><code>VirtualFileSystem</code> implements the following methods, with the same\nsignatures as their <a href=\"fs.html\"><code>node:fs</code></a> counterparts:</p>",
+              "modules": [
+                {
+                  "textRaw": "Synchronous API",
+                  "name": "synchronous_api",
+                  "type": "module",
+                  "desc": "<ul>\n<li><code>existsSync(path)</code></li>\n<li><code>statSync(path[, options])</code></li>\n<li><code>lstatSync(path[, options])</code></li>\n<li><code>readFileSync(path[, options])</code></li>\n<li><code>writeFileSync(path, data[, options])</code></li>\n<li><code>appendFileSync(path, data[, options])</code></li>\n<li><code>readdirSync(path[, options])</code></li>\n<li><code>mkdirSync(path[, options])</code></li>\n<li><code>rmdirSync(path)</code></li>\n<li><code>unlinkSync(path)</code></li>\n<li><code>renameSync(oldPath, newPath)</code></li>\n<li><code>copyFileSync(src, dest[, mode])</code></li>\n<li><code>realpathSync(path[, options])</code></li>\n<li><code>readlinkSync(path[, options])</code></li>\n<li><code>symlinkSync(target, path[, type])</code></li>\n<li><code>accessSync(path[, mode])</code></li>\n<li><code>rmSync(path[, options])</code></li>\n<li><code>truncateSync(path[, len])</code></li>\n<li><code>ftruncateSync(fd[, len])</code></li>\n<li><code>linkSync(existingPath, newPath)</code></li>\n<li><code>chmodSync(path, mode)</code></li>\n<li><code>chownSync(path, uid, gid)</code></li>\n<li><code>lchownSync(path, uid, gid)</code></li>\n<li><code>utimesSync(path, atime, mtime)</code></li>\n<li><code>lutimesSync(path, atime, mtime)</code></li>\n<li><code>mkdtempSync(prefix)</code></li>\n<li><code>opendirSync(path[, options])</code></li>\n<li><code>openAsBlob(path[, options])</code></li>\n<li>File-descriptor ops: <code>openSync</code>, <code>closeSync</code>, <code>readSync</code>, <code>writeSync</code>,\n<code>fstatSync</code></li>\n<li>Streams: <code>createReadStream</code>, <code>createWriteStream</code></li>\n<li>Watchers: <code>watch</code>, <code>watchFile</code>, <code>unwatchFile</code></li>\n</ul>",
+                  "displayName": "Synchronous API"
+                },
+                {
+                  "textRaw": "Callback API",
+                  "name": "callback_api",
+                  "type": "module",
+                  "desc": "<p><code>readFile</code>, <code>writeFile</code>, <code>stat</code>, <code>lstat</code>, <code>readdir</code>, <code>realpath</code>, <code>readlink</code>,\n<code>access</code>, <code>open</code>, <code>close</code>, <code>read</code>, <code>write</code>, <code>rm</code>, <code>fstat</code>, <code>truncate</code>,\n<code>ftruncate</code>, <code>link</code>, <code>mkdtemp</code>, <code>opendir</code>. Each takes a Node.js-style\ncallback <code>(err, ...result) => {}</code>.</p>",
+                  "displayName": "Callback API"
+                },
+                {
+                  "textRaw": "Promise API",
+                  "name": "promise_api",
+                  "type": "module",
+                  "desc": "<p><code>vfs.promises</code> exposes the promise-based variants:</p>\n<pre><code class=\"language-cjs\">const vfs = require('node:vfs');\n\nasync function example() {\n  const myVfs = vfs.create();\n  await myVfs.promises.writeFile('/file.txt', 'hello');\n  const data = await myVfs.promises.readFile('/file.txt', 'utf8');\n  return data;\n}\nexample();\n</code></pre>\n<p>The promise namespace mirrors <code>fs.promises</code> and includes <code>readFile</code>,\n<code>writeFile</code>, <code>appendFile</code>, <code>stat</code>, <code>lstat</code>, <code>readdir</code>, <code>mkdir</code>, <code>rmdir</code>,\n<code>unlink</code>, <code>rename</code>, <code>copyFile</code>, <code>realpath</code>, <code>readlink</code>, <code>symlink</code>,\n<code>access</code>, <code>rm</code>, <code>truncate</code>, <code>link</code>, <code>mkdtemp</code>, <code>chmod</code>, <code>chown</code>, <code>lchown</code>,\n<code>utimes</code>, <code>lutimes</code>, <code>open</code>, <code>lchmod</code>, and <code>watch</code>.</p>",
+                  "displayName": "Promise API"
+                }
+              ],
+              "displayName": "APIs"
+            }
+          ]
+        },
+        {
+          "textRaw": "Class: `VirtualProvider`",
+          "name": "VirtualProvider",
+          "type": "class",
+          "meta": {
+            "added": [
+              "v26.4.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>The base class for all VFS providers. Subclasses implement the essential\nprimitives (such as <code>open</code>, <code>stat</code>, <code>readdir</code>, <code>mkdir</code>, <code>rmdir</code>, <code>unlink</code>,\n<code>rename</code>, etc.) and inherit default implementations of the derived\nmethods (such as <code>readFile</code>, <code>writeFile</code>, <code>exists</code>, <code>copyFile</code>, <code>access</code>, etc.).</p>",
+          "modules": [
+            {
+              "textRaw": "Capability flags",
+              "name": "capability_flags",
+              "type": "module",
+              "desc": "<ul>\n<li><code>provider.readonly</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#boolean_type\"><code>&#x3C;boolean></code></a> <strong>Default:</strong> <code>false</code>.</li>\n<li><code>provider.supportsSymlinks</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#boolean_type\"><code>&#x3C;boolean></code></a> <strong>Default:</strong> <code>false</code>.</li>\n<li><code>provider.supportsWatch</code> <a href=\"https://developer.mozilla.org/docs/Web/JavaScript/Data_structures#boolean_type\"><code>&#x3C;boolean></code></a> <strong>Default:</strong> <code>false</code>.</li>\n</ul>",
+              "displayName": "Capability flags"
+            },
+            {
+              "textRaw": "Creating custom providers",
+              "name": "creating_custom_providers",
+              "type": "module",
+              "desc": "<pre><code class=\"language-cjs\">const { VirtualProvider } = require('node:vfs');\n\nclass StaticProvider extends VirtualProvider {\n  get readonly() { return true; }\n\n  statSync(path) { /* ... */ }\n  openSync(path, flags) { /* ... */ }\n  readdirSync(path, options) { /* ... */ }\n  // ...\n}\n</code></pre>\n<p>The base class throws <code>ERR_METHOD_NOT_IMPLEMENTED</code> for any primitive\nthat has not been overridden, and rejects writes from a <code>readonly</code>\nprovider with <code>EROFS</code>.</p>",
+              "displayName": "Creating custom providers"
+            }
+          ]
+        },
+        {
+          "textRaw": "Class: `MemoryProvider`",
+          "name": "MemoryProvider",
+          "type": "class",
+          "meta": {
+            "added": [
+              "v26.4.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>The default in-memory provider. Stores files, directories, and symbolic\nlinks in a <code>Map</code>-backed tree, supports symlinks (<code>supportsSymlinks === true</code>), and supports watching (<code>supportsWatch === true</code>).</p>",
+          "methods": [
+            {
+              "textRaw": "`memoryProvider.setReadOnly()`",
+              "name": "setReadOnly",
+              "type": "method",
+              "meta": {
+                "added": [
+                  "v26.4.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>Locks the provider into read-only mode. Subsequent writes through any\n<a href=\"#class-virtualfilesystem\"><code>VirtualFileSystem</code></a> using this provider throw <code>EROFS</code>. There is no\nway to revert the provider to writable.</p>\n<pre><code class=\"language-cjs\">const vfs = require('node:vfs');\n\nconst provider = new vfs.MemoryProvider();\nconst myVfs = vfs.create(provider);\nmyVfs.writeFileSync('/seed.txt', 'initial');\n\nprovider.setReadOnly();\n\nmyVfs.writeFileSync('/x.txt', 'fail'); // throws EROFS\n</code></pre>"
+            }
+          ]
+        },
+        {
+          "textRaw": "Class: `ComposableProvider`",
+          "name": "ComposableProvider",
+          "type": "class",
+          "meta": {
+            "added": [
+              "v26.12.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p><a href=\"#class-composableprovider\"><code>ComposableProvider</code></a> combines one or more providers in priority order. The first\nprovider is the writable layer; reads search from first to last. Directories\nare merged, with entries in higher-priority layers shadowing entries with the\nsame name in lower layers. Writes to a lower file copy it to the first provider\nbefore changing it. Removing a file hides lower copies without deleting them.\nThe first provider must be writable to change the composed file system.</p>",
+          "signatures": [
+            {
+              "textRaw": "`new ComposableProvider(providers)`",
+              "name": "ComposableProvider",
+              "type": "ctor",
+              "meta": {
+                "added": [
+                  "v26.12.0"
+                ],
+                "changes": []
+              },
+              "params": [
+                {
+                  "textRaw": "`providers` {VirtualProvider}[] Non-empty array of providers, ordered from highest to lowest priority.",
+                  "name": "providers",
+                  "type": "VirtualProvider",
+                  "desc": "[] Non-empty array of providers, ordered from highest to lowest priority."
+                }
+              ],
+              "desc": "<pre><code class=\"language-cjs\">const vfs = require('node:vfs');\n\nconst memory = new vfs.MemoryProvider();\nconst disk = new vfs.RealFSProvider('/tmp/vfs-root');\nconst combined = vfs.create(new vfs.ComposableProvider([memory, disk]));\ncombined.writeFileSync('/config.json', '{\"debug\":true}');\n// The file in memory shadows /tmp/vfs-root/config.json.\n</code></pre>"
+            }
+          ],
+          "properties": [
+            {
+              "textRaw": "{VirtualProvider}[]",
+              "name": "providers",
+              "type": "VirtualProvider",
+              "meta": {
+                "added": [
+                  "v26.12.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>A copy of the ordered provider list. Changes to this array do not affect the\ncomposition. File handles opened before a write continue to refer to the layer\non which they were opened. Watching a path watches only its currently selected\nprovider, not changes across the entire composition. Symbolic links are\nresolved by the provider containing them, not across providers. Traversal\nthrough a symbolic-link directory is not supported by the composition. Renaming\na directory over a directory that exists only in a lower layer is not supported.\nLayer selection and copy-up use synchronous provider operations, including\nwhen invoked through the asynchronous VFS API.</p>",
+              "shortDesc": "[]"
+            }
+          ]
+        },
+        {
+          "textRaw": "Class: `RealFSProvider`",
+          "name": "RealFSProvider",
+          "type": "class",
+          "meta": {
+            "added": [
+              "v26.4.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>A provider that wraps a directory (i.e. one on the actual file system) and\nexposes its contents through the VFS API. All VFS paths are resolved relative to\nthe root and verified to stay inside it; symbolic links resolving outside the\nroot are rejected. This path mapping is not a sandbox or access-control\nmechanism.</p>",
+          "signatures": [
+            {
+              "textRaw": "`new RealFSProvider(rootPath)`",
+              "name": "RealFSProvider",
+              "type": "ctor",
+              "meta": {
+                "added": [
+                  "v26.4.0"
+                ],
+                "changes": []
+              },
+              "params": [
+                {
+                  "textRaw": "`rootPath` {string} The absolute file-system path to use as the root. Must be a non-empty string.",
+                  "name": "rootPath",
+                  "type": "string",
+                  "desc": "The absolute file-system path to use as the root. Must be a non-empty string."
+                }
+              ],
+              "desc": "<pre><code class=\"language-cjs\">const vfs = require('node:vfs');\n\nconst realVfs = vfs.create(new vfs.RealFSProvider('/tmp/vfs-root'));\nrealVfs.writeFileSync('/file.txt', 'hello'); // writes /tmp/vfs-root/file.txt\n</code></pre>"
+            }
+          ],
+          "properties": [
+            {
+              "textRaw": "{string}",
+              "name": "rootPath",
+              "type": "string",
+              "meta": {
+                "added": [
+                  "v26.4.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>The resolved absolute path used as the root.</p>"
+            }
+          ]
+        },
+        {
+          "textRaw": "Class: `ZipProvider`",
+          "name": "ZipProvider",
+          "type": "class",
+          "meta": {
+            "added": [
+              "v26.9.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>A provider that exposes the entries of a ZIP archive - either a\n<a href=\"zlib.html#class-zlibzipbuffer\"><code>zlib.ZipBuffer</code></a> (in memory) or a <a href=\"zlib.html#class-zlibzipfile\"><code>zlib.ZipFile</code></a> (on disk) - through\nthe VFS API. <code>provider.readonly</code> reflects the archive's own\n<a href=\"zlib.html#zipfilewritable\"><code>zipFile.writable</code></a> flag: a <code>ZipBuffer</code> is always writable, and a\n<code>ZipFile</code> is writable only when opened with <code>{ writable: true }</code>.</p>\n<p>Directories are recognized both explicitly (an entry whose name ends in <code>/</code>)\nand implicitly (any entry name starting with <code>\"&#x3C;dir>/\"</code>), and are listed by\n<code>readdir()</code>, including with <code>{ recursive: true }</code>, either way. Because a ZIP\nmember cannot be edited or read in place - only fully written or fully\ndecompressed - a file opened for writing only commits its content (as a new\narchive entry) when the handle is closed.</p>\n<p>Every method has a synchronous counterpart (<code>openSync()</code>, <code>statSync()</code>,\n<code>readdirSync()</code>, and so on), backed by the equally complete synchronous\nsurface <a href=\"zlib.html#class-zlibzipbuffer\"><code>zlib.ZipBuffer</code></a>/<a href=\"zlib.html#class-zlibzipfile\"><code>zlib.ZipFile</code></a> expose. As with those, the\nsynchronous methods here block the Node.js event loop and further JavaScript\nexecution until the operation - including any deflate/inflate pass -\ncompletes.</p>\n<pre><code class=\"language-cjs\">const vfs = require('node:vfs');\nconst zlib = require('node:zlib');\nconst { readFileSync } = require('node:fs');\n\nasync function main() {\n  const zip = new zlib.ZipBuffer(readFileSync('archive.zip'));\n  const archiveVfs = vfs.create(new vfs.ZipProvider(zip));\n\n  console.log(await archiveVfs.promises.readdir('/'));\n  await archiveVfs.promises.writeFile('/new.txt', 'hello');\n}\nmain();\n</code></pre>",
+          "signatures": [
+            {
+              "textRaw": "`new ZipProvider(source)`",
+              "name": "ZipProvider",
+              "type": "ctor",
+              "meta": {
+                "added": [
+                  "v26.9.0"
+                ],
+                "changes": []
+              },
+              "params": [
+                {
+                  "textRaw": "`source` {zlib.ZipBuffer|zlib.ZipFile} An already-open archive.",
+                  "name": "source",
+                  "type": "zlib.ZipBuffer|zlib.ZipFile",
+                  "desc": "An already-open archive."
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "displayName": "Virtual File System"
+    }
+  ]
+}
