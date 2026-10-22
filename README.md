@@ -5,16 +5,35 @@ This is a *fun* mod of Node.JS that initially embedded a modified version of dco
 
 Thanks to the inspiration from dcodeIO et al =D
 
-## Version 26.12.0
+This branch goes further in embedding the latest TypeScript 7.x via [tsrs](https://github.com/oxc-project/tsrs), a Rust-based, high performant port of tsc.
+
+## Version 26.12.0 + TS 7.1.0 (tsrs)
 * Update to Node.JS 26.12.0 baseline.
+* Embed experimental Rust-based TS 7.1.0-dev via [tsrs](https://github.com/oxc-project/tsrs) [0.18.0](https://github.com/oxc-project/tsrs/commit/1932525c59ab3d8ab93d117df4b85acb998c1096).
 
 It embeds:
 * DS v1.2.3.
 * CS v2.7.0.
-* TS v6.0.3.
+* TS v6.0.3, TS 7.1.0-dev via tsrs 0.18.0.
 
 Refer to prior readmes for old changes.
 * `--experimental-strip-types` is disabled (in favour of full TS transpiler), although Node.JS 23.6.0 enables it by default.
+
+### Using TS7 (tsrs)
+Default is still TS6. To use TS7:
+```
+PowerShell:  $env:TS_ENGINE='tsrs'; node yourscript.ds
+cmd:         set TS_ENGINE=tsrs && node yourscript.ds
+bash:        TS_ENGINE=tsrs node yourscript.ds
+```
+Set it as a user `environment variable` if you want it on all the time.
+
+Can be toggled during runtime too:
+```js
+process.env.TS_ENGINE = 'tsrs'; //enable use of TS7/tsrs for subsequent #ts codes loaded
+//...
+delete process.env.TS_ENGINE; //disable TS7, and restore use of TS6
+```
 
 ## Usage
 The mod thus allows Node.JS+ to run .ds, .cs and .ts scripts directly for D Script, CoffeeScript and TypeScript directly. D being just a simple moniker for preprocessor sprinkled scripts.
